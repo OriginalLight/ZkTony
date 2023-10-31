@@ -26,4 +26,5 @@
     <string name="confirm">Confirm</string>
     <string name="downloading">Downloading</string>
     <string name="copyright">Copyright © 2023 Zktony Inc. All rights reserved.</string>
+    <string name="remark">Remark</string>
 </resources>

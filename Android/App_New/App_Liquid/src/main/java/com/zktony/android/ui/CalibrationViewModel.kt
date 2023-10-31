@@ -65,15 +65,15 @@ class CalibrationViewModel @Inject constructor(
 
             is CalibrationUiEvent.Delete -> viewModelScope.launch { dao.deleteById(uiEvent.id) }
             is CalibrationUiEvent.Update -> viewModelScope.launch { dao.update(uiEvent.calibration) }
-            is CalibrationUiEvent.AddLiquid -> addLiquid(uiEvent.index, uiEvent.step)
+            is CalibrationUiEvent.Transfer -> transfer(uiEvent.index, uiEvent.turns)
             is CalibrationUiEvent.Message -> _message.value = uiEvent.message
         }
     }
 
-    private fun addLiquid(index: Int, step: Long) {
+    private fun transfer(index: Int, turns: Double) {
         viewModelScope.launch {
             _uiFlags.value = UiFlags.PUMP
-            start { with(index + 2, step) }
+            start { with(index, (turns * 3200L).toLong()) }
             _uiFlags.value = UiFlags.NONE
         }
     }
@@ -86,7 +86,7 @@ data class CalibrationUiState(
 )
 
 sealed class CalibrationUiEvent {
-    data class AddLiquid(val index: Int, val step: Long) : CalibrationUiEvent()
+    data class Transfer(val index: Int, val turns: Double) : CalibrationUiEvent()
     data class Delete(val id: Long) : CalibrationUiEvent()
     data class Insert(val displayText: String) : CalibrationUiEvent()
     data class NavTo(val page: Int) : CalibrationUiEvent()

@@ -19,11 +19,10 @@ import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.SerialPortUtils.readWithTemperature
-import com.zktony.android.utils.SerialPortUtils.readWithValve
 import com.zktony.android.utils.SerialPortUtils.writeRegister
 import com.zktony.android.utils.SerialPortUtils.writeWithTemperature
-import com.zktony.serialport.ext.toAsciiString
-import com.zktony.serialport.lifecycle.Callback
+import com.zktony.serialport.command.runze.RunzeProtocol
+import com.zktony.serialport.lifecycle.SerialStoreUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -72,7 +71,39 @@ class HomeViewModel @Inject constructor(
                     _uiState.value = it
                 }
             }
-            launch { init() }
+            launch {
+                // 根据模块数量配置
+                val coll = dataStore.readData(Constants.ZT_0000, 4)
+                repeat(coll / 2) {
+                    // 读取阀门状态
+                    SerialStoreUtils.get("rtu")?.sendByteArray(bytes = RunzeProtocol().apply {
+                        this.slaveAddr = it.toByte()
+                        funcCode = 0x3E
+                        data = byteArrayOf(0x00, 0x00)
+                    }.toByteArray())
+                    delay(300L)
+                }
+                // 设置初始温度
+                writeWithTemperature(0, dataStore.readData(Constants.ZT_0001, 4.0))
+                delay(500L)
+                repeat(coll) {
+                    writeWithTemperature(it + 1, 26.0)
+                    delay(500L)
+                }
+                // 设置定时查询温度
+                while (true) {
+                    delay(3000L)
+                    repeat(coll + 1) {
+                        readWithTemperature(it) { address, temp ->
+                            _stand.value = _stand.value.copy(
+                                insulation = _stand.value.insulation.toMutableList().apply {
+                                    this[address] = temp
+                                })
+                        }
+                        delay(100L)
+                    }
+                }
+            }
             launch {
                 jobExecutorUtils.callback = { event ->
                     when (event) {
@@ -175,46 +206,6 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
-
-    private suspend fun init() {
-        repeat(4) {
-            // 读取阀门状态
-            readWithValve(slaveAddr = it)
-            delay(300L)
-        }
-        val coll = dataStore.readData(Constants.ZT_0000, 4)
-        writeWithTemperature(0, dataStore.readData(Constants.ZT_0001, 4.0))
-        delay(500L)
-        repeat(coll) {
-            writeWithTemperature(it + 1, 26.0)
-            delay(500L)
-        }
-        _stand.value = _stand.value.copy(insulation = List(coll + 1) { 0.0 })
-        while (true) {
-            delay(3000L)
-            repeat(coll + 1) {
-                readWithTemperature(it, object : Callback {
-                    override fun callback(byteArray: ByteArray) {
-                        val ascii = byteArray.toAsciiString()
-                        val address = ascii.substring(ascii.length - 2, ascii.length - 1).toInt()
-                        val data = ascii.replace("TC1:TCACTUALTEMP=", "").split("@")[0].format()
-                        _stand.value = _stand.value.copy(
-                            insulation = _stand.value.insulation.toMutableList().apply {
-                                this[address] = data.toDoubleOrNull() ?: 0.0
-                            })
-                    }
-
-                    override fun exception(ex: Exception) {
-                        _stand.value = _stand.value.copy(
-                            insulation = _stand.value.insulation.toMutableList().apply {
-                                this[it] = 0.0
-                            })
-                    }
-                })
-                delay(100L)
-            }
-        }
-    }
 }
 
 data class HomeUiState(
@@ -226,7 +217,7 @@ data class HomeUiState(
 )
 
 data class StandState(
-    val insulation: List<Double> = emptyList(),
+    val insulation: List<Double> = List(9) { 0.0 },
     val shaker: Boolean = false
 )
 

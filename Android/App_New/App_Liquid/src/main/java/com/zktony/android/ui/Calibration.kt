@@ -191,7 +191,7 @@ fun CalibrationDetail(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Text(text = "泵编号", style = MaterialTheme.typography.titleMedium)
+                Text(text = "编号", style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.weight(1f))
                 BasicTextField(
                     modifier = Modifier.width(64.dp),
@@ -278,7 +278,7 @@ fun CalibrationDetail(
                 onClick = { flag ->
                     scope.launch {
                         if (flag == 0) {
-                            uiEvent(CalibrationUiEvent.AddLiquid(selected.index, item.y.toLong()))
+                            uiEvent(CalibrationUiEvent.Transfer(selected.index, item.y))
                         } else {
                             val points = selected.points.toMutableList()
                             points.remove(item)

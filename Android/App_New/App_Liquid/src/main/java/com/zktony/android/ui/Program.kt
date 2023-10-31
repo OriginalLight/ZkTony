@@ -338,7 +338,7 @@ fun ProgramInput(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 modifier = Modifier.width(48.dp),
-                                text = "C/${selected.column}",
+                                text = "竖/${selected.column}",
                                 textAlign = TextAlign.Center
                             )
                             Slider(
@@ -363,7 +363,7 @@ fun ProgramInput(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 modifier = Modifier.width(48.dp),
-                                text = "R/${selected.row}",
+                                text = "横/${selected.row}",
                                 textAlign = TextAlign.Center
                             )
                             Slider(
@@ -444,7 +444,7 @@ fun ProgramInput(
                 item {
                     CircleTabRow(
                         modifier = Modifier.weight(0.5f),
-                        tabItems = listOf("M0", "M1", "M2", "M3", "M4", "M5"),
+                        tabItems = listOf("P1", "P2", "P3", "P4", "P5", "P6"),
                         selected = volumeIndex,
                     ) {
                         scope.launch {

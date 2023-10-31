@@ -6,10 +6,11 @@ import com.zktony.serialport.abstractSerialHelperOf
 import com.zktony.serialport.command.modbus.RtuProtocol
 import com.zktony.serialport.command.runze.RunzeProtocol
 import com.zktony.serialport.ext.readInt16BE
+import com.zktony.serialport.ext.toAsciiString
 import com.zktony.serialport.ext.writeInt16BE
 import com.zktony.serialport.ext.writeInt32BE
 import com.zktony.serialport.ext.writeInt8
-import com.zktony.serialport.lifecycle.Callback
+import com.zktony.serialport.lifecycle.SerialResult
 import com.zktony.serialport.lifecycle.SerialStoreUtils
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
@@ -28,7 +29,6 @@ object SerialPortUtils {
         // 初始化zkty串口
         SerialStoreUtils.put("zkty", abstractSerialHelperOf {
             baudRate = 57600
-            log = true
         })
         // rtu串口全局回调
         SerialStoreUtils.get("rtu")?.callbackHandler = { bytes ->
@@ -60,31 +60,25 @@ object SerialPortUtils {
      * 读取寄存器
      */
     suspend fun readRegister(slaveAddr: Int, startAddr: Int, quantity: Int) {
-        val rtu = RtuProtocol().apply {
-            this.slaveAddr = (slaveAddr + 1).toByte()
-            funcCode = 0x03
-            data = ByteArray(4).writeInt16BE(startAddr).writeInt16BE(quantity, 2)
-        }
-        SerialStoreUtils.get("rtu")?.sendByteArray(bytes = rtu.toByteArray())
+
     }
 
     /**
      * 写入 16 位整数
      */
     suspend fun writeRegister(slaveAddr: Int, startAddr: Int, value: Int) {
-        val rtu = RtuProtocol().apply {
+        SerialStoreUtils.get("rtu")?.sendByteArray(bytes = RtuProtocol().apply {
             this.slaveAddr = (slaveAddr + 1).toByte()
             funcCode = 0x06
             data = ByteArray(4).writeInt16BE(startAddr).writeInt16BE(value, 2)
-        }
-        SerialStoreUtils.get("rtu")?.sendByteArray(bytes = rtu.toByteArray())
+        }.toByteArray())
     }
 
     /**
      * 写入 32 位整数
      */
     suspend fun writeRegister(slaveAddr: Int, startAddr: Int, value: Long) {
-        val rtu = RtuProtocol().apply {
+        SerialStoreUtils.get("rtu")?.sendByteArray(bytes = RtuProtocol().apply {
             val byteArray = ByteArray(4).writeInt32BE(value)
             this.slaveAddr = (slaveAddr + 1).toByte()
             funcCode = 0x10
@@ -94,20 +88,7 @@ object SerialPortUtils {
                 .writeInt16BE(startAddr)
                 .writeInt16BE(2, 2)
                 .writeInt8(4, 4)
-        }
-        SerialStoreUtils.get("rtu")?.sendByteArray(bytes = rtu.toByteArray())
-    }
-
-    /**
-     * 读取阀门状态
-     */
-    suspend fun readWithValve(slaveAddr: Int) {
-        val runze = RunzeProtocol().apply {
-            this.slaveAddr = slaveAddr.toByte()
-            funcCode = 0x3E
-            data = byteArrayOf(0x00, 0x00)
-        }
-        SerialStoreUtils.get("rtu")?.sendByteArray(bytes = runze.toByteArray())
+        }.toByteArray())
     }
 
     /**
@@ -118,20 +99,27 @@ object SerialPortUtils {
         if (current == channel) return
         try {
             withTimeout((current - channel).absoluteValue * 1000L) {
-                val runze = RunzeProtocol().apply {
+                // 切阀命令
+                SerialStoreUtils.get("rtu")?.sendByteArray(bytes = RunzeProtocol().apply {
                     this.slaveAddr = slaveAddr.toByte()
                     funcCode = 0x44
                     data = byteArrayOf(channel.toByte(), 0x00)
-                }
-                SerialStoreUtils.get("rtu")?.sendByteArray(bytes = runze.toByteArray())
+                }.toByteArray())
 
                 while (hpv[slaveAddr] != channel) {
+                    // 减小反应时间
                     repeat(3) {
                         delay(100L)
                         if (hpv[slaveAddr] == channel) return@withTimeout
                     }
-                    readWithValve(slaveAddr)
+                    // 读取阀门状态
+                    SerialStoreUtils.get("rtu")?.sendByteArray(bytes = RunzeProtocol().apply {
+                        this.slaveAddr = slaveAddr.toByte()
+                        funcCode = 0x3E
+                        data = byteArrayOf(0x00, 0x00)
+                    }.toByteArray())
                 }
+
             }
         } catch (ex: TimeoutCancellationException) {
             if (hpv[slaveAddr] != channel && retry > 0) {
@@ -151,11 +139,17 @@ object SerialPortUtils {
                 writeRegister(startAddr = 222, slaveAddr = slaveAddr, value = value)
                 hps[slaveAddr] = 1
                 while ((hps[slaveAddr] ?: 0) != 0) {
+                    // 减小反应时间
                     repeat(3) {
                         delay(100L)
                         if ((hps[slaveAddr] ?: 0) == 0) return@withTimeout
                     }
-                    readRegister(slaveAddr = slaveAddr, startAddr = 25, quantity = 1)
+                    // 读取当前的速度
+                    SerialStoreUtils.get("rtu")?.sendByteArray(bytes = RtuProtocol().apply {
+                        this.slaveAddr = (slaveAddr + 1).toByte()
+                        funcCode = 0x03
+                        data = ByteArray(4).writeInt16BE(25).writeInt16BE(1, 2)
+                    }.toByteArray())
                 }
             }
         } catch (ex: TimeoutCancellationException) {
@@ -176,8 +170,19 @@ object SerialPortUtils {
     /**
      * 读取温度
      */
-    suspend fun readWithTemperature(id: Int, callback: Callback) {
-        SerialStoreUtils.get("zkty")
-            ?.sendAsciiString("TC1:TCACTUALTEMP?@$id\n", callback = callback)
+    suspend fun readWithTemperature(id: Int, block: (Int, Double) -> Unit) {
+        SerialStoreUtils.get("zkty")?.sendAsciiString("TC1:TCACTUALTEMP?@$id\n") { res ->
+            when (res) {
+                is SerialResult.Success -> {
+                    val ascii = res.byteArray.toAsciiString()
+                    val address =
+                        ascii.substring(ascii.length - 2, ascii.length - 1).toInt()
+                    val data = ascii.replace("TC1:TCACTUALTEMP=", "").split("@")[0].format()
+                    block(address, data.toDoubleOrNull() ?: 0.0)
+                }
+
+                else -> {}
+            }
+        }
     }
 }

@@ -34,7 +34,7 @@ object AlgorithmUtils {
         val slopeList = mutableListOf<Double>()
         points.forEach {
             if (it.x == 0.0) return@forEach
-            slopeList.add(it.y / it.x)
+            slopeList.add(it.y * 3200 / it.x)
         }
         if (slopeList.isEmpty()) {
             return { x -> x * 100 }

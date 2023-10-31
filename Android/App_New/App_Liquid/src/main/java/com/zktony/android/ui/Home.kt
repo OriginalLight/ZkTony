@@ -50,6 +50,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.components.CountDownDialog
+import com.zktony.android.ui.components.FinishDialog
 import com.zktony.android.ui.components.HomeAppBar
 import com.zktony.android.ui.components.OrificePlate
 import com.zktony.android.ui.navigation.Route
@@ -189,6 +190,14 @@ fun HomeContent(
     val info by remember(uiState.jobState.orificePlate) {
         mutableStateOf(uiState.jobState.orificePlate.getInfo())
     }
+    val tankAbscissa by rememberDataSaverState(
+        key = Constants.ZT_0003,
+        default = 0.0
+    )
+    val tankOrdinate by rememberDataSaverState(
+        key = Constants.ZT_0004,
+        default = 0.0
+    )
 
     LaunchedEffect(key1 = entities) {
         if (entities.isEmpty()) {
@@ -222,6 +231,30 @@ fun HomeContent(
         )
     }
 
+    if (uiState.uiFlags == UiFlags.DIALOG) {
+        FinishDialog { code ->
+            scope.launch {
+                when (code) {
+                    0 -> {
+                        uiEvent(HomeUiEvent.UiFlags(UiFlags.NONE))
+                    }
+                    1 -> {
+                        uiEvent(HomeUiEvent.Reset)
+                    }
+                    else -> {
+                        scope.launch {
+                            start {
+                                with(index = 0, pdv = tankAbscissa)
+                                with(index = 1, pdv = tankOrdinate)
+                            }
+                        }
+                        uiEvent(HomeUiEvent.UiFlags(UiFlags.NONE))
+                    }
+                }
+            }
+        }
+    }
+
     Row(
         modifier = Modifier
             .fillMaxSize()
@@ -251,8 +284,9 @@ fun HomeContent(
                     },
                 headlineContent = {
                     Text(
+                        modifier = Modifier.padding(vertical = 8.dp),
                         text = selected.displayText,
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -447,15 +481,6 @@ fun HomeContent(
                         text = if (uiState.uiFlags == UiFlags.PIPELINE_OUT) "回吸中" else "回吸",
                         style = MaterialTheme.typography.titleMedium,
                         color = if (uiState.uiFlags == UiFlags.PIPELINE_OUT) Color.Red else Color.Unspecified
-                    )
-
-                    val tankAbscissa by rememberDataSaverState(
-                        key = Constants.ZT_0003,
-                        default = 0.0
-                    )
-                    val tankOrdinate by rememberDataSaverState(
-                        key = Constants.ZT_0004,
-                        default = 0.0
                     )
 
                     Text(

@@ -15,6 +15,7 @@ data class Motor(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,
     val index: Int = 0,
+    val displayText: String,
     val speed: Long = 600L,
     val acceleration: Long = 300L,
     val deceleration: Long = 400L,

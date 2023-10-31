@@ -11,4 +11,5 @@ object UiFlags {
     const val PIPELINE_IN = 3
     const val PIPELINE_OUT = 4
     const val PUMP = 5
+    const val DIALOG = 6
 }

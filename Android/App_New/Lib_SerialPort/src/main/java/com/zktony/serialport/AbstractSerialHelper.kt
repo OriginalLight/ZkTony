@@ -4,7 +4,7 @@ import android.util.Log
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.ext.ascii2ByteArray
 import com.zktony.serialport.ext.hex2ByteArray
-import com.zktony.serialport.lifecycle.Callback
+import com.zktony.serialport.lifecycle.SerialResult
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
 import java.io.IOException
@@ -49,8 +49,12 @@ abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
      *
      * @param bytes byte data
      */
-    suspend fun sendByteArray(bytes: ByteArray, timeOut: Long = 1000L, callback: Callback? = null) {
-        if (callback == null) {
+    suspend fun sendByteArray(
+        bytes: ByteArray,
+        timeOut: Long = 1000L,
+        block: ((SerialResult) -> Unit)? = null
+    ) {
+        if (block == null) {
             addByteArrayToQueue(bytes)
         } else {
             try {
@@ -61,10 +65,10 @@ abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
                     while (ref.isEmpty()) {
                         delay(10L)
                     }
-                    callback.callback(ref)
+                    block(SerialResult.Success(ref))
                 }
             } catch (ex: Exception) {
-                callback.exception(ex)
+                block(SerialResult.Failure(ex))
             } finally {
                 callbackHandler = null
             }
@@ -76,8 +80,12 @@ abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
      *
      * @param hex String
      */
-    suspend fun sendHexString(hex: String, timeOut: Long = 1000L, callback: Callback? = null) {
-        sendByteArray(hex.hex2ByteArray(), timeOut, callback)
+    suspend fun sendHexString(
+        hex: String,
+        timeOut: Long = 1000L,
+        block: ((SerialResult) -> Unit)? = null
+    ) {
+        sendByteArray(hex.hex2ByteArray(), timeOut, block)
     }
 
     /**
@@ -85,8 +93,12 @@ abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
      *
      * @param ascii String
      */
-    suspend fun sendAsciiString(ascii: String, timeOut: Long = 1000L, callback: Callback? = null) {
-        sendByteArray(ascii.ascii2ByteArray(true), timeOut, callback)
+    suspend fun sendAsciiString(
+        ascii: String,
+        timeOut: Long = 1000L,
+        block: ((SerialResult) -> Unit)? = null
+    ) {
+        sendByteArray(ascii.ascii2ByteArray(true), timeOut, block)
     }
 
 

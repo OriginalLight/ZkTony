@@ -202,7 +202,7 @@ fun PointItem(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 Text(
-                                    text = "出液",
+                                    text = "向量",
                                     fontStyle = FontStyle.Italic,
                                     fontSize = 14.sp,
                                     fontFamily = FontFamily.Serif,
@@ -236,7 +236,7 @@ fun PointItem(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 Text(
-                                    text = "步数",
+                                    text = "圈数",
                                     fontStyle = FontStyle.Italic,
                                     fontSize = 14.sp,
                                     fontFamily = FontFamily.Serif,
@@ -268,7 +268,7 @@ fun PointItem(
                         .clip(MaterialTheme.shapes.small)
                         .clickable { if (uiState.uiFlags == UiFlags.NONE) onClick(0) }
                         .padding(vertical = 4.dp, horizontal = 8.dp),
-                    text = "加液",
+                    text = "移动",
                     style = MaterialTheme.typography.bodyMedium,
                     color = if (uiState.uiFlags == UiFlags.NONE) MaterialTheme.colorScheme.onSurface else Color.Gray
                 )
@@ -367,22 +367,16 @@ fun MotorItem(
                 onLongClick = { delete = true },
             ),
         headlineContent = {
-            Column(modifier = Modifier.padding(start = 16.dp)) {
-                Text(
-                    text = "A - ${item.acceleration}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-
-                Text(
-                    text = "D - ${item.deceleration}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-
-                Text(
-                    text = "S - ${item.speed}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
+            Text(
+                text = item.displayText,
+                style = MaterialTheme.typography.bodyLarge
+            )
+        },
+        supportingContent = {
+            Text(
+                text = "ADS - ${item.acceleration}/${item.deceleration}/${item.speed}",
+                style = MaterialTheme.typography.bodyMedium
+            )
         },
         leadingContent = {
             Text(

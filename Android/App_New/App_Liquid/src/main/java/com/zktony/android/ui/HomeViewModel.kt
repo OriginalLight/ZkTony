@@ -97,6 +97,7 @@ class HomeViewModel @Inject constructor(
             is HomeUiEvent.Pipeline -> pipeline(uiEvent.index)
             is HomeUiEvent.Reset -> init()
             is HomeUiEvent.Resume -> _status.value = JobState.RUNNING
+            is HomeUiEvent.UiFlags -> _uiFlags.value = uiEvent.uiFlags
             is HomeUiEvent.Start -> startJob()
             is HomeUiEvent.Stop -> stopJob()
             is HomeUiEvent.ToggleSelected -> toggleSelected(uiEvent.id)
@@ -151,9 +152,9 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun startJob() {
-        _status.value = JobState.RUNNING
         _job.value = viewModelScope.launch {
             try {
+                _status.value = JobState.RUNNING
                 val selected =
                     dao.getById(_selected.value).firstOrNull() ?: throw Exception("程序为空")
                 if (selected.orificePlates.isEmpty()) throw Exception("加液孔板为空")
@@ -170,6 +171,9 @@ class HomeViewModel @Inject constructor(
                         hybridAlgorithm(op)
                     }
                 }
+                if (_job.value?.isCancelled == false) {
+                    _uiFlags.value = UiFlags.DIALOG
+                }
             } catch (ex: Exception) {
                 ex.printStackTrace()
             } finally {
@@ -182,7 +186,6 @@ class HomeViewModel @Inject constructor(
     private fun stopJob() {
         viewModelScope.launch {
             _job.value?.cancel()
-            _job.value = null
             stop(0, 1, 2, 3, 4, 5, 6, 7)
         }
     }
@@ -237,7 +240,7 @@ class HomeViewModel @Inject constructor(
         val column = op.column
         for (i in 0 until ceil(row / 6.0).toInt()) {
             for (j in if (i % 2 == 0) 0 until column else column - 1 downTo 0) {
-                if (_job.value == null) return
+                if (_job.value?.isCancelled == true) return
 
                 var next = false
                 repeat(6) {
@@ -293,7 +296,7 @@ class HomeViewModel @Inject constructor(
         val rowSpace = (coordinate[1].x - coordinate[0].x) / (row - 1)
         for (i in 0 until row + 5) {
             for (j in if (i % 2 == 0) 0 until column else column - 1 downTo 0) {
-                if (_job.value == null) return
+                if (_job.value?.isCancelled == true) return
                 var next = false
                 repeat(6) {
                     if (i - 5 + it in 0 until row) {
@@ -375,6 +378,7 @@ sealed class HomeUiEvent {
     data class Pipeline(val index: Int) : HomeUiEvent()
     data class ToggleSelected(val id: Long) : HomeUiEvent()
     data class Message(val message: String?) : HomeUiEvent()
+    data class UiFlags(val uiFlags: Int) : HomeUiEvent()
     data object Pause : HomeUiEvent()
     data object Reset : HomeUiEvent()
     data object Resume : HomeUiEvent()

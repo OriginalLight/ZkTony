@@ -29,7 +29,7 @@ class StartBuilder {
             val ba2 = ByteArray(12)
             ba1.writeInt8(index, 0).writeInt32LE(step, 1)
             if (ads == null) {
-                val motor = AppStateUtils.hpm[index] ?: Motor()
+                val motor = AppStateUtils.hpm[index] ?: Motor(displayText = "Default")
                 ba2.writeInt32LE(motor.acceleration, 0).writeInt32LE(motor.deceleration, 4)
                     .writeInt32LE(motor.speed, 8)
             } else {

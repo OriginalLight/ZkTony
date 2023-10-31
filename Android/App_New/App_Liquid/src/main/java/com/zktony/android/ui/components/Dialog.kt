@@ -183,7 +183,9 @@ fun CountDownDialog(
                             .weight(1f)
                             .padding(horizontal = 16.dp),
                         onClick = {
-                            if (isRunning) { onStop() }
+                            if (isRunning) {
+                                onStop()
+                            }
                             onCancel()
                         },
                     ) {
@@ -214,6 +216,60 @@ fun CountDownDialog(
     }
 }
 
+@Composable
+fun FinishDialog(onClick: (Int) -> Unit) {
+    Dialog(onDismissRequest = { onClick(0) }) {
+        ElevatedCard {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = "运行完成",
+                    style = MaterialTheme.typography.titleMedium,
+                )
+
+                Text(
+                    text = "请选择下一步操作",
+                    style = MaterialTheme.typography.titleLarge,
+                )
+
+                Row {
+                    OutlinedButton(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 16.dp),
+                        onClick = { onClick(0) },
+                    ) {
+                        Text(text = "返回")
+                    }
+
+                    Button(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 16.dp),
+                        onClick = { onClick(1) },
+                    ) {
+                        Text(text = "复位")
+                    }
+
+                    Button(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 16.dp),
+                        onClick = { onClick(2) }
+                    ) {
+                        Text(text = "移动到废液槽")
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Preview
 @Composable
 fun CountDownDialogPreview() {
@@ -222,4 +278,10 @@ fun CountDownDialogPreview() {
         onStop = {},
         onCancel = {}
     )
+}
+
+@Preview(device = "id:pixel_tablet")
+@Composable
+fun FinishDialogPreview() {
+    FinishDialog(onClick = {})
 }

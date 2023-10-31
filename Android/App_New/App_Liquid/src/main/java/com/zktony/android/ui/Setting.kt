@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Cyclone
 import androidx.compose.material.icons.filled.Numbers
 import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.TrendingDown
 import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material.icons.filled.Tune
@@ -497,7 +498,8 @@ fun MotorDetail(
     val softKeyboard = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
 
-    val selected = uiState.entities.find { it.id == uiState.selected } ?: Motor()
+    val selected = uiState.entities.find { it.id == uiState.selected } ?: Motor(displayText = "None")
+    var displayText by remember { mutableStateOf(selected.displayText) }
     var acceleration by remember { mutableStateOf(selected.acceleration.toString()) }
     var deceleration by remember { mutableStateOf(selected.deceleration.toString()) }
     var speed by remember { mutableStateOf(selected.speed.toString()) }
@@ -568,11 +570,7 @@ fun MotorDetail(
                 onValueChange = {
                     scope.launch {
                         acceleration = it
-                        uiEvent(
-                            SettingUiEvent.Update(
-                                selected.copy(acceleration = it.toLongOrNull() ?: 0L)
-                            )
-                        )
+                        uiEvent(SettingUiEvent.Update(selected.copy(acceleration = it.toLongOrNull() ?: 0L)))
                     }
                 },
                 leadingIcon = {
@@ -600,13 +598,7 @@ fun MotorDetail(
                 onValueChange = {
                     scope.launch {
                         deceleration = it
-                        uiEvent(
-                            SettingUiEvent.Update(
-                                selected.copy(
-                                    deceleration = it.toLongOrNull() ?: 0L
-                                )
-                            )
-                        )
+                        uiEvent(SettingUiEvent.Update(selected.copy(deceleration = it.toLongOrNull() ?: 0L)))
                     }
                 },
                 leadingIcon = {
@@ -634,13 +626,7 @@ fun MotorDetail(
                 onValueChange = {
                     scope.launch {
                         speed = it
-                        uiEvent(
-                            SettingUiEvent.Update(
-                                selected.copy(
-                                    speed = it.toLongOrNull() ?: 0L
-                                )
-                            )
-                        )
+                        uiEvent(SettingUiEvent.Update(selected.copy(speed = it.toLongOrNull() ?: 0L)))
                     }
                 },
                 leadingIcon = {
@@ -655,6 +641,37 @@ fun MotorDetail(
                     Text(text = stringResource(id = R.string.speed), style = textStyle)
                 },
                 keyboardOptions = keyboardOptions,
+                keyboardActions = keyboardActions,
+                shape = CircleShape,
+                colors = colors,
+                textStyle = textStyle,
+            )
+        }
+        item {
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = displayText,
+                onValueChange = {
+                    scope.launch {
+                        displayText = it
+                        uiEvent(SettingUiEvent.Update(selected.copy(displayText = it)))
+                    }
+                },
+                leadingIcon = {
+                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                        Icon(
+                            imageVector = Icons.Default.TextFields,
+                            contentDescription = stringResource(id = R.string.remark)
+                        )
+                    }
+                },
+                suffix = {
+                    Text(text = stringResource(id = R.string.remark), style = textStyle)
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Done,
+                ),
                 keyboardActions = keyboardActions,
                 shape = CircleShape,
                 colors = colors,

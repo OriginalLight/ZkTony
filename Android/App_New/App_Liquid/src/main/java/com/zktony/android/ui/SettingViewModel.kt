@@ -71,7 +71,7 @@ class SettingViewModel @Inject constructor(
         when (uiEvent) {
             is SettingUiEvent.CheckUpdate -> checkUpdate()
             is SettingUiEvent.Delete -> viewModelScope.launch { dao.deleteById(uiEvent.id) }
-            is SettingUiEvent.Insert -> viewModelScope.launch { dao.insert(Motor()) }
+            is SettingUiEvent.Insert -> viewModelScope.launch { dao.insert(Motor(displayText = "None")) }
             is SettingUiEvent.Message -> _message.value = uiEvent.message
             is SettingUiEvent.Navigation -> navigation(uiEvent.navigation)
             is SettingUiEvent.NavTo -> _page.value = uiEvent.page

@@ -15,4 +15,8 @@ object SerialStoreUtils {
     fun remove(key: String) {
         serialStore.remove(key)
     }
+
+    fun clear() {
+        serialStore.clear()
+    }
 }

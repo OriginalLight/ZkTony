@@ -23,8 +23,7 @@ abstract class AbstractSerial {
     private var serialPort: SerialPort? = null
     private var outputStream: OutputStream? = null
     private var inputStream: InputStream? = null
-    private var delay: Long = 10L
-    private var log: Boolean = false
+    private var config: SerialConfig = SerialConfig()
     private var isOpen: Boolean = false
     private val buffer = ByteArrayOutputStream()
     private val byteArrayQueue = LinkedBlockingQueue<ByteArray>()
@@ -36,8 +35,7 @@ abstract class AbstractSerial {
      */
     @Throws(SecurityException::class, IOException::class, InvalidParameterException::class)
     fun open(config: SerialConfig) {
-        delay = config.delay
-        log = config.log
+        this.config = config
         serialPort = SerialPort(
             device = File(config.device),
             baudRate = config.baudRate,
@@ -100,8 +98,8 @@ abstract class AbstractSerial {
             if (buffer.size() > 0) {
                 try {
                     callbackHandler?.let { it(buffer.toByteArray()) }
-                    if (log) {
-                        Log.i("SerialPort", "Receive: ${buffer.toByteArray().toHexString()}")
+                    if (config.log) {
+                        Log.i(config.device, "RX: ${buffer.toByteArray().toHexString()}")
                     }
                 } catch (ex: Exception) {
                     ex.printStackTrace()
@@ -153,11 +151,11 @@ abstract class AbstractSerial {
         executor.execute {
             while (isOpen) {
                 try {
-                    val message = byteArrayQueue.poll(delay, TimeUnit.MILLISECONDS)
+                    val message = byteArrayQueue.poll(config.delay, TimeUnit.MILLISECONDS)
                     if (message != null) {
                         send(message)
-                        if (log) {
-                            Log.i("SerialPort", "Send: ${message.toHexString()}")
+                        if (config.log) {
+                            Log.i(config.device, "TX: ${message.toHexString()}")
                         }
                     }
                 } catch (ex: Exception) {
