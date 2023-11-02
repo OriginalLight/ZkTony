@@ -387,7 +387,7 @@ fun CalibrationList(
                                 tx {
                                     move(MoveType.MOVE_PULSE) {
                                         index = 1
-                                        pulse = (3200L * fwgd.value.toDouble()).toLong();
+                                        pulse = (3200L * fwgd.value.toDouble()).toLong()
                                     }
                                 }
                             } catch (e: Exception) {
@@ -840,7 +840,7 @@ fun CalibrationList(
                             try {
                                 tx {
                                     move(MoveType.MOVE_PULSE) {
-                                        index = 1
+                                        index = 0
                                         pulse = (3200L * spgd2.value.toDouble()).toLong();
                                     }
                                 }
@@ -1004,7 +1004,7 @@ fun CalibrationList(
                         valveOne_ex = 0
                         event(
                             CalibrationEvent.Reset(
-                                listOf(5),
+                                listOf(3),
                                 spydjl.value.toDouble(),
                                 xpydjl.value.toDouble(),
                                 fwgd.value.toDouble(),
@@ -1051,7 +1051,7 @@ fun CalibrationList(
                             try {
                                 tx {
                                     move(MoveType.MOVE_PULSE) {
-                                        index = 5
+                                        index = 3
                                         pulse = (3200L * spydjl.value.toDouble()).toLong();
                                     }
                                 }
@@ -1103,8 +1103,8 @@ fun CalibrationList(
                             try {
                                 tx {
                                     move(MoveType.MOVE_PULSE) {
-                                        index = 5
-                                        pulse = (3200L * spkwjl1.value.toDouble()).toLong();
+                                        index = 3
+                                        pulse = (3200L * spkwjl1.value.toDouble()).toLong()
                                     }
                                 }
                             } catch (e: Exception) {
@@ -1155,7 +1155,7 @@ fun CalibrationList(
                             try {
                                 tx {
                                     move(MoveType.MOVE_PULSE) {
-                                        index = 5
+                                        index = 3
                                         pulse = (3200L * spkwjl2.value.toDouble()).toLong();
                                     }
                                 }
@@ -1209,7 +1209,7 @@ fun CalibrationList(
                             try {
                                 tx {
                                     move(MoveType.MOVE_PULSE) {
-                                        index = 5
+                                        index = 3
                                         pulse = (3200L * spkwjl3.value.toDouble()).toLong();
                                     }
                                 }
@@ -1261,7 +1261,7 @@ fun CalibrationList(
                             try {
                                 tx {
                                     move(MoveType.MOVE_PULSE) {
-                                        index = 5
+                                        index = 3
                                         pulse = (3200L * spkwjl4.value.toDouble()).toLong();
                                     }
                                 }
@@ -1313,7 +1313,7 @@ fun CalibrationList(
                             try {
                                 tx {
                                     move(MoveType.MOVE_PULSE) {
-                                        index = 5
+                                        index = 3
                                         pulse = (3200L * spkwjl5.value.toDouble()).toLong();
                                     }
                                 }
@@ -1367,7 +1367,7 @@ fun CalibrationList(
                             try {
                                 tx {
                                     move(MoveType.MOVE_PULSE) {
-                                        index = 5
+                                        index = 3
                                         pulse = (3200L * spkwjl6.value.toDouble()).toLong();
                                     }
                                 }
@@ -1419,7 +1419,7 @@ fun CalibrationList(
                             try {
                                 tx {
                                     move(MoveType.MOVE_PULSE) {
-                                        index = 5
+                                        index = 3
                                         pulse = (3200L * spkwjl7.value.toDouble()).toLong();
                                     }
                                 }
@@ -1471,7 +1471,7 @@ fun CalibrationList(
                             try {
                                 tx {
                                     move(MoveType.MOVE_PULSE) {
-                                        index = 5
+                                        index = 3
                                         pulse = (3200L * spkwjl8.value.toDouble()).toLong();
                                     }
                                 }
@@ -1551,7 +1551,7 @@ fun CalibrationList(
                                 tx {
                                     move(MoveType.MOVE_PULSE) {
                                         index = 4
-                                        pulse = (2599L * xpydjl.value.toDouble()).toLong()
+                                        pulse = (1300 * xpydjl.value.toDouble()).toLong()
                                     }
                                 }
                             } catch (e: Exception) {
@@ -1744,7 +1744,7 @@ fun CalibrationList(
                         scope.launch {
                             tx {
                                 move(MoveType.MOVE_PULSE) {
-                                    index = 3
+                                    index = 5
                                     pulse = 32000L
                                 }
                             }
@@ -1767,7 +1767,7 @@ fun CalibrationList(
                         scope.launch {
                             tx {
                                 move(MoveType.MOVE_PULSE) {
-                                    index = 8
+                                    index = 6
                                     pulse = 32000L
                                 }
                             }

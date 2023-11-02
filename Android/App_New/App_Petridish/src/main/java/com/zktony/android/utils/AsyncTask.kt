@@ -3,12 +3,13 @@ package com.zktony.android.utils
 import com.zktony.android.data.dao.CalibrationDao
 import com.zktony.android.data.dao.MotorDao
 import com.zktony.android.data.entities.Motor
+import com.zktony.android.utils.AppStateUtils.hpc
+import com.zktony.android.utils.AppStateUtils.hpm
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.inject
-import java.util.concurrent.ConcurrentHashMap
 
 /**
  * @author: 刘贺贺
@@ -19,11 +20,7 @@ class AsyncTask {
     private val cd: CalibrationDao by inject(CalibrationDao::class.java)
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    // 电机信息
-    val hpm: MutableMap<Int, Motor> = ConcurrentHashMap()
 
-    // 校准信息
-    val hpc: MutableMap<Int, Double> = ConcurrentHashMap()
 
     init {
         scope.launch {
@@ -68,7 +65,7 @@ class AsyncTask {
                         }
 
                         3 -> {
-                            list.add(Motor(text = "泵", index = i))
+                            list.add(Motor(text = "上盘", index = i))
                         }
 
                         4 -> {
@@ -76,7 +73,7 @@ class AsyncTask {
                         }
 
                         5 -> {
-                            list.add(Motor(text = "上盘", index = i))
+                            list.add(Motor(text = "泵", index = i))
                         }
                     }
 

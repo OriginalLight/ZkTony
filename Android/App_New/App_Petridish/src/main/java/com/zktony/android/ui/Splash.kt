@@ -143,11 +143,12 @@ fun Splash(
                     Button(
                         modifier = Modifier.width(300.dp),
                         onClick = {
+
                             if (clickNum == 0) {
                                 clickNum = 1;
                                 scope.launch {
 
-                                    val ids = listOf(1, 0, 2, 4, 5)
+                                    val ids = listOf(1, 0, 2, 4, 3)
                                     tx {
                                         queryGpio(ids)
                                         delay = 300L
@@ -156,16 +157,33 @@ fun Splash(
                                     // 针对每个电机进行初始化
                                     ids.forEach {
                                         // 如果电机未初始化，则进行初始化
-                                        if (!getGpio(it)) {
-                                            // 进行电机初始化
-                                            tx {
-                                                timeout = 1000L * 60
-                                                move(MoveType.MOVE_PULSE) {
-                                                    index = it
-                                                    pulse = 3200L * -30
-                                                    ads = Triple(50L, 80L, 100L)
-                                                }
+                                        if (it == 3) {
+                                            if (getGpio(it)) {
+                                                println("第一次反向运动")
+                                                // 进行电机初始化
+                                                tx {
+                                                    timeout = 1000L * 60
+                                                    move(MoveType.MOVE_PULSE) {
+                                                        index = it
+                                                        pulse = 3200L * -30
+                                                       
+                                                    }
 
+                                                }
+                                            }
+                                        } else {
+                                            if (!getGpio(it)) {
+                                                println("第一次反向运动")
+                                                // 进行电机初始化
+                                                tx {
+                                                    timeout = 1000L * 60
+                                                    move(MoveType.MOVE_PULSE) {
+                                                        index = it
+                                                        pulse = 3200L * -30
+                                                       
+                                                    }
+
+                                                }
                                             }
                                         }
 
@@ -175,7 +193,7 @@ fun Splash(
                                             move(MoveType.MOVE_PULSE) {
                                                 index = it
                                                 pulse = 800L
-                                                ads = Triple(50L, 80L, 100L)
+                                               
                                             }
                                         }
 
@@ -185,7 +203,7 @@ fun Splash(
                                             move(MoveType.MOVE_PULSE) {
                                                 index = it
                                                 pulse = 3200L * -3
-                                                ads = Triple(50L, 80L, 100L)
+                                               
                                             }
                                         }
                                     }
@@ -193,16 +211,16 @@ fun Splash(
                                     //移动上盘到原点距离
                                     tx {
                                         move(MoveType.MOVE_PULSE) {
-                                            index = 5
+                                            index = 3
                                             pulse = (3200L * spydjl).toLong();
-                                            ads = Triple(50L, 80L, 100L)
+                                           
                                         }
 
                                         //移动下盘到原点距离
                                         move(MoveType.MOVE_PULSE) {
                                             index = 4
-                                            pulse = (2599L * xpydjl).toLong();
-                                            ads = Triple(50L, 80L, 100L)
+                                            pulse = (1300 * xpydjl).toLong();
+                                           
                                         }
 
                                     }
@@ -212,13 +230,13 @@ fun Splash(
                                         move(MoveType.MOVE_PULSE) {
                                             index = 1
                                             pulse = (3200L * fwgd).toLong();
-                                            ads = Triple(50L, 80L, 100L)
+                                           
                                         }
                                         //移动到复位高度
                                         move(MoveType.MOVE_PULSE) {
                                             index = 0
                                             pulse = (3200L * fwgd2).toLong();
-                                            ads = Triple(50L, 80L, 100L)
+                                           
                                         }
                                     }
                                     valveOne.value = 0

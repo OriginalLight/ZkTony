@@ -1,6 +1,7 @@
 package com.zktony.android.utils.tx
 
 import com.zktony.android.data.entities.Motor
+import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.ext.dataSaver
 import com.zktony.serialport.ext.writeInt32LE
 import com.zktony.serialport.ext.writeInt8
@@ -50,7 +51,7 @@ class TxScope {
         val ads = moveScope.ads
         var adsBytes = ByteArray(12)
         if (ads == null) {
-            val hpm = asyncTask.hpm[moveScope.index] ?: Motor()
+            val hpm = AppStateUtils.hpm[moveScope.index] ?: Motor()
             adsBytes.writeInt32LE(hpm.acc, 0).writeInt32LE(hpm.dec, 4).writeInt32LE(hpm.speed, 8)
         } else {
             adsBytes.writeInt32LE(ads.first, 0).writeInt32LE(ads.second, 4)
@@ -71,6 +72,18 @@ class TxScope {
                 }
                 val pulse = ((moveScope.dv / ((jyh - jyq) / 10 * 1000)) * 3200L).toLong()
                 if (pulse != 0L) {
+//                    if (moveScope.index != 3) {
+//                        jyh = dataSaver.readData("jyh", 0f)
+//                        jyq = dataSaver.readData("jyq", 0f)
+//                        val pulse3 = ((moveScope.dv / ((jyh - jyq) / 10 * 1000)) * 3200L).toLong()
+//
+//                        val pulse_multiple = pulse3 / pulse
+//                        val hpm3 = AppStateUtils.hpm[3] ?: Motor()
+//                        val hpm8 = AppStateUtils.hpm[8] ?: Motor()
+//                        val speed = hpm3.speed * pulse_multiple
+//                        adsBytes.writeInt32LE(hpm8.acc, 0).writeInt32LE(hpm8.dec, 4)
+//                            .writeInt32LE(speed, 8)
+//                    }
                     val ba = ByteArray(5)
                     ba.writeInt8(moveScope.index, 0).writeInt32LE(pulse, 1)
                     byteList.addAll(ba.toList())

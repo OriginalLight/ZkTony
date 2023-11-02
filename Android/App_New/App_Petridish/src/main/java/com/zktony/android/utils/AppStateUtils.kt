@@ -1,5 +1,6 @@
 package com.zktony.android.utils
 
+import com.zktony.android.data.entities.Motor
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -16,4 +17,10 @@ object AppStateUtils {
      * GPIO 状态
      */
     val hpg: MutableMap<Int, Boolean> = ConcurrentHashMap()
+
+    // 电机信息
+    val hpm: MutableMap<Int, Motor> = ConcurrentHashMap()
+
+    // 校准信息
+    val hpc: MutableMap<Int, Double> = ConcurrentHashMap()
 }
