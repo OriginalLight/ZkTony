@@ -1,5 +1,6 @@
 package com.zktony.android.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -18,7 +19,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowRight
@@ -29,7 +29,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,6 +46,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.Program
+import com.zktony.android.ui.components.ErrorDialog
 import com.zktony.android.ui.components.HomeAppBar
 import com.zktony.android.ui.components.ModuleItem
 import com.zktony.android.ui.components.ProcessItem
@@ -64,53 +64,56 @@ import com.zktony.android.utils.extra.dateFormat
 import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun HomeRoute(viewModel: HomeViewModel) {
 
     val scope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackbarHostState.current
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     val message by viewModel.message.collectAsStateWithLifecycle()
+    val page by viewModel.page.collectAsStateWithLifecycle()
+    val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
+    val selected by viewModel.selected.collectAsStateWithLifecycle()
+    val jobList by viewModel.jobList.collectAsStateWithLifecycle()
+    val insulation by viewModel.insulation.collectAsStateWithLifecycle()
+    val shaker by viewModel.shaker.collectAsStateWithLifecycle()
+
     val entities = viewModel.entities.collectAsLazyPagingItems()
     val navigation: () -> Unit = {
         scope.launch {
-            when (uiState.page) {
+            when (page) {
                 PageType.HOME -> {}
-                else -> viewModel.uiEvent(HomeUiEvent.NavTo(PageType.HOME))
+                else -> viewModel.dispatch(HomeIntent.NavTo(PageType.HOME))
             }
         }
     }
 
+    BackHandler { navigation() }
+
     LaunchedEffect(key1 = message) {
         message?.let {
             snackbarHostState.showSnackbar(it)
-            viewModel.uiEvent(HomeUiEvent.Message(null))
+            viewModel.dispatch(HomeIntent.Message(null))
         }
     }
 
-    HomeWrapper(
-        entities = entities,
-        uiState = uiState,
-        uiEvent = viewModel::uiEvent,
-        navigation = navigation
-    )
-}
-
-@OptIn(ExperimentalAnimationApi::class)
-@Composable
-fun HomeWrapper(
-    entities: LazyPagingItems<Program>,
-    uiState: HomeUiState,
-    uiEvent: (HomeUiEvent) -> Unit,
-    navigation: () -> Unit
-) {
     Column {
-        HomeAppBar(uiState) { navigation() }
-        ModuleList(uiState, uiEvent)
-        AnimatedContent(targetState = uiState.page) {
-            when (uiState.page) {
-                PageType.HOME -> HomeContent(entities.toList(), uiState, uiEvent)
-                PageType.PROGRAM_LIST -> ProgramList(entities, uiState, uiEvent)
+        HomeAppBar(page) { navigation() }
+        ModuleList(selected, jobList, insulation, viewModel::dispatch)
+        AnimatedContent(targetState = page) {
+            when (page) {
+                PageType.HOME -> HomeContent(
+                    entities.toList(),
+                    selected,
+                    uiFlags,
+                    jobList,
+                    insulation,
+                    shaker,
+                    viewModel::dispatch
+                )
+
+                PageType.PROGRAM_LIST -> ProgramList(entities, selected, viewModel::dispatch)
                 else -> {}
             }
         }
@@ -119,25 +122,27 @@ fun HomeWrapper(
 
 @Composable
 fun ModuleList(
-    uiState: HomeUiState,
-    uiEvent: (HomeUiEvent) -> Unit
+    selected: Int,
+    jobList: List<JobState>,
+    insulation: List<Double>,
+    dispatch: (HomeIntent) -> Unit
 ) {
-    val lazyListState = rememberLazyListState()
     val size by rememberDataSaverState(key = Constants.ZT_0000, default = 4)
     val arrangement = if (size > 4) Arrangement.spacedBy(16.dp) else Arrangement.SpaceBetween
+
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
-        state = lazyListState,
         contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp),
         horizontalArrangement = arrangement
     ) {
         items(size) { index ->
-            ModuleItem(
-                index = index,
-                uiState = uiState,
-                selected = uiState.selected,
-                onClick = { uiEvent(HomeUiEvent.ToggleSelected(index)) }
-            )
+            ModuleItem(index, selected, jobList, insulation) {
+                dispatch(
+                    HomeIntent.ToggleSelected(
+                        index
+                    )
+                )
+            }
         }
     }
 }
@@ -146,13 +151,24 @@ fun ModuleList(
 @Composable
 fun HomeContent(
     entities: List<Program>,
-    uiState: HomeUiState,
-    uiEvent: (HomeUiEvent) -> Unit
+    selected: Int,
+    uiFlags: UiFlags,
+    jobList: List<JobState>,
+    insulation: List<Double>,
+    shaker: Boolean,
+    dispatch: (HomeIntent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackbarHostState.current
     val navigationActions = LocalNavigationActions.current
-    val jobState = uiState.jobList.find { it.index == uiState.selected } ?: JobState()
+    val jobState = jobList.find { it.index == selected } ?: JobState()
+
+    if (uiFlags is UiFlags.Error) {
+        ErrorDialog(
+            message = uiFlags.message,
+            onConfirm = { scope.launch { dispatch(HomeIntent.UiFlags(UiFlags.none())) } }
+        )
+    }
 
     Row(
         modifier = Modifier.padding(horizontal = 32.dp, vertical = 16.dp),
@@ -172,7 +188,7 @@ fun HomeContent(
                             scope.launch {
                                 if (!jobState.isRunning()) {
                                     if (entities.isNotEmpty()) {
-                                        uiEvent(HomeUiEvent.NavTo(PageType.PROGRAM_LIST))
+                                        dispatch(HomeIntent.NavTo(PageType.PROGRAM_LIST))
                                     } else {
                                         navigationActions.navigate(Route.PROGRAM)
                                     }
@@ -220,8 +236,10 @@ fun HomeContent(
                             .clip(CircleShape)
                             .clickable {
                                 scope.launch {
-                                    if (uiState.uiFlags == UiFlags.NONE && jobState.processes.isNotEmpty()) {
-                                        uiEvent(HomeUiEvent.Start(uiState.selected))
+                                    if (uiFlags is UiFlags.None) {
+                                        dispatch(HomeIntent.Start(selected))
+                                    } else {
+                                        snackbarHostState.showSnackbar("WARN 请先停止当前任务")
                                     }
                                 }
                             },
@@ -238,7 +256,7 @@ fun HomeContent(
                             .clip(CircleShape)
                             .clickable {
                                 scope.launch {
-                                    uiEvent(HomeUiEvent.Stop(uiState.selected))
+                                    dispatch(HomeIntent.Stop(selected))
                                 }
                             },
                         imageVector = Icons.Default.Close,
@@ -272,18 +290,12 @@ fun HomeContent(
                         .clickable {
                             scope.launch {
                                 snackbarHostState.showSnackbar(
-                                    message = "当前抗体保温温度 ${
-                                        uiState.stand.insulation.getOrNull(
-                                            0
-                                        ) ?: 0.0
-                                    } ℃",
-                                    actionLabel = "关闭",
-                                    duration = SnackbarDuration.Short
+                                    "INFO 当前抗体温度 ${insulation.getOrNull(0) ?: 0.0} ℃"
                                 )
                             }
                         }
                         .padding(vertical = 8.dp, horizontal = 16.dp),
-                    text = "${uiState.stand.insulation.getOrNull(0) ?: 0.0} ℃",
+                    text = "${insulation.getOrNull(0) ?: 0.0} ℃",
                     style = MaterialTheme.typography.titleMedium
                 )
 
@@ -294,9 +306,9 @@ fun HomeContent(
                             shape = MaterialTheme.shapes.small
                         )
                         .clip(MaterialTheme.shapes.small)
-                        .clickable { scope.launch { uiEvent(HomeUiEvent.Shaker) } }
+                        .clickable { scope.launch { dispatch(HomeIntent.Shaker) } }
                         .padding(vertical = 8.dp, horizontal = 16.dp),
-                    text = if (uiState.stand.shaker) "ON" else "OFF",
+                    text = if (shaker) "ON" else "OFF",
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -307,8 +319,8 @@ fun HomeContent(
 @Composable
 fun ProgramList(
     entities: LazyPagingItems<Program>,
-    uiState: HomeUiState,
-    uiEvent: (HomeUiEvent) -> Unit
+    selected: Int,
+    dispatch: (HomeIntent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
 
@@ -325,8 +337,8 @@ fun ProgramList(
                     .clip(MaterialTheme.shapes.small)
                     .clickable {
                         scope.launch {
-                            uiEvent(HomeUiEvent.ToggleProcess(uiState.selected, item))
-                            uiEvent(HomeUiEvent.NavTo(PageType.HOME))
+                            dispatch(HomeIntent.ToggleProcess(selected, item))
+                            dispatch(HomeIntent.NavTo(PageType.HOME))
                         }
                     },
                 headlineContent = {

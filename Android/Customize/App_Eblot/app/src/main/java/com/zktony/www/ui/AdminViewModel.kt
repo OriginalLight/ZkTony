@@ -14,6 +14,8 @@ import com.zktony.www.BuildConfig
 import com.zktony.www.R
 import com.zktony.www.core.SerialPort
 import com.zktony.www.core.ext.updateDialog
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -31,14 +33,27 @@ class AdminViewModel constructor(
      * 泵开关
      * @param pump [Boolean] true 开 false 关
      */
-    fun touchPump(pump: Boolean) {
-        val cmd = SM.send.value
-        if (pump) {
-            cmd.motorX = 1
+    fun touchPump() {
+        if (uiState.value.job == null)
+        {
+            val job = viewModelScope.launch {
+                SM.send(SM.send.value.apply { motorX = 1 })
+                delay(10 * 1000L)
+                SM.send(SM.send.value.apply { motorX = 0 })
+
+            }
+            job.invokeOnCompletion {
+                _uiState.value = _uiState.value.copy(
+                    job = null
+                )
+            }
+            _uiState.value = _uiState.value.copy(
+                job = job
+            )
         } else {
-            cmd.motorX = 0
+            uiState.value.job?.cancel()
+            SM.send(SM.send.value.apply { motorX = 0 })
         }
-        SM.send(cmd)
     }
 
     /**
@@ -253,5 +268,6 @@ class AdminViewModel constructor(
 data class AdminUiState(
     val application: Application? = null,
     val progress: Int = 0,
-    val loading: Boolean = false
+    val loading: Boolean = false,
+    val job: Job? = null
 )

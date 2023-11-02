@@ -9,8 +9,6 @@ import com.zktony.android.utils.SerialPortUtils.writeWithValve
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,68 +19,53 @@ import javax.inject.Inject
 @HiltViewModel
 class DebugViewModel @Inject constructor() : ViewModel() {
 
-    private val _uiState = MutableStateFlow(DebugUiState())
-    private val _selected = MutableStateFlow(0L)
     private val _page = MutableStateFlow(PageType.DEBUG)
-    private val _uiFlags = MutableStateFlow(UiFlags.NONE)
+    private val _uiFlags = MutableStateFlow<UiFlags>(UiFlags.none())
     private val _message = MutableStateFlow<String?>(null)
 
-    val uiState = _uiState.asStateFlow()
+    val page = _page.asStateFlow()
+    val uiFlags = _uiFlags.asStateFlow()
     val message = _message.asStateFlow()
 
-    init {
+    fun dispatch(intent: DebugIntent) {
+        when (intent) {
+            is DebugIntent.Message -> _message.value = intent.message
+            is DebugIntent.NavTo -> _page.value = intent.page
+            is DebugIntent.Valve -> valve(intent.index, intent.value)
+            is DebugIntent.Transfer -> transfer(intent.index, intent.turns)
+        }
+    }
+
+    private fun valve(index: Int, value: Int) {
         viewModelScope.launch {
-            combine(_selected, _page, _uiFlags) { selected, page, uiFlags ->
-                DebugUiState(selected, page, uiFlags)
-            }.catch { ex ->
+            try {
+                _uiFlags.value = UiFlags.loading()
+                writeWithValve(index, value)
+            } catch (ex: Exception) {
                 _message.value = ex.message
-            }.collect {
-                _uiState.value = it
+            } finally {
+                _uiFlags.value = UiFlags.none()
             }
         }
     }
 
-
-    fun uiEvent(uiEvent: DebugUiEvent) {
-        when (uiEvent) {
-            is DebugUiEvent.Message -> _message.value = uiEvent.message
-            is DebugUiEvent.NavTo -> _page.value = uiEvent.page
-            is DebugUiEvent.ToggleSelected -> _selected.value = uiEvent.id
-            is DebugUiEvent.Valve -> viewModelScope.launch {
-                try {
-                    _uiFlags.value = UiFlags.VALVE
-                    writeWithValve(uiEvent.id, uiEvent.value)
-                } catch (ex: Exception) {
-                    _message.value = ex.message
-                } finally {
-                    _uiFlags.value = UiFlags.NONE
-                }
-            }
-
-            is DebugUiEvent.Pulse -> viewModelScope.launch {
-                try {
-                    _uiFlags.value = UiFlags.PUMP
-                    writeWithPulse(uiEvent.id, uiEvent.value)
-                } catch (ex: Exception) {
-                    _message.value = ex.message
-                } finally {
-                    _uiFlags.value = UiFlags.NONE
-                }
+    private fun transfer(index: Int, turns: Double) {
+        viewModelScope.launch {
+            try {
+                _uiFlags.value = UiFlags.loading()
+                writeWithPulse(index, (turns * 6400).toLong())
+            } catch (ex: Exception) {
+                _message.value = ex.message
+            } finally {
+                _uiFlags.value = UiFlags.none()
             }
         }
     }
 }
 
-data class DebugUiState(
-    val selected: Long = 0L,
-    val page: Int = PageType.DEBUG,
-    val uiFlags: Int = UiFlags.NONE
-)
-
-sealed class DebugUiEvent {
-    data class Message(val message: String?) : DebugUiEvent()
-    data class NavTo(val page: Int) : DebugUiEvent()
-    data class Pulse(val id: Int, val value: Long) : DebugUiEvent()
-    data class ToggleSelected(val id: Long) : DebugUiEvent()
-    data class Valve(val id: Int, val value: Int) : DebugUiEvent()
+sealed class DebugIntent {
+    data class Message(val message: String?) : DebugIntent()
+    data class NavTo(val page: Int) : DebugIntent()
+    data class Transfer(val index: Int, val turns: Double) : DebugIntent()
+    data class Valve(val index: Int, val value: Int) : DebugIntent()
 }

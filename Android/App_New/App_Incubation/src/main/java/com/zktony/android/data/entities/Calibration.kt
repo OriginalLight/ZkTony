@@ -18,7 +18,7 @@ import java.util.Date
 data class Calibration(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,
-    val index: Int = 0,
+    val index: Int = 1,
     val displayText: String,
     val points: List<Point> = emptyList(),
     val enable: Boolean = true,

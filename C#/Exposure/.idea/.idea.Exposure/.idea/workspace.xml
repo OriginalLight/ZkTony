@@ -12,28 +12,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="218c30b2-f65b-45d2-afac-8f962c847297" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../../Android/App_New/Lib_SerialPort/src/main/java/com/zktony/serialport/lifecycle/SerialResult.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/ui/HomeViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/ui/HomeViewModel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/utils/SerialPortUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/utils/SerialPortUtils.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/data/entities/Motor.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/data/entities/Motor.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/ui/Calibration.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/ui/Calibration.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/ui/CalibrationViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/ui/CalibrationViewModel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/ui/Home.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/ui/Home.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/ui/Program.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/ui/Program.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/ui/Setting.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/ui/Setting.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/ui/SettingViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/ui/SettingViewModel.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/ui/components/Items.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/ui/components/Items.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/utils/AlgorithmUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/utils/AlgorithmUtils.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/utils/SerialPortUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/utils/SerialPortUtils.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/utils/internal/StartBuilder.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/utils/internal/StartBuilder.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/res/values-en/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/res/values-en/strings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/res/values-zh/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/res/values-zh/strings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/res/values/strings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Android/App_New/Lib_SerialPort/src/main/java/com/zktony/serialport/AbstractSerial.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/Lib_SerialPort/src/main/java/com/zktony/serialport/AbstractSerial.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Android/App_New/Lib_SerialPort/src/main/java/com/zktony/serialport/AbstractSerialHelper.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/Lib_SerialPort/src/main/java/com/zktony/serialport/AbstractSerialHelper.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Android/App_New/Lib_SerialPort/src/main/java/com/zktony/serialport/lifecycle/Callback.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Android/App_New/Lib_SerialPort/src/main/java/com/zktony/serialport/lifecycle/SerialStoreUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/Lib_SerialPort/src/main/java/com/zktony/serialport/lifecycle/SerialStoreUtils.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Exposure/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Exposure/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -141,7 +120,7 @@
       <workItem from="1697426914729" duration="607000" />
       <workItem from="1698196096396" duration="2644000" />
       <workItem from="1698215321985" duration="2502000" />
-      <workItem from="1698737576397" duration="1209000" />
+      <workItem from="1698737576397" duration="1211000" />
     </task>
     <servers />
   </component>

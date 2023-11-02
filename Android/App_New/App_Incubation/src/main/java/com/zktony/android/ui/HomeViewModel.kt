@@ -27,8 +27,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -44,93 +42,106 @@ class HomeViewModel @Inject constructor(
     private val jobExecutorUtils: JobExecutorUtils
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(HomeUiState())
-    private val _selected = MutableStateFlow(0)
     private val _page = MutableStateFlow(PageType.HOME)
-    private val _uiFlags = MutableStateFlow(UiFlags.NONE)
+    private val _uiFlags = MutableStateFlow<UiFlags>(UiFlags.none())
     private val _message = MutableStateFlow<String?>(null)
+    private val _selected = MutableStateFlow(0)
     private val _jobList = MutableStateFlow(listOf<JobState>())
-    private val _stand = MutableStateFlow(StandState())
+    private val _insulation = MutableStateFlow(List(9) { 0.0 })
+    private val _shaker = MutableStateFlow(false)
 
-    val uiState = _uiState.asStateFlow()
+    val page = _page.asStateFlow()
+    val uiFlags = _uiFlags.asStateFlow()
     val message = _message.asStateFlow()
+    val selected = _selected.asStateFlow()
+    val jobList = _jobList.asStateFlow()
+    val insulation = _insulation.asStateFlow()
+    val shaker = _shaker.asStateFlow()
     val entities = Pager(
         config = PagingConfig(pageSize = 20, initialLoadSize = 40)
     ) { dao.getByPage() }.flow.cachedIn(viewModelScope)
 
     init {
+        prepare()
+        deployJobCallback()
+    }
+
+    fun dispatch(intent: HomeIntent) {
+        when (intent) {
+            is HomeIntent.Message -> _message.value = intent.message
+            is HomeIntent.UiFlags -> _uiFlags.value = intent.uiFlags
+            is HomeIntent.NavTo -> _page.value = intent.page
+            is HomeIntent.ToggleSelected -> _selected.value = intent.id
+            is HomeIntent.Start -> start(intent.index)
+            is HomeIntent.Pause -> pause(intent.index)
+            is HomeIntent.Stop -> stop(intent.index)
+            is HomeIntent.ToggleProcess -> toggleProcess(intent.index, intent.program)
+            is HomeIntent.Shaker -> shaker()
+        }
+    }
+
+    private fun prepare() {
         viewModelScope.launch {
-            launch {
-                combine(
-                    _selected, _page, _uiFlags, _jobList, _stand
-                ) { selected, page, uiFlags, jobList, stand ->
-                    HomeUiState(selected, page, uiFlags, jobList, stand)
-                }.catch { ex ->
-                    _message.value = ex.message
-                }.collect {
-                    _uiState.value = it
-                }
+            // 根据模块数量配置
+            val coll = dataStore.readData(Constants.ZT_0000, 4)
+            repeat(coll / 2) {
+                // 读取阀门状态
+                SerialStoreUtils.get("rtu")?.sendByteArray(bytes = RunzeProtocol().apply {
+                    this.slaveAddr = it.toByte()
+                    funcCode = 0x3E
+                    data = byteArrayOf(0x00, 0x00)
+                }.toByteArray())
+                delay(300L)
             }
-            launch {
-                // 根据模块数量配置
-                val coll = dataStore.readData(Constants.ZT_0000, 4)
-                repeat(coll / 2) {
-                    // 读取阀门状态
-                    SerialStoreUtils.get("rtu")?.sendByteArray(bytes = RunzeProtocol().apply {
-                        this.slaveAddr = it.toByte()
-                        funcCode = 0x3E
-                        data = byteArrayOf(0x00, 0x00)
-                    }.toByteArray())
-                    delay(300L)
-                }
-                // 设置初始温度
-                writeWithTemperature(0, dataStore.readData(Constants.ZT_0001, 4.0))
+            // 设置初始温度
+            writeWithTemperature(0, dataStore.readData(Constants.ZT_0001, 4.0))
+            delay(500L)
+            repeat(coll) {
+                writeWithTemperature(it + 1, 26.0)
                 delay(500L)
-                repeat(coll) {
-                    writeWithTemperature(it + 1, 26.0)
-                    delay(500L)
-                }
-                // 设置定时查询温度
-                while (true) {
-                    delay(3000L)
-                    repeat(coll + 1) {
-                        readWithTemperature(it) { address, temp ->
-                            _stand.value = _stand.value.copy(
-                                insulation = _stand.value.insulation.toMutableList().apply {
-                                    this[address] = temp
-                                })
+            }
+            // 设置定时查询温度
+            while (true) {
+                delay(3000L)
+                repeat(coll + 1) {
+                    readWithTemperature(it) { address, temp ->
+                        _insulation.value = _insulation.value.toMutableList().apply {
+                            this[address] = temp
                         }
-                        delay(100L)
                     }
+                    delay(100L)
                 }
             }
-            launch {
-                jobExecutorUtils.callback = { event ->
-                    when (event) {
-                        is JobEvent.Changed -> {
-                            val jobList = _jobList.value.toMutableList()
-                            val jobIndex = jobList.indexOfFirst { it.index == event.state.index }
-                            if (jobIndex != -1) {
-                                jobList[jobIndex] = event.state
-                            }
-                            _jobList.value = jobList
-                        }
+        }
+    }
 
-                        is JobEvent.Error -> {
-                            _message.value = event.ex.message
+    private fun deployJobCallback() {
+        viewModelScope.launch {
+            jobExecutorUtils.callback = { event ->
+                when (event) {
+                    is JobEvent.Changed -> {
+                        val jobList = _jobList.value.toMutableList()
+                        val jobIndex = jobList.indexOfFirst { it.index == event.state.index }
+                        if (jobIndex != -1) {
+                            jobList[jobIndex] = event.state
                         }
+                        _jobList.value = jobList
+                    }
 
-                        is JobEvent.Shaker -> {
-                            _stand.value = _stand.value.copy(shaker = event.shaker)
-                        }
+                    is JobEvent.Error -> {
+                        _uiFlags.value = UiFlags.error(event.ex.message ?: "Unknown")
+                    }
 
-                        is JobEvent.Logs -> {
-                            val startTime =
-                                (event.logs.firstOrNull() ?: Log(message = "None")).createTime
-                            val logs = event.logs.sortedBy { it.index }
-                            launch {
-                                historyDao.insert(History(logs = logs, createTime = startTime))
-                            }
+                    is JobEvent.Shaker -> {
+                        _shaker.value = event.shaker
+                    }
+
+                    is JobEvent.Logs -> {
+                        val startTime =
+                            (event.logs.firstOrNull() ?: Log(message = "None")).createTime
+                        val logs = event.logs.sortedBy { it.index }
+                        viewModelScope.launch {
+                            historyDao.insert(History(logs = logs, createTime = startTime))
                         }
                     }
                 }
@@ -138,97 +149,88 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun uiEvent(uiEvent: HomeUiEvent) {
-        when (uiEvent) {
-            is HomeUiEvent.Message -> _message.value = uiEvent.message
-            is HomeUiEvent.NavTo -> _page.value = uiEvent.page
-            is HomeUiEvent.ToggleSelected -> _selected.value = uiEvent.id
-            is HomeUiEvent.Start -> viewModelScope.launch {
-                val jobList = _jobList.value.toMutableList()
-                val jobIndex = jobList.indexOfFirst { it.index == uiEvent.index }
-                if (jobIndex != -1) {
-                    val job = jobList[jobIndex]
-                    val processes = job.processes.map { it.copy(status = Process.UPCOMING) }
-                    jobExecutorUtils.create(job.copy(processes = processes))
-                }
+    private fun start(index: Int) {
+        viewModelScope.launch {
+            val jobList = _jobList.value.toMutableList()
+            val jobIndex = jobList.indexOfFirst { it.index == index }
+            if (jobIndex != -1) {
+                val job = jobList[jobIndex]
+                val processes = job.processes.map { it.copy(status = Process.UPCOMING) }
+                jobExecutorUtils.create(job.copy(processes = processes))
+            } else {
+                _message.value = "INFO 请选择一个程序"
             }
+        }
+    }
 
-            is HomeUiEvent.Pause -> viewModelScope.launch {
-                val jobList = _jobList.value.toMutableList()
-                val jobIndex = jobList.indexOfFirst { it.index == uiEvent.index }
-                if (jobIndex == -1) {
-                    jobList.add(JobState(index = uiEvent.index, status = 2))
-                } else {
-                    jobList[jobIndex] = jobList[jobIndex].copy(status = 2)
-                }
-                _jobList.value = jobList
+    private fun pause(index: Int) {
+        viewModelScope.launch {
+            val jobList = _jobList.value.toMutableList()
+            val jobIndex = jobList.indexOfFirst { it.index == index }
+            if (jobIndex == -1) {
+                jobList.add(JobState(index = index, status = 2))
+            } else {
+                jobList[jobIndex] = jobList[jobIndex].copy(status = 2)
             }
+            _jobList.value = jobList
+        }
+    }
 
-            is HomeUiEvent.Stop -> viewModelScope.launch {
-                jobExecutorUtils.destroy(uiEvent.index)
-            }
+    private fun stop(index: Int) {
+        viewModelScope.launch {
+            jobExecutorUtils.destroy(index)
+        }
+    }
 
-            is HomeUiEvent.ToggleProcess -> viewModelScope.launch {
-                val jobList = _jobList.value.toMutableList()
-                val jobIndex = jobList.indexOfFirst { it.index == uiEvent.index }
-                if (jobIndex == -1) {
-                    jobList.add(
-                        JobState(
-                            index = uiEvent.index,
-                            id = uiEvent.program.id,
-                            processes = uiEvent.program.processes
-                        )
+    private fun toggleProcess(index: Int, program: Program) {
+        viewModelScope.launch {
+            val jobList = _jobList.value.toMutableList()
+            val jobIndex = jobList.indexOfFirst { it.index == index }
+            if (jobIndex == -1) {
+                jobList.add(
+                    JobState(
+                        index = index,
+                        id = program.id,
+                        processes = program.processes
                     )
-                } else {
-                    jobList[jobIndex] = jobList[jobIndex].copy(
-                        id = uiEvent.program.id,
-                        processes = uiEvent.program.processes
-                    )
-                }
-                _jobList.value = jobList
+                )
+            } else {
+                jobList[jobIndex] = jobList[jobIndex].copy(
+                    id = program.id,
+                    processes = program.processes
+                )
             }
+            _jobList.value = jobList
+        }
+    }
 
-            is HomeUiEvent.Shaker -> viewModelScope.launch {
-                val shaker = _stand.value.shaker
-                try {
-                    if (shaker) {
-                        writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
-                        delay(300L)
-                        writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
-                    } else {
-                        writeRegister(slaveAddr = 0, startAddr = 200, value = 1)
-                    }
-                } catch (ex: Exception) {
-                    _message.value = ex.message
-                } finally {
-                    _stand.value = _stand.value.copy(shaker = !shaker)
+    private fun shaker() {
+        viewModelScope.launch {
+            try {
+                if (_shaker.value) {
+                    writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
+                    delay(300L)
+                    writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
+                } else {
+                    writeRegister(slaveAddr = 0, startAddr = 200, value = 1)
                 }
+            } catch (ex: Exception) {
+                _message.value = ex.message
+            } finally {
+                _shaker.value = !_shaker.value
             }
         }
     }
 }
 
-data class HomeUiState(
-    val selected: Int = 0,
-    val page: Int = PageType.HOME,
-    val uiFlags: Int = UiFlags.NONE,
-    val jobList: List<JobState> = listOf(),
-    val stand: StandState = StandState()
-)
-
-data class StandState(
-    val insulation: List<Double> = List(9) { 0.0 },
-    val shaker: Boolean = false
-)
-
-sealed class HomeUiEvent {
-    data class Message(val message: String?) : HomeUiEvent()
-    data class NavTo(val page: Int) : HomeUiEvent()
-    data class Pause(val index: Int) : HomeUiEvent()
-    data class Start(val index: Int) : HomeUiEvent()
-    data class Stop(val index: Int) : HomeUiEvent()
-    data class ToggleProcess(val index: Int, val program: Program) : HomeUiEvent()
-    data class ToggleSelected(val id: Int) : HomeUiEvent()
-    data object Shaker : HomeUiEvent()
+sealed class HomeIntent {
+    data class Message(val message: String?) : HomeIntent()
+    data class UiFlags(val uiFlags: com.zktony.android.ui.utils.UiFlags) : HomeIntent()
+    data class NavTo(val page: Int) : HomeIntent()
+    data class Pause(val index: Int) : HomeIntent()
+    data class Start(val index: Int) : HomeIntent()
+    data class Stop(val index: Int) : HomeIntent()
+    data class ToggleProcess(val index: Int, val program: Program) : HomeIntent()
+    data class ToggleSelected(val id: Int) : HomeIntent()
+    data object Shaker : HomeIntent()
 }
-

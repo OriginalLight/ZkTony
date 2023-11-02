@@ -1,6 +1,7 @@
 package com.zktony.www.ui
 
 import android.graphics.Color
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -51,7 +52,6 @@ class HomeViewModel constructor(
     val uiStateX = _uiStateX.asStateFlow()
     val uiStateY = _uiStateY.asStateFlow()
     val programList = _programList.asStateFlow()
-    private var cleanJob: Job? = null
     private var sentinelJob: Job? = null
     private var first = true
 
@@ -98,16 +98,6 @@ class HomeViewModel constructor(
                 launch {
                     DS.read(Constants.DETECT, true).collect {
                         _setting.value = _setting.value.copy(detect = it)
-                    }
-                }
-                launch {
-                    DS.read(Constants.INTERVAL, 1).collect {
-                        _setting.value = _setting.value.copy(interval = it)
-                    }
-                }
-                launch {
-                    DS.read(Constants.DURATION, 10).collect {
-                        _setting.value = _setting.value.copy(duration = it)
                     }
                 }
                 launch {
@@ -238,7 +228,7 @@ class HomeViewModel constructor(
                 _uiStateY.value = _uiStateY.value.copy(motorCache = latest.stepMotorY)
                 SM.send(latest.apply { stepMotorY = speed })
             }
-            delay((1600L / _setting.value.motorSpeed) * 1000L)
+            delay(30 * 1000L)
             if(xy == 0) {
                 SM.send(latest.apply { stepMotorX = _uiStateX.value.motorCache })
             } else {
@@ -271,16 +261,13 @@ class HomeViewModel constructor(
             } else {
                 // 发送开始命令
                 startOrStop(true, xy)
-                if (state.value.model == 0) {
-                    autoClean()
-                }
                 sentinel()
                 updateProgram(xy)
             }
             for (i in (state.value.time * 60).toInt() downTo 0) {
                 delay(1000)
                 state.value = state.value.copy(currentTime = i.getTimeFormat())
-                if (i == 20 && state.value.programName == Ext.ctx.getString(R.string.wash)) {
+                if (i == 30 && state.value.programName == Ext.ctx.getString(R.string.wash)) {
                     val latest = SM.send.value
                     SM.send(latest.apply {
                         stepMotorX = if (xy == 0) -state.value.motor else latest.stepMotorX
@@ -288,9 +275,20 @@ class HomeViewModel constructor(
                     })
                 }
                 if (i == 0) {
+                    playAudio(R.raw.finish)
+                    if (state.value.model == 0) {
+                        // 自动清洁
+                        // 计算需要清洁的时间
+                        val cleanTime = 30L * 1000L
+                        state.value = state.value.copy(cleanTime = cleanTime)
+                        if (xy == 0 && _uiStateY.value.job == null) {
+                            autoClean(cleanTime + _uiStateY.value.cleanTime)
+                        } else if (xy == 1 && _uiStateX.value.job == null) {
+                            autoClean(cleanTime + _uiStateX.value.cleanTime)
+                        }
+                    }
                     stop(xy)
                     state.value = state.value.copy(currentTime = "已完成")
-                    playAudio(R.raw.finish)
                 }
             }
         }
@@ -324,8 +322,6 @@ class HomeViewModel constructor(
             state.value = state.value.copy(log = null)
         }
         state.value = state.value.copy(job = job, log = log)
-        job.start()
-        log.start()
 
     }
 
@@ -348,23 +344,9 @@ class HomeViewModel constructor(
             })
         }
         if (_uiStateX.value.job == null && _uiStateY.value.job == null) {
-            if (cleanJob != null) {
-                cleanJob?.cancel()
-                cleanJob = null
-            }
             if (sentinelJob != null) {
                 sentinelJob?.cancel()
                 sentinelJob = null
-            }
-        } else if (_uiStateX.value.job != null && _uiStateY.value.job == null) {
-            if (_uiStateX.value.model == 1 && cleanJob != null) {
-                cleanJob?.cancel()
-                cleanJob = null
-            }
-        } else if (_uiStateX.value.job == null && _uiStateY.value.job != null) {
-            if (_uiStateY.value.model == 1 && cleanJob != null) {
-                cleanJob?.cancel()
-                cleanJob = null
             }
         }
     }
@@ -475,24 +457,17 @@ class HomeViewModel constructor(
     /**
      * 设置自动清理
      */
-    private fun autoClean() {
-        if (cleanJob == null) {
-            val job = viewModelScope.launch {
-                val interval = _setting.value.interval
-                val duration = _setting.value.duration
-                while (true) {
-                    delay(interval * 60 * 1000L)
-                    viewModelScope.launch {
-                        // 开启直流泵
-                        SM.send(SM.send.value.apply { motorX = 1 })
-                        delay(duration * 1000L)
-                        // 关闭直流泵
-                        SM.send(SM.send.value.apply { motorX = 0 })
-                    }
-                }
-            }
-            cleanJob = job
-            job.start()
+    private fun autoClean(time: Long) {
+        viewModelScope.launch {
+            delay(1000L)
+            Log.e("HomeViewModel", "autoClean: $time")
+            // 开启直流泵
+            SM.send(SM.send.value.apply { motorX = 1 })
+            delay(time)
+            // 关闭直流泵
+            SM.send(SM.send.value.apply { motorX = 0 })
+            _uiStateX.value = _uiStateX.value.copy(cleanTime = 0L)
+            _uiStateY.value = _uiStateY.value.copy(cleanTime = 0L)
         }
     }
 
@@ -536,6 +511,7 @@ data class HomeUiState(
     val motor: Int = 0,
     val voltage: Float = 0f,
     val time: Float = 0f,
+    val cleanTime: Long = 0L,
     val currentMotor: Int = 0,
     val currentVoltage: Float = 0f,
     val currentTime: String = "00:00",
@@ -547,7 +523,5 @@ data class Setting(
     val audio: Boolean = true,
     val bar: Boolean = false,
     val detect: Boolean = true,
-    val duration: Int = 10,
-    val interval: Int = 1,
     val motorSpeed: Int = 160,
 )

@@ -153,33 +153,37 @@ class HomeViewModel @Inject constructor(
 
     private fun startJob() {
         _job.value = viewModelScope.launch {
-            try {
-                _status.value = JobState.RUNNING
-                val selected =
-                    dao.getById(_selected.value).firstOrNull() ?: throw Exception("程序为空")
-                if (selected.orificePlates.isEmpty()) throw Exception("加液孔板为空")
-
-                val orificePlates = selected.orificePlates
-
-                orificePlates.forEach { op ->
-                    _orificePlate.value = op
-                    previousAlgorithm(op)
-
-                    if (op.type == 0) {
-                        separationAlgorithm(op)
-                    } else {
-                        hybridAlgorithm(op)
-                    }
-                }
-                if (_job.value?.isCancelled == false) {
-                    _uiFlags.value = UiFlags.DIALOG
-                }
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-            } finally {
-                _finished.value = emptyList()
+            _status.value = JobState.RUNNING
+            val selected = dao.getById(_selected.value).firstOrNull()
+            if (selected == null) {
+                _message.value = "不存在该程序，请检查！！！"
                 _status.value = JobState.STEPPED
+                return@launch
             }
+            if (selected.orificePlates.isEmpty()) {
+                _message.value = "该程序没有孔板，请检查！！！"
+                _status.value = JobState.STEPPED
+                return@launch
+            }
+
+            val orificePlates = selected.orificePlates
+
+            orificePlates.forEach { op ->
+                _orificePlate.value = op
+                previousAlgorithm(op)
+
+                if (op.type == 0) {
+                    separationAlgorithm(op)
+                } else {
+                    hybridAlgorithm(op)
+                }
+            }
+            delay(100L)
+            _uiFlags.value = UiFlags.DIALOG
+        }
+        _job.value?.invokeOnCompletion {
+            _finished.value = emptyList()
+            _status.value = JobState.STEPPED
         }
     }
 
@@ -240,8 +244,7 @@ class HomeViewModel @Inject constructor(
         val column = op.column
         for (i in 0 until ceil(row / 6.0).toInt()) {
             for (j in if (i % 2 == 0) 0 until column else column - 1 downTo 0) {
-                if (_job.value?.isCancelled == true) return
-
+                // 检查该步是否有需要加液的
                 var next = false
                 repeat(6) {
                     if (i * 6 + it < row) {
@@ -254,21 +257,25 @@ class HomeViewModel @Inject constructor(
                 }
                 if (!next) continue
 
+                delay(10L)
                 while (_status.value == JobState.PAUSED) {
                     delay(100)
                 }
+
+                // 移动到加液位置
                 val coordinate = op.orifices[j][i * 6].point
                 start {
                     with(index = 0, pdv = coordinate.x)
                     with(index = 1, pdv = coordinate.y)
                 }
 
+                delay(10L)
                 while (_status.value == JobState.PAUSED) {
                     delay(100)
                 }
 
+                // 加液
                 val list = mutableListOf<Triple<Int, Int, Color>>()
-
                 start {
                     timeOut = 1000L * 30
                     repeat(6) {
@@ -281,8 +288,11 @@ class HomeViewModel @Inject constructor(
                         }
                     }
                 }
+
+                // 记录已完成的
                 _finished.value += list
 
+                // 延时
                 delay((op.delay * 1000L).toLong())
             }
         }
@@ -296,7 +306,7 @@ class HomeViewModel @Inject constructor(
         val rowSpace = (coordinate[1].x - coordinate[0].x) / (row - 1)
         for (i in 0 until row + 5) {
             for (j in if (i % 2 == 0) 0 until column else column - 1 downTo 0) {
-                if (_job.value?.isCancelled == true) return
+                // 检查该步是否有需要加液的
                 var next = false
                 repeat(6) {
                     if (i - 5 + it in 0 until row) {
@@ -311,54 +321,63 @@ class HomeViewModel @Inject constructor(
                 }
                 if (!next) continue
 
+                delay(10L)
                 while (_status.value == JobState.PAUSED) {
                     delay(100)
                 }
-                val abscissa = if (i < 6) {
-                    op.orifices[j][0].point.x - (5 - i) * rowSpace
-                } else {
-                    op.orifices[j][i - 5].point.x
-                }
 
+                // 移动到加液位置
                 start {
-                    with(index = 0, pdv = abscissa)
+                    with(
+                        index = 0, pdv = if (i < 6) {
+                            op.orifices[j][0].point.x - (5 - i) * rowSpace
+                        } else {
+                            op.orifices[j][i - 5].point.x
+                        }
+                    )
                     with(index = 1, pdv = op.orifices[j][0].point.y)
                 }
 
+                delay(10L)
                 while (_status.value == JobState.PAUSED) {
                     delay(100)
                 }
 
+                // 加液
                 val list = mutableListOf<Triple<Int, Int, Color>>()
-
                 start {
                     timeOut = 1000L * 30
                     repeat(6) {
                         if (i - 5 + it in 0 until row) {
                             val orifice = op.orifices[j][i - 5 + it]
                             if (orifice.selected) {
-                                with(index = 2 + it, pdv = orifice.volume.getOrNull(it) ?: 0.0)
-                                list += Triple(
-                                    j, i - 5 + it, when (it) {
-                                        0 -> Color.Green
-                                        1 -> Color.Blue
-                                        2 -> Color.Red
-                                        3 -> Color.Yellow
-                                        4 -> Color.Cyan
-                                        5 -> Color.Magenta
-                                        else -> Color.Black
-                                    }
-                                )
+                                val pdv = orifice.volume.getOrNull(it) ?: 0.0
+                                if (pdv > 0.0) {
+                                    with(index = 2 + it, pdv = pdv)
+                                    list += Triple(
+                                        j, i - 5 + it, when (it) {
+                                            0 -> Color.Green
+                                            1 -> Color.Blue
+                                            2 -> Color.Red
+                                            3 -> Color.Yellow
+                                            4 -> Color.Cyan
+                                            5 -> Color.Magenta
+                                            else -> Color.Black
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
                 }
 
+                // 记录已完成的
                 list.forEach { triple ->
                     _finished.value -= _finished.value.filter { it.first == triple.first && it.second == triple.second }
                 }
                 _finished.value += list
 
+                // 延时
                 delay((op.delay * 1000L).toLong())
             }
         }

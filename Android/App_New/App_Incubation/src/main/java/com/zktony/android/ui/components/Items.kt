@@ -61,7 +61,6 @@ import com.zktony.android.data.entities.Program
 import com.zktony.android.data.entities.internal.Log
 import com.zktony.android.data.entities.internal.Point
 import com.zktony.android.data.entities.internal.Process
-import com.zktony.android.ui.HomeUiState
 import com.zktony.android.ui.utils.JobState
 import com.zktony.android.ui.utils.selectedColor
 import com.zktony.android.utils.extra.dateFormat
@@ -214,7 +213,7 @@ fun PointItem(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 Text(
-                                    text = "出液",
+                                    text = "向量",
                                     fontStyle = FontStyle.Italic,
                                     fontSize = 14.sp,
                                     fontFamily = FontFamily.Serif,
@@ -248,7 +247,7 @@ fun PointItem(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 Text(
-                                    text = "步数",
+                                    text = "圈数",
                                     fontStyle = FontStyle.Italic,
                                     fontSize = 14.sp,
                                     fontFamily = FontFamily.Serif,
@@ -280,7 +279,7 @@ fun PointItem(
                         .clip(MaterialTheme.shapes.small)
                         .clickable { onClick(0) }
                         .padding(vertical = 4.dp, horizontal = 8.dp),
-                    text = "加液",
+                    text = "移动",
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
@@ -348,7 +347,7 @@ fun LogItem(item: Log) {
         headlineContent = {
             Text(
                 text = item.createTime.dateFormat("HH:mm:ss"),
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodySmall
             )
         },
         supportingContent = {
@@ -668,22 +667,16 @@ fun MotorItem(
                 onLongClick = { delete = true },
             ),
         headlineContent = {
-            Column(modifier = Modifier.padding(start = 16.dp)) {
-                Text(
-                    text = "A - ${item.acceleration}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-
-                Text(
-                    text = "D - ${item.deceleration}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-
-                Text(
-                    text = "S - ${item.speed}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
+            Text(
+                text = item.displayText,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        },
+        supportingContent = {
+            Text(
+                text = "ADS - ${item.acceleration}/${item.deceleration}/${item.speed}",
+                style = MaterialTheme.typography.bodyLarge
+            )
         },
         leadingContent = {
             Text(
@@ -707,17 +700,17 @@ fun MotorItem(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
     )
-
 }
 
 @Composable
 fun ModuleItem(
     index: Int,
-    uiState: HomeUiState,
     selected: Int,
+    jobList: List<JobState>,
+    insulation: List<Double>,
     onClick: () -> Unit
 ) {
-    val jobState = uiState.jobList.find { it.index == index } ?: JobState()
+    val jobState = jobList.find { it.index == index } ?: JobState()
 
     Box {
         Column(
@@ -778,7 +771,7 @@ fun ModuleItem(
                         y = 4.dp.roundToPx()
                     )
                 },
-            text = "${uiState.stand.insulation.getOrNull(index + 1) ?: 0.0} ℃",
+            text = "${insulation.getOrNull(index + 1) ?: 0.0} ℃",
             style = MaterialTheme.typography.bodyMedium,
             fontStyle = FontStyle.Italic
         )

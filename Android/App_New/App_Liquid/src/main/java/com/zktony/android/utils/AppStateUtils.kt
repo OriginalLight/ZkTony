@@ -29,7 +29,7 @@ object AppStateUtils {
     val hpp: MutableMap<Int, Long> = ConcurrentHashMap()
 
     /**
-     * 校准曲线
+     * 校准方法
      */
     val hpc: MutableMap<Int, (Double) -> Double> = ConcurrentHashMap()
 }

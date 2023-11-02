@@ -22,7 +22,7 @@ class WorkerManager {
         scope.launch {
             WorkManager.getInstance(Ext.ctx).enqueue(
                 OneTimeWorkRequestBuilder<LogWorker>()
-                    .setInitialDelay(15, TimeUnit.MINUTES)
+                    .setInitialDelay(30, TimeUnit.MINUTES)
                     .build()
             )
         }
