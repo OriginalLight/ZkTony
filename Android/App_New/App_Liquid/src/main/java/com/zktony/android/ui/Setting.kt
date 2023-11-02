@@ -292,7 +292,6 @@ fun SettingContent(
                         }
                     }
                 }) {
-
                     if (uiState.application == null) {
                         Icon(
                             imageVector = Icons.Default.Check, contentDescription = null
@@ -498,7 +497,8 @@ fun MotorDetail(
     val softKeyboard = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
 
-    val selected = uiState.entities.find { it.id == uiState.selected } ?: Motor(displayText = "None")
+    val selected =
+        uiState.entities.find { it.id == uiState.selected } ?: Motor(displayText = "None")
     var displayText by remember { mutableStateOf(selected.displayText) }
     var acceleration by remember { mutableStateOf(selected.acceleration.toString()) }
     var deceleration by remember { mutableStateOf(selected.deceleration.toString()) }
@@ -554,7 +554,7 @@ fun MotorDetail(
                     }
                 },
                 suffix = {
-                    Text(text = "电机编号", style = textStyle)
+                    Text(text = "编号", style = textStyle)
                 },
                 keyboardOptions = keyboardOptions,
                 keyboardActions = keyboardActions,
@@ -570,7 +570,13 @@ fun MotorDetail(
                 onValueChange = {
                     scope.launch {
                         acceleration = it
-                        uiEvent(SettingUiEvent.Update(selected.copy(acceleration = it.toLongOrNull() ?: 0L)))
+                        uiEvent(
+                            SettingUiEvent.Update(
+                                selected.copy(
+                                    acceleration = it.toLongOrNull() ?: 0L
+                                )
+                            )
+                        )
                     }
                 },
                 leadingIcon = {
@@ -598,7 +604,13 @@ fun MotorDetail(
                 onValueChange = {
                     scope.launch {
                         deceleration = it
-                        uiEvent(SettingUiEvent.Update(selected.copy(deceleration = it.toLongOrNull() ?: 0L)))
+                        uiEvent(
+                            SettingUiEvent.Update(
+                                selected.copy(
+                                    deceleration = it.toLongOrNull() ?: 0L
+                                )
+                            )
+                        )
                     }
                 },
                 leadingIcon = {
@@ -626,7 +638,13 @@ fun MotorDetail(
                 onValueChange = {
                     scope.launch {
                         speed = it
-                        uiEvent(SettingUiEvent.Update(selected.copy(speed = it.toLongOrNull() ?: 0L)))
+                        uiEvent(
+                            SettingUiEvent.Update(
+                                selected.copy(
+                                    speed = it.toLongOrNull() ?: 0L
+                                )
+                            )
+                        )
                     }
                 },
                 leadingIcon = {

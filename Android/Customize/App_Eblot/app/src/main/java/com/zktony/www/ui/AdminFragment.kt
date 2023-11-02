@@ -36,7 +36,7 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
     /**
      * init观察者
      */
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "UseCompatLoadingForDrawables")
     private fun initFlowCollector() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -45,6 +45,11 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                         binding.apply {
                             tvUpdate.text =
                                 if (it.progress == 0) resources.getString(R.string.check_update) else "${it.progress}%"
+                            if (it.job == null) {
+                                pump.background = resources.getDrawable(R.drawable.bg_img_btn_unpressed)
+                            } else {
+                                pump.background = resources.getDrawable(R.drawable.bg_img_btn_pressed)
+                            }
                         }
                     }
                 }
@@ -65,16 +70,6 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                         }
                     }
                     launch {
-                        dataStore.read(Constants.INTERVAL, 1).collect {
-                            if (it > 0) binding.interval.setEqualText(it.toString())
-                        }
-                    }
-                    launch {
-                        dataStore.read(Constants.DURATION, 10).collect {
-                            if (it > 0) binding.duration.setEqualText(it.toString())
-                        }
-                    }
-                    launch {
                         dataStore.read(Constants.MOTOR_SPEED, 160).collect {
                             if (it > 0) binding.motorSpeed.setEqualText(it.toString())
                         }
@@ -92,24 +87,8 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
         binding.apply {
             tvVersionName.text = BuildConfig.VERSION_NAME
 
-            pump.addTouchEvent({
-                it.scaleX = 0.8f
-                it.scaleY = 0.8f
-                it.background = resources.getDrawable(R.drawable.bg_img_btn_pressed)
-                viewModel.touchPump(true)
-            }, {
-                it.scaleX = 1f
-                it.scaleY = 1f
-                it.background = resources.getDrawable(R.drawable.bg_img_btn_unpressed)
-                viewModel.touchPump(false)
-            })
-
-            interval.afterTextChange {
-                viewModel.toggleInterval(it.toIntOrNull() ?: 0)
-            }
-
-            duration.afterTextChange {
-                viewModel.toggleDuration(it.toIntOrNull() ?: 0)
+            pump.clickNoRepeat {
+                 viewModel.touchPump()
             }
 
             motorSpeed.afterTextChange {

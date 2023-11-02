@@ -33,20 +33,24 @@ import kotlinx.coroutines.launch
  * @author 刘贺贺
  * @date 2023/8/31 9:57
  */
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun HistoryRoute(viewModel: HistoryViewModel) {
 
     val scope = rememberCoroutineScope()
     val navigationActions = LocalNavigationActions.current
     val snackbarHostState = LocalSnackbarHostState.current
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val page by viewModel.page.collectAsStateWithLifecycle()
+    val selected by viewModel.selected.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
+
     val entities = viewModel.entities.collectAsLazyPagingItems()
     val navigation: () -> Unit = {
         scope.launch {
-            when (uiState.page) {
+            when (page) {
                 PageType.HISTORY_LIST -> navigationActions.navigateUp()
-                else -> viewModel.uiEvent(HistoryUiEvent.NavTo(PageType.HISTORY_LIST))
+                else -> viewModel.dispatch(HistoryIntent.NavTo(PageType.HISTORY_LIST))
             }
         }
     }
@@ -56,32 +60,16 @@ fun HistoryRoute(viewModel: HistoryViewModel) {
     LaunchedEffect(key1 = message) {
         message?.let {
             snackbarHostState.showSnackbar(it)
-            viewModel.uiEvent(HistoryUiEvent.Message(null))
+            viewModel.dispatch(HistoryIntent.Message(null))
         }
     }
 
-    HistoryWrapper(
-        entities = entities,
-        uiState = uiState,
-        uiEvent = viewModel::uiEvent,
-        navigation = navigation
-    )
-}
-
-@OptIn(ExperimentalAnimationApi::class)
-@Composable
-fun HistoryWrapper(
-    entities: LazyPagingItems<History>,
-    uiState: HistoryUiState,
-    uiEvent: (HistoryUiEvent) -> Unit,
-    navigation: () -> Unit
-) {
     Column {
-        HistoryAppBar(entities, uiState, uiEvent) { navigation() }
-        AnimatedContent(targetState = uiState.page) {
+        HistoryAppBar(entities, selected, page, viewModel::dispatch) { navigation() }
+        AnimatedContent(targetState = page) {
             when (it) {
-                PageType.HISTORY_LIST -> HistoryList(entities, uiEvent)
-                PageType.HISTORY_DETAIL -> HistoryDetail(entities, uiState)
+                PageType.HISTORY_LIST -> HistoryList(entities, viewModel::dispatch)
+                PageType.HISTORY_DETAIL -> HistoryDetail(entities, selected)
                 else -> {}
             }
         }
@@ -91,7 +79,7 @@ fun HistoryWrapper(
 @Composable
 fun HistoryList(
     entities: LazyPagingItems<History>,
-    uiEvent: (HistoryUiEvent) -> Unit
+    dispatch: (HistoryIntent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
 
@@ -105,8 +93,8 @@ fun HistoryList(
         itemsIndexed(entities) { index, item ->
             HistoryItem(index, item) {
                 scope.launch {
-                    uiEvent(HistoryUiEvent.ToggleSelected(it.id))
-                    uiEvent(HistoryUiEvent.NavTo(PageType.HISTORY_DETAIL))
+                    dispatch(HistoryIntent.ToggleSelected(it.id))
+                    dispatch(HistoryIntent.NavTo(PageType.HISTORY_DETAIL))
                 }
             }
         }
@@ -116,14 +104,14 @@ fun HistoryList(
 @Composable
 fun HistoryDetail(
     entities: LazyPagingItems<History>,
-    uiState: HistoryUiState
+    selected: Long
 ) {
     LazyColumn(
         modifier = Modifier,
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        val item = entities.itemSnapshotList.items.find { it.id == uiState.selected }
+        val item = entities.itemSnapshotList.items.find { it.id == selected }
         if (item != null) {
             items(item.logs) { LogItem(item = it) }
         }

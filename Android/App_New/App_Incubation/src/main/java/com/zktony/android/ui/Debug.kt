@@ -2,14 +2,27 @@ package com.zktony.android.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -36,13 +49,16 @@ fun DebugRoute(viewModel: DebugViewModel) {
     val scope = rememberCoroutineScope()
     val navigationActions = LocalNavigationActions.current
     val snackbarHostState = LocalSnackbarHostState.current
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val page by viewModel.page.collectAsStateWithLifecycle()
+    val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
+
     val navigation: () -> Unit = {
         scope.launch {
-            when (uiState.page) {
+            when (page) {
                 PageType.DEBUG -> navigationActions.navigateUp()
-                else -> viewModel.uiEvent(DebugUiEvent.NavTo(PageType.DEBUG))
+                else -> viewModel.dispatch(DebugIntent.NavTo(PageType.DEBUG))
             }
         }
     }
@@ -52,23 +68,9 @@ fun DebugRoute(viewModel: DebugViewModel) {
     LaunchedEffect(key1 = message) {
         message?.let {
             snackbarHostState.showSnackbar(it)
-            viewModel.uiEvent(DebugUiEvent.Message(null))
+            viewModel.dispatch(DebugIntent.Message(null))
         }
     }
-
-    DebugWrapper(
-        uiState = uiState,
-        uiEvent = viewModel::uiEvent,
-        navigation = navigation
-    )
-}
-
-@Composable
-fun DebugWrapper(
-    uiState: DebugUiState,
-    uiEvent: (DebugUiEvent) -> Unit,
-    navigation: () -> Unit
-) {
 
     var group by remember { mutableIntStateOf(0) }
 
@@ -77,22 +79,23 @@ fun DebugWrapper(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         DebugAppBar { navigation() }
-        PulseForm(group, uiState, uiEvent) { group = it }
-        ValveGroup(group, uiState, uiEvent)
+        PulseForm(group, uiFlags, viewModel::dispatch) { group = it }
+        ValveGroup(group, page, uiFlags, viewModel::dispatch)
     }
 }
 
 @Composable
 fun ValveGroup(
     group: Int,
-    uiState: DebugUiState,
-    uiEvent: (DebugUiEvent) -> Unit
+    page: Int,
+    uiFlags: UiFlags,
+    dispatch: (DebugIntent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     var valveOne by remember { mutableIntStateOf(0) }
     var valveTwo by remember { mutableIntStateOf(0) }
 
-    LaunchedEffect(key1 = uiState.page) {
+    LaunchedEffect(key1 = page) {
         valveOne = (hpv[0 + 2 * group] ?: 1) - 1
         valveTwo = (hpv[1 + 2 * group] ?: 1) - 1
     }
@@ -103,12 +106,12 @@ fun ValveGroup(
             contentAlignment = Alignment.Center
         ) {
             CircularButtons(
-                enabled = uiState.uiFlags != UiFlags.VALVE,
+                enabled = uiFlags is UiFlags.None,
                 selected = valveOne
             ) { index ->
                 scope.launch {
                     valveOne = index
-                    uiEvent(DebugUiEvent.Valve(0 + 2 * group + group, index + 1))
+                    dispatch(DebugIntent.Valve(0 + 2 * group + group, index + 1))
                 }
             }
         }
@@ -119,12 +122,12 @@ fun ValveGroup(
         ) {
             CircularButtons(
                 count = 6,
-                enabled = uiState.uiFlags != UiFlags.VALVE,
+                enabled = uiFlags is UiFlags.None,
                 selected = valveTwo
             ) { index ->
                 scope.launch {
                     valveTwo = index
-                    uiEvent(DebugUiEvent.Valve(1 + 2 * group, index + 1))
+                    dispatch(DebugIntent.Valve(1 + 2 * group, index + 1))
                 }
             }
         }
@@ -134,13 +137,13 @@ fun ValveGroup(
 @Composable
 fun PulseForm(
     group: Int,
-    uiState: DebugUiState,
-    uiEvent: (DebugUiEvent) -> Unit,
+    uiFlags: UiFlags,
+    dispatch: (DebugIntent) -> Unit,
     onGroupChanged: (Int) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val number by rememberDataSaverState(key = Constants.ZT_0000, default = 4)
-    var pulse by remember { mutableStateOf("6400") }
+    var turns by remember { mutableStateOf("1") }
 
     Column(
         modifier = Modifier
@@ -180,15 +183,15 @@ fun PulseForm(
         }
 
         SquareTextField(
-            title = "步数",
-            value = pulse,
+            title = "圈数",
+            value = turns,
             trailingIcon = {
                 ElevatedButton(
                     modifier = Modifier.padding(end = 16.dp),
-                    enabled = uiState.uiFlags != UiFlags.PUMP,
+                    enabled = uiFlags is UiFlags.None,
                     onClick = {
                         scope.launch {
-                            uiEvent(DebugUiEvent.Pulse(1 + group, pulse.toLongOrNull() ?: 0L))
+                            dispatch(DebugIntent.Transfer(1 + group, turns.toDoubleOrNull() ?: 0.0))
                         }
                     }
                 ) {
@@ -198,6 +201,6 @@ fun PulseForm(
                     )
                 }
             }
-        ) { pulse = it }
+        ) { turns = it }
     }
 }

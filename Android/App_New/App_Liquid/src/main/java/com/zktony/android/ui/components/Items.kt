@@ -369,13 +369,13 @@ fun MotorItem(
         headlineContent = {
             Text(
                 text = item.displayText,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyMedium
             )
         },
         supportingContent = {
             Text(
                 text = "ADS - ${item.acceleration}/${item.deceleration}/${item.speed}",
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyLarge
             )
         },
         leadingContent = {
@@ -400,5 +400,4 @@ fun MotorItem(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
     )
-
 }

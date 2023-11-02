@@ -16,7 +16,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.LinkedList
-import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
 /**
@@ -30,7 +30,7 @@ class JobExecutorUtils @Inject constructor(
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val hashMap = HashMap<Int, JobState>()
     private val jobMap = HashMap<Int, Job>()
-    private val lock = AtomicBoolean(false)
+    private val lock = AtomicInteger(-1)
     private val logLinkedList = LinkedList<Log>()
 
     fun create(jobState: JobState) {
@@ -43,26 +43,30 @@ class JobExecutorUtils @Inject constructor(
                     val logs = logLinkedList.toList()
                     callback(JobEvent.Logs(logs))
                     logLinkedList.clear()
+                    // 停止摇床
+                    writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
+                    delay(300L)
+                    writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
                 }
             }
         }
     }
 
     fun destroy(index: Int) {
-        jobMap[index]?.cancel()
-        jobMap.remove(index)
+        if (lock.get() == index) {
+            lock.set(-1)
+        }
+        jobMap.remove(index)?.cancel()
         val state = hashMap[index] ?: return
         callback(JobEvent.Changed(state.copy(status = JobState.STOPPED)))
         hashMap.remove(index)
-        if (jobMap.isEmpty()) {
-            scope.launch {
-                writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
-                delay(300L)
-                writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
-            }
-        }
     }
 
+    /**
+     * 解释器
+     *
+     * 解释每个进程
+     */
     private suspend fun interpreter(jobState: JobState) {
 
         val index = jobState.index
@@ -71,115 +75,106 @@ class JobExecutorUtils @Inject constructor(
         linkedList.addAll(processes)
         hashMap[index] = jobState
 
-        linkedList.forEach { process ->
-            when (process.type) {
-                Process.BLOCKING -> blocking(index, process)
-                Process.PRIMARY_ANTIBODY -> primaryAntibody(index, process)
-                Process.SECONDARY_ANTIBODY -> secondaryAntibody(index, process)
-                Process.WASHING -> washing(index, process)
-                Process.PHOSPHATE_BUFFERED_SALINE -> phosphateBufferedSaline(index, process)
+        try {
+            linkedList.forEach { process ->
+                when (process.type) {
+                    Process.BLOCKING -> blocking(index, process)
+                    Process.PRIMARY_ANTIBODY -> primaryAntibody(index, process)
+                    Process.SECONDARY_ANTIBODY -> secondaryAntibody(index, process)
+                    Process.WASHING -> washing(index, process)
+                    Process.PHOSPHATE_BUFFERED_SALINE -> phosphateBufferedSaline(index, process)
+                }
             }
+        } catch (ex: Exception) {
+            callback(JobEvent.Error(index, ex))
+            reportLog(index, "ERROR", "${ex.message}")
+            destroy(index)
         }
     }
 
     private suspend fun blocking(index: Int, process: Process) {
         // check
-        try {
-            verify(index, process)
-        } catch (ex: Exception) {
-            callback(JobEvent.Error(ex))
-            logLinkedList.add(
-                Log(
-                    index = index,
-                    level = "ERROR",
-                    message = "${ex.message}"
-                )
-            )
-            return
-        }
+        verify(index, process)
 
         var state = hashMap[index]!!
         val processes = state.processes.toMutableList()
         val processIndex = processes.indexOf(process)
 
-        waitForLock(state) {
+        waitForLock(index, state) {
+            // 更新模块状态
             state = state.copy(status = JobState.LIQUID)
             callback(JobEvent.Changed(state))
+            // 加液
             liquid(index, process, 9, (index - ((index / 4) * 4)) + 1)
+            // 更新模块状态和进程状态
             processes[processIndex] = process.copy(status = Process.RUNNING)
             state = state.copy(status = JobState.RUNNING, processes = processes)
             callback(JobEvent.Changed(state))
-        }
-        logLinkedList.add(
-            Log(
-                index = index,
-                level = "INFO",
-                message = "添加封闭液完成 √ \n加液量：${process.dosage} \n进液通道：9 \n出液通道：${(index - ((index / 4) * 4)) + 1}"
+            // 记录日志
+            reportLog(
+                index,
+                "INFO",
+                "添加封闭液完成 √ \n加液量：${process.dosage} \n进液通道：9 \n出液通道：${(index - ((index / 4) * 4)) + 1}"
             )
-        )
+        }
 
+        // 倒计时
         countDown(state, (process.duration * 60 * 60).toLong())
 
-        waitForLock(state) {
+        waitForLock(index, state) {
+            // 更新模块状态
             state = state.copy(status = JobState.WASTE)
             callback(JobEvent.Changed(state))
+            // 清理废液
             clean(index, process, 11, (index - ((index / 4) * 4)) + 1)
+            // 更新模块状态和进程状态
             processes[processIndex] = process.copy(status = Process.FINISHED)
             state = state.copy(status = JobState.FINISHED, processes = processes)
             callback(JobEvent.Changed(state))
             hashMap[index] = state
-        }
-        logLinkedList.add(
-            Log(
-                index = index,
-                level = "INFO",
-                message = "封闭液废液处理完成 √ \n进液通道：11 \n出液通道：${(index - ((index / 4) * 4)) + 1}"
+            // 记录日志
+            reportLog(
+                index,
+                "INFO",
+                "封闭液废液处理完成 √ \n进液通道：11 \n出液通道：${(index - ((index / 4) * 4)) + 1}"
             )
-        )
+        }
     }
 
     private suspend fun primaryAntibody(index: Int, process: Process) {
-        try {
-            verify(index, process)
-        } catch (ex: Exception) {
-            callback(JobEvent.Error(ex))
-            logLinkedList.add(
-                Log(
-                    index = index,
-                    level = "ERROR",
-                    message = "${ex.message}"
-                )
-            )
-            return
-        }
+        // check
+        verify(index, process)
 
         var state = hashMap[index]!!
         val processes = state.processes.toMutableList()
         val processIndex = processes.indexOf(process)
 
 
-        waitForLock(state) {
+        waitForLock(index, state) {
+            // 更新模块状态
             state = state.copy(status = JobState.LIQUID)
             callback(JobEvent.Changed(state))
+            // 加液
             val inChannel =
                 if (process.origin == 0) (index - ((index / 4) * 4)) + 1 else process.origin
             liquid(index, process, inChannel, (index - ((index / 4) * 4)) + 1)
+            // 更新模块状态和进程状态
             processes[processIndex] = process.copy(status = Process.RUNNING)
             state = state.copy(status = JobState.RUNNING, processes = processes)
             callback(JobEvent.Changed(state))
-        }
-        logLinkedList.add(
-            Log(
-                index = index,
-                level = "INFO",
-                message = "添加一抗完成 √ \n加液量：${process.dosage} \n进液通道：${if (process.origin == 0) (index - ((index / 4) * 4)) + 1 else process.origin} \n出液通道：${(index - ((index / 4) * 4)) + 1}"
+            // 记录日志
+            reportLog(
+                index,
+                "INFO",
+                "添加一抗完成 √ \n加液量：${process.dosage} \n进液通道：$inChannel \n出液通道：${(index - ((index / 4) * 4)) + 1}"
             )
-        )
+        }
 
+        // 倒计时
         countDown(state, (process.duration * 60 * 60).toLong())
 
-
-        waitForLock(state) {
+        waitForLock(index, state) {
+            // 更新模块状态
             val inChannel =
                 if (process.origin == 0) (index - (index / 4) * 4) + 1 else process.origin
             if (process.recycle) {
@@ -191,123 +186,110 @@ class JobExecutorUtils @Inject constructor(
                 callback(JobEvent.Changed(state))
                 clean(index, process, 11, (index - ((index / 4) * 4)) + 1)
             }
+            // 更新模块状态和进程状态
             processes[processIndex] = process.copy(status = Process.FINISHED)
             state = state.copy(status = JobState.FINISHED, processes = processes)
             callback(JobEvent.Changed(state))
             hashMap[index] = state
-        }
-        logLinkedList.add(
-            Log(
-                index = index,
-                level = "INFO",
-                message = "一抗废液${if (process.recycle) "回收" else "清理"}完成 √ \n进液通道：${if (process.origin == 0) (index - ((index / 4) * 4)) + 1 else process.origin} \n出液通道：${(index - ((index / 4) * 4)) + 1}"
+            // 记录日志
+            reportLog(
+                index,
+                "INFO",
+                "一抗废液${if (process.recycle) "回收" else "清理"}完成 √ \n进液通道：${if (process.recycle) inChannel else 11} \n出液通道：${(index - ((index / 4) * 4)) + 1}"
             )
-        )
+        }
     }
 
     private suspend fun secondaryAntibody(index: Int, process: Process) {
-        try {
-            verify(index, process)
-        } catch (ex: Exception) {
-            callback(JobEvent.Error(ex))
-            logLinkedList.add(
-                Log(
-                    index = index,
-                    level = "ERROR",
-                    message = "${ex.message}"
-                )
-            )
-            return
-        }
+        // check
+        verify(index, process)
 
         var state = hashMap[index]!!
         val processes = state.processes.toMutableList()
         val processIndex = processes.indexOf(process)
 
-        waitForLock(state) {
+        waitForLock(index, state) {
+            // 更新模块状态
             state = state.copy(status = JobState.LIQUID)
             callback(JobEvent.Changed(state))
+            // 加液
             val inChannel =
                 if (process.origin == 0) (index - ((index / 4) * 4)) + 5 else process.origin
             liquid(index, process, inChannel, (index - ((index / 4) * 4)) + 1)
+            // 更新模块状态和进程状态
             processes[processIndex] = process.copy(status = Process.RUNNING)
             state = state.copy(status = JobState.RUNNING, processes = processes)
             callback(JobEvent.Changed(state))
-        }
-        logLinkedList.add(
-            Log(
-                index = index,
-                level = "INFO",
-                message = "添加二抗完成 √ \n加液量：${process.dosage} \n进液通道：${if (process.origin == 0) (index - ((index / 4) * 4)) + 5 else process.origin} \n出液通道：${(index - ((index / 4) * 4)) + 1}"
+            // 记录日志
+            reportLog(
+                index,
+                "INFO",
+                "添加二抗完成 √ \n加液量：${process.dosage} \n进液通道：$inChannel \n出液通道：${(index - ((index / 4) * 4)) + 1}"
             )
-        )
+        }
 
+        // 倒计时
         countDown(state, (process.duration * 60 * 60).toLong())
 
-        waitForLock(state) {
+        waitForLock(index, state) {
+            // 更新模块状态
             state = state.copy(status = JobState.WASTE)
             callback(JobEvent.Changed(state))
+            // 清理废液
             clean(index, process, 11, (index - ((index / 4) * 4)) + 1)
+            // 更新模块状态和进程状态
             processes[processIndex] = process.copy(status = Process.FINISHED)
             state = state.copy(status = JobState.FINISHED, processes = processes)
             callback(JobEvent.Changed(state))
             hashMap[index] = state
-        }
-        logLinkedList.add(
-            Log(
-                index = index,
-                level = "INFO",
-                message = "二抗废液清理完成 √ \n进液通道：${if (process.origin == 0) (index - ((index / 4) * 4)) + 5 else process.origin} \n出液通道：${(index - ((index / 4) * 4)) + 1}"
+            // 记录日志
+            reportLog(
+                index,
+                "INFO",
+                "二抗废液清理完成 √ \n进液通道：11 \n出液通道：${(index - ((index / 4) * 4)) + 1}"
             )
-        )
+        }
     }
 
     private suspend fun washing(index: Int, process: Process) {
-        try {
-            verify(index, process)
-        } catch (ex: Exception) {
-            callback(JobEvent.Error(ex))
-            logLinkedList.add(
-                Log(
-                    index = index,
-                    level = "ERROR",
-                    message = "${ex.message}"
-                )
-            )
-            return
-        }
+        // check
+        verify(index, process)
 
         var state = hashMap[index]!!
         val processes = state.processes.toMutableList()
         val processIndex = processes.indexOf(process)
 
         repeat(process.times) {
-            waitForLock(state) {
+            waitForLock(index, state) {
+                // 更新模块状态
                 state = state.copy(status = JobState.LIQUID)
                 callback(JobEvent.Changed(state))
+                // 加液
                 liquid(index, process, 10, (index - ((index / 4) * 4)) + 1)
+                // 更新模块状态和进程状态
                 processes[processIndex] = process.copy(status = Process.RUNNING)
                 state = state.copy(status = JobState.RUNNING, processes = processes)
                 callback(JobEvent.Changed(state))
-                lock.set(false)
             }
 
+            // 倒计时
             countDown(state, (process.duration * 60).toLong())
 
-            waitForLock(state) {
+            waitForLock(index, state) {
+                // 更新模块状态
                 state = state.copy(status = JobState.WASTE)
                 callback(JobEvent.Changed(state))
+                // 清理废液
                 clean(index, process, 11, (index - ((index / 4) * 4)) + 1)
-            }
-            logLinkedList.add(
-                Log(
-                    index = index,
-                    level = "INFO",
-                    message = "第${it + 1}次洗涤完成"
+                reportLog(
+                    index,
+                    "INFO",
+                    "第${it + 1}次洗涤完成 √ \n进液通道：11 \n出液通道：${(index - ((index / 4) * 4)) + 1}"
                 )
-            )
+            }
         }
 
+        // 更新模块状态
         processes[processIndex] = process.copy(status = Process.FINISHED)
         state = state.copy(status = JobState.FINISHED, processes = processes)
         callback(JobEvent.Changed(state))
@@ -315,48 +297,34 @@ class JobExecutorUtils @Inject constructor(
     }
 
     private suspend fun phosphateBufferedSaline(index: Int, process: Process) {
-        try {
-            verify(index, process)
-        } catch (ex: Exception) {
-            callback(JobEvent.Error(ex))
-            logLinkedList.add(
-                Log(
-                    index = index,
-                    level = "ERROR",
-                    message = "${ex.message}"
-                )
-            )
-            return
-        }
+        // check
+        verify(index, process)
 
         var state = hashMap[index]!!
         val processes = state.processes.toMutableList()
         val processIndex = processes.indexOf(process)
 
-        waitForLock(state) {
+        waitForLock(index, state) {
+            // 更新模块状态
             state = state.copy(status = JobState.LIQUID)
             callback(JobEvent.Changed(state))
+            // 加液
             liquid(index, process, 10, (index - ((index / 4) * 4)) + 1)
+            // 更新模块状态和进程状态
             processes[processIndex] = process.copy(status = Process.FINISHED)
             state = state.copy(status = JobState.FINISHED, processes = processes)
             callback(JobEvent.Changed(state))
         }
-        logLinkedList.add(
-            Log(
-                index = index,
-                level = "INFO",
-                message = "添加缓冲液完成"
-            )
-        )
+        reportLog(index, "INFO", "添加缓冲液完成")
     }
 
     private fun verify(index: Int, process: Process) {
-        var state = hashMap[index] ?: throw Exception("程序不存在")
+        var state = hashMap[index] ?: throw Exception("ERROR 0X0003 - 程序不存在")
         val processes = state.processes.toMutableList()
         val processIndex = processes.indexOf(process)
 
         if (process.dosage == 0.0) {
-            throw Exception("加液量为零错误")
+            throw Exception("ERROR 0X0004 - 加液量为零")
         }
 
         if (processIndex != -1) {
@@ -364,59 +332,67 @@ class JobExecutorUtils @Inject constructor(
             state = state.copy(status = JobState.RUNNING, processes = processes)
             callback(JobEvent.Changed(state))
         } else {
-            throw Exception("进程不存在")
+            throw Exception("ERROR 0X0005 - 进程不存在")
         }
     }
 
     private suspend fun liquid(index: Int, process: Process, inChannel: Int, outChannel: Int) {
         val group = index / 4
-        val pulse = (hpc[group] ?: { x -> x * 100 }).invoke(process.dosage)
+        val pulse = (hpc[group + 1] ?: { x -> x * 100 }).invoke(process.dosage)
         val inAddr = 2 * group
         val outAddr = 2 * group + 1
-        val recoup = dataStore.readData(Constants.ZT_0002, 0L)
-        callback(JobEvent.Shaker(true))
+        val recoup = dataStore.readData(Constants.ZT_0002, 0.0)
+        // 设置温度
         writeWithTemperature(index + 1, process.temperature)
+        // 打开摇床
         writeRegister(slaveAddr = 0, startAddr = 200, value = 1)
+        callback(JobEvent.Shaker(true))
+        // 切阀
         delay(100L)
         writeWithValve(inAddr, inChannel)
         writeWithValve(outAddr, outChannel)
-        writeWithPulse(group + 1, pulse.toLong() + recoup)
+        // 加液
+        writeWithPulse(group + 1, (pulse + (recoup * 6400)).toLong())
+        // 回收残留液体
         if (recoup > 0.0) {
             // 后边段残留的液体
             writeWithValve(inAddr, 12)
-            writeWithPulse(slaveAddr = group + 1, value = recoup * 2)
+            writeWithPulse(slaveAddr = group + 1, value = (recoup * 6400 * 2).toLong())
             // 退回前半段残留的液体
             writeWithValve(inAddr, inChannel)
             writeWithValve(outAddr, 6)
-            writeWithPulse(group + 1, -recoup * 2)
+            writeWithPulse(group + 1, -(recoup * 6400 * 2).toLong())
         }
     }
 
     private suspend fun clean(index: Int, process: Process, inChannel: Int, outChannel: Int) {
         val group = index / 4
-        val pulse = (hpc[group] ?: { x -> x * 100 }).invoke(process.dosage)
+        val pulse = (hpc[group + 1] ?: { x -> x * 100 }).invoke(process.dosage)
         val inAddr = 2 * group
         val outAddr = 2 * group + 1
-        val recoup = dataStore.readData(Constants.ZT_0002, 0L)
-        callback(JobEvent.Shaker(false))
+        val recoup = dataStore.readData(Constants.ZT_0002, 0.0)
+        // 停止摇床
         writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
         delay(300L)
         writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
+        callback(JobEvent.Shaker(false))
+        // 切阀
         writeWithValve(inAddr, inChannel)
         writeWithValve(outAddr, outChannel)
-        writeWithPulse(group + 1, -(pulse + recoup).toLong() * 2)
+        // 回收残留液体
+        writeWithPulse(group + 1, -(pulse + (recoup * 6400)).toLong() * 2)
     }
 
-    private suspend fun waitForLock(state: JobState, block: suspend () -> Unit) {
-        if (lock.get()) {
+    private suspend fun waitForLock(index: Int, state: JobState, block: suspend () -> Unit) {
+        if (lock.get() >= 0) {
             callback(JobEvent.Changed(state.copy(status = JobState.WAITING)))
-            while (lock.get()) {
+            while (lock.get() >= 0) {
                 delay(1000L)
             }
         }
-        lock.set(true)
+        lock.set(index)
         block()
-        lock.set(false)
+        lock.set(-1)
     }
 
     private suspend fun countDown(state: JobState, allTime: Long) {
@@ -424,6 +400,16 @@ class JobExecutorUtils @Inject constructor(
             callback(JobEvent.Changed(state.copy(time = allTime - it)))
             delay(1000L)
         }
+    }
+
+    private fun reportLog(index: Int, level: String, message: String) {
+        logLinkedList.add(
+            Log(
+                index = index,
+                level = level,
+                message = message
+            )
+        )
     }
 }
 
@@ -434,8 +420,7 @@ data class JobState(
     val status: Int = 0,
     val time: Long = 0L
 ) {
-
-    fun isRunning() = status != RUNNING && status != FINISHED
+    fun isRunning() = status != STOPPED && status != FINISHED
 
     companion object {
         const val STOPPED = 0
@@ -450,7 +435,7 @@ data class JobState(
 
 sealed class JobEvent {
     data class Changed(val state: JobState) : JobEvent()
-    data class Error(val ex: Exception) : JobEvent()
+    data class Error(val index: Int, val ex: Exception) : JobEvent()
     data class Shaker(val shaker: Boolean) : JobEvent()
     data class Logs(val logs: List<Log>) : JobEvent()
 }

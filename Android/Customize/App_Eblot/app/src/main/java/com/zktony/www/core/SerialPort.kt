@@ -1,5 +1,6 @@
 package com.zktony.www.core
 
+import android.util.Log
 import com.zktony.core.ext.logi
 import com.zktony.serialport.SerialHelper
 import com.zktony.serialport.config.serialConfig
@@ -61,6 +62,7 @@ class SerialPort {
     fun send(v0: V0) {
         _send.value = v0
         helper.sendHex(v0.toHex())
+        Log.i("SerialPort", "send: ${v0.toHex()}")
     }
 
     fun initializer() {

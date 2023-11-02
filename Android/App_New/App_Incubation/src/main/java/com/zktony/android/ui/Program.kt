@@ -55,20 +55,24 @@ import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.toList
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ProgramRoute(viewModel: ProgramViewModel) {
 
     val scope = rememberCoroutineScope()
     val navigationActions = LocalNavigationActions.current
     val snackbarHostState = LocalSnackbarHostState.current
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val entities = viewModel.entities.collectAsLazyPagingItems()
+
+    val page by viewModel.page.collectAsStateWithLifecycle()
+    val selected by viewModel.selected.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
+
+    val entities = viewModel.entities.collectAsLazyPagingItems()
     val navigation: () -> Unit = {
         scope.launch {
-            when (uiState.page) {
+            when (page) {
                 PageType.PROGRAM_LIST -> navigationActions.navigateUp()
-                else -> viewModel.uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_LIST))
+                else -> viewModel.dispatch(ProgramIntent.NavTo(PageType.PROGRAM_LIST))
             }
         }
     }
@@ -79,33 +83,16 @@ fun ProgramRoute(viewModel: ProgramViewModel) {
     LaunchedEffect(key1 = message) {
         message?.let {
             snackbarHostState.showSnackbar(it)
-            viewModel.uiEvent(ProgramUiEvent.Message(null))
+            viewModel.dispatch(ProgramIntent.Message(null))
         }
     }
 
-    ProgramWrapper(
-        entities = entities,
-        uiState = uiState,
-        uiEvent = viewModel::uiEvent,
-        navigation = navigation
-    )
-}
-
-
-@OptIn(ExperimentalAnimationApi::class)
-@Composable
-fun ProgramWrapper(
-    entities: LazyPagingItems<Program>,
-    uiState: ProgramUiState,
-    uiEvent: (ProgramUiEvent) -> Unit,
-    navigation: () -> Unit
-) {
     Column {
-        ProgramAppBar(entities.toList(), uiState, uiEvent) { navigation() }
-        AnimatedContent(targetState = uiState.page) {
+        ProgramAppBar(entities.toList(), selected, page, viewModel::dispatch) { navigation() }
+        AnimatedContent(targetState = page) {
             when (it) {
-                PageType.PROGRAM_LIST -> ProgramList(entities, uiEvent)
-                PageType.PROGRAM_DETAIL -> ProgramDetail(entities.toList(), uiState, uiEvent)
+                PageType.PROGRAM_LIST -> ProgramList(entities, viewModel::dispatch)
+                PageType.PROGRAM_DETAIL -> ProgramDetail(entities.toList(), selected, viewModel::dispatch)
                 else -> {}
             }
         }
@@ -115,7 +102,7 @@ fun ProgramWrapper(
 @Composable
 fun ProgramList(
     entities: LazyPagingItems<Program>,
-    uiEvent: (ProgramUiEvent) -> Unit
+    dispatch: (ProgramIntent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackbarHostState.current
@@ -133,13 +120,13 @@ fun ProgramList(
                 item = item,
                 onClick = {
                     scope.launch {
-                        uiEvent(ProgramUiEvent.ToggleSelected(item.id))
-                        uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_DETAIL))
+                        dispatch(ProgramIntent.ToggleSelected(item.id))
+                        dispatch(ProgramIntent.NavTo(PageType.PROGRAM_DETAIL))
                     }
                 },
                 onDelete = {
                     scope.launch {
-                        uiEvent(ProgramUiEvent.Delete(item.id))
+                        dispatch(ProgramIntent.Delete(item.id))
                         snackbarHostState.showSnackbar("删除成功")
                     }
                 }
@@ -151,13 +138,13 @@ fun ProgramList(
 @Composable
 fun ProgramDetail(
     entities: List<Program>,
-    uiState: ProgramUiState,
-    uiEvent: (ProgramUiEvent) -> Unit,
+    selected: Long,
+    dispatch: (ProgramIntent) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
-    val selected = entities.find { it.id == uiState.selected } ?: Program()
+    val program = entities.find { it.id == selected } ?: Program()
     val selectedIndex = remember { mutableIntStateOf(0) }
-    val process = selected.processes.getOrNull(selectedIndex.intValue)
+    val process = program.processes.getOrNull(selectedIndex.intValue)
 
     Row(
         modifier = Modifier.padding(16.dp),
@@ -167,7 +154,7 @@ fun ProgramDetail(
             modifier = Modifier.fillMaxWidth(0.5f),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            itemsIndexed(selected.processes) { index, item ->
+            itemsIndexed(program.processes) { index, item ->
                 ProcessItem(
                     item = item,
                     selected = index == selectedIndex.intValue
@@ -179,7 +166,7 @@ fun ProgramDetail(
                             }
 
                             1, 2 -> {
-                                val processes = selected.processes.toMutableList()
+                                val processes = program.processes.toMutableList()
                                 val temp = processes[index]
                                 if (func == 1) {
                                     if (index == 0) {
@@ -194,13 +181,13 @@ fun ProgramDetail(
                                     processes[index] = processes[index + 1]
                                     processes[index + 1] = temp
                                 }
-                                uiEvent(ProgramUiEvent.Update(selected.copy(processes = processes)))
+                                dispatch(ProgramIntent.Update(program.copy(processes = processes)))
                             }
 
                             3 -> {
-                                val processes = selected.processes.toMutableList()
+                                val processes = program.processes.toMutableList()
                                 processes.removeAt(index)
-                                uiEvent(ProgramUiEvent.Update(selected.copy(processes = processes)))
+                                dispatch(ProgramIntent.Update(program.copy(processes = processes)))
                             }
                         }
                     }
@@ -215,9 +202,9 @@ fun ProgramDetail(
                 process = process
             ) { p ->
                 scope.launch {
-                    val processes = selected.processes.toMutableList()
+                    val processes = program.processes.toMutableList()
                     processes[selectedIndex.intValue] = p
-                    uiEvent(ProgramUiEvent.Update(selected.copy(processes = processes)))
+                    dispatch(ProgramIntent.Update(program.copy(processes = processes)))
                 }
             }
         }

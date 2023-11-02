@@ -57,13 +57,6 @@ object SerialPortUtils {
     }
 
     /**
-     * 读取寄存器
-     */
-    suspend fun readRegister(slaveAddr: Int, startAddr: Int, quantity: Int) {
-
-    }
-
-    /**
      * 写入 16 位整数
      */
     suspend fun writeRegister(slaveAddr: Int, startAddr: Int, value: Int) {
@@ -94,11 +87,11 @@ object SerialPortUtils {
     /**
      * 设置阀门状态
      */
-    suspend fun writeWithValve(slaveAddr: Int, channel: Int, retry: Int = 3) {
+    suspend fun writeWithValve(slaveAddr: Int, channel: Int, retry: Int = 1) {
         val current = hpv[slaveAddr] ?: 0
         if (current == channel) return
         try {
-            withTimeout((current - channel).absoluteValue * 1000L) {
+            withTimeout((current - channel).absoluteValue * 2000L) {
                 // 切阀命令
                 SerialStoreUtils.get("rtu")?.sendByteArray(bytes = RunzeProtocol().apply {
                     this.slaveAddr = slaveAddr.toByte()
@@ -124,6 +117,8 @@ object SerialPortUtils {
         } catch (ex: TimeoutCancellationException) {
             if (hpv[slaveAddr] != channel && retry > 0) {
                 writeWithValve(slaveAddr, channel, retry - 1)
+            } else {
+                throw Exception("ERROR 0X0002 - 切阀超时")
             }
         }
     }
@@ -131,17 +126,16 @@ object SerialPortUtils {
     /**
      * 发送脉冲数
      */
-    suspend fun writeWithPulse(slaveAddr: Int, value: Long, retry: Int = 3) {
+    suspend fun writeWithPulse(slaveAddr: Int, value: Long) {
         if (value == 0L) return
-        val before = hps[slaveAddr] ?: 0
         try {
-            withTimeout(maxOf(value.absoluteValue / 32000L, 1) * 1000L + 1000L) {
+            withTimeout(maxOf(value.absoluteValue / 32000L, 1) * 1000L + 2000L) {
                 writeRegister(startAddr = 222, slaveAddr = slaveAddr, value = value)
                 hps[slaveAddr] = 1
                 while ((hps[slaveAddr] ?: 0) != 0) {
                     // 减小反应时间
                     repeat(3) {
-                        delay(100L)
+                        delay(50L)
                         if ((hps[slaveAddr] ?: 0) == 0) return@withTimeout
                     }
                     // 读取当前的速度
@@ -153,9 +147,8 @@ object SerialPortUtils {
                 }
             }
         } catch (ex: TimeoutCancellationException) {
-            if ((hps[slaveAddr] ?: 0) == before && retry > 0) {
-                writeWithPulse(slaveAddr, value, retry - 1)
-            }
+            writeRegister(slaveAddr = slaveAddr, startAddr = 200, value = 0)
+            throw Exception("ERROR 0X0001 - 电机运行超时")
         }
     }
 
