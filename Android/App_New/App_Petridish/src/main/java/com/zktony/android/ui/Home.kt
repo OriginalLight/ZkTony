@@ -404,7 +404,7 @@ fun MenuContent(
                         uvState_ex = true
                         scope.launch {
                             tx {
-                                valve(1 to 1)
+                                valve(0 to 1)
                             }
                         }
                     } else {
@@ -412,7 +412,7 @@ fun MenuContent(
                         uvState_ex = false
                         scope.launch {
                             tx {
-                                valve(1 to 0)
+                                valve(0 to 0)
                             }
                         }
                     }

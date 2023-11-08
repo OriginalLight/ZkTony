@@ -35,7 +35,7 @@ private var jiazhua: AtomicLong = AtomicLong(0L)
 private var xp: AtomicLong = AtomicLong(0L)
 
 /**
- * 上盘是电机5
+ * 上盘是电机3
  */
 private var sp: AtomicLong = AtomicLong(0L)
 
@@ -50,7 +50,7 @@ fun <T : Number> pulse(index: Int, dvp: T): Long {
 
     val p = when (dvp) {
         is Float -> {
-            (dvp / asyncTask.hpc[index]!!).toLong()
+            (dvp / AppStateUtils.hpc[index]!!).toLong()
         }
 
         is Long -> {
@@ -85,17 +85,15 @@ fun <T : Number> pulse(index: Int, dvp: T): Long {
             d
         }
 
+        3 -> {
+            val d = p - sp.get()
+            sp.set(maxOf(p, 0))
+            d
+        }
 
         4 -> {
             val d = p - xp.get()
             xp.set(maxOf(p, 0))
-            d
-        }
-
-
-        5 -> {
-            val d = p - sp.get()
-            sp.set(maxOf(p, 0))
             d
         }
 

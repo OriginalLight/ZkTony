@@ -10,7 +10,10 @@ import com.zktony.serialport.lifecycle.SerialStoreUtils
 object SerialPortUtils {
     fun with() {
         // 初始化zkty串口
-        SerialStoreUtils.put("zkty", abstractSerialHelperOf {})
+        SerialStoreUtils.put("zkty", abstractSerialHelperOf {
+            device = "/dev/ttyS0"
+            log = true
+        })
 
         // rtu串口全局回调
         SerialStoreUtils.get("zkty")?.callbackHandler = { bytes ->
