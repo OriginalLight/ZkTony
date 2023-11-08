@@ -68,7 +68,7 @@ class CalibrationViewModel @Inject constructor(
             }
             try {
                 if (AppStateUtils.hpv[2 * index - 2] != 10) {
-                    SerialPortUtils.writeWithValve(2 * index - 2, 10)
+                    SerialPortUtils.writeWithValve(2 * index - 2, 1)
                 }
                 if (AppStateUtils.hpv[2 * index - 1] != 1) {
                     SerialPortUtils.writeWithValve(2 * index - 1, 1)

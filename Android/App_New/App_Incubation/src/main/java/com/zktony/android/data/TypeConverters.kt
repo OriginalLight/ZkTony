@@ -3,9 +3,9 @@ package com.zktony.android.data
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.zktony.android.data.entities.internal.IncubationStage
 import com.zktony.android.data.entities.internal.Log
 import com.zktony.android.data.entities.internal.Point
-import com.zktony.android.data.entities.internal.Process
 import java.util.Date
 
 /**
@@ -27,17 +27,17 @@ object DateConverters {
     }
 }
 
-object ProcessConverters {
+object IncubationStageConverters {
     @TypeConverter
     @JvmStatic
-    fun toObject(value: String): List<Process> {
-        val listType = object : TypeToken<List<Process>>() {}.type
+    fun toObject(value: String): List<IncubationStage> {
+        val listType = object : TypeToken<List<IncubationStage>>() {}.type
         return Gson().fromJson(value, listType)
     }
 
     @TypeConverter
     @JvmStatic
-    fun toString(list: List<Process>): String {
+    fun toString(list: List<IncubationStage>): String {
         return Gson().toJson(list)
     }
 }

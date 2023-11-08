@@ -28,7 +28,9 @@ object SerialPortUtils {
         })
         // 初始化zkty串口
         SerialStoreUtils.put("zkty", abstractSerialHelperOf {
+            device = "/dev/ttyS0"
             baudRate = 57600
+            log = true
         })
         // rtu串口全局回调
         SerialStoreUtils.get("rtu")?.callbackHandler = { bytes ->
@@ -91,7 +93,7 @@ object SerialPortUtils {
         val current = hpv[slaveAddr] ?: 0
         if (current == channel) return
         try {
-            withTimeout((current - channel).absoluteValue * 2000L) {
+            withTimeout((current - channel).absoluteValue * 1000L + 1000L) {
                 // 切阀命令
                 SerialStoreUtils.get("rtu")?.sendByteArray(bytes = RunzeProtocol().apply {
                     this.slaveAddr = slaveAddr.toByte()
@@ -156,15 +158,19 @@ object SerialPortUtils {
      * 发送温度
      */
     suspend fun writeWithTemperature(id: Int, value: Double) {
+        SerialStoreUtils.get("zkty")?.sendAsciiString("TC1:TCSW=0@$id\r")
+        delay(60 * 1000L)
         SerialStoreUtils.get("zkty")
-            ?.sendAsciiString("TC1:TCADJUSTTEMP=${String.format("%.2f", value)}@$id\n")
+            ?.sendAsciiString("TC1:TCADJUSTTEMP=${String.format("%.2f", value)}@$id\r")
+        delay(60 * 1000L)
+        SerialStoreUtils.get("zkty")?.sendAsciiString("TC1:TCSW=1@$id\r")
     }
 
     /**
      * 读取温度
      */
     suspend fun readWithTemperature(id: Int, block: (Int, Double) -> Unit) {
-        SerialStoreUtils.get("zkty")?.sendAsciiString("TC1:TCACTUALTEMP?@$id\n") { res ->
+        SerialStoreUtils.get("zkty")?.sendAsciiString("TC1:TCACTUALTEMP?@$id\r") { res ->
             when (res) {
                 is SerialResult.Success -> {
                     val ascii = res.byteArray.toAsciiString()

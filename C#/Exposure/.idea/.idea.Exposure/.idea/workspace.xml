@@ -12,7 +12,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="218c30b2-f65b-45d2-afac-8f962c847297" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/ui/components/Items.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/ui/components/Items.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/data/TypeConverters.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/data/TypeConverters.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/data/entities/Program.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/data/entities/Program.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/data/entities/internal/Process.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/data/entities/internal/IncubationStage.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/data/entities/internal/defaults/ProcessDefaults.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/data/entities/internal/defaults/IncubationStageDefaults.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/ui/Debug.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/ui/Debug.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/ui/Home.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/ui/Home.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/ui/HomeViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/ui/HomeViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/ui/Program.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/ui/Program.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/ui/components/Items.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/ui/components/Items.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/ui/components/TopAppBar.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/ui/components/TopAppBar.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/ui/utils/JobExecutorUtils.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/utils/SerialPortUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/utils/SerialPortUtils.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Exposure/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Exposure/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -121,6 +133,7 @@
       <workItem from="1698196096396" duration="2644000" />
       <workItem from="1698215321985" duration="2502000" />
       <workItem from="1698737576397" duration="1211000" />
+      <workItem from="1699001494327" duration="828000" />
     </task>
     <servers />
   </component>

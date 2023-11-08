@@ -10,24 +10,27 @@ import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.datastore.DataSaverDataStore
 import com.zktony.android.data.entities.History
 import com.zktony.android.data.entities.Program
+import com.zktony.android.data.entities.internal.IncubationStage
 import com.zktony.android.data.entities.internal.Log
-import com.zktony.android.data.entities.internal.Process
-import com.zktony.android.ui.utils.JobEvent
-import com.zktony.android.ui.utils.JobExecutorUtils
-import com.zktony.android.ui.utils.JobState
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
+import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.SerialPortUtils.readWithTemperature
 import com.zktony.android.utils.SerialPortUtils.writeRegister
+import com.zktony.android.utils.SerialPortUtils.writeWithPulse
 import com.zktony.android.utils.SerialPortUtils.writeWithTemperature
+import com.zktony.android.utils.SerialPortUtils.writeWithValve
 import com.zktony.serialport.command.runze.RunzeProtocol
 import com.zktony.serialport.lifecycle.SerialStoreUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
 /**
@@ -38,49 +41,36 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val dao: ProgramDao,
     private val historyDao: HistoryDao,
-    private val dataStore: DataSaverDataStore,
-    private val jobExecutorUtils: JobExecutorUtils
+    private val dataStore: DataSaverDataStore
 ) : ViewModel() {
 
     private val _page = MutableStateFlow(PageType.HOME)
     private val _uiFlags = MutableStateFlow<UiFlags>(UiFlags.none())
     private val _message = MutableStateFlow<String?>(null)
     private val _selected = MutableStateFlow(0)
-    private val _jobList = MutableStateFlow(listOf<JobState>())
     private val _insulation = MutableStateFlow(List(9) { 0.0 })
     private val _shaker = MutableStateFlow(false)
+    private val _stateList = MutableStateFlow<List<IncubationState>>(emptyList())
+    private val _cleanJob = MutableStateFlow(0)
+
+    private val jobMap = hashMapOf<Int, Job>()
+    private val lock = AtomicInteger(-1)
+    private val logList = mutableListOf<Log>()
+    private var job: Job? = null
 
     val page = _page.asStateFlow()
     val uiFlags = _uiFlags.asStateFlow()
     val message = _message.asStateFlow()
     val selected = _selected.asStateFlow()
-    val jobList = _jobList.asStateFlow()
     val insulation = _insulation.asStateFlow()
     val shaker = _shaker.asStateFlow()
+    val stateList = _stateList.asStateFlow()
+    val cleanJob = _cleanJob.asStateFlow()
     val entities = Pager(
         config = PagingConfig(pageSize = 20, initialLoadSize = 40)
     ) { dao.getByPage() }.flow.cachedIn(viewModelScope)
 
     init {
-        prepare()
-        deployJobCallback()
-    }
-
-    fun dispatch(intent: HomeIntent) {
-        when (intent) {
-            is HomeIntent.Message -> _message.value = intent.message
-            is HomeIntent.UiFlags -> _uiFlags.value = intent.uiFlags
-            is HomeIntent.NavTo -> _page.value = intent.page
-            is HomeIntent.ToggleSelected -> _selected.value = intent.id
-            is HomeIntent.Start -> start(intent.index)
-            is HomeIntent.Pause -> pause(intent.index)
-            is HomeIntent.Stop -> stop(intent.index)
-            is HomeIntent.ToggleProcess -> toggleProcess(intent.index, intent.program)
-            is HomeIntent.Shaker -> shaker()
-        }
-    }
-
-    private fun prepare() {
         viewModelScope.launch {
             // 根据模块数量配置
             val coll = dataStore.readData(Constants.ZT_0000, 4)
@@ -94,11 +84,8 @@ class HomeViewModel @Inject constructor(
                 delay(300L)
             }
             // 设置初始温度
-            writeWithTemperature(0, dataStore.readData(Constants.ZT_0001, 4.0))
-            delay(500L)
-            repeat(coll) {
-                writeWithTemperature(it + 1, 26.0)
-                delay(500L)
+            launch {
+                writeWithTemperature(0, dataStore.readData(Constants.ZT_0001, 4.0))
             }
             // 设置定时查询温度
             while (true) {
@@ -115,92 +102,90 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun deployJobCallback() {
+    fun dispatch(intent: HomeIntent) {
+        when (intent) {
+            is HomeIntent.Message -> _message.value = intent.message
+            is HomeIntent.ToggleUiFlags -> _uiFlags.value = intent.uiFlags
+            is HomeIntent.NavTo -> _page.value = intent.page
+            is HomeIntent.ToggleSelected -> _selected.value = intent.id
+            is HomeIntent.Start -> start()
+            is HomeIntent.Stop -> stop()
+            is HomeIntent.ToggleProcess -> toggleProcess(intent.index, intent.program)
+            is HomeIntent.Shaker -> shaker()
+            is HomeIntent.AutoClean -> autoClean()
+        }
+    }
+
+    private fun start() {
         viewModelScope.launch {
-            jobExecutorUtils.callback = { event ->
-                when (event) {
-                    is JobEvent.Changed -> {
-                        val jobList = _jobList.value.toMutableList()
-                        val jobIndex = jobList.indexOfFirst { it.index == event.state.index }
-                        if (jobIndex != -1) {
-                            jobList[jobIndex] = event.state
-                        }
-                        _jobList.value = jobList
-                    }
-
-                    is JobEvent.Error -> {
-                        _uiFlags.value = UiFlags.error(event.ex.message ?: "Unknown")
-                    }
-
-                    is JobEvent.Shaker -> {
-                        _shaker.value = event.shaker
-                    }
-
-                    is JobEvent.Logs -> {
-                        val startTime =
-                            (event.logs.firstOrNull() ?: Log(message = "None")).createTime
-                        val logs = event.logs.sortedBy { it.index }
+            // check
+            val state = _stateList.value.find { it.index == _selected.value }
+            if (state == null) {
+                _message.value = "WARN 请选择一个程序"
+                return@launch
+            } else {
+                if (state.id == 0L) {
+                    _message.value = "WARN 请选择一个程序"
+                    return@launch
+                }
+                if (state.stages.isEmpty()) {
+                    _message.value = "WARN 程序中不存在孵育流程"
+                    return@launch
+                }
+                if (!state.isStopped()) {
+                    _message.value = "WARN 该程序正在运行中"
+                    return@launch
+                }
+                updateState(state.copy(flags = 1, stages = state.stages.map { it.copy(flags = 2) }))
+                val job = viewModelScope.launch {
+                    interpreter(_selected.value, state)
+                }
+                job.invokeOnCompletion {
+                    jobMap.remove(_selected.value)
+                    if (jobMap.isEmpty()) {
                         viewModelScope.launch {
+                            val startTime =
+                                (logList.firstOrNull() ?: Log(message = "None")).createTime
+                            val logs = logList.sortedBy { it.index }
                             historyDao.insert(History(logs = logs, createTime = startTime))
+                            // 清空日志
+                            logList.clear()
                         }
                     }
                 }
+                jobMap[_selected.value] = job
             }
         }
     }
 
-    private fun start(index: Int) {
+    private fun stop() {
         viewModelScope.launch {
-            val jobList = _jobList.value.toMutableList()
-            val jobIndex = jobList.indexOfFirst { it.index == index }
-            if (jobIndex != -1) {
-                val job = jobList[jobIndex]
-                val processes = job.processes.map { it.copy(status = Process.UPCOMING) }
-                jobExecutorUtils.create(job.copy(processes = processes))
-            } else {
-                _message.value = "INFO 请选择一个程序"
+            if (lock.get() == _selected.value) {
+                lock.set(-1)
             }
-        }
-    }
-
-    private fun pause(index: Int) {
-        viewModelScope.launch {
-            val jobList = _jobList.value.toMutableList()
-            val jobIndex = jobList.indexOfFirst { it.index == index }
-            if (jobIndex == -1) {
-                jobList.add(JobState(index = index, status = 2))
-            } else {
-                jobList[jobIndex] = jobList[jobIndex].copy(status = 2)
+            jobMap.remove(_selected.value)?.cancel()
+            _stateList.value.find { it.index == _selected.value }?.let { state ->
+                updateState(state.copy(flags = 2, stages = state.stages.map { it.copy(flags = 2) }))
             }
-            _jobList.value = jobList
-        }
-    }
-
-    private fun stop(index: Int) {
-        viewModelScope.launch {
-            jobExecutorUtils.destroy(index)
+            if (jobMap.isEmpty()) {
+                // 停止摇床
+                writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
+                delay(300L)
+                writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
+                _shaker.value = false
+            }
         }
     }
 
     private fun toggleProcess(index: Int, program: Program) {
         viewModelScope.launch {
-            val jobList = _jobList.value.toMutableList()
-            val jobIndex = jobList.indexOfFirst { it.index == index }
-            if (jobIndex == -1) {
-                jobList.add(
-                    JobState(
-                        index = index,
-                        id = program.id,
-                        processes = program.processes
-                    )
-                )
-            } else {
-                jobList[jobIndex] = jobList[jobIndex].copy(
+            updateState(
+                IncubationState(
+                    index = index,
                     id = program.id,
-                    processes = program.processes
+                    stages = program.stages
                 )
-            }
-            _jobList.value = jobList
+            )
         }
     }
 
@@ -221,16 +206,580 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * 解释器
+     *
+     * 解释每个进程
+     */
+    private suspend fun interpreter(index: Int, state: IncubationState) {
+        try {
+            state.stages.forEach { stage ->
+                when (stage.type) {
+                    0 -> blocking(index, stage)
+                    1 -> primaryAntibody(index, stage)
+                    2 -> secondaryAntibody(index, stage)
+                    3 -> washing(index, stage)
+                    4 -> phosphateBufferedSaline(index, stage)
+                }
+            }
+            // 更新模块显示
+            updateState(state.copy(flags = 2))
+        } catch (ex: Exception) {
+            if (ex !is CancellationException) {
+                _uiFlags.value = UiFlags.error(ex.message ?: "Unknown")
+                logList.add(Log(index = index, message = ex.message ?: "Unknown"))
+            }
+
+            if (lock.get() == index) {
+                lock.set(-1)
+            }
+            jobMap.remove(index)?.cancel()
+            updateState(state.copy(flags = 0))
+        }
+    }
+
+    private suspend fun blocking(index: Int, stage: IncubationStage) {
+        // check
+        if (stage.dosage == 0.0) {
+            throw Exception("ERROR 0X0003 - 加液量为零")
+        }
+
+        // 加液
+        waitForLock(index) {
+            // 更新模块状态
+            _stateList.value.find { it.index == index }?.let {
+                updateState(it.copy(flags = 4))
+            }
+            // 加液
+            liquid(index, stage, 9, (index - ((index / 4) * 4)) + 1)
+            // 更新模块状态和进程状态
+            _stateList.value.find { it.index == index }?.let { state ->
+                updateState(
+                    state.copy(
+                        flags = 1,
+                        stages = state.stages.map {
+                            if (it.uuid == stage.uuid) it.copy(flags = 1) else it
+                        })
+                )
+            }
+            // 记录日志
+            logList.add(
+                Log(
+                    index = index,
+                    message = "INFO 添加封闭液完成 √ \n加液量：${stage.dosage} \n进液通道：9 \n出液通道：${(index - ((index / 4) * 4)) + 1}"
+                )
+            )
+        }
+
+        // 倒计时
+        countDown(index, (stage.duration * 60 * 60).toLong())
+
+        waitForLock(index) {
+            // 更新模块状态
+            _stateList.value.find { it.index == index }?.let {
+                updateState(it.copy(flags = 5))
+            }
+            // 清理废液
+            clean(index, stage, 11, (index - ((index / 4) * 4)) + 1)
+            // 更新模块状态和进程状态
+            _stateList.value.find { it.index == index }?.let { state ->
+                updateState(
+                    state.copy(
+                        flags = 1,
+                        stages = state.stages.map {
+                            if (it.uuid == stage.uuid) it.copy(flags = 0) else it
+                        })
+                )
+            }
+            // 记录日志
+            logList.add(
+                Log(
+                    index = index,
+                    message = "INFO 封闭液废液处理完成 √ \n进液通道：11 \n出液通道：${(index - ((index / 4) * 4)) + 1}"
+                )
+            )
+        }
+    }
+
+    private suspend fun primaryAntibody(index: Int, stage: IncubationStage) {
+        // check
+        if (stage.dosage == 0.0) {
+            throw Exception("ERROR 0X0003 - 加液量为零")
+        }
+
+        waitForLock(index) {
+            // 更新模块状态
+            _stateList.value.find { it.index == index }?.let {
+                updateState(it.copy(flags = 4))
+            }
+            // 加液
+            val inChannel =
+                if (stage.origin == 0) (index - ((index / 4) * 4)) + 1 else stage.origin
+            liquid(index, stage, inChannel, (index - ((index / 4) * 4)) + 1)
+            // 更新模块状态和进程状态
+            _stateList.value.find { it.index == index }?.let { state ->
+                updateState(
+                    state.copy(
+                        flags = 1,
+                        stages = state.stages.map {
+                            if (it.uuid == stage.uuid) it.copy(flags = 1) else it
+                        })
+                )
+            }
+            // 记录日志
+            logList.add(
+                Log(
+                    index = index,
+                    message = "INFO 添加一抗完成 √ \n加液量：${stage.dosage} \n进液通道：$inChannel \n出液通道：${(index - ((index / 4) * 4)) + 1}"
+                )
+            )
+        }
+
+        // 倒计时
+        countDown(index, (stage.duration * 60 * 60).toLong())
+
+        waitForLock(index) {
+            // 更新模块状态
+            val inChannel =
+                if (stage.origin == 0) (index - (index / 4) * 4) + 1 else stage.origin
+            if (stage.recycle) {
+                _stateList.value.find { it.index == index }?.let {
+                    updateState(it.copy(flags = 6))
+                }
+                clean(index, stage, inChannel, (index - ((index / 4) * 4)) + 1)
+            } else {
+                _stateList.value.find { it.index == index }?.let {
+                    updateState(it.copy(flags = 5))
+                }
+                clean(index, stage, 11, (index - ((index / 4) * 4)) + 1)
+            }
+            // 更新模块状态和进程状态
+            _stateList.value.find { it.index == index }?.let { state ->
+                updateState(
+                    state.copy(
+                        flags = 1,
+                        stages = state.stages.map {
+                            if (it.uuid == stage.uuid) it.copy(flags = 0) else it
+                        })
+                )
+            }
+            // 记录日志
+            logList.add(
+                Log(
+                    index = index,
+                    message = "INFO 一抗废液${if (stage.recycle) "回收" else "清理"}完成 √ \n进液通道：${if (stage.recycle) inChannel else 11} \n出液通道：${(index - ((index / 4) * 4)) + 1}"
+                )
+            )
+        }
+    }
+
+    private suspend fun secondaryAntibody(index: Int, stage: IncubationStage) {
+        // check
+        if (stage.dosage == 0.0) {
+            throw Exception("ERROR 0X0003 - 加液量为零")
+        }
+
+        waitForLock(index) {
+            // 更新模块状态
+            _stateList.value.find { it.index == index }?.let {
+                updateState(it.copy(flags = 4))
+            }
+            // 加液
+            val inChannel =
+                if (stage.origin == 0) (index - ((index / 4) * 4)) + 5 else stage.origin
+            liquid(index, stage, inChannel, (index - ((index / 4) * 4)) + 1)
+            // 更新模块状态和进程状态
+            _stateList.value.find { it.index == index }?.let { state ->
+                updateState(
+                    state.copy(
+                        flags = 1,
+                        stages = state.stages.map {
+                            if (it.uuid == stage.uuid) it.copy(flags = 1) else it
+                        })
+                )
+            }
+            // 记录日志
+            logList.add(
+                Log(
+                    index = index,
+                    message = "INFO 添加二抗完成 √ \n加液量：${stage.dosage} \n进液通道：$inChannel \n出液通道：${(index - ((index / 4) * 4)) + 1}"
+                )
+            )
+        }
+
+        // 倒计时
+        countDown(index, (stage.duration * 60 * 60).toLong())
+
+        waitForLock(index) {
+            // 更新模块状态
+            _stateList.value.find { it.index == index }?.let {
+                updateState(it.copy(flags = 5))
+            }
+            // 清理废液
+            clean(index, stage, 11, (index - ((index / 4) * 4)) + 1)
+            // 更新模块状态和进程状态
+            // 更新模块状态
+            _stateList.value.find { it.index == index }?.let { state ->
+                updateState(
+                    state.copy(
+                        flags = 1,
+                        stages = state.stages.map {
+                            if (it.uuid == stage.uuid) it.copy(flags = 0) else it
+                        })
+                )
+            }
+            // 记录日志
+            logList.add(
+                Log(
+                    index = index,
+                    message = "INFO 二抗废液清理完成 √ \n进液通道：11 \n出液通道：${(index - ((index / 4) * 4)) + 1}"
+                )
+            )
+        }
+    }
+
+    private suspend fun washing(index: Int, stage: IncubationStage) {
+        // check
+        if (stage.dosage == 0.0) {
+            throw Exception("ERROR 0X0003 - 加液量为零")
+        }
+
+        repeat(stage.times) {
+            waitForLock(index) {
+                // 更新模块状态
+                _stateList.value.find { it.index == index }?.let {
+                    updateState(it.copy(flags = 4))
+                }
+                // 加液
+                liquid(index, stage, 10, (index - ((index / 4) * 4)) + 1)
+                // 更新模块状态和进程状态
+                _stateList.value.find { it.index == index }?.let { state ->
+                    updateState(
+                        state.copy(
+                            flags = 1,
+                            stages = state.stages.map {
+                                if (it.uuid == stage.uuid) it.copy(flags = 1) else it
+                            })
+                    )
+                }
+            }
+
+            // 倒计时
+            countDown(index, (stage.duration * 60).toLong())
+
+            waitForLock(index) {
+                // 更新模块状态
+                _stateList.value.find { it.index == index }?.let {
+                    updateState(it.copy(flags = 5))
+                }
+                // 清理废液
+                clean(index, stage, 11, (index - ((index / 4) * 4)) + 1)
+                logList.add(
+                    Log(
+                        index = index,
+                        message = "INFO 第${it + 1}次洗涤完成 √ \n进液通道：11 \n出液通道：${(index - ((index / 4) * 4)) + 1}"
+                    )
+                )
+            }
+        }
+
+        // 更新模块状态
+        _stateList.value.find { it.index == index }?.let { state ->
+            updateState(
+                state.copy(
+                    flags = 1,
+                    stages = state.stages.map {
+                        if (it.uuid == stage.uuid) it.copy(flags = 0) else it
+                    })
+            )
+        }
+    }
+
+    private suspend fun phosphateBufferedSaline(index: Int, stage: IncubationStage) {
+        // check
+        if (stage.dosage == 0.0) {
+            throw Exception("ERROR 0X0003 - 加液量为零")
+        }
+
+        waitForLock(index) {
+            // 更新模块状态
+            _stateList.value.find { it.index == index }?.let {
+                updateState(it.copy(flags = 4))
+            }
+            // 加液
+            liquid(index, stage, 10, (index - ((index / 4) * 4)) + 1)
+            // 更新模块状态和进程状态
+            _stateList.value.find { it.index == index }?.let { state ->
+                updateState(
+                    state.copy(
+                        flags = 1,
+                        stages = state.stages.map {
+                            if (it.uuid == stage.uuid) stage.copy(flags = 0) else it
+                        })
+                )
+            }
+            logList.add(
+                Log(
+                    index = index,
+                    message = "添加缓冲液完成"
+                )
+            )
+        }
+    }
+
+    private suspend fun liquid(
+        index: Int,
+        stage: IncubationStage,
+        inChannel: Int,
+        outChannel: Int
+    ) {
+        val group = index / 4
+        val pulse = (AppStateUtils.hpc[group + 1] ?: { x -> x * 100 }).invoke(stage.dosage)
+        val inAddr = 2 * group
+        val outAddr = 2 * group + 1
+        val recoup = dataStore.readData(
+            when (stage.type) {
+                0 -> Constants.ZT_0003
+                1, 2 -> Constants.ZT_0002
+                3, 4 -> Constants.ZT_0004
+                else -> Constants.ZT_0002
+            }, 0.0
+        )
+        // 设置温度
+        viewModelScope.launch {
+            writeWithTemperature(index + 1, stage.temperature)
+        }
+        // 打开摇床
+        writeRegister(slaveAddr = 0, startAddr = 200, value = 1)
+        _shaker.value = true
+        // 切阀
+        delay(100L)
+        writeWithValve(inAddr, inChannel)
+        writeWithValve(outAddr, outChannel)
+        // 加液
+        writeWithPulse(group + 1, (pulse + (recoup * 6400)).toLong())
+        // 回收残留液体
+        if (recoup > 0.0) {
+            // 后边段残留的液体
+            delay(500L)
+            writeWithValve(inAddr, 12)
+            writeWithPulse(
+                slaveAddr = group + 1,
+                value = (recoup * 6400 * 2).toLong()
+            )
+            delay(500L)
+            // 退回前半段残留的液体
+            writeWithValve(inAddr, inChannel)
+            writeWithValve(outAddr, 6)
+            writeWithPulse(group + 1, -(recoup * 6400 * 2).toLong())
+        }
+        // 清理管路避免污染
+        if (stage.type == 1 || stage.type == 2) {
+            delay(500L)
+            writeWithValve(inAddr, 10)
+            writeWithValve(outAddr, 5)
+            writeWithPulse(group + 1, (recoup * 6400 * 2).toLong())
+            delay(500L)
+            writeWithValve(inAddr, 12)
+            writeWithPulse(group + 1, (recoup * 6400 * 2).toLong())
+            delay(500L)
+            writeWithValve(outAddr, 6)
+            writeWithValve(inAddr, 10)
+            writeWithPulse(group + 1, (recoup * 6400 * -2).toLong())
+        }
+    }
+
+    private suspend fun clean(
+        index: Int,
+        stage: IncubationStage,
+        inChannel: Int,
+        outChannel: Int
+    ) {
+        val group = index / 4
+        val pulse = (AppStateUtils.hpc[group + 1] ?: { x -> x * 100 }).invoke(stage.dosage)
+        val inAddr = 2 * group
+        val outAddr = 2 * group + 1
+        val recoup = dataStore.readData(
+            when (stage.type) {
+                0 -> Constants.ZT_0003
+                1, 2 -> Constants.ZT_0002
+                3, 4 -> Constants.ZT_0004
+                else -> Constants.ZT_0002
+            }, 0.0
+        )
+        // 停止摇床
+        writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
+        delay(300L)
+        writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
+        delay(300L)
+        _shaker.value = false
+        // 切阀
+        writeWithValve(inAddr, inChannel)
+        writeWithValve(outAddr, outChannel)
+        // 回收残留液体
+        writeWithPulse(group + 1, -(pulse + (recoup * 6400 * 4)).toLong())
+        // 清理管路避免污染
+        if (stage.type == 1 || stage.type == 2) {
+            delay(500L)
+            writeWithValve(inAddr, 10)
+            writeWithValve(outAddr, 5)
+            writeWithPulse(group + 1, (recoup * 6400 * 2).toLong())
+            delay(500L)
+            writeWithValve(inAddr, 12)
+            writeWithPulse(group + 1, (recoup * 6400 * 2).toLong())
+            delay(500L)
+            writeWithValve(outAddr, 6)
+            writeWithValve(inAddr, 10)
+            writeWithPulse(group + 1, (recoup * 6400 * -2).toLong())
+        }
+    }
+
+    private suspend fun waitForLock(index: Int, block: suspend () -> Unit) {
+        if (lock.get() >= 0) {
+            _stateList.value.find { it.index == index }?.let {
+                updateState(it.copy(flags = 3))
+            }
+            while (lock.get() >= 0) {
+                delay(1000L)
+            }
+        }
+        lock.set(index)
+        block()
+        lock.set(-1)
+    }
+
+    private suspend fun countDown(index: Int, allTime: Long) {
+        repeat(allTime.toInt()) { time ->
+            _stateList.value.find { it.index == index }?.let {
+                updateState(it.copy(time = allTime - time))
+            }
+            delay(1000L)
+        }
+    }
+
+    private fun updateState(state: IncubationState) {
+        val stateList = _stateList.value.toMutableList()
+        val ix = stateList.indexOfFirst { it.index == state.index }
+        if (ix >= 0) {
+            stateList.removeAt(ix)
+        }
+        stateList.add(state)
+        _stateList.value = stateList
+    }
+
+    private fun autoClean() {
+        if (job == null) {
+            job = viewModelScope.launch {
+                _cleanJob.value = 1
+                val r1 = dataStore.readData(Constants.ZT_0002, 0.0)
+                val r2 = dataStore.readData(Constants.ZT_0003, 0.0)
+                val r3 = dataStore.readData(Constants.ZT_0004, 0.0)
+                val pulse = (AppStateUtils.hpc[1] ?: { x -> x * 100 }).invoke(20000.0)
+
+                try {
+                    if (_shaker.value) {
+                        writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
+                        delay(300L)
+                        writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
+                        delay(300L)
+                    }
+
+                    repeat(2) {
+                        repeat(4) { index ->
+                            // 切阀加液进孵育盒
+                            writeWithValve(0, 10)
+                            writeWithValve(1, index + 1)
+                            writeWithPulse(1, (pulse + (r3 * 6400)).toLong())
+                            delay(500L)
+                            //切阀排空后半段
+                            writeWithValve(0, 12)
+                            writeWithValve(1, index + 1)
+                            writeWithPulse(1, (r1 * 6400 * 2).toLong())
+                            delay(500L)
+                            // 切阀放到一抗容器
+                            writeWithValve(0, index + 1)
+                            writeWithValve(1, index + 1)
+                            writeWithPulse(1, -(pulse + (r1 * 6400 * 4)).toLong())
+                            delay(500L)
+                            // 切阀加液进孵育盒
+                            writeWithValve(0, 10)
+                            writeWithValve(1, index + 1)
+                            writeWithPulse(1, pulse.toLong())
+                            delay(500L)
+                            //切阀排空后半段
+                            writeWithValve(0, 12)
+                            writeWithValve(1, index + 1)
+                            writeWithPulse(1, (r3 * 6400 * 2).toLong())
+                            delay(500L)
+                            //切阀排空前半段
+                            writeWithValve(0, 10)
+                            writeWithValve(1, 6)
+                            writeWithPulse(1, -(r1 * 6400 * 2).toLong())
+                            delay(500L)
+                            // 切阀放到二抗容器
+                            writeWithValve(0, index + 5)
+                            writeWithValve(1, index + 1)
+                            writeWithPulse(1, -(pulse + (r1 * 6400 * 4)).toLong())
+                            delay(500L)
+                            // 切阀排空一抗容器
+                            writeWithValve(0, index + 1)
+                            writeWithValve(1, 5)
+                            writeWithPulse(1, (pulse + (4 * r1 * 6400)).toLong())
+                            delay(500L)
+                            // 切阀排空二抗容器
+                            writeWithValve(0, index + 5)
+                            writeWithValve(1, 5)
+                            writeWithPulse(1, (pulse + (4 * r1 * 6400)).toLong())
+                            delay(500L)
+                        }
+                        // 洗涤封闭液管路
+                        writeWithValve(0, 9)
+                        writeWithValve(1, 5)
+                        writeWithPulse(1, (pulse + (r2 * 6400)).toLong())
+                        // 切阀排空后半段
+                        writeWithValve(0, 12)
+                        writeWithValve(1, 5)
+                        writeWithPulse(1, (r2 * 6400 * 2).toLong())
+                        // 切阀排空前半段
+                        writeWithValve(0, 9)
+                        writeWithValve(1, 6)
+                        writeWithPulse(1, -(r2 * 6400 * 2).toLong())
+                    }
+                    _cleanJob.value = 2
+                } catch (ex: Exception) {
+                    if (ex !is CancellationException) {
+                        _uiFlags.value = UiFlags.error(ex.message ?: "Unknown")
+                    }
+                    _cleanJob.value = 0
+                }
+            }
+        } else {
+            job?.cancel()
+            job = null
+        }
+    }
 }
 
 sealed class HomeIntent {
     data class Message(val message: String?) : HomeIntent()
-    data class UiFlags(val uiFlags: com.zktony.android.ui.utils.UiFlags) : HomeIntent()
     data class NavTo(val page: Int) : HomeIntent()
-    data class Pause(val index: Int) : HomeIntent()
-    data class Start(val index: Int) : HomeIntent()
-    data class Stop(val index: Int) : HomeIntent()
+    data class ToggleUiFlags(val uiFlags: UiFlags) : HomeIntent()
     data class ToggleProcess(val index: Int, val program: Program) : HomeIntent()
     data class ToggleSelected(val id: Int) : HomeIntent()
+    data object Start : HomeIntent()
+    data object Stop : HomeIntent()
     data object Shaker : HomeIntent()
+    data object AutoClean : HomeIntent()
+}
+
+data class IncubationState(
+    val id: Long = 0L,
+    val index: Int = 0,
+    val stages: List<IncubationStage> = listOf(),
+    // 0 未开始 1 运行中 2 已结束 3 等待中 4 液位 5 废液 6 回收
+    val flags: Int = 0,
+    val time: Long = 0L
+) {
+    fun isStopped() = flags == 0 || flags == 2
 }

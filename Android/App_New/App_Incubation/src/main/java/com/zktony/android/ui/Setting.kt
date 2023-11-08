@@ -784,7 +784,39 @@ fun ConfigList() {
             var string by remember { mutableStateOf(value.toString()) }
 
             CircleTextField(
-                title = "补偿圈数",
+                title = "抗体补偿",
+                value = string,
+                keyboardType = KeyboardType.Number
+            ) {
+                scope.launch {
+                    string = it
+                    value = it.toDoubleOrNull() ?: 0.0
+                }
+            }
+        }
+
+        item {
+            var value by rememberDataSaverState(Constants.ZT_0003, 0.0)
+            var string by remember { mutableStateOf(value.toString()) }
+
+            CircleTextField(
+                title = "封闭液补偿",
+                value = string,
+                keyboardType = KeyboardType.Number
+            ) {
+                scope.launch {
+                    string = it
+                    value = it.toDoubleOrNull() ?: 0.0
+                }
+            }
+        }
+
+        item {
+            var value by rememberDataSaverState(Constants.ZT_0004, 0.0)
+            var string by remember { mutableStateOf(value.toString()) }
+
+            CircleTextField(
+                title = "洗涤液补偿",
                 value = string,
                 keyboardType = KeyboardType.Number
             ) {

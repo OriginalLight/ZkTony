@@ -62,7 +62,7 @@ class SerialPort {
     fun send(v0: V0) {
         _send.value = v0
         helper.sendHex(v0.toHex())
-        Log.i("SerialPort", "send: ${v0.toHex()}")
+        //Log.i("SerialPort", "send: ${v0.toHex()}")
     }
 
     fun initializer() {

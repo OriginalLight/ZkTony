@@ -15,12 +15,15 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -31,6 +34,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.zktony.android.R
+import com.zktony.android.ui.HomeIntent
+import com.zktony.android.utils.extra.timeFormat
+import kotlinx.coroutines.delay
 
 /**
  * @author 刘贺贺
@@ -136,6 +142,98 @@ fun ErrorDialog(
     }
 }
 
+
+@Composable
+fun CleanDialog(
+    job: Int,
+    dispatch: (HomeIntent) -> Unit,
+    onCancel: () -> Unit
+) {
+
+    var time by remember { mutableLongStateOf(20 * 60L) }
+
+    LaunchedEffect(key1 = job) {
+        while (job == 1) {
+            time -= 1
+            delay(1000L)
+        }
+    }
+
+    Dialog(onDismissRequest = { }) {
+        ElevatedCard {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "自动清理",
+                    style = MaterialTheme.typography.titleLarge,
+                )
+
+                Column(modifier = Modifier.padding(horizontal = 8.dp)) {
+                    Text(text = "请取走孵育完成的膜")
+                    Text(text = "请放回孵育盒")
+                    Text(text = "请将抗体试剂瓶置空")
+                    Text(text = "请确保洗涤液不低于500mL")
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    OutlinedButton(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 16.dp),
+                        onClick = {
+                            if (job != 0) {
+                                dispatch(HomeIntent.AutoClean)
+                            }
+                            onCancel()
+                        }
+                    ) {
+                        Text(
+                            text = if (job == 1) "中止" else "返回",
+                            color = if (job == 1) MaterialTheme.colorScheme.error else Color.Black
+                        )
+                    }
+
+                    Button(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 16.dp),
+                        onClick = {
+                            if (job == 0) {
+                                dispatch(HomeIntent.AutoClean)
+                            }
+                        }
+                    ) {
+                        Text(
+                            text = when (job) {
+                                0 -> {
+                                    "开始"
+                                }
+                                1 -> {
+                                    time.timeFormat()
+                                }
+                                2 -> {
+                                    "已完成"
+                                }
+                                else -> {
+                                    "Unknown"
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Preview
 @Composable
 fun PreviewInputDialog() {
@@ -146,4 +244,12 @@ fun PreviewInputDialog() {
 @Composable
 fun PreviewErrorDialog() {
     ErrorDialog(message = "错误", onConfirm = {})
+}
+
+@Preview
+@Composable
+fun PreviewCleanDialog() {
+    CleanDialog(job = 0, dispatch = {}) {
+
+    }
 }

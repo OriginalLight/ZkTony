@@ -58,10 +58,10 @@ import com.zktony.android.data.entities.Calibration
 import com.zktony.android.data.entities.History
 import com.zktony.android.data.entities.Motor
 import com.zktony.android.data.entities.Program
+import com.zktony.android.data.entities.internal.IncubationStage
 import com.zktony.android.data.entities.internal.Log
 import com.zktony.android.data.entities.internal.Point
-import com.zktony.android.data.entities.internal.Process
-import com.zktony.android.ui.utils.JobState
+import com.zktony.android.ui.IncubationState
 import com.zktony.android.ui.utils.selectedColor
 import com.zktony.android.utils.extra.dateFormat
 import com.zktony.android.utils.extra.timeFormat
@@ -438,37 +438,37 @@ fun ProgramItem(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ProcessItem(
-    item: Process,
+fun IncubationStageItem(
+    stage: IncubationStage,
     selected: Boolean,
     onClick: (Int) -> Unit
 ) {
 
-    val displayText = when (item.type) {
-        Process.BLOCKING -> stringResource(id = R.string.blocking)
-        Process.PRIMARY_ANTIBODY -> stringResource(id = R.string.primary_antibody)
-        Process.SECONDARY_ANTIBODY -> stringResource(id = R.string.secondary_antibody)
-        Process.WASHING -> stringResource(id = R.string.washing)
-        Process.PHOSPHATE_BUFFERED_SALINE -> stringResource(id = R.string.phosphate_buffered_saline)
+    val displayText = when (stage.type) {
+        0 -> stringResource(id = R.string.blocking)
+        1 -> stringResource(id = R.string.primary_antibody)
+        2 -> stringResource(id = R.string.secondary_antibody)
+        3 -> stringResource(id = R.string.washing)
+        4 -> stringResource(id = R.string.phosphate_buffered_saline)
         else -> "未知"
     }
 
     val info: List<String> = mutableListOf<String>().apply {
-        add("${item.temperature} ℃")
-        add("${item.dosage} μL")
-        add("${item.duration} ${if (item.type == Process.WASHING) "Min" else "Hour"}")
+        add("${stage.temperature} ℃")
+        add("${stage.dosage} μL")
+        add("${stage.duration} ${if (stage.type == 3) "Min" else "Hour"}")
 
-        if (item.type == Process.PRIMARY_ANTIBODY) {
-            add("${'@' + item.origin}")
-            add(if (item.recycle) "Recycle" else "No Recycle")
+        if (stage.type == 1) {
+            add("${'@' + stage.origin}")
+            add(if (stage.recycle) "Recycle" else "No Recycle")
         }
 
-        if (item.type == Process.SECONDARY_ANTIBODY) {
-            add("${'@' + item.origin}")
+        if (stage.type == 2) {
+            add("${'@' + stage.origin}")
         }
 
-        if (item.type == Process.WASHING) {
-            add("${item.times} Cycle")
+        if (stage.type == 3) {
+            add("${stage.times} Cycle")
         }
     }
 
@@ -556,32 +556,35 @@ fun ProcessItem(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ProcessItem(item: Process) {
+fun IncubationStageItem(item: IncubationStage) {
 
     val displayText = when (item.type) {
-        Process.BLOCKING -> stringResource(id = R.string.blocking)
-        Process.PRIMARY_ANTIBODY -> stringResource(id = R.string.primary_antibody)
-        Process.SECONDARY_ANTIBODY -> stringResource(id = R.string.secondary_antibody)
-        Process.WASHING -> stringResource(id = R.string.washing)
-        Process.PHOSPHATE_BUFFERED_SALINE -> stringResource(id = R.string.phosphate_buffered_saline)
+        0 -> stringResource(id = R.string.blocking)
+        1 -> stringResource(id = R.string.primary_antibody)
+        2 -> stringResource(id = R.string.secondary_antibody)
+        3 -> stringResource(id = R.string.washing)
+        4 -> stringResource(id = R.string.phosphate_buffered_saline)
         else -> "未知"
     }
 
     val info: List<String> = mutableListOf<String>().apply {
         add("${item.temperature} ℃")
         add("${item.dosage} μL")
-        add("${item.duration} ${if (item.type == Process.WASHING) "Min" else "Hour"}")
 
-        if (item.type == Process.PRIMARY_ANTIBODY) {
+        if (item.type != 4) {
+            add("${item.duration} ${if (item.type == 3) "Min" else "Hour"}")
+        }
+
+        if (item.type == 1) {
             add("${'@' + item.origin}")
             add(if (item.recycle) "Recycle" else "No Recycle")
         }
 
-        if (item.type == Process.SECONDARY_ANTIBODY) {
+        if (item.type == 2) {
             add("${'@' + item.origin}")
         }
 
-        if (item.type == Process.WASHING) {
+        if (item.type == 3) {
             add("${item.times} Cycle")
         }
     }
@@ -611,17 +614,17 @@ fun ProcessItem(item: Process) {
                         shape = MaterialTheme.shapes.small
                     )
                     .padding(vertical = 4.dp, horizontal = 8.dp),
-                text = when (item.status) {
-                    Process.UPCOMING -> "未开始"
-                    Process.RUNNING -> "进行中"
-                    Process.FINISHED -> "已完成"
+                text = when (item.flags) {
+                    0 -> "已完成"
+                    1 -> "进行中"
+                    2 -> "未开始"
                     else -> "未知"
                 },
                 style = MaterialTheme.typography.bodyMedium,
-                color = when (item.status) {
-                    Process.UPCOMING -> Color.Gray
-                    Process.RUNNING -> Color.Green
-                    Process.FINISHED -> Color.Blue
+                color = when (item.flags) {
+                    0 -> Color.Gray
+                    1 -> Color.Green
+                    2 -> Color.Blue
                     else -> Color.Red
                 }
             )
@@ -706,11 +709,11 @@ fun MotorItem(
 fun ModuleItem(
     index: Int,
     selected: Int,
-    jobList: List<JobState>,
+    stateList: List<IncubationState>,
     insulation: List<Double>,
     onClick: () -> Unit
 ) {
-    val jobState = jobList.find { it.index == index } ?: JobState()
+    val state = stateList.find { it.index == index } ?: IncubationState()
 
     Box {
         Column(
@@ -727,14 +730,14 @@ fun ModuleItem(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            val message = when (jobState.status) {
-                JobState.STOPPED -> "已就绪"
-                JobState.RUNNING -> jobState.time.timeFormat()
-                JobState.FINISHED -> "已完成"
-                JobState.WAITING -> "等待中"
-                JobState.LIQUID -> "加液中"
-                JobState.WASTE -> "排液中"
-                JobState.RECYCLE -> "回收中"
+            val message = when (state.flags) {
+                0 -> "已就绪"
+                1 -> state.time.timeFormat()
+                2 -> "已完成"
+                3 -> "等待中"
+                4 -> "加液中"
+                5 -> "排液中"
+                6 -> "回收中"
                 else -> "未知"
             }
 

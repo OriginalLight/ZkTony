@@ -1,9 +1,11 @@
 package com.zktony.android.data.entities
 
 import androidx.compose.runtime.Immutable
-import androidx.room.*
-import com.zktony.android.data.ProcessConverters
-import com.zktony.android.data.entities.internal.Process
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
+import com.zktony.android.data.IncubationStageConverters
+import com.zktony.android.data.entities.internal.IncubationStage
 import java.util.Date
 
 /**
@@ -11,12 +13,12 @@ import java.util.Date
  * @date: 2023-02-02 10:56
  */
 @Entity(tableName = "program")
-@TypeConverters(ProcessConverters::class)
+@TypeConverters(IncubationStageConverters::class)
 @Immutable
 data class Program(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,
     val displayText: String = "None",
-    val processes: List<Process> = emptyList(),
+    val stages: List<IncubationStage> = emptyList(),
     val createTime: Date = Date(System.currentTimeMillis())
 )

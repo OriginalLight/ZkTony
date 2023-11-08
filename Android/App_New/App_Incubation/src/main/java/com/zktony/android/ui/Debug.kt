@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
@@ -186,19 +187,46 @@ fun PulseForm(
             title = "圈数",
             value = turns,
             trailingIcon = {
-                ElevatedButton(
-                    modifier = Modifier.padding(end = 16.dp),
-                    enabled = uiFlags is UiFlags.None,
-                    onClick = {
-                        scope.launch {
-                            dispatch(DebugIntent.Transfer(1 + group, turns.toDoubleOrNull() ?: 0.0))
+                Row {
+                    ElevatedButton(
+                        modifier = Modifier.padding(end = 16.dp),
+                        enabled = uiFlags is UiFlags.None,
+                        onClick = {
+                            scope.launch {
+                                dispatch(
+                                    DebugIntent.Transfer(
+                                        1 + group,
+                                        (turns.toDoubleOrNull() ?: 0.0) * -1
+                                    )
+                                )
+                            }
                         }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = null
+                        )
                     }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowForward,
-                        contentDescription = null
-                    )
+
+                    ElevatedButton(
+                        modifier = Modifier.padding(end = 16.dp),
+                        enabled = uiFlags is UiFlags.None,
+                        onClick = {
+                            scope.launch {
+                                dispatch(
+                                    DebugIntent.Transfer(
+                                        1 + group,
+                                        turns.toDoubleOrNull() ?: 0.0
+                                    )
+                                )
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowForward,
+                            contentDescription = null
+                        )
+                    }
                 }
             }
         ) { turns = it }

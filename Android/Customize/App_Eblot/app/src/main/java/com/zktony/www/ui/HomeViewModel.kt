@@ -54,6 +54,7 @@ class HomeViewModel constructor(
     val programList = _programList.asStateFlow()
     private var sentinelJob: Job? = null
     private var first = true
+    private var cleanTime = 0L
 
 
     init {
@@ -264,7 +265,8 @@ class HomeViewModel constructor(
                 sentinel()
                 updateProgram(xy)
             }
-            for (i in (state.value.time * 60).toInt() downTo 0) {
+            val totalTime = (state.value.time * 60).toInt()
+            for (i in totalTime downTo 0) {
                 delay(1000)
                 state.value = state.value.copy(currentTime = i.getTimeFormat())
                 if (i == 30 && state.value.programName == Ext.ctx.getString(R.string.wash)) {
@@ -274,19 +276,15 @@ class HomeViewModel constructor(
                         stepMotorY = if (xy == 1) -state.value.motor else latest.stepMotorY
                     })
                 }
+
+                if ((i == totalTime / 3 || i == totalTime / 3 * 2 || i == 0) && state.value.model == 0) {
+                    // 自动清洁
+                    // 计算需要清洁的时间
+                    autoClean(30L)
+                }
+
                 if (i == 0) {
                     playAudio(R.raw.finish)
-                    if (state.value.model == 0) {
-                        // 自动清洁
-                        // 计算需要清洁的时间
-                        val cleanTime = 30L * 1000L
-                        state.value = state.value.copy(cleanTime = cleanTime)
-                        if (xy == 0 && _uiStateY.value.job == null) {
-                            autoClean(cleanTime + _uiStateY.value.cleanTime)
-                        } else if (xy == 1 && _uiStateX.value.job == null) {
-                            autoClean(cleanTime + _uiStateX.value.cleanTime)
-                        }
-                    }
                     stop(xy)
                     state.value = state.value.copy(currentTime = "已完成")
                 }
@@ -458,16 +456,22 @@ class HomeViewModel constructor(
      * 设置自动清理
      */
     private fun autoClean(time: Long) {
-        viewModelScope.launch {
-            delay(1000L)
-            Log.e("HomeViewModel", "autoClean: $time")
-            // 开启直流泵
-            SM.send(SM.send.value.apply { motorX = 1 })
-            delay(time)
-            // 关闭直流泵
-            SM.send(SM.send.value.apply { motorX = 0 })
-            _uiStateX.value = _uiStateX.value.copy(cleanTime = 0L)
-            _uiStateY.value = _uiStateY.value.copy(cleanTime = 0L)
+        if (cleanTime == 0L) {
+            cleanTime = time
+            viewModelScope.launch {
+                delay(1000L)
+                //Log.e("HomeViewModel", "autoClean: $cleanTime")
+                // 开启直流泵
+                SM.send(SM.send.value.apply { motorX = 1 })
+                while (cleanTime > 0) {
+                    cleanTime -= 1
+                    delay(1000L)
+                }
+                // 关闭直流泵
+                SM.send(SM.send.value.apply { motorX = 0 })
+            }
+        } else {
+            cleanTime += time
         }
     }
 
@@ -511,7 +515,6 @@ data class HomeUiState(
     val motor: Int = 0,
     val voltage: Float = 0f,
     val time: Float = 0f,
-    val cleanTime: Long = 0L,
     val currentMotor: Int = 0,
     val currentVoltage: Float = 0f,
     val currentTime: String = "00:00",

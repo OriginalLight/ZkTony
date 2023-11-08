@@ -25,7 +25,17 @@ object Constants {
     const val ZT_0001 = "ZT_0001"
 
     /**
-     * 管路死体积
+     * 抗体补偿
      */
     const val ZT_0002 = "ZT_0002"
+
+    /**
+     * 封闭液补偿
+     */
+    const val ZT_0003 = "ZT_0003"
+
+    /**
+     * 洗涤液补偿
+     */
+    const val ZT_0004 = "ZT_0004"
 }

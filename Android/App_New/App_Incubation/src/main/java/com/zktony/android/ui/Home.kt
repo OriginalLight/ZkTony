@@ -33,7 +33,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,13 +49,13 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.Program
+import com.zktony.android.ui.components.CleanDialog
 import com.zktony.android.ui.components.ErrorDialog
 import com.zktony.android.ui.components.HomeAppBar
+import com.zktony.android.ui.components.IncubationStageItem
 import com.zktony.android.ui.components.ModuleItem
-import com.zktony.android.ui.components.ProcessItem
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.AnimatedContent
-import com.zktony.android.ui.utils.JobState
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
@@ -61,6 +64,7 @@ import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.toList
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.extra.dateFormat
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 
@@ -75,9 +79,10 @@ fun HomeRoute(viewModel: HomeViewModel) {
     val page by viewModel.page.collectAsStateWithLifecycle()
     val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
     val selected by viewModel.selected.collectAsStateWithLifecycle()
-    val jobList by viewModel.jobList.collectAsStateWithLifecycle()
+    val stateList by viewModel.stateList.collectAsStateWithLifecycle()
     val insulation by viewModel.insulation.collectAsStateWithLifecycle()
     val shaker by viewModel.shaker.collectAsStateWithLifecycle()
+    val cleanJob by viewModel.cleanJob.collectAsStateWithLifecycle()
 
     val entities = viewModel.entities.collectAsLazyPagingItems()
     val navigation: () -> Unit = {
@@ -100,16 +105,17 @@ fun HomeRoute(viewModel: HomeViewModel) {
 
     Column {
         HomeAppBar(page) { navigation() }
-        ModuleList(selected, jobList, insulation, viewModel::dispatch)
+        ModuleList(selected, stateList, insulation, viewModel::dispatch)
         AnimatedContent(targetState = page) {
             when (page) {
                 PageType.HOME -> HomeContent(
                     entities.toList(),
                     selected,
                     uiFlags,
-                    jobList,
+                    stateList,
                     insulation,
                     shaker,
+                    cleanJob,
                     viewModel::dispatch
                 )
 
@@ -123,7 +129,7 @@ fun HomeRoute(viewModel: HomeViewModel) {
 @Composable
 fun ModuleList(
     selected: Int,
-    jobList: List<JobState>,
+    stateList: List<IncubationState>,
     insulation: List<Double>,
     dispatch: (HomeIntent) -> Unit
 ) {
@@ -136,11 +142,9 @@ fun ModuleList(
         horizontalArrangement = arrangement
     ) {
         items(size) { index ->
-            ModuleItem(index, selected, jobList, insulation) {
+            ModuleItem(index, selected, stateList, insulation) {
                 dispatch(
-                    HomeIntent.ToggleSelected(
-                        index
-                    )
+                    HomeIntent.ToggleSelected(index)
                 )
             }
         }
@@ -153,21 +157,29 @@ fun HomeContent(
     entities: List<Program>,
     selected: Int,
     uiFlags: UiFlags,
-    jobList: List<JobState>,
+    stateList: List<IncubationState>,
     insulation: List<Double>,
     shaker: Boolean,
+    cleanJob: Int,
     dispatch: (HomeIntent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackbarHostState.current
     val navigationActions = LocalNavigationActions.current
-    val jobState = jobList.find { it.index == selected } ?: JobState()
+    val state = stateList.find { it.index == selected } ?: IncubationState()
+    var clean by remember { mutableStateOf(false) }
 
     if (uiFlags is UiFlags.Error) {
         ErrorDialog(
             message = uiFlags.message,
-            onConfirm = { scope.launch { dispatch(HomeIntent.UiFlags(UiFlags.none())) } }
+            onConfirm = { scope.launch { dispatch(HomeIntent.ToggleUiFlags(UiFlags.none())) } }
         )
+    }
+
+    if (clean) {
+        CleanDialog(job = cleanJob, dispatch = dispatch) {
+            clean = false
+        }
     }
 
     Row(
@@ -180,13 +192,13 @@ fun HomeContent(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             stickyHeader {
-                val item = entities.find { it.id == jobState.id } ?: Program()
+                val item = entities.find { it.id == state.id } ?: Program()
                 ListItem(
                     modifier = Modifier
                         .clip(MaterialTheme.shapes.small)
                         .clickable {
                             scope.launch {
-                                if (!jobState.isRunning()) {
+                                if (state.isStopped()) {
                                     if (entities.isNotEmpty()) {
                                         dispatch(HomeIntent.NavTo(PageType.PROGRAM_LIST))
                                     } else {
@@ -219,8 +231,8 @@ fun HomeContent(
                 )
             }
 
-            items(jobState.processes) { item ->
-                ProcessItem(item = item)
+            items(state.stages) { item ->
+                IncubationStageItem(item = item)
             }
         }
 
@@ -228,8 +240,8 @@ fun HomeContent(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            when (jobState.status) {
-                JobState.STOPPED, JobState.FINISHED -> {
+            when (state.flags) {
+                0, 2 -> {
                     Icon(
                         modifier = Modifier
                             .size(128.dp)
@@ -237,7 +249,7 @@ fun HomeContent(
                             .clickable {
                                 scope.launch {
                                     if (uiFlags is UiFlags.None) {
-                                        dispatch(HomeIntent.Start(selected))
+                                        dispatch(HomeIntent.Start)
                                     } else {
                                         snackbarHostState.showSnackbar("WARN 请先停止当前任务")
                                     }
@@ -249,14 +261,14 @@ fun HomeContent(
                     )
                 }
 
-                JobState.RUNNING, JobState.WAITING -> {
+                1, 3 -> {
                     Icon(
                         modifier = Modifier
                             .size(128.dp)
                             .clip(CircleShape)
                             .clickable {
                                 scope.launch {
-                                    dispatch(HomeIntent.Stop(selected))
+                                    dispatch(HomeIntent.Stop)
                                 }
                             },
                         imageVector = Icons.Default.Close,
@@ -309,6 +321,23 @@ fun HomeContent(
                         .clickable { scope.launch { dispatch(HomeIntent.Shaker) } }
                         .padding(vertical = 8.dp, horizontal = 16.dp),
                     text = if (shaker) "ON" else "OFF",
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                Text(
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            shape = MaterialTheme.shapes.small
+                        )
+                        .clip(MaterialTheme.shapes.small)
+                        .clickable {
+                            if (stateList.all { it.isStopped() }) {
+                                clean = true
+                            }
+                        }
+                        .padding(vertical = 8.dp, horizontal = 16.dp),
+                    text = "自动清洗",
                     style = MaterialTheme.typography.titleMedium
                 )
             }

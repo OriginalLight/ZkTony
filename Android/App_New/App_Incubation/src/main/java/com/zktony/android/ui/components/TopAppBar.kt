@@ -40,8 +40,8 @@ import com.zktony.android.R
 import com.zktony.android.data.entities.Calibration
 import com.zktony.android.data.entities.History
 import com.zktony.android.data.entities.Program
+import com.zktony.android.data.entities.internal.IncubationStage
 import com.zktony.android.data.entities.internal.Point
-import com.zktony.android.data.entities.internal.defaults.ProcessDefaults
 import com.zktony.android.ui.CalibrationIntent
 import com.zktony.android.ui.HistoryIntent
 import com.zktony.android.ui.ProgramIntent
@@ -52,6 +52,7 @@ import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.extra.dateFormat
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 /**
  * @author 刘贺贺
@@ -206,9 +207,9 @@ fun ProgramAppBar(
                         )
                         .padding(horizontal = 32.dp, vertical = 4.dp)
                 ) {
-                    val item = entities.find { it.id == selected } ?: Program()
+                    val program = entities.find { it.id == selected } ?: Program()
                     Text(
-                        text = item.displayText,
+                        text = program.displayText,
                         style = TextStyle(
                             fontWeight = FontWeight.Bold,
                             fontSize = 20.sp,
@@ -216,7 +217,7 @@ fun ProgramAppBar(
                         )
                     )
                     Text(
-                        text = item.createTime.dateFormat("yyyy/MM/dd"),
+                        text = program.createTime.dateFormat("yyyy/MM/dd"),
                         style = TextStyle(
                             fontFamily = FontFamily.Monospace,
                             fontSize = 12.sp,
@@ -242,10 +243,22 @@ fun ProgramAppBar(
                         if (page == PageType.PROGRAM_LIST) {
                             dialog = true
                         } else {
-                            val item = entities.find { it.id == selected } ?: Program()
-                            val processes = item.processes.toMutableList()
-                            processes.add(ProcessDefaults.defaultPrimaryAntibody())
-                            dispatch(ProgramIntent.Update(item.copy(processes = processes)))
+                            val program = entities.find { it.id == selected } ?: Program()
+                            val stages = program.stages.toMutableList()
+                            stages.add(
+                                IncubationStage(
+                                    uuid = UUID.randomUUID().toString(),
+                                    type = 1,
+                                    duration = 12.0,
+                                    temperature = 4.0,
+                                    dosage = 8000.0,
+                                    recycle = true,
+                                    origin = 0,
+                                    times = 3,
+                                    flags = 2
+                                )
+                            )
+                            dispatch(ProgramIntent.Update(program.copy(stages = stages)))
                         }
                     }
                 }) {
@@ -310,7 +323,8 @@ fun CalibrationAppBar(
                         )
                         .padding(horizontal = 32.dp, vertical = 4.dp)
                 ) {
-                    val item = entities.find { it.id == selected } ?: Calibration(displayText = "None")
+                    val item =
+                        entities.find { it.id == selected } ?: Calibration(displayText = "None")
                     Text(
                         text = item.displayText,
                         style = TextStyle(
@@ -346,7 +360,9 @@ fun CalibrationAppBar(
                         if (page == PageType.CALIBRATION_LIST) {
                             dialog = true
                         } else {
-                            val item = entities.find { it.id == selected } ?: Calibration(displayText = "None")
+                            val item = entities.find { it.id == selected } ?: Calibration(
+                                displayText = "None"
+                            )
                             val points = item.points.toMutableList()
                             points.add(Point(0.0, 0.0))
                             dispatch(CalibrationIntent.Update(item.copy(points = points)))

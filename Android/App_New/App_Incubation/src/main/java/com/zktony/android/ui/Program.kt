@@ -42,8 +42,8 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.R
 import com.zktony.android.data.entities.Program
-import com.zktony.android.data.entities.internal.Process
-import com.zktony.android.ui.components.ProcessItem
+import com.zktony.android.data.entities.internal.IncubationStage
+import com.zktony.android.ui.components.IncubationStageItem
 import com.zktony.android.ui.components.ProgramAppBar
 import com.zktony.android.ui.components.ProgramItem
 import com.zktony.android.ui.components.SquareTextField
@@ -92,7 +92,12 @@ fun ProgramRoute(viewModel: ProgramViewModel) {
         AnimatedContent(targetState = page) {
             when (it) {
                 PageType.PROGRAM_LIST -> ProgramList(entities, viewModel::dispatch)
-                PageType.PROGRAM_DETAIL -> ProgramDetail(entities.toList(), selected, viewModel::dispatch)
+                PageType.PROGRAM_DETAIL -> ProgramDetail(
+                    entities.toList(),
+                    selected,
+                    viewModel::dispatch
+                )
+
                 else -> {}
             }
         }
@@ -144,7 +149,7 @@ fun ProgramDetail(
     val scope = rememberCoroutineScope()
     val program = entities.find { it.id == selected } ?: Program()
     val selectedIndex = remember { mutableIntStateOf(0) }
-    val process = program.processes.getOrNull(selectedIndex.intValue)
+    val incubationStage = program.stages.getOrNull(selectedIndex.intValue)
 
     Row(
         modifier = Modifier.padding(16.dp),
@@ -154,9 +159,9 @@ fun ProgramDetail(
             modifier = Modifier.fillMaxWidth(0.5f),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            itemsIndexed(program.processes) { index, item ->
-                ProcessItem(
-                    item = item,
+            itemsIndexed(program.stages) { index, item ->
+                IncubationStageItem(
+                    stage = item,
                     selected = index == selectedIndex.intValue
                 ) { func ->
                     scope.launch {
@@ -166,28 +171,28 @@ fun ProgramDetail(
                             }
 
                             1, 2 -> {
-                                val processes = program.processes.toMutableList()
-                                val temp = processes[index]
+                                val stages = program.stages.toMutableList()
+                                val temp = stages[index]
                                 if (func == 1) {
                                     if (index == 0) {
                                         return@launch
                                     }
-                                    processes[index] = processes[index - 1]
-                                    processes[index - 1] = temp
+                                    stages[index] = stages[index - 1]
+                                    stages[index - 1] = temp
                                 } else {
-                                    if (index == processes.size - 1) {
+                                    if (index == stages.size - 1) {
                                         return@launch
                                     }
-                                    processes[index] = processes[index + 1]
-                                    processes[index + 1] = temp
+                                    stages[index] = stages[index + 1]
+                                    stages[index + 1] = temp
                                 }
-                                dispatch(ProgramIntent.Update(program.copy(processes = processes)))
+                                dispatch(ProgramIntent.Update(program.copy(stages = stages)))
                             }
 
                             3 -> {
-                                val processes = program.processes.toMutableList()
+                                val processes = program.stages.toMutableList()
                                 processes.removeAt(index)
-                                dispatch(ProgramIntent.Update(program.copy(processes = processes)))
+                                dispatch(ProgramIntent.Update(program.copy(stages = processes)))
                             }
                         }
                     }
@@ -195,16 +200,16 @@ fun ProgramDetail(
             }
         }
 
-        process?.let {
+        incubationStage?.let {
             ProgramInput(
                 modifier = Modifier.fillMaxWidth(),
                 key = selectedIndex.intValue,
-                process = process
+                incubationStage = incubationStage
             ) { p ->
                 scope.launch {
-                    val processes = program.processes.toMutableList()
+                    val processes = program.stages.toMutableList()
                     processes[selectedIndex.intValue] = p
-                    dispatch(ProgramIntent.Update(program.copy(processes = processes)))
+                    dispatch(ProgramIntent.Update(program.copy(stages = processes)))
                 }
             }
         }
@@ -215,17 +220,17 @@ fun ProgramDetail(
 fun ProgramInput(
     modifier: Modifier = Modifier,
     key: Int,
-    process: Process,
-    onProcessChange: (Process) -> Unit
+    incubationStage: IncubationStage,
+    onProcessChange: (IncubationStage) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     var typeExpand by remember(key) { mutableStateOf(false) }
-    var temperature by remember(key) { mutableStateOf(process.temperature.toString()) }
-    var duration by remember(key) { mutableStateOf(process.duration.toString()) }
-    var dosage by remember(key) { mutableStateOf(process.dosage.toString()) }
-    var origin by remember(key) { mutableIntStateOf(process.origin) }
-    var recycle by remember(key) { mutableStateOf(process.recycle) }
-    var times by remember(key) { mutableStateOf(process.times.toString()) }
+    var temperature by remember(key) { mutableStateOf(incubationStage.temperature.toString()) }
+    var duration by remember(key) { mutableStateOf(incubationStage.duration.toString()) }
+    var dosage by remember(key) { mutableStateOf(incubationStage.dosage.toString()) }
+    var origin by remember(key) { mutableIntStateOf(incubationStage.origin) }
+    var recycle by remember(key) { mutableStateOf(incubationStage.recycle) }
+    var times by remember(key) { mutableStateOf(incubationStage.times.toString()) }
 
     LazyColumn(
         modifier = modifier.imePadding(),
@@ -234,11 +239,11 @@ fun ProgramInput(
 
         val displayText: @Composable (Int) -> String = {
             when (it) {
-                Process.BLOCKING -> stringResource(id = R.string.blocking)
-                Process.PRIMARY_ANTIBODY -> stringResource(id = R.string.primary_antibody)
-                Process.SECONDARY_ANTIBODY -> stringResource(id = R.string.secondary_antibody)
-                Process.WASHING -> stringResource(id = R.string.washing)
-                Process.PHOSPHATE_BUFFERED_SALINE -> stringResource(id = R.string.phosphate_buffered_saline)
+                0 -> stringResource(id = R.string.blocking)
+                1 -> stringResource(id = R.string.primary_antibody)
+                2 -> stringResource(id = R.string.secondary_antibody)
+                3 -> stringResource(id = R.string.washing)
+                4 -> stringResource(id = R.string.phosphate_buffered_saline)
                 else -> ""
             }
         }
@@ -257,7 +262,7 @@ fun ProgramInput(
                     .padding(16.dp)
             ) {
                 Text(
-                    text = displayText(process.type),
+                    text = displayText(incubationStage.type),
                     style = MaterialTheme.typography.titleMedium
                 )
                 Spacer(modifier = Modifier.weight(1f))
@@ -281,7 +286,7 @@ fun ProgramInput(
                         .clickable {
                             scope.launch {
                                 typeExpand = false
-                                onProcessChange(process.copy(type = type))
+                                onProcessChange(incubationStage.copy(type = type))
                             }
                         }
                         .padding(16.dp)
@@ -311,14 +316,14 @@ fun ProgramInput(
                 scope.launch {
                     temperature = it
                     val temp = it.toDoubleOrNull() ?: 0.0
-                    if (temp != process.temperature) {
-                        onProcessChange(process.copy(temperature = temp))
+                    if (temp != incubationStage.temperature) {
+                        onProcessChange(incubationStage.copy(temperature = temp))
                     }
                 }
             }
         }
 
-        if (process.type != Process.PHOSPHATE_BUFFERED_SALINE) {
+        if (incubationStage.type != 4) {
             item {
                 SquareTextField(
                     title = "时长",
@@ -326,7 +331,7 @@ fun ProgramInput(
                     trailingIcon = {
                         Text(
                             modifier = Modifier.padding(end = 16.dp),
-                            text = if (process.type == Process.WASHING) "Min" else "Hour",
+                            text = if (incubationStage.type == 3) "Min" else "Hour",
                             style = MaterialTheme.typography.titleMedium
                         )
                     }
@@ -334,8 +339,8 @@ fun ProgramInput(
                     scope.launch {
                         duration = it
                         val time = it.toDoubleOrNull() ?: 0.0
-                        if (time != process.duration) {
-                            onProcessChange(process.copy(duration = time))
+                        if (time != incubationStage.duration) {
+                            onProcessChange(incubationStage.copy(duration = time))
                         }
                     }
                 }
@@ -347,7 +352,7 @@ fun ProgramInput(
                 title = "液量",
                 value = dosage,
                 trailingIcon = {
-                    if (process.type == Process.PRIMARY_ANTIBODY || process.type == Process.SECONDARY_ANTIBODY) {
+                    if (incubationStage.type == 1 || incubationStage.type == 2) {
                         Text(
                             modifier = Modifier
                                 .padding(end = 16.dp)
@@ -359,7 +364,7 @@ fun ProgramInput(
                                 .clickable {
                                     scope.launch {
                                         origin = (origin + 1) % 5
-                                        onProcessChange(process.copy(origin = origin))
+                                        onProcessChange(incubationStage.copy(origin = origin))
                                     }
                                 }
                                 .padding(vertical = 4.dp, horizontal = 16.dp),
@@ -379,14 +384,14 @@ fun ProgramInput(
                 scope.launch {
                     dosage = it
                     val volume = it.toDoubleOrNull() ?: 0.0
-                    if (volume != process.dosage) {
-                        onProcessChange(process.copy(dosage = volume))
+                    if (volume != incubationStage.dosage) {
+                        onProcessChange(incubationStage.copy(dosage = volume))
                     }
                 }
             }
         }
 
-        if (process.type == Process.PRIMARY_ANTIBODY) {
+        if (incubationStage.type == 1) {
             item {
                 Row(
                     modifier = Modifier
@@ -409,14 +414,14 @@ fun ProgramInput(
                     Switch(checked = recycle, onCheckedChange = {
                         scope.launch {
                             recycle = it
-                            onProcessChange(process.copy(recycle = it))
+                            onProcessChange(incubationStage.copy(recycle = it))
                         }
                     })
                 }
             }
         }
 
-        if (process.type == Process.WASHING) {
+        if (incubationStage.type == 3) {
             item {
                 SquareTextField(
                     title = "次数",
@@ -432,8 +437,8 @@ fun ProgramInput(
                     scope.launch {
                         times = it
                         val count = it.toIntOrNull() ?: 0
-                        if (count != process.times) {
-                            onProcessChange(process.copy(times = count))
+                        if (count != incubationStage.times) {
+                            onProcessChange(incubationStage.copy(times = count))
                         }
                     }
                 }

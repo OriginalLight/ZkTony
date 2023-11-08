@@ -24,8 +24,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     override val viewModel: HomeViewModel by viewModel()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
-        initFlowCollector()
         initView()
+        initFlowCollector()
     }
 
     /**
@@ -80,18 +80,20 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     tabLayout.isVisible =
                         (BuildConfig.BUILD_TYPE != "beta") && (BuildConfig.BUILD_TYPE != "alpha")
 
-                    tabLayout.addOnTabSelectedListener(object :
-                        TabLayout.OnTabSelectedListener {
-                        override fun onTabSelected(tab: TabLayout.Tab?) {
-                            viewModel.setModel(tab?.position ?: 0, i)
-                        }
+                    if ((BuildConfig.BUILD_TYPE != "beta") && (BuildConfig.BUILD_TYPE != "alpha")) {
+                        tabLayout.addOnTabSelectedListener(object :
+                            TabLayout.OnTabSelectedListener {
+                            override fun onTabSelected(tab: TabLayout.Tab?) {
+                                viewModel.setModel(tab?.position ?: 0, i)
+                            }
 
-                        override fun onTabUnselected(tab: TabLayout.Tab?) {
-                        }
+                            override fun onTabUnselected(tab: TabLayout.Tab?) {
+                            }
 
-                        override fun onTabReselected(tab: TabLayout.Tab?) {
-                        }
-                    })
+                            override fun onTabReselected(tab: TabLayout.Tab?) {
+                            }
+                        })
+                    }
 
                     with(selector) {
                         clickScale()
