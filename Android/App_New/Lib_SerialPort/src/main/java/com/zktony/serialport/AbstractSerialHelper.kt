@@ -4,7 +4,7 @@ import android.util.Log
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.ext.ascii2ByteArray
 import com.zktony.serialport.ext.hex2ByteArray
-import com.zktony.serialport.lifecycle.SerialResult
+import com.zktony.serialport.lifecycle.SerialState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
 import java.io.IOException
@@ -45,34 +45,52 @@ abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
     }
 
     /**
-     * Send byte data
+     * Send byte data  with callback
      *
      * @param bytes byte data
      */
     suspend fun sendByteArray(
         bytes: ByteArray,
         timeOut: Long = 1000L,
-        block: ((SerialResult) -> Unit)? = null
+        block: ((SerialState) -> Unit)
     ) {
-        if (block == null) {
-            addByteArrayToQueue(bytes)
-        } else {
-            try {
-                withTimeout(timeOut) {
-                    var ref = ByteArray(0)
-                    callbackHandler = { ref = it }
-                    addByteArrayToQueue(bytes)
-                    while (ref.isEmpty()) {
-                        delay(10L)
-                    }
-                    block(SerialResult.Success(ref))
+        try {
+            withTimeout(timeOut) {
+                var ref = ByteArray(0)
+                callbackHandler = { ref = it }
+                addByteArrayToQueue(bytes)
+                while (ref.isEmpty()) {
+                    delay(10L)
                 }
-            } catch (ex: Exception) {
-                block(SerialResult.Failure(ex))
-            } finally {
-                callbackHandler = null
+                block(SerialState.Success(ref))
             }
+        } catch (ex: Exception) {
+            block(SerialState.Err(ex))
+        } finally {
+            callbackHandler = null
         }
+    }
+
+    /**
+     * Send byte data
+     *
+     * @param bytes byte data
+     */
+    fun sendByteArray(bytes: ByteArray) {
+        addByteArrayToQueue(bytes)
+    }
+
+    /**
+     * Send hex string with callback
+     *
+     * @param hex String
+     */
+    suspend fun sendHexString(
+        hex: String,
+        timeOut: Long = 1000L,
+        block: ((SerialState) -> Unit)
+    ) {
+        sendByteArray(hex.hex2ByteArray(), timeOut, block)
     }
 
     /**
@@ -80,12 +98,21 @@ abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
      *
      * @param hex String
      */
-    suspend fun sendHexString(
-        hex: String,
+    fun sendHexString(hex: String) {
+        sendByteArray(hex.hex2ByteArray())
+    }
+
+    /**
+     * Send ascii string with callback
+     *
+     * @param ascii String
+     */
+    suspend fun sendAsciiString(
+        ascii: String,
         timeOut: Long = 1000L,
-        block: ((SerialResult) -> Unit)? = null
+        block: ((SerialState) -> Unit)
     ) {
-        sendByteArray(hex.hex2ByteArray(), timeOut, block)
+        sendByteArray(ascii.ascii2ByteArray(true), timeOut, block)
     }
 
     /**
@@ -93,14 +120,9 @@ abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
      *
      * @param ascii String
      */
-    suspend fun sendAsciiString(
-        ascii: String,
-        timeOut: Long = 1000L,
-        block: ((SerialResult) -> Unit)? = null
-    ) {
-        sendByteArray(ascii.ascii2ByteArray(true), timeOut, block)
+    fun sendAsciiString(ascii: String) {
+        sendByteArray(ascii.ascii2ByteArray(true))
     }
-
 
     companion object {
         private const val TAG = "AbstractSerialHelper"

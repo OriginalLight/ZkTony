@@ -26,6 +26,7 @@ import com.zktony.android.ui.utils.AnimatedContent
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.ui.utils.itemsIndexed
 import kotlinx.coroutines.launch
 
@@ -43,7 +44,7 @@ fun HistoryRoute(viewModel: HistoryViewModel) {
 
     val page by viewModel.page.collectAsStateWithLifecycle()
     val selected by viewModel.selected.collectAsStateWithLifecycle()
-    val message by viewModel.message.collectAsStateWithLifecycle()
+    val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
 
     val entities = viewModel.entities.collectAsLazyPagingItems()
     val navigation: () -> Unit = {
@@ -57,10 +58,10 @@ fun HistoryRoute(viewModel: HistoryViewModel) {
 
     BackHandler { navigation() }
 
-    LaunchedEffect(key1 = message) {
-        message?.let {
-            snackbarHostState.showSnackbar(it)
-            viewModel.dispatch(HistoryIntent.Message(null))
+    LaunchedEffect(key1 = uiFlags) {
+        if (uiFlags is UiFlags.Message) {
+            snackbarHostState.showSnackbar((uiFlags as UiFlags.Message).message)
+            viewModel.dispatch(HistoryIntent.Flags(UiFlags.none()))
         }
     }
 
@@ -93,7 +94,7 @@ fun HistoryList(
         itemsIndexed(entities) { index, item ->
             HistoryItem(index, item) {
                 scope.launch {
-                    dispatch(HistoryIntent.ToggleSelected(it.id))
+                    dispatch(HistoryIntent.Selected(it.id))
                     dispatch(HistoryIntent.NavTo(PageType.HISTORY_DETAIL))
                 }
             }

@@ -46,7 +46,6 @@ class HomeViewModel @Inject constructor(
 
     private val _page = MutableStateFlow(PageType.HOME)
     private val _uiFlags = MutableStateFlow<UiFlags>(UiFlags.none())
-    private val _message = MutableStateFlow<String?>(null)
     private val _selected = MutableStateFlow(0)
     private val _insulation = MutableStateFlow(List(9) { 0.0 })
     private val _shaker = MutableStateFlow(false)
@@ -60,7 +59,6 @@ class HomeViewModel @Inject constructor(
 
     val page = _page.asStateFlow()
     val uiFlags = _uiFlags.asStateFlow()
-    val message = _message.asStateFlow()
     val selected = _selected.asStateFlow()
     val insulation = _insulation.asStateFlow()
     val shaker = _shaker.asStateFlow()
@@ -104,13 +102,12 @@ class HomeViewModel @Inject constructor(
 
     fun dispatch(intent: HomeIntent) {
         when (intent) {
-            is HomeIntent.Message -> _message.value = intent.message
-            is HomeIntent.ToggleUiFlags -> _uiFlags.value = intent.uiFlags
+            is HomeIntent.Flags -> _uiFlags.value = intent.uiFlags
             is HomeIntent.NavTo -> _page.value = intent.page
-            is HomeIntent.ToggleSelected -> _selected.value = intent.id
+            is HomeIntent.Selected -> _selected.value = intent.id
             is HomeIntent.Start -> start()
             is HomeIntent.Stop -> stop()
-            is HomeIntent.ToggleProcess -> toggleProcess(intent.index, intent.program)
+            is HomeIntent.Stages -> stages(intent.index, intent.program)
             is HomeIntent.Shaker -> shaker()
             is HomeIntent.AutoClean -> autoClean()
         }
@@ -121,19 +118,19 @@ class HomeViewModel @Inject constructor(
             // check
             val state = _stateList.value.find { it.index == _selected.value }
             if (state == null) {
-                _message.value = "WARN 请选择一个程序"
+                _uiFlags.value = UiFlags.message("WARN 请选择一个程序")
                 return@launch
             } else {
                 if (state.id == 0L) {
-                    _message.value = "WARN 请选择一个程序"
+                    _uiFlags.value = UiFlags.message("WARN 请选择一个程序")
                     return@launch
                 }
                 if (state.stages.isEmpty()) {
-                    _message.value = "WARN 程序中不存在孵育流程"
+                    _uiFlags.value = UiFlags.message("WARN 程序中不存在孵育流程")
                     return@launch
                 }
                 if (!state.isStopped()) {
-                    _message.value = "WARN 该程序正在运行中"
+                    _uiFlags.value = UiFlags.message("WARN 该程序正在运行中")
                     return@launch
                 }
                 updateState(state.copy(flags = 1, stages = state.stages.map { it.copy(flags = 2) }))
@@ -177,7 +174,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun toggleProcess(index: Int, program: Program) {
+    private fun stages(index: Int, program: Program) {
         viewModelScope.launch {
             updateState(
                 IncubationState(
@@ -200,7 +197,7 @@ class HomeViewModel @Inject constructor(
                     writeRegister(slaveAddr = 0, startAddr = 200, value = 1)
                 }
             } catch (ex: Exception) {
-                _message.value = ex.message
+                _uiFlags.value = UiFlags.message(ex.message ?: "Unknown")
             } finally {
                 _shaker.value = !_shaker.value
             }
@@ -538,7 +535,7 @@ class HomeViewModel @Inject constructor(
         val pulse = (AppStateUtils.hpc[group + 1] ?: { x -> x * 100 }).invoke(stage.dosage)
         val inAddr = 2 * group
         val outAddr = 2 * group + 1
-        val recoup = dataStore.readData(
+        val rIn = dataStore.readData(
             when (stage.type) {
                 0 -> Constants.ZT_0003
                 1, 2 -> Constants.ZT_0002
@@ -546,6 +543,7 @@ class HomeViewModel @Inject constructor(
                 else -> Constants.ZT_0002
             }, 0.0
         )
+        val rOut = dataStore.readData(Constants.ZT_0002, 0.0)
         // 设置温度
         viewModelScope.launch {
             writeWithTemperature(index + 1, stage.temperature)
@@ -553,40 +551,41 @@ class HomeViewModel @Inject constructor(
         // 打开摇床
         writeRegister(slaveAddr = 0, startAddr = 200, value = 1)
         _shaker.value = true
-        // 切阀
+        // 切阀加液
         delay(100L)
         writeWithValve(inAddr, inChannel)
         writeWithValve(outAddr, outChannel)
-        // 加液
-        writeWithPulse(group + 1, (pulse + (recoup * 6400)).toLong())
+        writeWithPulse(group + 1, (pulse + (rIn * 6400)).toLong())
         // 回收残留液体
-        if (recoup > 0.0) {
+        if (rIn > 0.0) {
             // 后边段残留的液体
             delay(500L)
             writeWithValve(inAddr, 12)
-            writeWithPulse(
-                slaveAddr = group + 1,
-                value = (recoup * 6400 * 2).toLong()
-            )
+            writeWithValve(outAddr, outChannel)
+            writeWithPulse(group + 1, (rOut * 6400 * 2).toLong())
             delay(500L)
             // 退回前半段残留的液体
             writeWithValve(inAddr, inChannel)
             writeWithValve(outAddr, 6)
-            writeWithPulse(group + 1, -(recoup * 6400 * 2).toLong())
+            writeWithPulse(group + 1, -(rIn * 6400 * 2).toLong())
         }
         // 清理管路避免污染
         if (stage.type == 1 || stage.type == 2) {
-            delay(500L)
-            writeWithValve(inAddr, 10)
-            writeWithValve(outAddr, 5)
-            writeWithPulse(group + 1, (recoup * 6400 * 2).toLong())
-            delay(500L)
-            writeWithValve(inAddr, 12)
-            writeWithPulse(group + 1, (recoup * 6400 * 2).toLong())
-            delay(500L)
-            writeWithValve(outAddr, 6)
-            writeWithValve(inAddr, 10)
-            writeWithPulse(group + 1, (recoup * 6400 * -2).toLong())
+            val rx = dataStore.readData(Constants.ZT_0004, 0.0)
+            if (rx > 0.0) {
+                delay(500L)
+                writeWithValve(inAddr, 10)
+                writeWithValve(outAddr, 5)
+                writeWithPulse(group + 1, (rx * 6400 * 4).toLong())
+                delay(500L)
+                writeWithValve(inAddr, 12)
+                writeWithValve(outAddr, 5)
+                writeWithPulse(group + 1, (rx * 6400 * 2).toLong())
+                delay(500L)
+                writeWithValve(inAddr, 10)
+                writeWithValve(outAddr, 6)
+                writeWithPulse(group + 1, -(rx * 6400 * 2).toLong())
+            }
         }
     }
 
@@ -600,7 +599,7 @@ class HomeViewModel @Inject constructor(
         val pulse = (AppStateUtils.hpc[group + 1] ?: { x -> x * 100 }).invoke(stage.dosage)
         val inAddr = 2 * group
         val outAddr = 2 * group + 1
-        val recoup = dataStore.readData(
+        val rIn = dataStore.readData(
             when (stage.type) {
                 0 -> Constants.ZT_0003
                 1, 2 -> Constants.ZT_0002
@@ -608,30 +607,34 @@ class HomeViewModel @Inject constructor(
                 else -> Constants.ZT_0002
             }, 0.0
         )
+        val rOut = dataStore.readData(Constants.ZT_0002, 0.0)
         // 停止摇床
         writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
         delay(300L)
         writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
         delay(300L)
         _shaker.value = false
-        // 切阀
+        // 切阀回收残留液体
         writeWithValve(inAddr, inChannel)
         writeWithValve(outAddr, outChannel)
-        // 回收残留液体
-        writeWithPulse(group + 1, -(pulse + (recoup * 6400 * 4)).toLong())
+        writeWithPulse(group + 1, -(pulse + ((rIn + rOut) * 6400 * 2)).toLong())
         // 清理管路避免污染
         if (stage.type == 1 || stage.type == 2) {
-            delay(500L)
-            writeWithValve(inAddr, 10)
-            writeWithValve(outAddr, 5)
-            writeWithPulse(group + 1, (recoup * 6400 * 2).toLong())
-            delay(500L)
-            writeWithValve(inAddr, 12)
-            writeWithPulse(group + 1, (recoup * 6400 * 2).toLong())
-            delay(500L)
-            writeWithValve(outAddr, 6)
-            writeWithValve(inAddr, 10)
-            writeWithPulse(group + 1, (recoup * 6400 * -2).toLong())
+            val rx = dataStore.readData(Constants.ZT_0004, 0.0)
+            if (rx > 0.0) {
+                delay(500L)
+                writeWithValve(inAddr, 10)
+                writeWithValve(outAddr, 5)
+                writeWithPulse(group + 1, (rx * 6400 * 4).toLong())
+                delay(500L)
+                writeWithValve(inAddr, 12)
+                writeWithValve(outAddr, 5)
+                writeWithPulse(group + 1, (rx * 6400 * 2).toLong())
+                delay(500L)
+                writeWithValve(inAddr, 10)
+                writeWithValve(outAddr, 6)
+                writeWithPulse(group + 1, -(rx * 6400 * 2).toLong())
+            }
         }
     }
 
@@ -684,73 +687,73 @@ class HomeViewModel @Inject constructor(
                         writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
                         delay(300L)
                     }
-
-                    repeat(2) {
-                        repeat(4) { index ->
-                            // 切阀加液进孵育盒
-                            writeWithValve(0, 10)
-                            writeWithValve(1, index + 1)
-                            writeWithPulse(1, (pulse + (r3 * 6400)).toLong())
-                            delay(500L)
-                            //切阀排空后半段
-                            writeWithValve(0, 12)
-                            writeWithValve(1, index + 1)
-                            writeWithPulse(1, (r1 * 6400 * 2).toLong())
-                            delay(500L)
-                            // 切阀放到一抗容器
-                            writeWithValve(0, index + 1)
-                            writeWithValve(1, index + 1)
-                            writeWithPulse(1, -(pulse + (r1 * 6400 * 4)).toLong())
-                            delay(500L)
-                            // 切阀加液进孵育盒
-                            writeWithValve(0, 10)
-                            writeWithValve(1, index + 1)
-                            writeWithPulse(1, pulse.toLong())
-                            delay(500L)
-                            //切阀排空后半段
-                            writeWithValve(0, 12)
-                            writeWithValve(1, index + 1)
-                            writeWithPulse(1, (r3 * 6400 * 2).toLong())
-                            delay(500L)
-                            //切阀排空前半段
-                            writeWithValve(0, 10)
-                            writeWithValve(1, 6)
-                            writeWithPulse(1, -(r1 * 6400 * 2).toLong())
-                            delay(500L)
-                            // 切阀放到二抗容器
-                            writeWithValve(0, index + 5)
-                            writeWithValve(1, index + 1)
-                            writeWithPulse(1, -(pulse + (r1 * 6400 * 4)).toLong())
-                            delay(500L)
-                            // 切阀排空一抗容器
-                            writeWithValve(0, index + 1)
-                            writeWithValve(1, 5)
-                            writeWithPulse(1, (pulse + (4 * r1 * 6400)).toLong())
-                            delay(500L)
-                            // 切阀排空二抗容器
-                            writeWithValve(0, index + 5)
-                            writeWithValve(1, 5)
-                            writeWithPulse(1, (pulse + (4 * r1 * 6400)).toLong())
-                            delay(500L)
-                        }
-                        // 洗涤封闭液管路
-                        writeWithValve(0, 9)
-                        writeWithValve(1, 5)
-                        writeWithPulse(1, (pulse + (r2 * 6400)).toLong())
-                        // 切阀排空后半段
+                    repeat(4) { index ->
+                        // 切阀加液进孵育盒
+                        writeWithValve(0, 10)
+                        writeWithValve(1, index + 1)
+                        writeWithPulse(1, (pulse + (r3 * 6400)).toLong())
+                        delay(500L)
+                        //切阀排空后半段
                         writeWithValve(0, 12)
-                        writeWithValve(1, 5)
-                        writeWithPulse(1, (r2 * 6400 * 2).toLong())
-                        // 切阀排空前半段
-                        writeWithValve(0, 9)
+                        writeWithValve(1, index + 1)
+                        writeWithPulse(1, (r1 * 6400 * 2).toLong())
+                        delay(500L)
+                        // 切阀放到一抗容器
+                        writeWithValve(0, index + 1)
+                        writeWithValve(1, index + 1)
+                        writeWithPulse(1, -(pulse + (r1 * 6400 * 4)).toLong())
+                        delay(500L)
+                        // 切阀加液进孵育盒
+                        writeWithValve(0, 10)
+                        writeWithValve(1, index + 1)
+                        writeWithPulse(1, pulse.toLong())
+                        delay(500L)
+                        //切阀排空后半段
+                        writeWithValve(0, 12)
+                        writeWithValve(1, index + 1)
+                        writeWithPulse(1, (r3 * 6400 * 2).toLong())
+                        delay(500L)
+                        //切阀排空前半段
+                        writeWithValve(0, 10)
                         writeWithValve(1, 6)
-                        writeWithPulse(1, -(r2 * 6400 * 2).toLong())
+                        writeWithPulse(1, -(r1 * 6400 * 2).toLong())
+                        delay(500L)
+                        // 切阀放到二抗容器
+                        writeWithValve(0, index + 5)
+                        writeWithValve(1, index + 1)
+                        writeWithPulse(1, -(pulse + (r1 * 6400 * 4)).toLong())
+                        delay(500L)
+                        // 切阀排空一抗容器
+                        writeWithValve(0, index + 1)
+                        writeWithValve(1, 5)
+                        writeWithPulse(1, (pulse + (4 * r1 * 6400)).toLong())
+                        delay(500L)
+                        // 切阀排空二抗容器
+                        writeWithValve(0, index + 5)
+                        writeWithValve(1, 5)
+                        writeWithPulse(1, (pulse + (4 * r1 * 6400)).toLong())
+                        delay(500L)
                     }
+                    // 洗涤封闭液管路
+                    writeWithValve(0, 9)
+                    writeWithValve(1, 5)
+                    writeWithPulse(1, (pulse + (r2 * 6400)).toLong())
+                    delay(500L)
+                    // 切阀排空后半段
+                    writeWithValve(0, 12)
+                    writeWithValve(1, 5)
+                    writeWithPulse(1, (r2 * 6400 * 2).toLong())
+                    delay(500L)
+                    // 切阀排空前半段
+                    writeWithValve(0, 9)
+                    writeWithValve(1, 6)
+                    writeWithPulse(1, -(r2 * 6400 * 2).toLong())
                     _cleanJob.value = 2
                 } catch (ex: Exception) {
                     if (ex !is CancellationException) {
                         _uiFlags.value = UiFlags.error(ex.message ?: "Unknown")
                     }
+                    writeRegister(slaveAddr = 1, startAddr = 200, value = 0)
                     _cleanJob.value = 0
                 }
             }
@@ -762,11 +765,10 @@ class HomeViewModel @Inject constructor(
 }
 
 sealed class HomeIntent {
-    data class Message(val message: String?) : HomeIntent()
     data class NavTo(val page: Int) : HomeIntent()
-    data class ToggleUiFlags(val uiFlags: UiFlags) : HomeIntent()
-    data class ToggleProcess(val index: Int, val program: Program) : HomeIntent()
-    data class ToggleSelected(val id: Int) : HomeIntent()
+    data class Flags(val uiFlags: UiFlags) : HomeIntent()
+    data class Stages(val index: Int, val program: Program) : HomeIntent()
+    data class Selected(val id: Int) : HomeIntent()
     data object Start : HomeIntent()
     data object Stop : HomeIntent()
     data object Shaker : HomeIntent()

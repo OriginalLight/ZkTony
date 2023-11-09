@@ -55,6 +55,7 @@ import com.zktony.android.ui.utils.AnimatedContent
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.toList
 import kotlinx.coroutines.launch
@@ -64,58 +65,47 @@ import kotlinx.coroutines.launch
  * @date 2023/8/30 11:10
  */
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun CalibrationRoute(viewModel: CalibrationViewModel) {
 
     val scope = rememberCoroutineScope()
     val navigationActions = LocalNavigationActions.current
     val snackbarHostState = LocalSnackbarHostState.current
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val message by viewModel.message.collectAsStateWithLifecycle()
+
+    val page by viewModel.page.collectAsStateWithLifecycle()
+    val selected by viewModel.selected.collectAsStateWithLifecycle()
+    val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
+
     val entities = viewModel.entities.collectAsLazyPagingItems()
     val navigation: () -> Unit = {
         scope.launch {
-            when (uiState.page) {
+            when (page) {
                 PageType.CALIBRATION_LIST -> navigationActions.navigateUp()
-                else -> viewModel.uiEvent(CalibrationUiEvent.NavTo(PageType.CALIBRATION_LIST))
+                else -> viewModel.dispatch(CalibrationIntent.NavTo(PageType.CALIBRATION_LIST))
             }
         }
     }
 
     BackHandler { navigation() }
 
-    LaunchedEffect(key1 = message) {
-        message?.let {
-            snackbarHostState.showSnackbar(it)
-            viewModel.uiEvent(CalibrationUiEvent.Message(null))
+    LaunchedEffect(key1 = uiFlags) {
+        if (uiFlags is UiFlags.Message) {
+            snackbarHostState.showSnackbar((uiFlags as UiFlags.Message).message)
+            viewModel.dispatch(CalibrationIntent.Flags(UiFlags.none()))
         }
     }
 
-    CalibrationWrapper(
-        entities = entities,
-        uiState = uiState,
-        uiEvent = viewModel::uiEvent,
-        navigation = navigation
-    )
-}
-
-@OptIn(ExperimentalAnimationApi::class)
-@Composable
-fun CalibrationWrapper(
-    entities: LazyPagingItems<Calibration>,
-    uiState: CalibrationUiState,
-    uiEvent: (CalibrationUiEvent) -> Unit,
-    navigation: () -> Unit
-) {
     Column {
-        CalibrationAppBar(entities.toList(), uiState, uiEvent) { navigation() }
-        AnimatedContent(targetState = uiState.page) {
-            when (uiState.page) {
-                PageType.CALIBRATION_LIST -> CalibrationList(entities, uiEvent)
+        CalibrationAppBar(entities.toList(), selected, page, viewModel::dispatch) { navigation() }
+        AnimatedContent(targetState = page) {
+            when (page) {
+                PageType.CALIBRATION_LIST -> CalibrationList(entities, viewModel::dispatch)
                 PageType.CALIBRATION_DETAIL -> CalibrationDetail(
                     entities.toList(),
-                    uiState,
-                    uiEvent
+                    selected,
+                    uiFlags,
+                    viewModel::dispatch
                 )
 
                 else -> {}
@@ -127,7 +117,7 @@ fun CalibrationWrapper(
 @Composable
 fun CalibrationList(
     entities: LazyPagingItems<Calibration>,
-    uiEvent: (CalibrationUiEvent) -> Unit,
+    dispatch: (CalibrationIntent) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackbarHostState.current
@@ -145,13 +135,13 @@ fun CalibrationList(
                 item = item,
                 onClick = {
                     scope.launch {
-                        uiEvent(CalibrationUiEvent.ToggleSelected(item.id))
-                        uiEvent(CalibrationUiEvent.NavTo(PageType.CALIBRATION_DETAIL))
+                        dispatch(CalibrationIntent.Selected(item.id))
+                        dispatch(CalibrationIntent.NavTo(PageType.CALIBRATION_DETAIL))
                     }
                 },
                 onDelete = {
                     scope.launch {
-                        uiEvent(CalibrationUiEvent.Delete(item.id))
+                        dispatch(CalibrationIntent.Delete(item.id))
                         snackbarHostState.showSnackbar("删除成功")
                     }
                 }
@@ -164,13 +154,14 @@ fun CalibrationList(
 @Composable
 fun CalibrationDetail(
     entities: List<Calibration>,
-    uiState: CalibrationUiState,
-    uiEvent: (CalibrationUiEvent) -> Unit,
+    selected: Long,
+    uiFlags: UiFlags,
+    dispatch: (CalibrationIntent) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val softKeyboard = LocalSoftwareKeyboardController.current
     val forceManager = LocalFocusManager.current
-    val selected = entities.find { it.id == uiState.selected } ?: Calibration(displayText = "None")
+    val calibration = entities.find { it.id == selected } ?: Calibration(displayText = "None")
 
     LazyVerticalGrid(
         modifier = Modifier.imePadding(),
@@ -196,14 +187,14 @@ fun CalibrationDetail(
                 BasicTextField(
                     modifier = Modifier.width(64.dp),
                     value = TextFieldValue(
-                        selected.index.toString(),
-                        TextRange(selected.index.toString().length)
+                        calibration.index.toString(),
+                        TextRange(calibration.index.toString().length)
                     ),
                     onValueChange = {
                         scope.launch {
-                            uiEvent(
-                                CalibrationUiEvent.Update(
-                                    selected.copy(
+                            dispatch(
+                                CalibrationIntent.Update(
+                                    calibration.copy(
                                         index = it.text.toIntOrNull() ?: 0
                                     )
                                 )
@@ -260,37 +251,37 @@ fun CalibrationDetail(
                 Spacer(modifier = Modifier.weight(1f))
                 Switch(
                     modifier = Modifier.height(32.dp),
-                    checked = selected.enable,
+                    checked = calibration.enable,
                     onCheckedChange = {
                         scope.launch {
-                            uiEvent(CalibrationUiEvent.Update(selected.copy(enable = it)))
+                            dispatch(CalibrationIntent.Update(calibration.copy(enable = it)))
                         }
                     }
                 )
             }
         }
-        itemsIndexed(items = selected.points) { index, item ->
+        itemsIndexed(items = calibration.points) { index, item ->
             PointItem(
-                key = selected.points.size,
+                key = calibration.points.size,
                 index = index,
                 item = item,
-                uiState = uiState,
+                uiFlags = uiFlags,
                 onClick = { flag ->
                     scope.launch {
                         if (flag == 0) {
-                            uiEvent(CalibrationUiEvent.Transfer(selected.index, item.y))
+                            dispatch(CalibrationIntent.Transfer(calibration.index, item.y))
                         } else {
-                            val points = selected.points.toMutableList()
+                            val points = calibration.points.toMutableList()
                             points.remove(item)
-                            uiEvent(CalibrationUiEvent.Update(selected.copy(points = points)))
+                            dispatch(CalibrationIntent.Update(calibration.copy(points = points)))
                         }
                     }
                 },
             ) { point ->
                 scope.launch {
-                    val points = selected.points.toMutableList()
+                    val points = calibration.points.toMutableList()
                     points[points.indexOf(item)] = point
-                    uiEvent(CalibrationUiEvent.Update(selected.copy(points = points)))
+                    dispatch(CalibrationIntent.Update(calibration.copy(points = points)))
                 }
             }
         }

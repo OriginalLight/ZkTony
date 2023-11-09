@@ -13,8 +13,6 @@ import com.zktony.android.utils.SerialPortUtils.start
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,68 +27,49 @@ class CalibrationViewModel @Inject constructor(
 
     private val _page = MutableStateFlow(PageType.CALIBRATION_LIST)
     private val _selected = MutableStateFlow(0L)
-    private val _uiFlags = MutableStateFlow(UiFlags.NONE)
-    private val _uiState = MutableStateFlow(CalibrationUiState())
-    private val _message = MutableStateFlow<String?>(null)
+    private val _uiFlags = MutableStateFlow<UiFlags>(UiFlags.none())
 
-    val uiState = _uiState.asStateFlow()
-    val message = _message.asStateFlow()
+    val page = _page.asStateFlow()
+    val selected = _selected.asStateFlow()
+    val uiFlags = _uiFlags.asStateFlow()
     val entities = Pager(
         config = PagingConfig(pageSize = 20, initialLoadSize = 40),
     ) { dao.getByPage() }.flow.cachedIn(viewModelScope)
 
-    init {
-        viewModelScope.launch {
-            combine(_selected, _page, _uiFlags) { selected, page, uiFlags ->
-                CalibrationUiState(selected, page, uiFlags)
-            }.catch { ex ->
-                _message.value = ex.message
-            }.collect {
-                _uiState.value = it
-            }
-        }
-    }
-
-    fun uiEvent(uiEvent: CalibrationUiEvent) {
-        when (uiEvent) {
-            is CalibrationUiEvent.NavTo -> _page.value = uiEvent.page
-            is CalibrationUiEvent.ToggleSelected -> _selected.value = uiEvent.id
-            is CalibrationUiEvent.Insert -> viewModelScope.launch {
+    fun dispatch(intent: CalibrationIntent) {
+        when (intent) {
+            is CalibrationIntent.NavTo -> _page.value = intent.page
+            is CalibrationIntent.Selected -> _selected.value = intent.id
+            is CalibrationIntent.Insert -> viewModelScope.launch {
                 dao.insert(
                     Calibration(
-                        displayText = uiEvent.displayText
+                        displayText = intent.displayText
                     )
                 )
             }
 
-            is CalibrationUiEvent.Delete -> viewModelScope.launch { dao.deleteById(uiEvent.id) }
-            is CalibrationUiEvent.Update -> viewModelScope.launch { dao.update(uiEvent.calibration) }
-            is CalibrationUiEvent.Transfer -> transfer(uiEvent.index, uiEvent.turns)
-            is CalibrationUiEvent.Message -> _message.value = uiEvent.message
+            is CalibrationIntent.Delete -> viewModelScope.launch { dao.deleteById(intent.id) }
+            is CalibrationIntent.Update -> viewModelScope.launch { dao.update(intent.calibration) }
+            is CalibrationIntent.Transfer -> transfer(intent.index, intent.turns)
+            is CalibrationIntent.Flags -> _uiFlags.value = intent.uiFlags
         }
     }
 
     private fun transfer(index: Int, turns: Double) {
         viewModelScope.launch {
-            _uiFlags.value = UiFlags.PUMP
+            _uiFlags.value = UiFlags.loading()
             start { with(index, (turns * 3200L).toLong()) }
-            _uiFlags.value = UiFlags.NONE
+            _uiFlags.value = UiFlags.none()
         }
     }
 }
 
-data class CalibrationUiState(
-    val selected: Long = 0L,
-    val page: Int = PageType.CALIBRATION_LIST,
-    val uiFlags: Int = UiFlags.NONE,
-)
-
-sealed class CalibrationUiEvent {
-    data class Transfer(val index: Int, val turns: Double) : CalibrationUiEvent()
-    data class Delete(val id: Long) : CalibrationUiEvent()
-    data class Insert(val displayText: String) : CalibrationUiEvent()
-    data class NavTo(val page: Int) : CalibrationUiEvent()
-    data class ToggleSelected(val id: Long) : CalibrationUiEvent()
-    data class Update(val calibration: Calibration) : CalibrationUiEvent()
-    data class Message(val message: String?) : CalibrationUiEvent()
+sealed class CalibrationIntent {
+    data class Transfer(val index: Int, val turns: Double) : CalibrationIntent()
+    data class Delete(val id: Long) : CalibrationIntent()
+    data class Insert(val displayText: String) : CalibrationIntent()
+    data class NavTo(val page: Int) : CalibrationIntent()
+    data class Selected(val id: Long) : CalibrationIntent()
+    data class Update(val calibration: Calibration) : CalibrationIntent()
+    data class Flags(val uiFlags: UiFlags) : CalibrationIntent()
 }

@@ -21,15 +21,13 @@ class DebugViewModel @Inject constructor() : ViewModel() {
 
     private val _page = MutableStateFlow(PageType.DEBUG)
     private val _uiFlags = MutableStateFlow<UiFlags>(UiFlags.none())
-    private val _message = MutableStateFlow<String?>(null)
 
     val page = _page.asStateFlow()
     val uiFlags = _uiFlags.asStateFlow()
-    val message = _message.asStateFlow()
 
     fun dispatch(intent: DebugIntent) {
         when (intent) {
-            is DebugIntent.Message -> _message.value = intent.message
+            is DebugIntent.Flags -> _uiFlags.value = intent.uiFlags
             is DebugIntent.NavTo -> _page.value = intent.page
             is DebugIntent.Valve -> valve(intent.index, intent.value)
             is DebugIntent.Transfer -> transfer(intent.index, intent.turns)
@@ -41,10 +39,9 @@ class DebugViewModel @Inject constructor() : ViewModel() {
             try {
                 _uiFlags.value = UiFlags.loading()
                 writeWithValve(index, value)
-            } catch (ex: Exception) {
-                _message.value = ex.message
-            } finally {
                 _uiFlags.value = UiFlags.none()
+            } catch (ex: Exception) {
+                _uiFlags.value = UiFlags.message(ex.message ?: "Unknown")
             }
         }
     }
@@ -54,17 +51,16 @@ class DebugViewModel @Inject constructor() : ViewModel() {
             try {
                 _uiFlags.value = UiFlags.loading()
                 writeWithPulse(index, (turns * 6400).toLong())
-            } catch (ex: Exception) {
-                _message.value = ex.message
-            } finally {
                 _uiFlags.value = UiFlags.none()
+            } catch (ex: Exception) {
+                _uiFlags.value = UiFlags.message(ex.message ?: "Unknown")
             }
         }
     }
 }
 
 sealed class DebugIntent {
-    data class Message(val message: String?) : DebugIntent()
+    data class Flags(val uiFlags: UiFlags) : DebugIntent()
     data class NavTo(val page: Int) : DebugIntent()
     data class Transfer(val index: Int, val turns: Double) : DebugIntent()
     data class Valve(val index: Int, val value: Int) : DebugIntent()

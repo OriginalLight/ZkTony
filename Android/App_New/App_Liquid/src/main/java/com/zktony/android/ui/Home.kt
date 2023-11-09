@@ -49,6 +49,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.Program
+import com.zktony.android.data.entities.internal.OrificePlate
 import com.zktony.android.ui.components.CountDownDialog
 import com.zktony.android.ui.components.FinishDialog
 import com.zktony.android.ui.components.HomeAppBar
@@ -66,18 +67,25 @@ import com.zktony.android.utils.SerialPortUtils.start
 import com.zktony.android.utils.extra.dateFormat
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun HomeRoute(viewModel: HomeViewModel) {
 
     val scope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackbarHostState.current
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val page by viewModel.page.collectAsStateWithLifecycle()
+    val selected by viewModel.selected.collectAsStateWithLifecycle()
+    val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
+    val status by viewModel.status.collectAsStateWithLifecycle()
+    val orificePlate by viewModel.orificePlate.collectAsStateWithLifecycle()
+    val finished by viewModel.finished.collectAsStateWithLifecycle()
+
     val entities = viewModel.entities.collectAsLazyPagingItems()
-    val message by viewModel.message.collectAsStateWithLifecycle()
     val navigation: () -> Unit = {
         scope.launch {
-            when (uiState.page) {
-                PageType.PROGRAM_LIST -> viewModel.uiEvent(HomeUiEvent.NavTo(PageType.HOME))
+            when (page) {
+                PageType.PROGRAM_LIST -> viewModel.dispatch(HomeIntent.NavTo(PageType.HOME))
                 else -> {}
             }
         }
@@ -85,36 +93,28 @@ fun HomeRoute(viewModel: HomeViewModel) {
 
     BackHandler { navigation() }
 
-    LaunchedEffect(key1 = message) {
-        message?.let {
-            snackbarHostState.showSnackbar(it)
-            viewModel.uiEvent(HomeUiEvent.Message(null))
+    LaunchedEffect(key1 = uiFlags) {
+        if (uiFlags is UiFlags.Message) {
+            snackbarHostState.showSnackbar((uiFlags as UiFlags.Message).message)
+            viewModel.dispatch(HomeIntent.Flags(UiFlags.none()))
         }
     }
 
-    HomeWrapper(
-        entities = entities,
-        uiState = uiState,
-        uiEvent = viewModel::uiEvent,
-        navigation = navigation
-    )
-
-}
-
-@OptIn(ExperimentalAnimationApi::class)
-@Composable
-fun HomeWrapper(
-    entities: LazyPagingItems<Program>,
-    uiState: HomeUiState,
-    uiEvent: (HomeUiEvent) -> Unit,
-    navigation: () -> Unit
-) {
     Column {
-        HomeAppBar(uiState) { navigation() }
-        AnimatedContent(targetState = uiState.page) {
-            when (uiState.page) {
-                PageType.PROGRAM_LIST -> ProgramList(entities, uiEvent)
-                PageType.HOME -> HomeContent(entities.toList(), uiState, uiEvent)
+        HomeAppBar(page) { navigation() }
+        AnimatedContent(targetState = page) {
+            when (page) {
+                PageType.PROGRAM_LIST -> ProgramList(entities, viewModel::dispatch)
+                PageType.HOME -> HomeContent(
+                    entities.toList(),
+                    selected,
+                    uiFlags,
+                    status,
+                    orificePlate,
+                    finished,
+                    viewModel::dispatch
+                )
+
                 else -> {}
             }
         }
@@ -124,7 +124,7 @@ fun HomeWrapper(
 @Composable
 fun ProgramList(
     entities: LazyPagingItems<Program>,
-    uiEvent: (HomeUiEvent) -> Unit,
+    dispatch: (HomeIntent) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
 
@@ -141,8 +141,8 @@ fun ProgramList(
                     .clip(MaterialTheme.shapes.small)
                     .clickable {
                         scope.launch {
-                            uiEvent(HomeUiEvent.ToggleSelected(item.id))
-                            uiEvent(HomeUiEvent.NavTo(PageType.HOME))
+                            dispatch(HomeIntent.Selected(item.id))
+                            dispatch(HomeIntent.NavTo(PageType.HOME))
                         }
                     },
                 headlineContent = {
@@ -179,37 +179,24 @@ fun ProgramList(
 @Composable
 fun HomeContent(
     entities: List<Program>,
-    uiState: HomeUiState,
-    uiEvent: (HomeUiEvent) -> Unit
+    selected: Long,
+    uiFlags: UiFlags,
+    status: Int,
+    orificePlate: OrificePlate,
+    finished: List<Triple<Int, Int, Color>>,
+    dispatch: (HomeIntent) -> Unit
 ) {
 
     val scope = rememberCoroutineScope()
     val navigationActions = LocalNavigationActions.current
     val snackbarHostState = LocalSnackbarHostState.current
     var dialog by remember { mutableStateOf(false) }
-    val info by remember(uiState.jobState.orificePlate) {
-        mutableStateOf(uiState.jobState.orificePlate.getInfo())
-    }
-    val tankAbscissa by rememberDataSaverState(
-        key = Constants.ZT_0003,
-        default = 0.0
-    )
-    val tankOrdinate by rememberDataSaverState(
-        key = Constants.ZT_0004,
-        default = 0.0
-    )
+    val tankAbscissa by rememberDataSaverState(Constants.ZT_0003, 0.0)
+    val tankOrdinate by rememberDataSaverState(Constants.ZT_0004, 0.0)
 
     LaunchedEffect(key1 = entities) {
         if (entities.isEmpty()) {
-            uiEvent(HomeUiEvent.ToggleSelected(0L))
-        } else {
-            if (uiState.selected == 0L) {
-                uiEvent(HomeUiEvent.ToggleSelected(entities.getOrNull(0)?.id ?: 0L))
-            } else {
-                if (!entities.any { it.id == uiState.selected }) {
-                    uiEvent(HomeUiEvent.ToggleSelected(entities.getOrNull(0)?.id ?: 0L))
-                }
-            }
+            dispatch(HomeIntent.Selected(0L))
         }
     }
 
@@ -217,12 +204,12 @@ fun HomeContent(
         CountDownDialog(
             onStart = {
                 scope.launch {
-                    uiEvent(HomeUiEvent.Pipeline(1))
+                    dispatch(HomeIntent.Pipeline(1))
                 }
             },
             onStop = {
                 scope.launch {
-                    uiEvent(HomeUiEvent.Pipeline(0))
+                    dispatch(HomeIntent.Pipeline(0))
                 }
             },
             onCancel = {
@@ -231,16 +218,18 @@ fun HomeContent(
         )
     }
 
-    if (uiState.uiFlags == UiFlags.DIALOG) {
+    if (uiFlags is UiFlags.Objects && uiFlags.objects == 4) {
         FinishDialog { code ->
             scope.launch {
                 when (code) {
                     0 -> {
-                        uiEvent(HomeUiEvent.UiFlags(UiFlags.NONE))
+                        dispatch(HomeIntent.Flags(UiFlags.none()))
                     }
+
                     1 -> {
-                        uiEvent(HomeUiEvent.Reset)
+                        dispatch(HomeIntent.Reset)
                     }
+
                     else -> {
                         scope.launch {
                             start {
@@ -248,7 +237,7 @@ fun HomeContent(
                                 with(index = 1, pdv = tankOrdinate)
                             }
                         }
-                        uiEvent(HomeUiEvent.UiFlags(UiFlags.NONE))
+                        dispatch(HomeIntent.Flags(UiFlags.none()))
                     }
                 }
             }
@@ -266,16 +255,16 @@ fun HomeContent(
             modifier = Modifier.fillMaxWidth(0.5f),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            val selected = entities.firstOrNull { it.id == uiState.selected } ?: Program()
+            val program = entities.firstOrNull { it.id == selected } ?: Program()
 
             ListItem(
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.small)
                     .clickable {
                         scope.launch {
-                            if (uiState.jobState.status == JobState.STEPPED) {
+                            if (status == 0) {
                                 if (entities.isNotEmpty()) {
-                                    uiEvent(HomeUiEvent.NavTo(PageType.PROGRAM_LIST))
+                                    dispatch(HomeIntent.NavTo(PageType.PROGRAM_LIST))
                                 } else {
                                     navigationActions.navigate(Route.PROGRAM)
                                 }
@@ -285,7 +274,7 @@ fun HomeContent(
                 headlineContent = {
                     Text(
                         modifier = Modifier.padding(vertical = 8.dp),
-                        text = selected.displayText,
+                        text = program.displayText,
                         style = MaterialTheme.typography.titleMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -296,7 +285,7 @@ fun HomeContent(
                         verticalArrangement = Arrangement.spacedBy(4.dp),
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        info.forEach {
+                        orificePlate.getInfo().forEach {
                             Text(
                                 modifier = Modifier
                                     .border(
@@ -319,14 +308,16 @@ fun HomeContent(
                 )
             )
 
-            OrificePlate(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(328.dp),
-                row = uiState.jobState.orificePlate.row,
-                column = uiState.jobState.orificePlate.column,
-                selected = uiState.jobState.finished
-            )
+            if (selected != 0L) {
+                OrificePlate(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(328.dp),
+                    row = orificePlate.row,
+                    column = orificePlate.column,
+                    selected = finished
+                )
+            }
         }
 
         Box(
@@ -340,46 +331,35 @@ fun HomeContent(
                         .clip(CircleShape)
                         .clickable {
                             scope.launch {
-                                if (uiState.uiFlags == UiFlags.NONE && uiState.selected != 0L) {
-                                    when (uiState.jobState.status) {
-                                        JobState.STEPPED -> {
-                                            uiEvent(HomeUiEvent.Start)
-                                            snackbarHostState.showSnackbar("程序开始")
-                                        }
-
-                                        JobState.RUNNING -> {
-                                            uiEvent(HomeUiEvent.Pause)
-                                            snackbarHostState.showSnackbar("程序暂停")
-                                        }
-
-                                        JobState.PAUSED -> {
-                                            uiEvent(HomeUiEvent.Resume)
-                                            snackbarHostState.showSnackbar("程序继续")
-                                        }
+                                if (uiFlags is UiFlags.None && selected != 0L) {
+                                    when (status) {
+                                        0 -> { dispatch(HomeIntent.Start) }
+                                        1 -> { dispatch(HomeIntent.Pause) }
+                                        2 -> { dispatch(HomeIntent.Resume) }
                                     }
                                 } else {
                                     snackbarHostState.showSnackbar("请中止其他操作或选择程序")
                                 }
                             }
                         },
-                    imageVector = if (uiState.jobState.status == JobState.RUNNING) Icons.Default.Pause else Icons.Default.PlayArrow,
+                    imageVector = if (status == 1) Icons.Default.Pause else Icons.Default.PlayArrow,
                     contentDescription = null,
-                    tint = when (uiState.jobState.status) {
-                        JobState.STEPPED -> Color.Blue
-                        JobState.RUNNING -> Color.DarkGray
-                        JobState.PAUSED -> Color.Yellow
+                    tint = when (status) {
+                        0 -> Color.Blue
+                        1 -> Color.DarkGray
+                        2 -> Color.Yellow
                         else -> Color.Gray
                     }
                 )
 
-                if (uiState.jobState.status != JobState.STEPPED) {
+                if (status != 0) {
                     Icon(
                         modifier = Modifier
                             .size(150.dp)
                             .clip(CircleShape)
                             .clickable {
                                 scope.launch {
-                                    uiEvent(HomeUiEvent.Stop)
+                                    dispatch(HomeIntent.Stop)
                                     snackbarHostState.showSnackbar("程序中止")
                                 }
                             },
@@ -389,8 +369,7 @@ fun HomeContent(
                     )
                 }
             }
-
-            if (uiState.jobState.status != JobState.RUNNING) {
+            if (status != 1) {
                 Column(
                     modifier = Modifier.align(Alignment.CenterEnd),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -405,15 +384,15 @@ fun HomeContent(
                             .clip(MaterialTheme.shapes.small)
                             .clickable {
                                 scope.launch {
-                                    if (uiState.uiFlags == UiFlags.NONE) {
-                                        uiEvent(HomeUiEvent.Reset)
+                                    if (uiFlags is UiFlags.None) {
+                                        dispatch(HomeIntent.Reset)
                                     }
                                 }
                             }
                             .padding(vertical = 8.dp, horizontal = 16.dp),
-                        text = if (uiState.uiFlags == UiFlags.RESET) "复位中" else "复位",
+                        text = if (uiFlags is UiFlags.Objects && uiFlags.objects == 1) "复位中" else "复位",
                         style = MaterialTheme.typography.titleMedium,
-                        color = if (uiState.uiFlags == UiFlags.RESET) Color.Red else Color.Unspecified
+                        color = if (uiFlags is UiFlags.Objects && uiFlags.objects == 1) Color.Red else Color.Unspecified
                     )
 
                     Text(
@@ -425,7 +404,7 @@ fun HomeContent(
                             .clip(MaterialTheme.shapes.small)
                             .clickable {
                                 scope.launch {
-                                    if (uiState.uiFlags == UiFlags.NONE) {
+                                    if (uiFlags is UiFlags.None) {
                                         dialog = true
                                     }
                                 }
@@ -444,19 +423,19 @@ fun HomeContent(
                             .clip(MaterialTheme.shapes.small)
                             .clickable {
                                 scope.launch {
-                                    if (uiState.uiFlags == UiFlags.NONE || uiState.uiFlags == UiFlags.PIPELINE_IN) {
-                                        if (uiState.uiFlags == UiFlags.NONE) {
-                                            uiEvent(HomeUiEvent.Pipeline(2))
+                                    if (uiFlags is UiFlags.None || (uiFlags is UiFlags.Objects && uiFlags.objects == 2)) {
+                                        if (uiFlags is UiFlags.None) {
+                                            dispatch(HomeIntent.Pipeline(2))
                                         } else {
-                                            uiEvent(HomeUiEvent.Pipeline(0))
+                                            dispatch(HomeIntent.Pipeline(0))
                                         }
                                     }
                                 }
                             }
                             .padding(vertical = 8.dp, horizontal = 16.dp),
-                        text = if (uiState.uiFlags == UiFlags.PIPELINE_IN) "填充中" else "填充",
+                        text = if (uiFlags is UiFlags.Objects && uiFlags.objects == 2) "填充中" else "填充",
                         style = MaterialTheme.typography.titleMedium,
-                        color = if (uiState.uiFlags == UiFlags.PIPELINE_IN) Color.Red else Color.Unspecified
+                        color = if (uiFlags is UiFlags.Objects && uiFlags.objects == 2) Color.Red else Color.Unspecified
                     )
 
                     Text(
@@ -468,19 +447,19 @@ fun HomeContent(
                             .clip(MaterialTheme.shapes.small)
                             .clickable {
                                 scope.launch {
-                                    if (uiState.uiFlags == UiFlags.NONE || uiState.uiFlags == UiFlags.PIPELINE_OUT) {
-                                        if (uiState.uiFlags == UiFlags.NONE) {
-                                            uiEvent(HomeUiEvent.Pipeline(3))
+                                    if (uiFlags is UiFlags.None || (uiFlags is UiFlags.Objects && uiFlags.objects == 3)) {
+                                        if (uiFlags is UiFlags.None) {
+                                            dispatch(HomeIntent.Pipeline(3))
                                         } else {
-                                            uiEvent(HomeUiEvent.Pipeline(0))
+                                            dispatch(HomeIntent.Pipeline(0))
                                         }
                                     }
                                 }
                             }
                             .padding(vertical = 8.dp, horizontal = 16.dp),
-                        text = if (uiState.uiFlags == UiFlags.PIPELINE_OUT) "回吸中" else "回吸",
+                        text = if (uiFlags is UiFlags.Objects && uiFlags.objects == 3) "回吸中" else "回吸",
                         style = MaterialTheme.typography.titleMedium,
-                        color = if (uiState.uiFlags == UiFlags.PIPELINE_OUT) Color.Red else Color.Unspecified
+                        color = if (uiFlags is UiFlags.Objects && uiFlags.objects == 3) Color.Red else Color.Unspecified
                     )
 
                     Text(

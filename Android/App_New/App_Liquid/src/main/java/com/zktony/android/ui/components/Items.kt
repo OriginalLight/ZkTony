@@ -50,7 +50,6 @@ import com.zktony.android.data.entities.Calibration
 import com.zktony.android.data.entities.Motor
 import com.zktony.android.data.entities.Program
 import com.zktony.android.data.entities.internal.Point
-import com.zktony.android.ui.CalibrationUiState
 import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.utils.extra.dateFormat
 import kotlinx.coroutines.launch
@@ -149,7 +148,7 @@ fun PointItem(
     key: Int,
     item: Point,
     index: Int,
-    uiState: CalibrationUiState,
+    uiFlags: UiFlags,
     onClick: (Int) -> Unit,
     onPointChange: (Point) -> Unit,
 ) {
@@ -266,11 +265,11 @@ fun PointItem(
                             shape = MaterialTheme.shapes.small
                         )
                         .clip(MaterialTheme.shapes.small)
-                        .clickable { if (uiState.uiFlags == UiFlags.NONE) onClick(0) }
+                        .clickable { if (uiFlags is UiFlags.None) onClick(0) }
                         .padding(vertical = 4.dp, horizontal = 8.dp),
                     text = "移动",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (uiState.uiFlags == UiFlags.NONE) MaterialTheme.colorScheme.onSurface else Color.Gray
+                    color = if (uiFlags is UiFlags.None) MaterialTheme.colorScheme.onSurface else Color.Gray
                 )
                 Text(
                     modifier = Modifier

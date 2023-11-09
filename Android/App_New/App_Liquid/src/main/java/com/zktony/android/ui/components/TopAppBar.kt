@@ -39,13 +39,9 @@ import com.zktony.android.R
 import com.zktony.android.data.entities.Calibration
 import com.zktony.android.data.entities.Program
 import com.zktony.android.data.entities.internal.Point
-import com.zktony.android.ui.CalibrationUiEvent
-import com.zktony.android.ui.CalibrationUiState
-import com.zktony.android.ui.HomeUiState
-import com.zktony.android.ui.ProgramUiEvent
-import com.zktony.android.ui.ProgramUiState
-import com.zktony.android.ui.SettingUiEvent
-import com.zktony.android.ui.SettingUiState
+import com.zktony.android.ui.CalibrationIntent
+import com.zktony.android.ui.ProgramIntent
+import com.zktony.android.ui.SettingIntent
 import com.zktony.android.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.PageType
@@ -59,7 +55,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeAppBar(
-    uiState: HomeUiState,
+    page: Int,
     navigation: () -> Unit
 ) {
 
@@ -84,7 +80,7 @@ fun HomeAppBar(
                     .padding(horizontal = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                AnimatedVisibility(visible = uiState.page != PageType.HOME) {
+                AnimatedVisibility(visible = page != PageType.HOME) {
                     ElevatedButton(onClick = navigation) {
                         Icon(
                             imageVector = Icons.Default.Reply,
@@ -110,8 +106,8 @@ fun HomeAppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsAppBar(
-    uiState: SettingUiState,
-    uiEvent: (SettingUiEvent) -> Unit,
+    page: Int,
+    dispatch: (SettingIntent) -> Unit,
     navigation: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -140,8 +136,8 @@ fun SettingsAppBar(
                     .padding(horizontal = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                AnimatedVisibility(visible = uiState.page == PageType.MOTOR_LIST) {
-                    ElevatedButton(onClick = { scope.launch { uiEvent(SettingUiEvent.Insert) } }) {
+                AnimatedVisibility(visible = page == PageType.MOTOR_LIST) {
+                    ElevatedButton(onClick = { scope.launch { dispatch(SettingIntent.Insert) } }) {
                         Icon(
                             imageVector = Icons.Default.Add,
                             contentDescription = null
@@ -163,8 +159,9 @@ fun SettingsAppBar(
 @Composable
 fun ProgramAppBar(
     entities: List<Program>,
-    uiState: ProgramUiState,
-    uiEvent: (ProgramUiEvent) -> Unit,
+    selected: Long,
+    page: Int,
+    dispatch: (ProgramIntent) -> Unit,
     navigation: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -175,7 +172,7 @@ fun ProgramAppBar(
             onConfirm = {
                 scope.launch {
                     dialog = false
-                    uiEvent(ProgramUiEvent.Insert(it))
+                    dispatch(ProgramIntent.Insert(it))
                 }
             }
         ) { dialog = false }
@@ -183,7 +180,7 @@ fun ProgramAppBar(
 
     TopAppBar(
         title = {
-            if (uiState.page == PageType.PROGRAM_LIST) {
+            if (page == PageType.PROGRAM_LIST) {
                 Text(
                     modifier = Modifier
                         .background(
@@ -206,10 +203,9 @@ fun ProgramAppBar(
                         )
                         .padding(horizontal = 32.dp, vertical = 4.dp)
                 ) {
-                    val selected = entities.find { it.id == uiState.selected } ?: Program()
-
+                    val program = entities.find { it.id == selected } ?: Program()
                     Text(
-                        text = selected.displayText,
+                        text = program.displayText,
                         style = TextStyle(
                             fontWeight = FontWeight.Bold,
                             fontSize = 20.sp,
@@ -217,7 +213,7 @@ fun ProgramAppBar(
                         )
                     )
                     Text(
-                        text = selected.createTime.dateFormat("yyyy/MM/dd"),
+                        text = program.createTime.dateFormat("yyyy/MM/dd"),
                         style = TextStyle(
                             fontFamily = FontFamily.Monospace,
                             fontSize = 12.sp,
@@ -240,14 +236,14 @@ fun ProgramAppBar(
             ) {
                 ElevatedButton(onClick = {
                     scope.launch {
-                        if (uiState.page == PageType.PROGRAM_LIST) {
+                        if (page == PageType.PROGRAM_LIST) {
                             dialog = true
                         } else {
-                            val program = entities.find { it.id == uiState.selected }
+                            val program = entities.find { it.id == selected }
                             if (program != null) {
                                 val orificePlates = program.orificePlates.toMutableList()
                                 orificePlates.add(com.zktony.android.data.entities.internal.OrificePlate())
-                                uiEvent(ProgramUiEvent.Update(program.copy(orificePlates = orificePlates)))
+                                dispatch(ProgramIntent.Update(program.copy(orificePlates = orificePlates)))
                             }
                         }
                     }
@@ -257,8 +253,6 @@ fun ProgramAppBar(
                         contentDescription = null
                     )
                 }
-
-
                 ElevatedButton(onClick = navigation) {
                     Icon(
                         imageVector = Icons.Default.Reply,
@@ -275,8 +269,9 @@ fun ProgramAppBar(
 @Composable
 fun CalibrationAppBar(
     entities: List<Calibration>,
-    uiState: CalibrationUiState,
-    uiEvent: (CalibrationUiEvent) -> Unit,
+    selected: Long,
+    page: Int,
+    dispatch: (CalibrationIntent) -> Unit,
     navigation: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -285,7 +280,7 @@ fun CalibrationAppBar(
     if (dialog) {
         InputDialog(
             onConfirm = {
-                uiEvent(CalibrationUiEvent.Insert(it))
+                dispatch(CalibrationIntent.Insert(it))
                 dialog = false
             },
             onCancel = { dialog = false }
@@ -294,7 +289,7 @@ fun CalibrationAppBar(
 
     TopAppBar(
         title = {
-            if (uiState.page == PageType.CALIBRATION_LIST) {
+            if (page == PageType.CALIBRATION_LIST) {
                 Text(
                     modifier = Modifier
                         .background(
@@ -314,11 +309,11 @@ fun CalibrationAppBar(
                         )
                         .padding(horizontal = 32.dp, vertical = 4.dp)
                 ) {
-                    val selected = entities.find { it.id == uiState.selected } ?: Calibration(
+                    val calibration = entities.find { it.id == selected } ?: Calibration(
                         displayText = "None"
                     )
                     Text(
-                        text = selected.displayText,
+                        text = calibration.displayText,
                         style = TextStyle(
                             fontWeight = FontWeight.Bold,
                             fontSize = 20.sp,
@@ -326,7 +321,7 @@ fun CalibrationAppBar(
                         )
                     )
                     Text(
-                        text = selected.createTime.dateFormat("yyyy/MM/dd"),
+                        text = calibration.createTime.dateFormat("yyyy/MM/dd"),
                         style = TextStyle(
                             fontFamily = FontFamily.Monospace,
                             fontSize = 12.sp,
@@ -349,16 +344,15 @@ fun CalibrationAppBar(
             ) {
                 ElevatedButton(onClick = {
                     scope.launch {
-                        if (uiState.page == PageType.CALIBRATION_LIST) {
+                        if (page == PageType.CALIBRATION_LIST) {
                             dialog = true
                         } else {
-                            val selected =
-                                entities.find { it.id == uiState.selected } ?: Calibration(
-                                    displayText = "None"
-                                )
-                            val points = selected.points.toMutableList()
+                            val calibration = entities.find { it.id == selected } ?: Calibration(
+                                displayText = "None"
+                            )
+                            val points = calibration.points.toMutableList()
                             points.add(Point(0.0, 0.0))
-                            uiEvent(CalibrationUiEvent.Update(selected.copy(points = points)))
+                            dispatch(CalibrationIntent.Update(calibration.copy(points = points)))
                         }
                     }
                 }) {

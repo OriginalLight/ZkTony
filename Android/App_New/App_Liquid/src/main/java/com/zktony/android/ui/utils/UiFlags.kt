@@ -9,11 +9,13 @@ sealed class UiFlags {
     data object Loading : UiFlags()
     data class Error(val message: String) : UiFlags()
     data class Message(val message: String) : UiFlags()
+    data class Objects(val objects: Int) : UiFlags()
 
     companion object {
         fun none() = None
         fun loading() = Loading
         fun error(message: String) = Error(message)
         fun message(message: String) = Message(message)
+        fun objects(objects: Int) = Objects(objects)
     }
 }

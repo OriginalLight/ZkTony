@@ -10,7 +10,7 @@ import com.zktony.serialport.ext.toAsciiString
 import com.zktony.serialport.ext.writeInt16BE
 import com.zktony.serialport.ext.writeInt32BE
 import com.zktony.serialport.ext.writeInt8
-import com.zktony.serialport.lifecycle.SerialResult
+import com.zktony.serialport.lifecycle.SerialState
 import com.zktony.serialport.lifecycle.SerialStoreUtils
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
@@ -28,7 +28,7 @@ object SerialPortUtils {
         })
         // 初始化zkty串口
         SerialStoreUtils.put("zkty", abstractSerialHelperOf {
-            device = "/dev/ttyS0"
+            device = "/dev/ttyS4"
             baudRate = 57600
             log = true
         })
@@ -61,7 +61,7 @@ object SerialPortUtils {
     /**
      * 写入 16 位整数
      */
-    suspend fun writeRegister(slaveAddr: Int, startAddr: Int, value: Int) {
+    fun writeRegister(slaveAddr: Int, startAddr: Int, value: Int) {
         SerialStoreUtils.get("rtu")?.sendByteArray(bytes = RtuProtocol().apply {
             this.slaveAddr = (slaveAddr + 1).toByte()
             funcCode = 0x06
@@ -72,7 +72,7 @@ object SerialPortUtils {
     /**
      * 写入 32 位整数
      */
-    suspend fun writeRegister(slaveAddr: Int, startAddr: Int, value: Long) {
+    fun writeRegister(slaveAddr: Int, startAddr: Int, value: Long) {
         SerialStoreUtils.get("rtu")?.sendByteArray(bytes = RtuProtocol().apply {
             val byteArray = ByteArray(4).writeInt32BE(value)
             this.slaveAddr = (slaveAddr + 1).toByte()
@@ -172,7 +172,7 @@ object SerialPortUtils {
     suspend fun readWithTemperature(id: Int, block: (Int, Double) -> Unit) {
         SerialStoreUtils.get("zkty")?.sendAsciiString("TC1:TCACTUALTEMP?@$id\r") { res ->
             when (res) {
-                is SerialResult.Success -> {
+                is SerialState.Success -> {
                     val ascii = res.byteArray.toAsciiString()
                     val address =
                         ascii.substring(ascii.length - 2, ascii.length - 1).toInt()

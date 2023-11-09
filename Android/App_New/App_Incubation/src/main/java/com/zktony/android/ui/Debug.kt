@@ -53,7 +53,6 @@ fun DebugRoute(viewModel: DebugViewModel) {
 
     val page by viewModel.page.collectAsStateWithLifecycle()
     val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
-    val message by viewModel.message.collectAsStateWithLifecycle()
 
     val navigation: () -> Unit = {
         scope.launch {
@@ -66,10 +65,10 @@ fun DebugRoute(viewModel: DebugViewModel) {
 
     BackHandler { navigation() }
 
-    LaunchedEffect(key1 = message) {
-        message?.let {
-            snackbarHostState.showSnackbar(it)
-            viewModel.dispatch(DebugIntent.Message(null))
+    LaunchedEffect(key1 = uiFlags) {
+        if (uiFlags is UiFlags.Message) {
+            snackbarHostState.showSnackbar((uiFlags as UiFlags.Message).message)
+            viewModel.dispatch(DebugIntent.Flags(UiFlags.none()))
         }
     }
 

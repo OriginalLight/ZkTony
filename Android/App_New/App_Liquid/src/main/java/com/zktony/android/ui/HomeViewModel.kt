@@ -22,8 +22,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
@@ -40,75 +38,49 @@ class HomeViewModel @Inject constructor(
     private val dataStore: DataSaverDataStore
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(HomeUiState())
     private val _selected = MutableStateFlow(0L)
     private val _page = MutableStateFlow(PageType.HOME)
-    private val _uiFlags = MutableStateFlow(UiFlags.NONE)
+    private val _uiFlags = MutableStateFlow<UiFlags>(UiFlags.none())
 
-    private val _jobState = MutableStateFlow(JobState())
-    private val _status = MutableStateFlow(JobState.STEPPED)
+    private val _status = MutableStateFlow(0)
     private val _orificePlate = MutableStateFlow(OrificePlate())
     private val _finished = MutableStateFlow(emptyList<Triple<Int, Int, Color>>())
-    private val _job = MutableStateFlow<Job?>(null)
 
-    private val _message: MutableStateFlow<String?> = MutableStateFlow(null)
+    private var job: Job? = null
 
-    val uiState = _uiState.asStateFlow()
-    val message = _message.asStateFlow()
+    val selected = _selected.asStateFlow()
+    val page = _page.asStateFlow()
+    val uiFlags = _uiFlags.asStateFlow()
+    val status = _status.asStateFlow()
+    val orificePlate = _orificePlate.asStateFlow()
+    val finished = _finished.asStateFlow()
     val entities = Pager(
         config = PagingConfig(pageSize = 20, initialLoadSize = 40)
     ) { dao.getByPage() }.flow.cachedIn(viewModelScope)
 
     init {
-        viewModelScope.launch {
-            launch {
-                combine(
-                    _selected, _page, _uiFlags, _jobState
-                ) { selected, page, uiFlags, jobState ->
-                    HomeUiState(selected, page, uiFlags, jobState)
-                }.catch { ex ->
-                    _message.value = ex.message
-                }.collect {
-                    _uiState.value = it
-                }
-            }
-            launch {
-                combine(
-                    _status, _orificePlate, _finished, _job
-                ) { status, orificePlate, finished, job ->
-                    JobState(status, orificePlate, finished, job)
-                }.catch { ex ->
-                    _message.value = ex.message
-                }.collect {
-                    _jobState.value = it
-                }
-            }
-            launch {
-                init()
-            }
+        reset()
+    }
+
+    fun dispatch(intent: HomeIntent) {
+        when (intent) {
+            is HomeIntent.NavTo -> _page.value = intent.page
+            is HomeIntent.Pause -> _status.value = 2
+            is HomeIntent.Pipeline -> pipeline(intent.index)
+            is HomeIntent.Reset -> reset()
+            is HomeIntent.Resume -> _status.value = 1
+            is HomeIntent.Flags -> _uiFlags.value = intent.uiFlags
+            is HomeIntent.Start -> start()
+            is HomeIntent.Stop -> stop()
+            is HomeIntent.Selected -> selected(intent.id)
         }
     }
 
-    fun uiEvent(uiEvent: HomeUiEvent) {
-        when (uiEvent) {
-            is HomeUiEvent.Message -> _message.value = uiEvent.message
-            is HomeUiEvent.NavTo -> _page.value = uiEvent.page
-            is HomeUiEvent.Pause -> _status.value = JobState.PAUSED
-            is HomeUiEvent.Pipeline -> pipeline(uiEvent.index)
-            is HomeUiEvent.Reset -> init()
-            is HomeUiEvent.Resume -> _status.value = JobState.RUNNING
-            is HomeUiEvent.UiFlags -> _uiFlags.value = uiEvent.uiFlags
-            is HomeUiEvent.Start -> startJob()
-            is HomeUiEvent.Stop -> stopJob()
-            is HomeUiEvent.ToggleSelected -> toggleSelected(uiEvent.id)
-        }
-    }
-
-    private fun init() {
+    private fun reset() {
         viewModelScope.launch {
-            _uiFlags.value = UiFlags.RESET
             try {
-                withTimeout(60 * 1000L) {
+                _uiFlags.value = UiFlags.objects(1)
+                withTimeout(30 * 1000L) {
                     gpio(0, 1)
                     delay(300L)
                     val job: MutableList<Job?> = MutableList(2) { null }
@@ -143,26 +115,25 @@ class HomeViewModel @Inject constructor(
                     }
                     job.forEach { it?.join() }
                 }
+                _uiFlags.value = UiFlags.none()
             } catch (ex: Exception) {
-                _message.value = ex.message
-            } finally {
-                _uiFlags.value = UiFlags.NONE
+                _uiFlags.value = UiFlags.message("复位超时请重试")
             }
         }
     }
 
-    private fun startJob() {
-        _job.value = viewModelScope.launch {
-            _status.value = JobState.RUNNING
+    private fun start() {
+        job = viewModelScope.launch {
+            _status.value = 1
             val selected = dao.getById(_selected.value).firstOrNull()
             if (selected == null) {
-                _message.value = "不存在该程序，请检查！！！"
-                _status.value = JobState.STEPPED
+                _uiFlags.value = UiFlags.message("不存在该程序，请检查！！！")
+                _status.value = 0
                 return@launch
             }
             if (selected.orificePlates.isEmpty()) {
-                _message.value = "该程序没有孔板，请检查！！！"
-                _status.value = JobState.STEPPED
+                _uiFlags.value = UiFlags.message("该程序没有孔板，请检查！！！")
+                _status.value = 0
                 return@launch
             }
 
@@ -179,22 +150,22 @@ class HomeViewModel @Inject constructor(
                 }
             }
             delay(100L)
-            _uiFlags.value = UiFlags.DIALOG
+            _uiFlags.value = UiFlags.objects(4)
         }
-        _job.value?.invokeOnCompletion {
+        job?.invokeOnCompletion {
             _finished.value = emptyList()
-            _status.value = JobState.STEPPED
+            _status.value = 0
         }
     }
 
-    private fun stopJob() {
+    private fun stop() {
         viewModelScope.launch {
-            _job.value?.cancel()
+            job?.cancel()
             stop(0, 1, 2, 3, 4, 5, 6, 7)
         }
     }
 
-    private fun toggleSelected(id: Long) {
+    private fun selected(id: Long) {
         viewModelScope.launch {
             _selected.value = id
             _orificePlate.value =
@@ -206,10 +177,10 @@ class HomeViewModel @Inject constructor(
     private fun pipeline(index: Int) {
         viewModelScope.launch {
             if (index == 0) {
-                _uiFlags.value = UiFlags.NONE
+                _uiFlags.value = UiFlags.none()
                 stop(2, 3, 4, 5, 6, 7)
             } else {
-                _uiFlags.value = index + 1
+                _uiFlags.value = UiFlags.objects(index)
                 start {
                     executeType = ExecuteType.ASYNC
                     repeat(6) {
@@ -258,7 +229,7 @@ class HomeViewModel @Inject constructor(
                 if (!next) continue
 
                 delay(10L)
-                while (_status.value == JobState.PAUSED) {
+                while (_status.value == 2) {
                     delay(100)
                 }
 
@@ -270,7 +241,7 @@ class HomeViewModel @Inject constructor(
                 }
 
                 delay(10L)
-                while (_status.value == JobState.PAUSED) {
+                while (_status.value == 2) {
                     delay(100)
                 }
 
@@ -322,7 +293,7 @@ class HomeViewModel @Inject constructor(
                 if (!next) continue
 
                 delay(10L)
-                while (_status.value == JobState.PAUSED) {
+                while (_status.value == 2) {
                     delay(100)
                 }
 
@@ -339,7 +310,7 @@ class HomeViewModel @Inject constructor(
                 }
 
                 delay(10L)
-                while (_status.value == JobState.PAUSED) {
+                while (_status.value == 2) {
                     delay(100)
                 }
 
@@ -385,35 +356,14 @@ class HomeViewModel @Inject constructor(
     }
 }
 
-data class HomeUiState(
-    val selected: Long = 0L,
-    val page: Int = PageType.HOME,
-    val uiFlags: Int = UiFlags.NONE,
-    val jobState: JobState = JobState(),
-)
-
-sealed class HomeUiEvent {
-    data class NavTo(val page: Int) : HomeUiEvent()
-    data class Pipeline(val index: Int) : HomeUiEvent()
-    data class ToggleSelected(val id: Long) : HomeUiEvent()
-    data class Message(val message: String?) : HomeUiEvent()
-    data class UiFlags(val uiFlags: Int) : HomeUiEvent()
-    data object Pause : HomeUiEvent()
-    data object Reset : HomeUiEvent()
-    data object Resume : HomeUiEvent()
-    data object Start : HomeUiEvent()
-    data object Stop : HomeUiEvent()
-}
-
-data class JobState(
-    val status: Int = 0,
-    val orificePlate: OrificePlate = OrificePlate(),
-    val finished: List<Triple<Int, Int, Color>> = emptyList(),
-    val job: Job? = null,
-) {
-    companion object {
-        const val STEPPED = 0
-        const val RUNNING = 1
-        const val PAUSED = 2
-    }
+sealed class HomeIntent {
+    data class NavTo(val page: Int) : HomeIntent()
+    data class Pipeline(val index: Int) : HomeIntent()
+    data class Selected(val id: Long) : HomeIntent()
+    data class Flags(val uiFlags: UiFlags) : HomeIntent()
+    data object Pause : HomeIntent()
+    data object Reset : HomeIntent()
+    data object Resume : HomeIntent()
+    data object Start : HomeIntent()
+    data object Stop : HomeIntent()
 }

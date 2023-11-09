@@ -64,7 +64,6 @@ import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.toList
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.extra.dateFormat
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 
@@ -75,7 +74,6 @@ fun HomeRoute(viewModel: HomeViewModel) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackbarHostState.current
 
-    val message by viewModel.message.collectAsStateWithLifecycle()
     val page by viewModel.page.collectAsStateWithLifecycle()
     val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
     val selected by viewModel.selected.collectAsStateWithLifecycle()
@@ -96,10 +94,10 @@ fun HomeRoute(viewModel: HomeViewModel) {
 
     BackHandler { navigation() }
 
-    LaunchedEffect(key1 = message) {
-        message?.let {
-            snackbarHostState.showSnackbar(it)
-            viewModel.dispatch(HomeIntent.Message(null))
+    LaunchedEffect(key1 = uiFlags) {
+        if (uiFlags is UiFlags.Message) {
+            snackbarHostState.showSnackbar((uiFlags as UiFlags.Message).message)
+            viewModel.dispatch(HomeIntent.Flags(UiFlags.none()))
         }
     }
 
@@ -144,7 +142,7 @@ fun ModuleList(
         items(size) { index ->
             ModuleItem(index, selected, stateList, insulation) {
                 dispatch(
-                    HomeIntent.ToggleSelected(index)
+                    HomeIntent.Selected(index)
                 )
             }
         }
@@ -172,7 +170,7 @@ fun HomeContent(
     if (uiFlags is UiFlags.Error) {
         ErrorDialog(
             message = uiFlags.message,
-            onConfirm = { scope.launch { dispatch(HomeIntent.ToggleUiFlags(UiFlags.none())) } }
+            onConfirm = { scope.launch { dispatch(HomeIntent.Flags(UiFlags.none())) } }
         )
     }
 
@@ -366,7 +364,7 @@ fun ProgramList(
                     .clip(MaterialTheme.shapes.small)
                     .clickable {
                         scope.launch {
-                            dispatch(HomeIntent.ToggleProcess(selected, item))
+                            dispatch(HomeIntent.Stages(selected, item))
                             dispatch(HomeIntent.NavTo(PageType.HOME))
                         }
                     },

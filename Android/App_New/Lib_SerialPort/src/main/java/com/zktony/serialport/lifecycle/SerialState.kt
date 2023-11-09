@@ -1,7 +1,7 @@
 package com.zktony.serialport.lifecycle
 
-sealed class SerialResult {
-    data class Success(val byteArray: ByteArray) : SerialResult() {
+sealed class SerialState {
+    data class Success(val byteArray: ByteArray) : SerialState() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
@@ -16,5 +16,5 @@ sealed class SerialResult {
         }
     }
 
-    data class Failure(val exception: Exception) : SerialResult()
+    data class Err(val ex: Exception) : SerialState()
 }

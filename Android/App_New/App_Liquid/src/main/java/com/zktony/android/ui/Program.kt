@@ -63,6 +63,7 @@ import com.zktony.android.ui.utils.AnimatedContent
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.toList
 import com.zktony.android.utils.Constants
@@ -70,78 +71,67 @@ import com.zktony.android.utils.SerialPortUtils.start
 import com.zktony.android.utils.extra.format
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ProgramRoute(viewModel: ProgramViewModel) {
 
     val scope = rememberCoroutineScope()
     val navigationActions = LocalNavigationActions.current
     val snackbarHostState = LocalSnackbarHostState.current
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val page by viewModel.page.collectAsStateWithLifecycle()
+    val selected by viewModel.selected.collectAsStateWithLifecycle()
+    val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
+
     val entities = viewModel.entities.collectAsLazyPagingItems()
-    val message by viewModel.message.collectAsStateWithLifecycle()
     val navigation: () -> Unit = {
         scope.launch {
-            when (uiState.page) {
+            when (page) {
                 PageType.PROGRAM_LIST -> navigationActions.navigateUp()
-                PageType.PROGRAM_EDIT -> viewModel.uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_DETAIL))
-                else -> viewModel.uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_LIST))
+                PageType.PROGRAM_EDIT -> viewModel.dispatch(ProgramIntent.NavTo(PageType.PROGRAM_DETAIL))
+                else -> viewModel.dispatch(ProgramIntent.NavTo(PageType.PROGRAM_LIST))
             }
         }
     }
 
     BackHandler { navigation() }
 
-    LaunchedEffect(key1 = message) {
-        message?.let {
-            snackbarHostState.showSnackbar(it)
-            viewModel.uiEvent(ProgramUiEvent.Message(null))
+    LaunchedEffect(key1 = uiFlags) {
+        if (uiFlags is UiFlags.Message) {
+            snackbarHostState.showSnackbar((uiFlags as UiFlags.Message).message)
+            viewModel.dispatch(ProgramIntent.Flags(UiFlags.none()))
         }
     }
 
-    ProgramWrapper(
-        entities = entities,
-        uiState = uiState,
-        uiEvent = viewModel::uiEvent,
-        navigation = navigation
-    )
-}
-
-@OptIn(ExperimentalAnimationApi::class)
-@Composable
-fun ProgramWrapper(
-    entities: LazyPagingItems<Program>,
-    uiState: ProgramUiState,
-    uiEvent: (ProgramUiEvent) -> Unit,
-    navigation: () -> Unit
-) {
-
-    val scope = rememberCoroutineScope()
-    val selected = remember { mutableIntStateOf(0) }
+    val selectedPlate = remember { mutableIntStateOf(0) }
 
     Column {
-        ProgramAppBar(entities.toList(), uiState, uiEvent) { navigation() }
-        AnimatedContent(targetState = uiState.page) {
-            when (uiState.page) {
-                PageType.PROGRAM_LIST -> ProgramList(entities, uiEvent)
-                PageType.PROGRAM_DETAIL -> ProgramDetail(entities.toList(), uiState, uiEvent) {
+        ProgramAppBar(entities.toList(), selected, page, viewModel::dispatch) { navigation() }
+        AnimatedContent(targetState = page) {
+            when (page) {
+                PageType.PROGRAM_LIST -> ProgramList(entities, viewModel::dispatch)
+                PageType.PROGRAM_DETAIL -> ProgramDetail(
+                    entities.toList(),
+                    selected,
+                    viewModel::dispatch
+                ) {
                     scope.launch {
-                        selected.intValue = it
-                        uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_EDIT))
+                        selectedPlate.intValue = it
+                        viewModel.dispatch(ProgramIntent.NavTo(PageType.PROGRAM_EDIT))
                     }
-
                 }
 
                 PageType.PROGRAM_EDIT -> {
-                    val program = entities.itemSnapshotList.items.find { it.id == uiState.selected }
+                    val program = entities.itemSnapshotList.items.find { it.id == selected }
                         ?: Program()
                     val orificePlate =
-                        program.orificePlates.getOrNull(selected.intValue) ?: OrificePlate()
+                        program.orificePlates.getOrNull(selectedPlate.intValue) ?: OrificePlate()
 
                     ProgramInput(orificePlate) {
                         scope.launch {
                             val array = program.orificePlates.toMutableList()
-                            array[selected.intValue] = it
-                            uiEvent(ProgramUiEvent.Update(program.copy(orificePlates = array)))
+                            array[selectedPlate.intValue] = it
+                            viewModel.dispatch(ProgramIntent.Update(program.copy(orificePlates = array)))
                         }
                     }
                 }
@@ -155,7 +145,7 @@ fun ProgramWrapper(
 @Composable
 fun ProgramList(
     entities: LazyPagingItems<Program>,
-    uiEvent: (ProgramUiEvent) -> Unit,
+    dispatch: (ProgramIntent) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackbarHostState.current
@@ -172,13 +162,13 @@ fun ProgramList(
                 item = item,
                 onClick = {
                     scope.launch {
-                        uiEvent(ProgramUiEvent.ToggleSelected(item.id))
-                        uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_DETAIL))
+                        dispatch(ProgramIntent.Selected(item.id))
+                        dispatch(ProgramIntent.NavTo(PageType.PROGRAM_DETAIL))
                     }
                 },
                 onDelete = {
                     scope.launch {
-                        uiEvent(ProgramUiEvent.Delete(item.id))
+                        dispatch(ProgramIntent.Delete(item.id))
                         snackbarHostState.showSnackbar("删除成功")
                     }
                 }
@@ -190,13 +180,13 @@ fun ProgramList(
 @Composable
 fun ProgramDetail(
     entities: List<Program>,
-    uiState: ProgramUiState,
-    uiEvent: (ProgramUiEvent) -> Unit,
+    selected: Long,
+    dispatch: (ProgramIntent) -> Unit,
     toggleSelected: (Int) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackbarHostState.current
-    val selected = entities.find { it.id == uiState.selected } ?: Program()
+    val program = entities.find { it.id == selected } ?: Program()
 
     LazyVerticalGrid(
         modifier = Modifier
@@ -212,7 +202,7 @@ fun ProgramDetail(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        itemsIndexed(items = selected.orificePlates) { index, item ->
+        itemsIndexed(items = program.orificePlates) { index, item ->
             OrificePlateBox(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -220,9 +210,9 @@ fun ProgramDetail(
                 orificePlate = item,
                 delete = {
                     scope.launch {
-                        val array = selected.orificePlates.toMutableList()
+                        val array = program.orificePlates.toMutableList()
                         array.removeAt(index)
-                        uiEvent(ProgramUiEvent.Update(selected.copy(orificePlates = array)))
+                        dispatch(ProgramIntent.Update(program.copy(orificePlates = array)))
                         snackbarHostState.showSnackbar("删除成功")
                     }
                 },

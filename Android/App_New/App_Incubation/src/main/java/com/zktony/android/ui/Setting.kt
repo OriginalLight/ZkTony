@@ -97,6 +97,7 @@ import com.zktony.android.ui.utils.AnimatedContent
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.ui.utils.items
 import com.zktony.android.ui.utils.toList
 import com.zktony.android.utils.ApplicationUtils
@@ -118,7 +119,7 @@ fun SettingRoute(viewModel: SettingViewModel) {
     val selected by viewModel.selected.collectAsStateWithLifecycle()
     val progress by viewModel.progress.collectAsStateWithLifecycle()
     val page by viewModel.page.collectAsStateWithLifecycle()
-    val message by viewModel.message.collectAsStateWithLifecycle()
+    val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
 
     val entities = viewModel.entities.collectAsLazyPagingItems()
     val navigation: () -> Unit = {
@@ -133,10 +134,10 @@ fun SettingRoute(viewModel: SettingViewModel) {
 
     BackHandler { navigation() }
 
-    LaunchedEffect(key1 = message) {
-        message?.let {
-            snackbarHostState.showSnackbar(it)
-            viewModel.dispatch(SettingIntent.Message(null))
+    LaunchedEffect(key1 = uiFlags) {
+        if (uiFlags is UiFlags.Message) {
+            snackbarHostState.showSnackbar((uiFlags as UiFlags.Message).message)
+            viewModel.dispatch(SettingIntent.Flags(UiFlags.none()))
         }
     }
 
@@ -489,7 +490,7 @@ fun MotorList(
                 item = item,
                 onClick = {
                     scope.launch {
-                        dispatch(SettingIntent.ToggleSelected(item.id))
+                        dispatch(SettingIntent.Selected(item.id))
                         dispatch(SettingIntent.NavTo(PageType.MOTOR_DETAIL))
                     }
                 },
@@ -503,7 +504,6 @@ fun MotorList(
         }
     }
 }
-
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -735,7 +735,6 @@ fun MotorDetail(
         }
     }
 }
-
 
 @Composable
 fun ConfigList() {

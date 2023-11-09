@@ -51,6 +51,7 @@ import com.zktony.android.ui.utils.AnimatedContent
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.toList
 import kotlinx.coroutines.launch
@@ -65,7 +66,7 @@ fun ProgramRoute(viewModel: ProgramViewModel) {
 
     val page by viewModel.page.collectAsStateWithLifecycle()
     val selected by viewModel.selected.collectAsStateWithLifecycle()
-    val message by viewModel.message.collectAsStateWithLifecycle()
+    val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
 
     val entities = viewModel.entities.collectAsLazyPagingItems()
     val navigation: () -> Unit = {
@@ -80,10 +81,10 @@ fun ProgramRoute(viewModel: ProgramViewModel) {
 
     BackHandler { navigation() }
 
-    LaunchedEffect(key1 = message) {
-        message?.let {
-            snackbarHostState.showSnackbar(it)
-            viewModel.dispatch(ProgramIntent.Message(null))
+    LaunchedEffect(key1 = uiFlags) {
+        if (uiFlags is UiFlags.Message) {
+            snackbarHostState.showSnackbar((uiFlags as UiFlags.Message).message)
+            viewModel.dispatch(ProgramIntent.Flags(UiFlags.none()))
         }
     }
 
@@ -125,7 +126,7 @@ fun ProgramList(
                 item = item,
                 onClick = {
                     scope.launch {
-                        dispatch(ProgramIntent.ToggleSelected(item.id))
+                        dispatch(ProgramIntent.Selected(item.id))
                         dispatch(ProgramIntent.NavTo(PageType.PROGRAM_DETAIL))
                     }
                 },

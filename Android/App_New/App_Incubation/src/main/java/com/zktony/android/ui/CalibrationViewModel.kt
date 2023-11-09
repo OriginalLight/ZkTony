@@ -32,21 +32,19 @@ class CalibrationViewModel @Inject constructor(
     private val _page = MutableStateFlow(PageType.CALIBRATION_LIST)
     private val _selected = MutableStateFlow(0L)
     private val _uiFlags = MutableStateFlow<UiFlags>(UiFlags.none())
-    private val _message = MutableStateFlow<String?>(null)
 
     val page = _page.asStateFlow()
     val selected = _selected.asStateFlow()
     val uiFlags = _uiFlags.asStateFlow()
-    val message = _message.asStateFlow()
     val entities = Pager(
         config = PagingConfig(pageSize = 20, initialLoadSize = 40),
     ) { dao.getByPage() }.flow.cachedIn(viewModelScope)
 
     fun dispatch(intent: CalibrationIntent) {
         when (intent) {
-            is CalibrationIntent.Message -> _message.value = intent.message
+            is CalibrationIntent.Flags -> _uiFlags.value = intent.uiFlags
             is CalibrationIntent.NavTo -> _page.value = intent.page
-            is CalibrationIntent.ToggleSelected -> _selected.value = intent.id
+            is CalibrationIntent.Selected -> _selected.value = intent.id
             is CalibrationIntent.Insert -> viewModelScope.launch {
                 dao.insert(Calibration(displayText = intent.displayText))
             }
@@ -62,8 +60,7 @@ class CalibrationViewModel @Inject constructor(
             _uiFlags.value = UiFlags.loading()
             val volume = dataStore.readData(Constants.ZT_0002, 0.0)
             if (turns == 0.0) {
-                _message.value = "转数不能为0"
-                _uiFlags.value = UiFlags.none()
+                _uiFlags.value = UiFlags.message("转数不能为0")
                 return@launch
             }
             try {
@@ -78,10 +75,9 @@ class CalibrationViewModel @Inject constructor(
                     SerialPortUtils.writeWithValve(2 * index - 1, 6)
                     SerialPortUtils.writeWithPulse(index, -(volume * 6400).toLong())
                 }
-            } catch (ex: Exception) {
-                _message.value = ex.message
-            } finally {
                 _uiFlags.value = UiFlags.none()
+            } catch (ex: Exception) {
+                _uiFlags.value = UiFlags.message(ex.message ?: "Unknown")
             }
         }
     }
@@ -90,9 +86,9 @@ class CalibrationViewModel @Inject constructor(
 sealed class CalibrationIntent {
     data class Delete(val id: Long) : CalibrationIntent()
     data class Insert(val displayText: String) : CalibrationIntent()
-    data class Message(val message: String?) : CalibrationIntent()
+    data class Flags(val uiFlags: UiFlags) : CalibrationIntent()
     data class NavTo(val page: Int) : CalibrationIntent()
     data class Transfer(val index: Int, val turns: Double) : CalibrationIntent()
-    data class ToggleSelected(val id: Long) : CalibrationIntent()
+    data class Selected(val id: Long) : CalibrationIntent()
     data class Update(val calibration: Calibration) : CalibrationIntent()
 }

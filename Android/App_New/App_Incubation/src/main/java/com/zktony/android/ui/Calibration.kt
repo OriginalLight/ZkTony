@@ -76,7 +76,6 @@ fun CalibrationRoute(viewModel: CalibrationViewModel) {
     val page by viewModel.page.collectAsStateWithLifecycle()
     val selected by viewModel.selected.collectAsStateWithLifecycle()
     val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
-    val message by viewModel.message.collectAsStateWithLifecycle()
 
     val entities = viewModel.entities.collectAsLazyPagingItems()
     val navigation: () -> Unit = {
@@ -90,10 +89,10 @@ fun CalibrationRoute(viewModel: CalibrationViewModel) {
 
     BackHandler { navigation() }
 
-    LaunchedEffect(key1 = message) {
-        message?.let {
-            snackbarHostState.showSnackbar(it)
-            viewModel.dispatch(CalibrationIntent.Message(null))
+    LaunchedEffect(key1 = uiFlags) {
+        if (uiFlags is UiFlags.Message) {
+            snackbarHostState.showSnackbar((uiFlags as UiFlags.Message).message)
+            viewModel.dispatch(CalibrationIntent.Flags(UiFlags.none()))
         }
     }
 
@@ -137,7 +136,7 @@ fun CalibrationList(
                 item = item,
                 onClick = {
                     scope.launch {
-                        dispatch(CalibrationIntent.ToggleSelected(item.id))
+                        dispatch(CalibrationIntent.Selected(item.id))
                         dispatch(CalibrationIntent.NavTo(PageType.CALIBRATION_DETAIL))
                     }
                 },

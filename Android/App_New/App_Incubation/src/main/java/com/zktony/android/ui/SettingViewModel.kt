@@ -12,6 +12,7 @@ import com.zktony.android.R
 import com.zktony.android.data.dao.MotorDao
 import com.zktony.android.data.entities.Motor
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.utils.ApplicationUtils
 import com.zktony.android.utils.extra.Application
 import com.zktony.android.utils.extra.DownloadState
@@ -37,13 +38,13 @@ class SettingViewModel @Inject constructor(
     private val _selected = MutableStateFlow(0L)
     private val _progress = MutableStateFlow(0)
     private val _page = MutableStateFlow(PageType.SETTINGS)
-    private val _message = MutableStateFlow<String?>(null)
+    private val _uiFlags = MutableStateFlow<UiFlags>(UiFlags.none())
 
     val application = _application.asStateFlow()
     val selected = _selected.asStateFlow()
     val progress = _progress.asStateFlow()
     val page = _page.asStateFlow()
-    val message = _message.asStateFlow()
+    val uiFlags = _uiFlags.asStateFlow()
     val entities = Pager(
         config = PagingConfig(pageSize = 20, initialLoadSize = 40),
     ) { dao.getByPage() }.flow.cachedIn(viewModelScope)
@@ -61,11 +62,11 @@ class SettingViewModel @Inject constructor(
             is SettingIntent.CheckUpdate -> checkUpdate()
             is SettingIntent.Delete -> viewModelScope.launch { dao.deleteById(intent.id) }
             is SettingIntent.Insert -> viewModelScope.launch { dao.insert(Motor(displayText = "None")) }
-            is SettingIntent.Message -> _message.value = intent.message
+            is SettingIntent.Flags -> _uiFlags.value = intent.uiFlags
             is SettingIntent.Navigation -> navigation(intent.navigation)
             is SettingIntent.NavTo -> _page.value = intent.page
             is SettingIntent.Network -> network()
-            is SettingIntent.ToggleSelected -> _selected.value = intent.id
+            is SettingIntent.Selected -> _selected.value = intent.id
             is SettingIntent.Update -> viewModelScope.launch { dao.update(intent.entity) }
         }
     }
@@ -116,7 +117,7 @@ class SettingViewModel @Inject constructor(
 
                             is DownloadState.Err -> {
                                 _progress.value = 0
-                                _message.value = "下载失败: ${it.t.message}"
+                                _uiFlags.value = UiFlags.message("下载失败: ${it.t.message}")
                             }
 
                             is DownloadState.Progress -> {
@@ -126,11 +127,11 @@ class SettingViewModel @Inject constructor(
                     }
                 }
             } else {
-                httpCall(exception = { _message.value = it.message }) { app ->
+                httpCall(exception = { _uiFlags.value = UiFlags.message(it.message ?: "Unknown") }) { app ->
                     if (app != null) {
                         _application.value = app
                     } else {
-                        _message.value = "未找到升级信息"
+                        _uiFlags.value = UiFlags.message("未找到升级信息")
                     }
                 }
             }
@@ -140,10 +141,10 @@ class SettingViewModel @Inject constructor(
 
 sealed class SettingIntent {
     data class Delete(val id: Long) : SettingIntent()
-    data class Message(val message: String?) : SettingIntent()
+    data class Flags(val uiFlags: UiFlags) : SettingIntent()
     data class Navigation(val navigation: Boolean) : SettingIntent()
     data class NavTo(val page: Int) : SettingIntent()
-    data class ToggleSelected(val id: Long) : SettingIntent()
+    data class Selected(val id: Long) : SettingIntent()
     data class Update(val entity: Motor) : SettingIntent()
     data object CheckUpdate : SettingIntent()
     data object Insert : SettingIntent()
