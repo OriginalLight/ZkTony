@@ -28,7 +28,7 @@ object SerialPortUtils {
         })
         // 初始化zkty串口
         SerialStoreUtils.put("zkty", abstractSerialHelperOf {
-            device = "/dev/ttyS4"
+            device = "/dev/ttyS0"
             baudRate = 57600
             log = true
         })
@@ -159,10 +159,10 @@ object SerialPortUtils {
      */
     suspend fun writeWithTemperature(id: Int, value: Double) {
         SerialStoreUtils.get("zkty")?.sendAsciiString("TC1:TCSW=0@$id\r")
-        delay(60 * 1000L)
+        delay(15 * 1000L)
         SerialStoreUtils.get("zkty")
             ?.sendAsciiString("TC1:TCADJUSTTEMP=${String.format("%.2f", value)}@$id\r")
-        delay(60 * 1000L)
+        delay(15 * 1000L)
         SerialStoreUtils.get("zkty")?.sendAsciiString("TC1:TCSW=1@$id\r")
     }
 

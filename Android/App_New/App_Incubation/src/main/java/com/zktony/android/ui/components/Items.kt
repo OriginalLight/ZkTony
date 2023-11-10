@@ -569,15 +569,15 @@ fun IncubationStageItem(item: IncubationStage) {
 
     val info: List<String> = mutableListOf<String>().apply {
         add("${item.temperature} ℃")
-        add("${item.dosage} μL")
+        add("${item.dosage} 微升")
 
         if (item.type != 4) {
-            add("${item.duration} ${if (item.type == 3) "Min" else "Hour"}")
+            add("${item.duration} ${if (item.type == 3) "分钟" else "小时"}")
         }
 
         if (item.type == 1) {
             add("${'@' + item.origin}")
-            add(if (item.recycle) "Recycle" else "No Recycle")
+            add(if (item.recycle) "回收" else "不回收")
         }
 
         if (item.type == 2) {
@@ -585,7 +585,7 @@ fun IncubationStageItem(item: IncubationStage) {
         }
 
         if (item.type == 3) {
-            add("${item.times} Cycle")
+            add("${item.times} 次")
         }
     }
 

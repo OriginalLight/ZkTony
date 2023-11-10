@@ -318,7 +318,7 @@ fun HomeContent(
                         .clip(MaterialTheme.shapes.small)
                         .clickable { scope.launch { dispatch(HomeIntent.Shaker) } }
                         .padding(vertical = 8.dp, horizontal = 16.dp),
-                    text = if (shaker) "ON" else "OFF",
+                    text = if (shaker) "摇床开" else "摇床关",
                     style = MaterialTheme.typography.titleMedium
                 )
 
