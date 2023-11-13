@@ -4,7 +4,6 @@ import android.util.Log
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.ext.ascii2ByteArray
 import com.zktony.serialport.ext.hex2ByteArray
-import com.zktony.serialport.lifecycle.SerialState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
 import java.io.IOException
@@ -48,11 +47,13 @@ abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
      * Send byte data  with callback
      *
      * @param bytes byte data
+     * @param timeOut Long
+     * @param block Function1<[@kotlin.ParameterName] Result<ByteArray>, Unit>
      */
     suspend fun sendByteArray(
         bytes: ByteArray,
         timeOut: Long = 1000L,
-        block: ((SerialState) -> Unit)
+        block: ((Result<ByteArray>) -> Unit)
     ) {
         try {
             withTimeout(timeOut) {
@@ -62,10 +63,10 @@ abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
                 while (ref.isEmpty()) {
                     delay(10L)
                 }
-                block(SerialState.Success(ref))
+                block(Result.success(ref))
             }
         } catch (ex: Exception) {
-            block(SerialState.Err(ex))
+            block(Result.failure(ex))
         } finally {
             callbackHandler = null
         }
@@ -84,11 +85,13 @@ abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
      * Send hex string with callback
      *
      * @param hex String
+     * @param timeOut Long
+     * @param block Function1<[@kotlin.ParameterName] Result<ByteArray>, Unit>
      */
     suspend fun sendHexString(
         hex: String,
         timeOut: Long = 1000L,
-        block: ((SerialState) -> Unit)
+        block: ((Result<ByteArray>) -> Unit)
     ) {
         sendByteArray(hex.hex2ByteArray(), timeOut, block)
     }
@@ -106,11 +109,13 @@ abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
      * Send ascii string with callback
      *
      * @param ascii String
+     * @param timeOut Long
+     * @param block Function1<[@kotlin.ParameterName] Result<ByteArray>, Unit>
      */
     suspend fun sendAsciiString(
         ascii: String,
         timeOut: Long = 1000L,
-        block: ((SerialState) -> Unit)
+        block: ((Result<ByteArray>) -> Unit)
     ) {
         sendByteArray(ascii.ascii2ByteArray(true), timeOut, block)
     }

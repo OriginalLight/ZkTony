@@ -10,7 +10,6 @@ import com.zktony.serialport.ext.toAsciiString
 import com.zktony.serialport.ext.writeInt16BE
 import com.zktony.serialport.ext.writeInt32BE
 import com.zktony.serialport.ext.writeInt8
-import com.zktony.serialport.lifecycle.SerialState
 import com.zktony.serialport.lifecycle.SerialStoreUtils
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
@@ -171,16 +170,11 @@ object SerialPortUtils {
      */
     suspend fun readWithTemperature(id: Int, block: (Int, Double) -> Unit) {
         SerialStoreUtils.get("zkty")?.sendAsciiString("TC1:TCACTUALTEMP?@$id\r") { res ->
-            when (res) {
-                is SerialState.Success -> {
-                    val ascii = res.byteArray.toAsciiString()
-                    val address =
-                        ascii.substring(ascii.length - 2, ascii.length - 1).toInt()
-                    val data = ascii.replace("TC1:TCACTUALTEMP=", "").split("@")[0].format()
-                    block(address, data.toDoubleOrNull() ?: 0.0)
-                }
-
-                else -> {}
+            if (res.isSuccess) {
+                val ascii = res.getOrElse { return@sendAsciiString }.toAsciiString()
+                val address = ascii.substring(ascii.length - 2, ascii.length - 1).toInt()
+                val data = ascii.replace("TC1:TCACTUALTEMP=", "").split("@")[0].format()
+                block(address, data.toDoubleOrNull() ?: 0.0)
             }
         }
     }

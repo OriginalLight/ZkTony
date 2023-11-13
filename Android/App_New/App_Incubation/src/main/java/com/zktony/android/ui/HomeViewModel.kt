@@ -135,23 +135,9 @@ class HomeViewModel @Inject constructor(
                     return@launch
                 }
                 updateState(state.copy(flags = 1, stages = state.stages.map { it.copy(flags = 2) }))
-                val job = viewModelScope.launch {
+                jobMap[current] = viewModelScope.launch {
                     interpreter(current, state)
                 }
-                job.invokeOnCompletion {
-                    jobMap.remove(current)
-                    if (jobMap.isEmpty()) {
-                        viewModelScope.launch {
-                            val startTime =
-                                (logList.firstOrNull() ?: Log(message = "None")).createTime
-                            val logs = logList.sortedBy { it.index }
-                            historyDao.insert(History(logs = logs, createTime = startTime))
-                            // 清空日志
-                            logList.clear()
-                        }
-                    }
-                }
-                jobMap[current] = job
             }
         }
     }
@@ -225,17 +211,19 @@ class HomeViewModel @Inject constructor(
             _stateList.value.find { it.index == index }?.let {
                 updateState(it.copy(flags = 2))
             }
+            jobMap.remove(index)
         } catch (ex: Exception) {
             if (ex !is CancellationException) {
                 _uiFlags.value = UiFlags.error(ex.message ?: "Unknown")
                 logList.add(Log(index = index, message = ex.message ?: "Unknown"))
             }
-
             if (lock.get() == index) {
                 lock.set(-1)
             }
             jobMap.remove(index)?.cancel()
             updateState(state.copy(flags = 0))
+        } finally {
+            storageLog()
         }
     }
 
@@ -672,6 +660,19 @@ class HomeViewModel @Inject constructor(
         }
         stateList.add(state)
         _stateList.value = stateList
+    }
+
+    private fun storageLog() {
+        viewModelScope.launch {
+            if (jobMap.isEmpty() && logList.isNotEmpty()) {
+                val startTime =
+                    (logList.firstOrNull() ?: Log(message = "None")).createTime
+                val logs = logList.sortedBy { it.index }
+                historyDao.insert(History(logs = logs, createTime = startTime))
+                // 清空日志
+                logList.clear()
+            }
+        }
     }
 
     private fun autoClean() {
