@@ -7,37 +7,49 @@ import com.zktony.android.utils.internal.ExceptionPolicy
 import com.zktony.android.utils.internal.ExecuteType
 import com.zktony.android.utils.internal.GlueBuilder
 import com.zktony.android.utils.internal.StartBuilder
-import com.zktony.serialport.abstractSerialHelperOf
 import com.zktony.serialport.command.Protocol
+import com.zktony.serialport.ext.readInt16LE
 import com.zktony.serialport.ext.readInt8
 import com.zktony.serialport.ext.writeInt8
 import com.zktony.serialport.lifecycle.SerialStoreUtils
+import com.zktony.serialport.serialPortOf
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
 
 object SerialPortUtils {
     fun with() {
         // 初始化zkty串口
-        SerialStoreUtils.put("zkty", abstractSerialHelperOf {})
+        SerialStoreUtils.put("zkty", serialPortOf {})
 
         // rtu串口全局回调
         SerialStoreUtils.get("zkty")?.callbackHandler = { bytes ->
-            Protocol.Protocol.callbackHandler(bytes) { code, rx ->
-                when (code) {
-                    Protocol.RX_0X01 -> {
-                        for (i in 0 until rx.data.size / 2) {
-                            val index = rx.data.readInt8(offset = i * 2)
-                            val status = rx.data.readInt8(offset = i * 2 + 1)
-                            hpa[index] = status == 1
-                        }
+            Protocol.verifyProtocol(bytes) { protocol ->
+                if (protocol.func == 0xFF.toByte()) {
+                    when (protocol.data.readInt16LE()) {
+                        1 -> throw Exception("TX Header Error")
+                        2 -> throw Exception("TX Addr Error")
+                        3 -> throw Exception("TX Crc Error")
+                        4 -> throw Exception("TX No Com")
                     }
-
-                    Protocol.RX_0X02 -> {
-                        for (i in 0 until rx.data.size / 2) {
-                            val index = rx.data.readInt8(offset = i * 2)
-                            val status = rx.data.readInt8(offset = i * 2 + 1)
-                            hpg[index] = status == 1
+                } else {
+                    when (protocol.func) {
+                        0x01.toByte() -> {
+                            for (i in 0 until protocol.data.size / 2) {
+                                val index = protocol.data.readInt8(offset = i * 2)
+                                val status = protocol.data.readInt8(offset = i * 2 + 1)
+                                hpa[index] = status == 1
+                            }
                         }
+
+                        0x02.toByte() -> {
+                            for (i in 0 until protocol.data.size / 2) {
+                                val index = protocol.data.readInt8(offset = i * 2)
+                                val status = protocol.data.readInt8(offset = i * 2 + 1)
+                                hpg[index] = status == 1
+                            }
+                        }
+
+                        else -> {}
                     }
                 }
             }

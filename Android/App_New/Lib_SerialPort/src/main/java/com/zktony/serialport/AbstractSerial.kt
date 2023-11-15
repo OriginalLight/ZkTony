@@ -98,7 +98,7 @@ abstract class AbstractSerial {
             if (buffer.size() > 0) {
                 try {
                     callbackHandler?.let { it(buffer.toByteArray()) }
-                    if (config.log) {
+                    if (BuildConfig.DEBUG) {
                         Log.i(config.device, "RX: ${buffer.toByteArray().toHexString()}")
                     }
                 } catch (ex: Exception) {
@@ -154,7 +154,7 @@ abstract class AbstractSerial {
                     val message = byteArrayQueue.poll(config.delay, TimeUnit.MILLISECONDS)
                     if (message != null) {
                         send(message)
-                        if (config.log) {
+                        if (BuildConfig.DEBUG) {
                             Log.i(config.device, "TX: ${message.toHexString()}")
                         }
                     }

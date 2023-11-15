@@ -103,52 +103,35 @@ class RunzeProtocol : BaseProtocol<RunzeProtocol> {
         return byteArray.plus(byteArray.checkSumLE())
     }
 
-    override fun toProtocol(byteArray: ByteArray) {
-        head = byteArray[0]
-        slaveAddr = byteArray[1]
-        funcCode = byteArray[2]
-        data = byteArray.copyOfRange(3, byteArray.size - 3)
-        end = byteArray[byteArray.size - 3]
-        checksum = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
-    }
-
-    override fun callbackHandler(byteArray: ByteArray, block: (Int, RunzeProtocol) -> Unit) {
-        // checksum 校验
-        val crc = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
-        val bytes = byteArray.copyOfRange(0, byteArray.size - 2)
-        if (!bytes.checkSumLE().contentEquals(crc)) {
-            throw Exception("RX Crc Error with byteArray: ${byteArray.toHexString()}")
-        }
-
-        // 解析协议
-        toProtocol(byteArray)
-
-        // 处理数据包
-        when (funcCode) {
-            0x00.toByte() -> {
-                block(RX_0x00, this)
-            }
-
-            0x01.toByte() -> throw Exception("帧错误")
-            0x02.toByte() -> throw Exception("参数错误")
-            0x03.toByte() -> throw Exception("光耦错误")
-            0x04.toByte() -> throw Exception("电机忙")
-            0x05.toByte() -> throw Exception("电机堵转")
-            0x06.toByte() -> throw Exception("未知位置")
-            0xFE.toByte() -> {
-                block(RX_0XFE, this)
-            }
-
-            0xFF.toByte() -> throw Exception("未知错误")
-            else -> {}
+    override fun toProtocol(byteArray: ByteArray): RunzeProtocol {
+        return RunzeProtocol().apply {
+            head = byteArray[0]
+            slaveAddr = byteArray[1]
+            funcCode = byteArray[2]
+            data = byteArray.copyOfRange(3, byteArray.size - 3)
+            end = byteArray[byteArray.size - 3]
+            checksum = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
         }
     }
 
     companion object {
-        const val RX_0x00 = 0
-        const val RX_0XFE = 1
 
-        // 单例 RunzeProtocol 协议 用于返回
-        val Protocol: RunzeProtocol by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) { RunzeProtocol() }
+        /**
+         * Verify the protocol
+         * @param byteArray ByteArray
+         * @param block Function1<[@kotlin.ParameterName] RunzeProtocol, Unit>
+         * @throws Exception
+         */
+        @kotlin.jvm.Throws(Exception::class)
+        fun verifyProtocol(byteArray: ByteArray, block: (RunzeProtocol) -> Unit) {
+            // checksum 校验
+            val crc = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
+            val bytes = byteArray.copyOfRange(0, byteArray.size - 2)
+            if (!bytes.checkSumLE().contentEquals(crc)) {
+                throw Exception("RX Crc Error with byteArray: ${byteArray.toHexString()}")
+            }
+
+            block(RunzeProtocol().apply { toProtocol(byteArray) })
+        }
     }
 }

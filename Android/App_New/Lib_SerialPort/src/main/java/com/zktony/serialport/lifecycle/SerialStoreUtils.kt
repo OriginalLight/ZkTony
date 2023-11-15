@@ -1,6 +1,6 @@
 package com.zktony.serialport.lifecycle
 
-import com.zktony.serialport.AbstractSerialHelper
+import com.zktony.serialport.AbstractSerialPort
 
 object SerialStoreUtils {
 
@@ -9,8 +9,10 @@ object SerialStoreUtils {
 
     /**
      * Add a serial port object to the store
+     * @param key The key is the serial port name
+     * @param value The value is the serial port object
      */
-    fun put(key: String, value: AbstractSerialHelper) {
+    fun put(key: String, value: AbstractSerialPort) {
         store.put(key, value)
     }
 
@@ -18,7 +20,7 @@ object SerialStoreUtils {
      * Get the serial port object from the store
      * @param key The key is the serial port name
      */
-    fun get(key: String): AbstractSerialHelper? {
+    fun get(key: String): AbstractSerialPort? {
         return store.get(key)
     }
 
@@ -32,7 +34,7 @@ object SerialStoreUtils {
     /**
      * Get all serial port objects
      */
-    fun values(): Collection<AbstractSerialHelper> {
+    fun values(): Collection<AbstractSerialPort> {
         return store.values()
     }
 

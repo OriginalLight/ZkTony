@@ -407,7 +407,6 @@ class HomeViewModel @Inject constructor(
             // 清理废液
             clean(index, stage, 11, (index - ((index / 4) * 4)) + 1)
             // 更新模块状态和进程状态
-            // 更新模块状态
             _stateList.value.find { it.index == index }?.let { state ->
                 updateState(
                     state.copy(
@@ -654,9 +653,8 @@ class HomeViewModel @Inject constructor(
 
     private fun updateState(state: IncubationState) {
         val stateList = _stateList.value.toMutableList()
-        val ix = stateList.indexOfFirst { it.index == state.index }
-        if (ix >= 0) {
-            stateList.removeAt(ix)
+        stateList.indexOfFirst { it.index == state.index }.takeIf { it >= 0 }?.let {
+            stateList.removeAt(it)
         }
         stateList.add(state)
         _stateList.value = stateList

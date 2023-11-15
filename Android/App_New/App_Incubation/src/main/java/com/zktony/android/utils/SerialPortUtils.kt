@@ -2,7 +2,6 @@ package com.zktony.android.utils
 
 import com.zktony.android.utils.AppStateUtils.hps
 import com.zktony.android.utils.AppStateUtils.hpv
-import com.zktony.serialport.abstractSerialHelperOf
 import com.zktony.serialport.command.modbus.RtuProtocol
 import com.zktony.serialport.command.runze.RunzeProtocol
 import com.zktony.serialport.ext.readInt16BE
@@ -11,6 +10,7 @@ import com.zktony.serialport.ext.writeInt16BE
 import com.zktony.serialport.ext.writeInt32BE
 import com.zktony.serialport.ext.writeInt8
 import com.zktony.serialport.lifecycle.SerialStoreUtils
+import com.zktony.serialport.serialPortOf
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
@@ -20,34 +20,41 @@ object SerialPortUtils {
 
     fun with() {
         // 初始化rtu串口
-        SerialStoreUtils.put("rtu", abstractSerialHelperOf {
+        SerialStoreUtils.put("rtu", serialPortOf {
             device = "/dev/ttyS3"
             baudRate = 9600
-            log = true
         })
-        // 初始化zkty串口
-        SerialStoreUtils.put("zkty", abstractSerialHelperOf {
+        // 初始化tec串口
+        SerialStoreUtils.put("tec", serialPortOf {
             device = "/dev/ttyS0"
             baudRate = 57600
-            log = true
         })
         // rtu串口全局回调
         SerialStoreUtils.get("rtu")?.callbackHandler = { bytes ->
             if (bytes[0] == 0xCC.toByte()) {
-                RunzeProtocol.Protocol.callbackHandler(bytes) { code, rx ->
-                    when (code) {
-                        RunzeProtocol.RX_0x00 -> {
-                            hpv[rx.slaveAddr.toInt()] = rx.data[0].toInt()
+                RunzeProtocol.verifyProtocol(bytes) { protocol ->
+                    // 处理数据包
+                    when (protocol.funcCode) {
+                        0x00.toByte() -> {
+                            hpv[protocol.slaveAddr.toInt()] = protocol.data[0].toInt()
                         }
 
+                        0x01.toByte() -> throw Exception("帧错误")
+                        0x02.toByte() -> throw Exception("参数错误")
+                        0x03.toByte() -> throw Exception("光耦错误")
+                        0x04.toByte() -> throw Exception("电机忙")
+                        0x05.toByte() -> throw Exception("电机堵转")
+                        0x06.toByte() -> throw Exception("未知位置")
+                        0xFE.toByte() -> throw Exception("任务挂起")
+                        0xFF.toByte() -> throw Exception("未知错误")
                         else -> {}
                     }
                 }
             } else {
-                RtuProtocol.Protocol.callbackHandler(bytes) { code, rx ->
-                    when (code) {
-                        RtuProtocol.READ -> {
-                            hps[rx.slaveAddr.toInt() - 1] = rx.data.readInt16BE(1)
+                RtuProtocol.verifyProtocol(bytes) { protocol ->
+                    when (protocol.funcCode) {
+                        0x03.toByte() -> {
+                            hps[protocol.slaveAddr.toInt() - 1] = protocol.data.readInt16BE(1)
                         }
 
                         else -> {}
@@ -113,7 +120,6 @@ object SerialPortUtils {
                         data = byteArrayOf(0x00, 0x00)
                     }.toByteArray())
                 }
-
             }
         } catch (ex: TimeoutCancellationException) {
             if (hpv[slaveAddr] != channel && retry > 0) {
@@ -157,19 +163,19 @@ object SerialPortUtils {
      * 发送温度
      */
     suspend fun writeWithTemperature(id: Int, value: Double) {
-        SerialStoreUtils.get("zkty")?.sendAsciiString("TC1:TCSW=0@$id\r")
+        SerialStoreUtils.get("tec")?.sendAsciiString("TC1:TCSW=0@$id\r")
         delay(15 * 1000L)
-        SerialStoreUtils.get("zkty")
+        SerialStoreUtils.get("tec")
             ?.sendAsciiString("TC1:TCADJUSTTEMP=${String.format("%.2f", value)}@$id\r")
         delay(15 * 1000L)
-        SerialStoreUtils.get("zkty")?.sendAsciiString("TC1:TCSW=1@$id\r")
+        SerialStoreUtils.get("tec")?.sendAsciiString("TC1:TCSW=1@$id\r")
     }
 
     /**
      * 读取温度
      */
     suspend fun readWithTemperature(id: Int, block: (Int, Double) -> Unit) {
-        SerialStoreUtils.get("zkty")?.sendAsciiString("TC1:TCACTUALTEMP?@$id\r") { res ->
+        SerialStoreUtils.get("tec")?.sendAsciiString("TC1:TCACTUALTEMP?@$id\r") { res ->
             if (res.isSuccess) {
                 val ascii = res.getOrElse { return@sendAsciiString }.toAsciiString()
                 val address = ascii.substring(ascii.length - 2, ascii.length - 1).toInt()

@@ -1,10 +1,10 @@
 package com.zktony.serialport.lifecycle
 
-import com.zktony.serialport.AbstractSerialHelper
+import com.zktony.serialport.AbstractSerialPort
 
 open class SerialStore {
     // The key is the serial port name, and the value is the serial port object
-    private val map = mutableMapOf<String, AbstractSerialHelper>()
+    private val map = mutableMapOf<String, AbstractSerialPort>()
 
     /**
      * Add a serial port object to the store
@@ -12,7 +12,7 @@ open class SerialStore {
      * @param key   The key is the serial port name
      * @param value The value is the serial port object
      */
-    fun put(key: String, value: AbstractSerialHelper) {
+    fun put(key: String, value: AbstractSerialPort) {
         val old = map.put(key, value)
         old?.close()
     }
@@ -23,7 +23,7 @@ open class SerialStore {
      * @param key The key is the serial port name
      * @return The value is the serial port object
      */
-    fun get(key: String): AbstractSerialHelper? {
+    fun get(key: String): AbstractSerialPort? {
         return map[key]
     }
 
@@ -37,7 +37,7 @@ open class SerialStore {
     /**
      * Get all serial port objects
      */
-    fun values(): Collection<AbstractSerialHelper> {
+    fun values(): Collection<AbstractSerialPort> {
         return map.values
     }
 

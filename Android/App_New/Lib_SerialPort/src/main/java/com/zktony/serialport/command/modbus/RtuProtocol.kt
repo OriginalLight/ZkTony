@@ -19,38 +19,32 @@ class RtuProtocol : BaseProtocol<RtuProtocol> {
         return byteArray.plus(byteArray.crc16LE())
     }
 
-    override fun toProtocol(byteArray: ByteArray) {
-        slaveAddr = byteArray[0]
-        funcCode = byteArray[1]
-        data = byteArray.copyOfRange(2, byteArray.size - 2)
-        crc = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
-    }
-
-    override fun callbackHandler(byteArray: ByteArray, block: (Int, RtuProtocol) -> Unit) {
-        // crc 校验
-        val crc = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
-        val bytes = byteArray.copyOfRange(0, byteArray.size - 2)
-        if (!bytes.crc16LE().contentEquals(crc)) {
-            throw Exception("RX Crc Error with byteArray: ${byteArray.toHexString()}")
-        }
-
-        // 解析协议
-        toProtocol(byteArray)
-
-        // 处理数据包
-        when (funcCode) {
-            0x03.toByte() -> {
-                block(READ, this)
-            }
-
-            else -> {}
+    override fun toProtocol(byteArray: ByteArray): RtuProtocol {
+        return RtuProtocol().apply {
+            slaveAddr = byteArray[0]
+            funcCode = byteArray[1]
+            data = byteArray.copyOfRange(2, byteArray.size - 2)
+            crc = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
         }
     }
 
     companion object {
-        const val READ = 0
+        /**
+         * Verify the protocol
+         * @param byteArray ByteArray
+         * @param block Function1<[@kotlin.ParameterName] RtuProtocol, Unit>
+         * @throws Exception
+         */
+        @kotlin.jvm.Throws(Exception::class)
+        fun verifyProtocol(byteArray: ByteArray, block: (RtuProtocol) -> Unit) {
+            // crc 校验
+            val crc = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
+            val bytes = byteArray.copyOfRange(0, byteArray.size - 2)
+            if (!bytes.crc16LE().contentEquals(crc)) {
+                throw Exception("RX Crc Error with byteArray: ${byteArray.toHexString()}")
+            }
 
-        // 单例 RtuProtocol 协议 用于返回
-        val Protocol: RtuProtocol by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) { RtuProtocol() }
+            block(RtuProtocol().apply { toProtocol(byteArray) })
+        }
     }
 }

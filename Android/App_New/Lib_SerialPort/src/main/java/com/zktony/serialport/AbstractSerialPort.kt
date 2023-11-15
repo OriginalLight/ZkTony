@@ -13,10 +13,10 @@ import java.security.InvalidParameterException
  * @author: 刘贺贺
  * @date: 2022-12-08 14:39
  */
-abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
+abstract class AbstractSerialPort(config: SerialConfig) : AbstractSerial() {
 
     init {
-        // Open the serial port
+        // Open the serial port when the class is initialized
         openDevice(config)
     }
 

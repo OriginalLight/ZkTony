@@ -1,6 +1,9 @@
 package com.zktony.serialport.command
 
-import com.zktony.serialport.ext.*
+import com.zktony.serialport.ext.crc16LE
+import com.zktony.serialport.ext.replaceByteArrayBE
+import com.zktony.serialport.ext.splitByteArray
+import com.zktony.serialport.ext.writeInt16LE
 
 /**
  * Protocol
@@ -63,70 +66,59 @@ class Protocol : BaseProtocol<Protocol> {
         )
     }
 
-    override fun toProtocol(byteArray: ByteArray) {
-        head = byteArray[0]
-        addr = byteArray[1]
-        func = byteArray[2]
-        length = byteArray.copyOfRange(3, 5)
-        data = byteArray.copyOfRange(5, byteArray.size - 6)
-        crc = byteArray.copyOfRange(byteArray.size - 6, byteArray.size - 4)
-        end = byteArray.copyOfRange(byteArray.size - 4, byteArray.size)
-    }
-
-    override fun callbackHandler(byteArray: ByteArray, block: (Int, Protocol) -> Unit) {
-        // 验证包长 >= 12
-        if (byteArray.size < 12) {
-            throw Exception("RX Length Error")
-        }
-
-        // 分包处理
-        byteArray.splitByteArray(expectHead, expectEnd).forEach { pkg ->
-            // 验证包头和包尾
-            val head = pkg.copyOfRange(0, 1)
-            if (!head.contentEquals(expectHead)) {
-                throw Exception("RX Header Error")
-            }
-            val end = pkg.copyOfRange(pkg.size - 4, pkg.size)
-            if (!end.contentEquals(expectEnd)) {
-                throw Exception("RX End Error")
-            }
-
-            // crc 校验
-            val crc = pkg.copyOfRange(pkg.size - 6, pkg.size - 4)
-            val bytes = pkg.copyOfRange(0, pkg.size - 6)
-            if (!bytes.crc16LE().contentEquals(crc)) {
-                throw Exception("RX Crc Error")
-            }
-
-            // 解析协议
-            toProtocol(pkg)
-
-            if (func == 0xFF.toByte()) {
-                when (data.readInt16LE()) {
-                    1 -> throw Exception("TX Header Error")
-                    2 -> throw Exception("TX Addr Error")
-                    3 -> throw Exception("TX Crc Error")
-                    4 -> throw Exception("TX No Com")
-                }
-            } else {
-                block(func.toInt(), this)
-            }
+    override fun toProtocol(byteArray: ByteArray): Protocol {
+        return Protocol().apply {
+            head = byteArray[0]
+            addr = byteArray[1]
+            func = byteArray[2]
+            length = byteArray.copyOfRange(3, 5)
+            data = byteArray.copyOfRange(5, byteArray.size - 6)
+            crc = byteArray.copyOfRange(byteArray.size - 6, byteArray.size - 4)
+            end = byteArray.copyOfRange(byteArray.size - 4, byteArray.size)
         }
     }
 
     companion object {
-        const val RX_0X01 = 1
-        const val RX_0X02 = 2
-        const val RX_0X03 = 3
-        const val RX_0X04 = 4
-        const val RX_0X05 = 5
-        const val RX_0X06 = 6
-
         // 协议包头和包尾
-        val expectHead = byteArrayOf(0xEE.toByte())
-        val expectEnd = byteArrayOf(0xFF.toByte(), 0xFC.toByte(), 0xFF.toByte(), 0xFF.toByte())
+        private val expectHead = byteArrayOf(0xEE.toByte())
+        private val expectEnd =
+            byteArrayOf(0xFF.toByte(), 0xFC.toByte(), 0xFF.toByte(), 0xFF.toByte())
 
-        // 单例 Protocol 协议 用于返回
-        val Protocol: Protocol by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) { Protocol() }
+        /**
+         * Verify the protocol
+         * @param byteArray ByteArray
+         * @param block Function1<[@kotlin.ParameterName] Protocol, Unit>
+         * @throws Exception
+         */
+        @kotlin.jvm.Throws(Exception::class)
+        fun verifyProtocol(byteArray: ByteArray, block: (Protocol) -> Unit) {
+            // 验证包长 >= 12
+            if (byteArray.size < 12) {
+                throw Exception("RX Length Error")
+            }
+
+            // 分包处理
+            byteArray.splitByteArray(expectHead, expectEnd).forEach { pkg ->
+                // 验证包头和包尾
+                val head = pkg.copyOfRange(0, 1)
+                if (!head.contentEquals(expectHead)) {
+                    throw Exception("RX Header Error")
+                }
+                val end = pkg.copyOfRange(pkg.size - 4, pkg.size)
+                if (!end.contentEquals(expectEnd)) {
+                    throw Exception("RX End Error")
+                }
+
+                // crc 校验
+                val crc = pkg.copyOfRange(pkg.size - 6, pkg.size - 4)
+                val bytes = pkg.copyOfRange(0, pkg.size - 6)
+                if (!bytes.crc16LE().contentEquals(crc)) {
+                    throw Exception("RX Crc Error")
+                }
+
+                // 解析协议
+                block(Protocol().apply { toProtocol(pkg) })
+            }
+        }
     }
 }
