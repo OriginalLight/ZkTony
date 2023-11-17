@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
+import kotlin.math.absoluteValue
 
 /**
  * @author: 刘贺贺
@@ -48,7 +49,7 @@ class HomeViewModel @Inject constructor(
     private val _uiFlags = MutableStateFlow<UiFlags>(UiFlags.none())
     private val _selected = MutableStateFlow(0)
     private val _insulation = MutableStateFlow(List(9) { 0.0 })
-    private val _shaker = MutableStateFlow(false)
+    private val _shaker = MutableStateFlow(1)
     private val _stateList = MutableStateFlow<List<IncubationState>>(emptyList())
     private val _cleanJob = MutableStateFlow(0)
 
@@ -156,7 +157,11 @@ class HomeViewModel @Inject constructor(
                 writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
                 delay(300L)
                 writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
-                _shaker.value = false
+                dataStore.readData(Constants.ZT_0005, 0.0).takeIf { it > 0.0 }?.let {
+                    delay(3000L)
+                    writeWithPulse(0, (it * 6400).toLong())
+                }
+                _shaker.value = 1
             }
         }
     }
@@ -176,17 +181,21 @@ class HomeViewModel @Inject constructor(
     private fun shaker() {
         viewModelScope.launch {
             try {
-                if (_shaker.value) {
+                if (_shaker.value > 0) {
                     writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
                     delay(300L)
                     writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
+                    dataStore.readData(Constants.ZT_0005, 0.0).takeIf { it > 0.0 }?.let {
+                        delay(3000L)
+                        writeWithPulse(0, (it * 6400).toLong())
+                    }
+                    _shaker.value = 1
                 } else {
                     writeRegister(slaveAddr = 0, startAddr = 200, value = 1)
+                    _shaker.value = 0
                 }
             } catch (ex: Exception) {
                 _uiFlags.value = UiFlags.message(ex.message ?: "Unknown")
-            } finally {
-                _shaker.value = !_shaker.value
             }
         }
     }
@@ -540,7 +549,7 @@ class HomeViewModel @Inject constructor(
         }
         // 打开摇床
         writeRegister(slaveAddr = 0, startAddr = 200, value = 1)
-        _shaker.value = true
+        _shaker.value = 0
         // 切阀加液
         delay(100L)
         writeWithValve(inAddr, inChannel)
@@ -602,8 +611,12 @@ class HomeViewModel @Inject constructor(
         writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
         delay(300L)
         writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
+        dataStore.readData(Constants.ZT_0006, 0.0).takeIf { it > 0.0 }?.let {
+            delay(3000L)
+            writeWithPulse(0, (it * 6400).toLong())
+        }
         delay(300L)
-        _shaker.value = false
+        _shaker.value = 2
         // 切阀回收残留液体
         writeWithValve(inAddr, inChannel)
         writeWithValve(outAddr, outChannel)
@@ -683,12 +696,25 @@ class HomeViewModel @Inject constructor(
                 val pulse = (AppStateUtils.hpc[1] ?: { x -> x * 100 }).invoke(20000.0)
 
                 try {
-                    if (_shaker.value) {
+                    if (_shaker.value == 0) {
                         writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
                         delay(300L)
                         writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
-                        delay(300L)
+                        dataStore.readData(Constants.ZT_0006, 0.0).takeIf { it > 0.0 }?.let {
+                            delay(3000L)
+                            writeWithPulse(0, (it * 6400).toLong())
+                        }
+                        _shaker.value = 2
+                    } else if (_shaker.value == 1) {
+                        val z1 = dataStore.readData(Constants.ZT_0005, 0.0)
+                        val z2 = dataStore.readData(Constants.ZT_0006, 0.0)
+                        (z2 - z1).absoluteValue.takeIf { it > 0.0 }?.let {
+                            writeWithPulse(0, (it * 6400).toLong())
+                        }
+                        _shaker.value = 2
                     }
+
+                    delay(300L)
                     repeat(4) { index ->
                         // 切阀加液进孵育盒
                         writeWithValve(0, 10)

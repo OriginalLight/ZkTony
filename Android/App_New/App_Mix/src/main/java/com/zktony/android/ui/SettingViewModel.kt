@@ -4,11 +4,15 @@ import android.content.Intent
 import android.provider.Settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
 import com.zktony.android.data.dao.MotorDao
 import com.zktony.android.data.entities.Motor
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.utils.ApplicationUtils
 import com.zktony.android.utils.extra.Application
 import com.zktony.android.utils.extra.DownloadState
@@ -17,8 +21,6 @@ import com.zktony.android.utils.extra.httpCall
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
@@ -32,52 +34,40 @@ class SettingViewModel @Inject constructor(
     private val dao: MotorDao
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(SettingUiState())
     private val _application = MutableStateFlow<Application?>(null)
     private val _selected = MutableStateFlow(0L)
     private val _progress = MutableStateFlow(0)
     private val _page = MutableStateFlow(PageType.SETTINGS)
-    private val _message = MutableStateFlow<String?>(null)
+    private val _uiFlags = MutableStateFlow<UiFlags>(UiFlags.none())
 
-    val uiState = _uiState.asStateFlow()
-    val message = _message.asStateFlow()
+    val application = _application.asStateFlow()
+    val selected = _selected.asStateFlow()
+    val progress = _progress.asStateFlow()
+    val page = _page.asStateFlow()
+    val uiFlags = _uiFlags.asStateFlow()
+    val entities = Pager(
+        config = PagingConfig(pageSize = 20, initialLoadSize = 40),
+    ) { dao.getByPage() }.flow.cachedIn(viewModelScope)
 
     init {
         viewModelScope.launch {
-            launch {
-                combine(
-                    _application,
-                    dao.getAll(),
-                    _selected,
-                    _progress,
-                    _page
-                ) { application, entities, selected, progress, page ->
-                    SettingUiState(application, entities, selected, progress, page)
-                }.catch { ex ->
-                    _message.value = ex.message
-                }.collect {
-                    _uiState.value = it
-                }
-            }
-            launch {
-                if (ApplicationUtils.isNetworkAvailable()) {
-                    httpCall { _application.value = it }
-                }
+            if (ApplicationUtils.isNetworkAvailable()) {
+                httpCall { _application.value = it }
             }
         }
     }
 
-    fun uiEvent(uiEvent: SettingUiEvent) {
-        when (uiEvent) {
-            is SettingUiEvent.CheckUpdate -> checkUpdate()
-            is SettingUiEvent.Delete -> viewModelScope.launch { dao.deleteById(uiEvent.id) }
-            is SettingUiEvent.Insert -> viewModelScope.launch { dao.insert(Motor()) }
-            is SettingUiEvent.Message -> _message.value = uiEvent.message
-            is SettingUiEvent.Navigation -> navigation(uiEvent.navigation)
-            is SettingUiEvent.NavTo -> _page.value = uiEvent.page
-            is SettingUiEvent.Network -> network()
-            is SettingUiEvent.ToggleSelected -> _selected.value = uiEvent.id
-            is SettingUiEvent.Update -> viewModelScope.launch { dao.update(uiEvent.entity) }
+    fun dispatch(intent: SettingIntent) {
+        when (intent) {
+            is SettingIntent.CheckUpdate -> checkUpdate()
+            is SettingIntent.Delete -> viewModelScope.launch { dao.deleteById(intent.id) }
+            is SettingIntent.Insert -> viewModelScope.launch { dao.insert(Motor(displayText = "None")) }
+            is SettingIntent.Flags -> _uiFlags.value = intent.uiFlags
+            is SettingIntent.Navigation -> navigation(intent.navigation)
+            is SettingIntent.NavTo -> _page.value = intent.page
+            is SettingIntent.Network -> network()
+            is SettingIntent.Selected -> _selected.value = intent.id
+            is SettingIntent.Update -> viewModelScope.launch { dao.update(intent.entity) }
         }
     }
 
@@ -127,7 +117,7 @@ class SettingViewModel @Inject constructor(
 
                             is DownloadState.Err -> {
                                 _progress.value = 0
-                                _message.value = "下载失败: ${it.t.message}"
+                                _uiFlags.value = UiFlags.message("下载失败: ${it.t.message}")
                             }
 
                             is DownloadState.Progress -> {
@@ -137,11 +127,13 @@ class SettingViewModel @Inject constructor(
                     }
                 }
             } else {
-                httpCall(exception = { _message.value = it.message }) { app ->
+                httpCall(exception = {
+                    _uiFlags.value = UiFlags.message(it.message ?: "Unknown")
+                }) { app ->
                     if (app != null) {
                         _application.value = app
                     } else {
-                        _message.value = "未找到升级信息"
+                        _uiFlags.value = UiFlags.message("未找到升级信息")
                     }
                 }
             }
@@ -149,22 +141,14 @@ class SettingViewModel @Inject constructor(
     }
 }
 
-data class SettingUiState(
-    val application: Application? = null,
-    val entities: List<Motor> = emptyList(),
-    val selected: Long = 0,
-    val progress: Int = 0,
-    val page: Int = PageType.SETTINGS
-)
-
-sealed class SettingUiEvent {
-    data class Message(val message: String?) : SettingUiEvent()
-    data class Delete(val id: Long) : SettingUiEvent()
-    data class Navigation(val navigation: Boolean) : SettingUiEvent()
-    data class NavTo(val page: Int) : SettingUiEvent()
-    data class ToggleSelected(val id: Long) : SettingUiEvent()
-    data class Update(val entity: Motor) : SettingUiEvent()
-    data object CheckUpdate : SettingUiEvent()
-    data object Insert : SettingUiEvent()
-    data object Network : SettingUiEvent()
+sealed class SettingIntent {
+    data class Navigation(val navigation: Boolean) : SettingIntent()
+    data class NavTo(val page: Int) : SettingIntent()
+    data class Flags(val uiFlags: UiFlags) : SettingIntent()
+    data class Selected(val id: Long) : SettingIntent()
+    data object Insert : SettingIntent()
+    data class Update(val entity: Motor) : SettingIntent()
+    data class Delete(val id: Long) : SettingIntent()
+    data object CheckUpdate : SettingIntent()
+    data object Network : SettingIntent()
 }

@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.ArrowCircleUp
 import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Cyclone
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Numbers
 import androidx.compose.material.icons.filled.Speed
@@ -314,9 +315,16 @@ fun SettingContent(
                         )
                     } else {
                         if (progress == 0) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowCircleUp, contentDescription = null
-                            )
+                            if (application.versionCode > BuildConfig.VERSION_CODE) {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowCircleUp,
+                                    contentDescription = null
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Default.Done, contentDescription = null
+                                )
+                            }
                         } else {
                             Text(
                                 text = "$progress%",
@@ -816,6 +824,38 @@ fun ConfigList() {
 
             CircleTextField(
                 title = "洗涤液补偿",
+                value = string,
+                keyboardType = KeyboardType.Number
+            ) {
+                scope.launch {
+                    string = it
+                    value = it.toDoubleOrNull() ?: 0.0
+                }
+            }
+        }
+
+        item {
+            var value by rememberDataSaverState(Constants.ZT_0005, 0.0)
+            var string by remember { mutableStateOf(value.toString()) }
+
+            CircleTextField(
+                title = "摇床平面补偿",
+                value = string,
+                keyboardType = KeyboardType.Number
+            ) {
+                scope.launch {
+                    string = it
+                    value = it.toDoubleOrNull() ?: 0.0
+                }
+            }
+        }
+
+        item {
+            var value by rememberDataSaverState(Constants.ZT_0006, 0.0)
+            var string by remember { mutableStateOf(value.toString()) }
+
+            CircleTextField(
+                title = "摇床低点补偿",
                 value = string,
                 keyboardType = KeyboardType.Number
             ) {

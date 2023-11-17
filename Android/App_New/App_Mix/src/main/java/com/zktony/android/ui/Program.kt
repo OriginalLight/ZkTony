@@ -35,6 +35,7 @@ import com.zktony.android.ui.utils.AnimatedContent
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.toList
 import com.zktony.android.utils.Constants
@@ -42,58 +43,43 @@ import com.zktony.android.utils.SerialPortUtils.start
 import com.zktony.android.utils.extra.format
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ProgramRoute(viewModel: ProgramViewModel) {
 
     val scope = rememberCoroutineScope()
     val navigationActions = LocalNavigationActions.current
     val snackbarHostState = LocalSnackbarHostState.current
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val message by viewModel.message.collectAsStateWithLifecycle()
+
+    val page by viewModel.page.collectAsStateWithLifecycle()
+    val selected by viewModel.selected.collectAsStateWithLifecycle()
+    val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
+
     val entities = viewModel.entities.collectAsLazyPagingItems()
     val navigation: () -> Unit = {
         scope.launch {
-            when (uiState.page) {
+            when (page) {
                 PageType.PROGRAM_LIST -> navigationActions.navigateUp()
-                else -> viewModel.uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_LIST))
+                else -> viewModel.dispatch(ProgramIntent.NavTo(PageType.PROGRAM_LIST))
             }
         }
     }
 
     BackHandler { navigation() }
 
-    BackHandler { navigation() }
-
-    LaunchedEffect(key1 = message) {
-        message?.let {
-            snackbarHostState.showSnackbar(it)
-            viewModel.uiEvent(ProgramUiEvent.Message(null))
+    LaunchedEffect(key1 = uiFlags) {
+        if (uiFlags is UiFlags.Message) {
+            snackbarHostState.showSnackbar((uiFlags as UiFlags.Message).message)
+            viewModel.dispatch(ProgramIntent.Flags(UiFlags.none()))
         }
     }
 
-    ProgramWrapper(
-        entities = entities,
-        uiState = uiState,
-        uiEvent = viewModel::uiEvent,
-        navigation = navigation
-    )
-}
-
-@OptIn(ExperimentalAnimationApi::class)
-@Composable
-fun ProgramWrapper(
-    entities: LazyPagingItems<Program>,
-    uiState: ProgramUiState,
-    uiEvent: (ProgramUiEvent) -> Unit,
-    navigation: () -> Unit
-) {
-
     Column {
-        ProgramAppBar(entities.toList(), uiState, uiEvent) { navigation() }
-        AnimatedContent(targetState = uiState.page) {
-            when (uiState.page) {
-                PageType.PROGRAM_LIST -> ProgramList(entities, uiEvent)
-                PageType.PROGRAM_DETAIL -> ProgramDetail(entities.toList(), uiState, uiEvent)
+        ProgramAppBar(entities.toList(), selected, page, viewModel::dispatch) { navigation() }
+        AnimatedContent(targetState = page) {
+            when (page) {
+                PageType.PROGRAM_LIST -> ProgramList(entities, viewModel::dispatch)
+                PageType.PROGRAM_DETAIL -> ProgramDetail(entities.toList(), selected, viewModel::dispatch)
                 else -> {}
             }
         }
@@ -103,7 +89,7 @@ fun ProgramWrapper(
 @Composable
 fun ProgramList(
     entities: LazyPagingItems<Program>,
-    uiEvent: (ProgramUiEvent) -> Unit
+    dispatch: (ProgramIntent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackbarHostState.current
@@ -120,13 +106,13 @@ fun ProgramList(
                 item = item,
                 onClick = {
                     scope.launch {
-                        uiEvent(ProgramUiEvent.ToggleSelected(item.id))
-                        uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_DETAIL))
+                        dispatch(ProgramIntent.Selected(item.id))
+                        dispatch(ProgramIntent.NavTo(PageType.PROGRAM_DETAIL))
                     }
                 },
                 onDelete = {
                     scope.launch {
-                        uiEvent(ProgramUiEvent.Delete(item.id))
+                        dispatch(ProgramIntent.Delete(item.id))
                         snackbarHostState.showSnackbar("删除成功")
                     }
                 }
@@ -138,19 +124,19 @@ fun ProgramList(
 @Composable
 fun ProgramDetail(
     entities: List<Program>,
-    uiState: ProgramUiState,
-    uiEvent: (ProgramUiEvent) -> Unit
+    selected: Long,
+    dispatch: (ProgramIntent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    val selected = entities.find { it.id == uiState.selected } ?: Program()
+    val program = entities.find { it.id == selected } ?: Program()
     val maxAbscissa by rememberDataSaverState(key = Constants.ZT_0001, initialValue = 0.0)
     val maxOrdinate by rememberDataSaverState(key = Constants.ZT_0002, initialValue = 0.0)
-    var colloid by remember { mutableStateOf(selected.dosage.colloid.format(1)) }
-    var coagulant by remember { mutableStateOf(selected.dosage.coagulant.format(1)) }
-    var preColloid by remember { mutableStateOf(selected.dosage.preColloid.format(1)) }
-    var preCoagulant by remember { mutableStateOf(selected.dosage.preCoagulant.format(1)) }
-    var glueSpeed by remember { mutableStateOf(selected.speed.glue.format(1)) }
-    var preSpeed by remember { mutableStateOf(selected.speed.pre.format(1)) }
+    var colloid by remember { mutableStateOf(program.dosage.colloid.format(1)) }
+    var coagulant by remember { mutableStateOf(program.dosage.coagulant.format(1)) }
+    var preColloid by remember { mutableStateOf(program.dosage.preColloid.format(1)) }
+    var preCoagulant by remember { mutableStateOf(program.dosage.preCoagulant.format(1)) }
+    var glueSpeed by remember { mutableStateOf(program.speed.glue.format(1)) }
+    var preSpeed by remember { mutableStateOf(program.speed.pre.format(1)) }
 
     LazyColumn(
         modifier = Modifier
@@ -169,8 +155,8 @@ fun ProgramDetail(
                         scope.launch {
                             coagulant = it
                             val dosage =
-                                selected.dosage.copy(coagulant = it.toDoubleOrNull() ?: 0.0)
-                            uiEvent(ProgramUiEvent.Update(selected.copy(dosage = dosage)))
+                                program.dosage.copy(coagulant = it.toDoubleOrNull() ?: 0.0)
+                            dispatch(ProgramIntent.Update(program.copy(dosage = dosage)))
                         }
                     }
                 )
@@ -182,8 +168,8 @@ fun ProgramDetail(
                         scope.launch {
                             colloid = it
                             val dosage =
-                                selected.dosage.copy(colloid = it.toDoubleOrNull() ?: 0.0)
-                            uiEvent(ProgramUiEvent.Update(selected.copy(dosage = dosage)))
+                                program.dosage.copy(colloid = it.toDoubleOrNull() ?: 0.0)
+                            dispatch(ProgramIntent.Update(program.copy(dosage = dosage)))
                         }
                     }
                 )
@@ -197,8 +183,8 @@ fun ProgramDetail(
                     scope.launch {
                         glueSpeed = it
                         val speed =
-                            selected.speed.copy(glue = it.toDoubleOrNull() ?: 0.0)
-                        uiEvent(ProgramUiEvent.Update(selected.copy(speed = speed)))
+                            program.speed.copy(glue = it.toDoubleOrNull() ?: 0.0)
+                        dispatch(ProgramIntent.Update(program.copy(speed = speed)))
                     }
                 }
             )
@@ -213,8 +199,8 @@ fun ProgramDetail(
                         scope.launch {
                             preCoagulant = it
                             val dosage =
-                                selected.dosage.copy(preCoagulant = it.toDoubleOrNull() ?: 0.0)
-                            uiEvent(ProgramUiEvent.Update(selected.copy(dosage = dosage)))
+                                program.dosage.copy(preCoagulant = it.toDoubleOrNull() ?: 0.0)
+                            dispatch(ProgramIntent.Update(program.copy(dosage = dosage)))
                         }
                     }
                 )
@@ -226,8 +212,8 @@ fun ProgramDetail(
                         scope.launch {
                             preColloid = it
                             val dosage =
-                                selected.dosage.copy(preColloid = it.toDoubleOrNull() ?: 0.0)
-                            uiEvent(ProgramUiEvent.Update(selected.copy(dosage = dosage)))
+                                program.dosage.copy(preColloid = it.toDoubleOrNull() ?: 0.0)
+                            dispatch(ProgramIntent.Update(program.copy(dosage = dosage)))
                         }
                     }
                 )
@@ -241,8 +227,8 @@ fun ProgramDetail(
                     scope.launch {
                         preSpeed = it
                         val speed =
-                            selected.speed.copy(pre = it.toDoubleOrNull() ?: 0.0)
-                        uiEvent(ProgramUiEvent.Update(selected.copy(speed = speed)))
+                            program.speed.copy(pre = it.toDoubleOrNull() ?: 0.0)
+                        dispatch(ProgramIntent.Update(program.copy(speed = speed)))
                     }
                 }
             )
@@ -251,11 +237,11 @@ fun ProgramDetail(
             CoordinateInput(
                 modifier = Modifier.fillMaxWidth(),
                 title = "位置",
-                point = selected.point,
+                point = program.point,
                 limit = Point(maxAbscissa, maxOrdinate),
                 onCoordinateChange = {
                     scope.launch {
-                        uiEvent(ProgramUiEvent.Update(selected.copy(point = it)))
+                        dispatch(ProgramIntent.Update(program.copy(point = it)))
                     }
                 }
             ) {
@@ -266,11 +252,11 @@ fun ProgramDetail(
                     }
                     start {
                         timeOut = 1000L * 60L
-                        with(index = 0, pdv = selected.point.x)
+                        with(index = 0, pdv = program.point.x)
                     }
                     start {
                         timeOut = 1000L * 60L
-                        with(index = 1, pdv = selected.point.y)
+                        with(index = 1, pdv = program.point.y)
                     }
                 }
             }

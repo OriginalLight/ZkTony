@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Reply
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,7 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -42,16 +39,11 @@ import com.zktony.android.R
 import com.zktony.android.data.entities.Calibration
 import com.zktony.android.data.entities.Program
 import com.zktony.android.data.entities.internal.Point
-import com.zktony.android.ui.CalibrationUiEvent
-import com.zktony.android.ui.CalibrationUiState
-import com.zktony.android.ui.HomeUiState
-import com.zktony.android.ui.ProgramUiEvent
-import com.zktony.android.ui.ProgramUiState
-import com.zktony.android.ui.SettingUiEvent
-import com.zktony.android.ui.SettingUiState
+import com.zktony.android.ui.CalibrationIntent
+import com.zktony.android.ui.ProgramIntent
+import com.zktony.android.ui.SettingIntent
 import com.zktony.android.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.zktony.android.ui.utils.LocalNavigationActions
-import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.extra.dateFormat
 import kotlinx.coroutines.launch
@@ -63,7 +55,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeAppBar(
-    uiState: HomeUiState,
+    page: Int,
     navigation: () -> Unit
 ) {
 
@@ -88,7 +80,7 @@ fun HomeAppBar(
                     .padding(horizontal = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                AnimatedVisibility(visible = uiState.page != PageType.HOME) {
+                AnimatedVisibility(visible = page != PageType.HOME) {
                     ElevatedButton(onClick = navigation) {
                         Icon(
                             imageVector = Icons.Default.Reply,
@@ -114,8 +106,8 @@ fun HomeAppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsAppBar(
-    uiState: SettingUiState,
-    uiEvent: (SettingUiEvent) -> Unit,
+    page: Int,
+    dispatch: (SettingIntent) -> Unit,
     navigation: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -144,8 +136,8 @@ fun SettingsAppBar(
                     .padding(horizontal = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                AnimatedVisibility(visible = uiState.page == PageType.MOTOR_LIST) {
-                    ElevatedButton(onClick = { scope.launch { uiEvent(SettingUiEvent.Insert) } }) {
+                AnimatedVisibility(visible = page == PageType.MOTOR_LIST) {
+                    ElevatedButton(onClick = { scope.launch { dispatch(SettingIntent.Insert) } }) {
                         Icon(
                             imageVector = Icons.Default.Add,
                             contentDescription = null
@@ -168,8 +160,9 @@ fun SettingsAppBar(
 @Composable
 fun ProgramAppBar(
     entities: List<Program>,
-    uiState: ProgramUiState,
-    uiEvent: (ProgramUiEvent) -> Unit,
+    selected: Long,
+    page: Int,
+    dispatch: (ProgramIntent) -> Unit,
     navigation: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -180,7 +173,7 @@ fun ProgramAppBar(
             onConfirm = {
                 scope.launch {
                     dialog = false
-                    uiEvent(ProgramUiEvent.Insert(it))
+                    dispatch(ProgramIntent.Insert(it))
                 }
             }
         ) { dialog = false }
@@ -188,7 +181,7 @@ fun ProgramAppBar(
 
     TopAppBar(
         title = {
-            if (uiState.page == PageType.PROGRAM_LIST) {
+            if (page == PageType.PROGRAM_LIST) {
                 Text(
                     modifier = Modifier
                         .background(
@@ -211,9 +204,9 @@ fun ProgramAppBar(
                         )
                         .padding(horizontal = 32.dp, vertical = 4.dp)
                 ) {
-                    val selected = entities.find { it.id == uiState.selected } ?: Program()
+                    val program = entities.find { it.id == selected } ?: Program()
                     Text(
-                        text = selected.displayText,
+                        text = program.displayText,
                         style = TextStyle(
                             fontWeight = FontWeight.Bold,
                             fontSize = 20.sp,
@@ -221,7 +214,7 @@ fun ProgramAppBar(
                         )
                     )
                     Text(
-                        text = selected.createTime.dateFormat("yyyy/MM/dd"),
+                        text = program.createTime.dateFormat("yyyy/MM/dd"),
                         style = TextStyle(
                             fontFamily = FontFamily.Monospace,
                             fontSize = 12.sp,
@@ -242,7 +235,7 @@ fun ProgramAppBar(
                     .padding(horizontal = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                AnimatedVisibility(visible = uiState.page == PageType.PROGRAM_LIST) {
+                AnimatedVisibility(visible = page == PageType.PROGRAM_LIST) {
                     ElevatedButton(onClick = { dialog = true }) {
                         Icon(
                             imageVector = Icons.Default.Add,
@@ -267,19 +260,18 @@ fun ProgramAppBar(
 @Composable
 fun CalibrationAppBar(
     entities: List<Calibration>,
-    uiState: CalibrationUiState,
-    uiEvent: (CalibrationUiEvent) -> Unit,
+    selected: Long,
+    page: Int,
+    dispatch: (CalibrationIntent) -> Unit,
     navigation: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    val snackbarHostState = LocalSnackbarHostState.current
-    var count by remember { mutableIntStateOf(0) }
     var dialog by remember { mutableStateOf(false) }
 
     if (dialog) {
         InputDialog(
             onConfirm = {
-                uiEvent(CalibrationUiEvent.Insert(it))
+                dispatch(CalibrationIntent.Insert(it))
                 dialog = false
             },
             onCancel = { dialog = false }
@@ -288,7 +280,7 @@ fun CalibrationAppBar(
 
     TopAppBar(
         title = {
-            if (uiState.page == PageType.CALIBRATION_LIST) {
+            if (page == PageType.CALIBRATION_LIST) {
                 Text(
                     modifier = Modifier
                         .background(
@@ -308,11 +300,11 @@ fun CalibrationAppBar(
                         )
                         .padding(horizontal = 32.dp, vertical = 4.dp)
                 ) {
-                    val selected = entities.find { it.id == uiState.selected } ?: Calibration(
+                    val calibration = entities.find { it.id == selected } ?: Calibration(
                         displayText = "None"
                     )
                     Text(
-                        text = selected.displayText,
+                        text = calibration.displayText,
                         style = TextStyle(
                             fontWeight = FontWeight.Bold,
                             fontSize = 20.sp,
@@ -320,7 +312,7 @@ fun CalibrationAppBar(
                         )
                     )
                     Text(
-                        text = selected.createTime.dateFormat("yyyy/MM/dd"),
+                        text = calibration.createTime.dateFormat("yyyy/MM/dd"),
                         style = TextStyle(
                             fontFamily = FontFamily.Monospace,
                             fontSize = 12.sp,
@@ -343,16 +335,15 @@ fun CalibrationAppBar(
             ) {
                 ElevatedButton(onClick = {
                     scope.launch {
-                        if (uiState.page == PageType.CALIBRATION_LIST) {
+                        if (page == PageType.CALIBRATION_LIST) {
                             dialog = true
                         } else {
-                            val selected =
-                                entities.find { it.id == uiState.selected } ?: Calibration(
-                                    displayText = "None"
-                                )
-                            val points = selected.points.toMutableList()
+                            val calibration = entities.find { it.id == selected } ?: Calibration(
+                                displayText = "None"
+                            )
+                            val points = calibration.points.toMutableList()
                             points.add(Point(0.0, 0.0))
-                            uiEvent(CalibrationUiEvent.Update(selected.copy(points = points)))
+                            dispatch(CalibrationIntent.Update(calibration.copy(points = points)))
                         }
                     }
                 }) {
@@ -360,42 +351,6 @@ fun CalibrationAppBar(
                         imageVector = Icons.Default.Add,
                         contentDescription = null
                     )
-                }
-
-                AnimatedVisibility(
-                    visible = uiState.page == PageType.CALIBRATION_LIST
-                            && uiState.selected != 0L
-                ) {
-                    ElevatedButton(onClick = { uiEvent(CalibrationUiEvent.NavTo(PageType.CALIBRATION_DETAIL)) }) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = null
-                        )
-                    }
-                }
-
-                AnimatedVisibility(
-                    visible = uiState.page == PageType.CALIBRATION_LIST
-                            && uiState.selected != 0L
-                ) {
-                    ElevatedButton(onClick = {
-                        scope.launch {
-                            if (count == 0) {
-                                count++
-                                snackbarHostState.showSnackbar("再次点击删除")
-                            } else {
-                                count = 0
-                                uiEvent(CalibrationUiEvent.Delete(uiState.selected))
-                                uiEvent(CalibrationUiEvent.ToggleSelected(0L))
-                            }
-                        }
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = null,
-                            tint = if (count == 0) MaterialTheme.colorScheme.primary else Color.Red
-                        )
-                    }
                 }
 
                 ElevatedButton(onClick = navigation) {

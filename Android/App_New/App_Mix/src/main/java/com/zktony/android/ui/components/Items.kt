@@ -50,7 +50,6 @@ import com.zktony.android.data.entities.Calibration
 import com.zktony.android.data.entities.Motor
 import com.zktony.android.data.entities.Program
 import com.zktony.android.data.entities.internal.Point
-import com.zktony.android.ui.CalibrationUiState
 import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.utils.extra.dateFormat
 import kotlinx.coroutines.launch
@@ -149,7 +148,7 @@ fun PointItem(
     key: Int,
     item: Point,
     index: Int,
-    uiState: CalibrationUiState,
+    uiFlags: UiFlags,
     onClick: (Int) -> Unit,
     onPointChange: (Point) -> Unit,
 ) {
@@ -202,7 +201,7 @@ fun PointItem(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 Text(
-                                    text = "出液",
+                                    text = "向量",
                                     fontStyle = FontStyle.Italic,
                                     fontSize = 14.sp,
                                     fontFamily = FontFamily.Serif,
@@ -236,7 +235,7 @@ fun PointItem(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 Text(
-                                    text = "步数",
+                                    text = "圈数",
                                     fontStyle = FontStyle.Italic,
                                     fontSize = 14.sp,
                                     fontFamily = FontFamily.Serif,
@@ -266,11 +265,11 @@ fun PointItem(
                             shape = MaterialTheme.shapes.small
                         )
                         .clip(MaterialTheme.shapes.small)
-                        .clickable { if (uiState.uiFlags == UiFlags.NONE) onClick(0) }
+                        .clickable { if (uiFlags is UiFlags.None) onClick(0) }
                         .padding(vertical = 4.dp, horizontal = 8.dp),
-                    text = "加液",
+                    text = "移动",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (uiState.uiFlags == UiFlags.NONE) MaterialTheme.colorScheme.onSurface else Color.Gray
+                    color = if (uiFlags is UiFlags.None) MaterialTheme.colorScheme.onSurface else Color.Gray
                 )
                 Text(
                     modifier = Modifier
@@ -367,22 +366,16 @@ fun MotorItem(
                 onLongClick = { delete = true },
             ),
         headlineContent = {
-            Column(modifier = Modifier.padding(start = 16.dp)) {
-                Text(
-                    text = "A - ${item.acceleration}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-
-                Text(
-                    text = "D - ${item.deceleration}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-
-                Text(
-                    text = "S - ${item.speed}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
+            Text(
+                text = item.displayText,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        },
+        supportingContent = {
+            Text(
+                text = "ADS - ${item.acceleration}/${item.deceleration}/${item.speed}",
+                style = MaterialTheme.typography.bodyLarge
+            )
         },
         leadingContent = {
             Text(
@@ -406,5 +399,4 @@ fun MotorItem(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
     )
-
 }

@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.ArrowCircleUp
 import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Cyclone
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Numbers
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.TextFields
@@ -312,9 +313,16 @@ fun SettingContent(
                         )
                     } else {
                         if (progress == 0) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowCircleUp, contentDescription = null
-                            )
+                            if (application.versionCode > BuildConfig.VERSION_CODE) {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowCircleUp,
+                                    contentDescription = null
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Default.Done, contentDescription = null
+                                )
+                            }
                         } else {
                             Text(
                                 text = "$progress%",

@@ -65,21 +65,27 @@ import com.zktony.android.ui.utils.toList
 import com.zktony.android.utils.extra.dateFormat
 import com.zktony.android.utils.extra.format
 import com.zktony.android.utils.extra.timeFormat
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun HomeRoute(viewModel: HomeViewModel) {
 
     val scope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackbarHostState.current
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val message by viewModel.message.collectAsStateWithLifecycle()
+
+    val page by viewModel.page.collectAsStateWithLifecycle()
+    val selected by viewModel.selected.collectAsStateWithLifecycle()
+    val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
+    val job by viewModel.job.collectAsStateWithLifecycle()
+
     val entities = viewModel.entities.collectAsLazyPagingItems()
     val navigation: () -> Unit = {
         scope.launch {
-            when (uiState.page) {
-                PageType.PROGRAM_LIST -> viewModel.uiEvent(HomeUiEvent.NavTo(PageType.HOME))
+            when (page) {
+                PageType.PROGRAM_LIST -> viewModel.dispatch(HomeIntent.NavTo(PageType.HOME))
                 else -> {}
             }
         }
@@ -87,35 +93,25 @@ fun HomeRoute(viewModel: HomeViewModel) {
 
     BackHandler { navigation() }
 
-    LaunchedEffect(key1 = message) {
-        message?.let {
-            snackbarHostState.showSnackbar(it)
-            viewModel.uiEvent(HomeUiEvent.Message(null))
+    LaunchedEffect(key1 = uiFlags) {
+        if (uiFlags is UiFlags.Message) {
+            snackbarHostState.showSnackbar((uiFlags as UiFlags.Message).message)
+            viewModel.dispatch(HomeIntent.Flags(UiFlags.none()))
         }
     }
 
-    HomeWrapper(
-        entities = entities,
-        uiState = uiState,
-        uiEvent = viewModel::uiEvent,
-        navigation = navigation
-    )
-}
-
-@OptIn(ExperimentalAnimationApi::class)
-@Composable
-fun HomeWrapper(
-    entities: LazyPagingItems<Program>,
-    uiState: HomeUiState,
-    uiEvent: (HomeUiEvent) -> Unit,
-    navigation: () -> Unit
-) {
     Column {
-        HomeAppBar(uiState = uiState) { navigation() }
-        AnimatedContent(targetState = uiState.page) {
-            when (uiState.page) {
-                PageType.PROGRAM_LIST -> ProgramList(entities, uiEvent)
-                PageType.HOME -> HomeContent(entities.toList(), uiState, uiEvent)
+        HomeAppBar(page) { navigation() }
+        AnimatedContent(targetState = page) {
+            when (page) {
+                PageType.PROGRAM_LIST -> ProgramList(entities, viewModel::dispatch)
+                PageType.HOME -> HomeContent(
+                    entities.toList(),
+                    selected,
+                    uiFlags,
+                    job,
+                    viewModel::dispatch
+                )
             }
         }
     }
@@ -124,7 +120,7 @@ fun HomeWrapper(
 @Composable
 fun ProgramList(
     entities: LazyPagingItems<Program>,
-    uiEvent: (HomeUiEvent) -> Unit,
+    dispatch: (HomeIntent) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
 
@@ -141,8 +137,8 @@ fun ProgramList(
                     .clip(MaterialTheme.shapes.small)
                     .clickable {
                         scope.launch {
-                            uiEvent(HomeUiEvent.ToggleSelected(item.id))
-                            uiEvent(HomeUiEvent.NavTo(PageType.HOME))
+                            dispatch(HomeIntent.Selected(item.id))
+                            dispatch(HomeIntent.NavTo(PageType.HOME))
                         }
                     },
                 headlineContent = {
@@ -179,24 +175,20 @@ fun ProgramList(
 @Composable
 fun HomeContent(
     entities: List<Program>,
-    uiState: HomeUiState,
-    uiEvent: (HomeUiEvent) -> Unit
+    selected: Long,
+    uiFlags: UiFlags,
+    job: Job?,
+    uiEvent: (HomeIntent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val navigationActions = LocalNavigationActions.current
     val snackbarHostState = LocalSnackbarHostState.current
     var time by remember { mutableLongStateOf(0L) }
-    val item = entities.find { it.id == uiState.selected } ?: Program()
+    val program = entities.find { it.id == selected } ?: Program()
 
-    LaunchedEffect(key1 = uiState.selected) {
-        if (uiState.selected == 0L && entities.isNotEmpty()) {
-            uiEvent(HomeUiEvent.ToggleSelected(entities[0].id))
-        }
-    }
-
-    LaunchedEffect(key1 = uiState.job) {
+    LaunchedEffect(key1 = job) {
         while (true) {
-            if (uiState.job != null) {
+            if (job != null) {
                 time += 1
             } else {
                 time = 0
@@ -219,8 +211,8 @@ fun HomeContent(
             Card(
                 onClick = {
                     scope.launch {
-                        if (uiState.job == null) {
-                            uiEvent(HomeUiEvent.NavTo(PageType.PROGRAM_LIST))
+                        if (job == null) {
+                            uiEvent(HomeIntent.NavTo(PageType.PROGRAM_LIST))
                         }
                     }
                 },
@@ -234,7 +226,7 @@ fun HomeContent(
                 ) {
                     Column {
                         Text(
-                            text = item.displayText,
+                            text = program.displayText,
                             style = TextStyle(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 20.sp,
@@ -242,7 +234,7 @@ fun HomeContent(
                             )
                         )
                         Text(
-                            text = item.createTime.dateFormat("yyyy/MM/dd"),
+                            text = program.createTime.dateFormat("yyyy/MM/dd"),
                             style = TextStyle(
                                 fontFamily = FontFamily.Monospace,
                                 fontSize = 12.sp,
@@ -262,7 +254,7 @@ fun HomeContent(
                 Box(
                     modifier = Modifier.padding(8.dp),
                 ) {
-                    if (uiState.job != null) {
+                    if (job != null) {
                         CircularProgressIndicator(
                             modifier = Modifier
                                 .size(24.dp)
@@ -303,7 +295,7 @@ fun HomeContent(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp),
-                        text = item.dosage.coagulant.format(1),
+                        text = program.dosage.coagulant.format(1),
                         style = MaterialTheme.typography.titleLarge,
                         textAlign = TextAlign.Center,
                         fontFamily = FontFamily.Monospace,
@@ -318,7 +310,7 @@ fun HomeContent(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp),
-                        text = item.dosage.colloid.format(1),
+                        text = program.dosage.colloid.format(1),
                         style = MaterialTheme.typography.titleLarge,
                         textAlign = TextAlign.Center,
                         fontFamily = FontFamily.Monospace,
@@ -346,7 +338,7 @@ fun HomeContent(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp),
-                        text = item.dosage.preCoagulant.format(1),
+                        text = program.dosage.preCoagulant.format(1),
                         style = MaterialTheme.typography.titleLarge,
                         textAlign = TextAlign.Center,
                         fontFamily = FontFamily.Monospace,
@@ -360,7 +352,7 @@ fun HomeContent(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp),
-                        text = item.dosage.preColloid.format(1),
+                        text = program.dosage.preColloid.format(1),
                         style = MaterialTheme.typography.titleLarge,
                         textAlign = TextAlign.Center,
                         fontFamily = FontFamily.Monospace,
@@ -379,27 +371,27 @@ fun HomeContent(
                     .clip(CircleShape)
                     .clickable {
                         scope.launch {
-                            if (uiState.uiFlags == UiFlags.NONE) {
-                                if (uiState.job == null) {
-                                    if (uiState.selected == 0L) {
+                            if (uiFlags is UiFlags.None) {
+                                if (job == null) {
+                                    if (selected == 0L) {
                                         navigationActions.navigate(Route.PROGRAM)
                                     } else {
-                                        uiEvent(HomeUiEvent.Start)
+                                        uiEvent(HomeIntent.Start)
                                     }
                                 } else {
-                                    uiEvent(HomeUiEvent.Stop)
+                                    uiEvent(HomeIntent.Stop)
                                 }
                             } else {
                                 snackbarHostState.showSnackbar("请先完成当前操作")
                             }
                         }
                     },
-                imageVector = if (uiState.job == null) Icons.Default.PlayArrow else Icons.Default.Close,
+                imageVector = if (job == null) Icons.Default.PlayArrow else Icons.Default.Close,
                 contentDescription = null,
-                tint = if (uiState.job == null) MaterialTheme.colorScheme.primary else Color.Red
+                tint = if (job == null) MaterialTheme.colorScheme.primary else Color.Red
             )
 
-            if (uiState.job == null) {
+            if (job == null) {
                 Column(
                     modifier = Modifier.align(Alignment.CenterEnd),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -414,15 +406,15 @@ fun HomeContent(
                             .clip(MaterialTheme.shapes.small)
                             .clickable {
                                 scope.launch {
-                                    if (uiState.uiFlags == UiFlags.NONE) {
-                                        uiEvent(HomeUiEvent.Reset)
+                                    if (uiFlags !is UiFlags.None) {
+                                        uiEvent(HomeIntent.Reset)
                                     }
                                 }
                             }
                             .padding(vertical = 8.dp, horizontal = 16.dp),
-                        text = if (uiState.uiFlags == UiFlags.RESET) "复位中" else "复位",
+                        text = if (uiFlags is UiFlags.Objects && uiFlags.objects == 1) "复位中" else "复位",
                         style = MaterialTheme.typography.titleMedium,
-                        color = if (uiState.uiFlags == UiFlags.RESET) Color.Red else Color.Unspecified
+                        color = if (uiFlags is UiFlags.Objects && uiFlags.objects == 1) Color.Red else Color.Unspecified
                     )
                     Text(
                         modifier = Modifier
@@ -433,15 +425,15 @@ fun HomeContent(
                             .clip(MaterialTheme.shapes.small)
                             .clickable {
                                 scope.launch {
-                                    if (uiState.uiFlags == UiFlags.NONE || uiState.uiFlags == UiFlags.CLEAN) {
-                                        uiEvent(HomeUiEvent.Clean)
+                                    if (uiFlags is UiFlags.None || (uiFlags is UiFlags.Objects && uiFlags.objects == 2)) {
+                                        uiEvent(HomeIntent.Clean)
                                     }
                                 }
                             }
                             .padding(vertical = 8.dp, horizontal = 16.dp),
-                        text = if (uiState.uiFlags == UiFlags.CLEAN) "清洗中" else "清洗",
+                        text = if (uiFlags is UiFlags.Objects && uiFlags.objects == 2) "清洗中" else "清洗",
                         style = MaterialTheme.typography.titleMedium,
-                        color = if (uiState.uiFlags == UiFlags.CLEAN) Color.Red else Color.Unspecified
+                        color = if (uiFlags is UiFlags.Objects && uiFlags.objects == 2) Color.Red else Color.Unspecified
                     )
                     Text(
                         modifier = Modifier
@@ -452,19 +444,19 @@ fun HomeContent(
                             .clip(MaterialTheme.shapes.small)
                             .clickable {
                                 scope.launch {
-                                    if (uiState.uiFlags == UiFlags.NONE || uiState.uiFlags == UiFlags.PIPELINE_IN) {
-                                        if (uiState.uiFlags == UiFlags.NONE) {
-                                            uiEvent(HomeUiEvent.Pipeline(1))
+                                    if (uiFlags is UiFlags.None || (uiFlags is UiFlags.Objects && uiFlags.objects == 3)) {
+                                        if (uiFlags is UiFlags.None) {
+                                            uiEvent(HomeIntent.Pipeline(1))
                                         } else {
-                                            uiEvent(HomeUiEvent.Pipeline(0))
+                                            uiEvent(HomeIntent.Pipeline(0))
                                         }
                                     }
                                 }
                             }
                             .padding(vertical = 8.dp, horizontal = 16.dp),
-                        text = if (uiState.uiFlags == UiFlags.PIPELINE_IN) "填充胶体中" else "填充胶体",
+                        text = if (uiFlags is UiFlags.Objects && uiFlags.objects == 3) "填充胶体中" else "填充胶体",
                         style = MaterialTheme.typography.titleMedium,
-                        color = if (uiState.uiFlags == UiFlags.PIPELINE_IN) Color.Red else Color.Unspecified
+                        color = if (uiFlags is UiFlags.Objects && uiFlags.objects == 3) Color.Red else Color.Unspecified
                     )
                     Text(
                         modifier = Modifier
@@ -475,19 +467,19 @@ fun HomeContent(
                             .clip(MaterialTheme.shapes.small)
                             .clickable {
                                 scope.launch {
-                                    if (uiState.uiFlags == UiFlags.NONE || uiState.uiFlags == UiFlags.PIPELINE_OUT) {
-                                        if (uiState.uiFlags == UiFlags.NONE) {
-                                            uiEvent(HomeUiEvent.Pipeline(2))
+                                    if (uiFlags is UiFlags.None || (uiFlags is UiFlags.Objects && uiFlags.objects == 4)) {
+                                        if (uiFlags is UiFlags.None) {
+                                            uiEvent(HomeIntent.Pipeline(2))
                                         } else {
-                                            uiEvent(HomeUiEvent.Pipeline(0))
+                                            uiEvent(HomeIntent.Pipeline(0))
                                         }
                                     }
                                 }
                             }
                             .padding(vertical = 8.dp, horizontal = 16.dp),
-                        text = if (uiState.uiFlags == UiFlags.PIPELINE_OUT) "回吸胶体中" else "回吸胶体",
+                        text = if (uiFlags is UiFlags.Objects && uiFlags.objects == 4) "回吸胶体中" else "回吸胶体",
                         style = MaterialTheme.typography.titleMedium,
-                        color = if (uiState.uiFlags == UiFlags.PIPELINE_OUT) Color.Red else Color.Unspecified
+                        color = if (uiFlags is UiFlags.Objects && uiFlags.objects == 4) Color.Red else Color.Unspecified
                     )
                     Text(
                         modifier = Modifier
@@ -498,19 +490,19 @@ fun HomeContent(
                             .clip(MaterialTheme.shapes.small)
                             .clickable {
                                 scope.launch {
-                                    if (uiState.uiFlags == UiFlags.NONE || uiState.uiFlags == UiFlags.SYRINGE_IN) {
-                                        if (uiState.uiFlags == UiFlags.NONE) {
-                                            uiEvent(HomeUiEvent.Syringe(1))
+                                    if (uiFlags is UiFlags.None || (uiFlags is UiFlags.Objects && uiFlags.objects == 5)) {
+                                        if (uiFlags is UiFlags.None) {
+                                            uiEvent(HomeIntent.Syringe(1))
                                         } else {
-                                            uiEvent(HomeUiEvent.Syringe(0))
+                                            uiEvent(HomeIntent.Syringe(0))
                                         }
                                     }
                                 }
                             }
                             .padding(vertical = 8.dp, horizontal = 16.dp),
-                        text = if (uiState.uiFlags == UiFlags.SYRINGE_IN) "填充促凝剂中" else "填充促凝剂",
+                        text = if (uiFlags is UiFlags.Objects && uiFlags.objects == 5) "填充促凝剂中" else "填充促凝剂",
                         style = MaterialTheme.typography.titleMedium,
-                        color = if (uiState.uiFlags == UiFlags.SYRINGE_IN) Color.Red else Color.Unspecified
+                        color = if (uiFlags is UiFlags.Objects && uiFlags.objects == 5) Color.Red else Color.Unspecified
                     )
                     Text(
                         modifier = Modifier
@@ -521,19 +513,19 @@ fun HomeContent(
                             .clip(MaterialTheme.shapes.small)
                             .clickable {
                                 scope.launch {
-                                    if (uiState.uiFlags == UiFlags.NONE || uiState.uiFlags == UiFlags.SYRINGE_OUT) {
-                                        if (uiState.uiFlags == UiFlags.NONE) {
-                                            uiEvent(HomeUiEvent.Pipeline(2))
+                                    if (uiFlags is UiFlags.None || (uiFlags is UiFlags.Objects && uiFlags.objects == 6)) {
+                                        if (uiFlags is UiFlags.None) {
+                                            uiEvent(HomeIntent.Pipeline(2))
                                         } else {
-                                            uiEvent(HomeUiEvent.Pipeline(0))
+                                            uiEvent(HomeIntent.Pipeline(0))
                                         }
                                     }
                                 }
                             }
                             .padding(vertical = 8.dp, horizontal = 16.dp),
-                        text = if (uiState.uiFlags == UiFlags.SYRINGE_OUT) "回吸促凝剂中" else "回吸促凝剂",
+                        text = if (uiFlags is UiFlags.Objects && uiFlags.objects == 6) "回吸促凝剂中" else "回吸促凝剂",
                         style = MaterialTheme.typography.titleMedium,
-                        color = if (uiState.uiFlags == UiFlags.SYRINGE_OUT) Color.Red else Color.Unspecified
+                        color = if (uiFlags is UiFlags.Objects && uiFlags.objects == 6) Color.Red else Color.Unspecified
                     )
                 }
             }

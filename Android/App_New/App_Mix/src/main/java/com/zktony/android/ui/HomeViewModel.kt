@@ -23,8 +23,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
@@ -40,57 +38,42 @@ class HomeViewModel @Inject constructor(
     private val dataStore: DataSaverDataStore
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(HomeUiState())
     private val _selected = MutableStateFlow(0L)
     private val _page = MutableStateFlow(PageType.HOME)
-    private val _uiFlags = MutableStateFlow(0)
+    private val _uiFlags = MutableStateFlow<UiFlags>(UiFlags.none())
     private val _job = MutableStateFlow<Job?>(null)
+
     private var syringeJob: Job? = null
 
-    private val _message: MutableStateFlow<String?> = MutableStateFlow(null)
-
-    val uiState = _uiState.asStateFlow()
-    val message = _message.asStateFlow()
+    val selected = _selected.asStateFlow()
+    val page = _page.asStateFlow()
+    val uiFlags = _uiFlags.asStateFlow()
+    val job = _job.asStateFlow()
     val entities = Pager(
         config = PagingConfig(pageSize = 20, initialLoadSize = 40),
     ) { dao.getByPage() }.flow.cachedIn(viewModelScope)
 
     init {
-        viewModelScope.launch {
-            launch {
-                combine(
-                    _selected, _page, _uiFlags, _job
-                ) { selected, page, uiFlags, job ->
-                    HomeUiState(selected, page, uiFlags, job)
-                }.catch { ex ->
-                    _message.value = ex.message
-                }.collect {
-                    _uiState.value = it
-                }
-            }
-            launch {
-                init()
-            }
+        reset()
+    }
+
+    fun dispatch(intent: HomeIntent) {
+        when (intent) {
+            is HomeIntent.Clean -> clean()
+            is HomeIntent.NavTo -> _page.value = intent.page
+            is HomeIntent.Flags -> _uiFlags.value = intent.uiFlags
+            is HomeIntent.Pipeline -> pipeline(intent.index)
+            is HomeIntent.Reset -> reset()
+            is HomeIntent.Start -> startJob()
+            is HomeIntent.Stop -> stopJob()
+            is HomeIntent.Syringe -> syringe(intent.index)
+            is HomeIntent.Selected -> _selected.value = intent.id
         }
     }
 
-    fun uiEvent(uiEvent: HomeUiEvent) {
-        when (uiEvent) {
-            is HomeUiEvent.Clean -> clean()
-            is HomeUiEvent.Message -> _message.value = uiEvent.message
-            is HomeUiEvent.NavTo -> _page.value = uiEvent.page
-            is HomeUiEvent.Pipeline -> pipeline(uiEvent.index)
-            is HomeUiEvent.Reset -> init()
-            is HomeUiEvent.Start -> startJob()
-            is HomeUiEvent.Stop -> stopJob()
-            is HomeUiEvent.Syringe -> syringe(uiEvent.index)
-            is HomeUiEvent.ToggleSelected -> _selected.value = uiEvent.id
-        }
-    }
-
-    private fun init() {
+    private fun reset() {
         viewModelScope.launch {
-            _uiFlags.value = UiFlags.RESET
+            _uiFlags.value = UiFlags.objects(1)
             try {
                 withTimeout(60 * 1000L) {
                     gpio(0, 1, 2)
@@ -130,10 +113,9 @@ class HomeViewModel @Inject constructor(
                     }
                     job.join()
                 }
+                _uiFlags.value = UiFlags.none()
             } catch (ex: Exception) {
-                _message.value = ex.message
-            } finally {
-                _uiFlags.value = UiFlags.NONE
+                _uiFlags.value = UiFlags.message("复位超时请重试")
             }
         }
     }
@@ -142,7 +124,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val selected = dao.getById(_selected.value).firstOrNull()
             if (selected == null) {
-                _message.value = "未选择程序"
+                _uiFlags.value = UiFlags.message("未选择程序")
                 return@launch
             }
             val abscissa = dataStore.readData(Constants.ZT_0003, 0.0)
@@ -271,7 +253,7 @@ class HomeViewModel @Inject constructor(
                             )
                         )
                     }
-                    _uiFlags.value = UiFlags.RESET
+                    _uiFlags.value = UiFlags.objects(1)
                     start {
                         timeOut = 1000L * 60L
                         with(index = 1, pdv = ordinate)
@@ -293,7 +275,7 @@ class HomeViewModel @Inject constructor(
                 } catch (ex: Exception) {
                     ex.printStackTrace()
                 } finally {
-                    _uiFlags.value = UiFlags.NONE
+                    _uiFlags.value = UiFlags.none()
                     _job.value?.cancel()
                     _job.value = null
                 }
@@ -308,17 +290,17 @@ class HomeViewModel @Inject constructor(
             delay(200L)
             stop(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
             delay(200L)
-            init()
+            reset()
         }
     }
 
     private fun clean() {
         viewModelScope.launch {
-            if (_uiFlags.value == UiFlags.CLEAN) {
-                _uiFlags.value = UiFlags.NONE
+            if (_uiFlags.value is UiFlags.Objects && (_uiFlags.value as UiFlags.Objects).objects == 2) {
+                _uiFlags.value = UiFlags.none()
                 stop(9)
             } else {
-                _uiFlags.value = UiFlags.CLEAN
+                _uiFlags.value = UiFlags.objects(2)
                 start {
                     executeType = ExecuteType.ASYNC
                     with(index = 9, pdv = 3200L * 10000L)
@@ -334,16 +316,16 @@ class HomeViewModel @Inject constructor(
                 syringeJob = null
                 stop(2)
                 delay(100L)
-                valve(2 to if (_uiFlags.value == UiFlags.SYRINGE_IN) 1 else 0)
+                valve(2 to if (_uiFlags.value is UiFlags.Objects && (_uiFlags.value as UiFlags.Objects).objects == 3) 1 else 0)
                 delay(30L)
-                _uiFlags.value = UiFlags.RESET
+                _uiFlags.value = UiFlags.objects(1)
                 start {
                     timeOut = 1000L * 30
                     with(index = 2, pdv = Constants.ZT_0005 * -1)
                 }
-                _uiFlags.value = UiFlags.NONE
+                _uiFlags.value = UiFlags.none()
             } else {
-                _uiFlags.value = 2 + index
+                _uiFlags.value = UiFlags.objects(2 + index)
                 syringeJob = launch {
                     while (true) {
                         valve(2 to if (index == 1) 0 else 1)
@@ -367,10 +349,10 @@ class HomeViewModel @Inject constructor(
     private fun pipeline(index: Int) {
         viewModelScope.launch {
             if (index == 0) {
-                _uiFlags.value = UiFlags.NONE
+                _uiFlags.value = UiFlags.none()
                 stop(3, 4, 5, 6, 7, 8)
             } else {
-                _uiFlags.value = 4 + index
+                _uiFlags.value = UiFlags.objects(4 + index)
                 start {
                     executeType = ExecuteType.ASYNC
                     repeat(6) {
@@ -382,21 +364,14 @@ class HomeViewModel @Inject constructor(
     }
 }
 
-data class HomeUiState(
-    val selected: Long = 0L,
-    val page: Int = PageType.HOME,
-    val uiFlags: Int = UiFlags.NONE,
-    val job: Job? = null,
-)
-
-sealed class HomeUiEvent {
-    data class Message(val message: String?) : HomeUiEvent()
-    data class NavTo(val page: Int) : HomeUiEvent()
-    data class Pipeline(val index: Int) : HomeUiEvent()
-    data class Syringe(val index: Int) : HomeUiEvent()
-    data class ToggleSelected(val id: Long) : HomeUiEvent()
-    data object Clean : HomeUiEvent()
-    data object Reset : HomeUiEvent()
-    data object Start : HomeUiEvent()
-    data object Stop : HomeUiEvent()
+sealed class HomeIntent {
+    data class NavTo(val page: Int) : HomeIntent()
+    data class Flags(val uiFlags: UiFlags) : HomeIntent()
+    data class Pipeline(val index: Int) : HomeIntent()
+    data class Syringe(val index: Int) : HomeIntent()
+    data class Selected(val id: Long) : HomeIntent()
+    data object Clean : HomeIntent()
+    data object Reset : HomeIntent()
+    data object Start : HomeIntent()
+    data object Stop : HomeIntent()
 }

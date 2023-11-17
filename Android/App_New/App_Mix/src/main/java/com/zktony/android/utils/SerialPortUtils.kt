@@ -19,7 +19,9 @@ import kotlinx.coroutines.withTimeout
 object SerialPortUtils {
     fun with() {
         // 初始化zkty串口
-        SerialStoreUtils.put("zkty", serialPortOf {})
+        SerialStoreUtils.put("zkty", serialPortOf {
+            device = "/dev/ttyS0"
+        })
 
         // rtu串口全局回调
         SerialStoreUtils.get("zkty")?.callbackHandler = { bytes ->
@@ -61,12 +63,7 @@ object SerialPortUtils {
      */
     fun <T : Number> pulse(index: Int, dvp: T): Long {
         val p = when (dvp) {
-            is Double -> when (index) {
-                0 -> (dvp / 4.0 * 3200L).toLong()
-                1 -> (dvp / 6.35 * 3200L).toLong()
-                else -> (AppStateUtils.hpc[index - 2] ?: { x -> x * 100 }).invoke(dvp).toLong()
-            }
-
+            is Double -> ((AppStateUtils.hpc[index] ?: { x -> x * 100 }).invoke(dvp)).toLong()
             is Long -> dvp
             else -> dvp.toLong()
         }

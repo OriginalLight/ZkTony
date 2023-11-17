@@ -38,4 +38,14 @@ object Constants {
      * 洗涤液补偿
      */
     const val ZT_0004 = "ZT_0004"
+
+    /**
+     * 摇床复位到平面补偿
+     */
+    const val ZT_0005 = "ZT_0005"
+
+    /**
+     * 摇床复位到低点补偿
+     */
+    const val ZT_0006 = "ZT_0006"
 }

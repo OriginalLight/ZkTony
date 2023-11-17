@@ -157,7 +157,7 @@ fun HomeContent(
     uiFlags: UiFlags,
     stateList: List<IncubationState>,
     insulation: List<Double>,
-    shaker: Boolean,
+    shaker: Int,
     cleanJob: Int,
     dispatch: (HomeIntent) -> Unit
 ) {
@@ -318,7 +318,7 @@ fun HomeContent(
                         .clip(MaterialTheme.shapes.small)
                         .clickable { scope.launch { dispatch(HomeIntent.Shaker) } }
                         .padding(vertical = 8.dp, horizontal = 16.dp),
-                    text = if (shaker) "摇床开" else "摇床关",
+                    text = if (shaker == 0) "摇床开" else "摇床关",
                     style = MaterialTheme.typography.titleMedium
                 )
 
