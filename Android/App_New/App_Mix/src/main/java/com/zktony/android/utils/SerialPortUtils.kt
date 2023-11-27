@@ -81,7 +81,7 @@ object SerialPortUtils {
      * 发送协议
      */
     suspend inline fun sendProtocol(block: Protocol.() -> Unit) =
-        SerialStoreUtils.get("zkty")?.sendByteArray(Protocol().apply(block).toByteArray())
+        SerialStoreUtils.get("zkty")?.sendByteArray(Protocol().apply(block).serialization())
 
     /**
      * 设置轴锁定状态

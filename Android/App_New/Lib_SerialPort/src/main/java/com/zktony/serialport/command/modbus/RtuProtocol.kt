@@ -8,24 +8,22 @@ import com.zktony.serialport.ext.toHexString
  * Modbus RTU 协议
  */
 
-class RtuProtocol : BaseProtocol<RtuProtocol> {
+class RtuProtocol : BaseProtocol {
     var slaveAddr: Byte = 0x01
     var funcCode: Byte = 0x03
     var data: ByteArray = byteArrayOf()
     var crc: ByteArray = byteArrayOf(0x00.toByte(), 0x00.toByte())
 
-    override fun toByteArray(): ByteArray {
+    override fun serialization(): ByteArray {
         val byteArray = byteArrayOf(slaveAddr, funcCode).plus(data)
         return byteArray.plus(byteArray.crc16LE())
     }
 
-    override fun toProtocol(byteArray: ByteArray): RtuProtocol {
-        return RtuProtocol().apply {
-            slaveAddr = byteArray[0]
-            funcCode = byteArray[1]
-            data = byteArray.copyOfRange(2, byteArray.size - 2)
-            crc = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
-        }
+    override fun deserialization(byteArray: ByteArray) {
+        slaveAddr = byteArray[0]
+        funcCode = byteArray[1]
+        data = byteArray.copyOfRange(2, byteArray.size - 2)
+        crc = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
     }
 
     companion object {
@@ -44,7 +42,7 @@ class RtuProtocol : BaseProtocol<RtuProtocol> {
                 throw Exception("RX Crc Error with byteArray: ${byteArray.toHexString()}")
             }
 
-            block(RtuProtocol().apply { toProtocol(byteArray) })
+            block(RtuProtocol().apply { deserialization(byteArray) })
         }
     }
 }

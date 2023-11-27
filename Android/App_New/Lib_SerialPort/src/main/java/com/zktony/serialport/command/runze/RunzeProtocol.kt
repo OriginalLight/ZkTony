@@ -88,7 +88,7 @@ import com.zktony.serialport.ext.toHexString
  * 0xFF      未知错误       参数=0x00 0x00
  *
  */
-class RunzeProtocol : BaseProtocol<RunzeProtocol> {
+class RunzeProtocol : BaseProtocol {
     var head: Byte = 0xCC.toByte()
     var slaveAddr: Byte = 0x00.toByte()
     var funcCode: Byte = 0x00.toByte()
@@ -96,22 +96,20 @@ class RunzeProtocol : BaseProtocol<RunzeProtocol> {
     var end: Byte = 0xDD.toByte()
     var checksum: ByteArray = byteArrayOf(0x00.toByte(), 0x00.toByte())
 
-    override fun toByteArray(): ByteArray {
+    override fun serialization(): ByteArray {
         val byteArray = byteArrayOf(head, slaveAddr, funcCode)
             .plus(data)
             .plus(end)
         return byteArray.plus(byteArray.checkSumLE())
     }
 
-    override fun toProtocol(byteArray: ByteArray): RunzeProtocol {
-        return RunzeProtocol().apply {
-            head = byteArray[0]
-            slaveAddr = byteArray[1]
-            funcCode = byteArray[2]
-            data = byteArray.copyOfRange(3, byteArray.size - 3)
-            end = byteArray[byteArray.size - 3]
-            checksum = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
-        }
+    override fun deserialization(byteArray: ByteArray) {
+        head = byteArray[0]
+        slaveAddr = byteArray[1]
+        funcCode = byteArray[2]
+        data = byteArray.copyOfRange(3, byteArray.size - 3)
+        end = byteArray[byteArray.size - 3]
+        checksum = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
     }
 
     companion object {
@@ -131,7 +129,7 @@ class RunzeProtocol : BaseProtocol<RunzeProtocol> {
                 throw Exception("RX Crc Error with byteArray: ${byteArray.toHexString()}")
             }
 
-            block(RunzeProtocol().apply { toProtocol(byteArray) })
+            block(RunzeProtocol().apply { deserialization(byteArray) })
         }
     }
 }

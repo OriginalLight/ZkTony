@@ -16,7 +16,7 @@ import com.zktony.serialport.ext.writeInt16LE
  * @property crc ByteArray
  * @property end ByteArray
  */
-class Protocol : BaseProtocol<Protocol> {
+class Protocol : BaseProtocol {
     // Head 1byte 0xEE
     var head: Byte = 0xEE.toByte()
 
@@ -51,7 +51,7 @@ class Protocol : BaseProtocol<Protocol> {
     // End 4byte 0xFF 0xFC 0xFF 0xFF
     var end: ByteArray = byteArrayOf(0xFF.toByte(), 0xFC.toByte(), 0xFF.toByte(), 0xFF.toByte())
 
-    override fun toByteArray(): ByteArray {
+    override fun serialization(): ByteArray {
         val byteArray = byteArrayOf(head, addr, func)
             .plus(length.writeInt16LE(data.size, 0))
             .plus(data)
@@ -66,16 +66,14 @@ class Protocol : BaseProtocol<Protocol> {
         )
     }
 
-    override fun toProtocol(byteArray: ByteArray): Protocol {
-        return Protocol().apply {
-            head = byteArray[0]
-            addr = byteArray[1]
-            func = byteArray[2]
-            length = byteArray.copyOfRange(3, 5)
-            data = byteArray.copyOfRange(5, byteArray.size - 6)
-            crc = byteArray.copyOfRange(byteArray.size - 6, byteArray.size - 4)
-            end = byteArray.copyOfRange(byteArray.size - 4, byteArray.size)
-        }
+    override fun deserialization(byteArray: ByteArray) {
+        head = byteArray[0]
+        addr = byteArray[1]
+        func = byteArray[2]
+        length = byteArray.copyOfRange(3, 5)
+        data = byteArray.copyOfRange(5, byteArray.size - 6)
+        crc = byteArray.copyOfRange(byteArray.size - 6, byteArray.size - 4)
+        end = byteArray.copyOfRange(byteArray.size - 4, byteArray.size)
     }
 
     companion object {
@@ -117,7 +115,7 @@ class Protocol : BaseProtocol<Protocol> {
                 }
 
                 // 解析协议
-                block(Protocol().apply { toProtocol(pkg) })
+                block(Protocol().apply { deserialization(pkg) })
             }
         }
     }

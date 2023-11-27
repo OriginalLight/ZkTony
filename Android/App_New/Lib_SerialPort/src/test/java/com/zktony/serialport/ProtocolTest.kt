@@ -14,7 +14,7 @@ class ProtocolTest {
         }
         assertEquals(
             "EE 01 01 06 00 01 06 0A 00 00 00 33 B9 FF FC FF FF",
-            p.toByteArray().toHexString()
+            p.serialization().toHexString()
         )
     }
 

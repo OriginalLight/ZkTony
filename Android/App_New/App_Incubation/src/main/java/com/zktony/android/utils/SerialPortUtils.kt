@@ -72,7 +72,7 @@ object SerialPortUtils {
             this.slaveAddr = (slaveAddr + 1).toByte()
             funcCode = 0x06
             data = ByteArray(4).writeInt16BE(startAddr).writeInt16BE(value, 2)
-        }.toByteArray())
+        }.serialization())
     }
 
     /**
@@ -89,7 +89,7 @@ object SerialPortUtils {
                 .writeInt16BE(startAddr)
                 .writeInt16BE(2, 2)
                 .writeInt8(4, 4)
-        }.toByteArray())
+        }.serialization())
     }
 
     /**
@@ -105,7 +105,7 @@ object SerialPortUtils {
                     this.slaveAddr = slaveAddr.toByte()
                     funcCode = 0x44
                     data = byteArrayOf(channel.toByte(), 0x00)
-                }.toByteArray())
+                }.serialization())
 
                 while (hpv[slaveAddr] != channel) {
                     // 减小反应时间
@@ -118,7 +118,7 @@ object SerialPortUtils {
                         this.slaveAddr = slaveAddr.toByte()
                         funcCode = 0x3E
                         data = byteArrayOf(0x00, 0x00)
-                    }.toByteArray())
+                    }.serialization())
                 }
             }
         } catch (ex: TimeoutCancellationException) {
@@ -150,7 +150,7 @@ object SerialPortUtils {
                         this.slaveAddr = (slaveAddr + 1).toByte()
                         funcCode = 0x03
                         data = ByteArray(4).writeInt16BE(25).writeInt16BE(1, 2)
-                    }.toByteArray())
+                    }.serialization())
                 }
             }
         } catch (ex: TimeoutCancellationException) {

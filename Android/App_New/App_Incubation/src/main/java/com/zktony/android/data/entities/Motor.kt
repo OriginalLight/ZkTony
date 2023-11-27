@@ -17,7 +17,7 @@ data class Motor(
     val index: Int = 0,
     val displayText: String,
     val speed: Long = 600L,
-    val acceleration: Long = 120L,
-    val deceleration: Long = 120L,
+    val acceleration: Long = 50L,
+    val deceleration: Long = 50L,
     val createTime: Date = Date(System.currentTimeMillis())
 )

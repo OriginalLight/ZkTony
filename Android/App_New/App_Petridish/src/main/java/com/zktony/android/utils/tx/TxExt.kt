@@ -108,8 +108,8 @@ fun <T : Number> pulse(index: Int, dvp: T): Long {
  * @return Unit
  */
 suspend fun sendProtocol(block: Protocol.() -> Unit) {
-    SerialStoreUtils.get("zkty")?.sendByteArray(Protocol().apply(block).toByteArray())
-    Protocol().apply(block).toByteArray().toHexString().loge()
+    SerialStoreUtils.get("zkty")?.sendByteArray(Protocol().apply(block).serialization())
+    Protocol().apply(block).serialization().toHexString().loge()
 }
 
 /**

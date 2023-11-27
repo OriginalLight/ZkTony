@@ -79,7 +79,7 @@ class HomeViewModel @Inject constructor(
                     this.slaveAddr = it.toByte()
                     funcCode = 0x3E
                     data = byteArrayOf(0x00, 0x00)
-                }.toByteArray())
+                }.serialization())
                 delay(300L)
             }
             // 设置初始温度
@@ -153,13 +153,14 @@ class HomeViewModel @Inject constructor(
                 updateState(state.copy(flags = 2, stages = state.stages.map { it.copy(flags = 2) }))
             }
             if (jobMap.isEmpty()) {
+                _shaker.value = 4
                 // 停止摇床
                 writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
                 delay(300L)
                 writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
                 dataStore.readData(Constants.ZT_0005, 0.0).takeIf { it > 0.0 }?.let {
-                    delay(3000L)
-                    writeWithPulse(0, (it * 6400).toLong())
+                    delay(3500L)
+                    writeRegister(startAddr = 222, slaveAddr = 0, value = (it * 6400).toLong())
                 }
                 _shaker.value = 1
             }
@@ -181,18 +182,31 @@ class HomeViewModel @Inject constructor(
     private fun shaker() {
         viewModelScope.launch {
             try {
-                if (_shaker.value > 0) {
-                    writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
-                    delay(300L)
-                    writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
-                    dataStore.readData(Constants.ZT_0005, 0.0).takeIf { it > 0.0 }?.let {
-                        delay(3000L)
-                        writeWithPulse(0, (it * 6400).toLong())
+                when (_shaker.value) {
+                    0 -> {
+                        _shaker.value = 4
+                        writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
+                        delay(300L)
+                        writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
+                        dataStore.readData(Constants.ZT_0005, 0.0).takeIf { it > 0.0 }?.let {
+                            delay(3500L)
+                            writeRegister(
+                                startAddr = 222,
+                                slaveAddr = 0,
+                                value = (it * 6400).toLong()
+                            )
+                        }
+                        _shaker.value = 1
                     }
-                    _shaker.value = 1
-                } else {
-                    writeRegister(slaveAddr = 0, startAddr = 200, value = 1)
-                    _shaker.value = 0
+
+                    4 -> {
+                        _uiFlags.value = UiFlags.message("WARN 请不要重复点击")
+                    }
+
+                    else -> {
+                        writeRegister(slaveAddr = 0, startAddr = 200, value = 1)
+                        _shaker.value = 0
+                    }
                 }
             } catch (ex: Exception) {
                 _uiFlags.value = UiFlags.message(ex.message ?: "Unknown")
@@ -608,14 +622,15 @@ class HomeViewModel @Inject constructor(
         )
         val rOut = dataStore.readData(Constants.ZT_0002, 0.0)
         // 停止摇床
+        _shaker.value = 4
         writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
         delay(300L)
         writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
         dataStore.readData(Constants.ZT_0006, 0.0).takeIf { it > 0.0 }?.let {
-            delay(3000L)
-            writeWithPulse(0, (it * 6400).toLong())
+            delay(3500L)
+            writeRegister(startAddr = 222, slaveAddr = 0, value = (it * 6400).toLong())
         }
-        delay(300L)
+        delay(1000L)
         _shaker.value = 2
         // 切阀回收残留液体
         writeWithValve(inAddr, inChannel)
@@ -697,19 +712,28 @@ class HomeViewModel @Inject constructor(
 
                 try {
                     if (_shaker.value == 0) {
+                        _shaker.value = 4
                         writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
                         delay(300L)
                         writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
                         dataStore.readData(Constants.ZT_0006, 0.0).takeIf { it > 0.0 }?.let {
-                            delay(3000L)
-                            writeWithPulse(0, (it * 6400).toLong())
+                            delay(3500L)
+                            writeRegister(
+                                startAddr = 222,
+                                slaveAddr = 0,
+                                value = (it * 6400).toLong()
+                            )
                         }
                         _shaker.value = 2
                     } else if (_shaker.value == 1) {
                         val z1 = dataStore.readData(Constants.ZT_0005, 0.0)
                         val z2 = dataStore.readData(Constants.ZT_0006, 0.0)
                         (z2 - z1).absoluteValue.takeIf { it > 0.0 }?.let {
-                            writeWithPulse(0, (it * 6400).toLong())
+                            writeRegister(
+                                startAddr = 222,
+                                slaveAddr = 0,
+                                value = (it * 6400).toLong()
+                            )
                         }
                         _shaker.value = 2
                     }
