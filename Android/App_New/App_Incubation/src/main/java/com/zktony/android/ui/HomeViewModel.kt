@@ -238,7 +238,7 @@ class HomeViewModel @Inject constructor(
         } catch (ex: Exception) {
             if (ex !is CancellationException) {
                 _uiFlags.value = UiFlags.error(ex.message ?: "Unknown")
-                logList.add(Log(index = index, message = ex.message ?: "Unknown"))
+                logList.add(Log(index = index, message = ex.message ?: "Unknown", level = "ERROR"))
             }
             if (lock.get() == index) {
                 lock.set(-1)

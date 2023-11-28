@@ -23,6 +23,7 @@ object SerialPortUtils {
         SerialStoreUtils.put("rtu", serialPortOf {
             device = "/dev/ttyS3"
             baudRate = 9600
+            log = true
         })
         // 初始化tec串口
         SerialStoreUtils.put("tec", serialPortOf {

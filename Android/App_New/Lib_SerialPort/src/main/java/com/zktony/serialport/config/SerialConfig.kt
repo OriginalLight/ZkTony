@@ -40,4 +40,9 @@ data class SerialConfig(
      * 发送延时
      */
     var delay: Long = 10L,
+
+    /**
+     * 日志
+     */
+    var log: Boolean = false
 )
