@@ -150,7 +150,7 @@ fun CleanDialog(
     onCancel: () -> Unit
 ) {
 
-    var time by remember { mutableLongStateOf(20 * 60L) }
+    var time by remember { mutableLongStateOf(30 * 60L) }
 
     LaunchedEffect(key1 = job) {
         while (job == 1) {

@@ -21,8 +21,6 @@ import com.zktony.android.utils.SerialPortUtils.writeRegister
 import com.zktony.android.utils.SerialPortUtils.writeWithPulse
 import com.zktony.android.utils.SerialPortUtils.writeWithTemperature
 import com.zktony.android.utils.SerialPortUtils.writeWithValve
-import com.zktony.serialport.command.runze.RunzeProtocol
-import com.zktony.serialport.lifecycle.SerialStoreUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -32,7 +30,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
-import kotlin.math.absoluteValue
 
 /**
  * @author: 刘贺贺
@@ -74,12 +71,7 @@ class HomeViewModel @Inject constructor(
             // 根据模块数量配置
             val coll = dataStore.readData(Constants.ZT_0000, 4)
             repeat(coll / 2) {
-                // 读取阀门状态
-                SerialStoreUtils.get("rtu")?.sendByteArray(bytes = RunzeProtocol().apply {
-                    this.slaveAddr = it.toByte()
-                    funcCode = 0x3E
-                    data = byteArrayOf(0x00, 0x00)
-                }.serialization())
+                writeWithValve(it, 1)
                 delay(300L)
             }
             // 设置初始温度
@@ -711,32 +703,19 @@ class HomeViewModel @Inject constructor(
                 val pulse = (AppStateUtils.hpc[1] ?: { x -> x * 100 }).invoke(20000.0)
 
                 try {
-                    if (_shaker.value == 0) {
-                        _shaker.value = 4
-                        writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
-                        delay(300L)
-                        writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
-                        dataStore.readData(Constants.ZT_0006, 0.0).takeIf { it > 0.0 }?.let {
-                            delay(3500L)
-                            writeRegister(
-                                startAddr = 222,
-                                slaveAddr = 0,
-                                value = (it * 6400).toLong()
-                            )
-                        }
-                        _shaker.value = 2
-                    } else if (_shaker.value == 1) {
-                        val z1 = dataStore.readData(Constants.ZT_0005, 0.0)
-                        val z2 = dataStore.readData(Constants.ZT_0006, 0.0)
-                        (z2 - z1).absoluteValue.takeIf { it > 0.0 }?.let {
-                            writeRegister(
-                                startAddr = 222,
-                                slaveAddr = 0,
-                                value = (it * 6400).toLong()
-                            )
-                        }
-                        _shaker.value = 2
+                    _shaker.value = 4
+                    writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
+                    delay(300L)
+                    writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
+                    dataStore.readData(Constants.ZT_0006, 0.0).takeIf { it > 0.0 }?.let {
+                        delay(3500L)
+                        writeRegister(
+                            startAddr = 222,
+                            slaveAddr = 0,
+                            value = (it * 6400).toLong()
+                        )
                     }
+                    _shaker.value = 2
 
                     delay(300L)
                     repeat(4) { index ->
