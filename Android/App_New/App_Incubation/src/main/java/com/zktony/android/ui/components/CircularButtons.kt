@@ -27,6 +27,7 @@ import kotlin.math.sin
 @Composable
 fun CircularButtons(
     count: Int = 12,
+    display: List<String>,
     radius: Dp = 24.dp,
     enabled: Boolean = true,
     circleRadius: Dp = 300.dp,
@@ -74,7 +75,7 @@ fun CircularButtons(
         }
 
         Text(
-            text = (selected + 1).toString(),
+            text = display[selected],
             style = MaterialTheme.typography.headlineMedium
         )
     }
@@ -87,6 +88,7 @@ fun CircularButtonsWithSelectionPreview() {
 
     CircularButtons(
         selected = selected,
+        display = listOf("1", "2", "3", "4", "5", "6"),
         onSelected = { index ->
             selected = index
         }

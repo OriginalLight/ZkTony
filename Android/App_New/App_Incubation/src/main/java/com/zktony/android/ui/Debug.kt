@@ -106,6 +106,11 @@ fun ValveGroup(
             contentAlignment = Alignment.Center
         ) {
             CircularButtons(
+                count = 12,
+                display = listOf(
+                    "A1", "B1", "C1", "D1", "A2", "B2",
+                    "C2", "D2", "封闭", "洗涤", "废液", "空气"
+                ),
                 enabled = uiFlags is UiFlags.None,
                 selected = valveOne
             ) { index ->
@@ -122,6 +127,7 @@ fun ValveGroup(
         ) {
             CircularButtons(
                 count = 6,
+                display = listOf("A", "B", "C", "D", "废液", "空气"),
                 enabled = uiFlags is UiFlags.None,
                 selected = valveTwo
             ) { index ->

@@ -52,6 +52,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     composeOptions {
@@ -95,7 +96,7 @@ dependencies {
 
     ksp(libs.androidx.room.compiler)
     implementation(project(mapOf("path" to ":Lib_SerialPort")))
-    
+
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material.iconsExtended)
     implementation(libs.androidx.compose.material3)

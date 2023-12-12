@@ -71,7 +71,11 @@ class HomeViewModel @Inject constructor(
             // 根据模块数量配置
             val coll = dataStore.readData(Constants.ZT_0000, 4)
             repeat(coll / 2) {
-                writeWithValve(it, 1)
+                try {
+                    writeWithValve(it, 1)
+                } catch (ex: Exception) {
+                    _uiFlags.value = UiFlags.message(ex.message ?: "Unknown")
+                }
                 delay(300L)
             }
             // 设置初始温度
@@ -567,7 +571,7 @@ class HomeViewModel @Inject constructor(
             delay(500L)
             writeWithValve(inAddr, 12)
             writeWithValve(outAddr, outChannel)
-            writeWithPulse(group + 1, (rOut * 6400 * 4).toLong())
+            writeWithPulse(group + 1, (rOut * 6400 * 9).toLong())
             delay(500L)
             // 退回前半段残留的液体
             writeWithValve(inAddr, inChannel)
@@ -627,7 +631,7 @@ class HomeViewModel @Inject constructor(
         // 切阀回收残留液体
         writeWithValve(inAddr, inChannel)
         writeWithValve(outAddr, outChannel)
-        writeWithPulse(group + 1, -(pulse * 1.5 + ((rIn + rOut * 2) * 6400 * 2)).toLong())
+        writeWithPulse(group + 1, -(pulse * 2 + ((rIn + rOut * 3) * 6400 * 2)).toLong())
         // 清理管路避免污染
         if (stage.type == 1 || stage.type == 2) {
             val rx = dataStore.readData(Constants.ZT_0004, 0.0)
