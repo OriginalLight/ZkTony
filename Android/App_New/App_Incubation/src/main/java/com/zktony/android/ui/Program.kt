@@ -43,7 +43,9 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.R
 import com.zktony.android.data.entities.Program
 import com.zktony.android.data.entities.internal.IncubationStage
+import com.zktony.android.data.entities.internal.defaults.StageDefaults
 import com.zktony.android.ui.components.IncubationStageItem
+import com.zktony.android.ui.components.InputDialog
 import com.zktony.android.ui.components.ProgramAppBar
 import com.zktony.android.ui.components.ProgramItem
 import com.zktony.android.ui.components.SquareTextField
@@ -112,6 +114,28 @@ fun ProgramList(
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackbarHostState.current
+    var dialog by remember { mutableIntStateOf(0) }
+    var temp by remember { mutableStateOf(Program()) }
+
+    if (dialog > 0) {
+        InputDialog(
+            title = if (dialog == 1) "复制-重命名" else "重命名",
+            onConfirm = {
+                scope.launch {
+                    if (dialog == 1) {
+                        dispatch(ProgramIntent.Insert(temp.copy(displayText = it)))
+                        dialog = 0
+                        snackbarHostState.showSnackbar("复制成功")
+                    } else {
+                        dispatch(ProgramIntent.Update(temp.copy(displayText = it)))
+                        dialog = 0
+                        snackbarHostState.showSnackbar("重命名成功")
+                    }
+                }
+            },
+            onCancel = { dialog = 0 }
+        )
+    }
 
     LazyVerticalGrid(
         modifier = Modifier,
@@ -135,6 +159,14 @@ fun ProgramList(
                         dispatch(ProgramIntent.Delete(item.id))
                         snackbarHostState.showSnackbar("删除成功")
                     }
+                },
+                onCopy = {
+                    temp = item.copy(id = 0)
+                    dialog = 1
+                },
+                onRename = {
+                    temp = item
+                    dialog = 2
                 }
             )
         }
@@ -204,12 +236,12 @@ fun ProgramDetail(
         incubationStage?.let {
             ProgramInput(
                 modifier = Modifier.fillMaxWidth(),
-                key = selectedIndex.intValue,
-                incubationStage = incubationStage
+                stage = incubationStage
             ) { p ->
                 scope.launch {
                     val processes = program.stages.toMutableList()
-                    processes[selectedIndex.intValue] = p
+                    val index = processes.indexOfFirst { it.uuid == p.uuid }
+                    processes[index] = p
                     dispatch(ProgramIntent.Update(program.copy(stages = processes)))
                 }
             }
@@ -220,18 +252,17 @@ fun ProgramDetail(
 @Composable
 fun ProgramInput(
     modifier: Modifier = Modifier,
-    key: Int,
-    incubationStage: IncubationStage,
+    stage: IncubationStage,
     onProcessChange: (IncubationStage) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    var typeExpand by remember(key) { mutableStateOf(false) }
-    var temperature by remember(key) { mutableStateOf(incubationStage.temperature.toString()) }
-    var duration by remember(key) { mutableStateOf(incubationStage.duration.toString()) }
-    var dosage by remember(key) { mutableStateOf(incubationStage.dosage.toString()) }
-    var origin by remember(key) { mutableIntStateOf(incubationStage.origin) }
-    var recycle by remember(key) { mutableStateOf(incubationStage.recycle) }
-    var times by remember(key) { mutableStateOf(incubationStage.times.toString()) }
+    var typeExpand by remember(stage) { mutableStateOf(false) }
+    var temperature by remember(stage) { mutableStateOf(stage.temperature.toString()) }
+    var duration by remember(stage) { mutableStateOf(stage.duration.toString()) }
+    var dosage by remember(stage) { mutableStateOf(stage.dosage.toString()) }
+    var origin by remember(stage) { mutableIntStateOf(stage.origin) }
+    var recycle by remember(stage) { mutableStateOf(stage.recycle) }
+    var times by remember(stage) { mutableStateOf(stage.times.toString()) }
 
     LazyColumn(
         modifier = modifier.imePadding(),
@@ -263,7 +294,7 @@ fun ProgramInput(
                     .padding(16.dp)
             ) {
                 Text(
-                    text = displayText(incubationStage.type),
+                    text = displayText(stage.type),
                     style = MaterialTheme.typography.titleMedium
                 )
                 Spacer(modifier = Modifier.weight(1f))
@@ -287,7 +318,8 @@ fun ProgramInput(
                         .clickable {
                             scope.launch {
                                 typeExpand = false
-                                onProcessChange(incubationStage.copy(type = type))
+                                val default = StageDefaults.defaultByType(type)
+                                onProcessChange(default.copy(uuid = stage.uuid))
                             }
                         }
                         .padding(16.dp)
@@ -317,14 +349,14 @@ fun ProgramInput(
                 scope.launch {
                     temperature = it
                     val temp = it.toDoubleOrNull() ?: 0.0
-                    if (temp != incubationStage.temperature) {
-                        onProcessChange(incubationStage.copy(temperature = temp))
+                    if (temp != stage.temperature) {
+                        onProcessChange(stage.copy(temperature = temp))
                     }
                 }
             }
         }
 
-        if (incubationStage.type != 4) {
+        if (stage.type != 4) {
             item {
                 SquareTextField(
                     title = "时长",
@@ -332,7 +364,7 @@ fun ProgramInput(
                     trailingIcon = {
                         Text(
                             modifier = Modifier.padding(end = 16.dp),
-                            text = if (incubationStage.type == 3) "Min" else "Hour",
+                            text = if (stage.type == 3) "Min" else "Hour",
                             style = MaterialTheme.typography.titleMedium
                         )
                     }
@@ -340,8 +372,8 @@ fun ProgramInput(
                     scope.launch {
                         duration = it
                         val time = it.toDoubleOrNull() ?: 0.0
-                        if (time != incubationStage.duration) {
-                            onProcessChange(incubationStage.copy(duration = time))
+                        if (time != stage.duration) {
+                            onProcessChange(stage.copy(duration = time))
                         }
                     }
                 }
@@ -353,7 +385,7 @@ fun ProgramInput(
                 title = "液量",
                 value = dosage,
                 trailingIcon = {
-                    if (incubationStage.type == 1 || incubationStage.type == 2) {
+                    if (stage.type == 1 || stage.type == 2) {
                         Text(
                             modifier = Modifier
                                 .padding(end = 16.dp)
@@ -365,7 +397,7 @@ fun ProgramInput(
                                 .clickable {
                                     scope.launch {
                                         origin = (origin + 1) % 5
-                                        onProcessChange(incubationStage.copy(origin = origin))
+                                        onProcessChange(stage.copy(origin = origin))
                                     }
                                 }
                                 .padding(vertical = 4.dp, horizontal = 16.dp),
@@ -385,14 +417,14 @@ fun ProgramInput(
                 scope.launch {
                     dosage = it
                     val volume = it.toDoubleOrNull() ?: 0.0
-                    if (volume != incubationStage.dosage) {
-                        onProcessChange(incubationStage.copy(dosage = volume))
+                    if (volume != stage.dosage) {
+                        onProcessChange(stage.copy(dosage = volume))
                     }
                 }
             }
         }
 
-        if (incubationStage.type == 1) {
+        if (stage.type == 1 || stage.type == 2) {
             item {
                 Row(
                     modifier = Modifier
@@ -415,14 +447,14 @@ fun ProgramInput(
                     Switch(checked = recycle, onCheckedChange = {
                         scope.launch {
                             recycle = it
-                            onProcessChange(incubationStage.copy(recycle = it))
+                            onProcessChange(stage.copy(recycle = it))
                         }
                     })
                 }
             }
         }
 
-        if (incubationStage.type == 3) {
+        if (stage.type == 3) {
             item {
                 SquareTextField(
                     title = "次数",
@@ -438,8 +470,8 @@ fun ProgramInput(
                     scope.launch {
                         times = it
                         val count = it.toIntOrNull() ?: 0
-                        if (count != incubationStage.times) {
-                            onProcessChange(incubationStage.copy(times = count))
+                        if (count != stage.times) {
+                            onProcessChange(stage.copy(times = count))
                         }
                     }
                 }

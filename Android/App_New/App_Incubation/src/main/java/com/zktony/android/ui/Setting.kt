@@ -38,6 +38,8 @@ import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.TrendingDown
 import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.outlined.Analytics
+import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.Grade
 import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.Info
@@ -94,6 +96,7 @@ import com.zktony.android.ui.components.MotorItem
 import com.zktony.android.ui.components.SettingsAppBar
 import com.zktony.android.ui.components.VerificationCodeField
 import com.zktony.android.ui.components.VerificationCodeItem
+import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.AnimatedContent
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
@@ -170,6 +173,7 @@ fun SettingContent(
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackbarHostState.current
+    val navigationActions = LocalNavigationActions.current
     var navigation by rememberDataSaverState(key = Constants.NAVIGATION, default = false)
     var helpInfo by remember { mutableStateOf(false) }
 
@@ -191,6 +195,33 @@ fun SettingContent(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+
+            item {
+                SettingsCard(
+                    icon = Icons.Outlined.BarChart,
+                    text = stringResource(id = R.string.calibration),
+                    onClick = { navigationActions.navigate(Route.CALIBRATION) }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowRight,
+                        contentDescription = null
+                    )
+                }
+            }
+
+            item {
+                SettingsCard(
+                    icon = Icons.Outlined.Analytics,
+                    text = stringResource(id = R.string.debug),
+                    onClick = { navigationActions.navigate(Route.DEBUG) }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowRight,
+                        contentDescription = null
+                    )
+                }
+            }
+
             item {
                 SettingsCard(
                     icon = Icons.Outlined.Navigation,

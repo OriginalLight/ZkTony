@@ -85,6 +85,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
         when(code) {
             0 -> {
                 _shakerJob.value = viewModelScope.launch {
+                    delay(100L)
                     writeRegister(slaveAddr = 0, startAddr = 200, value = 1)
                     _motor.value = _motor.value.toMutableList().apply {
                         this[0] = 1

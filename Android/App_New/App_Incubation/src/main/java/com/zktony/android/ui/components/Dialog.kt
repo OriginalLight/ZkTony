@@ -1,5 +1,6 @@
 package com.zktony.android.ui.components
 
+import android.icu.text.CaseMap.Title
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -45,6 +46,7 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun InputDialog(
+    title: String = "添加",
     onConfirm: (String) -> Unit,
     onCancel: () -> Unit
 ) {
@@ -60,7 +62,7 @@ fun InputDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = stringResource(id = R.string.add),
+                    text = title,
                     style = MaterialTheme.typography.titleMedium
                 )
 
@@ -234,6 +236,62 @@ fun CleanDialog(
     }
 }
 
+/**
+ * 二次确认对话框
+ */
+@Composable
+fun ConfirmDialog(
+    title: String,
+    message: String,
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit
+) {
+    Dialog(onDismissRequest = onCancel) {
+        ElevatedCard {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    OutlinedButton(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 16.dp),
+                        onClick = { onCancel() }
+                    ) {
+                        Text(text = stringResource(id = R.string.cancel))
+                    }
+
+                    Button(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 16.dp),
+                        onClick = { onConfirm() }
+                    ) {
+                        Text(text = stringResource(id = R.string.confirm))
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Preview
 @Composable
 fun PreviewInputDialog() {
@@ -252,4 +310,15 @@ fun PreviewCleanDialog() {
     CleanDialog(job = 0, dispatch = {}) {
 
     }
+}
+
+@Preview
+@Composable
+fun PreviewConfirmDialog() {
+    ConfirmDialog(
+        title = "确认",
+        message = "确认删除？",
+        onConfirm = {},
+        onCancel = {}
+    )
 }

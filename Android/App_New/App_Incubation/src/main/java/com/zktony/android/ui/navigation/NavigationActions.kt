@@ -66,19 +66,9 @@ val TOP_LEVEL_DESTINATIONS = listOf(
         iconTextId = R.string.program
     ),
     TopLevelDestination(
-        route = Route.CALIBRATION,
-        icon = Icons.Outlined.BarChart,
-        iconTextId = R.string.calibration
-    ),
-    TopLevelDestination(
         route = Route.HISTORY,
         icon = Icons.Outlined.History,
         iconTextId = R.string.history
-    ),
-    TopLevelDestination(
-        route = Route.DEBUG,
-        icon = Icons.Outlined.Analytics,
-        iconTextId = R.string.debug
     ),
     TopLevelDestination(
         route = Route.SETTING,

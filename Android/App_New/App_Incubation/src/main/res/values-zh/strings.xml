@@ -10,9 +10,9 @@
     <string name="parameters">系统参数</string>
     <string name="qrcode">微信扫码关注公众号</string>
     <string name="system_config">系统参数</string>
-    <string name="calibration">校准管理</string>
-    <string name="history">历史记录</string>
-    <string name="program">孵育程序</string>
+    <string name="calibration">校准</string>
+    <string name="history">日志</string>
+    <string name="program">程序</string>
     <string name="update">检测更新</string>
     <string name="update_available">有新版本</string>
     <string name="version">版本</string>
@@ -22,7 +22,7 @@
     <string name="acceleration">加速度</string>
     <string name="deceleration">减速度</string>
     <string name="delete">删除</string>
-    <string name="setting">系统设置</string>
+    <string name="setting">设置</string>
     <string name="notice_content">1. 运动机构运行时请不要打开抽屉\n2. 执行程序前请确认有充足的洗涤液\n3. 程序结束后请及时清理容器，避免滋生微生物等问题\n4. 实验结束后即时断电，延长Tec寿命\n5. 请阅读说明书后使用，避免误操作</string>
     <string name="notice">注意事项</string>
     <string name="confirm">确认</string>

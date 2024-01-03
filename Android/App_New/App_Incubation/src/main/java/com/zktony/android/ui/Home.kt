@@ -33,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -50,6 +51,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.components.CleanDialog
+import com.zktony.android.ui.components.ConfirmDialog
 import com.zktony.android.ui.components.ErrorDialog
 import com.zktony.android.ui.components.HomeAppBar
 import com.zktony.android.ui.components.IncubationStageItem
@@ -166,6 +168,7 @@ fun HomeContent(
     val navigationActions = LocalNavigationActions.current
     val state = stateList.find { it.index == selected } ?: IncubationState()
     var clean by remember { mutableStateOf(false) }
+    var confirm by remember { mutableIntStateOf(0) }
 
     if (uiFlags is UiFlags.Error) {
         ErrorDialog(
@@ -178,6 +181,23 @@ fun HomeContent(
         CleanDialog(job = cleanJob, dispatch = dispatch) {
             clean = false
         }
+    }
+
+    if (confirm > 0) {
+        ConfirmDialog(
+            title = "确认",
+            message = if (confirm == 1) "确认开始执行 ${'A' + selected} 模块程序？" else "确认中止 ${'A' + selected} 模块程序？",
+            onConfirm = {
+                scope.launch {
+                    if (confirm == 1) {
+                        dispatch(HomeIntent.Start)
+                    } else {
+                        dispatch(HomeIntent.Stop)
+                    }
+                    confirm = 0
+                } },
+            onCancel = { confirm = 0 }
+        )
     }
 
     Row(
@@ -247,7 +267,7 @@ fun HomeContent(
                             .clickable {
                                 scope.launch {
                                     if (uiFlags is UiFlags.None) {
-                                        dispatch(HomeIntent.Start)
+                                        confirm = 1
                                     } else {
                                         snackbarHostState.showSnackbar("WARN 请先停止当前任务")
                                     }
@@ -264,11 +284,7 @@ fun HomeContent(
                         modifier = Modifier
                             .size(128.dp)
                             .clip(CircleShape)
-                            .clickable {
-                                scope.launch {
-                                    dispatch(HomeIntent.Stop)
-                                }
-                            },
+                            .clickable { scope.launch { confirm = 2 } },
                         imageVector = Icons.Default.Close,
                         contentDescription = null,
                         tint = Color.Red
@@ -318,7 +334,7 @@ fun HomeContent(
                         .clip(MaterialTheme.shapes.small)
                         .clickable { scope.launch { dispatch(HomeIntent.Shaker) } }
                         .padding(vertical = 8.dp, horizontal = 16.dp),
-                    text = if (shaker == 0 || shaker == 4) "摇床开" else "摇床关",
+                    text = if (shaker == 0 || shaker == 4) "摇床暂停" else "摇床开启",
                     style = MaterialTheme.typography.titleMedium
                 )
 

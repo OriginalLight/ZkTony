@@ -25,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -42,6 +43,7 @@ import com.zktony.android.data.entities.History
 import com.zktony.android.data.entities.Program
 import com.zktony.android.data.entities.internal.IncubationStage
 import com.zktony.android.data.entities.internal.Point
+import com.zktony.android.data.entities.internal.defaults.StageDefaults
 import com.zktony.android.ui.CalibrationIntent
 import com.zktony.android.ui.HistoryIntent
 import com.zktony.android.ui.ProgramIntent
@@ -98,10 +100,16 @@ fun HomeAppBar(
                     ElevatedButton(
                         onClick = { navigationActions.navigateTo(destination) },
                     ) {
-                        Icon(
-                            imageVector = destination.icon,
-                            contentDescription = stringResource(id = destination.iconTextId)
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(
+                                imageVector = destination.icon,
+                                contentDescription = stringResource(id = destination.iconTextId)
+                            )
+                            Text(text = stringResource(id = destination.iconTextId))
+                        }
                     }
                 }
             }
@@ -177,7 +185,7 @@ fun ProgramAppBar(
         InputDialog(
             onConfirm = {
                 scope.launch {
-                    dispatch(ProgramIntent.Insert(it))
+                    dispatch(ProgramIntent.Insert(Program(displayText = it)))
                     dialog = false
                 }
             },
@@ -245,19 +253,7 @@ fun ProgramAppBar(
                         } else {
                             val program = entities.find { it.id == selected } ?: Program()
                             val stages = program.stages.toMutableList()
-                            stages.add(
-                                IncubationStage(
-                                    uuid = UUID.randomUUID().toString(),
-                                    type = 1,
-                                    duration = 12.0,
-                                    temperature = 4.0,
-                                    dosage = 8000.0,
-                                    recycle = true,
-                                    origin = 0,
-                                    times = 3,
-                                    flags = 2
-                                )
-                            )
+                            stages.add(StageDefaults.defaultPrimaryAntibody())
                             dispatch(ProgramIntent.Update(program.copy(stages = stages)))
                         }
                     }

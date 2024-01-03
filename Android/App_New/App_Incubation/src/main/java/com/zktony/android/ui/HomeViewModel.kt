@@ -394,7 +394,7 @@ class HomeViewModel @Inject constructor(
             }
             // 加液
             val inChannel =
-                if (stage.origin == 0) (index - ((index / 4) * 4)) + 5 else stage.origin
+                if (stage.origin == 0) (index - ((index / 4) * 4)) + 5 else stage.origin + 4
             liquid(index, stage, inChannel, (index - ((index / 4) * 4)) + 1)
             // 更新模块状态和进程状态
             _stateList.value.find { it.index == index }?.let { state ->
@@ -420,11 +420,19 @@ class HomeViewModel @Inject constructor(
 
         waitForLock(index) {
             // 更新模块状态
-            _stateList.value.find { it.index == index }?.let {
-                updateState(it.copy(flags = 5))
+            val inChannel =
+                if (stage.origin == 0) (index - (index / 4) * 4) + 5 else stage.origin + 4
+            if (stage.recycle) {
+                _stateList.value.find { it.index == index }?.let {
+                    updateState(it.copy(flags = 6))
+                }
+                clean(index, stage, inChannel, (index - ((index / 4) * 4)) + 1)
+            } else {
+                _stateList.value.find { it.index == index }?.let {
+                    updateState(it.copy(flags = 5))
+                }
+                clean(index, stage, 11,(index - ((index / 4) * 4)) + 1)
             }
-            // 清理废液
-            clean(index, stage, 11, (index - ((index / 4) * 4)) + 1)
             // 更新模块状态和进程状态
             _stateList.value.find { it.index == index }?.let { state ->
                 updateState(

@@ -20,6 +20,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DriveFileRenameOutline
+import androidx.compose.material.icons.filled.FileCopy
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,6 +31,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -192,39 +195,6 @@ fun PointItem(
         modifier = Modifier.clip(MaterialTheme.shapes.small),
         headlineContent = {
             Column(modifier = Modifier.padding(end = 16.dp)) {
-                BasicTextField(
-                    value = TextFieldValue(x, TextRange(x.length)),
-                    onValueChange = {
-                        scope.launch {
-                            x = it.text
-                            val value = it.text.toDoubleOrNull() ?: 0.0
-                            if (value != item.x) {
-                                onPointChange(item.copy(x = value))
-                            }
-                        }
-                    },
-                    textStyle = textStyle,
-                    keyboardOptions = keyboardOptions,
-                    keyboardActions = keyboardActions,
-                    decorationBox = @Composable { innerTextField ->
-                        Column {
-                            Row(
-                                verticalAlignment = Alignment.Bottom,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Text(
-                                    text = "向量",
-                                    fontStyle = FontStyle.Italic,
-                                    fontSize = 14.sp,
-                                    fontFamily = FontFamily.Serif,
-                                    color = Color.Gray
-                                )
-                                innerTextField()
-                            }
-                            Divider()
-                        }
-                    }
-                )
 
                 BasicTextField(
                     value = TextFieldValue(y, TextRange(y.length)),
@@ -248,6 +218,40 @@ fun PointItem(
                             ) {
                                 Text(
                                     text = "圈数",
+                                    fontStyle = FontStyle.Italic,
+                                    fontSize = 14.sp,
+                                    fontFamily = FontFamily.Serif,
+                                    color = Color.Gray
+                                )
+                                innerTextField()
+                            }
+                            Divider()
+                        }
+                    }
+                )
+
+                BasicTextField(
+                    value = TextFieldValue(x, TextRange(x.length)),
+                    onValueChange = {
+                        scope.launch {
+                            x = it.text
+                            val value = it.text.toDoubleOrNull() ?: 0.0
+                            if (value != item.x) {
+                                onPointChange(item.copy(x = value))
+                            }
+                        }
+                    },
+                    textStyle = textStyle,
+                    keyboardOptions = keyboardOptions,
+                    keyboardActions = keyboardActions,
+                    decorationBox = @Composable { innerTextField ->
+                        Column {
+                            Row(
+                                verticalAlignment = Alignment.Bottom,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    text = "液量",
                                     fontStyle = FontStyle.Italic,
                                     fontSize = 14.sp,
                                     fontFamily = FontFamily.Serif,
@@ -386,16 +390,19 @@ fun ProgramItem(
     index: Int,
     item: Program,
     onClick: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onCopy: () -> Unit,
+    onRename: () -> Unit
 ) {
-    var delete by remember(item) { mutableStateOf(false) }
+    var longClick by remember(item) { mutableStateOf(false) }
+    var delete by remember(item) { mutableIntStateOf(0) }
 
     ListItem(
         modifier = Modifier
             .clip(MaterialTheme.shapes.small)
             .combinedClickable(
                 onClick = onClick,
-                onLongClick = { delete = true },
+                onLongClick = { longClick = true },
             ),
         headlineContent = {
             Text(
@@ -420,13 +427,37 @@ fun ProgramItem(
             )
         },
         trailingContent = {
-            if (delete) {
-                IconButton(onClick = onDelete) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = null,
-                        tint = Color.Red
-                    )
+            if (longClick) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    IconButton(onClick = {
+                        if (delete == 0) {
+                            delete = 1
+                        } else {
+                            onDelete()
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = null,
+                            tint = if (delete == 1) Color.Red else MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                    IconButton(onClick = onCopy) {
+                        Icon(
+                            imageVector = Icons.Default.FileCopy,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                    IconButton(onClick = onRename) {
+                        Icon(
+                            imageVector = Icons.Default.DriveFileRenameOutline,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
         },
@@ -455,20 +486,19 @@ fun IncubationStageItem(
 
     val info: List<String> = mutableListOf<String>().apply {
         add("${stage.temperature} ℃")
-        add("${stage.dosage} μL")
-        add("${stage.duration} ${if (stage.type == 3) "Min" else "Hour"}")
+        add("${stage.dosage} 微升")
 
-        if (stage.type == 1) {
-            add("${'@' + stage.origin}")
-            add(if (stage.recycle) "Recycle" else "No Recycle")
+        if (stage.type != 4) {
+            add("${stage.duration} ${if (stage.type == 3) "分钟" else "小时"}")
         }
 
-        if (stage.type == 2) {
+        if (stage.type == 1 || stage.type == 2) {
             add("${'@' + stage.origin}")
+            add(if (stage.recycle) "回收" else "不回收")
         }
 
         if (stage.type == 3) {
-            add("${stage.times} Cycle")
+            add("${stage.times} 次")
         }
     }
 
