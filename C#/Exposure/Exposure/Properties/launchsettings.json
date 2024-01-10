@@ -1,0 +1,10 @@
+﻿{
+  "profiles": {
+    "Exposure (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Exposure (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

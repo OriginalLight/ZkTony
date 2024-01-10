@@ -1,0 +1,630 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        android:background="@color/dark_onBackground"
+        android:orientation="vertical"
+        tools:context=".ui.calibration.CalibrationFragment">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@color/light_onPrimary"
+            tools:ignore="TextSizeCheck">
+
+            <ImageButton
+                android:id="@+id/back"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:background="@mipmap/left"
+                tools:ignore="ContentDescription,SpeakableTextPresentCheck" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:text="@string/title_container"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="24sp" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@color/light_onPrimary"
+            android:orientation="vertical">
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:ignore="UselessParent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/waste_tank"
+                        android:textColor="@color/black"
+                        android:textSize="20sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginEnd="32dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:text="@string/position"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
+
+                        <EditText
+                            android:id="@+id/waste_position"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:autofillHints=""
+                            android:gravity="center"
+                            android:inputType="numberDecimal"
+                            android:paddingStart="8dp"
+                            android:textSize="14sp"
+                            tools:ignore="DuplicateSpeakableTextCheck,LabelFor,RtlSymmetry,SpeakableTextPresentCheck,TextContrastCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/move_waste_position"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="0.4"
+                            android:text="@string/move"
+                            android:textAllCaps="false"
+                            android:textSize="16sp"
+                            app:cornerRadius="0dp"
+                            app:rippleColor="@color/purple_700"
+                            tools:ignore="TouchTargetSizeCheck,DuplicateSpeakableTextCheck,VisualLintLocaleText" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:text="@string/height"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
+
+                        <EditText
+                            android:id="@+id/waste_height"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:autofillHints=""
+                            android:gravity="center"
+                            android:inputType="numberDecimal"
+                            android:paddingStart="8dp"
+                            android:textSize="14sp"
+                            tools:ignore="DuplicateSpeakableTextCheck,LabelFor,RtlSymmetry,SpeakableTextPresentCheck,TextContrastCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/move_waste_height"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="0.4"
+                            android:text="@string/move"
+                            android:textAllCaps="false"
+                            android:textSize="16sp"
+                            app:cornerRadius="0dp"
+                            app:rippleColor="@color/purple_700"
+                            tools:ignore="TouchTargetSizeCheck,DuplicateSpeakableTextCheck,VisualLintLocaleText" />
+                    </LinearLayout>
+
+                    <com.google.android.material.divider.MaterialDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginEnd="32dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/wash_tank"
+                        android:textColor="@color/black"
+                        android:textSize="20sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="32dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:text="@string/position"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
+
+
+                        <EditText
+                            android:id="@+id/wash_position"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:autofillHints=""
+                            android:gravity="center"
+                            android:inputType="numberDecimal"
+                            android:paddingStart="8dp"
+                            android:textSize="14sp"
+                            tools:ignore="LabelFor,RtlSymmetry,SpeakableTextPresentCheck,TextContrastCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/move_wash_position"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="0.4"
+                            android:text="@string/move"
+                            android:textAllCaps="false"
+                            android:textSize="16sp"
+                            app:cornerRadius="0dp"
+                            app:rippleColor="@color/purple_700"
+                            tools:ignore="TouchTargetSizeCheck,DuplicateSpeakableTextCheck,VisualLintLocaleText" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:text="@string/height"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
+
+                        <EditText
+                            android:id="@+id/wash_height"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:autofillHints=""
+                            android:gravity="center"
+                            android:inputType="numberDecimal"
+                            android:paddingStart="8dp"
+                            android:textSize="14sp"
+                            tools:ignore="LabelFor,RtlSymmetry,SpeakableTextPresentCheck,TextContrastCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/move_wash_height"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="0.4"
+                            android:text="@string/move"
+                            android:textAllCaps="false"
+                            android:textSize="16sp"
+                            app:cornerRadius="0dp"
+                            app:rippleColor="@color/purple_700"
+                            tools:ignore="TouchTargetSizeCheck,DuplicateSpeakableTextCheck,VisualLintLocaleText" />
+
+                    </LinearLayout>
+
+                    <com.google.android.material.divider.MaterialDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginEnd="32dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/blocking_liquid_tank"
+                        android:textColor="@color/black"
+                        android:textSize="20sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="32dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:text="@string/position"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
+
+                        <EditText
+                            android:id="@+id/blocking_liquid_position"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:autofillHints=""
+                            android:gravity="center"
+                            android:inputType="numberDecimal"
+                            android:paddingStart="8dp"
+                            android:textSize="14sp"
+                            tools:ignore="LabelFor,RtlSymmetry,SpeakableTextPresentCheck,TextContrastCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/move_blocking_liquid_position"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="0.4"
+                            android:text="@string/move"
+                            android:textAllCaps="false"
+                            android:textSize="16sp"
+                            app:cornerRadius="0dp"
+                            app:rippleColor="@color/purple_700"
+                            tools:ignore="TouchTargetSizeCheck,DuplicateSpeakableTextCheck,VisualLintLocaleText" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:text="@string/height"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
+
+                        <EditText
+                            android:id="@+id/blocking_liquid_height"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:autofillHints=""
+                            android:gravity="center"
+                            android:inputType="numberDecimal"
+                            android:paddingStart="8dp"
+                            android:textSize="14sp"
+                            tools:ignore="LabelFor,RtlSymmetry,SpeakableTextPresentCheck,TextContrastCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/move_blocking_liquid_height"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="0.4"
+                            android:text="@string/move"
+                            android:textAllCaps="false"
+                            android:textSize="16sp"
+                            app:cornerRadius="0dp"
+                            app:rippleColor="@color/purple_700"
+                            tools:ignore="TouchTargetSizeCheck,DuplicateSpeakableTextCheck,VisualLintLocaleText" />
+                    </LinearLayout>
+
+                    <com.google.android.material.divider.MaterialDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginEnd="32dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/antibody_two_tank"
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        tools:ignore="VisualLintLocaleText" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="32dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:text="@string/position"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
+
+                        <EditText
+                            android:id="@+id/antibody_two_position"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:autofillHints=""
+                            android:gravity="center"
+                            android:inputType="numberDecimal"
+                            android:paddingStart="8dp"
+                            android:textSize="14sp"
+                            tools:ignore="LabelFor,RtlSymmetry,SpeakableTextPresentCheck,TextContrastCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/move_antibody_two_position"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="0.4"
+                            android:text="@string/move"
+                            android:textAllCaps="false"
+                            android:textSize="16sp"
+                            app:cornerRadius="0dp"
+                            app:rippleColor="@color/purple_700"
+                            tools:ignore="TouchTargetSizeCheck,DuplicateSpeakableTextCheck,VisualLintLocaleText" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:text="@string/height"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
+
+                        <EditText
+                            android:id="@+id/antibody_two_height"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:autofillHints=""
+                            android:gravity="center"
+                            android:inputType="numberDecimal"
+                            android:paddingStart="8dp"
+                            android:textSize="14sp"
+                            tools:ignore="LabelFor,RtlSymmetry,SpeakableTextPresentCheck,TextContrastCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/move_antibody_two_height"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="0.4"
+                            android:text="@string/move"
+                            android:textAllCaps="false"
+                            android:textSize="16sp"
+                            app:cornerRadius="0dp"
+                            app:rippleColor="@color/purple_700"
+                            tools:ignore="TouchTargetSizeCheck,DuplicateSpeakableTextCheck,VisualLintLocaleText" />
+                    </LinearLayout>
+
+                    <com.google.android.material.divider.MaterialDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginEnd="32dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/antibody_one_tank"
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        tools:ignore="VisualLintLocaleText" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="32dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:text="@string/position"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
+
+                        <EditText
+                            android:id="@+id/antibody_one_position"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:autofillHints=""
+                            android:gravity="center"
+                            android:inputType="numberDecimal"
+                            android:paddingStart="8dp"
+                            android:textSize="14sp"
+                            tools:ignore="LabelFor,RtlSymmetry,SpeakableTextPresentCheck,TextContrastCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/move_antibody_one_position"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="0.4"
+                            android:text="@string/move"
+                            android:textAllCaps="false"
+                            android:textSize="16sp"
+                            app:cornerRadius="0dp"
+                            app:rippleColor="@color/purple_700"
+                            tools:ignore="TouchTargetSizeCheck,DuplicateSpeakableTextCheck,VisualLintLocaleText" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:text="@string/height"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
+
+                        <EditText
+                            android:id="@+id/antibody_one_height"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:autofillHints=""
+                            android:gravity="center"
+                            android:inputType="numberDecimal"
+                            android:paddingStart="8dp"
+                            android:textSize="14sp"
+                            tools:ignore="LabelFor,RtlSymmetry,SpeakableTextPresentCheck,TextContrastCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/move_antibody_one_height"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="0.4"
+                            android:text="@string/move"
+                            android:textAllCaps="false"
+                            android:textSize="16sp"
+                            app:cornerRadius="0dp"
+                            app:rippleColor="@color/purple_700"
+                            tools:ignore="TouchTargetSizeCheck,DuplicateSpeakableTextCheck,VisualLintLocaleText" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="32dp"
+                        android:orientation="horizontal"
+                        tools:ignore="DisableBaselineAlignment">
+
+                        <Space
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:layout_marginEnd="8dp"
+                                android:text="@string/recycle"
+                                android:textColor="@color/black"
+                                android:textSize="16sp" />
+
+                            <EditText
+                                android:id="@+id/antibody_one_recycle"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:autofillHints=""
+                                android:gravity="center"
+                                android:inputType="numberDecimal"
+                                android:paddingStart="8dp"
+                                android:textSize="14sp"
+                                tools:ignore="LabelFor,NestedWeights,RtlSymmetry,SpeakableTextPresentCheck,TextContrastCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/move_antibody_one_recycle"
+                                android:layout_width="0dp"
+                                android:layout_height="40dp"
+                                android:layout_weight="0.4"
+                                android:text="@string/move"
+                                android:textAllCaps="false"
+                                android:textSize="16sp"
+                                app:cornerRadius="0dp"
+                                app:rippleColor="@color/purple_700"
+                                tools:ignore="TouchTargetSizeCheck,DuplicateSpeakableTextCheck,VisualLintLocaleText" />
+                        </LinearLayout>
+
+                        <Space
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1" />
+                    </LinearLayout>
+
+                    <com.google.android.material.divider.MaterialDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginEnd="32dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginTop="32dp"
+                        android:layout_marginEnd="32dp"
+                        android:layout_marginBottom="32dp"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/zero"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="16dp"
+                            android:layout_weight="1"
+                            android:backgroundTint="@color/light_primary"
+                            android:text="@string/zero"
+                            android:textAllCaps="false"
+                            android:textColor="@color/light_onPrimary"
+                            android:textSize="20sp"
+                            app:cornerRadius="24dp"
+                            app:rippleColor="#7B1FA2"
+                            tools:ignore="VisualLintButtonSize" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/update"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:layout_weight="1"
+                            android:backgroundTint="@color/light_primary"
+                            android:text="@string/save"
+                            android:textAllCaps="false"
+                            android:textColor="@color/light_onPrimary"
+                            android:textSize="20sp"
+                            app:cornerRadius="24dp"
+                            app:rippleColor="#7B1FA2"
+                            tools:ignore="VisualLintButtonSize" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </ScrollView>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</layout>
+

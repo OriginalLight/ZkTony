@@ -1,0 +1,16 @@
+[package]
+name = "zkty"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+members = [".", "api", "config", "db", "entity", "protobuf"]
+
+[dependencies]
+api = { path = "api" }
+config = { path = "config" }
+tonic = { version = "0.9", features = ["transport"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "full"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }

@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "pwm.h": "c",
+        "cmd_process.h": "c",
+        "cmd_queue.h": "c",
+        "hmi_driver.h": "c"
+    }
+}

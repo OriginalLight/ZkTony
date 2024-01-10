@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="already_latest">已是最新版</string>
+    <string name="app_name">ZkTony</string>
+    <string name="cancel">返回</string>
+    <string name="finish">完成</string>
+    <string name="help">帮助</string>
+    <string name="motor_config">电机参数</string>
+    <string name="navigation">导航栏</string>
+    <string name="parameters">系统参数</string>
+    <string name="qrcode">微信扫码关注公众号</string>
+    <string name="system_config">系统参数</string>
+    <string name="calibration">校准管理</string>
+    <string name="program">分液程序</string>
+    <string name="update">检测更新</string>
+    <string name="update_available">有新版本</string>
+    <string name="version">版本</string>
+    <string name="network">网络设置</string>
+    <string name="speed">速度</string>
+    <string name="acceleration">加速度</string>
+    <string name="deceleration">减速度</string>
+    <string name="delete">删除</string>
+    <string name="setting">系统设置</string>
+    <string name="add">添加</string>
+    <string name="notice_content">1. 执行程序前请确认有充足的溶液。\n2. 程序结束后请及时清理容器，避免滋生微生物等问题。\n3. 请阅读说明书后使用，避免误操作。</string>
+    <string name="notice">注意事项</string>
+    <string name="confirm">确认</string>
+    <string name="downloading">下载中</string>
+    <string name="copyright">南京中科通仪科技有限公司 版权所有</string>
+    <string name="remark">备注</string>
+</resources>

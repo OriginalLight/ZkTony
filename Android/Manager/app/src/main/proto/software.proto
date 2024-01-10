@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.zktony.proto";
+option java_outer_classname = "SoftwareProto";
+
+package software;
+
+service SoftwareService {
+  rpc GetSoftwarePage (SoftwareRequestPage) returns (SoftwareReplyPage) {}
+  rpc SearchSoftware (SoftwareSearch) returns (SoftwareList) {}
+  rpc GetById (SoftwareId) returns (Software) {}
+  rpc AddSoftware (Software) returns (SoftwareId) {}
+  rpc UpdateSoftware(Software) returns (SoftwareReply) {}
+  rpc DeleteSoftware (SoftwareId) returns (SoftwareReply) {}
+}
+
+message SoftwareRequestPage {
+  uint64 page_size = 1;
+  uint64 page = 2;
+}
+
+message SoftwareReply {bool success = 1;}
+
+message SoftwareSearch {
+  string id = 1;
+  string package = 2;
+}
+
+message SoftwareId {
+  string id = 1;
+}
+
+message Software {
+  string id = 1;
+  string package = 2;
+  string build_type = 3;
+  string version_name = 4;
+  int32 version_code = 5;
+  string remarks = 6;
+  string create_time = 7;
+  string create_by = 8;
+}
+
+message SoftwareList {repeated Software list = 1;}
+
+message SoftwareReplyPage {
+  repeated Software list = 1;
+  uint64 total = 2;
+}

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:id="@+id/g_home">
+        <item
+            android:id="@+id/navigation_home"
+            android:icon="@mipmap/home"
+            android:title="@string/title_home" />
+    </group>
+
+    <group android:id="@+id/g_program">
+        <item
+            android:id="@+id/navigation_program"
+            android:icon="@mipmap/program"
+            android:title="@string/title_program" />
+    </group>
+
+    <group android:id="@+id/g_calibration">
+        <item
+            android:id="@+id/navigation_calibration"
+            android:icon="@mipmap/calibration"
+            android:title="@string/title_calibration" />
+    </group>
+
+    <group android:id="@+id/g_log">
+        <item
+            android:id="@+id/navigation_log"
+            android:icon="@mipmap/log"
+            android:title="@string/title_log" />
+    </group>
+
+    <group android:id="@+id/g_admin">
+        <item
+            android:id="@+id/navigation_admin"
+            android:icon="@mipmap/admin"
+            android:title="@string/title_admin" />
+    </group>
+
+</menu>
