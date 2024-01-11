@@ -9,5 +9,7 @@ declare module '*.vue' {
 
 interface ImportMetaEnv {
   readonly RENDERER_VITE_API_BASE_URL: string
+  readonly RENDERER_VITE_METRIC_WEBSOCKET_URL: string
+  readonly RENDERER_VITE_CAMERA_WEBSOCKET_PORT: string
   // more env variables...
 }

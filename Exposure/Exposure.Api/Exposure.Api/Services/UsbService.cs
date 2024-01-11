@@ -26,14 +26,12 @@ public class UsbService : IUsbService
     public void DeviceInsertedEvent(object sender, EventArrivedEventArgs e)
     {
         // 获取到当前插入的什么
-        var drive = e.NewEvent.Properties["DriveName"].Value.ToString();
-        _logger.LogInformation("外设插入：" + drive);
+        _logger.LogInformation("外设插入");
     }
 
     public void DeviceRemovedEvent(object sender, EventArrivedEventArgs e)
     {
-        var drive = e.NewEvent.Properties["DriveName"].Value.ToString();
-        _logger.LogInformation("外设移除：" + drive);
+        _logger.LogInformation("外设移除");
     }
 
     public Task InitializeAsync()

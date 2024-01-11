@@ -15,7 +15,10 @@ builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new DateTimeJsonConverter());
+});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -36,6 +39,7 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader();
     });
 });
+
 // Add DbContext
 builder.Services.AddTransient<IDbContext, AppDbContext>();
 
@@ -47,12 +51,14 @@ builder.Services.AddSingleton<IUserService, UserService>();
 builder.Services.AddSingleton<ICameraService, CameraService>();
 builder.Services.AddSingleton<IErrorLogService, ErrorLogService>();
 builder.Services.AddSingleton<IOperLogService, OperLogService>();
+builder.Services.AddSingleton<IPictureService, PictureService>();
 
 // Add Repositories
 builder.Services.AddTransient(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddTransient<IErrorLogRepository, ErrorLogRepository>();
 builder.Services.AddTransient<IOperLogRepository, OperLogRepository>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
+builder.Services.AddTransient<IPictureRepository, PictureRepository>();
 
 var app = builder.Build();
 
@@ -62,6 +68,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseWebSockets();
 
 app.UseHttpsRedirection();
 

@@ -19,15 +19,9 @@ import com.zktony.www.data.entities.Program
  */
 class LogAdapter : ListAdapter<LogRecord, LogViewHolder>(diffCallback) {
 
-    var selected: LogRecord? = null
-        @SuppressLint("NotifyDataSetChanged")
-        set(value) {
-            field = value
-            callback(value)
-            notifyDataSetChanged()
-        }
+    var selected = mutableListOf<LogRecord>()
 
-    var callback : (LogRecord?) -> Unit = {}
+    var callback : (List<LogRecord>) -> Unit = {}
     var onDoubleClick : (LogRecord) -> Unit = {}
 
 
@@ -39,10 +33,26 @@ class LogAdapter : ListAdapter<LogRecord, LogViewHolder>(diffCallback) {
                 false
             ),
             onItemClick = {
-                selected = it
+                if (selected.contains(it)) {
+                    selected.remove(it)
+                    callback(selected)
+                    notifyDataSetChanged()
+                } else {
+                    selected.add(it)
+                    callback(selected)
+                    notifyDataSetChanged()
+                }
             },
             onItemDoubleClick = {
-                selected = it
+                if (selected.contains(it)) {
+                    selected.remove(it)
+                    callback(selected)
+                    notifyDataSetChanged()
+                } else {
+                    selected.add(it)
+                    callback(selected)
+                    notifyDataSetChanged()
+                }
                 onDoubleClick(it)
             }
         )
@@ -51,7 +61,7 @@ class LogAdapter : ListAdapter<LogRecord, LogViewHolder>(diffCallback) {
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onBindViewHolder(holder: LogViewHolder, position: Int) {
         holder.bind(getItem(position))
-        holder.select(selected?.id == getItem(position).id)
+        holder.select(getItem(position).id in selected.map { it.id })
     }
 
     companion object {

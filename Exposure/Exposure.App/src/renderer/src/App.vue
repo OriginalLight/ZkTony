@@ -1,33 +1,48 @@
 <template>
-  <a-space direction="vertical">
-    <a-space>
-      <a-button type="primary" status="success" @click="handleClick">Primary</a-button>
-      <a-button>Default</a-button>
-      <a-button type="dashed" status="success">Dashed</a-button>
-      <a-button type="outline" status="success">Outline</a-button>
-      <a-button type="text" status="success">Text</a-button>
-    </a-space>
-    <a-space>
-      <a-button type="primary" status="warning">Primary</a-button>
-      <a-button status="warning">Default</a-button>
-      <a-button type="dashed" status="warning">Dashed</a-button>
-      <a-button type="outline" status="warning">Outline</a-button>
-      <a-button type="text" status="warning">Text</a-button>
-    </a-space>
-    <a-space>
-      <a-button type="primary" status="danger">Primary</a-button>
-      <a-button status="danger">Default</a-button>
-      <a-button type="dashed" status="danger">Dashed</a-button>
-      <a-button type="outline" status="danger">Outline</a-button>
-      <a-button type="text" status="danger">Text</a-button>
-    </a-space>
-  </a-space>
+  <a-layout class="layout">
+    <a-layout-header class="layout-header"> <Navigation /> </a-layout-header>
+    <a-layout-content class="layout-content">
+      <a-config-provider :locale="locale">
+        <router-view />
+      </a-config-provider>
+    </a-layout-content>
+  </a-layout>
 </template>
 
 <script lang="ts" setup>
-import { getWeather } from '@renderer/api/weather'
-const handleClick = async () => {
-  const res = await getWeather()
-  console.log(res.data)
-}
+import { computed } from 'vue'
+import enUS from '@arco-design/web-vue/es/locale/lang/en-us'
+import zhCN from '@arco-design/web-vue/es/locale/lang/zh-cn'
+import Navigation from '@renderer/components/navigation/index.vue'
+import useLocale from '@renderer/hooks/locale'
+import useTheme from '@renderer/hooks/themes'
+
+const { currentLocale } = useLocale()
+const { initTheme } = useTheme()
+const locale = computed(() => {
+  switch (currentLocale.value) {
+    case 'zh-CN':
+      return zhCN
+    case 'en-US':
+      return enUS
+    default:
+      return enUS
+  }
+})
+// 初始化主题
+initTheme()
 </script>
+
+<style lang="less" scoped>
+.layout {
+  height: 100vh;
+  background-color: var(--color-bg-2);
+  .layout-header {
+    height: 66px;
+  }
+  .layout-content {
+    overflow: hidden;
+    height: calc(100vh - 66px);
+  }
+}
+</style>

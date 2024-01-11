@@ -42,6 +42,10 @@ public class UserService : BaseService<User>, IUserService
         var user = list[0];
         // 检查密码
         if (!BCrypt.Net.BCrypt.Verify(password, user.Sha)) return 2;
+        // 检查是否被禁用
+        if (!user.Enabled) return 3;
+        // 检查是否过期
+        if (user.Expire < DateTime.Now) return 4;
         // 存储登录状态
         _logged = user;
         // 更新登录时间

@@ -53,23 +53,25 @@ class LogViewModel constructor(
      * 删除日志记录
      * @param logRecord 日志记录
      */
-    fun delete(logRecord: LogRecord) {
+    fun delete(list: List<LogRecord>) {
         viewModelScope.launch {
-            LRD.delete(logRecord)
-            LDD.deleteByRecordId(logRecord.id)
+            list.forEach {
+                LRD.delete(it)
+                LDD.deleteByRecordId(it.id)
+            }
         }
     }
 
     /**
      * 切换搜索栏
      */
-    fun select(logRecord: LogRecord?) {
-        _uiState.value = _uiState.value.copy(selected = logRecord)
+    fun select(list: List<LogRecord>) {
+        _uiState.value = _uiState.value.copy(selected = list)
     }
 
 }
 
 data class LogUiState(
     val list: List<LogRecord> = emptyList(),
-    val selected: LogRecord? = null,
+    val selected: List<LogRecord> = emptyList()
 )

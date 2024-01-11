@@ -256,13 +256,13 @@ fun ProgramInput(
     onProcessChange: (IncubationStage) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    var typeExpand by remember(stage) { mutableStateOf(false) }
-    var temperature by remember(stage) { mutableStateOf(stage.temperature.toString()) }
-    var duration by remember(stage) { mutableStateOf(stage.duration.toString()) }
-    var dosage by remember(stage) { mutableStateOf(stage.dosage.toString()) }
-    var origin by remember(stage) { mutableIntStateOf(stage.origin) }
-    var recycle by remember(stage) { mutableStateOf(stage.recycle) }
-    var times by remember(stage) { mutableStateOf(stage.times.toString()) }
+    var typeExpand by remember(stage.uuid) { mutableStateOf(false) }
+    var temperature by remember(stage.uuid) { mutableStateOf(stage.temperature.toString()) }
+    var duration by remember(stage.uuid) { mutableStateOf(stage.duration.toString()) }
+    var dosage by remember(stage.uuid) { mutableStateOf(stage.dosage.toString()) }
+    var origin by remember(stage.uuid) { mutableIntStateOf(stage.origin) }
+    var recycle by remember(stage.uuid) { mutableStateOf(stage.recycle) }
+    var times by remember(stage.uuid) { mutableStateOf(stage.times.toString()) }
 
     LazyColumn(
         modifier = modifier.imePadding(),

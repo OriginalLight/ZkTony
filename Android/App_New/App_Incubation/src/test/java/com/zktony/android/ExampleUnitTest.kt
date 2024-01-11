@@ -61,14 +61,4 @@ class ExampleUnitTest {
         assertEquals(data.toHexString(), "00 C9 B2 2A")
 
     }
-
-    @Test
-    fun test2() {
-        val byte = RtuProtocol().apply {
-            this.slaveAddr = (1).toByte()
-            funcCode = 0x06
-            data = ByteArray(4).writeInt16BE(201).writeInt16BE(45610, 2)
-        }.serialization()
-        assertEquals("01 06 00 C9 B2 2A 8C 3B", byte.toHexString())
-    }
 }

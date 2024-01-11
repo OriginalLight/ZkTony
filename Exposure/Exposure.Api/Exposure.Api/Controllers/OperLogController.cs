@@ -18,7 +18,13 @@ public class OperLogController : ControllerBase
         _usb = usb;
         _operLog = operLog;
     }
-
+    
+    /// <summary>
+    ///  分页查询
+    /// </summary>
+    /// <param name="page"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
     [HttpGet]
     public async Task<HttpResult> Page([FromQuery] int page, [FromQuery] int size)
     {
@@ -35,7 +41,12 @@ public class OperLogController : ControllerBase
             Data = list
         });
     }
-
+    
+    /// <summary>
+    ///  删除
+    /// </summary>
+    /// <param name="ids"></param>
+    /// <returns></returns>
     [HttpDelete]
     public async Task<HttpResult> Delete([FromBody] object[] ids)
     {

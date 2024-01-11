@@ -23,16 +23,6 @@ public class ExceptionHandlerMiddleware
         catch (Exception ex)
         {
             _errorLog.Create(ex);
-            await HandleExceptionAsync(context);
         }
-    }
-
-    private static Task HandleExceptionAsync(HttpContext context)
-    {
-        context.Response.ContentType = "application/json";
-        context.Response.StatusCode = (int)HttpStatusCode.OK;
-
-
-        return context.Response.WriteAsJsonAsync(HttpResult.Fail("系统异常！"));
     }
 }

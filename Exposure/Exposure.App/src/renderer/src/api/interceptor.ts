@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { InternalAxiosRequestConfig, AxiosResponse } from 'axios'
+import type { AxiosRequestConfig, AxiosResponse } from 'axios'
 import { Message } from '@arco-design/web-vue'
 
 // 定义接口
@@ -16,7 +16,7 @@ if (import.meta.env.RENDERER_VITE_API_BASE_URL) {
 
 // 请求拦截器
 axios.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
+  (config: AxiosRequestConfig) => {
     // let each request carry token
     // this example using the JWT token
     // Authorization is a custom headers key
@@ -32,17 +32,19 @@ axios.interceptors.request.use(
 
 // 回复拦截器
 axios.interceptors.response.use(
-  (response: AxiosResponse<HttpResponse>) => {
+  function (response: AxiosResponse<HttpResponse>) {
     const res = response.data
     if (res.code !== 200) {
-      Message.error(res.msg)
-      return Promise.reject(res.msg)
+      return Promise.reject(new Error(res.msg || 'Error'))
     }
-    return response
+    return res
   },
   (error) => {
     // do something
-    Message.error(error.message)
+    Message.error({
+      content: error.msg || 'Request Error',
+      duration: 5 * 1000
+    })
     return Promise.reject(error)
   }
 )

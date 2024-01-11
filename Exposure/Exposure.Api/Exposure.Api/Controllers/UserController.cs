@@ -35,9 +35,12 @@ public class UserController : ControllerBase
         // 登录
         return await _user.LogIn(dto.UserName, dto.Password) switch
         {
-            0 => HttpResult.Success("登录成功", null),
+            0 => HttpResult.Success("登录成功", 
+                _user.GetLogged()?.Adapt<UserOutDto>()),
             1 => HttpResult.Fail("登录失败: 用户不存在", null),
             2 => HttpResult.Fail("登录失败: 密码错误", null),
+            3 => HttpResult.Fail("登录失败: 用户被禁用", null),
+            4 => HttpResult.Fail("登录失败: 用户已过期", null),
             _ => HttpResult.Fail("登录失败: 未知错误", null)
         };
     }

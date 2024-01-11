@@ -3,31 +3,23 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
+process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
+
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: 1280,
+    height: 800,
+    minWidth: 800,
+    minHeight: 600,
     show: false,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
+      webSecurity: false
     }
-  })
-
-  mainWindow.webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
-    callback({ requestHeaders: { Origin: '*', ...details.requestHeaders } })
-  })
-
-  mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
-    callback({
-      responseHeaders: {
-        'Access-Control-Allow-Origin': ['*'],
-        ...details.responseHeaders
-      }
-    })
   })
 
   mainWindow.on('ready-to-show', () => {

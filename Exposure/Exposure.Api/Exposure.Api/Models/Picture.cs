@@ -9,34 +9,44 @@ public class Picture
     public int Id { get; set; }
 
     /// <summary>
-    ///     用户ID
+    ///   用户ID
     /// </summary>
     public int UserId { get; set; }
 
     /// <summary>
-    ///     图片名称
+    ///   图片名称
     /// </summary>
     public string Name { get; set; }
 
     /// <summary>
-    ///     图片路径
+    ///   图片路径
     /// </summary>
     public string Path { get; set; }
 
     /// <summary>
-    ///     宽度
+    ///   宽度
     /// </summary>
     public int Width { get; set; }
 
     /// <summary>
-    ///     高度
+    ///   高度
     /// </summary>
     public int Height { get; set; }
-
+    
     /// <summary>
-    ///     大小
+    ///  曝光时间
     /// </summary>
-    public double Size { get; set; }
+    public int ExposureTime { get; set; }
+    
+    /// <summary>
+    ///  曝光增益
+    /// </summary>
+    public int ExposureGain { get; set; }
+    
+    /// <summary>
+    ///   白平衡
+    /// </summary>
+    public int BlackLevel { get; set; }
 
     /// <summary>
     ///     是否删除

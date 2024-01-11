@@ -1,12 +1,32 @@
 import { computed } from 'vue'
-import { useAppStore } from '@renderer/store'
 
 export default function useThemes() {
-  const appStore = useAppStore()
-  const isDark = computed(() => {
-    return appStore.theme === 'dark'
+  const theme = localStorage.getItem('theme') || 'light'
+
+  const currentTheme = computed(() => {
+    return theme
   })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const changeTheme = (value: any) => {
+    if (value === 'dark') {
+      localStorage.setItem('theme', 'dark')
+      document.body.setAttribute('arco-theme', 'dark')
+    } else {
+      localStorage.setItem('theme', 'light')
+      document.body.removeAttribute('arco-theme')
+    }
+  }
+
+  const initTheme = () => {
+    if (theme === 'dark') {
+      document.body.setAttribute('arco-theme', 'dark')
+    } else {
+      document.body.removeAttribute('arco-theme')
+    }
+  }
   return {
-    isDark
+    currentTheme,
+    changeTheme,
+    initTheme
   }
 }

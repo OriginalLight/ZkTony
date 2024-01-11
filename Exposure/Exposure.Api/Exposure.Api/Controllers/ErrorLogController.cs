@@ -25,6 +25,12 @@ public class ErrorLogController : ControllerBase
         _operLog = operLog;
     }
 
+    /// <summary>
+    ///   分页查询
+    /// </summary>
+    /// <param name="page"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
     [HttpGet]
     public async Task<HttpResult> Page([FromQuery] int page, [FromQuery] int size)
     {
@@ -42,6 +48,11 @@ public class ErrorLogController : ControllerBase
         });
     }
 
+    /// <summary>
+    ///  删除
+    /// </summary>
+    /// <param name="ids"></param>
+    /// <returns></returns>
     [HttpDelete]
     public async Task<HttpResult> Delete([FromBody] object[] ids)
     {
@@ -51,6 +62,10 @@ public class ErrorLogController : ControllerBase
         return await _errorLog.DeleteRange(ids) ? HttpResult.Success("删除成功", null) : HttpResult.Fail("删除失败");
     }
 
+    /// <summary>
+    ///  导出
+    /// </summary>
+    /// <returns></returns>
     [HttpGet]
     [Route("Export")]
     public async Task<HttpResult> Export()

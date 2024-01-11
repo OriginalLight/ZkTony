@@ -10,6 +10,7 @@ import com.zktony.core.ext.*
 import com.zktony.www.R
 import com.zktony.www.adapter.LogAdapter
 import com.zktony.www.core.ext.messageDialog
+import com.zktony.www.data.entities.LogRecord
 import com.zktony.www.databinding.FragmentLogBinding
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -36,8 +37,8 @@ class LogFragment :
                 viewModel.uiState.collect {
                     adapter.submitList(it.list)
                     binding.apply {
-                        lineChart.isEnabled = it.selected != null && adapter.selected != null
-                        delete.isEnabled = it.selected != null && adapter.selected != null
+                        lineChart.isEnabled =  adapter.selected.size == 1
+                        delete.isEnabled =  adapter.selected.size > 0
                     }
                 }
             }
@@ -50,7 +51,7 @@ class LogFragment :
             recycleView.adapter = adapter
             adapter.callback =  { viewModel.select(it) }
             adapter.onDoubleClick = {
-                viewModel.select(it)
+                viewModel.select(adapter.selected)
                 findNavController().navigate(
                     R.id.action_navigation_log_to_navigation_log_chart,
                     Bundle().apply { putString("id", it.id) }
@@ -59,7 +60,7 @@ class LogFragment :
             lineChart.clickNoRepeat {
                 findNavController().navigate(
                     R.id.action_navigation_log_to_navigation_log_chart,
-                    Bundle().apply { putString("id", adapter.selected!!.id) }
+                    Bundle().apply { putString("id", adapter.selected[0].id) }
                 )
             }
             datePicker.clickNoRepeat {
@@ -68,11 +69,11 @@ class LogFragment :
             delete.clickNoRepeat {
                 messageDialog(
                     title = getString(R.string.delete_log),
-                    message = "您确定要删除该日志吗？",
+                    message = "您确定要删除选中的日志吗？",
                     block = {
-                        viewModel.delete(adapter.selected!!)
-                        adapter.selected = null
-                        viewModel.select(null)
+                        viewModel.delete(adapter.selected)
+                        adapter.selected = mutableListOf()
+                        viewModel.select(emptyList())
                     },
                 )
             }
@@ -105,6 +106,6 @@ class LogFragment :
 
     override fun onDestroy() {
         super.onDestroy()
-        viewModel.select(null)
+        viewModel.select(emptyList())
     }
 }
