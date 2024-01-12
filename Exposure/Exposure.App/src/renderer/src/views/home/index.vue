@@ -4,7 +4,7 @@
       <div class="left">
         <a-image
           src="C:\Users\ThinkBook\Desktop\test\2024-01-10-14-33-15.jpg"
-          fit="scale-down"
+          fit="fill"
           width="100%"
           height="100%"
         />
@@ -26,8 +26,8 @@
   display: flex;
   align-items: center;
   flex-direction: column;
-  padding: 8px;
-  height: calc(100vh - 66px - 16px);
+  padding: 4px;
+  height: calc(100vh - 66px - 8px);
   overflow: hidden;
   justify-content: center;
 }

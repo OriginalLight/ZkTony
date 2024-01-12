@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Exposure.Api.Contracts.Services;
+﻿using Exposure.Api.Contracts.Services;
 
 namespace Exposure.Api.Core;
 
@@ -22,7 +21,7 @@ public class ExceptionHandlerMiddleware
         }
         catch (Exception ex)
         {
-            _errorLog.Create(ex);
+            _errorLog.AddErrorLog(ex);
         }
     }
 }

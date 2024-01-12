@@ -8,16 +8,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <None Include="..\.editorconfig" Link=".editorconfig" />
+        <None Include="..\.editorconfig" Link=".editorconfig"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
-        <PackageReference Include="Mapster" Version="7.4.0" />
-        <PackageReference Include="SqlSugarCore" Version="5.1.4.129" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
-        <PackageReference Include="System.IO.Ports" Version="8.0.0" />
-        <PackageReference Include="System.Management" Version="8.0.0" />
+        <PackageReference Include="BCrypt.Net-Next" Version="4.0.3"/>
+        <PackageReference Include="Mapster" Version="7.4.0"/>
+        <PackageReference Include="OpenCvSharp4.Windows" Version="4.9.0.20240103"/>
+        <PackageReference Include="SqlSugarCore" Version="5.1.4.132"/>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0"/>
+        <PackageReference Include="System.IO.Ports" Version="8.0.0"/>
+        <PackageReference Include="System.Management" Version="8.0.0"/>
     </ItemGroup>
 
     <ItemGroup>

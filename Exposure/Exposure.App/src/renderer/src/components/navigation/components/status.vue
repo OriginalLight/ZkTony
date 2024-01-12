@@ -28,12 +28,13 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onBeforeUnmount } from 'vue'
+import { ref, reactive, onBeforeUnmount, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { Message } from '@arco-design/web-vue'
-import { useUserStore } from '@renderer/store'
+import { useAppStore, useUserStore } from '@renderer/store'
 import { Usb as IconUsb, OpenDoor as IconOpenDoor } from '@icon-park/vue-next'
+import useSocket from '@renderer/hooks/socket'
 
 // 国际化
 const { t } = useI18n()
@@ -41,6 +42,10 @@ const { t } = useI18n()
 const router = useRouter()
 // 获取用户信息
 const userStore = useUserStore()
+// 获取应用信息
+const appStore = useAppStore()
+// websocket
+const socket = useSocket()
 // 注销弹窗
 const visible = ref(false)
 // 状态栏的一些图标颜色和文字
@@ -52,8 +57,6 @@ const status = reactive({
   // 温度
   temperature: '0.0°C'
 })
-// websocket
-const socket = new WebSocket(import.meta.env.RENDERER_VITE_METRIC_WEBSOCKET_URL)
 // 确认注销
 const handleLogout = async () => {
   try {
@@ -67,31 +70,32 @@ const handleLogout = async () => {
 }
 // 定时发送websocket请求
 const timer = setInterval(() => {
-  socket.send('all')
+  const message = JSON.stringify({ code: 'status' })
+  socket.send(message)
 }, 3000)
-// websocket连接成功
-socket.addEventListener('open', () => {
-  console.log('websocket connected')
-})
-// websocket接收到消息
-socket.addEventListener('message', (event) => {
-  try {
-    const json = JSON.parse(event.data)
-    status.usb = json.usb === 0 ? '#808080' : '#1890ff'
-    status.temperature = json.temperature <= -100 ? '/' : `${json.temperature} °C`
-    status.door = json.door === 0 ? '#808080' : '#1890ff'
-  } catch (err) {
-    console.log(err)
+
+watch(socket.data, (data) => {
+  if (data) {
+    try {
+      const obj: { code: string; data: never } = JSON.parse(data)
+      if (obj.code === 'status') {
+        const data: { usb: boolean; temperature: number; door: boolean } = obj.data
+        status.usb = data.usb ? '#1890ff' : '#808080'
+        status.temperature = data.temperature <= -100 ? '/' : `${data.temperature} °C`
+        status.door = data.door ? '#1890ff' : '#808080'
+        appStore.toggleUsb(data.usb)
+        appStore.toggleDoor(data.door)
+        appStore.toggleTemperature(data.temperature)
+      }
+    } catch (error) {
+      console.log(error)
+    }
   }
 })
-// websocket连接失败
-socket.addEventListener('error', (err) => {
-  console.log(err)
-})
+
 // 组件销毁时清除定时器
 onBeforeUnmount(() => {
-  console.log('websocket disconnected')
-  socket.close()
+  console.log('clear timer')
   clearInterval(timer)
 })
 </script>

@@ -1,4 +1,6 @@
 ﻿using Exposure.Api.Models;
+using Exposure.Api.Models.Dto;
+using SqlSugar;
 
 namespace Exposure.Api.Contracts.Services;
 
@@ -22,4 +24,11 @@ public interface IUserService : IBaseService<User>
     ///     注销
     /// </summary>
     void LogOut();
+
+    /// <summary>
+    ///     分页查询
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    Task<List<User>> GetByPage(UserQueryDto dto, RefAsync<int> total);
 }

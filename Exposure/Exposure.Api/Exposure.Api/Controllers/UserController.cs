@@ -4,6 +4,7 @@ using Exposure.Api.Models;
 using Exposure.Api.Models.Dto;
 using Mapster;
 using Microsoft.AspNetCore.Mvc;
+using SqlSugar;
 
 namespace Exposure.Api.Controllers;
 
@@ -31,12 +32,12 @@ public class UserController : ControllerBase
     public async Task<HttpResult> Login([FromBody] LoginDto dto)
     {
         // 记录登录日志
-        _operLog.Create("登录", $"登录系统: {dto.UserName}");
+        _operLog.AddOperLog("登录", $"登录系统: {dto.UserName}");
         // 登录
         return await _user.LogIn(dto.UserName, dto.Password) switch
         {
-            0 => HttpResult.Success("登录成功", 
-                _user.GetLogged()?.Adapt<UserOutDto>()),
+            0 => HttpResult.Success("登录成功",
+                _user.GetLogged()),
             1 => HttpResult.Fail("登录失败: 用户不存在", null),
             2 => HttpResult.Fail("登录失败: 密码错误", null),
             3 => HttpResult.Fail("登录失败: 用户被禁用", null),
@@ -54,7 +55,7 @@ public class UserController : ControllerBase
     public HttpResult Logout()
     {
         // 记录登出日志
-        _operLog.Create("登录", $"登出系统: {_user.GetLogged()?.Name}");
+        _operLog.AddOperLog("登录", $"登出系统: {_user.GetLogged()?.Name}");
         _user.LogOut();
         return HttpResult.Success();
     }
@@ -62,24 +63,22 @@ public class UserController : ControllerBase
     /// <summary>
     ///     分页查询所有用户
     /// </summary>
-    /// <param name="page"></param>
-    /// <param name="size"></param>
     /// <returns></returns>
-    [HttpGet]
-    public async Task<HttpResult> Page([FromQuery] int page, [FromQuery] int size)
+    [HttpPost]
+    [Route("Page")]
+    public async Task<HttpResult> Page([FromBody] UserQueryDto dto)
     {
         // 记录查询日志
-        _operLog.Create("查询", $"查询所有用户：页码 = {page}，大小 = {size}");
+        _operLog.AddOperLog("查询", $"查询所有用户：页码 = {dto.Page}，大小 = {dto.Size}");
         // 查询
-        var list = await _user.getPageList<User>(page, size);
-        var total = await _user.Count();
-        var dto = list.Adapt<List<UserOutDto>>();
-        return HttpResult.Success("查询成功", new PageList<List<UserOutDto>>
+        var total = new RefAsync<int>();
+        var list = await _user.GetByPage(dto, total);
+        return HttpResult.Success("查询成功", new PageOutDto<List<User>>
         {
-            Page = page,
-            Size = size,
-            Total = total,
-            Data = dto
+            Page = dto.Page,
+            Size = dto.Size,
+            Total = total.Value,
+            Data = list
         });
     }
 
@@ -89,10 +88,10 @@ public class UserController : ControllerBase
     /// <param name="dto"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<HttpResult> Add([FromBody] UserInDto dto)
+    public async Task<HttpResult> Add([FromBody] UserEditDto dto)
     {
         // 记录添加日志
-        _operLog.Create("添加", $"添加用户: {dto.Name}");
+        _operLog.AddOperLog("添加", $"添加用户: {dto.Name}");
         // 添加
         var user = dto.Adapt<User>();
         user.Sha = BCrypt.Net.BCrypt.HashPassword(dto.Password);
@@ -100,7 +99,7 @@ public class UserController : ControllerBase
         user.CreateTime = DateTime.Now;
         user.UpdateTime = DateTime.Now;
         user.LastLoginTime = DateTime.Now;
-        var res = await _user.AddReturnIdentity(user);
+        var res = await _user.Add(user);
         // 返回
         return res ? HttpResult.Success("添加成功", null) : HttpResult.Fail("添加失败", null);
     }
@@ -111,12 +110,12 @@ public class UserController : ControllerBase
     /// <param name="dto"></param>
     /// <returns></returns>
     [HttpPut]
-    public async Task<HttpResult> Update([FromBody] UserInDto dto)
+    public async Task<HttpResult> Update([FromBody] UserEditDto dto)
     {
         // 记录更新日志
-        _operLog.Create("更新", $"更新用户: {dto.Name}");
+        _operLog.AddOperLog("更新", $"更新用户: {dto.Name}");
         // 更新
-        var old = await _user.getByPrimaryKey(dto.Id);
+        var old = await _user.GetByPrimary(dto.Id);
         // 如果密码不为空，则更新密码
         if (dto.Password.Length > 0) old.Sha = BCrypt.Net.BCrypt.HashPassword(dto.Password);
         // 更新其他信息
@@ -138,7 +137,7 @@ public class UserController : ControllerBase
     public async Task<HttpResult> Delete([FromBody] object[] ids)
     {
         // 记录删除日志
-        _operLog.Create("删除", $"删除用户: {ids}");
+        _operLog.AddOperLog("删除", $"删除用户: {string.Join(',', ids)}");
         // 删除
         return await _user.DeleteRange(ids) ? HttpResult.Success("删除成功", null) : HttpResult.Fail("删除失败");
     }

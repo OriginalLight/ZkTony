@@ -9,5 +9,5 @@ public interface IOperLogService : IBaseService<OperLog>
     /// </summary>
     /// <param name="type"></param>
     /// <param name="desc"></param>
-    void Create(string type, string desc);
+    void AddOperLog(string type, string desc);
 }

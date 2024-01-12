@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using SqlSugar;
+﻿using SqlSugar;
 
 namespace Exposure.Api.Models;
 

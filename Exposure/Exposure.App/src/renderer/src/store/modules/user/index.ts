@@ -5,7 +5,7 @@ import { UserState } from './types'
 const useUserStore = defineStore('user', {
   state: (): UserState => ({
     id: 0,
-    name: '',
+    name: 'zkty',
     role: 2,
     enabled: false,
     expire: '',
@@ -13,6 +13,8 @@ const useUserStore = defineStore('user', {
     updateTime: '',
     lastLoginTime: ''
   }),
+
+  persist: true,
 
   getters: {
     userInfo(state: UserState): UserState {

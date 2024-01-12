@@ -3,7 +3,10 @@ import { AppState } from './types'
 
 const useAppStore = defineStore('app', {
   state: (): AppState => ({
-    device: 'desktop'
+    device: 'desktop',
+    usb: false,
+    door: false,
+    temperature: 0
   }),
 
   persist: true,
@@ -28,6 +31,15 @@ const useAppStore = defineStore('app', {
     },
     toggleDevice(device: string) {
       this.device = device
+    },
+    toggleUsb(usb: boolean) {
+      this.usb = usb
+    },
+    toggleDoor(door: boolean) {
+      this.door = door
+    },
+    toggleTemperature(temperature: number) {
+      this.temperature = temperature
     },
     toggleKey(key: string) {
       this.key = key

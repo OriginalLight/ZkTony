@@ -1,5 +1,5 @@
-﻿using Exposure.Api.Contracts.Repositories;
-using Exposure.Api.Contracts.Services;
+﻿using Exposure.Api.Contracts.Services;
+using Exposure.Api.Contracts.SqlSugar;
 using Exposure.Api.Models;
 
 namespace Exposure.Api.Services;
@@ -7,25 +7,28 @@ namespace Exposure.Api.Services;
 public class OperLogService : BaseService<OperLog>, IOperLogService
 {
     private readonly IUserService _user;
-    private readonly IOperLogRepository dal;
+    private readonly IDbContext context;
 
-    public OperLogService(IOperLogRepository repository, IUserService userService) : base(repository)
+    public OperLogService(IDbContext dbContext, IUserService userService) : base(dbContext)
     {
-        dal = repository;
+        context = dbContext;
         _user = userService;
     }
 
 
-    public void Create(string type, string desc)
+    public void AddOperLog(string type, string desc)
     {
         var logged = _user.GetLogged();
         if (logged != null)
-            dal.AddReturnIdentity(new OperLog
+        {
+            var operLog = new OperLog
             {
                 UserId = logged.Id,
                 Type = type,
                 Description = desc,
                 Time = DateTime.Now
-            });
+            };
+            context.db.Insertable(operLog).ExecuteReturnIdentity();
+        }
     }
 }

@@ -1,19 +1,21 @@
-﻿using Exposure.Api.Contracts.Repositories;
-using Exposure.Api.Contracts.Services;
+﻿using Exposure.Api.Contracts.Services;
+using Exposure.Api.Contracts.SqlSugar;
 using Exposure.Api.Models;
+using Exposure.Api.Models.Dto;
+using SqlSugar;
 
 namespace Exposure.Api.Services;
 
 public class UserService : BaseService<User>, IUserService
 {
-    private readonly IUserRepository dal;
+    private readonly IDbContext context;
 
     // 登录状态
     private User? _logged;
 
-    public UserService(IUserRepository repository) : base(repository)
+    public UserService(IDbContext dbContext) : base(dbContext)
     {
-        dal = repository;
+        context = dbContext;
     }
 
     /// <summary>
@@ -23,7 +25,9 @@ public class UserService : BaseService<User>, IUserService
     public User? GetLogged()
     {
         // 返回登录状态
-        return _logged;
+        var user = _logged;
+        if (user != null) user.Sha = "";
+        return user;
     }
 
     /// <summary>
@@ -35,7 +39,7 @@ public class UserService : BaseService<User>, IUserService
     public async Task<int> LogIn(string name, string password)
     {
         // 查询用户
-        var list = await dal.getByWhere(it => it.Name == name);
+        var list = await context.db.Queryable<User>().Where(u => u.Name == name).ToListAsync();
         // 检查用户是否存在
         if (list.Count == 0) return 1;
         // 获取用户
@@ -50,7 +54,7 @@ public class UserService : BaseService<User>, IUserService
         _logged = user;
         // 更新登录时间
         user.LastLoginTime = DateTime.Now;
-        await dal.Update(user);
+        await context.db.Updateable(user).ExecuteCommandAsync();
         // 返回成功
         return 0;
     }
@@ -62,5 +66,31 @@ public class UserService : BaseService<User>, IUserService
     {
         // 清除登录状态
         _logged = null;
+    }
+
+    /// <summary>
+    ///     分页查询
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    public async Task<List<User>> GetByPage(UserQueryDto dto, RefAsync<int> total)
+    {
+        return await context.db.Queryable<User>()
+            .Select(p => new User
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Role = p.Role,
+                Enabled = p.Enabled,
+                Expire = p.Expire,
+                CreateTime = p.CreateTime,
+                UpdateTime = p.UpdateTime,
+                LastLoginTime = p.LastLoginTime
+            })
+            .WhereIF(!string.IsNullOrEmpty(dto.Name), p => p.Name.Contains(dto.Name))
+            .WhereIF(dto.Role != null, p => p.Role == dto.Role)
+            .WhereIF(dto.Enabled != null, p => p.Enabled == dto.Enabled)
+            .OrderBy(p => p.CreateTime)
+            .ToPageListAsync(dto.Page, dto.Size, total);
     }
 }

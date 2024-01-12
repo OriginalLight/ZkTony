@@ -13,11 +13,21 @@ public class SerialPortService : ISerialPortService
         _logger = logger;
     }
 
+    /// <summary>
+    ///     获取所有的串口
+    /// </summary>
+    /// <returns></returns>
     public string[] GetPorts()
     {
         return SerialPort.GetPortNames();
     }
 
+    /// <summary>
+    ///     打开串口
+    /// </summary>
+    /// <param name="portName"></param>
+    /// <param name="baudRate"></param>
+    /// <returns></returns>
     public bool OpenPort(string portName, int baudRate)
     {
         if (_serialPorts.ContainsKey(portName)) return false;
@@ -37,6 +47,10 @@ public class SerialPortService : ISerialPortService
         return false;
     }
 
+    /// <summary>
+    ///     关闭串口
+    /// </summary>
+    /// <param name="portName"></param>
     public void ClosePort(string portName)
     {
         try
@@ -51,6 +65,11 @@ public class SerialPortService : ISerialPortService
         }
     }
 
+    /// <summary>
+    ///     写入串口
+    /// </summary>
+    /// <param name="portName"></param>
+    /// <param name="bytes"></param>
     public void WritePort(string portName, byte[] bytes)
     {
         try
@@ -64,6 +83,11 @@ public class SerialPortService : ISerialPortService
         }
     }
 
+    /// <summary>
+    ///     读取串口
+    /// </summary>
+    /// <param name="portName"></param>
+    /// <returns></returns>
     public string? ReadPort(string portName)
     {
         if (!_serialPorts.TryGetValue(portName, out var value)) return null;

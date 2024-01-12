@@ -1,6 +1,6 @@
 ﻿namespace Exposure.Api.Models.Dto;
 
-public class UserInDto
+public class UserEditDto
 {
     public long Id { get; set; }
     public string Name { get; set; }

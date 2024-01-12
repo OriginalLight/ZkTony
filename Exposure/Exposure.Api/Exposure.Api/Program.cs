@@ -1,8 +1,6 @@
-using Exposure.Api.Contracts.Repositories;
 using Exposure.Api.Contracts.Services;
 using Exposure.Api.Contracts.SqlSugar;
 using Exposure.Api.Core;
-using Exposure.Api.Repositories;
 using Exposure.Api.Services;
 using Exposure.Api.SqlSugar;
 using Microsoft.OpenApi.Models;
@@ -52,13 +50,6 @@ builder.Services.AddSingleton<ICameraService, CameraService>();
 builder.Services.AddSingleton<IErrorLogService, ErrorLogService>();
 builder.Services.AddSingleton<IOperLogService, OperLogService>();
 builder.Services.AddSingleton<IPictureService, PictureService>();
-
-// Add Repositories
-builder.Services.AddTransient(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-builder.Services.AddTransient<IErrorLogRepository, ErrorLogRepository>();
-builder.Services.AddTransient<IOperLogRepository, OperLogRepository>();
-builder.Services.AddTransient<IUserRepository, UserRepository>();
-builder.Services.AddTransient<IPictureRepository, PictureRepository>();
 
 var app = builder.Build();
 
