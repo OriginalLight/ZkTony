@@ -82,7 +82,7 @@ android {
     applicationVariants.all {
         outputs.all {
             (this as? com.android.build.gradle.internal.api.ApkVariantOutputImpl)?.outputFileName =
-                "zktony-mix-${versionName}-${name}.apk"
+                "zktony-manual-${versionName}-${name}.apk"
         }
     }
 
