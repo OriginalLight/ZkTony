@@ -7,16 +7,16 @@
       <h3 style="white-space: nowrap">{{ status.temperature }}</h3>
     </a-tooltip>
     <a-tooltip :content="$t('navigation.status.usb')">
-      <icon-usb size="24" :fill="status.usb" />
+      <usb size="24" :fill="status.usb" />
     </a-tooltip>
     <a-tooltip :content="$t('navigation.status.door')">
-      <icon-open-door size="24" :fill="status.door" />
+      <open-door size="24" :fill="status.door" />
     </a-tooltip>
     <a-button class="logout" @click="visible = true">
       <template #icon>
         <icon-user />
       </template>
-      {{ userStore.name }}
+      <div class="name">{{ userStore.name }}</div>
     </a-button>
   </a-space>
   <a-modal v-model:visible="visible" draggable @ok="handleLogout" @cancel="visible = false">
@@ -33,7 +33,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { Message } from '@arco-design/web-vue'
 import { useAppStore, useUserStore } from '@renderer/store'
-import { Usb as IconUsb, OpenDoor as IconOpenDoor } from '@icon-park/vue-next'
+import { Usb, OpenDoor } from '@icon-park/vue-next'
 import useSocket from '@renderer/hooks/socket'
 
 // 国际化
@@ -55,7 +55,7 @@ const status = reactive({
   // 舱门图标颜色
   door: '#808080',
   // 温度
-  temperature: '0.0°C'
+  temperature: '0°C'
 })
 // 确认注销
 const handleLogout = async () => {
@@ -65,7 +65,7 @@ const handleLogout = async () => {
     router.push({ name: 'login' })
     Message.success(t('navigation.status.logout.success'))
   } catch (err) {
-    Message.success(t('navigation.status.logout.failed'))
+    Message.error((err as Error).message)
   }
 }
 // 定时发送websocket请求
@@ -111,6 +111,14 @@ onBeforeUnmount(() => {
 }
 .logout {
   max-width: 200px;
+  min-width: 100px;
   overflow: hidden;
+
+  .name {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 </style>

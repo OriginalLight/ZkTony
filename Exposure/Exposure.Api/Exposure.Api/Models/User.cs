@@ -12,7 +12,6 @@ public class User
     public string Sha { get; set; }
     public int Role { get; set; }
     public bool Enabled { get; set; }
-    public DateTime Expire { get; set; }
     public DateTime CreateTime { get; set; }
     public DateTime UpdateTime { get; set; }
     public DateTime LastLoginTime { get; set; }

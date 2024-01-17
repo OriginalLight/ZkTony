@@ -116,9 +116,13 @@ public class WebSocketController : ControllerBase
             }
             catch (Exception e)
             {
-                await webSocket.SendAsync(
-                    new ArraySegment<byte>(Encoding.UTF8.GetBytes(e.Message), 0,
-                        Encoding.UTF8.GetBytes(e.Message).Length),
+                var dict = new Dictionary<string, object>
+                {
+                    { "code", "error" },
+                    { "data", e.Message }
+                };
+                var clientMsg = Encoding.UTF8.GetBytes(JsonHelper.Serialize(dict));
+                await webSocket.SendAsync(new ArraySegment<byte>(clientMsg, 0, clientMsg.Length),
                     result.MessageType, result.EndOfMessage, CancellationToken.None);
                 _errorLog.AddErrorLog(e);
             }

@@ -2,7 +2,6 @@ using Exposure.Api.Contracts.Services;
 using Exposure.Api.Contracts.SqlSugar;
 using Exposure.Api.Core;
 using Exposure.Api.Services;
-using Exposure.Api.SqlSugar;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);

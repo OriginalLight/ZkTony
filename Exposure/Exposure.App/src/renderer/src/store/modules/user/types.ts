@@ -3,7 +3,6 @@ export interface UserState {
   name: string
   role: number
   enabled: boolean
-  expire: string
   createTime: string
   updateTime: string
   lastLoginTime: string

@@ -1,8 +1,10 @@
 ﻿using System.Text;
 using Exposure.Api.Contracts.Services;
-using Exposure.Api.Core;
+using Exposure.Api.Models;
+using Exposure.Api.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using SqlSugar;
 
 namespace Exposure.Api.Controllers;
 
@@ -30,37 +32,53 @@ public class ErrorLogController : ControllerBase
     /// <param name="ids"></param>
     /// <returns></returns>
     [HttpDelete]
-    public async Task<HttpResult> Delete([FromBody] object[] ids)
+    public async Task<IActionResult> Delete([FromBody] object[] ids)
     {
-        // 删除日志
-        _operLog.AddOperLog("删除", $"删除崩溃日志: {JsonConvert.SerializeObject(ids)}");
+        if (await _errorLog.DeleteRange(ids))
+        {
+            // 插入日志
+            _operLog.AddOperLog("删除", $"删除崩溃日志：ids = {string.Join(",", ids)}");
+            return Ok("删除成功");
+        }
+
         // 返回结果
-        return await _errorLog.DeleteRange(ids) ? HttpResult.Success("删除成功", null) : HttpResult.Fail("删除失败");
+        return Problem("删除失败");
+    }
+
+    [HttpPost]
+    [Route("Page")]
+    public async Task<IActionResult> Page([FromBody] ErrorLogQueryDto dto)
+    {
+        // 查询
+        var total = new RefAsync<int>();
+        var list = await _errorLog.GetByPage(dto, total);
+        return new JsonResult(new PageOutDto<List<ErrorLog>>
+        {
+            Total = total.Value,
+            List = list
+        });
     }
 
     /// <summary>
     ///     导出
     /// </summary>
     /// <returns></returns>
-    [HttpGet]
+    [HttpPost]
     [Route("Export")]
-    public async Task<HttpResult> Export()
+    public async Task<IActionResult> Export([FromBody] object[] ids)
     {
-        // 导出日志
-        _operLog.AddOperLog("导出", "导出崩溃日志");
         // 获取U盘
         var usb = _usb.GetDefaultUsbDrive();
-        if (usb == null) return HttpResult.Fail("导出失败: 未找到可用的U盘");
+        if (usb == null) return Problem("未找到可用的U盘");
         // 获取日志
-        var list = await _errorLog.GetAll();
-        if (list.Count == 0) return HttpResult.Fail("导出失败: 未找到日志");
-
-        // 转换为json
-        var json = JsonConvert.SerializeObject(list);
+        var list = await _errorLog.GetByIds(ids);
+        if (list.Count == 0) return Problem("未找到相关日志");
         // 保存到U盘
-        var path = Path.Combine(usb.Name, "日志.json");
-        await System.IO.File.WriteAllTextAsync(path, json, Encoding.UTF8);
+        await System.IO.File.WriteAllTextAsync(Path.Combine(usb.Name, "错误日志.json"), JsonConvert.SerializeObject(list),
+            Encoding.UTF8);
+        // 插入日志
+        _operLog.AddOperLog("导出", "导出崩溃日志：ids = " + string.Join(",", ids));
         // 返回结果
-        return HttpResult.Success("导出成功", null);
+        return Ok("导出成功");
     }
 }

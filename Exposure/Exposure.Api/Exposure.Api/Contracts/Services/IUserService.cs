@@ -31,4 +31,10 @@ public interface IUserService : IBaseService<User>
     /// <param name="dto"></param>
     /// <returns></returns>
     Task<List<User>> GetByPage(UserQueryDto dto, RefAsync<int> total);
+    /// <summary>
+    ///   根据名称查询
+    /// </summary>
+    /// <param name="dtoName"></param>
+    /// <returns></returns>
+    Task<User?> GetByName(string dtoName);
 }

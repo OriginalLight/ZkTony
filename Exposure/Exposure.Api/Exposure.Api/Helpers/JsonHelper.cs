@@ -3,7 +3,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace Exposure.Api.Helpers;
 
-public class JsonHelper
+public static class JsonHelper
 {
     public static string Serialize(object? obj)
     {

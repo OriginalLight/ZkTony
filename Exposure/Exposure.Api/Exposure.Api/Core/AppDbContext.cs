@@ -2,7 +2,7 @@
 using Exposure.Api.Contracts.SqlSugar;
 using SqlSugar;
 
-namespace Exposure.Api.SqlSugar;
+namespace Exposure.Api.Core;
 
 /// <summary>
 ///     数据库上下文
@@ -10,14 +10,16 @@ namespace Exposure.Api.SqlSugar;
 public class AppDbContext : IDbContext
 {
     private readonly IConfiguration Configuration;
+    private readonly ILogger<AppDbContext> _logger;
 
-    public AppDbContext(IConfiguration configuration)
+    public AppDbContext(IConfiguration configuration, ILogger<AppDbContext> logger)
     {
+        _logger = logger;
         Configuration = configuration;
         //打印日志
         db.Aop.OnLogExecuting = (sql, paramster) =>
         {
-            Console.WriteLine(sql + "\r\n" +
+            _logger.LogInformation(sql + "\r\n" +
                               $"{db.Utilities.SerializeObject(paramster.ToDictionary(it => it.ParameterName, it => it.Value))} \r\n");
         };
     }

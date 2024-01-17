@@ -8,7 +8,6 @@ const useUserStore = defineStore('user', {
     name: 'zkty',
     role: 2,
     enabled: false,
-    expire: '',
     createTime: '',
     updateTime: '',
     lastLoginTime: ''

@@ -1,6 +1,8 @@
 ﻿using Exposure.Api.Contracts.Services;
 using Exposure.Api.Contracts.SqlSugar;
 using Exposure.Api.Models;
+using Exposure.Api.Models.Dto;
+using SqlSugar;
 
 namespace Exposure.Api.Services;
 
@@ -28,5 +30,19 @@ public class ErrorLogService : BaseService<ErrorLog>, IErrorLogService
             Time = DateTime.Now
         };
         context.db.Insertable(errLog).ExecuteReturnIdentity();
+    }
+
+    public async Task<List<ErrorLog>> GetByPage(ErrorLogQueryDto dto, RefAsync<int> total)
+    {
+        return await context.db.Queryable<ErrorLog>()
+            .WhereIF(dto.Date != null, p => p.Time >= dto.Date)
+            .WhereIF(dto.Date != null, p => p.Time < dto.Date.Value.AddDays(1))
+            .OrderBy(p => p.Time, OrderByType.Desc)
+            .ToPageListAsync(dto.Page, dto.Size, total);
+    }
+
+    public async Task<List<ErrorLog>> GetByIds(object[] ids)
+    {
+        return await context.db.Queryable<ErrorLog>().Where(p => ids.Contains(p.Id)).ToListAsync();
     }
 }

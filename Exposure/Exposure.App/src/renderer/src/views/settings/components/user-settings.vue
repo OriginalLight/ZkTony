@@ -4,30 +4,210 @@
       <div style="font-size: 20px">{{ t('settings.user.title') }}</div>
     </template>
     <a-list-item>
-      <a-list-item-meta
-        title="Beijing Bytedance Technology Co., Ltd."
-        description="Beijing ByteDance Technology Co., Ltd. is an enterprise located in China."
-      >
+      <a-list-item-meta :title="userStore.name" :description="getRoleName(userStore.role)">
         <template #avatar>
-          <a-avatar shape="square">
-            <img
-              alt="avatar"
-              src="https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/3ee5f13fb09879ecb5185e440cef6eb9.png~tplv-uwbnlip3yd-webp.webp"
-            />
-          </a-avatar>
+          <icon-user size="20" />
         </template>
       </a-list-item-meta>
       <template #actions>
-        <icon-edit />
-        <icon-delete />
+        <a-button @click="visible = true">
+          <template #icon>
+            <icon-edit />
+          </template>
+          <template #default>{{ t('settings.user.mofify.password') }}</template>
+        </a-button>
       </template>
     </a-list-item>
-    <a-list-item>Bytedance Technology Co., Ltd.</a-list-item>
+    <a-list-item v-if="userStore.role < 2">
+      <a-list-item-meta :title="$t('settings.user.operlog.title')">
+        <template #avatar>
+          <icon-file size="20" />
+        </template>
+      </a-list-item-meta>
+      <template #actions>
+        <a-button style="width: 60px" @click="handleOperlog">
+          <template #icon>
+            <icon-launch />
+          </template>
+        </a-button>
+      </template>
+    </a-list-item>
+    <a-list-item v-if="userStore.role < 2">
+      <a-list-item-meta :title="$t('settings.user.manage.title')">
+        <template #avatar>
+          <icon-nav size="20" />
+        </template>
+      </a-list-item-meta>
+      <template #actions>
+        <a-button style="width: 60px" @click="handleManage">
+          <template #icon>
+            <icon-launch />
+          </template>
+        </a-button>
+      </template>
+    </a-list-item>
   </a-list>
+  <a-modal v-model:visible="visible" draggable @ok="handleModifyPassword" @cancel="visible = false">
+    <template #title> {{ t('settings.user.mofify.password') }} </template>
+    <div>
+      <a-form :model="form">
+        <a-form-item
+          field="oldPassword"
+          :rules="[{ required: true, message: $t('settings.user.mofify.password.empty.errMsg') }]"
+          :validate-trigger="['change', 'blur']"
+          hide-label
+        >
+          <a-input-password
+            v-model="form.oldPassword"
+            :placeholder="$t('settings.user.mofify.password.old.placeholder')"
+            allow-clear
+          >
+            <template #prefix>
+              <icon-lock />
+            </template>
+          </a-input-password>
+        </a-form-item>
+        <a-form-item
+          field="newPassword"
+          :rules="[
+            { required: true, message: $t('settings.user.mofify.password.empty.errMsg') },
+            { validator: validateNewPassword }
+          ]"
+          :validate-trigger="['change', 'blur']"
+          hide-label
+        >
+          <a-input-password
+            v-model="form.newPassword"
+            :placeholder="$t('settings.user.mofify.password.new.placeholder')"
+            allow-clear
+          >
+            <template #prefix>
+              <icon-lock />
+            </template>
+          </a-input-password>
+        </a-form-item>
+        <a-form-item
+          field="confirmPassword"
+          :rules="[
+            { required: true, message: $t('settings.user.mofify.password.empty.errMsg') },
+            { validator: validateConfirmPassword }
+          ]"
+          :validate-trigger="['change', 'blur']"
+          hide-label
+        >
+          <a-input-password
+            v-model="form.confirmPassword"
+            :placeholder="$t('settings.user.mofify.password.confirm.placeholder')"
+            allow-clear
+          >
+            <template #prefix>
+              <icon-lock />
+            </template>
+          </a-input-password>
+        </a-form-item>
+      </a-form>
+    </div>
+  </a-modal>
 </template>
 
 <script lang="ts" setup>
+import { ref, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+import { useUserStore } from '@renderer/store'
+import { Message } from '@arco-design/web-vue'
+import { updateUser } from '@renderer/api/user'
 
 const { t } = useI18n()
+const userStore = useUserStore()
+const router = useRouter()
+
+// 修改密码弹窗
+const visible = ref(false)
+
+const form = reactive({
+  oldPassword: '',
+  newPassword: '',
+  confirmPassword: ''
+})
+
+// 根据role值返回对应的角色名称
+const getRoleName = (role: number) => {
+  switch (role) {
+    case 0:
+      return t('user.managemet.table.role.0')
+    case 1:
+      return t('user.managemet.table.role.1')
+    case 2:
+      return t('user.managemet.table.role.2')
+    default:
+      return t('user.managemet.table.role.2')
+  }
+}
+
+// 校验新密码
+const validateNewPassword = (value, cb) => {
+  return new Promise<void>((resolve) => {
+    if (value === form.oldPassword) {
+      cb(t('settings.user.mofify.password.new.errMsg'))
+    } else {
+      cb()
+    }
+    resolve()
+  })
+}
+
+// 校验确认密码
+const validateConfirmPassword = (value, cb) => {
+  return new Promise<void>((resolve) => {
+    if (value !== form.newPassword) {
+      cb(t('settings.user.mofify.password.confirm.errMsg'))
+    } else {
+      cb()
+    }
+    resolve()
+  })
+}
+
+// 修改密码
+const handleModifyPassword = async () => {
+  try {
+    if (form.newPassword === '' || form.confirmPassword === '' || form.oldPassword === '') {
+      return
+    }
+    if (form.oldPassword === form.newPassword) {
+      return
+    }
+    if (form.newPassword !== form.confirmPassword) {
+      return
+    }
+    await updateUser({
+      id: userStore.id,
+      name: userStore.name,
+      oldPassword: form.oldPassword,
+      newPassword: form.newPassword,
+      role: userStore.role,
+      enabled: userStore.enabled
+    })
+    visible.value = false
+    form.newPassword = ''
+    form.confirmPassword = ''
+    Message.success(t('settings.user.modify.password.success'))
+  } catch (error) {
+    Message.error((error as Error).message)
+  }
+}
+
+// 跳转到操作日志页面
+const handleOperlog = () => {
+  router.push({
+    path: '/operlog'
+  })
+}
+// 跳转到用户管理页面
+const handleManage = () => {
+  router.push({
+    path: '/userManagement'
+  })
+}
 </script>

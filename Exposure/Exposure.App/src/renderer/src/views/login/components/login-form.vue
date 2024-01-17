@@ -84,7 +84,7 @@ const handleSubmit = async ({
       router.push({ name: 'home' })
       Message.success(t('login.form.login.success'))
     } catch (err) {
-      errorMessage.value = err as string
+      errorMessage.value = (err as Error).message
     } finally {
       setLoading(false)
     }

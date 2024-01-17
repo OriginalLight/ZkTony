@@ -1,8 +1,12 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
+import NotFound from '@renderer/views/not-found/index.vue'
 import Login from '@renderer/views/login/index.vue'
 import Home from '@renderer/views/home/index.vue'
 import Gallery from '@renderer/views/gallery/index.vue'
 import Settings from '@renderer/views/settings/index.vue'
+import ErrLog from '@renderer/views/errlog/index.vue'
+import OperLog from '@renderer/views/operlog/index.vue'
+import UserManagement from '@renderer/views/user-management/index.vue'
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -21,7 +25,6 @@ const router = createRouter({
       name: 'home',
       component: Home,
       meta: {
-        icon: 'icon-home',
         locale: 'menu.home',
         nav: true
       }
@@ -31,7 +34,6 @@ const router = createRouter({
       name: 'gallery',
       component: Gallery,
       meta: {
-        icon: 'icon-image',
         locale: 'menu.gallery',
         nav: true
       }
@@ -41,10 +43,29 @@ const router = createRouter({
       name: 'settings',
       component: Settings,
       meta: {
-        icon: 'icon-settings',
         locale: 'menu.settings',
         nav: true
       }
+    },
+    {
+      path: '/errlog',
+      name: 'errlog',
+      component: ErrLog
+    },
+    {
+      path: '/operlog',
+      name: 'operlog',
+      component: OperLog
+    },
+    {
+      path: '/userManagement',
+      name: 'userManagement',
+      component: UserManagement
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'notFound',
+      component: NotFound
     }
   ],
   scrollBehavior() {

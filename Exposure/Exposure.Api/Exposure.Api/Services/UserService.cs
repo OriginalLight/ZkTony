@@ -48,8 +48,6 @@ public class UserService : BaseService<User>, IUserService
         if (!BCrypt.Net.BCrypt.Verify(password, user.Sha)) return 2;
         // 检查是否被禁用
         if (!user.Enabled) return 3;
-        // 检查是否过期
-        if (user.Expire < DateTime.Now) return 4;
         // 存储登录状态
         _logged = user;
         // 更新登录时间
@@ -72,6 +70,7 @@ public class UserService : BaseService<User>, IUserService
     ///     分页查询
     /// </summary>
     /// <param name="dto"></param>
+    /// <param name="total"></param>
     /// <returns></returns>
     public async Task<List<User>> GetByPage(UserQueryDto dto, RefAsync<int> total)
     {
@@ -82,15 +81,23 @@ public class UserService : BaseService<User>, IUserService
                 Name = p.Name,
                 Role = p.Role,
                 Enabled = p.Enabled,
-                Expire = p.Expire,
                 CreateTime = p.CreateTime,
                 UpdateTime = p.UpdateTime,
                 LastLoginTime = p.LastLoginTime
             })
-            .WhereIF(!string.IsNullOrEmpty(dto.Name), p => p.Name.Contains(dto.Name))
-            .WhereIF(dto.Role != null, p => p.Role == dto.Role)
-            .WhereIF(dto.Enabled != null, p => p.Enabled == dto.Enabled)
-            .OrderBy(p => p.CreateTime)
+            .WhereIF(!string.IsNullOrEmpty(dto.Name), p => p.Name.Contains(dto.Name!))
+            .WhereIF(_logged != null, p => p.Role > _logged!.Role)
+            .OrderBy(p => p.CreateTime, OrderByType.Desc)
             .ToPageListAsync(dto.Page, dto.Size, total);
+    }
+
+    /// <summary>
+    ///  根据名称查询
+    /// </summary>
+    /// <param name="dtoName"></param>
+    /// <returns></returns>
+    public async Task<User?> GetByName(string dtoName)
+    {
+        return await context.db.Queryable<User>().Where(u => u.Name == dtoName).FirstAsync();
     }
 }
