@@ -10,7 +10,6 @@ sealed class UiFlags {
     data class Error(val message: String) : UiFlags()
     data class Message(val message: String) : UiFlags()
     data class Objects(val objects: Int) : UiFlags()
-    data class Glue(val bar: Float) : UiFlags()
 
 
     companion object {
@@ -19,6 +18,5 @@ sealed class UiFlags {
         fun error(message: String) = Error(message)
         fun message(message: String) = Message(message)
         fun objects(objects: Int) = Objects(objects)
-        fun glue(bar: Float) = Glue(bar)
     }
 }

@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
  */
 @Composable
 fun VerticalProgressBar(
-    waterProgress: MutableState<Float>,
+    waterProgress: Float,
     progress: String,
     modifier: Modifier = Modifier,
     color: Color = Color.Green,
@@ -44,7 +44,7 @@ fun VerticalProgressBar(
     Canvas(
         modifier = modifier
             .size(size.width.dp, size.height.dp)
-            .border(width = strokeSize.dp, color = strokeColor,shape = RoundedCornerShape(10.dp))
+            .border(width = strokeSize.dp, color = strokeColor, shape = RoundedCornerShape(10.dp))
     ) {
         val canvasWidth = size.width
         val canvasHeight = size.height
@@ -54,19 +54,19 @@ fun VerticalProgressBar(
             color = color,
             size = Size(
                 size.width.dp.toPx(),
-                height = (waterProgress.value * size.height).dp.toPx()
+                height = (waterProgress * size.height).dp.toPx()
             ),
-            topLeft = Offset(0.dp.toPx(), ((1 - waterProgress.value) * size.height).dp.toPx()),
-            cornerRadius = CornerRadius ( 10f , 10f )
+            topLeft = Offset(0.dp.toPx(), ((1 - waterProgress) * size.height).dp.toPx()),
+            cornerRadius = CornerRadius(10f, 10f)
         )
         // background
         drawRoundRect(
             color = backgroundColor,
             size = Size(
                 width = size.width.dp.toPx(),
-                height = ((1 - waterProgress.value) * size.height).dp.toPx()
+                height = ((1 - waterProgress) * size.height).dp.toPx()
             ),
-            cornerRadius = CornerRadius ( 10f , 10f )
+            cornerRadius = CornerRadius(10f, 10f)
         )
 
         val textDescWidth = waterDescLayoutResult.size.width

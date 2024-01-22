@@ -1,5 +1,6 @@
 package com.zktony.android.ui
 
+import android.util.Log
 import android.widget.TableRow
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -106,7 +107,9 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.R
 import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.Motor
+import com.zktony.android.data.entities.NewCalibration
 import com.zktony.android.data.entities.Program
+import com.zktony.android.data.entities.Setting
 import com.zktony.android.data.entities.internal.Point
 import com.zktony.android.ui.components.CoordinateInput
 import com.zktony.android.ui.components.DebugModeAppBar
@@ -150,49 +153,41 @@ fun SettingRoute(viewModel: SettingViewModel) {
     val page by viewModel.page.collectAsStateWithLifecycle()
     val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
 
+
     val entities = viewModel.entities.collectAsLazyPagingItems()
     val proEntities = viewModel.proEntities.collectAsLazyPagingItems()
+    val slEntities = viewModel.slEntities.collectAsLazyPagingItems()
+    val ncEntities = viewModel.ncEntities.collectAsLazyPagingItems()
+
     val navigation: () -> Unit = {
         scope.launch {
             when (page) {
                 PageType.SETTINGS -> navigationActions.navigateUp()
-                PageType.MOTOR_DETAIL -> viewModel.dispatch(SettingIntent.NavTo(PageType.MOTOR_LIST))
-                else -> viewModel.dispatch(SettingIntent.NavTo(PageType.SETTINGS))
             }
         }
     }
 
     BackHandler { navigation() }
 
-    LaunchedEffect(key1 = uiFlags) {
-        if (uiFlags is UiFlags.Message) {
-            snackbarHostState.showSnackbar((uiFlags as UiFlags.Message).message)
-            viewModel.dispatch(SettingIntent.Flags(UiFlags.none()))
-        }
-    }
 
     Column {
-//        HomeAppBar(page) { navigation() }
         DebugModeAppBar(page) {
             navigation()
         }
-//        SettingsAppBar(page, viewModel::dispatch) { navigation() }
         AnimatedContent(targetState = page) {
             when (page) {
-                PageType.SETTINGS -> SettingLits(application, progress, viewModel::dispatch)
-                PageType.DEBUGMODE -> debug(
-                    viewModel::dispatch, entities.toList(), proEntities.toList(),
-                    selected,
-                )
-//                PageType.SETTINGS -> SettingContent(application, progress, viewModel::dispatch)
-                PageType.MOTOR_LIST -> MotorList(entities, viewModel::dispatch)
-                PageType.MOTOR_DETAIL -> MotorDetail(
-                    entities.toList(),
-                    selected,
+                PageType.SETTINGS -> SettingLits(
+                    slEntities.toList(),
+                    ncEntities.toList(),
+                    application,
+                    progress,
                     viewModel::dispatch
                 )
 
-                PageType.CONFIG -> ConfigList()
+                PageType.DEBUGMODE -> debug(
+                    viewModel::dispatch, proEntities.toList(), slEntities.toList()
+                )
+
                 else -> {}
             }
         }
@@ -202,8 +197,44 @@ fun SettingRoute(viewModel: SettingViewModel) {
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun SettingLits(
-    application: Application?, progress: Int, uiEvent: (SettingIntent) -> Unit
+    slEntities: List<Setting>,
+    ncEntities: List<NewCalibration>,
+    application: Application?,
+    progress: Int,
+    uiEvent: (SettingIntent) -> Unit
 ) {
+
+    var setting = slEntities.find {
+        it.id == 1L
+    } ?: Setting()
+    Log.d(
+        "Setting",
+        "setting=========$setting"
+    )
+    if (setting.id == 0L) {
+        uiEvent(
+            SettingIntent.InsertSet(
+                0.0, 0.0, 0.0, 500.0, 500.0, 500.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+            )
+        )
+    }
+
+    var newCalibration = ncEntities.find {
+        it.id == 1L
+    } ?: NewCalibration()
+
+    if (newCalibration.id == 0L) {
+        uiEvent(
+            SettingIntent.InsertNC(
+                0.0, 0.0, 0.0, 500.0,
+                0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.0
+            )
+        )
+    }
+
 
     Column(
         modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally
@@ -257,39 +288,22 @@ fun SettingLits(
         //================密码相关=============================
 
         //===============配件寿命==============================
-        /**
-         *  高浓度泵使用的时间
-         */
-        val highTime = rememberDataSaverState(key = "highTime", default = 1.0)
-
-        /**
-         *  低浓度泵使用的时间
-         */
-        val lowLife = rememberDataSaverState(key = "lowTime", default = 1.0)
-
-        /**
-         *  冲洗液泵使用的时间
-         */
-        val rinseTime = rememberDataSaverState(key = "rinseTime", default = 1.0)
-
 
         /**
          *  高浓度泵预计使用时间
          */
-        val highTimeExpected = rememberDataSaverState(key = "highTimeExpected", default = 500)
-        var highTimeExpected_ex by remember { mutableStateOf(highTimeExpected.value.toString()) }
+        var highTimeExpected_ex by remember { mutableStateOf(setting.highTimeExpected.toString()) }
 
         /**
          *  低浓度泵预计使用时间
          */
-        val lowTimeExpected = rememberDataSaverState(key = "lowTimeExpected", default = 500)
-        var lowTimeExpected_ex by remember { mutableStateOf(lowTimeExpected.value.toString()) }
+        var lowTimeExpected_ex by remember { mutableStateOf(setting.lowTimeExpected.toString()) }
 
         /**
          *  冲洗液泵预计使用时间
          */
-        val rinseTimeExpected = rememberDataSaverState(key = "rinseTimeExpected", default = 500)
-        var rinseTimeExpected_ex by remember { mutableStateOf(rinseTimeExpected.value.toString()) }
+        var rinseTimeExpected_ex by remember { mutableStateOf(setting.rinseTimeExpected.toString()) }
+
 
         /**
          * 配件的弹窗
@@ -303,14 +317,12 @@ fun SettingLits(
         /**
          * 胶板位置
          */
-        val glueBoardPosition = rememberDataSaverState(key = "glueBoardPosition", default = 0.0)
-        var glueBoardPosition_ex by remember { mutableStateOf(glueBoardPosition.value.format(1)) }
+        var glueBoardPosition_ex by remember { mutableStateOf(setting.glueBoardPosition.toString()) }
 
         /**
          * 废液位置
          */
-        val wastePosition = rememberDataSaverState(key = "wastePosition", default = 0.0)
-        var wastePosition_ex by remember { mutableStateOf(wastePosition.value.format(1)) }
+        var wastePosition_ex by remember { mutableStateOf(setting.wastePosition.toString()) }
 
         /**
          * 位置的弹窗
@@ -324,21 +336,18 @@ fun SettingLits(
         /**
          * 高浓度清洗液量
          */
-        var higeCleanVolume = rememberDataSaverState(key = "higeCleanVolume", default = 0.0)
-        var higeCleanVolume_ex by remember { mutableStateOf(higeCleanVolume.value.format(1)) }
+        var higeCleanVolume_ex by remember { mutableStateOf(setting.higeCleanVolume.toString()) }
 
 
         /**
          * 高浓度预排液量
          */
-        var higeRehearsalVolume = rememberDataSaverState(key = "higeRehearsalVolume", default = 0.0)
-        var higeRehearsalVolume_ex by remember { mutableStateOf(higeRehearsalVolume.value.format(1)) }
+        var higeRehearsalVolume_ex by remember { mutableStateOf(setting.higeRehearsalVolume.toString()) }
 
         /**
          * 高浓度管路填充
          */
-        var higeFilling = rememberDataSaverState(key = "higeFilling", default = 0.0)
-        var higeFilling_ex by remember { mutableStateOf(higeFilling.value.format(1)) }
+        var higeFilling_ex by remember { mutableStateOf(setting.higeFilling.toString()) }
 
         //高浓度
 
@@ -346,46 +355,45 @@ fun SettingLits(
         /**
          * 低浓度清洗液量
          */
-        var lowCleanVolume = rememberDataSaverState(key = "lowCleanVolume", default = 0.0)
-        var lowCleanVolume_ex by remember { mutableStateOf(lowCleanVolume.value.format(1)) }
+        var lowCleanVolume_ex by remember { mutableStateOf(setting.lowCleanVolume.toString()) }
 
 
         /**
          * 低浓度管路填充
          */
-        var lowFilling = rememberDataSaverState(key = "lowFilling", default = 0.0)
-        var lowFilling_ex by remember { mutableStateOf(lowFilling.value.format(1)) }
+        var lowFilling_ex by remember { mutableStateOf(setting.lowFilling.toString()) }
         //低浓度
 
         //冲洗液泵
         /**
          * 冲洗液泵清洗液量
          */
-        var rinseCleanVolume = rememberDataSaverState(key = "rinseCleanVolume", default = 0.0)
-        var rinseCleanVolume_ex by remember { mutableStateOf(rinseCleanVolume.value.format(1)) }
+        var rinseCleanVolume_ex by remember { mutableStateOf(setting.rinseCleanVolume.toString()) }
 
 
         /**
          * 冲洗液泵管路填充
          */
-        var rinseFilling = rememberDataSaverState(key = "rinseFilling", default = 0.0)
-        var rinseFilling_ex by remember { mutableStateOf(rinseFilling.value.format(1)) }
+        var rinseFilling_ex by remember { mutableStateOf(setting.rinseFilling.toString()) }
         //冲洗液泵
 
         //促凝剂泵
         /**
          * 促凝剂泵清洗液量
          */
-        var coagulantCleanVolume =
-            rememberDataSaverState(key = "coagulantCleanVolume", default = 0.0)
-        var coagulantCleanVolume_ex by remember { mutableStateOf(coagulantCleanVolume.value.format(1)) }
+        var coagulantCleanVolume_ex by remember { mutableStateOf(setting.coagulantCleanVolume.toString()) }
 
         /**
          * 促凝剂泵管路填充
          */
-        var coagulantFilling = rememberDataSaverState(key = "coagulantFilling", default = 0.0)
-        var coagulantFilling_ex by remember { mutableStateOf(coagulantFilling.value.format(1)) }
+        var coagulantFilling_ex by remember { mutableStateOf(setting.coagulantFilling.toString()) }
         //促凝剂泵
+
+        /**
+         * 预排恢复默认弹窗
+         */
+        val expectedResetDialog = remember { mutableStateOf(false) }
+
 
         //================预排设置=============================
 
@@ -395,21 +403,18 @@ fun SettingLits(
         /**
          * 加液量1
          */
-        var higeLiquidVolume1 = rememberDataSaverState(key = "higeLiquidVolume1", default = 0.0)
-        var higeLiquidVolume1_ex by remember { mutableStateOf(higeLiquidVolume1.value.format(1)) }
+        var higeLiquidVolume1_ex by remember { mutableStateOf(newCalibration.higeLiquidVolume1.toString()) }
 
         /**
          * 加液量2
          */
-        var higeLiquidVolume2 = rememberDataSaverState(key = "higeLiquidVolume2", default = 0.0)
-        var higeLiquidVolume2_ex by remember { mutableStateOf(higeLiquidVolume2.value.format(1)) }
+        var higeLiquidVolume2_ex by remember { mutableStateOf(newCalibration.higeLiquidVolume2.toString()) }
 
 
         /**
          * 加液量3
          */
-        var higeLiquidVolume3 = rememberDataSaverState(key = "higeLiquidVolume3", default = 0.0)
-        var higeLiquidVolume3_ex by remember { mutableStateOf(higeLiquidVolume3.value.format(1)) }
+        var higeLiquidVolume3_ex by remember { mutableStateOf(newCalibration.higeLiquidVolume3.toString()) }
         //高浓度
 
 
@@ -418,21 +423,18 @@ fun SettingLits(
         /**
          * 加液量1
          */
-        var lowLiquidVolume1 = rememberDataSaverState(key = "lowLiquidVolume1", default = 0.0)
-        var lowLiquidVolume1_ex by remember { mutableStateOf(lowLiquidVolume1.value.format(1)) }
+        var lowLiquidVolume1_ex by remember { mutableStateOf(newCalibration.lowLiquidVolume1.toString()) }
 
         /**
          * 加液量2
          */
-        var lowLiquidVolume2 = rememberDataSaverState(key = "lowLiquidVolume2", default = 0.0)
-        var lowLiquidVolume2_ex by remember { mutableStateOf(lowLiquidVolume2.value.format(1)) }
+        var lowLiquidVolume2_ex by remember { mutableStateOf(newCalibration.lowLiquidVolume2.toString()) }
 
 
         /**
          * 加液量3
          */
-        var lowLiquidVolume3 = rememberDataSaverState(key = "lowLiquidVolume3", default = 0.0)
-        var lowLiquidVolume3_ex by remember { mutableStateOf(lowLiquidVolume3.value.format(1)) }
+        var lowLiquidVolume3_ex by remember { mutableStateOf(newCalibration.lowLiquidVolume3.toString()) }
         //低浓度
 
         //冲洗液泵
@@ -440,21 +442,18 @@ fun SettingLits(
         /**
          * 加液量1
          */
-        var rinseLiquidVolume1 = rememberDataSaverState(key = "rinseLiquidVolume1", default = 0.0)
-        var rinseLiquidVolume1_ex by remember { mutableStateOf(rinseLiquidVolume1.value.format(1)) }
+        var rinseLiquidVolume1_ex by remember { mutableStateOf(newCalibration.rinseLiquidVolume1.toString()) }
 
         /**
          * 加液量2
          */
-        var rinseLiquidVolume2 = rememberDataSaverState(key = "rinseLiquidVolume2", default = 0.0)
-        var rinseLiquidVolume2_ex by remember { mutableStateOf(rinseLiquidVolume2.value.format(1)) }
+        var rinseLiquidVolume2_ex by remember { mutableStateOf(newCalibration.rinseLiquidVolume2.toString()) }
 
 
         /**
          * 加液量3
          */
-        var rinseLiquidVolume3 = rememberDataSaverState(key = "rinseLiquidVolume3", default = 0.0)
-        var rinseLiquidVolume3_ex by remember { mutableStateOf(rinseLiquidVolume3.value.format(1)) }
+        var rinseLiquidVolume3_ex by remember { mutableStateOf(newCalibration.rinseLiquidVolume3.toString()) }
         //冲洗液泵
 
         //促凝剂泵
@@ -462,44 +461,27 @@ fun SettingLits(
         /**
          * 加液量1
          */
-        var coagulantLiquidVolume1 =
-            rememberDataSaverState(key = "coagulantLiquidVolume1", default = 0.0)
-        var coagulantLiquidVolume1_ex by remember {
-            mutableStateOf(
-                coagulantLiquidVolume1.value.format(
-                    1
-                )
-            )
-        }
+        var coagulantLiquidVolume1_ex by remember { mutableStateOf(newCalibration.coagulantLiquidVolume1.toString()) }
 
         /**
          * 加液量2
          */
-        var coagulantLiquidVolume2 =
-            rememberDataSaverState(key = "coagulantLiquidVolume2", default = 0.0)
-        var coagulantLiquidVolume2_ex by remember {
-            mutableStateOf(
-                coagulantLiquidVolume2.value.format(
-                    1
-                )
-            )
-        }
+
+        var coagulantLiquidVolume2_ex by remember { mutableStateOf(newCalibration.coagulantLiquidVolume2.toString()) }
 
 
         /**
          * 加液量3
          */
-        var coagulantLiquidVolume3 =
-            rememberDataSaverState(key = "coagulantLiquidVolume3", default = 0.0)
-        var coagulantLiquidVolume3_ex by remember {
-            mutableStateOf(
-                coagulantLiquidVolume3.value.format(
-                    1
-                )
-            )
-        }
+
+        var coagulantLiquidVolume3_ex by remember { mutableStateOf(newCalibration.coagulantLiquidVolume3.toString()) }
         //促凝剂泵
 
+
+        /**
+         * 校准恢复默认弹窗
+         */
+        val calibrationResetDialog = remember { mutableStateOf(false) }
         //================校准设置=============================
 
 
@@ -614,6 +596,7 @@ fun SettingLits(
             }
 
             if (switchColum == 0) {
+
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -779,17 +762,24 @@ fun SettingLits(
                             .height(50.dp),
                             shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                             onClick = {
-                                higeCleanVolume.value = higeCleanVolume_ex.toDoubleOrNull() ?: 0.0
-                                higeRehearsalVolume.value =
+                                setting.higeCleanVolume = higeCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                setting.higeRehearsalVolume =
                                     higeRehearsalVolume_ex.toDoubleOrNull() ?: 0.0
-                                higeFilling.value = higeFilling_ex.toDoubleOrNull() ?: 0.0
-                                lowCleanVolume.value = lowCleanVolume_ex.toDoubleOrNull() ?: 0.0
-                                lowFilling.value = lowFilling_ex.toDoubleOrNull() ?: 0.0
-                                rinseCleanVolume.value = rinseCleanVolume_ex.toDoubleOrNull() ?: 0.0
-                                rinseFilling.value = rinseFilling_ex.toDoubleOrNull() ?: 0.0
-                                coagulantCleanVolume.value =
+                                setting.higeFilling = higeFilling_ex.toDoubleOrNull() ?: 0.0
+                                setting.lowCleanVolume = lowCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                setting.lowFilling = lowFilling_ex.toDoubleOrNull() ?: 0.0
+                                setting.rinseCleanVolume =
+                                    rinseCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                setting.rinseFilling = rinseFilling_ex.toDoubleOrNull() ?: 0.0
+                                setting.coagulantCleanVolume =
                                     coagulantCleanVolume_ex.toDoubleOrNull() ?: 0.0
-                                coagulantFilling.value = coagulantFilling_ex.toDoubleOrNull() ?: 0.0
+                                setting.coagulantFilling =
+                                    coagulantFilling_ex.toDoubleOrNull() ?: 0.0
+                                Log.d(
+                                    "Setting",
+                                    "保存的===setting=========$setting"
+                                )
+                                uiEvent(SettingIntent.UpdateSet(setting))
 
                                 Toast.makeText(
                                     context, "保存成功！", Toast.LENGTH_SHORT
@@ -806,27 +796,7 @@ fun SettingLits(
                             .height(50.dp),
                             shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                             onClick = {
-                                higeCleanVolume.value = 0.0
-                                higeRehearsalVolume.value = 0.0
-                                higeFilling.value = 0.0
-                                lowCleanVolume.value = 0.0
-                                lowFilling.value = 0.0
-                                rinseCleanVolume.value = 0.0
-                                rinseFilling.value = 0.0
-                                coagulantCleanVolume.value = 0.0
-                                coagulantFilling.value = 0.0
-
-
-                                higeCleanVolume_ex = "0.0"
-                                higeRehearsalVolume_ex = "0.0"
-                                higeFilling_ex = "0.0"
-                                lowCleanVolume_ex = "0.0"
-                                lowFilling_ex = "0.0"
-                                rinseCleanVolume_ex = "0.0"
-                                rinseFilling_ex = "0.0"
-                                coagulantCleanVolume_ex = "0.0"
-                                coagulantFilling_ex = "0.0"
-
+                                expectedResetDialog.value = true
                             }) {
                             Text(text = "恢复默认", fontSize = 18.sp)
                         }
@@ -1167,73 +1137,73 @@ fun SettingLits(
                                 .height(50.dp),
                                 shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                 onClick = {
-                                    higeLiquidVolume1.value =
+                                    newCalibration.higeLiquidVolume1 =
                                         higeLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
-                                    higeLiquidVolume2.value =
+                                    newCalibration.higeLiquidVolume2 =
                                         higeLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
-                                    higeLiquidVolume3.value =
+                                    newCalibration.higeLiquidVolume3 =
                                         higeLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
 
-                                    lowLiquidVolume1.value =
+                                    newCalibration.lowLiquidVolume1 =
                                         lowLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
-                                    lowLiquidVolume2.value =
+                                    newCalibration.lowLiquidVolume2 =
                                         lowLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
-                                    lowLiquidVolume3.value =
+                                    newCalibration.lowLiquidVolume3 =
                                         lowLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
 
-                                    rinseLiquidVolume1.value =
+                                    newCalibration.rinseLiquidVolume1 =
                                         rinseLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
-                                    rinseLiquidVolume2.value =
+                                    newCalibration.rinseLiquidVolume2 =
                                         rinseLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
-                                    rinseLiquidVolume3.value =
+                                    newCalibration.rinseLiquidVolume3 =
                                         rinseLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
 
-                                    coagulantLiquidVolume1.value =
+                                    newCalibration.coagulantLiquidVolume1 =
                                         coagulantLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
-                                    coagulantLiquidVolume2.value =
+                                    newCalibration.coagulantLiquidVolume2 =
                                         coagulantLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
-                                    coagulantLiquidVolume3.value =
+                                    newCalibration.coagulantLiquidVolume3 =
                                         coagulantLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
 
-                                    val higeAvg =
-                                        (higeLiquidVolume1.value + higeLiquidVolume2.value + higeLiquidVolume3.value) / 3
-                                    val lowAvg =
-                                        (lowLiquidVolume1.value + lowLiquidVolume2.value + lowLiquidVolume3.value) / 3
-                                    val rinseAvg =
-                                        (rinseLiquidVolume1.value + rinseLiquidVolume2.value + rinseLiquidVolume3.value) / 3
-                                    val coagulantAvg =
-                                        (coagulantLiquidVolume1.value + coagulantLiquidVolume1.value + coagulantLiquidVolume1.value) / 3
-
-
-
+                                    newCalibration.higeAvg =
+                                        (newCalibration.higeLiquidVolume1 + newCalibration.higeLiquidVolume2 + newCalibration.higeLiquidVolume3) / 3
+                                    newCalibration.lowAvg =
+                                        (newCalibration.lowLiquidVolume1 + newCalibration.lowLiquidVolume2 + newCalibration.lowLiquidVolume3) / 3
+                                    newCalibration.rinseAvg =
+                                        (newCalibration.rinseLiquidVolume1 + newCalibration.rinseLiquidVolume2 + newCalibration.rinseLiquidVolume3) / 3
+                                    newCalibration.coagulantAvg =
+                                        (newCalibration.coagulantLiquidVolume1 + newCalibration.coagulantLiquidVolume1 + newCalibration.coagulantLiquidVolume1) / 3
 
                                     AppStateUtils.hpc[0] =
                                         calculateCalibrationFactorNew(64000, 120.0)
 
                                     AppStateUtils.hpc[1] = calculateCalibrationFactorNew(
                                         coagulantpulse.value,
-                                        coagulantAvg * 1000
+                                        newCalibration.coagulantAvg * 1000
                                     )
 
                                     AppStateUtils.hpc[2] =
-                                        calculateCalibrationFactorNew(64000, higeAvg * 1000)
+                                        calculateCalibrationFactorNew(
+                                            64000,
+                                            newCalibration.higeAvg * 1000
+                                        )
 
                                     AppStateUtils.hpc[3] =
-                                        calculateCalibrationFactorNew(64000, lowAvg * 1000)
+                                        calculateCalibrationFactorNew(
+                                            64000,
+                                            newCalibration.lowAvg * 1000
+                                        )
 
                                     AppStateUtils.hpc[4] =
-                                        calculateCalibrationFactorNew(64000, rinseAvg * 1000)
+                                        calculateCalibrationFactorNew(
+                                            64000,
+                                            newCalibration.rinseAvg * 1000
+                                        )
+                                    uiEvent(SettingIntent.UpdateNC(newCalibration))
 
-                                    println("AppStateUtils  hpc=====0====" + AppStateUtils.hpc[0])
-                                    println("AppStateUtils  hpc=====1====" + AppStateUtils.hpc[1])
-                                    println("AppStateUtils  hpc=====2====" + AppStateUtils.hpc[2])
-                                    println("AppStateUtils  hpc=====3====" + AppStateUtils.hpc[3])
-                                    println("AppStateUtils  hpc=====4====" + AppStateUtils.hpc[4])
-
-
-                                    Toast.makeText(
-                                        context, "保存成功！", Toast.LENGTH_SHORT
-                                    ).show()
+                                        Toast.makeText(
+                                            context, "保存成功！", Toast.LENGTH_SHORT
+                                        ).show()
                                 }) {
                                 Text(text = "保    存", fontSize = 18.sp)
                             }
@@ -1245,39 +1215,7 @@ fun SettingLits(
                                 .height(50.dp),
                                 shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                 onClick = {
-                                    higeLiquidVolume1.value = 0.0
-                                    higeLiquidVolume2.value = 0.0
-                                    higeLiquidVolume3.value = 0.0
-
-                                    lowLiquidVolume1.value = 0.0
-                                    lowLiquidVolume2.value = 0.0
-                                    lowLiquidVolume3.value = 0.0
-
-                                    rinseLiquidVolume1.value = 0.0
-                                    rinseLiquidVolume2.value = 0.0
-                                    rinseLiquidVolume3.value = 0.0
-
-                                    coagulantLiquidVolume1.value = 0.0
-                                    coagulantLiquidVolume2.value = 0.0
-                                    coagulantLiquidVolume3.value = 0.0
-
-
-                                    higeLiquidVolume1_ex = "0.0"
-                                    higeLiquidVolume2_ex = "0.0"
-                                    higeLiquidVolume3_ex = "0.0"
-
-                                    lowLiquidVolume1_ex = "0.0"
-                                    lowLiquidVolume2_ex = "0.0"
-                                    lowLiquidVolume3_ex = "0.0"
-
-                                    rinseLiquidVolume1_ex = "0.0"
-                                    rinseLiquidVolume2_ex = "0.0"
-                                    rinseLiquidVolume3_ex = "0.0"
-
-                                    coagulantLiquidVolume1_ex = "0.0"
-                                    coagulantLiquidVolume2_ex = "0.0"
-                                    coagulantLiquidVolume3_ex = "0.0"
-
+                                    calibrationResetDialog.value = true
 
                                 }) {
                                 Text(text = "恢复默认", fontSize = 18.sp)
@@ -1442,6 +1380,118 @@ fun SettingLits(
 
         }
 
+        //校准恢复默认弹窗
+        if (calibrationResetDialog.value) {
+            AlertDialog(
+                onDismissRequest = { },
+                title = {
+                    Text(text = "是否恢复默认设置！")
+                },
+                text = {
+
+                }, confirmButton = {
+                    TextButton(onClick = {
+                        newCalibration.higeLiquidVolume1 = 0.0
+                        newCalibration.higeLiquidVolume2 = 0.0
+                        newCalibration.higeLiquidVolume3 = 0.0
+                        newCalibration.higeAvg = 0.0
+                        newCalibration.lowLiquidVolume1 = 0.0
+                        newCalibration.lowLiquidVolume2 = 0.0
+                        newCalibration.lowLiquidVolume3 = 0.0
+                        newCalibration.lowAvg = 0.0
+
+                        newCalibration.rinseLiquidVolume1 = 0.0
+                        newCalibration.rinseLiquidVolume2 = 0.0
+                        newCalibration.rinseLiquidVolume3 = 0.0
+                        newCalibration.rinseAvg = 0.0
+
+                        newCalibration.coagulantLiquidVolume1 = 0.0
+                        newCalibration.coagulantLiquidVolume2 = 0.0
+                        newCalibration.coagulantLiquidVolume3 = 0.0
+                        newCalibration.coagulantAvg = 0.0
+
+
+                        higeLiquidVolume1_ex = "0.0"
+                        higeLiquidVolume2_ex = "0.0"
+                        higeLiquidVolume3_ex = "0.0"
+
+                        lowLiquidVolume1_ex = "0.0"
+                        lowLiquidVolume2_ex = "0.0"
+                        lowLiquidVolume3_ex = "0.0"
+
+                        rinseLiquidVolume1_ex = "0.0"
+                        rinseLiquidVolume2_ex = "0.0"
+                        rinseLiquidVolume3_ex = "0.0"
+
+                        coagulantLiquidVolume1_ex = "0.0"
+                        coagulantLiquidVolume2_ex = "0.0"
+                        coagulantLiquidVolume3_ex = "0.0"
+
+                        AppStateUtils.hpc[1] = calculateCalibrationFactorNew(
+                            0,
+                            0.0
+                        )
+
+                        AppStateUtils.hpc[2] =
+                            calculateCalibrationFactorNew(0, 0.0)
+
+                        AppStateUtils.hpc[3] =
+                            calculateCalibrationFactorNew(0, 0.0)
+
+                        AppStateUtils.hpc[4] =
+                            calculateCalibrationFactorNew(0, 0.0)
+                        calibrationResetDialog.value = false
+                    }) {
+                        Text(text = "确认")
+                    }
+                }, dismissButton = {
+                    TextButton(onClick = { calibrationResetDialog.value = false }) {
+                        Text(text = "取消")
+                    }
+                })
+        }
+
+        //预排恢复默认弹窗
+        if (expectedResetDialog.value) {
+            AlertDialog(
+                onDismissRequest = { },
+                title = {
+                    Text(text = "是否恢复默认设置！")
+                },
+                text = {
+
+                }, confirmButton = {
+                    TextButton(onClick = {
+                        setting.higeCleanVolume = 0.0
+                        setting.higeRehearsalVolume = 0.0
+                        setting.higeFilling = 0.0
+                        setting.lowCleanVolume = 0.0
+                        setting.lowFilling = 0.0
+                        setting.rinseCleanVolume = 0.0
+                        setting.rinseFilling = 0.0
+                        setting.coagulantCleanVolume = 0.0
+                        setting.coagulantFilling = 0.0
+                        uiEvent(SettingIntent.UpdateSet(setting))
+
+                        higeCleanVolume_ex = "0.0"
+                        higeRehearsalVolume_ex = "0.0"
+                        higeFilling_ex = "0.0"
+                        lowCleanVolume_ex = "0.0"
+                        lowFilling_ex = "0.0"
+                        rinseCleanVolume_ex = "0.0"
+                        rinseFilling_ex = "0.0"
+                        coagulantCleanVolume_ex = "0.0"
+                        coagulantFilling_ex = "0.0"
+                        expectedResetDialog.value = false
+                    }) {
+                        Text(text = "确认")
+                    }
+                }, dismissButton = {
+                    TextButton(onClick = { expectedResetDialog.value = false }) {
+                        Text(text = "取消")
+                    }
+                })
+        }
 
         //修改密码弹窗
         if (updatePwdDialog.value) {
@@ -1551,19 +1601,19 @@ fun SettingLits(
                         Column {
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = CenterVertically
                             ) {
                                 Text(text = "高浓度泵", fontSize = 25.sp)
                                 Text(modifier = Modifier.padding(start = 10.dp), text = "已使用:")
                                 Text(
                                     modifier = Modifier.padding(start = 10.dp),
-                                    text = highTime.value.toString()
+                                    text = setting.highTime.toString()
                                 )
                                 Text(modifier = Modifier.padding(start = 10.dp), text = "小时")
                             }
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = CenterVertically
                             ) {
                                 if (factoryAdminPwd.value == currentPwd.value) {
                                     Button(
@@ -1572,7 +1622,9 @@ fun SettingLits(
                                             .height(50.dp),
                                         shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                         onClick = {
-                                            highTimeExpected.value = highTimeExpected_ex.toInt()
+                                            setting.highTimeExpected =
+                                                highTimeExpected_ex.toDoubleOrNull() ?: 0.0
+                                            uiEvent(SettingIntent.UpdateSet(setting))
                                         }
                                     ) {
                                         Text(text = "保    存", fontSize = 18.sp)
@@ -1606,7 +1658,8 @@ fun SettingLits(
                                             .height(50.dp),
                                         shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                         onClick = {
-                                            highTime.value = 0.0
+                                            setting.highTime = 0.0
+                                            uiEvent(SettingIntent.UpdateSet(setting))
                                         }
                                     ) {
                                         Text(text = "重    置", fontSize = 18.sp)
@@ -1618,7 +1671,7 @@ fun SettingLits(
                                     )
                                     Text(
                                         modifier = Modifier.padding(start = 10.dp),
-                                        text = highTimeExpected.value.toString()
+                                        text = setting.highTimeExpected.toString()
                                     )
                                 }
 
@@ -1628,20 +1681,20 @@ fun SettingLits(
                         Column(modifier = Modifier.padding(top = 10.dp)) {
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = CenterVertically
                             ) {
                                 Text(text = "低浓度泵", fontSize = 25.sp)
                                 Text(modifier = Modifier.padding(start = 10.dp), text = "已使用:")
                                 Text(
                                     modifier = Modifier.padding(start = 10.dp),
-                                    text = lowLife.value.toString()
+                                    text = setting.lowLife.toString()
                                 )
                                 Text(modifier = Modifier.padding(start = 10.dp), text = "小时")
                             }
 
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = CenterVertically
                             ) {
 
                                 if (factoryAdminPwd.value == currentPwd.value) {
@@ -1651,7 +1704,9 @@ fun SettingLits(
                                             .height(50.dp),
                                         shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                         onClick = {
-                                            lowTimeExpected.value = lowTimeExpected_ex.toInt()
+                                            setting.lowTimeExpected =
+                                                lowTimeExpected_ex.toDoubleOrNull() ?: 0.0
+                                            uiEvent(SettingIntent.UpdateSet(setting))
                                         }
                                     ) {
                                         Text(text = "保    存", fontSize = 18.sp)
@@ -1685,7 +1740,8 @@ fun SettingLits(
                                             .height(50.dp),
                                         shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                         onClick = {
-                                            lowLife.value = 0.0
+                                            setting.lowLife = 0.0
+                                            uiEvent(SettingIntent.UpdateSet(setting))
                                         }
                                     ) {
                                         Text(text = "重    置", fontSize = 18.sp)
@@ -1697,7 +1753,7 @@ fun SettingLits(
                                     )
                                     Text(
                                         modifier = Modifier.padding(start = 10.dp),
-                                        text = lowTimeExpected.value.toString()
+                                        text = setting.lowTimeExpected.toString()
                                     )
                                     Text(modifier = Modifier.padding(start = 10.dp), text = "小时")
                                 }
@@ -1709,21 +1765,21 @@ fun SettingLits(
                         Column(modifier = Modifier.padding(top = 10.dp)) {
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = CenterVertically
                             ) {
                                 Text(text = "冲洗液泵", fontSize = 25.sp)
                                 Text(modifier = Modifier.padding(start = 10.dp), text = "已使用:")
 
                                 Text(
                                     modifier = Modifier.padding(start = 10.dp),
-                                    text = rinseTime.value.toString()
+                                    text = setting.rinseTime.toString()
                                 )
                                 Text(modifier = Modifier.padding(start = 10.dp), text = "小时")
                             }
 
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = CenterVertically
                             ) {
                                 if (factoryAdminPwd.value == currentPwd.value) {
                                     Button(
@@ -1732,7 +1788,9 @@ fun SettingLits(
                                             .height(50.dp),
                                         shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                         onClick = {
-                                            rinseTimeExpected.value = rinseTimeExpected_ex.toInt()
+                                            setting.rinseTimeExpected =
+                                                rinseTimeExpected_ex.toDoubleOrNull() ?: 0.0
+                                            uiEvent(SettingIntent.UpdateSet(setting))
                                         }
                                     ) {
                                         Text(text = "保    存", fontSize = 18.sp)
@@ -1766,7 +1824,8 @@ fun SettingLits(
                                             .height(50.dp),
                                         shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                         onClick = {
-                                            rinseTime.value = 0.0
+                                            setting.rinseTime = 0.0
+                                            uiEvent(SettingIntent.UpdateSet(setting))
                                         }
                                     ) {
                                         Text(text = "重    置", fontSize = 18.sp)
@@ -1778,7 +1837,7 @@ fun SettingLits(
                                     )
                                     Text(
                                         modifier = Modifier.padding(start = 10.dp),
-                                        text = rinseTimeExpected.value.toString()
+                                        text = setting.rinseTimeExpected.toString()
                                     )
                                     Text(modifier = Modifier.padding(start = 10.dp), text = "小时")
                                 }
@@ -1793,18 +1852,20 @@ fun SettingLits(
                 }, confirmButton = {
                     if (factoryAdminPwd.value == currentPwd.value) {
                         TextButton(onClick = {
-                            lowTimeExpected.value = lowTimeExpected_ex.toInt()
-                            highTimeExpected.value = highTimeExpected_ex.toInt()
-                            rinseTimeExpected.value = rinseTimeExpected_ex.toInt()
+                            setting.lowTimeExpected = lowTimeExpected_ex.toDoubleOrNull() ?: 0.0
+                            setting.highTimeExpected = highTimeExpected_ex.toDoubleOrNull() ?: 0.0
+                            setting.rinseTimeExpected = rinseTimeExpected_ex.toDoubleOrNull() ?: 0.0
+                            uiEvent(SettingIntent.UpdateSet(setting))
                             accessoriesDialog.value = false
                         }) {
                             Text(text = "保存")
                         }
                     } else {
                         TextButton(onClick = {
-                            highTime.value = 0.0
-                            lowLife.value = 0.0
-                            rinseTime.value = 0.0
+                            setting.highTime = 0.0
+                            setting.lowLife = 0.0
+                            setting.rinseTime = 0.0
+                            uiEvent(SettingIntent.UpdateSet(setting))
                             accessoriesDialog.value = false
                         }) {
                             Text(text = "全部重置")
@@ -1830,14 +1891,12 @@ fun SettingLits(
 
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = CenterVertically
                         ) {
                             OutlinedTextField(value = glueBoardPosition_ex,
                                 label = { Text(text = "胶板位置") },
                                 onValueChange = {
                                     glueBoardPosition_ex = it
-                                    glueBoardPosition.value =
-                                        glueBoardPosition_ex.toDoubleOrNull() ?: 0.0
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1861,7 +1920,7 @@ fun SettingLits(
                                             with(
                                                 index = 0,
                                                 ads = Triple(600 * 100, 600 * 100, 600 * 100),
-                                                pdv = glueBoardPosition.value
+                                                pdv = glueBoardPosition_ex.toDoubleOrNull() ?: 0.0
                                             )
                                         }
                                     }
@@ -1875,14 +1934,12 @@ fun SettingLits(
                         Row(
                             modifier = Modifier.padding(top = 10.dp),
                             horizontalArrangement = Arrangement.spacedBy(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = CenterVertically
                         ) {
                             OutlinedTextField(value = wastePosition_ex,
                                 label = { Text(text = "废液槽位置") },
                                 onValueChange = {
                                     wastePosition_ex = it
-                                    wastePosition.value =
-                                        wastePosition_ex.toDoubleOrNull() ?: 0.0
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1906,7 +1963,7 @@ fun SettingLits(
                                             with(
                                                 index = 0,
                                                 ads = Triple(600 * 100, 600 * 100, 600 * 100),
-                                                pdv = wastePosition.value
+                                                pdv = wastePosition_ex.toDoubleOrNull() ?: 0.0
                                             )
                                         }
                                     }
@@ -1920,7 +1977,7 @@ fun SettingLits(
                         Row(
                             modifier = Modifier.padding(top = 10.dp),
                             horizontalArrangement = Arrangement.spacedBy(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = CenterVertically
                         ) {
                             Button(
                                 modifier = Modifier
@@ -1928,9 +1985,10 @@ fun SettingLits(
                                     .height(50.dp),
                                 shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                 onClick = {
-
-                                    glueBoardPosition.value = 0.0
-                                    wastePosition.value = 0.0
+                                    setting.glueBoardPosition = 0.0
+                                    setting.wastePosition = 0.0
+                                    uiEvent(SettingIntent.UpdateSet(setting))
+                                    positionDialog.value = false
                                 }
                             ) {
                                 Text(text = "恢复默认", fontSize = 18.sp)
@@ -1942,10 +2000,10 @@ fun SettingLits(
 
                 }, confirmButton = {
                     TextButton(onClick = {
-                        wastePosition.value = wastePosition_ex.toDoubleOrNull() ?: 0.0
-                        glueBoardPosition.value = glueBoardPosition_ex.toDoubleOrNull() ?: 0.0
+                        setting.wastePosition = wastePosition_ex.toDoubleOrNull() ?: 0.0
+                        setting.glueBoardPosition = glueBoardPosition_ex.toDoubleOrNull() ?: 0.0
+                        uiEvent(SettingIntent.UpdateSet(setting))
                         positionDialog.value = false
-
                     }) {
                         Text(text = "保存")
                     }
@@ -1964,621 +2022,16 @@ fun SettingLits(
 
 
 @Composable
-fun SettingContent(
-    application: Application?, progress: Int, uiEvent: (SettingIntent) -> Unit
-) {
-    val scope = rememberCoroutineScope()
-    val snackbarHostState = LocalSnackbarHostState.current
-    var navigation by rememberDataSaverState(key = Constants.NAVIGATION, default = false)
-    var helpInfo by remember { mutableStateOf(false) }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        LazyColumn(
-            modifier = Modifier
-                .weight(1f)
-                .border(
-                    width = 1.dp, color = Color.LightGray, shape = MaterialTheme.shapes.small
-                )
-                .animateContentSize(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            item {
-                SettingsCard(
-                    icon = Icons.Outlined.Navigation,
-                    text = stringResource(id = R.string.navigation)
-                ) {
-                    Switch(
-                        modifier = Modifier.height(32.dp),
-                        checked = navigation,
-                        onCheckedChange = {
-                            scope.launch {
-                                navigation = it
-                                uiEvent(SettingIntent.Navigation(it))
-                            }
-                        })
-                }
-            }
-
-            item {
-                SettingsCard(icon = Icons.Outlined.Wifi,
-                    text = stringResource(id = R.string.network),
-                    onClick = { uiEvent(SettingIntent.Network) }) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowRight, contentDescription = null
-                    )
-                }
-            }
-
-            item {
-                SettingsCard(icon = Icons.Outlined.Security,
-                    text = stringResource(id = R.string.parameters),
-                    onClick = { uiEvent(SettingIntent.NavTo(PageType.AUTH)) }) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowRight, contentDescription = null
-                    )
-                }
-            }
-        }
-
-        LazyColumn(
-            modifier = Modifier
-                .weight(1f)
-                .border(
-                    width = 1.dp, color = Color.LightGray, shape = MaterialTheme.shapes.small
-                )
-                .animateContentSize(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            item {
-                SettingsCard(
-                    icon = Icons.Outlined.Info, text = stringResource(id = R.string.version)
-                ) {
-//                    Text(
-//                        text = BuildConfig.VERSION_NAME,
-//                        fontSize = 16.sp,
-//                        fontWeight = FontWeight.Bold,
-//                        fontStyle = FontStyle.Italic
-//                    )
-                }
-            }
-
-            item {
-                SettingsCard(icon = Icons.Outlined.HelpOutline,
-                    text = if (helpInfo) stringResource(id = R.string.qrcode) else stringResource(id = R.string.help),
-                    onClick = { helpInfo = !helpInfo }) {
-                    if (helpInfo) {
-                        Text(
-                            text = "025-68790636",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontStyle = FontStyle.Italic
-                        )
-                    } else {
-                        Icon(
-                            imageVector = Icons.Default.ArrowRight, contentDescription = null
-                        )
-                    }
-                }
-            }
-
-//            item {
-//                val image = if (application == null) {
-//                    Icons.Outlined.Sync
-//                } else {
-//                    if (application.versionCode > BuildConfig.VERSION_CODE) {
-//                        Icons.Outlined.Grade
-//                    } else {
-//                        Icons.Outlined.Verified
-//                    }
-//                }
-//
-//                val text = if (application == null) {
-//                    stringResource(id = R.string.update)
-//                } else {
-//                    if (progress == 3) {
-//                        if (application.versionCode > BuildConfig.VERSION_CODE) {
-//                            stringResource(id = R.string.update_available)
-//                        } else {
-//                            stringResource(id = R.string.already_latest)
-//                        }
-//                    } else {
-//                        stringResource(id = R.string.downloading)
-//                    }
-//                }
-//
-//                SettingsCard(icon = image, text = text, onClick = {
-//                    scope.launch {
-//                        if (ApplicationUtils.isNetworkAvailable()) {
-//                            uiEvent(SettingIntent.CheckUpdate)
-//                        } else {
-//                            snackbarHostState.showSnackbar(message = "网络不可用")
-//                        }
-//                    }
-//                }) {
-//
-//                    if (application == null) {
-//                        Icon(
-//                            imageVector = Icons.Default.Check, contentDescription = null
-//                        )
-//                    } else {
-//                        if (progress == 0) {
-//                            if (application.versionCode > BuildConfig.VERSION_CODE) {
-//                                Icon(
-//                                    imageVector = Icons.Default.ArrowCircleUp,
-//                                    contentDescription = null
-//                                )
-//                            } else {
-//                                Icon(
-//                                    imageVector = Icons.Default.Done, contentDescription = null
-//                                )
-//                            }
-//                        } else {
-//                            Text(
-//                                text = "${progress}%",
-//                                fontSize = 16.sp,
-//                                fontWeight = FontWeight.Bold,
-//                                fontStyle = FontStyle.Italic
-//                            )
-//                        }
-//                    }
-//                }
-//            }
-
-            if (helpInfo) {
-                // Display the help info
-                item {
-                    Box(modifier = Modifier.fillMaxWidth()) {
-                        Image(
-                            modifier = Modifier
-                                .size(200.dp)
-                                .align(Alignment.Center),
-                            painter = painterResource(id = R.mipmap.qrcode),
-                            contentDescription = null
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun SettingsCard(
-    onClick: () -> Unit = { },
-    icon: ImageVector,
-    text: String? = null,
-    content: @Composable () -> Unit
-) {
-    Row(modifier = Modifier
-        .background(
-            color = MaterialTheme.colorScheme.surfaceVariant,
-            shape = MaterialTheme.shapes.medium
-        )
-        .clip(MaterialTheme.shapes.medium)
-        .clickable { onClick() }
-        .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Icon(
-            modifier = Modifier.size(32.dp),
-            imageVector = icon,
-            contentDescription = text,
-            tint = MaterialTheme.colorScheme.primary
-        )
-        text?.let {
-            Text(
-                text = text, style = MaterialTheme.typography.titleMedium
-            )
-        }
-        Spacer(modifier = Modifier.weight(1f))
-        content.invoke()
-    }
-}
-
-@OptIn(ExperimentalAnimationApi::class)
-@Composable
 fun debug(
-    dispatch: (SettingIntent) -> Unit,
-    entities: List<Motor>,
+    uiEvent: (SettingIntent) -> Unit,
     proEntities: List<Program>,
-    selected: Long
+    slEntities: List<Setting>,
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        debugMode(dispatch, entities, proEntities, selected)
+        debugMode(uiEvent, proEntities, slEntities)
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
-@Composable
-fun Authentication(dispatch: (SettingIntent) -> Unit) {
-
-    var show by remember { mutableStateOf(false) }
-
-    val scope = rememberCoroutineScope()
-
-    AnimatedContent(targetState = show) {
-        if (it) {
-            LazyVerticalGrid(
-                contentPadding = PaddingValues(16.dp),
-                columns = GridCells.Fixed(3),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                item {
-                    ListItem(modifier = Modifier
-                        .clip(MaterialTheme.shapes.small)
-                        .clickable {
-                            scope.launch {
-                                dispatch(SettingIntent.NavTo(PageType.MOTOR_LIST))
-                            }
-                        }, headlineContent = {
-                        Text(
-                            text = stringResource(id = R.string.motor_config),
-                            style = MaterialTheme.typography.titleMedium,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }, trailingContent = {
-                        Icon(
-                            imageVector = Icons.Default.Cyclone, contentDescription = null
-                        )
-                    }, colors = ListItemDefaults.colors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer
-                    )
-                    )
-                }
-                item {
-                    ListItem(modifier = Modifier
-                        .clip(MaterialTheme.shapes.small)
-                        .clickable {
-                            scope.launch {
-                                dispatch(SettingIntent.NavTo(PageType.CONFIG))
-                            }
-                        }, headlineContent = {
-                        Text(
-                            text = stringResource(id = R.string.system_config),
-                            style = MaterialTheme.typography.titleMedium,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }, trailingContent = {
-                        Icon(
-                            imageVector = Icons.Default.Tune, contentDescription = null
-                        )
-                    }, colors = ListItemDefaults.colors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer
-                    )
-                    )
-                }
-            }
-        } else {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .imePadding(), contentAlignment = Alignment.Center
-            ) {
-                VerificationCodeField(digits = 6, inputCallback = {
-                    show = true
-                }) { text, focused ->
-                    VerificationCodeItem(text, focused)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun MotorList(
-    entities: LazyPagingItems<Motor>, dispatch: (SettingIntent) -> Unit
-) {
-    val scope = rememberCoroutineScope()
-    val snackbarHostState = LocalSnackbarHostState.current
-
-    LazyVerticalGrid(
-        modifier = Modifier,
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        columns = GridCells.Fixed(3)
-    ) {
-        items(items = entities) { item ->
-            MotorItem(item = item, onClick = {
-                scope.launch {
-                    dispatch(SettingIntent.Selected(item.id))
-                    dispatch(SettingIntent.NavTo(PageType.MOTOR_DETAIL))
-                }
-            }, onDelete = {
-                scope.launch {
-                    dispatch(SettingIntent.Delete(item.id))
-                    snackbarHostState.showSnackbar(message = "删除成功")
-                }
-            })
-        }
-    }
-}
-
-
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-fun MotorDetail(
-    entities: List<Motor>, selected: Long, dispatch: (SettingIntent) -> Unit
-) {
-
-    val scope = rememberCoroutineScope()
-    val softKeyboard = LocalSoftwareKeyboardController.current
-    val focusManager = LocalFocusManager.current
-
-    val motor = entities.find { it.id == selected } ?: Motor(displayText = "None")
-    var displayText by remember { mutableStateOf(motor.displayText) }
-    var acceleration by remember { mutableStateOf(motor.acceleration.toString()) }
-    var deceleration by remember { mutableStateOf(motor.deceleration.toString()) }
-    var speed by remember { mutableStateOf(motor.speed.toString()) }
-    var index by remember { mutableStateOf(motor.index.toString()) }
-
-    val keyboardOptions = KeyboardOptions(
-        keyboardType = KeyboardType.Number,
-        imeAction = ImeAction.Done,
-    )
-
-    val keyboardActions = KeyboardActions(onDone = {
-        softKeyboard?.hide()
-        focusManager.clearFocus()
-    })
-
-    val colors = TextFieldDefaults.colors(
-        unfocusedIndicatorColor = Color.Transparent, focusedIndicatorColor = Color.Transparent
-    )
-
-    val textStyle = TextStyle(
-        fontStyle = FontStyle.Italic,
-        fontWeight = FontWeight.Bold,
-        fontSize = 20.sp,
-        fontFamily = FontFamily.Monospace
-    )
-
-    LazyColumn(
-        modifier = Modifier.imePadding(),
-        contentPadding = PaddingValues(32.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        item {
-            TextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = index,
-                onValueChange = {
-                    scope.launch {
-                        index = it
-                        dispatch(
-                            SettingIntent.Update(
-                                motor.copy(index = it.toIntOrNull() ?: 0)
-                            )
-                        )
-                    }
-                },
-                leadingIcon = {
-                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                        Icon(
-                            imageVector = Icons.Default.Numbers, contentDescription = null
-                        )
-                    }
-                },
-                suffix = {
-                    Text(text = "编号", style = textStyle)
-                },
-                keyboardOptions = keyboardOptions,
-                keyboardActions = keyboardActions,
-                shape = CircleShape,
-                colors = colors,
-                textStyle = textStyle,
-            )
-        }
-        item {
-            TextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = acceleration,
-                onValueChange = {
-                    scope.launch {
-                        acceleration = it
-                        dispatch(
-                            SettingIntent.Update(
-                                motor.copy(
-                                    acceleration = it.toLongOrNull() ?: 0L
-                                )
-                            )
-                        )
-                    }
-                },
-                leadingIcon = {
-                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                        Icon(
-                            imageVector = Icons.Default.TrendingUp,
-                            contentDescription = stringResource(id = R.string.acceleration)
-                        )
-                    }
-                },
-                suffix = {
-                    Text(text = stringResource(id = R.string.acceleration), style = textStyle)
-                },
-                keyboardOptions = keyboardOptions,
-                keyboardActions = keyboardActions,
-                shape = CircleShape,
-                colors = colors,
-                textStyle = textStyle,
-            )
-        }
-        item {
-            TextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = deceleration,
-                onValueChange = {
-                    scope.launch {
-                        deceleration = it
-                        dispatch(
-                            SettingIntent.Update(
-                                motor.copy(
-                                    deceleration = it.toLongOrNull() ?: 0L
-                                )
-                            )
-                        )
-                    }
-                },
-                leadingIcon = {
-                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                        Icon(
-                            imageVector = Icons.Default.TrendingDown,
-                            contentDescription = stringResource(id = R.string.deceleration)
-                        )
-                    }
-                },
-                suffix = {
-                    Text(text = stringResource(id = R.string.deceleration), style = textStyle)
-                },
-                keyboardOptions = keyboardOptions,
-                keyboardActions = keyboardActions,
-                shape = CircleShape,
-                colors = colors,
-                textStyle = textStyle,
-            )
-        }
-        item {
-            TextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = speed,
-                onValueChange = {
-                    scope.launch {
-                        speed = it
-                        dispatch(
-                            SettingIntent.Update(
-                                motor.copy(
-                                    speed = it.toLongOrNull() ?: 0L
-                                )
-                            )
-                        )
-                    }
-                },
-                leadingIcon = {
-                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                        Icon(
-                            imageVector = Icons.Default.Speed,
-                            contentDescription = stringResource(id = R.string.speed)
-                        )
-                    }
-                },
-                suffix = {
-                    Text(text = stringResource(id = R.string.speed), style = textStyle)
-                },
-                keyboardOptions = keyboardOptions,
-                keyboardActions = keyboardActions,
-                shape = CircleShape,
-                colors = colors,
-                textStyle = textStyle,
-            )
-        }
-        item {
-            TextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = displayText,
-                onValueChange = {
-                    scope.launch {
-                        displayText = it
-                        dispatch(SettingIntent.Update(motor.copy(displayText = it)))
-                    }
-                },
-                leadingIcon = {
-                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                        Icon(
-                            imageVector = Icons.Default.TextFields,
-                            contentDescription = stringResource(id = R.string.remark)
-                        )
-                    }
-                },
-                suffix = {
-                    Text(text = stringResource(id = R.string.remark), style = textStyle)
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done,
-                ),
-                keyboardActions = keyboardActions,
-                shape = CircleShape,
-                colors = colors,
-                textStyle = textStyle,
-            )
-        }
-    }
-}
-
-
-@Composable
-fun ConfigList(modifier: Modifier = Modifier) {
-
-    val scope = rememberCoroutineScope()
-
-    LazyColumn(
-        modifier = modifier.imePadding(),
-        contentPadding = PaddingValues(32.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        item {
-
-            var abscissa by rememberDataSaverState(key = Constants.ZT_0001, default = 0.0)
-            var ordinate by rememberDataSaverState(key = Constants.ZT_0002, default = 0.0)
-            var tankAbscissa by rememberDataSaverState(
-                key = Constants.ZT_0003, default = 0.0
-            )
-            var tankOrdinate by rememberDataSaverState(
-                key = Constants.ZT_0004, default = 0.0
-            )
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                CoordinateInput(modifier = Modifier.weight(1f),
-                    title = "行程",
-                    point = Point(x = abscissa, y = ordinate),
-                    onCoordinateChange = {
-                        scope.launch {
-                            abscissa = it.x
-                            ordinate = it.y
-                        }
-                    }) {
-                    scope.launch {
-                        start {
-                            with(index = 0, pdv = abscissa)
-                            with(index = 1, pdv = ordinate)
-                        }
-                    }
-                }
-                CoordinateInput(modifier = Modifier.weight(1f),
-                    title = "废液槽",
-                    point = Point(x = tankAbscissa, y = tankOrdinate),
-                    onCoordinateChange = {
-                        scope.launch {
-                            tankAbscissa = it.x
-                            tankOrdinate = it.y
-                        }
-                    }) {
-                    scope.launch {
-                        start {
-                            with(index = 0, pdv = tankAbscissa)
-                            with(index = 1, pdv = tankOrdinate)
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-@Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun SettingsPreview() {
-    SettingContent(null, 0) {}
-}

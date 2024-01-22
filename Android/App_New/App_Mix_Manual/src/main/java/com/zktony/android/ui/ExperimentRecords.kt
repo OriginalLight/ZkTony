@@ -129,19 +129,6 @@ fun experimentList(
     val context = LocalContext.current
 
 
-//    dispatch(
-//        ExperimentRecordsIntent.Insert(
-//            20.0,
-//            40.0,
-//            "1.0",
-//            95.0,
-//            9.5,
-//            1,
-//            "成功",
-//            ""
-//        )
-//    )
-
     /**
      * 新建和打开的弹窗
      */
@@ -164,7 +151,7 @@ fun experimentList(
 
 
     //	定义列宽
-    val cellWidthList = arrayListOf(70, 100, 100, 130, 90, 120)
+    val cellWidthList = arrayListOf(60, 100, 100, 130, 120, 120)
     //	使用lazyColumn来解决大数据量时渲染的性能问题
     LazyColumn(
         modifier = Modifier
@@ -189,7 +176,7 @@ fun experimentList(
 
             Row(
                 modifier = Modifier
-                    .background(if (selected) Color.Black else Color.White)
+                    .background(if (selected) Color.Gray else Color.White)
                     .clickable(onClick = {
                         selectedIndex = index
 
@@ -207,7 +194,7 @@ fun experimentList(
                 TableText(text = item.thickness + "mm", width = cellWidthList[3])
 
                 TableText(text = "" + item.number, width = cellWidthList[1])
-                TableText(text = item.detail, width = cellWidthList[4])
+                TableText(text = item.status, width = cellWidthList[4])
             }
         }
 
@@ -256,26 +243,30 @@ fun experimentList(
 
                     var path = getStoragePath(context, true)
                     if (!"".equals(path)) {
-                        val entity = entities[selectedIndex]
-                        if (entity != null) {
-                            File(path + "/zktony/test.txt").writeText(
-                                "实验记录:" + ",日期：" + entity.createTime.dateFormat("yyyy-MM-dd")
-                                        + ",开始浓度:" + entity.startRange.toString()
-                                        + ",结束浓度:" + entity.endRange.toString()
-                                        + ",常用厚度:" + entity.thickness
-                                        + ",促凝剂体积:" + entity.coagulant.toString()
-                                        + ",胶液体积:" + entity.volume.toString()
-                                        + ",制胶数量:" + entity.number.toString()
-                                        + ",状态:" + entity.status
-                                        + ",状态详情:" + entity.detail
-                            )
-                            Toast.makeText(
-                                context,
-                                "导出成功！",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                        if (entitiesList.isNotEmpty()) {
+
+
+                            val entity = entities[selectedIndex]
+                            if (entity != null) {
+                                File(path + "/zktony/test.txt").writeText(
+                                    "实验记录:" + ",日期：" + entity.createTime.dateFormat("yyyy-MM-dd")
+                                            + ",开始浓度:" + entity.startRange.toString()
+                                            + ",结束浓度:" + entity.endRange.toString()
+                                            + ",常用厚度:" + entity.thickness
+                                            + ",促凝剂体积:" + entity.coagulant.toString()
+                                            + ",胶液体积:" + entity.volume.toString()
+                                            + ",制胶数量:" + entity.number.toString()
+                                            + ",状态:" + entity.status
+                                            + ",状态详情:" + entity.detail
+                                )
+                                Toast.makeText(
+                                    context,
+                                    "导出成功！",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }
-                    }else{
+                    } else {
                         Toast.makeText(
                             context,
                             "未检测到USB！",
@@ -294,160 +285,186 @@ fun experimentList(
 
     //新建和打开弹窗
     if (showingDialog.value) {
-        val entity = entities[selectedIndex]
-        if (entity != null)
-            AlertDialog(
-                onDismissRequest = { showingDialog.value = false },
-                text = {
+        if (entitiesList.isNotEmpty()) {
+            val entity = entities[selectedIndex]
+            if (entity != null) {
+                AlertDialog(
+                    onDismissRequest = { showingDialog.value = false },
+                    text = {
 
-                    LazyColumn(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .imePadding(),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        contentPadding = PaddingValues(16.dp),
-                    ) {
+                        LazyColumn(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .imePadding(),
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                            contentPadding = PaddingValues(16.dp),
+                        ) {
 
-                        item {
-                            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                            item {
+                                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
 
-                                Text(
-                                    fontSize = 16.sp,
-                                    text = "日期："
-                                )
-                                Text(
-                                    fontSize = 16.sp,
-                                    text = entity.createTime.dateFormat("yyyy-MM-dd")
-                                )
+                                    Text(
+                                        fontSize = 16.sp,
+                                        text = "日期："
+                                    )
+                                    Text(
+                                        fontSize = 16.sp,
+                                        text = entity.createTime.dateFormat("yyyy-MM-dd")
+                                    )
 
+                                }
                             }
+
+                            item {
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        fontSize = 16.sp,
+                                        text = "浓度范围："
+                                    )
+                                    Text(
+                                        fontSize = 16.sp,
+                                        text = entity.startRange.toString() + "%"
+                                    )
+                                    Text(
+                                        fontSize = 16.sp,
+                                        text = "~"
+                                    )
+                                    Text(
+                                        fontSize = 16.sp,
+                                        text = entity.endRange.toString() + "%"
+                                    )
+
+                                }
+                            }
+
+                            item {
+                                Row {
+                                    Text(
+                                        fontSize = 16.sp,
+                                        text = "厚度："
+                                    )
+                                    Text(
+                                        fontSize = 16.sp,
+                                        text = entity.thickness + "mm"
+                                    )
+
+                                }
+                            }
+
+                            item {
+                                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+
+                                    Text(
+                                        fontSize = 16.sp,
+                                        text = "胶液体积："
+                                    )
+                                    Text(
+                                        fontSize = 16.sp,
+                                        text = entity.volume.toString() + "mL"
+                                    )
+
+                                }
+                            }
+
+                            item {
+                                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+
+                                    Text(
+                                        fontSize = 16.sp,
+                                        text = "促凝剂体积："
+                                    )
+                                    Text(
+                                        fontSize = 16.sp,
+                                        text = entity.coagulant.toString() + "μL"
+                                    )
+
+                                }
+                            }
+
+                            item {
+                                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+
+                                    Text(
+                                        fontSize = 16.sp,
+                                        text = "状态："
+                                    )
+                                    Text(
+                                        fontSize = 16.sp,
+                                        text = entity.status
+                                    )
+
+                                }
+                            }
+                            item {
+                                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                                    Text(
+                                        fontSize = 16.sp,
+                                        text = entity.detail
+                                    )
+
+                                }
+                            }
+
                         }
 
-                        item {
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    fontSize = 16.sp,
-                                    text = "浓度范围："
-                                )
-                                Text(
-                                    fontSize = 16.sp,
-                                    text = entity.startRange.toString() + "%"
-                                )
-                                Text(
-                                    fontSize = 16.sp,
-                                    text = "~"
-                                )
-                                Text(
-                                    fontSize = 16.sp,
-                                    text = entity.endRange.toString() + "%"
-                                )
 
-                            }
-                        }
-
-                        item {
-                            Row {
-                                Text(
-                                    fontSize = 16.sp,
-                                    text = "厚度："
-                                )
-                                Text(
-                                    fontSize = 16.sp,
-                                    text = entity.thickness + "mm"
-                                )
-
-                            }
-                        }
-
-                        item {
-                            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-
-                                Text(
-                                    fontSize = 16.sp,
-                                    text = "胶液体积："
-                                )
-                                Text(
-                                    fontSize = 16.sp,
-                                    text = entity.volume.toString() + "mL"
-                                )
-
-                            }
-                        }
-
-                        item {
-                            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-
-                                Text(
-                                    fontSize = 16.sp,
-                                    text = "促凝剂体积："
-                                )
-                                Text(
-                                    fontSize = 16.sp,
-                                    text = entity.coagulant.toString() + "μL"
-                                )
-
-                            }
-                        }
-
-                        item {
-                            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-
-                                Text(
-                                    fontSize = 16.sp,
-                                    text = "状态："
-                                )
-                                Text(
-                                    fontSize = 16.sp,
-                                    text = entity.status
-                                )
-
-                            }
-                        }
-                        item {
-                            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                                Text(
-                                    fontSize = 16.sp,
-                                    text = entity.detail
-                                )
-
-                            }
-                        }
-
-                    }
+                    }, confirmButton = {
+                    })
+            }
+        } else {
+            showingDialog.value = false
+        }
 
 
-                }, confirmButton = {
-                })
     }
 
 
     //删除弹窗
     if (deleteDialog.value) {
-        AlertDialog(
-            onDismissRequest = { deleteDialog.value = false },
-            title = {
-                Text(text = "是否确认删除！")
-            },
-            text = {
+        if (entitiesList.isNotEmpty()) {
+            AlertDialog(
+                onDismissRequest = { deleteDialog.value = false },
+                title = {
+                    Text(text = "是否确认删除！")
+                },
+                text = {
 
-            }, confirmButton = {
-                TextButton(onClick = {
-                    val entity = entities[selectedIndex]
-                    if (entity != null) {
-                        dispatch(ExperimentRecordsIntent.Delete(entity.id))
+                }, confirmButton = {
+                    TextButton(onClick = {
+                        val entity = entities[selectedIndex]
+                        if (entity != null) {
+                            if (entity.status != EPStatus.RUNNING) {
+                                dispatch(ExperimentRecordsIntent.Delete(entity.id))
+                                if (selectedIndex > 0) {
+                                    selectedIndex -= 1
+                                }
+                                deleteDialog.value = false
+                            }else{
+                                Toast.makeText(
+                                    context,
+                                    "制胶程序还在运动中,不能删除！",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+
+                        }
+
+                    }) {
+                        Text(text = "确认")
                     }
-                    deleteDialog.value = false
-                }) {
-                    Text(text = "确认")
-                }
-            }, dismissButton = {
-                TextButton(onClick = { deleteDialog.value = false }) {
-                    Text(text = "取消")
-                }
-            })
+                }, dismissButton = {
+                    TextButton(onClick = { deleteDialog.value = false }) {
+                        Text(text = "取消")
+                    }
+                })
+        } else {
+            deleteDialog.value = false
+        }
+
+
     }
 
 

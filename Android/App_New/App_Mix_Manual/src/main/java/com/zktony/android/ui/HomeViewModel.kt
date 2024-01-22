@@ -1,22 +1,31 @@
 package com.zktony.android.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Logger
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.R
+import com.zktony.android.data.dao.ExperimentRecordDao
 import com.zktony.android.data.dao.ProgramDao
+import com.zktony.android.data.dao.SettingDao
 import com.zktony.android.data.datastore.DataSaverDataStore
 import com.zktony.android.data.datastore.rememberDataSaverState
+import com.zktony.android.data.entities.ExperimentRecord
+import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
+import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.AppStateUtils.hpd
 import com.zktony.android.utils.ApplicationUtils
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.SerialPortUtils.cleanLight
 import com.zktony.android.utils.SerialPortUtils.getGpio
 import com.zktony.android.utils.SerialPortUtils.glue
+import com.zktony.android.utils.SerialPortUtils.glueNew
 import com.zktony.android.utils.SerialPortUtils.gpio
 import com.zktony.android.utils.SerialPortUtils.lightFlashYellow
 import com.zktony.android.utils.SerialPortUtils.lightGreed
@@ -34,8 +43,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
+import java.util.Date
 import javax.inject.Inject
 
 /**
@@ -45,23 +56,52 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val dao: ProgramDao,
-    private val dataStore: DataSaverDataStore
+    private val dataStore: DataSaverDataStore,
+    private val erDao: ExperimentRecordDao,
+    private val slDao: SettingDao
 ) : ViewModel() {
 
     private val _selected = MutableStateFlow(1L)
+    private val _selectedER = MutableStateFlow(0L)
     private val _page = MutableStateFlow(PageType.HOME)
     private val _uiFlags = MutableStateFlow<UiFlags>(UiFlags.none())
     private val _job = MutableStateFlow<Job?>(null)
 
+    /**
+     * 加液次数
+     */
+    private val _complate = MutableStateFlow(0)
+
+    /**
+     * 单次加液进度
+     */
+    private val _progress = MutableStateFlow(0f)
+
+
     private var syringeJob: Job? = null
 
     val selected = _selected.asStateFlow()
+    val selectedER = _selectedER.asStateFlow()
     val page = _page.asStateFlow()
     val uiFlags = _uiFlags.asStateFlow()
     val job = _job.asStateFlow()
+    val complate = _complate.asStateFlow()
+    val progress = _progress.asStateFlow()
+
+
+    /**
+     * 制胶程序dao
+     */
     val entities = Pager(
         config = PagingConfig(pageSize = 20, initialLoadSize = 40),
     ) { dao.getByPage() }.flow.cachedIn(viewModelScope)
+
+    /**
+     * 实验记录dao
+     */
+    val erEntities = Pager(
+        config = PagingConfig(pageSize = 20, initialLoadSize = 40),
+    ) { erDao.getByPage() }.flow.cachedIn(viewModelScope)
 
 
     init {
@@ -81,6 +121,22 @@ class HomeViewModel @Inject constructor(
             is HomeIntent.Stop -> stopJob()
             is HomeIntent.Syringe -> syringe(intent.index)
             is HomeIntent.Selected -> _selected.value = intent.id
+            is HomeIntent.Insert -> viewModelScope.launch {
+                _selectedER.value = erDao.insert(
+                    ExperimentRecord(
+                        startRange = intent.startRange,
+                        endRange = intent.endRange,
+                        thickness = intent.thickness,
+                        coagulant = intent.coagulant,
+                        volume = intent.volume,
+                        number = intent.number,
+                        status = intent.status,
+                        detail = intent.detail
+                    )
+                )
+            }
+
+            is HomeIntent.Update -> viewModelScope.launch { erDao.update(intent.entity) }
         }
     }
 
@@ -97,15 +153,15 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             gpio(3)
             delay(500L)
-            println("getGpio(3)====" + getGpio(3))
         }
     }
+
 
     private fun reset() {
         viewModelScope.launch {
             _uiFlags.value = UiFlags.objects(1)
             try {
-                dataStore.saveData("finishpluse", 0L)
+                hpd[0] = -1
                 val coagulantpulse = dataStore.readData("coagulantpulse", 67500).toLong()
                 withTimeout(60 * 1000L) {
                     /**
@@ -118,13 +174,15 @@ class HomeViewModel @Inject constructor(
                     //x轴复位===========================================
                     gpio(0, 1)
                     delay(500L)
-                    println(
-                        "x轴光电状态====0号光电===" + getGpio(0) + "====1号光电===" + getGpio(
-                            1
-                        )
+                    Log.d(
+                        "HomeViewModel",
+                        "x轴光电状态====0号光电===" + getGpio(0) + "====1号光电===" + getGpio(1)
                     )
                     if (!getGpio(0) && !getGpio(1)) {
-                        println("x轴反转")
+                        Log.d(
+                            "HomeViewModel",
+                            "x轴反转"
+                        )
                         start {
                             timeOut = 1000L * 30
                             with(
@@ -134,7 +192,10 @@ class HomeViewModel @Inject constructor(
 
                                 )
                         }
-                        println("x轴正转")
+                        Log.d(
+                            "HomeViewModel",
+                            "x轴正转"
+                        )
                         start {
                             timeOut = 1000L * 30
                             with(
@@ -165,10 +226,16 @@ class HomeViewModel @Inject constructor(
 
                                     )
                             }
-                            println("复位完成")
+                            Log.d(
+                                "HomeViewModel",
+                                "复位完成"
+                            )
                             //复位完成
                         } else {
-                            println("复位失败")
+                            Log.d(
+                                "HomeViewModel",
+                                "复位失败"
+                            )
                             //复位失败
                         }
 
@@ -212,10 +279,16 @@ class HomeViewModel @Inject constructor(
 
                                     )
                             }
-                            println("复位完成")
+                            Log.d(
+                                "HomeViewModel",
+                                "复位完成"
+                            )
                             //复位完成
                         } else {
-                            println("复位失败")
+                            Log.d(
+                                "HomeViewModel",
+                                "复位失败"
+                            )
                             //复位失败
                         }
 
@@ -231,7 +304,10 @@ class HomeViewModel @Inject constructor(
                         gpio(0)
                         delay(500L)
                         if (getGpio(0)) {
-                            println("复位失败")
+                            Log.d(
+                                "HomeViewModel",
+                                "复位失败"
+                            )
                         } else {
                             start {
                                 timeOut = 1000L * 30
@@ -242,7 +318,10 @@ class HomeViewModel @Inject constructor(
 
                                     )
                             }
-                            println("复位完成")
+                            Log.d(
+                                "HomeViewModel",
+                                "复位完成"
+                            )
                             start {
                                 timeOut = 1000L * 30
                                 with(
@@ -253,7 +332,10 @@ class HomeViewModel @Inject constructor(
                             }
                         }
                     } else {
-                        println("复位失败")
+                        Log.d(
+                            "HomeViewModel",
+                            "复位失败"
+                        )
                     }
                     //x轴复位===========================================
 
@@ -262,7 +344,10 @@ class HomeViewModel @Inject constructor(
                     //柱塞泵复位===========================================
                     gpio(2)
                     delay(500L)
-                    println("注射泵光电状态====2号光电===" + getGpio(2))
+                    Log.d(
+                        "HomeViewModel",
+                        "注射泵光电状态====2号光电===" + getGpio(2)
+                    )
                     if (!getGpio(2)) {
                         start {
                             timeOut = 1000L * 30
@@ -351,49 +436,84 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun startJob(count: Int) {
+    private fun startJob(status: Int) {
         viewModelScope.launch {
             _uiFlags.value = UiFlags.objects(0)
+            Log.d(
+                "HomeViewModel",
+                "已选择程序的id=========" + _selected.value
+            )
             val selected = dao.getById(_selected.value).firstOrNull()
+
+            Log.d(
+                "HomeViewModel",
+                "已选择的程序=========" + selected
+            )
             if (selected == null) {
                 _uiFlags.value = UiFlags.message("未选择程序")
                 return@launch
             }
 
+
+            val setting = slDao.getById(1L).firstOrNull()
+            if (setting == null) {
+                _uiFlags.value = UiFlags.message("系统参数无数据")
+                return@launch
+            }
+
+            if (status == 0) {
+                _complate.value = 0
+            }
+            /**
+             * 要完成的制胶数量
+             */
+            var expectedMakeNum = dataStore.readData("expectedMakenum", 1)
+
+
+
+
+            hpd[0] = -1
             /**
              * 总步数
              */
             val coagulantpulse = dataStore.readData("coagulantpulse", 67500).toLong()
-            println("总步数=========$coagulantpulse")
+            Log.d(
+                "HomeViewModel",
+                "总步数=========$coagulantpulse"
+            )
 
+            /**
+             * 促凝剂体积
+             */
+            val coagulantVol = selected.coagulant
+            var coagulantPulse = pulse(index = 1, dvp = coagulantVol)
+
+            /**
+             * 制胶进度总长度
+             */
+            val barCount = Math.floor(coagulantPulse / 160.0).toLong() - 2
+            var barBool = false
 
             /**
              * 完成步数
              */
-            var finishpluse = dataStore.readData("finishpluse", 0L)
-            println("完成步数=========$finishpluse")
-            if (coagulantpulse - finishpluse <= finishpluse) {
+            if (coagulantpulse - coagulantPulse <= coagulantPulse) {
                 stopJob()
             } else {
-                println("===开始制胶===")
+                Log.d(
+                    "HomeViewModel",
+                    "===开始制胶==="
+                )
 
-                /**
-                 * 废液槽位置
-                 */
-                val wastePosition = dataStore.readData("wastePosition", 0.0)
-                println("废液槽位置===$wastePosition")
-
-                /**
-                 * 胶板位置
-                 */
-                val glueBoardPosition = dataStore.readData("glueBoardPosition", 0.0)
-                println("胶板位置===$glueBoardPosition")
 
                 /**
                  * 高浓度预排液量
                  */
-                val higeRehearsalVolume = dataStore.readData("higeRehearsalVolume", 0.0) * 1000
-                println("高浓度预排液量===$higeRehearsalVolume")
+                val higeRehearsalVolume = setting.higeRehearsalVolume * 1000
+                Log.d(
+                    "HomeViewModel",
+                    "高浓度预排液量===$higeRehearsalVolume"
+                )
 
                 /**
                  * 制胶速度，根据这个速度转换其他泵的速度
@@ -406,50 +526,57 @@ class HomeViewModel @Inject constructor(
                 val rinseSpeed = dataStore.readData("rinseSpeed", 600L)
                 println("冲洗液泵转速===$rinseSpeed")
 
-                /**
-                 * 促凝剂体积
-                 */
-                val coagulantVol = selected.coagulant
-                println("促凝剂体积===" + coagulantVol)
-
 
                 /**
                  * 胶液体积
                  */
                 val volumeVol = selected.volume * 1000
-                println("胶液体积===" + volumeVol)
+                Log.d(
+                    "HomeViewModel",
+                    "胶液体积===$volumeVol"
+                )
 
                 /**
                  * 促凝剂预排液量
                  */
                 val coagulantRehearsal = coagulantVol / volumeVol * higeRehearsalVolume
-                println("促凝剂预排液量===$coagulantRehearsal")
-
+                Log.d(
+                    "HomeViewModel",
+                    "促凝剂预排液量===$coagulantRehearsal"
+                )
 
                 _job.value?.cancel()
                 _job.value = launch {
                     try {
                         cleanLight()
 //===================废液槽运动开始=====================
-                        println("===废液槽运动开始===")
+                        Log.d(
+                            "HomeViewModel",
+                            "===废液槽运动开始==="
+                        )
                         //废液槽位置
                         start {
                             timeOut = 1000L * 60L
                             with(
-
                                 index = 0,
-                                pdv = wastePosition,
+                                pdv = setting.wastePosition,
                                 ads = Triple(300 * 100, 400 * 100, 600 * 100),
                             )
                         }
-                        println("===废液槽运动结束===")
+                        Log.d(
+                            "HomeViewModel",
+                            "===废液槽运动结束==="
+                        )
 //===================废液槽运动结束=====================
 
                         /**
                          * 预排液
                          */
                         //===================预排液开始=====================
-                        println("===预排液开始===")
+                        Log.d(
+                            "HomeViewModel",
+                            "===预排液开始==="
+                        )
                         start {
                             timeOut = 1000L * 60 * 1
 
@@ -457,24 +584,32 @@ class HomeViewModel @Inject constructor(
 
 
                             //柱塞泵-促凝剂  促凝剂体积/胶液体积*higeRehearsalVolume
-                            var p1 =
-                                pulse(index = 1, dvp = coagulantRehearsal)
-                            dataStore.saveData("finishpluse", p1 + finishpluse)
-                            p1 = dataStore.readData("finishpluse", 0L)
-                            println("预排液p1步数=====" + p1)
-
+                            var p1 = pulse(index = 1, dvp = coagulantRehearsal)
+//                            _usedCoagulant.value += p1 / 1000f
+                            Log.d(
+                                "HomeViewModel",
+                                "预排液p1步数=====$p1"
+                            )
                             //高浓度
-                            val p2 =
-                                pulse(index = 2, dvp = higeRehearsalVolume)
-                            println("预排液p2步数=====" + p2)
+                            val p2 = pulse(index = 2, dvp = higeRehearsalVolume)
+//                            _usedHigh.value += p2 / 1000f
+                            Log.d(
+                                "HomeViewModel",
+                                "预排液p2步数=====$p2"
+                            )
 
-                            val ad = (2 * rinseSpeed * 100).toLong()
+                            val ad = (2 * rinseSpeed * 100)
 
 
                             val s1 = (p1.toDouble() / p2 * rinseSpeed * 100).toLong()
-
-                            println("s1=====$s1")
-                            println("ad=====$ad")
+                            Log.d(
+                                "HomeViewModel",
+                                "预排液s1=====$s1"
+                            )
+                            Log.d(
+                                "HomeViewModel",
+                                "预排液ad=====$ad"
+                            )
 
                             with(index = 1, pdv = p1, ads = Triple(s1 * 2, s1 * 2, s1))
 
@@ -482,52 +617,82 @@ class HomeViewModel @Inject constructor(
                         }
 
                         //===================预排液结束=====================
-                        println("===预排液结束===")
+                        Log.d(
+                            "HomeViewModel",
+                            "===预排液结束==="
+                        )
 
 
 //===================制胶位置移动开始=====================
-                        println("===制胶位置移动开始===")
+                        Log.d(
+                            "HomeViewModel",
+                            "===制胶位置移动开始==="
+                        )
                         //制胶位置
                         start {
                             timeOut = 1000L * 60L
 //                        with(index = 0, pdv = glueBoardPosition)
                             with(
                                 index = 0,
-                                pdv = glueBoardPosition,
+                                pdv = setting.glueBoardPosition,
                                 ads = Triple(300 * 100, 400 * 100, 600 * 100),
                             )
 
                         }
-                        println("===制胶位置移动结束===")
+                        Log.d(
+                            "HomeViewModel",
+                            "===制胶位置移动结束==="
+                        )
                         delay(100)
                         //回复=柱塞泵总步数/160
-                        println("===制胶运动开始===")
+                        Log.d(
+                            "HomeViewModel",
+                            "===制胶运动开始==="
+                        )
                         start {
                             timeOut = 1000L * 60 * 10
+                            executeType = ExecuteType.ASYNC
                             val s = speed.toDouble()
                             var p1 = pulse(index = 1, dvp = coagulantVol)
                             val p2 = pulse(index = 2, dvp = volumeVol)
                             val p3 = pulse(index = 3, dvp = volumeVol)
 
-                            dataStore.saveData("finishpluse", p1 + finishpluse)
-                            p1 = dataStore.readData("finishpluse", 0L)
 
-                            println("加液p1步数=====" + p1)
-                            println("加液p2步数=====" + p2)
-                            println("加液p3步数=====" + p3)
+                            Log.d(
+                                "HomeViewModel",
+                                "加液p1步数=====$p1"
+                            )
+                            Log.d(
+                                "HomeViewModel",
+                                "加液p2步数=====$p2"
+                            )
+                            Log.d(
+                                "HomeViewModel",
+                                "加液p3步数=====$p3"
+                            )
 
                             val pv1 = (p2 + p3) / 2
 
+                            Log.d(
+                                "HomeViewModel",
+                                "index===1===所有速度===" + ((p1 / (pv1 * 2 / s)) * 100).toLong()
+                            )
 
-                            println("index===1===加速===" + (2.5 * s * 100).toLong() + "===+减速===" + (2.5 * s * 100).toLong() + "===速度===" + ((p1 / (pv1 * 2 / s)) * 100).toLong())
-                            println("index===2===加速===" + (s * 100).toLong() + "===+减速===" + (s * s / 2 / pv1 * 100).toLong() + "===速度===" + (s * 100).toLong())
-                            println("index===3===加速===" + (s * s / 2 / pv1 * 100).toLong() + "===+减速===" + (s * 100).toLong() + "===速度===" + (s * 100).toLong())
+                            Log.d(
+                                "HomeViewModel",
+                                "index===2===加速===" + (s * 100).toLong() + "===+减速===" + (s * s / 2 / pv1 * 100).toLong() + "===速度===" + (s * 100).toLong()
+                            )
+
+
+                            Log.d(
+                                "HomeViewModel",
+                                "index===3===加速===" + (s * s / 2 / pv1 * 100).toLong() + "===+减速===" + (s * 100).toLong() + "===速度===" + (s * 100).toLong()
+                            )
+
 
 
                             with(
-                                index = 1,
-                                pdv = p1,
-                                ads = Triple(
+                                index = 1, pdv = p1, ads = Triple(
                                     ((p1 / (pv1 * 2 / s)) * 100).toLong(),
                                     ((p1 / (pv1 * 2 / s)) * 100).toLong(),
 //                                (2.5 * s * 100).toLong(),
@@ -536,9 +701,7 @@ class HomeViewModel @Inject constructor(
                                 )
                             )
                             with(
-                                index = 2,
-                                pdv = pv1,
-                                ads = Triple(
+                                index = 2, pdv = pv1, ads = Triple(
 //                                1, 1,
 //                                s.toLong()
                                     (s * 100).toLong(),
@@ -547,9 +710,7 @@ class HomeViewModel @Inject constructor(
                                 )
                             )
                             with(
-                                index = 3,
-                                pdv = pv1,
-                                ads = Triple(
+                                index = 3, pdv = pv1, ads = Triple(
 //                                1, 1,
 //                                s.toLong()
                                     (s * s / 2 / pv1 * 100).toLong(),
@@ -557,60 +718,92 @@ class HomeViewModel @Inject constructor(
                                     (s * 100).toLong()
                                 )
                             )
-
                         }
 
                         delay(100)
-                        println("===制胶运动结束===")
-//===================制胶运动结束=====================
 
 
-                        //制胶完成，清洗运动
-                        /**
-                         * 冲洗液泵清洗液量
-                         */
-                        val rinseCleanVolume = dataStore.readData("rinseCleanVolume", 0.0)
-                        start {
-                            timeOut = 1000L * 60L
-                            with(
-                                index = 0,
-                                ads = Triple(600 * 100, 600 * 100, 600 * 100),
-                                pdv = wastePosition
-                            )
+                        if (hpd[0] != null && barCount > 0) {
+                            while (hpd[0]!! <= barCount) {
+                                delay(100L)
+                                var bars = hpd[0]?.div(barCount.toFloat())
+                                if (bars != null) {
+                                    _progress.value = bars
+                                }
+                                Log.d(
+                                    "HomeViewModel",
+                                    "hdp[0]====" + hpd[0] + "===barCount===" + barCount + "===_progress.value===" + _progress.value
+                                )
+                                if (bars == 1.0f) {
+                                    barBool = true
+                                    _progress.value = bars
+                                    break
+                                }
+
+                            }
                         }
 
-                        start {
-                            timeOut = 1000L * 60L
-                            with(
-                                index = 4,
-                                ads = Triple(600 * 100, 600 * 100, 600 * 100),
-                                pdv = rinseCleanVolume * 1000
-                            )
+                        Log.d(
+                            "HomeViewModel",
+                            "===制胶运动结束==="
+                        )
+
+                        //===================制胶运动结束=====================
+
+                        if (barBool) {
+                            delay(2000)
+                            //制胶完成，清洗运动
+                            /**
+                             * 冲洗液泵清洗液量
+                             */
+                            val rinseP = pulse(index = 4, dvp = setting.rinseCleanVolume * 1000)
+
+                            start {
+                                timeOut = 1000L * 60L
+                                with(
+                                    index = 0,
+                                    ads = Triple(600 * 100, 600 * 100, 600 * 100),
+                                    pdv = setting.wastePosition
+                                )
+                            }
+
+                            start {
+                                timeOut = 1000L * 60L
+                                with(
+                                    index = 4,
+                                    ads = Triple(600 * 100, 600 * 100, 600 * 100),
+                                    pdv = rinseP
+                                )
+                            }
+
+                            delay(100)
+                            _complate.value += 1
+//                            _usedCoagulant.value += (coagulantRehearsal/1000).toFloat()
+
+                            if (_complate.value == expectedMakeNum) {
+                                _uiFlags.value = UiFlags.objects(6)
+                            } else {
+                                lightFlashYellow()
+                                _uiFlags.value = UiFlags.objects(4)
+                            }
+                            ApplicationUtils.ctx.playAudio(R.raw.error)
                         }
 
-                        delay(100)
-                        var complete = dataStore.readData("complete", 0)
-                        dataStore.saveData("complete", complete + 1)
-                        complete = dataStore.readData("complete", 0)
-                        var expectedMakeNum = dataStore.readData("expectedMakenum", 1)
-                        println("complete===$complete")
-                        println("expectedMakeNum===$expectedMakeNum")
-                        if (complete == expectedMakeNum) {
-                            _uiFlags.value = UiFlags.objects(6)
-                        } else {
-                            lightFlashYellow()
-                            _uiFlags.value = UiFlags.objects(4)
-                        }
-                        ApplicationUtils.ctx.playAudio(R.raw.error)
                     } catch (ex: Exception) {
+                        var experimentRecord = erDao.getById(_selectedER.value).firstOrNull()
+                        if (experimentRecord != null) {
+                            experimentRecord.status = EPStatus.FAULT
+                            experimentRecord.detail = "系统故障"
+                            HomeIntent.Update(experimentRecord)
+                        }
                         ex.printStackTrace()
                     } finally {
-//                        _uiFlags.value = UiFlags.none()
 
                         _job.value?.cancel()
                         _job.value = null
                     }
                 }
+
 
             }
         }
@@ -674,7 +867,7 @@ class HomeViewModel @Inject constructor(
                 val wastePosition = dataStore.readData("wastePosition", 0.0)
 
                 start {
-                    timeOut = 1000L * 60L
+                    timeOut = 1000L * 60L * 10
                     with(
 
                         index = 0,
@@ -686,6 +879,7 @@ class HomeViewModel @Inject constructor(
                 if (p1Count > 1) {
                     for (i in 0 until Math.ceil(p1Count).toInt()) {
                         start {
+                            timeOut = 1000L * 60L * 10
                             with(
                                 index = 1,
                                 ads = Triple(600 * 100, 600 * 100, 600 * 100),
@@ -693,6 +887,7 @@ class HomeViewModel @Inject constructor(
                             )
                         }
                         start {
+                            timeOut = 1000L * 60L * 10
                             with(
                                 index = 1,
                                 ads = Triple(600 * 100, 600 * 100, 600 * 100),
@@ -703,6 +898,7 @@ class HomeViewModel @Inject constructor(
 
                 } else {
                     start {
+                        timeOut = 1000L * 60L * 10
                         with(
                             index = 1,
                             ads = Triple(600 * 100, 600 * 100, 600 * 100),
@@ -713,6 +909,7 @@ class HomeViewModel @Inject constructor(
 
 
                 start {
+                    timeOut = 1000L * 60L * 10
                     with(
                         index = 2,
                         ads = Triple(600 * 100 + 5, 600 * 100 + 5, 600 * 100),
@@ -772,6 +969,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+
     private fun pipeline(index: Int) {
         viewModelScope.launch {
             if (index == 0) {
@@ -802,14 +1000,10 @@ class HomeViewModel @Inject constructor(
                  * 促凝剂泵管路填充
                  */
                 val coagulantFilling = dataStore.readData("coagulantFilling", 0.0)
-                println("coagulantFilling===$coagulantFilling")
 
                 val p1 = pulse(index = 1, dvp = coagulantFilling)
                 val coagulantpulse = dataStore.readData("coagulantpulse", 67500).toLong()
-                println("coagulantpulse===$coagulantpulse")
                 val p1Count = p1.toDouble() / coagulantpulse.toDouble()
-                println("p1Count===$p1Count")
-                println("Math.ceil===p1Count===" + Math.ceil(p1Count).toInt())
 
                 /**
                  * 废液槽位置
@@ -817,7 +1011,7 @@ class HomeViewModel @Inject constructor(
                 val wastePosition = dataStore.readData("wastePosition", 0.0)
 
                 start {
-                    timeOut = 1000L * 60L
+                    timeOut = 1000L * 60L * 10
                     with(
 
                         index = 0,
@@ -829,6 +1023,7 @@ class HomeViewModel @Inject constructor(
                 if (p1Count > 1) {
                     for (i in 0 until Math.ceil(p1Count).toInt()) {
                         start {
+                            timeOut = 1000L * 60L * 10
                             with(
                                 index = 1,
                                 ads = Triple(600 * 100, 600 * 100, 600 * 100),
@@ -836,6 +1031,7 @@ class HomeViewModel @Inject constructor(
                             )
                         }
                         start {
+                            timeOut = 1000L * 60L * 10
                             with(
                                 index = 1,
                                 ads = Triple(600 * 100, 600 * 100, 600 * 100),
@@ -846,6 +1042,7 @@ class HomeViewModel @Inject constructor(
 
                 } else {
                     start {
+                        timeOut = 1000L * 60L * 10
                         with(
                             index = 1,
                             ads = Triple(600 * 100, 600 * 100, 600 * 100),
@@ -858,6 +1055,7 @@ class HomeViewModel @Inject constructor(
 
 
                 start {
+                    timeOut = 1000L * 60L * 10
                     with(
                         index = 2,
                         ads = Triple(600 * 100 + 5, 600 * 100 + 5, 600 * 100),
@@ -882,6 +1080,31 @@ class HomeViewModel @Inject constructor(
     }
 }
 
+/**
+ * 状态；0-运行中；1-已完成；2-中止；3-故障
+ */
+object EPStatus {
+    /**
+     * 运行中
+     */
+    const val RUNNING = "运行中"
+
+    /**
+     * 已完成
+     */
+    const val COMPLETED = "已完成"
+
+    /**
+     * 中止
+     */
+    const val ABORT = "中止"
+
+    /**
+     * 故障
+     */
+    const val FAULT = "故障"
+}
+
 sealed class HomeIntent {
     data class NavTo(val page: Int) : HomeIntent()
     data class Flags(val uiFlags: UiFlags) : HomeIntent()
@@ -894,4 +1117,17 @@ sealed class HomeIntent {
     data object deng : HomeIntent()
     data class Start(val count: Int) : HomeIntent()
     data object Stop : HomeIntent()
+
+    data class Insert(
+        val startRange: Double,
+        val endRange: Double,
+        val thickness: String,
+        val coagulant: Double,
+        val volume: Double,
+        var number: Int,
+        var status: String,
+        var detail: String
+    ) : HomeIntent()
+
+    data class Update(val entity: ExperimentRecord) : HomeIntent()
 }

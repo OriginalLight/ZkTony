@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
  */
 @Composable
 fun WaterVerticalProgressBar(
-    waterProgress: MutableState<Float>,
+    waterProgress: Float,
     water: String,
     modifier: Modifier = Modifier,
     color: Color = Color.Green,
@@ -45,7 +45,7 @@ fun WaterVerticalProgressBar(
 //    val water = rememberDataSaverState(key = "water", default = 0f)
 //    var water_ex by remember { mutableStateOf(water.value.format(1)) }
     val waterDescLayoutResult = rememberTextMeasurer().measure(
-        AnnotatedString("液量:" + water),
+        AnnotatedString("液量:$water"),
         TextStyle(color = Color(178, 193, 209))
     )
 
@@ -62,9 +62,9 @@ fun WaterVerticalProgressBar(
             color = color,
             size = Size(
                 size.width.dp.toPx(),
-                height = (waterProgress.value * size.height).dp.toPx()
+                height = (waterProgress * size.height).dp.toPx()
             ),
-            topLeft = Offset(0.dp.toPx(), ((1 - waterProgress.value) * size.height).dp.toPx()),
+            topLeft = Offset(0.dp.toPx(), ((1 - waterProgress) * size.height).dp.toPx()),
             cornerRadius = CornerRadius ( 10f , 10f )
         )
         // background
@@ -72,7 +72,7 @@ fun WaterVerticalProgressBar(
             color = backgroundColor,
             size = Size(
                 width = size.width.dp.toPx(),
-                height = ((1 - waterProgress.value) * size.height).dp.toPx()
+                height = ((1 - waterProgress) * size.height).dp.toPx()
             ),
             cornerRadius = CornerRadius ( 10f , 10f )
         )

@@ -35,4 +35,10 @@ object RoomModule {
 
     @Provides
     fun ExperimentRecordDao(database: AppDatabase) = database.ExperimentRecordDao()
+
+    @Provides
+    fun SettingDao(database: AppDatabase) = database.SettingDao()
+
+    @Provides
+    fun NewCalibrationDao(database: AppDatabase) = database.NewCalibrationDao()
 }

@@ -153,14 +153,6 @@ fun DebugModeAppBar(
                         .padding(top = 20.dp),
                     horizontalArrangement = Arrangement.spacedBy(50.dp)
                 ) {
-                    AnimatedVisibility(visible = page != PageType.HOME && page != PageType.PROGRAM && page != PageType.EXPERIMENTRECORDS && page != PageType.SETTINGS) {
-                        ElevatedButton(onClick = navigation) {
-                            Icon(
-                                imageVector = Icons.Default.Reply,
-                                contentDescription = null
-                            )
-                        }
-                    }
                     TOP_LEVEL_DESTINATIONS.forEach { destination ->
 
                         if ("首页".equals(destination.text)) {

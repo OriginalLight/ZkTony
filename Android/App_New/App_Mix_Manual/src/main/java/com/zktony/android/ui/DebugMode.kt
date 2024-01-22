@@ -1,5 +1,6 @@
 package com.zktony.android.ui
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.border
@@ -47,6 +48,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.Motor
 import com.zktony.android.data.entities.Program
+import com.zktony.android.data.entities.Setting
 import com.zktony.android.ui.components.DebugModeAppBar
 import com.zktony.android.ui.components.ProgramAppBar
 import com.zktony.android.ui.utils.AnimatedContent
@@ -63,6 +65,7 @@ import com.zktony.android.utils.SerialPortUtils.lightGreed
 import com.zktony.android.utils.SerialPortUtils.lightRed
 import com.zktony.android.utils.SerialPortUtils.lightYellow
 import com.zktony.android.utils.extra.format
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -78,6 +81,9 @@ fun DebugModeRoute(viewModel: SettingViewModel) {
     val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
     val entities = viewModel.entities.collectAsLazyPagingItems()
     val proEntities = viewModel.proEntities.collectAsLazyPagingItems()
+
+    val slEntities = viewModel.slEntities.collectAsLazyPagingItems()
+
     val navigation: () -> Unit = {
         scope.launch {
             when (page) {
@@ -100,7 +106,7 @@ fun DebugModeRoute(viewModel: SettingViewModel) {
         AnimatedContent(targetState = page) {
             when (page) {
                 PageType.DEBUGMODE -> debugMode(
-                    viewModel::dispatch, entities.toList(), proEntities.toList(), selected
+                    viewModel::dispatch, proEntities.toList(), slEntities.toList()
                 )
 
                 else -> {}
@@ -112,11 +118,26 @@ fun DebugModeRoute(viewModel: SettingViewModel) {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun debugMode(
-    dispatch: (SettingIntent) -> Unit,
-    entities: List<Motor>,
+    uiEvent: (SettingIntent) -> Unit,
     proEntities: List<Program>,
-    selected: Long
+    slEntities: List<Setting>,
 ) {
+
+    var setting = slEntities.find {
+        it.id == 1L
+    } ?: Setting()
+    Log.d(
+        "Setting",
+        "setting=========$setting"
+    )
+    if (setting.id == 0L) {
+        uiEvent(
+            SettingIntent.InsertSet(
+                0.0, 0.0, 0.0, 500.0, 500.0, 500.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+            )
+        )
+    }
 
     val scope = rememberCoroutineScope()
 
@@ -129,16 +150,14 @@ fun debugMode(
     var speed_ex by remember { mutableStateOf(speed.value.toString()) }
 
     /**
-     * 废液槽坐标
+     * 胶板位置
      */
-    val wasteCoordinates = rememberDataSaverState(key = "wasteCoordinates", default = 0.0)
-    var wasteCoordinates_ex by remember { mutableStateOf(wasteCoordinates.value.format(1)) }
+    var glueBoardPosition_ex by remember { mutableStateOf(setting.glueBoardPosition.toString()) }
 
     /**
-     * 制胶架坐标
+     * 废液位置
      */
-    val makeCoordinates = rememberDataSaverState(key = "makeCoordinates", default = 0.0)
-    var makeCoordinates_ex by remember { mutableStateOf(makeCoordinates.value.format(1)) }
+    var wastePosition_ex by remember { mutableStateOf(setting.wastePosition.toString()) }
 
     //高浓度泵转速
     var higeSpeed by remember { mutableStateOf(0L) }
@@ -173,13 +192,6 @@ fun debugMode(
 
     var xSpeed by remember { mutableStateOf(0L) }
 
-
-    if (entities.isNotEmpty()) {
-        higeSpeed = entities[2].speed
-        lowSpeed = entities[3].speed
-        coagulantSpeed = entities[1].speed
-        xSpeed = entities[0].speed
-    }
 
     /**
      * 光耦1
@@ -232,8 +244,6 @@ fun debugMode(
      */
     var sound by remember { mutableStateOf(false) }
 
-    var calibrationMap = hashMapOf<String, Float>()
-
 
     /**
      * 手动控制
@@ -264,6 +274,12 @@ fun debugMode(
     var downMenu by remember { mutableStateOf(false) }
     //===============制胶弹窗==============================
 
+
+    //===============X轴运行弹窗==============================
+    val xDialog = remember { mutableStateOf(false) }
+
+    var xNum by remember { mutableStateOf(1) }
+    //===============X轴运行弹窗==============================
 
     //===============高浓度弹窗==============================
     val highDialog = remember { mutableStateOf(false) }
@@ -437,7 +453,7 @@ fun debugMode(
                         modifier = Modifier.width(100.dp),
                         value = higeSpeed.toString(),
                         label = { Text(text = "转速") },
-                        onValueChange = { higeSpeed = it.toLong() },
+                        onValueChange = { higeSpeed = if (it == "") 0 else it.toLong() },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
                             imeAction = ImeAction.Done,
@@ -473,7 +489,7 @@ fun debugMode(
                                     with(
                                         index = 2,
                                         pdv = -32000L,
-                                        ads = Triple(300, 400, speed.value.toLong()),
+                                        ads = Triple(600 * 100, 600 * 100, higeSpeed),
                                     )
                                 }
                             }
@@ -497,7 +513,7 @@ fun debugMode(
                         modifier = Modifier.width(100.dp),
                         value = lowSpeed.toString(),
                         label = { Text(text = "转速") },
-                        onValueChange = { lowSpeed = it.toLong() },
+                        onValueChange = { lowSpeed = if (it == "") 0 else it.toLong() },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
                             imeAction = ImeAction.Done,
@@ -533,7 +549,7 @@ fun debugMode(
                                     with(
                                         index = 3,
                                         pdv = -32000L,
-                                        ads = Triple(300, 400, speed.value.toLong()),
+                                        ads = Triple(600 * 100, 600 * 100, lowSpeed),
                                     )
                                 }
                             }
@@ -596,7 +612,11 @@ fun debugMode(
                                     with(
                                         index = 4,
                                         pdv = -32000L,
-                                        ads = Triple(300, 400, speed.value.toLong()),
+                                        ads = Triple(
+                                            600 * 100,
+                                            600 * 100,
+                                            rinseSpeed.value.toLong()
+                                        ),
                                     )
                                 }
                             }
@@ -620,7 +640,7 @@ fun debugMode(
                         modifier = Modifier.width(100.dp),
                         value = coagulantSpeed.toString(),
                         label = { Text(text = "转速") },
-                        onValueChange = { coagulantSpeed = it.toLong() },
+                        onValueChange = { coagulantSpeed = if (it == "") 0 else it.toLong() },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
                             imeAction = ImeAction.Done,
@@ -705,13 +725,12 @@ fun debugMode(
                         shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                         onClick = {
                             scope.launch {
-
                                 SerialPortUtils.start {
                                     timeOut = 1000L * 30
                                     with(
                                         index = 1,
-                                        pdv = 260000L,
-                                        ads = Triple(300, 400, speed.value.toLong()),
+                                        pdv = coagulantpulse.value.toLong(),
+                                        ads = Triple(600 * 100, 600 * 100, coagulantSpeed * 100),
                                     )
                                 }
 
@@ -726,6 +745,100 @@ fun debugMode(
                         .height(50.dp),
                         shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                         onClick = {
+                            scope.launch {
+                                // 查询GPIO状态
+                                //柱塞泵复位===========================================
+                                SerialPortUtils.gpio(2)
+                                delay(500L)
+                                println("注射泵光电状态====2号光电===" + SerialPortUtils.getGpio(2))
+                                if (!SerialPortUtils.getGpio(2)) {
+                                    SerialPortUtils.start {
+                                        timeOut = 1000L * 30
+                                        with(
+                                            index = 1,
+                                            pdv = 310000L,
+                                            ads = Triple(1200 * 100, 1200 * 100 + 5, 1200 * 100),
+                                        )
+                                    }
+                                    SerialPortUtils.start {
+                                        timeOut = 1000L * 30
+                                        with(
+                                            index = 1,
+                                            pdv = -6400L,
+                                            ads = Triple(1200 * 100, 1200 * 100 + 5, 1200 * 100),
+                                        )
+                                    }
+                                    SerialPortUtils.start {
+                                        timeOut = 1000L * 30
+                                        with(
+                                            index = 1,
+                                            pdv = 9600L,
+                                            ads = Triple(600 * 100, 600 * 100 + 5, 600 * 100),
+                                        )
+                                    }
+
+                                    SerialPortUtils.gpio(2)
+                                    delay(500L)
+                                    if (SerialPortUtils.getGpio(2)) {
+                                        SerialPortUtils.start {
+                                            timeOut = 1000L * 30
+                                            with(
+                                                index = 1,
+                                                pdv = -coagulantpulse.value.toLong(),
+                                                ads = Triple(
+                                                    1200 * 100,
+                                                    1200 * 100 + 5,
+                                                    1200 * 100
+                                                ),
+                                            )
+                                        }
+
+                                        //复位完成
+                                    } else {
+                                        //复位失败
+                                    }
+                                } else {
+                                    SerialPortUtils.start {
+                                        timeOut = 1000L * 30
+                                        with(
+                                            index = 1,
+                                            pdv = -6400L,
+                                            ads = Triple(1200 * 100, 1200 * 100 + 5, 1200 * 100),
+
+                                            )
+                                    }
+                                    SerialPortUtils.gpio(2)
+                                    delay(500L)
+                                    if (SerialPortUtils.getGpio(2)) {
+                                        //复位失败
+                                    } else {
+                                        SerialPortUtils.start {
+                                            timeOut = 1000L * 30
+                                            with(
+                                                index = 1,
+                                                pdv = 9600L,
+                                                ads = Triple(600 * 100, 600 * 100 + 5, 600 * 100),
+                                            )
+                                        }
+                                        //复位完成
+                                        SerialPortUtils.start {
+                                            timeOut = 1000L * 30
+                                            with(
+                                                index = 1,
+                                                pdv = -coagulantpulse.value.toLong(),
+                                                ads = Triple(
+                                                    1200 * 100,
+                                                    1200 * 100 + 5,
+                                                    1200 * 100
+                                                ),
+                                            )
+                                        }
+
+
+                                    }
+                                }
+                                //柱塞泵复位===========================================
+                            }
 
                         }) {
                         Text(text = "复    位", fontSize = 18.sp)
@@ -762,7 +875,7 @@ fun debugMode(
                             modifier = Modifier.width(100.dp),
                             value = xSpeed.toString(),
                             label = { Text(text = "转速") },
-                            onValueChange = { xSpeed = it.toLong() },
+                            onValueChange = { xSpeed = if (it == "") 0 else it.toLong() },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number,
                                 imeAction = ImeAction.Done,
@@ -784,9 +897,14 @@ fun debugMode(
 
                         OutlinedTextField(
                             modifier = Modifier.width(100.dp),
-                            value = wasteCoordinates_ex,
+                            value = wastePosition_ex,
                             label = { Text(text = "废液槽坐标") },
-                            onValueChange = { wasteCoordinates_ex = it },
+                            onValueChange = {
+                                wastePosition_ex = it
+                                setting.wastePosition =
+                                    wastePosition_ex.toDoubleOrNull() ?: 0.0
+                                uiEvent(SettingIntent.UpdateSet(setting))
+                            },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number,
                                 imeAction = ImeAction.Done,
@@ -802,7 +920,16 @@ fun debugMode(
                             .height(50.dp),
                             shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                             onClick = {
-
+                                scope.launch {
+                                    SerialPortUtils.start {
+                                        timeOut = 1000L * 60L
+                                        with(
+                                            index = 0,
+                                            ads = Triple(600 * 100, 600 * 100, xSpeed * 100),
+                                            pdv = setting.wastePosition
+                                        )
+                                    }
+                                }
                             }) {
                             Text(text = "移    动", fontSize = 18.sp)
                         }
@@ -816,9 +943,14 @@ fun debugMode(
 
                         OutlinedTextField(
                             modifier = Modifier.width(100.dp),
-                            value = makeCoordinates_ex,
+                            value = glueBoardPosition_ex,
                             label = { Text(text = "制胶架坐标") },
-                            onValueChange = { makeCoordinates_ex = it },
+                            onValueChange = {
+                                glueBoardPosition_ex = it
+                                setting.glueBoardPosition =
+                                    glueBoardPosition_ex.toDoubleOrNull() ?: 0.0
+                                uiEvent(SettingIntent.UpdateSet(setting))
+                            },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number,
                                 imeAction = ImeAction.Done,
@@ -834,7 +966,16 @@ fun debugMode(
                             .height(50.dp),
                             shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                             onClick = {
-
+                                scope.launch {
+                                    SerialPortUtils.start {
+                                        timeOut = 1000L * 60L
+                                        with(
+                                            index = 0,
+                                            ads = Triple(600 * 100, 600 * 100, xSpeed * 100),
+                                            pdv = setting.glueBoardPosition
+                                        )
+                                    }
+                                }
                             }) {
                             Text(text = "移    动", fontSize = 18.sp)
                         }
@@ -851,7 +992,7 @@ fun debugMode(
                             .height(50.dp),
                             shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                             onClick = {
-
+                                xDialog.value = true
                             }) {
                             Text(text = "运    行", fontSize = 18.sp)
                         }
@@ -862,6 +1003,156 @@ fun debugMode(
                             .height(50.dp),
                             shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                             onClick = {
+
+                                scope.launch {
+                                    //x轴复位===========================================
+                                    SerialPortUtils.gpio(0, 1)
+                                    delay(500L)
+                                    println(
+                                        "x轴光电状态====0号光电===" + SerialPortUtils.getGpio(0) + "====1号光电===" + SerialPortUtils.getGpio(
+                                            1
+                                        )
+                                    )
+                                    if (!SerialPortUtils.getGpio(0) && !SerialPortUtils.getGpio(1)) {
+                                        println("x轴反转")
+                                        SerialPortUtils.start {
+                                            timeOut = 1000L * 30
+                                            with(
+                                                index = 0,
+                                                pdv = -64000L,
+                                                ads = Triple(600 * 100, 600 * 101, 600 * 100),
+
+                                                )
+                                        }
+                                        println("x轴正转")
+                                        SerialPortUtils.start {
+                                            timeOut = 1000L * 30
+                                            with(
+                                                index = 0,
+                                                pdv = 6400L,
+                                                ads = Triple(600 * 100, 600 * 101, 600 * 100),
+
+                                                )
+                                        }
+                                        SerialPortUtils.start {
+                                            timeOut = 1000L * 30
+                                            with(
+                                                index = 0,
+                                                pdv = -6500L,
+                                                ads = Triple(200 * 100, 200 * 101, 200 * 100),
+                                            )
+                                        }
+                                        SerialPortUtils.gpio(0)
+                                        delay(500L)
+                                        if (SerialPortUtils.getGpio(0)) {
+                                            SerialPortUtils.start {
+                                                timeOut = 1000L * 30
+                                                with(
+
+                                                    index = 0,
+                                                    pdv = 1600L,
+                                                    ads = Triple(600 * 100, 600 * 101, 600 * 100),
+
+                                                    )
+                                            }
+                                            println("复位完成")
+                                            //复位完成
+                                        } else {
+                                            println("复位失败")
+                                            //复位失败
+                                        }
+
+                                    } else if (!SerialPortUtils.getGpio(0) && SerialPortUtils.getGpio(
+                                            1
+                                        )
+                                    ) {
+                                        SerialPortUtils.start {
+                                            timeOut = 1000L * 30
+                                            with(
+                                                index = 0,
+                                                pdv = -64000L,
+                                                ads = Triple(600 * 100, 600 * 101, 600 * 100),
+
+                                                )
+                                        }
+                                        SerialPortUtils.start {
+                                            timeOut = 1000L * 30
+                                            with(
+                                                index = 0,
+                                                pdv = 6400L,
+                                                ads = Triple(600 * 100, 600 * 101, 600 * 100),
+
+                                                )
+                                        }
+                                        SerialPortUtils.start {
+                                            timeOut = 1000L * 30
+                                            with(
+                                                index = 0,
+                                                pdv = -6500L,
+                                                ads = Triple(200 * 100, 200 * 101, 200 * 100),
+
+                                                )
+                                        }
+                                        SerialPortUtils.gpio(0)
+                                        delay(500L)
+                                        if (SerialPortUtils.getGpio(0)) {
+                                            SerialPortUtils.start {
+                                                timeOut = 1000L * 30
+                                                with(
+                                                    index = 0,
+                                                    pdv = 1600L,
+                                                    ads = Triple(600 * 100, 600 * 101, 600 * 100),
+
+                                                    )
+                                            }
+                                            println("复位完成")
+                                            //复位完成
+                                        } else {
+                                            println("复位失败")
+                                            //复位失败
+                                        }
+
+                                    } else if (SerialPortUtils.getGpio(0) && !SerialPortUtils.getGpio(
+                                            1
+                                        )
+                                    ) {
+                                        SerialPortUtils.start {
+                                            timeOut = 1000L * 30
+                                            with(
+                                                index = 0,
+                                                pdv = 6400L,
+                                                ads = Triple(600 * 100, 600 * 101, 600 * 100),
+                                            )
+                                        }
+                                        SerialPortUtils.gpio(0)
+                                        delay(500L)
+                                        if (SerialPortUtils.getGpio(0)) {
+                                            println("复位失败")
+                                        } else {
+                                            SerialPortUtils.start {
+                                                timeOut = 1000L * 30
+                                                with(
+                                                    index = 0,
+                                                    pdv = -6500L,
+                                                    ads = Triple(200 * 100, 200 * 101, 200 * 100),
+
+                                                    )
+                                            }
+                                            println("复位完成")
+                                            SerialPortUtils.start {
+                                                timeOut = 1000L * 30
+                                                with(
+                                                    index = 0,
+                                                    pdv = 1600L,
+                                                    ads = Triple(600 * 100, 600 * 101, 600 * 100),
+                                                )
+                                            }
+                                        }
+                                    } else {
+                                        println("复位失败")
+                                    }
+                                    //x轴复位===========================================
+                                }
 
                             }) {
                             Text(text = "复    位", fontSize = 18.sp)
@@ -917,7 +1208,7 @@ fun debugMode(
                     ) {
 
                         Text(
-                            modifier = Modifier.padding(top = 10.dp, start = 5.dp), text = "光耦1"
+                            modifier = Modifier.padding(top = 10.dp, start = 5.dp), text = "光耦2"
                         )
 
                         Button(modifier = Modifier
@@ -931,8 +1222,8 @@ fun debugMode(
                             Text(text = "检    测", fontSize = 18.sp)
                         }
 
-                        Checkbox(checked = Optocoupler1, enabled = false, onCheckedChange = {
-                            Optocoupler1 = it
+                        Checkbox(checked = Optocoupler2, enabled = false, onCheckedChange = {
+                            Optocoupler2 = it
                         })
                     }
 
@@ -942,7 +1233,7 @@ fun debugMode(
                     ) {
 
                         Text(
-                            modifier = Modifier.padding(top = 10.dp, start = 5.dp), text = "光耦1"
+                            modifier = Modifier.padding(top = 10.dp, start = 5.dp), text = "光耦3"
                         )
 
                         Button(modifier = Modifier
@@ -956,8 +1247,8 @@ fun debugMode(
                             Text(text = "检    测", fontSize = 18.sp)
                         }
 
-                        Checkbox(checked = Optocoupler1, enabled = false, onCheckedChange = {
-                            Optocoupler1 = it
+                        Checkbox(checked = Optocoupler3, enabled = false, onCheckedChange = {
+                            Optocoupler3 = it
                         })
                     }
 
@@ -967,7 +1258,7 @@ fun debugMode(
                     ) {
 
                         Text(
-                            modifier = Modifier.padding(top = 10.dp, start = 5.dp), text = "光耦1"
+                            modifier = Modifier.padding(top = 10.dp, start = 5.dp), text = "光耦4"
                         )
 
                         Button(modifier = Modifier
@@ -981,8 +1272,8 @@ fun debugMode(
                             Text(text = "检    测", fontSize = 18.sp)
                         }
 
-                        Checkbox(checked = Optocoupler1, enabled = false, onCheckedChange = {
-                            Optocoupler1 = it
+                        Checkbox(checked = Optocoupler4, enabled = false, onCheckedChange = {
+                            Optocoupler4 = it
                         })
                     }
 
@@ -992,7 +1283,7 @@ fun debugMode(
                     ) {
 
                         Text(
-                            modifier = Modifier.padding(top = 10.dp, start = 5.dp), text = "光耦1"
+                            modifier = Modifier.padding(top = 10.dp, start = 5.dp), text = "光耦5"
                         )
 
                         Button(modifier = Modifier
@@ -1006,8 +1297,8 @@ fun debugMode(
                             Text(text = "检    测", fontSize = 18.sp)
                         }
 
-                        Checkbox(checked = Optocoupler1, enabled = false, onCheckedChange = {
-                            Optocoupler1 = it
+                        Checkbox(checked = Optocoupler5, enabled = false, onCheckedChange = {
+                            Optocoupler5 = it
                         })
                     }
                 }
@@ -1100,13 +1391,13 @@ fun debugMode(
                                                 scope.launch {
                                                     lightFlashYellow()
                                                 }
-                                            }else if (colorsThickness.value == "红" ||colorsThickness.value == "绿"){
+                                            } else if (colorsThickness.value == "红" || colorsThickness.value == "绿") {
                                                 flashingThickness.value = "常亮"
-                                                if(colorsThickness.value == "红"){
+                                                if (colorsThickness.value == "红") {
                                                     scope.launch {
                                                         lightRed()
                                                     }
-                                                }else{
+                                                } else {
                                                     scope.launch {
                                                         lightGreed()
                                                     }
@@ -1233,7 +1524,7 @@ fun debugMode(
                                 Text(text = it)
                             }
 
-                            Spacer(modifier = Modifier.width(20.dp))
+                            Spacer(modifier = Modifier.width(10.dp))
                         }
                     }
 
@@ -1249,7 +1540,7 @@ fun debugMode(
 
 
     //制胶弹窗
-    if (highDialog.value) {
+    if (glueDialog.value) {
         AlertDialog(onDismissRequest = { }, title = {}, text = {
 
             Column {
@@ -1346,16 +1637,87 @@ fun debugMode(
             }
         }, dismissButton = {
             TextButton(onClick = {
-                highDialog.value = false
+                glueDialog.value = false
             }) {
                 Text(text = "关闭")
             }
         })
     }
 
+    //X轴运行弹窗
+    if (xDialog.value) {
+        AlertDialog(onDismissRequest = { xDialog.value = false }, title = {}, text = {
+            Row {
+                Text(text = "请输入制胶数量:")
+
+                OutlinedTextField(
+                    modifier = Modifier.width(100.dp),
+                    value = xNum.toString(),
+                    label = { Text(text = "不输入默认运行1次") },
+                    onValueChange = {
+                        xNum = it.toIntOrNull() ?: 1
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(onDone = {
+                        keyboard?.hide()
+                    })
+                )
+            }
+
+
+        }, confirmButton = {
+            TextButton(onClick = {
+                for (i in 1..xNum) {
+                    scope.launch {
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 0,
+                                pdv = setting.wastePosition,
+                                ads = Triple(600 * 100, 600 * 100, xSpeed * 100),
+                            )
+                        }
+                        delay(100)
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 0,
+                                pdv = setting.glueBoardPosition,
+                                ads = Triple(600 * 100, 600 * 100, xSpeed * 100),
+                            )
+                        }
+
+                        delay(100)
+                    }
+                }
+
+
+            }) {
+                Text(text = "开始")
+            }
+        }, dismissButton = {
+            TextButton(onClick = {
+                scope.launch {
+                    SerialPortUtils.stop(0, 1, 2, 3, 4)
+                    xDialog.value = false
+                }
+            }) {
+                Text(text = "停止")
+            }
+        })
+    }
+
     //高浓度弹窗
     if (highDialog.value) {
-        AlertDialog(onDismissRequest = { highDialog.value = false }, title = {}, text = {
+        AlertDialog(onDismissRequest = {
+            scope.launch {
+                SerialPortUtils.stop(0, 1, 2, 3, 4)
+                highDialog.value = false
+            }
+        }, title = {}, text = {
             Row {
                 Text(text = "请输入运行步数:")
 
@@ -1380,7 +1742,16 @@ fun debugMode(
         }, confirmButton = {
             TextButton(onClick = {
                 if (highNum == 0) {
-
+                    scope.launch {
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 2,
+                                pdv = 3200L * 1000,
+                                ads = Triple(600 * 100, 600 * 100, higeSpeed * 100),
+                            )
+                        }
+                    }
                 } else {
                     scope.launch {
                         SerialPortUtils.start {
@@ -1388,7 +1759,7 @@ fun debugMode(
                             with(
                                 index = 2,
                                 pdv = highNum,
-                                ads = Triple(300, 400, speed.value.toLong()),
+                                ads = Triple(600 * 100, 600 * 100, higeSpeed * 100),
                             )
                         }
                     }
@@ -1399,7 +1770,10 @@ fun debugMode(
             }
         }, dismissButton = {
             TextButton(onClick = {
-                highDialog.value = false
+                scope.launch {
+                    SerialPortUtils.stop(0, 1, 2, 3, 4)
+                    highDialog.value = false
+                }
             }) {
                 Text(text = "停止")
             }
@@ -1408,7 +1782,12 @@ fun debugMode(
 
     //低浓度弹窗
     if (lowDialog.value) {
-        AlertDialog(onDismissRequest = { lowDialog.value = false }, title = {}, text = {
+        AlertDialog(onDismissRequest = {
+            scope.launch {
+                SerialPortUtils.stop(0, 1, 2, 3, 4)
+                lowDialog.value = false
+            }
+        }, title = {}, text = {
             Row {
                 Text(text = "请输入运行步数:")
 
@@ -1433,7 +1812,16 @@ fun debugMode(
         }, confirmButton = {
             TextButton(onClick = {
                 if (lowNum == 0) {
-
+                    scope.launch {
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 3,
+                                pdv = 3200L * 1000,
+                                ads = Triple(600 * 100, 600 * 100, lowSpeed * 100),
+                            )
+                        }
+                    }
                 } else {
                     scope.launch {
                         SerialPortUtils.start {
@@ -1441,7 +1829,7 @@ fun debugMode(
                             with(
                                 index = 3,
                                 pdv = lowNum,
-                                ads = Triple(300, 400, speed.value.toLong()),
+                                ads = Triple(600 * 100, 600 * 100, lowSpeed * 100),
                             )
                         }
                     }
@@ -1452,7 +1840,10 @@ fun debugMode(
             }
         }, dismissButton = {
             TextButton(onClick = {
-                lowDialog.value = false
+                scope.launch {
+                    SerialPortUtils.stop(0, 1, 2, 3, 4)
+                    lowDialog.value = false
+                }
             }) {
                 Text(text = "停止")
             }
@@ -1461,7 +1852,12 @@ fun debugMode(
 
     //冲洗泵弹窗
     if (rinseDialog.value) {
-        AlertDialog(onDismissRequest = { rinseDialog.value = false }, title = {}, text = {
+        AlertDialog(onDismissRequest = {
+            scope.launch {
+                SerialPortUtils.stop(0, 1, 2, 3, 4)
+                rinseDialog.value = false
+            }
+        }, title = {}, text = {
             Row {
                 Text(text = "请输入运行步数:")
 
@@ -1486,7 +1882,16 @@ fun debugMode(
         }, confirmButton = {
             TextButton(onClick = {
                 if (rinseNum == 0) {
-
+                    scope.launch {
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 4,
+                                pdv = 3200L * 1000,
+                                ads = Triple(600 * 100, 600 * 100, rinseSpeed.value * 100),
+                            )
+                        }
+                    }
                 } else {
                     scope.launch {
                         SerialPortUtils.start {
@@ -1494,7 +1899,7 @@ fun debugMode(
                             with(
                                 index = 4,
                                 pdv = rinseNum,
-                                ads = Triple(300, 400, speed.value.toLong()),
+                                ads = Triple(600 * 100, 600 * 100, rinseSpeed.value * 100),
                             )
                         }
                     }
@@ -1505,7 +1910,10 @@ fun debugMode(
             }
         }, dismissButton = {
             TextButton(onClick = {
-                rinseDialog.value = false
+                scope.launch {
+                    SerialPortUtils.stop(0, 1, 2, 3, 4)
+                    rinseDialog.value = false
+                }
             }) {
                 Text(text = "停止")
             }

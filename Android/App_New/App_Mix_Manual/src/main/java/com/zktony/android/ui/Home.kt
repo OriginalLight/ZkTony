@@ -1,5 +1,7 @@
 package com.zktony.android.ui
 
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -58,6 +60,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -77,6 +80,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.R
 import com.zktony.android.data.datastore.rememberDataSaverState
+import com.zktony.android.data.entities.ExperimentRecord
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.components.HomeAppBar
 import com.zktony.android.ui.components.TableText
@@ -95,7 +99,10 @@ import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.toList
 import com.zktony.android.utils.AppStateUtils
+import com.zktony.android.utils.AppStateUtils.hpc
+import com.zktony.android.utils.AppStateUtils.hpd
 import com.zktony.android.utils.ApplicationUtils
+import com.zktony.android.utils.SerialPortUtils
 import com.zktony.android.utils.extra.dateFormat
 import com.zktony.android.utils.extra.format
 import com.zktony.android.utils.extra.playAudio
@@ -113,13 +120,16 @@ fun HomeRoute(viewModel: HomeViewModel) {
 
     val page by viewModel.page.collectAsStateWithLifecycle()
     val selected by viewModel.selected.collectAsStateWithLifecycle()
+    val selectedER by viewModel.selectedER.collectAsStateWithLifecycle()
     val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
     val job by viewModel.job.collectAsStateWithLifecycle()
+    val complate by viewModel.complate.collectAsStateWithLifecycle()
+    val process by viewModel.progress.collectAsStateWithLifecycle()
 
     val entities = viewModel.entities.collectAsLazyPagingItems()
 
-//    val xpulse = rememberDataSaverState(key = "xpulse", default = 0L)
-//    val coagulantpulse = rememberDataSaverState(key = "coagulantpulse", default = 0L)
+    val erEntities = viewModel.erEntities.collectAsLazyPagingItems()
+
 
     val navigation: () -> Unit = {
         scope.launch {
@@ -147,10 +157,14 @@ fun HomeRoute(viewModel: HomeViewModel) {
                 PageType.HOME -> operate(
                     entities,
                     entities.toList(),
+                    erEntities.toList(),
                     selected,
+                    selectedER,
                     uiFlags,
                     job,
-                    viewModel::dispatch
+                    viewModel::dispatch,
+                    complate,
+                    process
                 )
             }
         }
@@ -165,16 +179,21 @@ fun HomeRoute(viewModel: HomeViewModel) {
 fun operate(
     entitiesLazy: LazyPagingItems<Program>,
     entities: List<Program>,
+    erEntities: List<ExperimentRecord>,
     selected: Long,
+    selectedER: Long,
     uiFlags: UiFlags,
     job: Job?,
-    uiEvent: (HomeIntent) -> Unit
+    uiEvent: (HomeIntent) -> Unit,
+    complate: Int,
+    process: Float
 ) {
 
     val scope = rememberCoroutineScope()
 
     val keyboard = LocalSoftwareKeyboardController.current
 
+    val context = LocalContext.current
 
     /**
      * 选中的程序
@@ -183,6 +202,8 @@ fun operate(
 
     var programId = rememberDataSaverState(key = "programid", default = 1L)
 
+    var erSelectedIndex by remember { mutableStateOf(0L) }
+
     /**
      * 选中的实体
      */
@@ -190,47 +211,53 @@ fun operate(
         it.id == programId.value
     } ?: Program()
 
-    /**
-     * 纯水进度
-     */
-    val waterSweepState = remember {
-        mutableStateOf(0f)
-    }
+    val experimentRecord = erEntities.find {
+        it.id == selectedER
+    } ?: ExperimentRecord()
 
-    /**
-     * 促凝剂进度
-     */
-    val coagulantSweepState = remember {
-        mutableStateOf(0f)
-    }
+    uiEvent(HomeIntent.Selected(program.id))
 
-    /**
-     * 低浓度进度
-     */
-    val lowCoagulantSweepState = remember {
-        mutableStateOf(0f)
-    }
-
-    /**
-     * 高浓度进度
-     */
-    val highCoagulantSweepState = remember {
-        mutableStateOf(0f)
-    }
-
-    /**
-     * 废液
-     */
-    val wasteSweepState = remember {
-        mutableStateOf(0f)
-    }
-
-    /**
-     * 制胶进度
-     */
-    val progressSweepState = remember {
-        mutableStateOf(0f)
-    }
+//    /**
+//     * 纯水进度
+//     */
+//    val waterSweepState = remember {
+//        mutableStateOf(0f)
+//    }
+//
+//    /**
+//     * 促凝剂进度
+//     */
+//    val coagulantSweepState = remember {
+//        mutableStateOf(0f)
+//    }
+//
+//    /**
+//     * 低浓度进度
+//     */
+//    val lowCoagulantSweepState = remember {
+//        mutableStateOf(0f)
+//    }
+//
+//    /**
+//     * 高浓度进度
+//     */
+//    val highCoagulantSweepState = remember {
+//        mutableStateOf(0f)
+//    }
+//
+//    /**
+//     * 废液进度
+//     */
+//    var wasteSweepState = remember {
+//        mutableStateOf(0f)
+//    }
+//
+//    /**
+//     * 制胶进度
+//     */
+//    val progressSweepState = remember {
+//        mutableStateOf(0f)
+//    }
 
     /**
      * 纯水弹窗
@@ -302,24 +329,22 @@ fun operate(
      */
     val waste = rememberDataSaverState(key = "waste", default = 0f)
     var waste_ex by remember { mutableStateOf(waste.value.format(1)) }
+    /**
+     * 制胶预排-高浓度预排液
+     */
+    var higeRehearsalVolume = rememberDataSaverState(key = "higeRehearsalVolume", default = 0.0)
 
 
     /**
-     *  制胶进度
+     * 制胶清洗-冲洗液泵清洗液量
      */
-    val progressVol = rememberDataSaverState(key = "progressVol", default = 0f)
-    var progressVol_ex by remember { mutableStateOf(progressVol.value.format(1)) }
+    var rinseCleanVolume = rememberDataSaverState(key = "rinseCleanVolume", default = 0.0)
+
 
     /**
      * 程序列表弹窗
      */
     val programListDialog = remember { mutableStateOf(false) }
-
-    /**
-     * 已完成的制胶数量
-     */
-    var complete = rememberDataSaverState(key = "complete", default = 0)
-    var complete_ex by remember { mutableStateOf(complete.value.toString()) }
 
 
     /**
@@ -339,12 +364,18 @@ fun operate(
      */
     val continueGlueDialog = remember { mutableStateOf(false) }
 
-    println("uiFlags is UiFlags.Objects$uiFlags")
+    /**
+     * 清空废液槽弹窗
+     */
+    val wasteDialog = remember { mutableStateOf(false) }
+
+
     if (uiFlags is UiFlags.Objects && uiFlags.objects == 4) {
-        complete = rememberDataSaverState(key = "complete", default = 0)
         continueGlueDialog.value = true
     } else if (uiFlags is UiFlags.Objects && uiFlags.objects == 6) {
-        complete = rememberDataSaverState(key = "complete", default = 0)
+        experimentRecord.status = EPStatus.COMPLETED
+        experimentRecord.number = complate
+        uiEvent(HomeIntent.Update(experimentRecord))
         continueGlueDialog.value = false
         uiEvent(HomeIntent.Stop)
     }
@@ -371,7 +402,7 @@ fun operate(
                     })
             ) {
                 //纯水进度条
-                WaterVerticalProgressBar(waterSweepState, water_ex)
+                WaterVerticalProgressBar(0f, water_ex)
             }
 
             Row(
@@ -382,7 +413,11 @@ fun operate(
                     })
             ) {
                 //促凝剂进度条
-                CoagulantProgressBarVertical(coagulantSweepState, coagulant_ex, concentration_ex)
+                CoagulantProgressBarVertical(
+                    0f,
+                    coagulant_ex,
+                    concentration_ex
+                )
             }
 
             Row(
@@ -394,7 +429,7 @@ fun operate(
             ) {
                 //低浓度进度条
                 LowCoagulantProgressBarVertical(
-                    lowCoagulantSweepState,
+                    0f,
                     lowCoagulantVol_ex,
                     lowCoagulant_ex
                 )
@@ -409,7 +444,7 @@ fun operate(
             ) {
                 //高浓度进度条
                 HighCoagulantProgressBarVertical(
-                    highCoagulantSweepState,
+                    0f,
                     highCoagulantVol_ex,
                     highCoagulant_ex
                 )
@@ -491,7 +526,7 @@ fun operate(
                     }
                 )
             )
-            Text(text = "已制胶数量:" + complete.value)
+            Text(text = "已制胶数量:$complate")
         }
 
 
@@ -509,7 +544,7 @@ fun operate(
                     })
             ) {
                 //废液进度条
-                WasteVerticalProgressBar(wasteSweepState, waste_ex)
+                WasteVerticalProgressBar(waste.value / 150f, waste_ex)
             }
 
             Row(
@@ -520,7 +555,10 @@ fun operate(
                     })
             ) {
                 //制胶进度的进度条
-                VerticalProgressBar(progressSweepState, progressVol_ex)
+                VerticalProgressBar(
+                    if (process > 0.01f) process else 0f,
+                    if (process < 0.01f) "0.0" else (process * 100).toString()
+                )
             }
 
         }
@@ -540,12 +578,43 @@ fun operate(
                             .clickable {
                                 if (job == null) {
                                     if (uiFlags is UiFlags.None) {
-                                        complete.value = 0
-                                        complete_ex = "0"
-                                        startMake = "停止制胶"
-                                        uiEvent(HomeIntent.Start(complete.value))
+
+                                        val coagulantRehearsal =
+                                            (program.coagulant / 1000) / program.volume * higeRehearsalVolume.value
+
+                                        waste.value +=
+                                            coagulantRehearsal.toFloat() + higeRehearsalVolume.value.toFloat()
+
+                                        waste_ex = waste.value.toString()
+                                        if (waste.value / 150f > 1f) {
+                                            wasteDialog.value = true
+                                        } else {
+                                            startMake = "停止制胶"
+                                            uiEvent(HomeIntent.Start(0))
+                                            uiEvent(
+                                                HomeIntent.Insert(
+                                                    program.startRange,
+                                                    program.endRange,
+                                                    program.thickness,
+                                                    program.coagulant,
+                                                    program.volume,
+                                                    complate,
+                                                    EPStatus.RUNNING,
+                                                    ""
+                                                )
+                                            )
+                                            Log.d(
+                                                "Home",
+                                                "selectedER===$selectedER"
+                                            )
+
+                                        }
+
                                     }
                                 } else {
+                                    experimentRecord.status = EPStatus.ABORT
+                                    experimentRecord.detail = "手动停止制胶"
+                                    uiEvent(HomeIntent.Update(experimentRecord))
                                     startMake = "开始制胶"
                                     uiEvent(HomeIntent.Stop)
 
@@ -554,7 +623,8 @@ fun operate(
                     )
 
                     Image(
-                        painter = painterResource(id = R.mipmap.filling), contentDescription = null,
+                        painter = painterResource(id = R.mipmap.filling),
+                        contentDescription = null,
                         modifier = Modifier
                             .padding(start = 20.dp)
                             .size(100.dp)
@@ -573,7 +643,8 @@ fun operate(
                     )
 
                     Image(
-                        painter = painterResource(id = R.mipmap.clean), contentDescription = null,
+                        painter = painterResource(id = R.mipmap.clean),
+                        contentDescription = null,
                         modifier = Modifier
                             .padding(start = 20.dp)
                             .size(100.dp)
@@ -588,12 +659,14 @@ fun operate(
                     )
 
                     Image(
-                        painter = painterResource(id = R.mipmap.reset), contentDescription = null,
+                        painter = painterResource(id = R.mipmap.reset),
+                        contentDescription = null,
                         modifier = Modifier
                             .padding(start = 20.dp)
                             .size(100.dp)
                             .clickable {
                                 if (job == null) {
+                                    waste.value = 0f
                                     uiEvent(HomeIntent.Reset)
                                 }
                             }
@@ -635,6 +708,33 @@ fun operate(
 
     }
 
+    if (wasteDialog.value) {
+        AlertDialog(
+            onDismissRequest = { },
+            title = {
+                Text(
+                    fontSize = 16.sp,
+                    text = "废液槽已满，请清空废液槽！"
+                )
+            },
+            text = {
+            }, confirmButton = {
+                TextButton(onClick = {
+                    wasteDialog.value = false
+                    waste.value = 0f
+                    waste_ex = "0"
+                }) {
+                    Text(text = "确定")
+                }
+            }, dismissButton = {
+                TextButton(onClick = {
+                    wasteDialog.value = false
+                }) {
+                    Text(text = "取消")
+                }
+            })
+    }
+
     /**
      * 继续制胶弹窗
      */
@@ -651,13 +751,19 @@ fun operate(
 
             }, confirmButton = {
                 TextButton(onClick = {
+                    experimentRecord.number = complate
+                    uiEvent(HomeIntent.Update(experimentRecord))
                     continueGlueDialog.value = false
-                    uiEvent(HomeIntent.Start(complete.value))
+                    uiEvent(HomeIntent.Start(1))
                 }) {
                     Text(text = "继续")
                 }
             }, dismissButton = {
                 TextButton(onClick = {
+                    experimentRecord.number = complate
+                    experimentRecord.status = EPStatus.ABORT
+                    experimentRecord.detail = "手动停止制胶"
+                    uiEvent(HomeIntent.Update(experimentRecord))
                     continueGlueDialog.value = false
                     uiEvent(HomeIntent.Stop)
                 }) {
@@ -671,7 +777,7 @@ fun operate(
      */
     if (waterDialog.value) {
         AlertDialog(
-            onDismissRequest = { waterDialog.value = false },
+            onDismissRequest = { },
             title = {
             },
             text = {
@@ -704,13 +810,25 @@ fun operate(
                 }
             }, confirmButton = {
                 TextButton(onClick = {
-                    water.value = water_ex.toFloatOrNull() ?: 0f
-                    waterDialog.value = false
+                    if (water_ex.toFloatOrNull() ?: 0f <= 50) {
+                        water.value = water_ex.toFloatOrNull() ?: 0f
+                        waterDialog.value = false
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "容量不能大于50ML！",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
                 }) {
                     Text(text = "确认")
                 }
             }, dismissButton = {
-                TextButton(onClick = { waterDialog.value = false }) {
+                TextButton(onClick = {
+                    water_ex = water.value.toString()
+                    waterDialog.value = false
+                }) {
                     Text(text = "取消")
                 }
             })
@@ -722,7 +840,7 @@ fun operate(
      */
     if (coagulantDialog.value) {
         AlertDialog(
-            onDismissRequest = { coagulantDialog.value = false },
+            onDismissRequest = { },
             title = {
 
             },
@@ -793,14 +911,27 @@ fun operate(
 
             }, confirmButton = {
                 TextButton(onClick = {
-                    concentration.value = concentration_ex.toFloatOrNull() ?: 0f
-                    coagulant.value = coagulant_ex.toFloatOrNull() ?: 0f
-                    coagulantDialog.value = false
+                    if (coagulant_ex.toFloatOrNull() ?: 0f <= 50) {
+                        concentration.value = concentration_ex.toFloatOrNull() ?: 0f
+                        coagulant.value = coagulant_ex.toFloatOrNull() ?: 0f
+                        coagulantDialog.value = false
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "容量不能大于50ML！",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
                 }) {
                     Text(text = "确认")
                 }
             }, dismissButton = {
-                TextButton(onClick = { coagulantDialog.value = false }) {
+                TextButton(onClick = {
+                    concentration_ex = concentration.value.toString()
+                    coagulant_ex = coagulant.value.toString()
+                    coagulantDialog.value = false
+                }) {
                     Text(text = "取消")
                 }
             })
@@ -812,7 +943,7 @@ fun operate(
      */
     if (lowDialog.value) {
         AlertDialog(
-            onDismissRequest = { lowDialog.value = false },
+            onDismissRequest = { },
             title = {
 
             },
@@ -884,14 +1015,27 @@ fun operate(
 
             }, confirmButton = {
                 TextButton(onClick = {
-                    lowCoagulant.value = lowCoagulant_ex.toFloatOrNull() ?: 0f
-                    lowCoagulantVol.value = lowCoagulantVol_ex.toFloatOrNull() ?: 0f
-                    lowDialog.value = false
+                    if (lowCoagulantVol_ex.toFloatOrNull() ?: 0f <= 50) {
+                        lowCoagulant.value = lowCoagulant_ex.toFloatOrNull() ?: 0f
+                        lowCoagulantVol.value = lowCoagulantVol_ex.toFloatOrNull() ?: 0f
+                        lowDialog.value = false
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "容量不能大于50ML！",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
                 }) {
                     Text(text = "确认")
                 }
             }, dismissButton = {
-                TextButton(onClick = { lowDialog.value = false }) {
+                TextButton(onClick = {
+                    lowCoagulant_ex = lowCoagulant.value.toString()
+                    lowCoagulantVol_ex = lowCoagulantVol.value.toString()
+                    lowDialog.value = false
+                }) {
                     Text(text = "取消")
                 }
             })
@@ -903,7 +1047,7 @@ fun operate(
      */
     if (highDialog.value) {
         AlertDialog(
-            onDismissRequest = { highDialog.value = false },
+            onDismissRequest = {},
             title = {
             },
             text = {
@@ -971,14 +1115,27 @@ fun operate(
 
             }, confirmButton = {
                 TextButton(onClick = {
-                    highCoagulant.value = highCoagulant_ex.toFloatOrNull() ?: 0f
-                    highCoagulantVol.value = highCoagulantVol_ex.toFloatOrNull() ?: 0f
-                    highDialog.value = false
+                    if (highCoagulantVol_ex.toFloatOrNull() ?: 0f <= 50) {
+                        highCoagulant.value = highCoagulant_ex.toFloatOrNull() ?: 0f
+                        highCoagulantVol.value = highCoagulantVol_ex.toFloatOrNull() ?: 0f
+                        highDialog.value = false
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "容量不能大于50ML！",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
                 }) {
                     Text(text = "确认")
                 }
             }, dismissButton = {
-                TextButton(onClick = { highDialog.value = false }) {
+                TextButton(onClick = {
+                    highCoagulant_ex = highCoagulant.value.toString()
+                    highCoagulantVol_ex = highCoagulantVol.value.toString()
+                    highDialog.value = false
+                }) {
                     Text(text = "取消")
                 }
             })
@@ -989,7 +1146,7 @@ fun operate(
      */
     if (programListDialog.value) {
         AlertDialog(
-            onDismissRequest = { programListDialog.value = false },
+            onDismissRequest = { },
             text = {
                 //	定义列宽
                 val cellWidthList = arrayListOf(70, 100, 130, 90, 100, 120)
@@ -1017,7 +1174,11 @@ fun operate(
                                     val entity = entities[selectedIndex]
                                     if (entity != null) {
                                         programId.value = entity.id
-                                        HomeIntent.Selected(entity.id)
+                                        Log.d(
+                                            "Test",
+                                            "home中选中的entityId===" + entity.id
+                                        )
+                                        uiEvent(HomeIntent.Selected(entity.id))
                                     }
 
                                 })

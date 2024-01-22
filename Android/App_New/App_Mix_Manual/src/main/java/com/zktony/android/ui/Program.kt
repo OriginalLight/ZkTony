@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Build
 import android.os.Environment
 import android.os.storage.StorageManager
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
@@ -65,6 +66,7 @@ import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.toList
+import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.extra.dateFormat
 import com.zktony.android.utils.extra.format
 import kotlinx.coroutines.launch
@@ -206,6 +208,11 @@ fun ProgramList(
      */
     var founder by remember { mutableStateOf("") }
 
+    /**
+     * home选中的制胶程序id
+     */
+    var programId = rememberDataSaverState(key = "programid", default = 1L)
+
 
     //	定义列宽
     val cellWidthList = arrayListOf(70, 100, 130, 90, 100, 120)
@@ -233,7 +240,10 @@ fun ProgramList(
                     .background(if (selected) Color.Gray else Color.White)
                     .clickable(onClick = {
                         selectedIndex = index
-
+                        Log.d(
+                            "Test",
+                            "点击选中的=========" + selectedIndex
+                        )
                     })
             ) {
                 TableText(text = "" + item.id, width = cellWidthList[0])
@@ -289,15 +299,24 @@ fun ProgramList(
                     if (entitiesList.size > 0) {
                         val entity = entities[selectedIndex]
                         if (entity != null) {
-                            displayText = entity.displayText
-                            startRange_ex = entity.startRange.toString()
-                            endRange_ex = entity.endRange.toString()
-                            coagulant_ex = entity.coagulant.toString()
-                            volume_ex = entity.volume.toString()
-                            thickness.value = entity.thickness
-                            founder = entity.founder
-                            showingDialog.value = true
-                            open.value = true
+                            if (programId.value == entity.id) {
+                                Toast.makeText(
+                                    context,
+                                    "已在制胶操作选中,不能编辑！",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                displayText = entity.displayText
+                                startRange_ex = entity.startRange.toString()
+                                endRange_ex = entity.endRange.toString()
+                                coagulant_ex = entity.coagulant.toString()
+                                volume_ex = entity.volume.toString()
+                                thickness.value = entity.thickness
+                                founder = entity.founder
+                                showingDialog.value = true
+                                open.value = true
+                            }
+
                         }
                     }
 
@@ -338,13 +357,12 @@ fun ProgramList(
                     .height(50.dp),
                 shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                 onClick = {
-
                     var path = getStoragePath(context, true)
-                    if (!"".equals(path)) {
+                    if ("" != path) {
                         if (entitiesList.size > 0) {
                             val entity = entities[selectedIndex]
                             if (entity != null) {
-                                File(path + "/zktony/test.txt").writeText(
+                                File(path + "/zktony/" + entity.displayText + ".txt").writeText(
                                     "制胶程序:" + entity.displayText
                                             + ",开始浓度:" + entity.startRange.toString()
                                             + ",结束浓度:" + entity.endRange.toString()
@@ -361,6 +379,12 @@ fun ProgramList(
                                 ).show()
                             }
                         }
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "U盘不存在！",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
 
 
@@ -632,12 +656,33 @@ fun ProgramList(
 
             }, confirmButton = {
                 TextButton(onClick = {
+                    Log.d(
+                        "Test",
+                        "删除选中的selectedIndex===$selectedIndex"
+                    )
                     if (entitiesList.size > 0) {
                         val entity = entities[selectedIndex]
+                        Log.d(
+                            "Test",
+                            "删除选中的entity===$entity==="
+                        )
                         if (entity != null) {
-                            dispatch(ProgramIntent.Delete(entity.id))
+                            if (programId.value == entity.id) {
+                                Toast.makeText(
+                                    context,
+                                    "已在制胶操作选中,不能删除！",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                if (selectedIndex > 0) {
+                                    selectedIndex -= 1
+                                }
+                                dispatch(ProgramIntent.Delete(entity.id))
+                                deleteDialog.value = false
+                            }
+
                         }
-                        deleteDialog.value = false
+
                     }
                 }) {
                     Text(text = "确认")
@@ -664,14 +709,6 @@ fun ProgramList(
                     println("path========" + path)
                     if (!"".equals(path)) {
 
-                        //获取文件列表
-//                        var fileList = File(path + "/zktony")
-//                        var files = fileList.listFiles()
-//                        files.forEach { file ->
-//                            run {
-//                                println("files========" + file.name)
-//                            }
-//                        }
                         try {
                             var textList = ArrayList<String>()
 
@@ -740,6 +777,12 @@ fun ProgramList(
                         }
 
 
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "U盘不存在！",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
 
 
@@ -781,16 +824,26 @@ private fun getStoragePath(context: Context, isUsb: Boolean): String? {
             if (isUsb == usb) { //usb
                 assert(file != null)
                 path = file.getAbsolutePath()
-                println("usb的path=====" + path)
+                Log.d(
+                    "Progarm",
+                    "usb的path=====$path"
+                )
             } else if (!isUsb == sd) { //sd
                 assert(file != null)
                 path = file.getAbsolutePath()
-                println("sd的path=====" + path)
             }
         }
     } catch (e: Exception) {
+        Log.d(
+            "Progarm",
+            "获取usb地址异常=====" + e.printStackTrace()
+        )
         e.printStackTrace()
     }
+    Log.d(
+        "Progarm",
+        "usb的path===未获取到==$path"
+    )
     return path
 }
 

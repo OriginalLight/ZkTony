@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
  */
 @Composable
 fun CoagulantProgressBarVertical(
-    waterProgress: MutableState<Float>,
+    waterProgress: Float,
     volume: String,
     concentration: String,
     modifier: Modifier = Modifier,
@@ -66,9 +66,9 @@ fun CoagulantProgressBarVertical(
             color = color,
             size = Size(
                 size.width.dp.toPx(),
-                height = (waterProgress.value * size.height).dp.toPx()
+                height = (waterProgress * size.height).dp.toPx()
             ),
-            topLeft = Offset(0.dp.toPx(), ((1 - waterProgress.value) * size.height).dp.toPx()),
+            topLeft = Offset(0.dp.toPx(), ((1 - waterProgress) * size.height).dp.toPx()),
             cornerRadius = CornerRadius ( 10f , 10f )
         )
         // background
@@ -76,7 +76,7 @@ fun CoagulantProgressBarVertical(
             color = backgroundColor,
             size = Size(
                 width = size.width.dp.toPx(),
-                height = ((1 - waterProgress.value) * size.height).dp.toPx()
+                height = ((1 - waterProgress) * size.height).dp.toPx()
             ),
             cornerRadius = CornerRadius ( 10f , 10f )
         )

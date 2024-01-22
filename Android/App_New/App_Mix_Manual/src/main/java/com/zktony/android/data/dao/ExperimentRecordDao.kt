@@ -22,7 +22,7 @@ abstract class ExperimentRecordDao : BaseDao<ExperimentRecord> {
     @Query(
         """
         SELECT * FROM ExperimentRecord
-        ORDER BY createTime ASC
+        ORDER BY id DESC
         """
     )
     abstract fun getByPage(): PagingSource<Int, ExperimentRecord>

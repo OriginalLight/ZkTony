@@ -4,6 +4,7 @@ import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.utils.AppStateUtils.hpa
 import com.zktony.android.utils.AppStateUtils.hpd
 import com.zktony.android.utils.AppStateUtils.hpg
+import com.zktony.android.utils.LogUtils.logD
 import com.zktony.android.utils.internal.ControlType
 import com.zktony.android.utils.internal.ExceptionPolicy
 import com.zktony.android.utils.internal.ExecuteType
@@ -13,6 +14,7 @@ import com.zktony.serialport.command.Protocol
 import com.zktony.serialport.ext.readInt16LE
 import com.zktony.serialport.ext.readInt8
 import com.zktony.serialport.ext.toAsciiString
+import com.zktony.serialport.ext.toHexString
 import com.zktony.serialport.ext.writeInt8
 import com.zktony.serialport.lifecycle.SerialStoreUtils
 import com.zktony.serialport.serialPortOf
@@ -28,26 +30,13 @@ object SerialPortUtils {
         })
 
         // 初始化tec串口
-        SerialStoreUtils.put("tec", serialPortOf {
+        SerialStoreUtils.put("led", serialPortOf {
             log = true
             device = "/dev/ttyS3"
         })
-
         // rtu串口全局回调
         SerialStoreUtils.get("zkty")?.callbackHandler = { bytes ->
             Protocol.verifyProtocol(bytes) { protocol ->
-
-                var int = 0L
-//                protocol.data.forEach {
-//                    if (it == 0x0B.toByte()) {
-//                        println("data====" + it)
-//                    }
-//                }
-                if (protocol.data[0] == 0x0B.toByte()) {
-                    UiFlags.objects(protocol.data[1].toInt())
-                }
-
-//                println("protocol.func====" + protocol.func + "data0=======" + protocol.data[0] + "===data1===" + protocol.data[1])
                 if (protocol.func == 0xFF.toByte()) {
                     when (protocol.data.readInt16LE()) {
                         1 -> throw Exception("TX Header Error")
@@ -55,8 +44,6 @@ object SerialPortUtils {
                         3 -> throw Exception("TX Crc Error")
                         4 -> throw Exception("TX No Com")
                     }
-                } else if (protocol.data[0] == 0x0B.toByte()) {
-                    hpd[0] = int++
                 } else {
                     when (protocol.func) {
                         0x01.toByte() -> {
@@ -72,6 +59,55 @@ object SerialPortUtils {
                                 val index = protocol.data.readInt8(offset = i * 2)
                                 val status = protocol.data.readInt8(offset = i * 2 + 1)
                                 hpg[index] = status == 1
+                            }
+                        }
+
+                        0x03.toByte() -> {
+                            if (protocol.data[0] == 0x0B.toByte()) {
+                                hpd[0] = protocol.data[1].toLong()
+                            }
+                        }
+
+                        else -> {}
+                    }
+                }
+            }
+        }
+
+
+        // rtu串口全局回调
+        SerialStoreUtils.get("led")?.callbackHandler = { bytes ->
+            logD(tag = "led", bytes.toHexString())
+            Protocol.verifyProtocol(bytes) { protocol ->
+                println("tec===" + protocol.data)
+                if (protocol.func == 0xFF.toByte()) {
+                    when (protocol.data.readInt16LE()) {
+                        1 -> throw Exception("TX Header Error")
+                        2 -> throw Exception("TX Addr Error")
+                        3 -> throw Exception("TX Crc Error")
+                        4 -> throw Exception("TX No Com")
+                    }
+                } else {
+                    when (protocol.func) {
+                        0x01.toByte() -> {
+                            for (i in 0 until protocol.data.size / 2) {
+                                val index = protocol.data.readInt8(offset = i * 2)
+                                val status = protocol.data.readInt8(offset = i * 2 + 1)
+                                hpa[index] = status == 1
+                            }
+                        }
+
+                        0x02.toByte() -> {
+                            for (i in 0 until protocol.data.size / 2) {
+                                val index = protocol.data.readInt8(offset = i * 2)
+                                val status = protocol.data.readInt8(offset = i * 2 + 1)
+                                hpg[index] = status == 1
+                            }
+                        }
+
+                        0x03.toByte() -> {
+                            if (protocol.data[0] == 0x0B.toByte()) {
+                                hpd[0] = protocol.data[1].toLong()
                             }
                         }
 
@@ -136,6 +172,7 @@ object SerialPortUtils {
      */
     fun getGpio(id: Int): Boolean = hpg[id] ?: false
 
+
     /**
      * 初始化下位机
      */
@@ -143,6 +180,64 @@ object SerialPortUtils {
         sendProtocol {
             func = ControlType.RESET
             data = byteArrayOf(0x00)
+        }
+    }
+
+    /**
+     * 制胶
+     */
+    suspend fun glueNew(count: Long, block: StartBuilder.() -> Unit) {
+        val builder = StartBuilder().apply(block)
+
+        when (builder.executeType) {
+            // 同步运动
+            ExecuteType.SYNC -> {
+                try {
+                    // 设置超时时间
+                    withTimeout(builder.timeOut) {
+                        // 发送运动命令
+                        if (builder.byteList.isNotEmpty()) {
+                            sendProtocol {
+                                func = ControlType.START
+                                data = builder.byteList.toByteArray()
+                            }
+                            delay(10L)
+                            // 等待运动完成
+//                            while (getLock(builder.indexList)) {
+//                                delay(10L)
+//                            }
+                            if (hpd[0] == count) {
+                                delay(10L)
+                            }
+                        }
+                    }
+                } catch (ex: Exception) {
+                    // 根据异常处理策略进行处理
+                    when (builder.exceptionPolicy) {
+                        // 重试
+                        ExceptionPolicy.RETRY -> start(block)
+                        // 查询轴状态
+                        ExceptionPolicy.QUERY -> query(builder.indexList)
+                        // 跳过
+                        ExceptionPolicy.SKIP -> setLock(builder.indexList, false)
+                        // 复位
+                        ExceptionPolicy.RESET -> init()
+                        // 抛出异常
+                        ExceptionPolicy.THROW -> throw ex
+                    }
+                }
+            }
+
+            // 异步运动
+            ExecuteType.ASYNC -> {
+                if (builder.byteList.isNotEmpty()) {
+                    setLock(builder.indexList)
+                    sendProtocol {
+                        func = ControlType.START
+                        data = builder.byteList.toByteArray()
+                    }
+                }
+            }
         }
     }
 
@@ -273,19 +368,12 @@ object SerialPortUtils {
         }
     }
 
-    suspend fun testA() {
-        SerialStoreUtils.get("zkty")?.sendByteArray(Protocol().apply {
-            func = 0x01
-            data = byteArrayOf(0x06)
-        }.serialization())
-
-    }
 
     /**
      * 红-常亮
      */
     suspend fun lightRed() {
-        SerialStoreUtils.get("tec")?.sendByteArray(Protocol().apply {
+        SerialStoreUtils.get("led")?.sendByteArray(Protocol().apply {
             func = 0x01
             data = byteArrayOf(0x01)
         }.serialization())
@@ -295,7 +383,7 @@ object SerialPortUtils {
      * 黄-常亮
      */
     suspend fun lightYellow() {
-        SerialStoreUtils.get("tec")?.sendByteArray(Protocol().apply {
+        SerialStoreUtils.get("led")?.sendByteArray(Protocol().apply {
             func = 0x01
             data = byteArrayOf(0x02)
         }.serialization())
@@ -305,7 +393,7 @@ object SerialPortUtils {
      * 绿-常亮
      */
     suspend fun lightGreed() {
-        SerialStoreUtils.get("tec")?.sendByteArray(Protocol().apply {
+        SerialStoreUtils.get("led")?.sendByteArray(Protocol().apply {
             func = 0x01
             data = byteArrayOf(0x03)
         }.serialization())
@@ -315,7 +403,7 @@ object SerialPortUtils {
      * 黄-闪烁
      */
     suspend fun lightFlashYellow() {
-        SerialStoreUtils.get("tec")?.sendByteArray(Protocol().apply {
+        SerialStoreUtils.get("led")?.sendByteArray(Protocol().apply {
             func = 0x01
             data = byteArrayOf(0x04)
         }.serialization())
@@ -325,7 +413,7 @@ object SerialPortUtils {
      * 关闭灯光
      */
     suspend fun cleanLight() {
-        SerialStoreUtils.get("tec")?.sendByteArray(Protocol().apply {
+        SerialStoreUtils.get("led")?.sendByteArray(Protocol().apply {
             func = 0x01
             data = byteArrayOf(0x05)
         }.serialization())
