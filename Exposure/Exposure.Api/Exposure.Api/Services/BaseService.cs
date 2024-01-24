@@ -50,7 +50,7 @@ public class BaseService<T> : IBaseService<T> where T : class, new()
         return await context.db.Queryable<T>().OrderByIF(isOrderBy, orderBy, orderByType).ToListAsync();
     }
 
-    public async Task<T> GetByPrimary<S>(S key)
+    public async Task<T?> GetByPrimary<S>(S key)
     {
         return await context.db.Queryable<T>().In(key).SingleAsync();
     }

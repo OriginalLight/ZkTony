@@ -1,6 +1,13 @@
 <template>
   <div class="container">
-    <h1>Gallery</h1>
+    <a-grid :cols="1" :row-gap="16" class="grid-demo-grid" style="height: 100%">
+      <a-grid-item class="demo-item">item</a-grid-item>
+      <a-grid-item class="demo-item">item</a-grid-item>
+      <a-grid-item class="demo-item">item</a-grid-item>
+      <a-grid-item class="demo-item">item</a-grid-item>
+      <a-grid-item class="demo-item">item</a-grid-item>
+      <a-grid-item class="demo-item">item</a-grid-item>
+    </a-grid>
   </div>
 </template>
 

@@ -4,6 +4,7 @@ import localSettings from '@renderer/views/settings/locale/zh-CN'
 import localErrLog from '@renderer/views/errlog/locale/zh-CN'
 import localOperLog from '@renderer/views/operlog/locale/zh-CN'
 import localUserManagement from '@renderer/views/user-management/locale/zh-CN'
+import localHome from '@renderer/views/home/locale/zh-CN'
 
 export default {
   'menu.home': '主页',
@@ -14,5 +15,6 @@ export default {
   ...localeLogin,
   ...localErrLog,
   ...localOperLog,
-  ...localUserManagement
+  ...localUserManagement,
+  ...localHome
 }

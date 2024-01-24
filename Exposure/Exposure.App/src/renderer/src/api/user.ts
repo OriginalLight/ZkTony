@@ -22,7 +22,7 @@ export interface UserQuery {
   name: string
 }
 
-export interface UpdateData {
+export interface UserUpdateParam {
   id: number
   name: string
   oldPassword: string
@@ -31,7 +31,7 @@ export interface UpdateData {
   enabled: boolean
 }
 
-export interface AddData {
+export interface UserAddParam {
   name: string
   password: string
   role: number
@@ -55,11 +55,11 @@ export function getUserByPage(data: UserQuery) {
   return axios.post<UserPageResult>('/User/Page', data)
 }
 
-export function updateUser(data: UpdateData) {
+export function updateUser(data: UserUpdateParam) {
   return axios.put('/User', data)
 }
 
-export function addUser(data: AddData) {
+export function addUser(data: UserAddParam) {
   return axios.post('/User', data)
 }
 

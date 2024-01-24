@@ -15,6 +15,7 @@ public class WebSocketController : ControllerBase
     private readonly ICameraService _camera;
     private readonly IErrorLogService _errorLog;
     private readonly IUsbService _usb;
+    private CancellationTokenSource _cts;
 
     public WebSocketController(IUsbService usb, ICameraService camera, IErrorLogService errorLog)
     {
@@ -27,12 +28,12 @@ public class WebSocketController : ControllerBase
     ///     获取状态
     /// </summary>
     [HttpGet]
-    public async Task Metric()
+    public async Task WebSocket()
     {
         if (HttpContext.WebSockets.IsWebSocketRequest)
         {
             using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-            await Status(webSocket);
+            await HandleWebSocket(webSocket);
         }
         else
         {
@@ -44,7 +45,7 @@ public class WebSocketController : ControllerBase
     ///     状态
     /// </summary>
     /// <param name="webSocket"></param>
-    private async Task Status(WebSocket webSocket)
+    private async Task HandleWebSocket(WebSocket webSocket)
     {
         var buffer = new byte[1024 * 4];
         var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
@@ -59,19 +60,6 @@ public class WebSocketController : ControllerBase
                 if (dto != null)
                     switch (dto.Code)
                     {
-                        // 判断是否为心跳包
-                        case "ping":
-                        {
-                            var dict = new Dictionary<string, object>
-                            {
-                                { "code", "ping" },
-                                { "data", "pong" }
-                            };
-                            var clientMsg = Encoding.UTF8.GetBytes(JsonHelper.Serialize(dict));
-                            await webSocket.SendAsync(new ArraySegment<byte>(clientMsg, 0, clientMsg.Length),
-                                result.MessageType, result.EndOfMessage, CancellationToken.None);
-                            break;
-                        }
                         // 判断是否为查询所有包
                         case "status":
                         {
@@ -92,26 +80,43 @@ public class WebSocketController : ControllerBase
                                 result.MessageType, result.EndOfMessage, CancellationToken.None);
                             break;
                         }
-                        // 初始化
+                        /*// 初始化
                         case "init":
                             await _camera.InitializeAsync(webSocket);
                             break;
-                        // 拍照
-                        case "photo":
-                            await _camera.TakePhotoAsync(webSocket);
-                            break;
-                        // 曝光时间
-                        case "exposure":
-                            if (dto.Data != null) await _camera.SetExposureAsync(webSocket, uint.Parse(dto.Data));
-                            break;
                         // 像素
                         case "pixel":
-                            if (dto.Data != null) await _camera.SetPixelAsync(webSocket, uint.Parse(dto.Data));
+                            if (dto.Data != null) await _camera.SetPixelAsync(webSocket, uint.Parse(dto.Data["index"].ToString() ?? "0"));
                             break;
-                        // 多帧拍照
-                        case "multiple":
-                            if (dto.Data != null) await _camera.TakeMultiplePhotoAsync(webSocket, uint.Parse(dto.Data));
+                        // 预览
+                        case "preview":
+                            await _camera.PreviewAsync(webSocket);
                             break;
+                        //自动拍照
+                        case "auto":
+                        {
+                            _cts = new CancellationTokenSource();
+                            _ = _camera.TakeAutoPhotoAsync(webSocket, _cts.Token);
+                        }
+                            break;
+                        // 手动拍照
+                        case "manual":
+                        {
+                            _cts = new CancellationTokenSource();
+                            if (dto.Data != null)
+                            {
+                                var exposure = int.Parse(dto.Data["exposure"].ToString() ?? "0");
+                                var frame = int.Parse(dto.Data["frame"].ToString() ?? "0");
+                                _ = _camera.TakeManualPhotoAsync(webSocket, exposure, frame, _cts.Token);
+                            }
+                        }
+                            break;
+                        // 取消
+                        case "cancel":
+                        {
+                            await _camera.CancelAsync(webSocket);
+                            break;
+                        }*/
                     }
             }
             catch (Exception e)

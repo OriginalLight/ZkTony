@@ -1,17 +1,16 @@
-﻿using SqlSugar;
+﻿namespace Exposure.Api.Models.Dto;
 
-namespace Exposure.Api.Models;
-
-[SugarTable("Picture")]
-public class Picture
+public class PictureOutDto
 {
-    [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
+    /// <summary>
+    ///   图片ID
+    /// </summary>
     public int Id { get; set; }
 
     /// <summary>
-    ///     用户ID
+    ///     用户
     /// </summary>
-    public int UserId { get; set; }
+    public User User { get; set; }
 
     /// <summary>
     ///     图片名称

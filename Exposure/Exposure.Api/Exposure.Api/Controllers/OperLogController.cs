@@ -18,7 +18,26 @@ public class OperLogController : ControllerBase
         _usb = usb;
         _operLog = operLog;
     }
-
+    
+    /// <summary>
+    ///  分页查询
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [Route("Page")]
+    public async Task<IActionResult> Page([FromBody] OperLogQueryDto dto)
+    {
+        // 查询
+        var total = new RefAsync<int>();
+        var list = await _operLog.GetByPage(dto, total);
+        return new JsonResult(new PageOutDto<List<OperLogOutDto>>
+        {
+            Total = total.Value,
+            List = list
+        });
+    }
+    
     /// <summary>
     ///     删除
     /// </summary>
@@ -35,20 +54,6 @@ public class OperLogController : ControllerBase
         }
 
         return Problem("删除失败");
-    }
-
-    [HttpPost]
-    [Route("Page")]
-    public async Task<IActionResult> Page([FromBody] OperLogQueryDto dto)
-    {
-        // 查询
-        var total = new RefAsync<int>();
-        var list = await _operLog.GetByPage(dto, total);
-        return new JsonResult(new PageOutDto<List<OperLogOutDto>>
-        {
-            Total = total.Value,
-            List = list
-        });
     }
 
     /// <summary>

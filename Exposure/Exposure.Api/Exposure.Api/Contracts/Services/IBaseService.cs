@@ -78,7 +78,7 @@ public interface IBaseService<T> where T : class, new()
     /// <param name="key"></param>
     /// <typeparam name="S"></typeparam>
     /// <returns></returns>
-    public Task<T> GetByPrimary<S>(S key);
+    public Task<T?> GetByPrimary<S>(S key);
 
     #endregion
 }

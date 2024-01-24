@@ -27,6 +27,25 @@ public class ErrorLogController : ControllerBase
     }
 
     /// <summary>
+    ///   分页查询
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [Route("Page")]
+    public async Task<IActionResult> Page([FromBody] ErrorLogQueryDto dto)
+    {
+        // 查询
+        var total = new RefAsync<int>();
+        var list = await _errorLog.GetByPage(dto, total);
+        return new JsonResult(new PageOutDto<List<ErrorLog>>
+        {
+            Total = total.Value,
+            List = list
+        });
+    }
+    
+    /// <summary>
     ///     删除
     /// </summary>
     /// <param name="ids"></param>
@@ -43,20 +62,6 @@ public class ErrorLogController : ControllerBase
 
         // 返回结果
         return Problem("删除失败");
-    }
-
-    [HttpPost]
-    [Route("Page")]
-    public async Task<IActionResult> Page([FromBody] ErrorLogQueryDto dto)
-    {
-        // 查询
-        var total = new RefAsync<int>();
-        var list = await _errorLog.GetByPage(dto, total);
-        return new JsonResult(new PageOutDto<List<ErrorLog>>
-        {
-            Total = total.Value,
-            List = list
-        });
     }
 
     /// <summary>

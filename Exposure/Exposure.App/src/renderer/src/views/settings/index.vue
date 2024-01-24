@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div v-dragscroll class="container">
     <a-space size="large" direction="vertical">
       <SystemSettings />
       <UserSettings />

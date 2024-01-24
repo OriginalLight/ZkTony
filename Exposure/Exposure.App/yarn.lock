@@ -3457,6 +3457,11 @@ text-table@^0.2.0:
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
   integrity sha512-N+8UisAXDGk8PFXP4HAzVR9nbfmVJ3zYLAWiTIoqC5v5isinhr+r5uaO8+7r3BMfuNIufIsA7RdpVgacC2cSpw==
 
+tiff.js@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/tiff.js/-/tiff.js-1.0.0.tgz#31696dd884d911ed9a4191e78bd90fb33af948bb"
+  integrity sha512-P+ZWp1hcpEIx/Pzuc+REh0+isGXk5kfnFEJKRPq1trMbZW49eD/QGDT8Y4KamIK2ZXU+DcYr47auaO93akVP3A==
+
 tiny-typed-emitter@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/tiny-typed-emitter/-/tiny-typed-emitter-2.1.0.tgz#b3b027fdd389ff81a152c8e847ee2f5be9fad7b5"
@@ -3637,6 +3642,11 @@ vue-tsc@^1.8.8:
     "@volar/typescript" "~1.11.1"
     "@vue/language-core" "1.8.27"
     semver "^7.5.4"
+
+vue3-dragscroll@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/vue3-dragscroll/-/vue3-dragscroll-1.0.2.tgz#dbf306ca4d8c31c46eb14a0b089f5fbbc67e50cc"
+  integrity sha512-6cMgLsgZUeRCZlhBlQRakEHQKYj/m8pSEoBM/E6Emw9TojEGQv1tGPvNGw4GCho28q3mae2WovMkRAEbAz4SGQ==
 
 vue@^3.3.4:
   version "3.4.14"

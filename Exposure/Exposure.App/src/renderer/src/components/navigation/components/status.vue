@@ -1,5 +1,5 @@
 <template>
-  <a-space class="space" :size="30">
+  <a-space class="space" :size="10">
     <template #split>
       <a-divider direction="vertical" />
     </template>
@@ -11,6 +11,9 @@
     </a-tooltip>
     <a-tooltip :content="$t('navigation.status.door')">
       <open-door size="24" :fill="status.door" />
+    </a-tooltip>
+    <a-tooltip :content="$t('navigation.status.time')">
+      <div style="font-size: 10px">{{ now }}</div>
     </a-tooltip>
     <a-button class="logout" @click="visible = true">
       <template #icon>
@@ -28,13 +31,14 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onBeforeUnmount, watch } from 'vue'
+import { ref, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { Message } from '@arco-design/web-vue'
 import { useAppStore, useUserStore } from '@renderer/store'
 import { Usb, OpenDoor } from '@icon-park/vue-next'
-import useSocket from '@renderer/hooks/socket'
+import { useNow, useDateFormat } from '@vueuse/core'
+import { metric } from '@renderer/api/metric'
 
 // 国际化
 const { t } = useI18n()
@@ -44,12 +48,10 @@ const router = useRouter()
 const userStore = useUserStore()
 // 获取应用信息
 const appStore = useAppStore()
-// websocket
-const socket = useSocket()
 // 注销弹窗
 const visible = ref(false)
 // 状态栏的一些图标颜色和文字
-const status = reactive({
+const status = ref({
   // usb图标颜色
   usb: '#808080',
   // 舱门图标颜色
@@ -57,6 +59,8 @@ const status = reactive({
   // 温度
   temperature: '0°C'
 })
+// 时间
+const now = useDateFormat(useNow(), 'HH:mm:ss YYYY/MM/DD')
 // 确认注销
 const handleLogout = async () => {
   try {
@@ -69,29 +73,20 @@ const handleLogout = async () => {
   }
 }
 // 定时发送websocket请求
-const timer = setInterval(() => {
-  const message = JSON.stringify({ code: 'status' })
-  socket.send(message)
-}, 3000)
-
-watch(socket.data, (data) => {
-  if (data) {
-    try {
-      const obj: { code: string; data: never } = JSON.parse(data)
-      if (obj.code === 'status') {
-        const data: { usb: boolean; temperature: number; door: boolean } = obj.data
-        status.usb = data.usb ? '#1890ff' : '#808080'
-        status.temperature = data.temperature <= -100 ? '/' : `${data.temperature} °C`
-        status.door = data.door ? '#1890ff' : '#808080'
-        appStore.toggleUsb(data.usb)
-        appStore.toggleDoor(data.door)
-        appStore.toggleTemperature(data.temperature)
-      }
-    } catch (error) {
-      console.log(error)
-    }
+const timer = setInterval(async () => {
+  try {
+    const res = await metric()
+    const data = res.data
+    status.value.usb = data.usb ? '#1890ff' : '#808080'
+    status.value.temperature = data.temperature <= -100 ? '/' : `${data.temperature} °C`
+    status.value.door = data.door ? '#1890ff' : '#808080'
+    appStore.toggleUsb(data.usb)
+    appStore.toggleDoor(data.door)
+    appStore.toggleTemperature(data.temperature)
+  } catch (err) {
+    console.log(err)
   }
-})
+}, 3000)
 
 // 组件销毁时清除定时器
 onBeforeUnmount(() => {

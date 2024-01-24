@@ -7,6 +7,7 @@ export interface Picture {
   path: string
   width: number
   height: number
+  type: number
   exposureTime: number
   exposureGain: number
   blackLevel: number
@@ -16,7 +17,7 @@ export interface Picture {
   deleteTime: string
 }
 
-export interface PictureQuery {
+export interface PictureQueryParam {
   page: number
   size: number
   isDeleted: boolean
@@ -25,8 +26,24 @@ export interface PictureQuery {
   endTime: string
 }
 
-export function getByPage(data: PictureQuery) {
-  return axios.post<Picture[]>('/Picture/Page', data)
+export interface PicturePageResult {
+  total: number
+  list: Picture[]
+}
+
+export interface PictureExportParam {
+  ids: number[]
+  format: string
+}
+
+export interface PictureAdjustParam {
+  id: number
+  brightness: number
+  contrast: number
+}
+
+export function getByPage(data: PictureQueryParam) {
+  return axios.post<PicturePageResult>('/Picture/Page', data)
 }
 
 export function Update(data: Picture) {
@@ -35,4 +52,16 @@ export function Update(data: Picture) {
 
 export function Delete(data: number[]) {
   return axios.delete('/Picture', { data })
+}
+
+export function combinePicture(data: number[]) {
+  return axios.post<Picture>('/Picture/Combine', data)
+}
+
+export function exportPicture(data: PictureExportParam) {
+  return axios.post('/Picture/Export', data)
+}
+
+export function adjustPicture(data: PictureAdjustParam) {
+  return axios.post('/Picture/Adjust', data)
 }

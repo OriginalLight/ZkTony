@@ -42,6 +42,7 @@ builder.Services.AddTransient<IDbContext, AppDbContext>();
 
 // Add Services
 builder.Services.AddHostedService<ApplicationHostService>();
+builder.Services.AddSingleton<IAutoCleanService, AutoCleanService>();
 builder.Services.AddSingleton<ISerialPortService, SerialPortService>();
 builder.Services.AddSingleton<IUsbService, UsbService>();
 builder.Services.AddSingleton<IUserService, UserService>();
@@ -59,7 +60,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseWebSockets();
+app.UseWebSockets(new WebSocketOptions
+{
+    KeepAliveInterval = TimeSpan.FromSeconds(120)
+});
 
 app.UseHttpsRedirection();
 

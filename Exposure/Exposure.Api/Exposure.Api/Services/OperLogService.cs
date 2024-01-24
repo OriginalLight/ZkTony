@@ -38,7 +38,7 @@ public class OperLogService : BaseService<OperLog>, IOperLogService
     {
         var list = await context.db.Queryable<OperLog>()
             .WhereIF(dto.Date != null, p => p.Time >= dto.Date)
-            .WhereIF(dto.Date != null, p => p.Time < dto.Date.Value.AddDays(1))
+            .WhereIF(dto.Date != null, p => p.Time < dto.Date!.Value.AddDays(1))
             .OrderBy(p => p.Time, OrderByType.Desc)
             .ToPageListAsync(dto.Page, dto.Size, total);
         // 提取出userI并去重

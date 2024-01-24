@@ -157,14 +157,19 @@ import { useUserStore } from '@renderer/store'
 const { t } = useI18n()
 const { loading, setLoading } = useLoading(true)
 const userStore = useUserStore()
+// 搜索关键字
 const searchKey = ref('')
+// 选中的用户
 const selectedKeys = ref([])
+// 重置密码
 const resetIndex = ref(0)
+// 弹窗
 const visible = reactive({
   add: false,
   delete: false,
   reset: false
 })
+// 添加用户表单
 const addForm = reactive({
   name: '',
   password: '',
@@ -172,8 +177,10 @@ const addForm = reactive({
   enabled: true
 })
 
+// 分页
 const pagination = reactive({ current: 1, pageSize: 15, total: 0 })
 
+// 表格列
 const columns: TableColumnData[] = [
   {
     title: t('user.managemet.table.id'),
@@ -220,6 +227,7 @@ const columns: TableColumnData[] = [
 ]
 const data = ref<User[]>([])
 
+// 获取用户列表
 const fetchData = async () => {
   setLoading(true)
   try {
@@ -228,7 +236,6 @@ const fetchData = async () => {
       size: pagination.pageSize,
       name: searchKey.value
     })
-    console.log(res)
     data.value = res.data.list
     pagination.total = res.data.total
   } catch (error) {
@@ -238,16 +245,19 @@ const fetchData = async () => {
   }
 }
 
+// 搜索
 const handleSearch = () => {
   selectedKeys.value = []
   fetchData()
 }
 
+// 分页
 const onPageChange = (current) => {
   pagination.current = current
   fetchData()
 }
 
+// 删除
 const handleDelete = async () => {
   visible.delete = false
   try {
@@ -265,9 +275,9 @@ const handleDelete = async () => {
   }
 }
 
+// 添加
 const handleAdd = async () => {
   try {
-    setLoading(true)
     if (addForm.name === '' || addForm.password === '') {
       return
     }
@@ -285,13 +295,13 @@ const handleAdd = async () => {
     fetchData()
   } catch (error) {
     Message.error((error as Error).message)
-  } finally {
-    setLoading(false)
   }
 }
 
+// 重置密码
 const handleReset = async () => {
   try {
+    setLoading(true)
     if (resetIndex.value == 0) {
       return
     }
@@ -307,9 +317,12 @@ const handleReset = async () => {
     Message.success(t('user.managemet.reset.success'))
   } catch (error) {
     Message.error((error as Error).message)
+  } finally {
+    setLoading(false)
   }
 }
 
+// 修改角色和状态
 const handleChange = async (index: number) => {
   try {
     setLoading(true)
@@ -330,6 +343,7 @@ const handleChange = async (index: number) => {
   }
 }
 
+// 初始化
 fetchData()
 </script>
 

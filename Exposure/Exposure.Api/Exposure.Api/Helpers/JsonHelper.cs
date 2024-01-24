@@ -9,7 +9,9 @@ public static class JsonHelper
     {
         return JsonConvert.SerializeObject(obj, Formatting.Indented, new JsonSerializerSettings
         {
-            ContractResolver = new CamelCasePropertyNamesContractResolver()
+            ContractResolver = new CamelCasePropertyNamesContractResolver(),
+            DateFormatString = "yyyy-MM-dd HH:mm:ss"
+            
         });
     }
 }
