@@ -21,12 +21,12 @@ public class CameraController : ControllerBase
 
     [HttpGet]
     [Route("Init")]
-    public async Task<IActionResult> Init()
+    public IActionResult Init()
     {
         // 初始化
         try
         {
-            await _camera.InitializeAsync();
+            _camera.Initialize();
         }
         catch (Exception e)
         {
@@ -44,7 +44,7 @@ public class CameraController : ControllerBase
         // 预览
         try
         {
-            var res = await _camera.PreviewAsync();
+            var res = _camera.PreviewAsync();
             _operLog.AddOperLog("预览", "预览成功");
             return Ok(res);
         }
@@ -57,12 +57,12 @@ public class CameraController : ControllerBase
 
     [HttpGet]
     [Route("Pixel")]
-    public async Task<IActionResult> Pixel([FromQuery] int index)
+    public IActionResult Pixel([FromQuery] int index)
     {
         // 设置像素
         try
         {
-            await _camera.SetPixelAsync(uint.Parse(index.ToString()));
+            _camera.SetPixel(uint.Parse(index.ToString()));
         }
         catch (Exception e)
         {
@@ -115,12 +115,12 @@ public class CameraController : ControllerBase
 
     [HttpGet]
     [Route("Cancel")]
-    public async Task<IActionResult> Cancel()
+    public IActionResult Cancel()
     {
         // 取消拍照
         try
         {
-            await _camera.CancelAsync();
+            _camera.CancelTask();
             _operLog.AddOperLog("取消拍照", "取消拍照成功");
         }
         catch (Exception e)
@@ -139,7 +139,7 @@ public class CameraController : ControllerBase
         // 获取温度
         try
         {
-            var cache = await _camera.GetCache();
+            var cache = await _camera.GetCacheAsync();
             return Ok(cache);
         }
         catch (Exception e)

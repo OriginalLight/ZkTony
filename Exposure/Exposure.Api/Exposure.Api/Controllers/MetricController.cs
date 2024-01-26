@@ -18,13 +18,13 @@ public class MetricController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> Status()
+    public IActionResult Status()
     {
         return new JsonResult(new StatusOutDto
         {
             Usb = _usb.IsUsbAttached(),
             Door = false,
-            Temperature = await _camera.GetTemperature()
+            Temperature =_camera.GetTemperature()
         });
     }
 }

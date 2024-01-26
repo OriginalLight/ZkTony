@@ -8,26 +8,26 @@ public interface ICameraService
     ///     初始化 0: 成功 1: 无设备 2: 打开失败
     /// </summary>
     /// <returns></returns>
-    Task InitializeAsync();
+    void Initialize();
 
     /// <summary>
     ///     设置像素
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    Task SetPixelAsync(uint index);
+    void SetPixel(uint index);
 
     /// <summary>
     ///     获取温度
     /// </summary>
     /// <returns></returns>
-    Task<double> GetTemperature();
+    double GetTemperature();
 
     /// <summary>
     ///     预览
     /// </summary>
     /// <returns></returns>
-    Task<Picture> PreviewAsync();
+    Picture PreviewAsync();
 
     /// <summary>
     ///     自动拍照
@@ -49,11 +49,11 @@ public interface ICameraService
     ///     取消拍照
     /// </summary>
     /// <returns></returns>
-    Task CancelAsync();
+    void CancelTask();
 
     /// <summary>
     ///     获取缓存
     /// </summary>
     /// <returns></returns>
-    Task<List<Picture>> GetCache();
+    Task<List<Picture>> GetCacheAsync();
 }

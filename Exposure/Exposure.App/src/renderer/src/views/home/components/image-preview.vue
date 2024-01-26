@@ -12,7 +12,7 @@
     <a-space size="medium">
       <a-tooltip placement="top" :content="t('home.image.preview.brightness')">
         <a-popover position="br" trigger="click">
-          <a-button shape="round" type="outline">
+          <a-button type="primary" size="medium">
             <template #icon>
               <Brightness />
             </template>
@@ -20,18 +20,16 @@
           <template #content>
             <a-slider
               v-model="imageOptions.brightness"
-              :style="{ width: '400px' }"
+              :style="{ width: '300px' }"
               :max="200"
-              :step="20"
               show-input
-              :show-ticks="true"
             />
           </template>
         </a-popover>
       </a-tooltip>
       <a-tooltip placement="top" :content="t('home.image.preview.contrast')">
         <a-popover position="br" trigger="click">
-          <a-button shape="round" type="outline">
+          <a-button type="primary" size="medium">
             <template #icon>
               <Contrast />
             </template>
@@ -39,17 +37,15 @@
           <template #content>
             <a-slider
               v-model="imageOptions.contrast"
-              :style="{ width: '400px' }"
-              show-input
+              :style="{ width: '300px' }"
               :max="200"
-              :step="20"
-              :show-ticks="true"
+              show-input
             />
           </template>
         </a-popover>
       </a-tooltip>
       <a-tooltip placement="top" :content="t('home.image.preview.undo')">
-        <a-button shape="round" type="outline" @click="undo">
+        <a-button type="primary" size="medium" @click="undo">
           <template #icon>
             <Undo />
           </template>
@@ -57,8 +53,8 @@
       </a-tooltip>
       <a-tooltip placement="top" :content="t('home.image.preview.redo')">
         <a-button
-          shape="round"
-          type="outline"
+          type="primary"
+          size="medium"
           @click="(imageOptions.brightness = 100), (imageOptions.contrast = 100)"
         >
           <template #icon>
@@ -68,8 +64,8 @@
       </a-tooltip>
       <a-tooltip placement="top" :content="t('home.image.preview.save')">
         <a-button
-          shape="round"
-          type="outline"
+          type="primary"
+          size="medium"
           :disabled="
             (imageOptions.brightness === 100 && imageOptions.contrast === 100) ||
             props.image.name === 'Preview'

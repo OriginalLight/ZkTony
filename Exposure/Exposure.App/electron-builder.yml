@@ -12,13 +12,21 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: 化学发光
+  icon: resources/icon.ico
+  executableName: Exposure
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
+  allowElevation: true
+  perMachine: true
+  createStartMenuShortcut: true
+  installerIcon: resources/icon.ico
+  uninstallerIcon: resources/icon.ico
+  installerHeaderIcon: resources/icon.ico
 mac:
+  icon: resources/icon.ico
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
     - NSCameraUsageDescription: Application requests access to the device's camera.
@@ -29,6 +37,7 @@ mac:
 dmg:
   artifactName: ${name}-${version}.${ext}
 linux:
+  icon: resources/icon.ico
   target:
     - AppImage
     - snap
