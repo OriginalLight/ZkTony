@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using Exposure.Api.Models;
+﻿using Exposure.Api.Models;
 using Exposure.Api.Models.Dto;
 using SqlSugar;
 
@@ -14,30 +13,30 @@ public interface IPictureService : IBaseService<Picture>
     /// <param name="total"></param>
     /// <returns></returns>
     Task<List<Picture>> GetByPage(PictureQueryDto dto, RefAsync<int> total);
-    
+
     /// <summary>
-    ///   添加并返回实体
+    ///     添加并返回实体
     /// </summary>
     /// <param name="picture"></param>
     /// <returns></returns>
     Task<Picture> AddReturnModel(Picture picture);
 
     /// <summary>
-    ///   根据id查询
+    ///     根据id查询
     /// </summary>
     /// <param name="ids"></param>
     /// <returns></returns>
     Task<List<Picture>> GetByIds(object[] ids);
 
     /// <summary>
-    ///  合成
+    ///     合成
     /// </summary>
     /// <param name="list"></param>
     /// <returns></returns>
     Task<Picture> Combine(List<Picture> list);
-    
+
     /// <summary>
-    ///  调整图片
+    ///     调整图片
     /// </summary>
     /// <param name="pic"></param>
     /// <param name="dto"></param>

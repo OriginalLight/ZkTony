@@ -5,25 +5,32 @@
     width="100%"
     height="100%"
     :style="{
-      filter: `brightness(${imageOptions.brightness / 30.0}) contrast(${imageOptions.contrast}%)`
+      filter: `brightness(${imageOptions.brightness}%) contrast(${imageOptions.contrast}%)`
     }"
   />
   <div class="image-edit">
     <a-space size="medium">
       <a-tooltip placement="top" :content="t('home.image.preview.brightness')">
-        <a-popover position="bottom" trigger="click">
+        <a-popover position="br" trigger="click">
           <a-button shape="round" type="outline">
             <template #icon>
               <Brightness />
             </template>
           </a-button>
           <template #content>
-            <a-slider v-model="imageOptions.brightness" :style="{ width: '300px' }" show-input />
+            <a-slider
+              v-model="imageOptions.brightness"
+              :style="{ width: '400px' }"
+              :max="200"
+              :step="20"
+              show-input
+              :show-ticks="true"
+            />
           </template>
         </a-popover>
       </a-tooltip>
       <a-tooltip placement="top" :content="t('home.image.preview.contrast')">
-        <a-popover position="bottom" trigger="click">
+        <a-popover position="br" trigger="click">
           <a-button shape="round" type="outline">
             <template #icon>
               <Contrast />
@@ -32,9 +39,11 @@
           <template #content>
             <a-slider
               v-model="imageOptions.contrast"
-              :style="{ width: '300px' }"
+              :style="{ width: '400px' }"
               show-input
-              :max="300"
+              :max="200"
+              :step="20"
+              :show-ticks="true"
             />
           </template>
         </a-popover>
@@ -50,7 +59,7 @@
         <a-button
           shape="round"
           type="outline"
-          @click="(imageOptions.brightness = 30), (imageOptions.contrast = 100)"
+          @click="(imageOptions.brightness = 100), (imageOptions.contrast = 100)"
         >
           <template #icon>
             <Refresh />
@@ -62,9 +71,10 @@
           shape="round"
           type="outline"
           :disabled="
-            (imageOptions.brightness === 30 && imageOptions.contrast === 100) ||
+            (imageOptions.brightness === 100 && imageOptions.contrast === 100) ||
             props.image.name === 'Preview'
           "
+          :loading="loading"
           @click="handleSave"
         >
           <template #icon>
@@ -83,7 +93,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Brightness, Contrast, Undo, Refresh, Save } from '@icon-park/vue-next'
 import { useRefHistory } from '@vueuse/core'
@@ -101,9 +111,12 @@ const emit = defineEmits(['adjust'])
 
 const { t } = useI18n()
 
+// 加载状态
+const loading = ref(false)
+
 // 参数
 const imageOptions = ref({
-  brightness: 30,
+  brightness: 100,
   contrast: 100
 })
 
@@ -115,6 +128,7 @@ const { undo } = useRefHistory(imageOptions, {
 // 保存
 const handleSave = async () => {
   try {
+    loading.value = true
     const res = await adjustPicture({
       id: props.image.id,
       brightness: imageOptions.value.brightness,
@@ -123,8 +137,18 @@ const handleSave = async () => {
     emit('adjust', res.data)
   } catch (error) {
     Message.error((error as Error).message)
+  } finally {
+    loading.value = false
   }
 }
+
+watch(
+  () => props.image,
+  () => {
+    imageOptions.value.brightness = 100
+    imageOptions.value.contrast = 100
+  }
+)
 </script>
 
 <style scoped lang="less">

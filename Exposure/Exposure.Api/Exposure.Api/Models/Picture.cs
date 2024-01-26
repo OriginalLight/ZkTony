@@ -32,7 +32,7 @@ public class Picture
     ///     高度
     /// </summary>
     public int Height { get; set; }
-    
+
     public int Type { get; set; }
 
     /// <summary>

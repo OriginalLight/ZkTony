@@ -176,6 +176,9 @@ import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Message } from '@arco-design/web-vue'
 import { init, preview, pixel, manual, auto, cancel, cache } from '@renderer/api/camera'
+import useHomeStore from '@renderer/hooks/home'
+
+const { options } = useHomeStore()
 
 const emit = defineEmits(['shoot', 'preview'])
 
@@ -189,18 +192,6 @@ const progress = ref({
   visible: false,
   message: '',
   time: 0
-})
-
-// 参数
-const options = ref({
-  mode: 'auto',
-  quality: '0',
-  time: {
-    minute: 1,
-    second: 0,
-    millisecond: 0
-  },
-  frame: 1
 })
 
 // loading状态

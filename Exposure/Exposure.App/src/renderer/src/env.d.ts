@@ -6,9 +6,3 @@ declare module '*.vue' {
   const component: DefineComponent<{}, {}, any>
   export default component
 }
-
-interface ImportMetaEnv {
-  readonly RENDERER_VITE_API_BASE_URL: string
-  readonly RENDERER_VITE_WEBSOCKET_URL: string
-  // more env variables...
-}

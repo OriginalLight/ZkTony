@@ -9,8 +9,8 @@ namespace Exposure.Api.Core;
 /// </summary>
 public class AppDbContext : IDbContext
 {
-    private readonly IConfiguration Configuration;
     private readonly ILogger<AppDbContext> _logger;
+    private readonly IConfiguration Configuration;
 
     public AppDbContext(IConfiguration configuration, ILogger<AppDbContext> logger)
     {
@@ -20,7 +20,7 @@ public class AppDbContext : IDbContext
         db.Aop.OnLogExecuting = (sql, paramster) =>
         {
             _logger.LogInformation(sql + "\r\n" +
-                              $"{db.Utilities.SerializeObject(paramster.ToDictionary(it => it.ParameterName, it => it.Value))} \r\n");
+                                   $"{db.Utilities.SerializeObject(paramster.ToDictionary(it => it.ParameterName, it => it.Value))} \r\n");
         };
     }
 

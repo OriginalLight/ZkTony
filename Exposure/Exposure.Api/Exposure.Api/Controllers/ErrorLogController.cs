@@ -27,7 +27,7 @@ public class ErrorLogController : ControllerBase
     }
 
     /// <summary>
-    ///   分页查询
+    ///     分页查询
     /// </summary>
     /// <param name="dto"></param>
     /// <returns></returns>
@@ -44,7 +44,7 @@ public class ErrorLogController : ControllerBase
             List = list
         });
     }
-    
+
     /// <summary>
     ///     删除
     /// </summary>

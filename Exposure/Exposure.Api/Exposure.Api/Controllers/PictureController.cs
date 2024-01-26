@@ -3,11 +3,7 @@ using System.Drawing.Imaging;
 using Exposure.Api.Contracts.Services;
 using Exposure.Api.Models;
 using Exposure.Api.Models.Dto;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient.Server;
-using OpenCvSharp;
-using OpenCvSharp.Extensions;
 using SqlSugar;
 
 namespace Exposure.Api.Controllers;
@@ -28,7 +24,7 @@ public class PictureController : ControllerBase
     }
 
     /// <summary>
-    ///  分页查询
+    ///     分页查询
     /// </summary>
     /// <param name="dto"></param>
     /// <returns></returns>
@@ -47,7 +43,7 @@ public class PictureController : ControllerBase
     }
 
     /// <summary>
-    ///  添加
+    ///     添加
     /// </summary>
     /// <param name="dto"></param>
     /// <returns></returns>
@@ -66,7 +62,7 @@ public class PictureController : ControllerBase
     }
 
     /// <summary>
-    ///   删除
+    ///     删除
     /// </summary>
     /// <param name="ids"></param>
     /// <returns></returns>
@@ -85,7 +81,7 @@ public class PictureController : ControllerBase
     }
 
     /// <summary>
-    ///  合成
+    ///     合成
     /// </summary>
     /// <param name="ids"></param>
     /// <returns></returns>
@@ -107,9 +103,9 @@ public class PictureController : ControllerBase
             return Problem(e.Message);
         }
     }
-    
+
     /// <summary>
-    ///  导出
+    ///     导出
     /// </summary>
     /// <param name="dto"></param>
     /// <returns></returns>
@@ -145,15 +141,15 @@ public class PictureController : ControllerBase
         {
             return Problem(e.Message);
         }
-        
+
         // 记录日志
         _operLog.AddOperLog("导出", "导出图片：ids = " + string.Join(",", dto.Ids));
         // 返回结果
         return Ok("导出成功");
     }
-    
+
     /// <summary>
-    ///  调整
+    ///     调整
     /// </summary>
     /// <param name="dto"></param>
     /// <returns></returns>
@@ -175,5 +171,4 @@ public class PictureController : ControllerBase
             return Problem(e.Message);
         }
     }
-    
 }

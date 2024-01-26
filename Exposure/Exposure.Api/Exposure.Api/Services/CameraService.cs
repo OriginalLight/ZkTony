@@ -15,10 +15,10 @@ public class CameraService : ICameraService
 {
     private readonly IPictureService _picture;
     private readonly IUserService _user;
-    private List<Bitmap> _bitmapList = new();
-    private List<Picture> _pictureList = new();
-    private Nncam? _nncam;
+    private readonly List<Bitmap> _bitmapList = new();
     private string _flag = "auto";
+    private Nncam? _nncam;
+    private readonly List<Picture> _pictureList = new();
 
     public CameraService(IPictureService picture, IUserService user)
     {
@@ -35,23 +35,15 @@ public class CameraService : ICameraService
         if (_nncam != null) return Task.CompletedTask;
 
         var arr = Nncam.EnumV2();
-        if (arr.Length <= 0)
-        {
-            throw new Exception("未找到设备");
-        }
+        if (arr.Length <= 0) throw new Exception("未找到设备");
 
         // 打开设备
         _nncam = Nncam.Open(arr[0].id);
-        if (_nncam == null)
-        {
-            throw new Exception("打开设备失败");
-        }
+        if (_nncam == null) throw new Exception("打开设备失败");
 
         // 设置参数
         if (!(_nncam.put_Option(Nncam.eOPTION.OPTION_TRIGGER, 1) && _nncam.put_AutoExpoEnable(false)))
-        {
             throw new Exception("参数设置失败");
-        }
 
         // 设置回调
         if (!SetCallBack())
@@ -60,12 +52,12 @@ public class CameraService : ICameraService
             _nncam = null;
             throw new Exception("设置回调失败");
         }
-        
+
         return Task.CompletedTask;
     }
-    
+
     /// <summary>
-    ///   预览
+    ///     预览
     /// </summary>
     /// <returns></returns>
     public async Task<Picture> PreviewAsync()
@@ -76,7 +68,7 @@ public class CameraService : ICameraService
         if (_nncam.get_Size(out var width, out var height))
         {
             var bytes = new byte[width * height * 3];
-            if (_nncam.put_ExpoTime(100000) && _nncam.TriggerSync(0, bytes,24,0, out var info))
+            if (_nncam.put_ExpoTime(100000) && _nncam.TriggerSync(0, bytes, 24, 0, out var info))
             {
                 var bitmap = new Bitmap(width, height, PixelFormat.Format24bppRgb);
                 var data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly,
@@ -89,14 +81,14 @@ public class CameraService : ICameraService
                 {
                     bitmap.UnlockBits(data);
                 }
-                
-                
+
+
                 var savePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Preview");
                 if (!Directory.Exists(savePath)) Directory.CreateDirectory(savePath);
                 var date = DateTime.Now.ToString("yyyyMMddHHmmss");
                 var filePath = Path.Combine(savePath, $"{date}.png");
                 bitmap.Save(filePath, ImageFormat.Png);
-        
+
                 _nncam.get_ExpoTime(out var exposureTime);
 
                 return new Picture
@@ -117,15 +109,13 @@ public class CameraService : ICameraService
                 };
             }
         }
-        
+
         //TODO 关闭灯光
         throw new Exception("预览失败");
-        
-        
     }
 
     /// <summary>
-    ///   自动拍照
+    ///     自动拍照
     /// </summary>
     /// <param name="ctsToken"></param>
     /// <returns></returns>
@@ -134,9 +124,9 @@ public class CameraService : ICameraService
     {
         throw new NotImplementedException();
     }
-    
+
     /// <summary>
-    ///  手动拍照
+    ///     手动拍照
     /// </summary>
     /// <param name="exposure"></param>
     /// <param name="frame"></param>
@@ -149,36 +139,28 @@ public class CameraService : ICameraService
         _pictureList.Clear();
         _flag = "manual";
         //TODO 打开灯光
-        if (!(_nncam.put_ExpoTime(100000) && _nncam.Trigger(1)))
-        {
-            throw new Exception("拍摄白光图失败");
-        }
+        if (!(_nncam.put_ExpoTime(100000) && _nncam.Trigger(1))) throw new Exception("拍摄白光图失败");
 
         await Task.Delay(500, ctsToken);
-        
+
         // 设置曝光时
         var avgExposureTime = exposure / frame;
         if (!(_nncam.put_ExpoTime(uint.Parse(avgExposureTime.ToString())) &&
-             _nncam.Trigger(ushort.Parse(frame.ToString()))))
-        {
+              _nncam.Trigger(ushort.Parse(frame.ToString()))))
             throw new Exception("设置曝光时间失败");
-        }
     }
 
     /// <summary>
-    ///  取消拍照
+    ///     取消拍照
     /// </summary>
     public async Task CancelAsync()
     {
         await InitializeAsync();
-        if (!(_nncam != null && _nncam.Trigger(0)))
-        {
-            throw new Exception("取消失败");
-        }
+        if (!(_nncam != null && _nncam.Trigger(0))) throw new Exception("取消失败");
     }
 
     /// <summary>
-    ///  获取缓存
+    ///     获取缓存
     /// </summary>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
@@ -196,14 +178,10 @@ public class CameraService : ICameraService
     public async Task SetPixelAsync(uint index)
     {
         await InitializeAsync();
-        
+
         if (_nncam != null && _nncam.get_eSize(out var size))
-        {
             if (size == index)
-            {
                 return;
-            }
-        }
 
         _nncam?.Stop();
         _nncam?.put_eSize(index);
@@ -294,11 +272,8 @@ public class CameraService : ICameraService
             {
                 bitmap.UnlockBits(data);
             }
-            
-            if (!bOk)
-            {
-                return;
-            }
+
+            if (!bOk) return;
 
             switch (_flag)
             {
@@ -325,8 +300,10 @@ public class CameraService : ICameraService
                         var bmp = new Bitmap(mat.Cols, mat.Rows, (int)mat.Step(), PixelFormat.Format24bppRgb, mat.Data);
                         // 保存图片
                         _nncam.get_ExpoTime(out var time);
-                        _pictureList.Add(await SaveAsync(bmp, info, int.Parse((time * (_bitmapList.Count - 1)).ToString()), 1));
+                        _pictureList.Add(await SaveAsync(bmp, info,
+                            int.Parse((time * (_bitmapList.Count - 1)).ToString()), 1));
                     }
+
                     break;
                 }
             }
@@ -360,15 +337,16 @@ public class CameraService : ICameraService
     /// <param name="type"></param>
     /// <param name="folder"></param>
     /// <returns></returns>
-    private async Task<Picture> SaveAsync(Bitmap bitmap, Nncam.FrameInfoV3 info, int exposureTime, int type = 0, string folder = "Exposure")
+    private async Task<Picture> SaveAsync(Bitmap bitmap, Nncam.FrameInfoV3 info, int exposureTime, int type = 0,
+        string folder = "Exposure")
     {
         var savePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), folder);
         if (!Directory.Exists(savePath)) Directory.CreateDirectory(savePath);
         var date = DateTime.Now.ToString("yyyyMMddHHmmss");
         var filePath = Path.Combine(savePath, $"{date}.png");
         bitmap.Save(filePath, ImageFormat.Png);
-        
-        var pic = await _picture.AddReturnModel( new Picture
+
+        var pic = await _picture.AddReturnModel(new Picture
         {
             UserId = _user.GetLogged()?.Id ?? 0,
             Name = date,

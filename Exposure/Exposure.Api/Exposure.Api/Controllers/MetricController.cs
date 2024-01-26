@@ -16,7 +16,7 @@ public class MetricController : ControllerBase
         _usb = usb;
         _camera = camera;
     }
-    
+
     [HttpGet]
     public async Task<IActionResult> Status()
     {

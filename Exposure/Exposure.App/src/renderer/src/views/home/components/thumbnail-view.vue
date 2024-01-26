@@ -95,34 +95,34 @@ const props = defineProps({
     type: Object as () => Picture[],
     required: true
   },
-  thumbnailSelected: {
+  selected: {
     type: Object as () => Picture[],
     required: true
   }
 })
-
 const emit = defineEmits(['selected', 'combine'])
-
 const { t } = useI18n()
 
+// 加载
 const loading = ref({
   combine: false,
   export: false
 })
-
+// 是否禁用合并
 const diableCombine = computed(() => {
   // 数量等于2, 类型一个是白光一个是曝光, 不能同时是白光或者曝光
   return (
-    props.thumbnailSelected.length !== 2 ||
-    props.thumbnailSelected[0].type === props.thumbnailSelected[1].type ||
-    props.thumbnailSelected.some((item) => item.type === 3) ||
+    props.selected.length !== 2 ||
+    props.selected[0].type === props.selected[1].type ||
+    props.selected.some((item) => item.type === 2) ||
     loading.value.combine
   )
 })
 
+// 是否禁用导出
 const disableExport = computed(() => {
   // 数量等于0
-  return props.thumbnailSelected.length === 0 || loading.value.export
+  return props.selected.length === 0 || loading.value.export
 })
 
 // 白光
@@ -154,7 +154,7 @@ const combine = computed(() => {
 
 // 是否显示选中
 const showSelected = (item: Picture) => {
-  return props.thumbnailSelected.some((selected) => selected.id === item.id)
+  return props.selected.some((selected) => selected.id === item.id)
 }
 
 // 是否显示预览
@@ -171,7 +171,7 @@ const handleSelected = (item: Picture) => {
 const handleCombine = async () => {
   try {
     loading.value.combine = true
-    const ids: number[] = props.thumbnailSelected.map((item) => item.id)
+    const ids: number[] = props.selected.map((item) => item.id)
     const res = await combinePicture(ids)
     emit('combine', res.data)
   } catch (error) {
@@ -185,7 +185,7 @@ const handleCombine = async () => {
 const handleExport = async (format: string) => {
   try {
     loading.value.export = true
-    const ids: number[] = props.thumbnailSelected.map((item) => item.id)
+    const ids: number[] = props.selected.map((item) => item.id)
     await exportPicture({ ids: ids, format: format })
     Message.success(t('home.thumbnail.view.export.success'))
   } catch (error) {
@@ -215,7 +215,8 @@ const handleExport = async (format: string) => {
 .scroll-wrapper {
   display: flex;
   height: 100%;
-  overflow: hidden;
+  overflow-y: hidden;
+  overflow-x: scroll;
 
   .scroll-item {
     position: relative;

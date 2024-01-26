@@ -56,12 +56,14 @@ import { useI18n } from 'vue-i18n'
 import useLoading from '@renderer/hooks/loading'
 import type { LoginData } from '@renderer/api/user'
 import { useUserStore } from '@renderer/store'
+import useHomeStore from '@renderer/hooks/home'
 
 const router = useRouter()
 const { t } = useI18n()
 const errorMessage = ref('')
 const { loading, setLoading } = useLoading()
 const userStore = useUserStore()
+const { init } = useHomeStore()
 
 const userInfo = reactive({
   username: '',
@@ -81,6 +83,7 @@ const handleSubmit = async ({
     setLoading(true)
     try {
       await userStore.login(values as LoginData)
+      init()
       router.push({ name: 'home' })
       Message.success(t('login.form.login.success'))
     } catch (err) {

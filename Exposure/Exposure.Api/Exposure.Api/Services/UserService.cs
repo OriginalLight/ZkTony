@@ -19,6 +19,31 @@ public class UserService : BaseService<User>, IUserService
     }
 
     /// <summary>
+    ///     初始化
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public async Task InitializeAsync()
+    {
+        // 查询超级管理员是否存在
+        var su = await context.db.Queryable<User>().Where(it => it.Role == 0).FirstAsync();
+        if (su == null)
+        {
+            su = new User
+            {
+                Name = "zkty",
+                Sha = BCrypt.Net.BCrypt.HashPassword("zkty"),
+                Role = 0,
+                Enabled = true,
+                CreateTime = DateTime.Now,
+                UpdateTime = DateTime.Now,
+                LastLoginTime = DateTime.Now
+            };
+            await context.db.Insertable(su).ExecuteReturnIdentityAsync();
+        }
+    }
+
+    /// <summary>
     ///     返回当前登录的用户
     /// </summary>
     /// <returns></returns>
@@ -92,7 +117,7 @@ public class UserService : BaseService<User>, IUserService
     }
 
     /// <summary>
-    ///  根据名称查询
+    ///     根据名称查询
     /// </summary>
     /// <param name="dtoName"></param>
     /// <returns></returns>

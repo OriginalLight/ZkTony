@@ -61,21 +61,30 @@
 
 <script lang="ts" setup>
 import dayjs from 'dayjs'
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Message, TableColumnData } from '@arco-design/web-vue'
 import useLoading from '@renderer/hooks/loading'
-
 import { ErrLog, getErrLogByPage, deleteErrLog, exportErrLog } from '@renderer/api/errlog'
 
 const { t } = useI18n()
-const { loading, setLoading } = useLoading(true)
+
+// 加载
+const { loading, setLoading } = useLoading()
+
+// 弹窗
 const visible = ref(false)
+
+// 搜索日期
 const searchDate = ref<Date | undefined>(undefined)
+
+// 选中的key
 const selectedKeys = ref([])
 
+// 分页
 const pagination = reactive({ current: 1, pageSize: 15, total: 0 })
 
+// 表格列
 const columns: TableColumnData[] = [
   {
     title: t('errlog.table.id'),
@@ -105,8 +114,11 @@ const columns: TableColumnData[] = [
     ellipsis: true
   }
 ]
+
+// 数据
 const data = ref<ErrLog[]>([])
 
+// 获取数据
 const fetchData = async () => {
   setLoading(true)
   try {
@@ -124,16 +136,19 @@ const fetchData = async () => {
   }
 }
 
+// 搜索
 const handleSearch = () => {
   selectedKeys.value = []
   fetchData()
 }
 
+// 分页
 const onPageChange = (current) => {
   pagination.current = current
   fetchData()
 }
 
+// 删除
 const handleDelete = async () => {
   visible.value = false
   try {
@@ -151,6 +166,7 @@ const handleDelete = async () => {
   }
 }
 
+// 导出
 const handleExport = async () => {
   try {
     await exportErrLog(selectedKeys.value)
@@ -160,7 +176,9 @@ const handleExport = async () => {
   }
 }
 
-fetchData()
+onMounted(() => {
+  fetchData()
+})
 </script>
 
 <style lang="less" scoped>
@@ -169,7 +187,6 @@ fetchData()
   flex-direction: column;
   padding: 16px;
   height: calc(100vh - 66px - 32px);
-  background-color: var(--color-bg-2);
 
   .bar {
     display: flex;

@@ -94,10 +94,7 @@ public class UserController : ControllerBase
         user.UpdateTime = DateTime.Now;
         user.LastLoginTime = DateTime.Now;
         // 验证用户名是否重复
-        if (await _user.GetByName(dto.Name) != null)
-        {
-            return Problem("用户名重复");
-        }
+        if (await _user.GetByName(dto.Name) != null) return Problem("用户名重复");
         if (await _user.Add(user))
         {
             // 记录添加日志
@@ -126,11 +123,10 @@ public class UserController : ControllerBase
                 return Problem("旧密码错误");
             old.Sha = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
         }
+
         // 如果旧密码为空，新密码不为空，则直接更新密码
         if (dto.OldPassword.Length == 0 && dto.NewPassword.Length > 0)
-        {
             old.Sha = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
-        }
         // 更新其他信息
         old.Name = dto.Name;
         old.Role = dto.Role;

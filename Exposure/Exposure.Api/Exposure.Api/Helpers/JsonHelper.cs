@@ -11,7 +11,6 @@ public static class JsonHelper
         {
             ContractResolver = new CamelCasePropertyNamesContractResolver(),
             DateFormatString = "yyyy-MM-dd HH:mm:ss"
-            
         });
     }
 }

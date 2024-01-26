@@ -6,14 +6,17 @@ using Exposure.Api.Models;
 using Exposure.Api.Models.Dto;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 using SqlSugar;
+using Image = SixLabors.ImageSharp.Image;
 
 namespace Exposure.Api.Services;
 
 public class PictureService : BaseService<Picture>, IPictureService
 {
-    private readonly IDbContext context;
     private readonly IUserService _user;
+    private readonly IDbContext context;
 
     public PictureService(IDbContext dbContext, IUserService user) : base(dbContext)
     {
@@ -30,10 +33,7 @@ public class PictureService : BaseService<Picture>, IPictureService
     public async Task<List<Picture>> GetByPage(PictureQueryDto dto, RefAsync<int> total)
     {
         var logged = _user.GetLogged();
-        if (logged == null)
-        {
-            return new List<Picture>();
-        }
+        if (logged == null) return new List<Picture>();
         var lower = await context.db.Queryable<User>().Where(u => u.Role > logged.Role).ToListAsync();
         var users = lower.Append(logged).ToList();
         var ids = users.Select(u => u.Id).ToList();
@@ -48,7 +48,7 @@ public class PictureService : BaseService<Picture>, IPictureService
     }
 
     /// <summary>
-    ///  添加并返回实体
+    ///     添加并返回实体
     /// </summary>
     /// <param name="picture"></param>
     /// <returns></returns>
@@ -59,7 +59,7 @@ public class PictureService : BaseService<Picture>, IPictureService
     }
 
     /// <summary>
-    ///  根据id查询
+    ///     根据id查询
     /// </summary>
     /// <param name="ids"></param>
     /// <returns></returns>
@@ -69,7 +69,7 @@ public class PictureService : BaseService<Picture>, IPictureService
     }
 
     /// <summary>
-    ///  合并图片
+    ///     合并图片
     /// </summary>
     /// <param name="list"></param>
     /// <returns></returns>
@@ -82,14 +82,14 @@ public class PictureService : BaseService<Picture>, IPictureService
         var mat = new Mat(list[0].Height, list[1].Width, MatType.CV_8UC3, new Scalar(0));
         Cv2.Add(mat1, mat2, mat);
         var bitmap = mat.ToBitmap();
-            
+
         var savePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Exposure");
         if (!Directory.Exists(savePath)) Directory.CreateDirectory(savePath);
         var date = DateTime.Now.ToString("yyyyMMddHHmmss");
         var filePath = Path.Combine(savePath, $"{date}.png");
         bitmap.Save(filePath, ImageFormat.Png);
-            
-        return await AddReturnModel( new Picture
+
+        return await AddReturnModel(new Picture
         {
             UserId = _user.GetLogged()?.Id ?? 0,
             Name = date,
@@ -108,32 +108,34 @@ public class PictureService : BaseService<Picture>, IPictureService
     }
 
     /// <summary>
-    ///  调整图片
+    ///     调整图片
     /// </summary>
     /// <param name="pic"></param>
     /// <param name="dto"></param>
     /// <returns></returns>
     public async Task<Picture> Adjust(Picture pic, PictureAdjustDto dto)
     {
-        var bitmap = new Bitmap(pic.Path);
-        var mat = bitmap.ToMat();
-        var mat1 = new Mat(bitmap.Height, bitmap.Width, MatType.CV_8UC3, new Scalar(0));
-        mat.ConvertTo(mat1, -1, dto.Brightness / 30.0, dto.Contrast / 100.0);
-        
+        // 使用imageSharp处理图片
+        var image = await Image.LoadAsync(pic.Path);
+        // 增强亮度
+        image.Mutate(x => x.Brightness(dto.Brightness / 100.0f));
+        // 增强对比度
+        image.Mutate(x => x.Contrast(dto.Contrast / 100.0f));
+        // 保存图片 image to bitmap
         var savePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Exposure");
         if (!Directory.Exists(savePath)) Directory.CreateDirectory(savePath);
         var date = DateTime.Now.ToString("yyyyMMddHHmmss");
         var filePath = Path.Combine(savePath, $"{date}.png");
-        var bitmap1 = mat1.ToBitmap();
-        bitmap1.Save(filePath, ImageFormat.Png);
-            
-        return await AddReturnModel( new Picture
+
+        await image.SaveAsPngAsync(filePath);
+
+        return await AddReturnModel(new Picture
         {
             UserId = _user.GetLogged()?.Id ?? 0,
             Name = date,
             Path = filePath,
-            Width = bitmap1.Width,
-            Height = bitmap1.Height,
+            Width = image.Width,
+            Height = image.Height,
             Type = pic.Type,
             ExposureTime = pic.ExposureTime,
             ExposureGain = pic.ExposureGain,

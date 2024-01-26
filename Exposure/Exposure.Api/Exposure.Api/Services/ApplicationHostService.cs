@@ -6,15 +6,18 @@ namespace Exposure.Api.Services;
 
 public class ApplicationHostService : IHostedService
 {
+    private readonly IAutoCleanService _autoCleanService;
     private readonly IDbContext _dbContext;
     private readonly IUsbService _usbService;
-    private readonly IAutoCleanService _autoCleanService;
+    private readonly IUserService _userService;
     private bool _isInitialized;
 
-    public ApplicationHostService(IDbContext dbContext, IUsbService usbService, IAutoCleanService autoCleanService)
+    public ApplicationHostService(IDbContext dbContext, IUserService userService, IUsbService usbService,
+        IAutoCleanService autoCleanService)
     {
         _dbContext = dbContext;
         _usbService = usbService;
+        _userService = userService;
         _autoCleanService = autoCleanService;
     }
 
@@ -27,6 +30,7 @@ public class ApplicationHostService : IHostedService
         if (!_isInitialized)
         {
             _dbContext.CreateTable(false, 50, typeof(User), typeof(Picture), typeof(OperLog), typeof(ErrorLog));
+            await _userService.InitializeAsync();
             await _autoCleanService.CleanPreviewAsync();
             await _usbService.InitializeAsync();
         }

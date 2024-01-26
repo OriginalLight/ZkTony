@@ -3,7 +3,7 @@
 public interface IAutoCleanService
 {
     /// <summary>
-    ///   清理预览图
+    ///     清理预览图
     /// </summary>
     /// <returns></returns>
     Task CleanPreviewAsync();
