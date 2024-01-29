@@ -2,6 +2,7 @@ package com.zktony.android.data.dao
 
 import androidx.paging.PagingSource
 import androidx.room.*
+import com.zktony.android.data.entities.NewCalibration
 import com.zktony.android.data.entities.Setting
 import kotlinx.coroutines.flow.Flow
 
@@ -11,6 +12,13 @@ import kotlinx.coroutines.flow.Flow
  */
 @Dao
 abstract class SettingDao : BaseDao<Setting> {
+
+    @Query(
+        """
+        SELECT * FROM setting
+        """
+    )
+    abstract fun getAll(): Flow<List<Setting>>
 
     @Query(
         """

@@ -328,7 +328,9 @@ fun operate(
      *  废液
      */
     val waste = rememberDataSaverState(key = "waste", default = 0f)
+    waste.value = 0f
     var waste_ex by remember { mutableStateOf(waste.value.format(1)) }
+
     /**
      * 制胶预排-高浓度预排液
      */
@@ -630,13 +632,16 @@ fun operate(
                             .size(100.dp)
                             .clickable {
                                 scope.launch {
-                                    if (uiFlags is UiFlags.None || (uiFlags is UiFlags.Objects && uiFlags.objects == 3)) {
-                                        if (uiFlags is UiFlags.None) {
-                                            uiEvent(HomeIntent.Pipeline(1))
-                                        } else {
-                                            uiEvent(HomeIntent.Pipeline(0))
-                                        }
+                                    Log.d(
+                                        "Home",
+                                        "uiFlags" + uiFlags
+                                    )
+                                    if (uiFlags is UiFlags.None) {
+                                        uiEvent(HomeIntent.Pipeline(1))
                                     }
+//                                        else {
+//                                            uiEvent(HomeIntent.Pipeline(0))
+//                                        }
                                 }
 
                             }
@@ -665,7 +670,7 @@ fun operate(
                             .padding(start = 20.dp)
                             .size(100.dp)
                             .clickable {
-                                if (job == null) {
+                                if (uiFlags is UiFlags.None) {
                                     waste.value = 0f
                                     uiEvent(HomeIntent.Reset)
                                 }
@@ -787,7 +792,7 @@ fun operate(
                 ) {
                     Text(
                         fontSize = 16.sp,
-                        text = "纯水液量/ml："
+                        text = "冲洗液量/ml："
                     )
                     OutlinedTextField(
                         modifier = Modifier.width(100.dp),

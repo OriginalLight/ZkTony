@@ -2,6 +2,7 @@ package com.zktony.android.ui
 
 import android.content.Intent
 import android.provider.Settings
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -23,7 +24,9 @@ import com.zktony.android.utils.extra.Application
 import com.zktony.android.utils.extra.httpCall
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -60,13 +63,17 @@ class SettingViewModel @Inject constructor(
         config = PagingConfig(pageSize = 20, initialLoadSize = 40),
     ) { proDao.getByPage() }.flow.cachedIn(viewModelScope)
 
-    val slEntities = Pager(
-        config = PagingConfig(pageSize = 20, initialLoadSize = 40),
-    ) { slDao.getByPage() }.flow.cachedIn(viewModelScope)
+//    val slEntities = Pager(
+//        config = PagingConfig(pageSize = 20, initialLoadSize = 40),
+//    ) { slDao.getByPage() }.flow.cachedIn(viewModelScope)
 
-    val ncEntities = Pager(
-        config = PagingConfig(pageSize = 20, initialLoadSize = 40),
-    ) { ncDao.getByPage() }.flow.cachedIn(viewModelScope)
+    val slEntitiy = slDao.getById(1L)
+
+    val ncEntitiy = ncDao.getById(1L)
+
+//    val ncEntities = Pager(
+//        config = PagingConfig(pageSize = 20, initialLoadSize = 40),
+//    ) { ncDao.getByPage() }.flow.cachedIn(viewModelScope)
 
 
     init {

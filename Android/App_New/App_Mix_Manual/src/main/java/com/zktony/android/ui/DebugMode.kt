@@ -77,12 +77,15 @@ fun DebugModeRoute(viewModel: SettingViewModel) {
     val snackbarHostState = LocalSnackbarHostState.current
 
     val page by viewModel.page.collectAsStateWithLifecycle()
+    Log.d(
+        "DebugMode", "page=========$page"
+    )
     val selected by viewModel.selected.collectAsStateWithLifecycle()
     val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
     val entities = viewModel.entities.collectAsLazyPagingItems()
     val proEntities = viewModel.proEntities.collectAsLazyPagingItems()
 
-    val slEntities = viewModel.slEntities.collectAsLazyPagingItems()
+    val slEntitiy by viewModel.slEntitiy.collectAsStateWithLifecycle(initialValue = null)
 
     val navigation: () -> Unit = {
         scope.launch {
@@ -106,7 +109,7 @@ fun DebugModeRoute(viewModel: SettingViewModel) {
         AnimatedContent(targetState = page) {
             when (page) {
                 PageType.DEBUGMODE -> debugMode(
-                    viewModel::dispatch, proEntities.toList(), slEntities.toList()
+                    viewModel::dispatch, proEntities.toList(), slEntitiy
                 )
 
                 else -> {}
@@ -120,24 +123,10 @@ fun DebugModeRoute(viewModel: SettingViewModel) {
 fun debugMode(
     uiEvent: (SettingIntent) -> Unit,
     proEntities: List<Program>,
-    slEntities: List<Setting>,
+    s1: Setting?,
 ) {
 
-    var setting = slEntities.find {
-        it.id == 1L
-    } ?: Setting()
-    Log.d(
-        "Setting",
-        "setting=========$setting"
-    )
-    if (setting.id == 0L) {
-        uiEvent(
-            SettingIntent.InsertSet(
-                0.0, 0.0, 0.0, 500.0, 500.0, 500.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                0.0, 0.0, 0.0, 0.0, 0.0, 0.0
-            )
-        )
-    }
+    var setting = s1 ?: Setting()
 
     val scope = rememberCoroutineScope()
 
@@ -166,17 +155,19 @@ fun debugMode(
     var lowSpeed by remember { mutableStateOf(0L) }
 
     //冲洗液泵转速
-    var rinseSpeed = rememberDataSaverState(key = "rinseSpeed", default = 0L)
+    var rinseSpeed = rememberDataSaverState(key = "rinseSpeed", default = 600L)
     var rinseSpeed_ex by remember { mutableStateOf(rinseSpeed.value.toString()) }
 
     //促凝剂泵转速
-    var coagulantSpeed by remember { mutableStateOf(0L) }
+    var coagulantSpeed = rememberDataSaverState(key = "coagulantSpeed", default = 200L)
+    var coagulantSpeed_ex by remember { mutableStateOf(coagulantSpeed.value.toString()) }
 
     /**
      * 促凝剂步数
      */
-    val coagulantpulse = rememberDataSaverState(key = "coagulantpulse", default = 67500)
+    val coagulantpulse = rememberDataSaverState(key = "coagulantpulse", default = 1080000)
     var coagulantpulse_ex by remember { mutableStateOf(coagulantpulse.value.toString()) }
+
 
     /**
      * 复位等待时间
@@ -190,7 +181,11 @@ fun debugMode(
     val coagulantResetPulse = rememberDataSaverState(key = "coagulantResetPulse", default = 1500)
     var coagulantResetPulse_ex by remember { mutableStateOf(coagulantResetPulse.value.toString()) }
 
-    var xSpeed by remember { mutableStateOf(0L) }
+    /**
+     * x轴转速
+     */
+    val xSpeed = rememberDataSaverState(key = "xSpeed", default = 100L)
+    var xSpeed_ex by remember { mutableStateOf(xSpeed.value.toString()) }
 
 
     /**
@@ -370,7 +365,7 @@ fun debugMode(
                         )
 
                         Text(
-                            modifier = Modifier.padding(top = 20.dp, start = 20.dp), text = "步/s"
+                            modifier = Modifier.padding(top = 20.dp, start = 20.dp), text = "rpm"
                         )
 
                         Button(modifier = Modifier
@@ -463,7 +458,7 @@ fun debugMode(
                         })
                     )
                     Text(
-                        modifier = Modifier.padding(top = 20.dp, start = 20.dp), text = "步/s"
+                        modifier = Modifier.padding(top = 20.dp, start = 20.dp), text = "rpm"
                     )
 
                     Button(modifier = Modifier
@@ -523,7 +518,7 @@ fun debugMode(
                         })
                     )
                     Text(
-                        modifier = Modifier.padding(top = 20.dp, start = 20.dp), text = "步/s"
+                        modifier = Modifier.padding(top = 20.dp, start = 20.dp), text = "rpm"
                     )
 
                     Button(modifier = Modifier
@@ -575,7 +570,9 @@ fun debugMode(
                         label = { Text(text = "转速") },
                         onValueChange = {
                             rinseSpeed_ex = it
-                            rinseSpeed.value = rinseSpeed_ex.toLongOrNull() ?: 0L
+                            if (rinseSpeed_ex.toLongOrNull() ?: 600L > 600L) rinseSpeed_ex =
+                                "600"
+                            rinseSpeed.value = rinseSpeed_ex.toLongOrNull() ?: 600L
                         },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
@@ -586,7 +583,7 @@ fun debugMode(
                         })
                     )
                     Text(
-                        modifier = Modifier.padding(top = 20.dp, start = 20.dp), text = "步/s"
+                        modifier = Modifier.padding(top = 20.dp, start = 20.dp), text = "rpm"
                     )
 
                     Button(modifier = Modifier
@@ -613,9 +610,7 @@ fun debugMode(
                                         index = 4,
                                         pdv = -32000L,
                                         ads = Triple(
-                                            600 * 100,
-                                            600 * 100,
-                                            rinseSpeed.value.toLong()
+                                            600 * 100, 600 * 100, rinseSpeed.value
                                         ),
                                     )
                                 }
@@ -638,9 +633,14 @@ fun debugMode(
 
                     OutlinedTextField(
                         modifier = Modifier.width(100.dp),
-                        value = coagulantSpeed.toString(),
+                        value = coagulantSpeed_ex,
                         label = { Text(text = "转速") },
-                        onValueChange = { coagulantSpeed = if (it == "") 0 else it.toLong() },
+                        onValueChange = {
+                            coagulantSpeed_ex = it
+                            if (coagulantSpeed_ex.toLongOrNull() ?: 600L > 600L) coagulantSpeed_ex =
+                                "600"
+                            coagulantSpeed.value = coagulantSpeed_ex.toLongOrNull() ?: 600L
+                        },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
                             imeAction = ImeAction.Done,
@@ -650,7 +650,7 @@ fun debugMode(
                         })
                     )
                     Text(
-                        modifier = Modifier.padding(top = 20.dp, start = 20.dp), text = "步/s"
+                        modifier = Modifier.padding(top = 20.dp, start = 20.dp), text = "rpm"
                     )
 
                     OutlinedTextField(
@@ -662,6 +662,25 @@ fun debugMode(
                         onValueChange = {
                             coagulantpulse_ex = it
                             coagulantpulse.value = coagulantpulse_ex.toIntOrNull() ?: 0
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Done,
+                        ),
+                        keyboardActions = KeyboardActions(onDone = {
+                            keyboard?.hide()
+                        })
+                    )
+
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .padding(start = 20.dp)
+                            .width(150.dp),
+                        enabled = false,
+                        value = "1",
+                        label = { Text(text = "促凝剂变速比") },
+                        onValueChange = {
+
                         },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
@@ -684,7 +703,7 @@ fun debugMode(
                         label = { Text(text = "复位等待时间") },
                         onValueChange = {
                             coagulantTime_ex = it
-                            coagulantTime.value = coagulantTime_ex.toIntOrNull() ?: 0
+                            coagulantTime.value = coagulantTime_ex.toIntOrNull() ?: 800
                         },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
@@ -730,7 +749,11 @@ fun debugMode(
                                     with(
                                         index = 1,
                                         pdv = coagulantpulse.value.toLong(),
-                                        ads = Triple(600 * 100, 600 * 100, coagulantSpeed * 100),
+                                        ads = Triple(
+                                            coagulantSpeed.value * 13,
+                                            coagulantSpeed.value * 1193,
+                                            coagulantSpeed.value * 1193
+                                        ),
                                     )
                                 }
 
@@ -786,9 +809,7 @@ fun debugMode(
                                                 index = 1,
                                                 pdv = -coagulantpulse.value.toLong(),
                                                 ads = Triple(
-                                                    1200 * 100,
-                                                    1200 * 100 + 5,
-                                                    1200 * 100
+                                                    1200 * 100, 1200 * 100 + 5, 1200 * 100
                                                 ),
                                             )
                                         }
@@ -827,9 +848,7 @@ fun debugMode(
                                                 index = 1,
                                                 pdv = -coagulantpulse.value.toLong(),
                                                 ads = Triple(
-                                                    1200 * 100,
-                                                    1200 * 100 + 5,
-                                                    1200 * 100
+                                                    1200 * 100, 1200 * 100 + 5, 1200 * 100
                                                 ),
                                             )
                                         }
@@ -873,9 +892,12 @@ fun debugMode(
 
                         OutlinedTextField(
                             modifier = Modifier.width(100.dp),
-                            value = xSpeed.toString(),
+                            value = xSpeed_ex,
                             label = { Text(text = "转速") },
-                            onValueChange = { xSpeed = if (it == "") 0 else it.toLong() },
+                            onValueChange = {
+                                xSpeed_ex = it
+                                xSpeed.value = xSpeed_ex.toLongOrNull() ?: 0L
+                            },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number,
                                 imeAction = ImeAction.Done,
@@ -885,7 +907,7 @@ fun debugMode(
                             })
                         )
                         Text(
-                            modifier = Modifier.padding(top = 20.dp, start = 20.dp), text = "步/s"
+                            modifier = Modifier.padding(top = 20.dp, start = 20.dp), text = "rpm"
                         )
 
                     }
@@ -901,8 +923,7 @@ fun debugMode(
                             label = { Text(text = "废液槽坐标") },
                             onValueChange = {
                                 wastePosition_ex = it
-                                setting.wastePosition =
-                                    wastePosition_ex.toDoubleOrNull() ?: 0.0
+                                setting.wastePosition = wastePosition_ex.toDoubleOrNull() ?: 0.0
                                 uiEvent(SettingIntent.UpdateSet(setting))
                             },
                             keyboardOptions = KeyboardOptions(
@@ -925,7 +946,7 @@ fun debugMode(
                                         timeOut = 1000L * 60L
                                         with(
                                             index = 0,
-                                            ads = Triple(600 * 100, 600 * 100, xSpeed * 100),
+                                            ads = Triple(xSpeed.value, xSpeed.value, xSpeed.value),
                                             pdv = setting.wastePosition
                                         )
                                     }
@@ -971,7 +992,7 @@ fun debugMode(
                                         timeOut = 1000L * 60L
                                         with(
                                             index = 0,
-                                            ads = Triple(600 * 100, 600 * 100, xSpeed * 100),
+                                            ads = Triple(xSpeed.value, xSpeed.value, xSpeed.value),
                                             pdv = setting.glueBoardPosition
                                         )
                                     }
@@ -1571,8 +1592,7 @@ fun debugMode(
                 ) {
 
                     Text(
-                        modifier = Modifier.padding(top = 10.dp, start = 5.dp),
-                        text = "是否加液:"
+                        modifier = Modifier.padding(top = 10.dp, start = 5.dp), text = "是否加液:"
                     )
 
                     liquid.forEach {
@@ -1592,8 +1612,7 @@ fun debugMode(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        modifier = Modifier.padding(top = 10.dp, start = 5.dp),
-                        text = "程序名称:"
+                        modifier = Modifier.padding(top = 10.dp, start = 5.dp), text = "程序名称:"
                     )
                     Text(
                         modifier = Modifier
@@ -1677,7 +1696,7 @@ fun debugMode(
                             with(
                                 index = 0,
                                 pdv = setting.wastePosition,
-                                ads = Triple(600 * 100, 600 * 100, xSpeed * 100),
+                                ads = Triple(xSpeed.value, xSpeed.value, xSpeed.value),
                             )
                         }
                         delay(100)
@@ -1686,7 +1705,7 @@ fun debugMode(
                             with(
                                 index = 0,
                                 pdv = setting.glueBoardPosition,
-                                ads = Triple(600 * 100, 600 * 100, xSpeed * 100),
+                                ads = Triple(xSpeed.value, xSpeed.value, xSpeed.value),
                             )
                         }
 

@@ -2,6 +2,7 @@ package com.zktony.android.data.dao
 
 import androidx.paging.PagingSource
 import androidx.room.*
+import com.zktony.android.data.entities.Motor
 import com.zktony.android.data.entities.NewCalibration
 import com.zktony.android.data.entities.Setting
 import kotlinx.coroutines.flow.Flow
@@ -12,6 +13,13 @@ import kotlinx.coroutines.flow.Flow
  */
 @Dao
 abstract class NewCalibrationDao : BaseDao<NewCalibration> {
+
+    @Query(
+        """
+        SELECT * FROM new_calibration
+        """
+    )
+    abstract fun getAll(): Flow<List<NewCalibration>>
 
     @Query(
         """

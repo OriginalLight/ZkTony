@@ -1,5 +1,6 @@
 package com.zktony.android.ui.mothersettingprogressbar
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.size
@@ -16,6 +17,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
+import com.zktony.android.utils.SerialPortUtils
 
 /**
  * 制胶进度竖形进度条
@@ -35,9 +37,13 @@ fun VerticalProgressBar(
     strokeColor: Color = Color.Blue
 ) {
 
+    val index = progress.indexOf('.')
+    var progress = progress.substring(0, index)
+
+
 
     val waterDescLayoutResult = rememberTextMeasurer().measure(
-        AnnotatedString(progress + "%"),
+        AnnotatedString("$progress%"),
         TextStyle(color = Color(178, 193, 209))
     )
 

@@ -35,7 +35,7 @@ fun WaterVerticalProgressBar(
     strokeColor: Color = Color.Blue
 ) {
 
-    val textDesc = "纯水"
+    val textDesc = "冲洗液"
     val textDescLayoutResult = rememberTextMeasurer().measure(
         AnnotatedString(textDesc),
         TextStyle(color = Color(178, 193, 209))

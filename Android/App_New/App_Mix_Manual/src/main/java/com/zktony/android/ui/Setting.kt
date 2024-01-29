@@ -136,6 +136,7 @@ import com.zktony.android.utils.SerialPortUtils.start
 import com.zktony.android.utils.extra.Application
 import com.zktony.android.utils.extra.dateFormat
 import com.zktony.android.utils.extra.format
+import kotlinx.coroutines.delay
 //import com.zktony.serialport.BuildConfig
 import kotlinx.coroutines.launch
 
@@ -156,13 +157,13 @@ fun SettingRoute(viewModel: SettingViewModel) {
 
     val entities = viewModel.entities.collectAsLazyPagingItems()
     val proEntities = viewModel.proEntities.collectAsLazyPagingItems()
-    val slEntities = viewModel.slEntities.collectAsLazyPagingItems()
-    val ncEntities = viewModel.ncEntities.collectAsLazyPagingItems()
-
+    val slEntitiy by viewModel.slEntitiy.collectAsStateWithLifecycle(initialValue = null)
+    val ncEntitiy by viewModel.ncEntitiy.collectAsStateWithLifecycle(initialValue = null)
     val navigation: () -> Unit = {
         scope.launch {
             when (page) {
                 PageType.SETTINGS -> navigationActions.navigateUp()
+                else -> viewModel.dispatch(SettingIntent.NavTo(PageType.SETTINGS))
             }
         }
     }
@@ -177,15 +178,15 @@ fun SettingRoute(viewModel: SettingViewModel) {
         AnimatedContent(targetState = page) {
             when (page) {
                 PageType.SETTINGS -> SettingLits(
-                    slEntities.toList(),
-                    ncEntities.toList(),
+                    slEntitiy,
+                    ncEntitiy,
                     application,
                     progress,
                     viewModel::dispatch
                 )
 
                 PageType.DEBUGMODE -> debug(
-                    viewModel::dispatch, proEntities.toList(), slEntities.toList()
+                    viewModel::dispatch, proEntities.toList(), slEntitiy
                 )
 
                 else -> {}
@@ -197,44 +198,15 @@ fun SettingRoute(viewModel: SettingViewModel) {
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun SettingLits(
-    slEntities: List<Setting>,
-    ncEntities: List<NewCalibration>,
+    s1: Setting?,
+    c1: NewCalibration?,
     application: Application?,
     progress: Int,
     uiEvent: (SettingIntent) -> Unit
 ) {
+    var setting = s1 ?: Setting()
 
-    var setting = slEntities.find {
-        it.id == 1L
-    } ?: Setting()
-    Log.d(
-        "Setting",
-        "setting=========$setting"
-    )
-    if (setting.id == 0L) {
-        uiEvent(
-            SettingIntent.InsertSet(
-                0.0, 0.0, 0.0, 500.0, 500.0, 500.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                0.0, 0.0, 0.0, 0.0, 0.0, 0.0
-            )
-        )
-    }
-
-    var newCalibration = ncEntities.find {
-        it.id == 1L
-    } ?: NewCalibration()
-
-    if (newCalibration.id == 0L) {
-        uiEvent(
-            SettingIntent.InsertNC(
-                0.0, 0.0, 0.0, 500.0,
-                0.0, 0.0, 0.0, 0.0,
-                0.0, 0.0, 0.0, 0.0,
-                0.0, 0.0, 0.0, 0.0
-            )
-        )
-    }
-
+    var newCalibration = c1 ?: NewCalibration()
 
     Column(
         modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally
@@ -292,23 +264,27 @@ fun SettingLits(
         /**
          *  高浓度泵预计使用时间
          */
-        var highTimeExpected_ex by remember { mutableStateOf(setting.highTimeExpected.toString()) }
+//        var highTimeExpected_ex by remember { mutableStateOf(setting.highTimeExpected.toString()) }
+        var highTimeExpected_ex by remember(setting) { mutableStateOf(setting.highTimeExpected.toString()) }
+//        highTimeExpected_ex = setting.highTimeExpected.toString()
 
         /**
          *  低浓度泵预计使用时间
          */
-        var lowTimeExpected_ex by remember { mutableStateOf(setting.lowTimeExpected.toString()) }
+        var lowTimeExpected_ex by remember(setting) { mutableStateOf(setting.lowTimeExpected.toString()) }
+//        lowTimeExpected_ex = setting.lowTimeExpected.toString()
 
         /**
          *  冲洗液泵预计使用时间
          */
-        var rinseTimeExpected_ex by remember { mutableStateOf(setting.rinseTimeExpected.toString()) }
+        var rinseTimeExpected_ex by remember(setting) { mutableStateOf(setting.rinseTimeExpected.toString()) }
+//        rinseTimeExpected_ex = setting.rinseTimeExpected.toString()
 
 
         /**
          * 配件的弹窗
          */
-        val accessoriesDialog = remember { mutableStateOf(false) }
+        val accessoriesDialog = remember(setting) { mutableStateOf(false) }
 
         //===============配件寿命==============================
 
@@ -317,12 +293,14 @@ fun SettingLits(
         /**
          * 胶板位置
          */
-        var glueBoardPosition_ex by remember { mutableStateOf(setting.glueBoardPosition.toString()) }
+        var glueBoardPosition_ex by remember(setting) { mutableStateOf(setting.glueBoardPosition.toString()) }
+//        glueBoardPosition_ex = setting.glueBoardPosition.toString()
 
         /**
          * 废液位置
          */
-        var wastePosition_ex by remember { mutableStateOf(setting.wastePosition.toString()) }
+        var wastePosition_ex by remember(setting) { mutableStateOf(setting.wastePosition.toString()) }
+//        wastePosition_ex = setting.wastePosition.toString()
 
         /**
          * 位置的弹窗
@@ -336,18 +314,21 @@ fun SettingLits(
         /**
          * 高浓度清洗液量
          */
-        var higeCleanVolume_ex by remember { mutableStateOf(setting.higeCleanVolume.toString()) }
 
+        var higeCleanVolume_ex by remember(setting) { mutableStateOf(setting.higeCleanVolume.toString()) }
+//        higeCleanVolume_ex = setting.higeCleanVolume.toString()
 
         /**
          * 高浓度预排液量
          */
-        var higeRehearsalVolume_ex by remember { mutableStateOf(setting.higeRehearsalVolume.toString()) }
+        var higeRehearsalVolume_ex by remember(setting) { mutableStateOf(setting.higeRehearsalVolume.toString()) }
+//        higeRehearsalVolume_ex = setting.higeRehearsalVolume.toString()
 
         /**
          * 高浓度管路填充
          */
-        var higeFilling_ex by remember { mutableStateOf(setting.higeFilling.toString()) }
+        var higeFilling_ex by remember(setting) { mutableStateOf(setting.higeFilling.toString()) }
+//        higeFilling_ex = setting.higeFilling.toString()
 
         //高浓度
 
@@ -355,44 +336,50 @@ fun SettingLits(
         /**
          * 低浓度清洗液量
          */
-        var lowCleanVolume_ex by remember { mutableStateOf(setting.lowCleanVolume.toString()) }
+        var lowCleanVolume_ex by remember(setting) { mutableStateOf(setting.lowCleanVolume.toString()) }
+//        lowCleanVolume_ex = setting.lowCleanVolume.toString()
 
 
         /**
          * 低浓度管路填充
          */
-        var lowFilling_ex by remember { mutableStateOf(setting.lowFilling.toString()) }
+        var lowFilling_ex by remember(setting) { mutableStateOf(setting.lowFilling.toString()) }
+//        lowFilling_ex = setting.lowFilling.toString()
         //低浓度
 
         //冲洗液泵
         /**
          * 冲洗液泵清洗液量
          */
-        var rinseCleanVolume_ex by remember { mutableStateOf(setting.rinseCleanVolume.toString()) }
+        var rinseCleanVolume_ex by remember(setting) { mutableStateOf(setting.rinseCleanVolume.toString()) }
+//        rinseCleanVolume_ex = setting.rinseCleanVolume.toString()
 
 
         /**
          * 冲洗液泵管路填充
          */
-        var rinseFilling_ex by remember { mutableStateOf(setting.rinseFilling.toString()) }
+        var rinseFilling_ex by remember(setting) { mutableStateOf(setting.rinseFilling.toString()) }
+//        rinseFilling_ex = setting.rinseFilling.toString()
         //冲洗液泵
 
         //促凝剂泵
         /**
          * 促凝剂泵清洗液量
          */
-        var coagulantCleanVolume_ex by remember { mutableStateOf(setting.coagulantCleanVolume.toString()) }
+        var coagulantCleanVolume_ex by remember(setting) { mutableStateOf(setting.coagulantCleanVolume.toString()) }
+//        coagulantCleanVolume_ex = setting.coagulantCleanVolume.toString()
 
         /**
          * 促凝剂泵管路填充
          */
-        var coagulantFilling_ex by remember { mutableStateOf(setting.coagulantFilling.toString()) }
+        var coagulantFilling_ex by remember(setting) { mutableStateOf(setting.coagulantFilling.toString()) }
+//        coagulantFilling_ex = setting.coagulantFilling.toString()
         //促凝剂泵
 
         /**
          * 预排恢复默认弹窗
          */
-        val expectedResetDialog = remember { mutableStateOf(false) }
+        val expectedResetDialog = remember(setting) { mutableStateOf(false) }
 
 
         //================预排设置=============================
@@ -403,18 +390,21 @@ fun SettingLits(
         /**
          * 加液量1
          */
-        var higeLiquidVolume1_ex by remember { mutableStateOf(newCalibration.higeLiquidVolume1.toString()) }
+        var higeLiquidVolume1_ex by remember(newCalibration) { mutableStateOf(newCalibration.higeLiquidVolume1.toString()) }
+//        higeLiquidVolume1_ex = newCalibration.higeLiquidVolume1.toString()
 
         /**
          * 加液量2
          */
-        var higeLiquidVolume2_ex by remember { mutableStateOf(newCalibration.higeLiquidVolume2.toString()) }
+        var higeLiquidVolume2_ex by remember(newCalibration) { mutableStateOf(newCalibration.higeLiquidVolume2.toString()) }
+//        higeLiquidVolume2_ex = newCalibration.higeLiquidVolume2.toString()
 
 
         /**
          * 加液量3
          */
-        var higeLiquidVolume3_ex by remember { mutableStateOf(newCalibration.higeLiquidVolume3.toString()) }
+        var higeLiquidVolume3_ex by remember(newCalibration) { mutableStateOf(newCalibration.higeLiquidVolume3.toString()) }
+//        higeLiquidVolume3_ex = newCalibration.higeLiquidVolume3.toString()
         //高浓度
 
 
@@ -423,18 +413,21 @@ fun SettingLits(
         /**
          * 加液量1
          */
-        var lowLiquidVolume1_ex by remember { mutableStateOf(newCalibration.lowLiquidVolume1.toString()) }
+        var lowLiquidVolume1_ex by remember(newCalibration) { mutableStateOf(newCalibration.lowLiquidVolume1.toString()) }
+//        lowLiquidVolume1_ex = newCalibration.lowLiquidVolume1.toString()
 
         /**
          * 加液量2
          */
-        var lowLiquidVolume2_ex by remember { mutableStateOf(newCalibration.lowLiquidVolume2.toString()) }
+        var lowLiquidVolume2_ex by remember(newCalibration) { mutableStateOf(newCalibration.lowLiquidVolume2.toString()) }
+//        lowLiquidVolume2_ex = newCalibration.lowLiquidVolume2.toString()
 
 
         /**
          * 加液量3
          */
-        var lowLiquidVolume3_ex by remember { mutableStateOf(newCalibration.lowLiquidVolume3.toString()) }
+        var lowLiquidVolume3_ex by remember(newCalibration) { mutableStateOf(newCalibration.lowLiquidVolume3.toString()) }
+//        lowLiquidVolume3_ex = newCalibration.lowLiquidVolume3.toString()
         //低浓度
 
         //冲洗液泵
@@ -442,18 +435,21 @@ fun SettingLits(
         /**
          * 加液量1
          */
-        var rinseLiquidVolume1_ex by remember { mutableStateOf(newCalibration.rinseLiquidVolume1.toString()) }
+        var rinseLiquidVolume1_ex by remember(newCalibration) { mutableStateOf(newCalibration.rinseLiquidVolume1.toString()) }
+//        rinseLiquidVolume1_ex = newCalibration.rinseLiquidVolume1.toString()
 
         /**
          * 加液量2
          */
-        var rinseLiquidVolume2_ex by remember { mutableStateOf(newCalibration.rinseLiquidVolume2.toString()) }
+        var rinseLiquidVolume2_ex by remember(newCalibration) { mutableStateOf(newCalibration.rinseLiquidVolume2.toString()) }
+//        rinseLiquidVolume2_ex = newCalibration.rinseLiquidVolume2.toString()
 
 
         /**
          * 加液量3
          */
-        var rinseLiquidVolume3_ex by remember { mutableStateOf(newCalibration.rinseLiquidVolume3.toString()) }
+        var rinseLiquidVolume3_ex by remember(newCalibration) { mutableStateOf(newCalibration.rinseLiquidVolume3.toString()) }
+//        rinseLiquidVolume3_ex = newCalibration.rinseLiquidVolume3.toString()
         //冲洗液泵
 
         //促凝剂泵
@@ -461,27 +457,30 @@ fun SettingLits(
         /**
          * 加液量1
          */
-        var coagulantLiquidVolume1_ex by remember { mutableStateOf(newCalibration.coagulantLiquidVolume1.toString()) }
+        var coagulantLiquidVolume1_ex by remember(newCalibration) { mutableStateOf(newCalibration.coagulantLiquidVolume1.toString()) }
+//        coagulantLiquidVolume1_ex = newCalibration.coagulantLiquidVolume1.toString()
 
         /**
          * 加液量2
          */
 
-        var coagulantLiquidVolume2_ex by remember { mutableStateOf(newCalibration.coagulantLiquidVolume2.toString()) }
+        var coagulantLiquidVolume2_ex by remember(newCalibration) { mutableStateOf(newCalibration.coagulantLiquidVolume2.toString()) }
+//        coagulantLiquidVolume2_ex = newCalibration.coagulantLiquidVolume2.toString()
 
 
         /**
          * 加液量3
          */
 
-        var coagulantLiquidVolume3_ex by remember { mutableStateOf(newCalibration.coagulantLiquidVolume3.toString()) }
+        var coagulantLiquidVolume3_ex by remember(newCalibration) { mutableStateOf(newCalibration.coagulantLiquidVolume3.toString()) }
+//        coagulantLiquidVolume3_ex = newCalibration.coagulantLiquidVolume3.toString()
         //促凝剂泵
 
 
         /**
          * 校准恢复默认弹窗
          */
-        val calibrationResetDialog = remember { mutableStateOf(false) }
+        val calibrationResetDialog = remember(newCalibration) { mutableStateOf(false) }
         //================校准设置=============================
 
 
@@ -490,7 +489,7 @@ fun SettingLits(
         /**
          * 促凝剂步数
          */
-        val coagulantpulse = rememberDataSaverState(key = "coagulantpulse", default = 270000)
+        val coagulantpulse = rememberDataSaverState(key = "coagulantpulse", default = 1080000)
 
 
         //================校准数据=============================
@@ -775,10 +774,6 @@ fun SettingLits(
                                     coagulantCleanVolume_ex.toDoubleOrNull() ?: 0.0
                                 setting.coagulantFilling =
                                     coagulantFilling_ex.toDoubleOrNull() ?: 0.0
-                                Log.d(
-                                    "Setting",
-                                    "保存的===setting=========$setting"
-                                )
                                 uiEvent(SettingIntent.UpdateSet(setting))
 
                                 Toast.makeText(
@@ -808,7 +803,8 @@ fun SettingLits(
 
 
             } else if (switchColum == 1) {
-
+                var rinseSpeed = rememberDataSaverState(key = "rinseSpeed", default = 600L)
+                var coagulantSpeed = rememberDataSaverState(key = "coagulantSpeed", default = 200L)
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
@@ -832,8 +828,12 @@ fun SettingLits(
                                             timeOut = 1000L * 30
                                             with(
                                                 index = 2,
-                                                pdv = 64000L,
-                                                ads = Triple(600 * 100, 600 * 100, 600 * 100),
+                                                pdv = 51200L * 10,
+                                                ads = Triple(
+                                                    rinseSpeed.value * 13,
+                                                    rinseSpeed.value * 1193,
+                                                    rinseSpeed.value * 1193
+                                                ),
 
                                                 )
                                         }
@@ -911,8 +911,12 @@ fun SettingLits(
                                             timeOut = 1000L * 30
                                             with(
                                                 index = 3,
-                                                pdv = 64000L,
-                                                ads = Triple(600 * 100, 600 * 100, 600 * 100),
+                                                pdv = 51200L * 10,
+                                                ads = Triple(
+                                                    rinseSpeed.value * 13,
+                                                    rinseSpeed.value * 1193,
+                                                    rinseSpeed.value * 1193
+                                                ),
 
                                                 )
                                         }
@@ -988,8 +992,12 @@ fun SettingLits(
                                             timeOut = 1000L * 30
                                             with(
                                                 index = 4,
-                                                pdv = 64000L,
-                                                ads = Triple(600 * 100, 600 * 100, 600 * 100),
+                                                pdv = 32000L,
+                                                ads = Triple(
+                                                    rinseSpeed.value * 13,
+                                                    rinseSpeed.value * 1193,
+                                                    rinseSpeed.value * 1193
+                                                ),
 
                                                 )
                                         }
@@ -1066,7 +1074,11 @@ fun SettingLits(
                                             with(
                                                 index = 1,
                                                 pdv = coagulantpulse.value.toLong(),
-                                                ads = Triple(600 * 100, 600 * 100, 600 * 100),
+                                                ads = Triple(
+                                                    coagulantSpeed.value * 13,
+                                                    coagulantSpeed.value * 1193,
+                                                    coagulantSpeed.value * 1193
+                                                ),
 
                                                 )
                                         }
@@ -1174,6 +1186,7 @@ fun SettingLits(
                                     newCalibration.coagulantAvg =
                                         (newCalibration.coagulantLiquidVolume1 + newCalibration.coagulantLiquidVolume1 + newCalibration.coagulantLiquidVolume1) / 3
 
+
                                     AppStateUtils.hpc[0] =
                                         calculateCalibrationFactorNew(64000, 120.0)
 
@@ -1184,26 +1197,29 @@ fun SettingLits(
 
                                     AppStateUtils.hpc[2] =
                                         calculateCalibrationFactorNew(
-                                            64000,
+                                            51200 * 10,
                                             newCalibration.higeAvg * 1000
                                         )
 
                                     AppStateUtils.hpc[3] =
                                         calculateCalibrationFactorNew(
-                                            64000,
+                                            51200 * 10,
                                             newCalibration.lowAvg * 1000
                                         )
 
                                     AppStateUtils.hpc[4] =
                                         calculateCalibrationFactorNew(
-                                            64000,
+                                            32000,
                                             newCalibration.rinseAvg * 1000
                                         )
+
+
+
                                     uiEvent(SettingIntent.UpdateNC(newCalibration))
 
-                                        Toast.makeText(
-                                            context, "保存成功！", Toast.LENGTH_SHORT
-                                        ).show()
+                                    Toast.makeText(
+                                        context, "保存成功！", Toast.LENGTH_SHORT
+                                    ).show()
                                 }) {
                                 Text(text = "保    存", fontSize = 18.sp)
                             }
@@ -2013,8 +2029,6 @@ fun SettingLits(
                     }
                 })
         }
-
-
     }
 
 
@@ -2025,7 +2039,7 @@ fun SettingLits(
 fun debug(
     uiEvent: (SettingIntent) -> Unit,
     proEntities: List<Program>,
-    slEntities: List<Setting>,
+    slEntities: Setting?,
 ) {
     Box(
         modifier = Modifier
@@ -2034,4 +2048,5 @@ fun debug(
         debugMode(uiEvent, proEntities, slEntities)
     }
 }
+
 

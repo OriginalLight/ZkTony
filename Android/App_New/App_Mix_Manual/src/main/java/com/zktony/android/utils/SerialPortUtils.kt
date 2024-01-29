@@ -1,5 +1,6 @@
 package com.zktony.android.utils
 
+import android.util.Log
 import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.utils.AppStateUtils.hpa
 import com.zktony.android.utils.AppStateUtils.hpd
@@ -62,11 +63,21 @@ object SerialPortUtils {
                             }
                         }
 
-                        0x03.toByte() -> {
-                            if (protocol.data[0] == 0x0B.toByte()) {
-                                hpd[0] = protocol.data[1].toLong()
-                            }
-                        }
+//                        0x03.toByte() -> {
+//                            for (i in 0 until protocol.data.size / 2) {
+//                                val status = protocol.data.readInt8(offset = i * 2)
+//                                val index = protocol.data.readInt8(offset = i * 2 + 1)
+//                                hpg[index] = status == 1
+//                                Log.d(
+//                                    "SerialPortUtils",
+//                                    "===0x03.toByte()===status===" + status + "===index===" + index + "===hpg[index]===" + hpg[index]
+//                                )
+//                            }
+//
+////                            if (protocol.data[0] == 0x0B.toByte()) {
+////                                hpd[0] = protocol.data[1].toLong()
+////                            }
+//                        }
 
                         else -> {}
                     }
@@ -183,70 +194,12 @@ object SerialPortUtils {
         }
     }
 
-    /**
-     * 制胶
-     */
-    suspend fun glueNew(count: Long, block: StartBuilder.() -> Unit) {
-        val builder = StartBuilder().apply(block)
-
-        when (builder.executeType) {
-            // 同步运动
-            ExecuteType.SYNC -> {
-                try {
-                    // 设置超时时间
-                    withTimeout(builder.timeOut) {
-                        // 发送运动命令
-                        if (builder.byteList.isNotEmpty()) {
-                            sendProtocol {
-                                func = ControlType.START
-                                data = builder.byteList.toByteArray()
-                            }
-                            delay(10L)
-                            // 等待运动完成
-//                            while (getLock(builder.indexList)) {
-//                                delay(10L)
-//                            }
-                            if (hpd[0] == count) {
-                                delay(10L)
-                            }
-                        }
-                    }
-                } catch (ex: Exception) {
-                    // 根据异常处理策略进行处理
-                    when (builder.exceptionPolicy) {
-                        // 重试
-                        ExceptionPolicy.RETRY -> start(block)
-                        // 查询轴状态
-                        ExceptionPolicy.QUERY -> query(builder.indexList)
-                        // 跳过
-                        ExceptionPolicy.SKIP -> setLock(builder.indexList, false)
-                        // 复位
-                        ExceptionPolicy.RESET -> init()
-                        // 抛出异常
-                        ExceptionPolicy.THROW -> throw ex
-                    }
-                }
-            }
-
-            // 异步运动
-            ExecuteType.ASYNC -> {
-                if (builder.byteList.isNotEmpty()) {
-                    setLock(builder.indexList)
-                    sendProtocol {
-                        func = ControlType.START
-                        data = builder.byteList.toByteArray()
-                    }
-                }
-            }
-        }
-    }
 
     /**
      * 启动运动
      */
     suspend fun start(block: StartBuilder.() -> Unit) {
         val builder = StartBuilder().apply(block)
-
         when (builder.executeType) {
             // 同步运动
             ExecuteType.SYNC -> {
@@ -410,6 +363,16 @@ object SerialPortUtils {
     }
 
     /**
+     * 运行结束时的闪烁
+     */
+    suspend fun endStartFlashYellow() {
+        SerialStoreUtils.get("led")?.sendByteArray(Protocol().apply {
+            func = 0x01
+            data = byteArrayOf(0x06)
+        }.serialization())
+    }
+
+    /**
      * 关闭灯光
      */
     suspend fun cleanLight() {
@@ -422,45 +385,5 @@ object SerialPortUtils {
 
     suspend fun valve(vararg ids: Pair<Int, Int>) = valve(ids.toList())
 
-    /**
-     * 制胶
-     */
-    suspend fun glue(block: GlueBuilder.() -> Unit) {
-
-        val builder = GlueBuilder().apply(block)
-
-        try {
-            // 设置超时时间
-            withTimeout(builder.timeOut) {
-                // 发送运动命令
-                if (builder.byteList.isNotEmpty()) {
-                    setLock(builder.indexList)
-                    sendProtocol {
-                        func = ControlType.GLUE
-                        data = builder.byteList.toByteArray()
-                    }
-                    delay(10L)
-                    // 等待运动完成
-                    while (getLock(builder.indexList)) {
-                        delay(10L)
-                    }
-                }
-            }
-        } catch (ex: Exception) {
-            // 根据异常处理策略进行处理
-            when (builder.exceptionPolicy) {
-                // 重试
-                ExceptionPolicy.RETRY -> glue(block)
-                // 查询轴状态
-                ExceptionPolicy.QUERY -> query(builder.indexList)
-                // 跳过
-                ExceptionPolicy.SKIP -> setLock(builder.indexList, false)
-                // 复位
-                ExceptionPolicy.RESET -> init()
-                // 抛出异常
-                ExceptionPolicy.THROW -> throw ex
-            }
-        }
-    }
 
 }
