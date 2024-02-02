@@ -272,13 +272,29 @@ fun CircleTextFieldPreview() {
 
 //	表格样式
 @Composable
-fun TableText(text: String?, width: Int) {
+fun TableTextHead(text: String?, width: Int) {
     Text(
         text = text ?: "",
         Modifier
             .width(width.dp)
             .height(50.dp)
-            .border(1.dp, Color.Black)
-            .padding(15.dp)
+            .border(1.dp, Color.White)
+            .padding(15.dp),
+        textAlign = TextAlign.Center,
+        color = Color.White
+    )
+}
+
+@Composable
+fun TableTextBody(text: String?, width: Int, selected: Boolean?) {
+    Text(
+        text = text ?: "",
+        Modifier
+            .width(width.dp)
+            .height(50.dp)
+            .border(1.dp, Color.White)
+            .padding(15.dp),
+        textAlign = TextAlign.Center,
+        color = if (selected != null && selected) Color.Red else Color.Black
     )
 }

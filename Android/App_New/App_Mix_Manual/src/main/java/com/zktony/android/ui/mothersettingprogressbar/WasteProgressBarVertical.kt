@@ -1,5 +1,6 @@
 package com.zktony.android.ui.mothersettingprogressbar
 
+import android.graphics.Color.rgb
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.size
@@ -7,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -16,6 +18,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 /**
  * 废液槽竖形进度条
@@ -28,17 +31,26 @@ fun WasteVerticalProgressBar(
     waterProgress: Float,
     water: String,
     modifier: Modifier = Modifier,
-    color: Color = Color.Green,
-    backgroundColor: Color = Color.White,
-    size: Size = Size(width = 50f, height = 200f),
+    color: Color = Color(rgb(136, 196, 254)),
+    backgroundColor: Color = Color(245, 245, 245),
+    size: Size = Size(width = 62.6f, height = 227.7f),
     strokeSize: Float = 0.1f,
     strokeColor: Color = Color.Blue
 ) {
 
-    val textDesc = "废液槽"
-    val textDescLayoutResult = rememberTextMeasurer().measure(
-        AnnotatedString(textDesc),
-        TextStyle(color = Color(178, 193, 209))
+    val feiDescLayoutResult = rememberTextMeasurer().measure(
+        AnnotatedString("废"),
+        TextStyle(color = Color(18, 95, 202), fontSize = 16.sp)
+    )
+
+    val yeDescLayoutResult = rememberTextMeasurer().measure(
+        AnnotatedString("液"),
+        TextStyle(color = Color(18, 95, 202), fontSize = 16.sp)
+    )
+
+    val caoDescLayoutResult = rememberTextMeasurer().measure(
+        AnnotatedString("槽"),
+        TextStyle(color = Color(18, 95, 202), fontSize = 16.sp)
     )
 
 
@@ -46,7 +58,7 @@ fun WasteVerticalProgressBar(
     Canvas(
         modifier = modifier
             .size(size.width.dp, size.height.dp)
-            .border(width = strokeSize.dp, color = strokeColor, shape = RoundedCornerShape(10.dp))
+            .clip(RoundedCornerShape(10.dp))
     ) {
         val canvasWidth = size.width
         val canvasHeight = size.height
@@ -71,14 +83,30 @@ fun WasteVerticalProgressBar(
             cornerRadius = CornerRadius(10f, 10f)
         )
 
-        val textDescWidth = textDescLayoutResult.size.width
-        val textDescHeight = textDescLayoutResult.size.height //用不着
+        val textDescWidth = feiDescLayoutResult.size.width
+        val textDescHeight = feiDescLayoutResult.size.height //用不着
         //名称
         drawText(
-            textLayoutResult = textDescLayoutResult,
+            textLayoutResult = feiDescLayoutResult,
             topLeft = Offset(
                 canvasWidth / 2 - textDescWidth / 2,
                 canvasHeight / 2 - 20
+            ),
+        )
+
+        drawText(
+            textLayoutResult = yeDescLayoutResult,
+            topLeft = Offset(
+                canvasWidth / 2 - textDescWidth / 2,
+                canvasHeight / 2
+            ),
+        )
+
+        drawText(
+            textLayoutResult = caoDescLayoutResult,
+            topLeft = Offset(
+                canvasWidth / 2 - textDescWidth / 2,
+                canvasHeight / 2 + 20
             ),
         )
 

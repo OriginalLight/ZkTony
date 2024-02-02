@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -16,6 +17,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 /**
  * 促凝剂竖形进度条
@@ -30,8 +32,8 @@ fun CoagulantProgressBarVertical(
     concentration: String,
     modifier: Modifier = Modifier,
     color: Color = Color.Green,
-    backgroundColor: Color = Color.White,
-    size: Size = Size(width = 100f, height = 200f),
+    backgroundColor: Color = Color(245, 245, 245),
+    size: Size = Size(width = 102.48f, height = 150.85f),
     strokeSize: Float = 0.1f,
     strokeColor: Color = Color.Blue
 ) {
@@ -39,24 +41,24 @@ fun CoagulantProgressBarVertical(
     val textDesc = "促凝剂"
     val textDescLayoutResult = rememberTextMeasurer().measure(
         AnnotatedString(textDesc),
-        TextStyle(color = Color(178, 193, 209))
+        TextStyle(color = Color(18, 95, 202), fontSize = 13.sp)
     )
 
 
     val volumeDescLayoutResult = rememberTextMeasurer().measure(
-        AnnotatedString("液量:" + volume),
-        TextStyle(color = Color(178, 193, 209))
+        AnnotatedString("液量:$volume"),
+        TextStyle(color = Color(18, 95, 202), fontSize = 16.sp)
     )
 
     val concentrationDescLayoutResult = rememberTextMeasurer().measure(
-        AnnotatedString("浓度:" + concentration + "%"),
-        TextStyle(color = Color(178, 193, 209))
+        AnnotatedString("浓度:$concentration%"),
+        TextStyle(color = Color(18, 95, 202), fontSize = 16.sp)
     )
 
     Canvas(
         modifier = modifier
             .size(size.width.dp, size.height.dp)
-            .border(width = strokeSize.dp, color = strokeColor,shape = RoundedCornerShape(10.dp))
+            .clip(RoundedCornerShape(10.dp))
     ) {
         val canvasWidth = size.width
         val canvasHeight = size.height
@@ -69,7 +71,7 @@ fun CoagulantProgressBarVertical(
                 height = (waterProgress * size.height).dp.toPx()
             ),
             topLeft = Offset(0.dp.toPx(), ((1 - waterProgress) * size.height).dp.toPx()),
-            cornerRadius = CornerRadius ( 10f , 10f )
+            cornerRadius = CornerRadius(10f, 10f)
         )
         // background
         drawRoundRect(
@@ -78,16 +80,15 @@ fun CoagulantProgressBarVertical(
                 width = size.width.dp.toPx(),
                 height = ((1 - waterProgress) * size.height).dp.toPx()
             ),
-            cornerRadius = CornerRadius ( 10f , 10f )
+            cornerRadius = CornerRadius(10f, 10f)
         )
 
         val textDescWidth = textDescLayoutResult.size.width
-        val textDescHeight = textDescLayoutResult.size.height //用不着
         //名称
         drawText(
-            textLayoutResult = textDescLayoutResult,
+            textLayoutResult = concentrationDescLayoutResult,
             topLeft = Offset(
-                canvasWidth / 2 - textDescWidth / 2,
+                canvasWidth / 2 - textDescWidth / 1.5f,
                 canvasHeight / 2 - 20
             ),
         )
@@ -95,15 +96,15 @@ fun CoagulantProgressBarVertical(
         drawText(
             textLayoutResult = volumeDescLayoutResult,
             topLeft = Offset(
-                canvasWidth / 2 - textDescWidth / 2 - 10,
-                canvasHeight / 2+ 20
+                canvasWidth / 2 - textDescWidth / 1.5f,
+                canvasHeight / 2
             ),
         )
         drawText(
-            textLayoutResult = concentrationDescLayoutResult,
+            textLayoutResult = textDescLayoutResult,
             topLeft = Offset(
-                canvasWidth / 2 - textDescWidth / 2 - 10,
-                canvasHeight / 2
+                canvasWidth / 2 - textDescWidth / 2,
+                canvasHeight / 2 + 40
             ),
         )
 

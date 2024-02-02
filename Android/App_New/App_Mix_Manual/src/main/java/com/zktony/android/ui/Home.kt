@@ -1,6 +1,8 @@
 package com.zktony.android.ui
 
+import android.graphics.Color.rgb
 import android.util.Log
+import android.util.Size
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,6 +27,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -33,8 +37,10 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Reply
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -42,10 +48,12 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -60,6 +68,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -83,7 +92,8 @@ import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.ExperimentRecord
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.components.HomeAppBar
-import com.zktony.android.ui.components.TableText
+import com.zktony.android.ui.components.TableTextBody
+import com.zktony.android.ui.components.TableTextHead
 import com.zktony.android.ui.mothersettingprogressbar.CoagulantProgressBarVertical
 import com.zktony.android.ui.mothersettingprogressbar.HighCoagulantProgressBarVertical
 import com.zktony.android.ui.mothersettingprogressbar.LowCoagulantProgressBarVertical
@@ -97,6 +107,7 @@ import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.ui.utils.itemsIndexed
+import com.zktony.android.ui.utils.line
 import com.zktony.android.ui.utils.toList
 import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.AppStateUtils.hpc
@@ -149,26 +160,32 @@ fun HomeRoute(viewModel: HomeViewModel) {
             viewModel.dispatch(HomeIntent.Flags(UiFlags.none()))
         }
     }
-
-    Column {
-        HomeAppBar(page) { navigation() }
-        AnimatedContent(targetState = page) {
-            when (page) {
-                PageType.HOME -> operate(
-                    entities,
-                    entities.toList(),
-                    erEntities.toList(),
-                    selected,
-                    selectedER,
-                    uiFlags,
-                    job,
-                    viewModel::dispatch,
-                    complate,
-                    process
-                )
-            }
+    Box {
+        Image(
+            modifier = Modifier.fillMaxSize(),
+            painter = painterResource(R.mipmap.bkimg),
+            contentDescription = "background_image",
+            contentScale = ContentScale.FillBounds
+        )
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            HomeAppBar(page) { navigation() }
+            operate(
+                entities,
+                entities.toList(),
+                erEntities.toList(),
+                selected,
+                selectedER,
+                uiFlags,
+                job,
+                viewModel::dispatch,
+                complate,
+                process
+            )
         }
     }
+
 }
 
 /**
@@ -217,47 +234,6 @@ fun operate(
 
     uiEvent(HomeIntent.Selected(program.id))
 
-//    /**
-//     * 纯水进度
-//     */
-//    val waterSweepState = remember {
-//        mutableStateOf(0f)
-//    }
-//
-//    /**
-//     * 促凝剂进度
-//     */
-//    val coagulantSweepState = remember {
-//        mutableStateOf(0f)
-//    }
-//
-//    /**
-//     * 低浓度进度
-//     */
-//    val lowCoagulantSweepState = remember {
-//        mutableStateOf(0f)
-//    }
-//
-//    /**
-//     * 高浓度进度
-//     */
-//    val highCoagulantSweepState = remember {
-//        mutableStateOf(0f)
-//    }
-//
-//    /**
-//     * 废液进度
-//     */
-//    var wasteSweepState = remember {
-//        mutableStateOf(0f)
-//    }
-//
-//    /**
-//     * 制胶进度
-//     */
-//    val progressSweepState = remember {
-//        mutableStateOf(0f)
-//    }
 
     /**
      * 纯水弹窗
@@ -294,8 +270,8 @@ fun operate(
     /**
      * 促凝剂浓度
      */
-    val concentration = rememberDataSaverState(key = "concentration", default = 0f)
-    var concentration_ex by remember { mutableStateOf(concentration.value.format(1)) }
+    val concentration = rememberDataSaverState(key = "concentration", default = 0)
+    var concentration_ex by remember { mutableStateOf(concentration.value.toString()) }
 
 
     /**
@@ -307,8 +283,8 @@ fun operate(
     /**
      * 低浓度
      */
-    val lowCoagulant = rememberDataSaverState(key = "lowCoagulant", default = 0f)
-    var lowCoagulant_ex by remember { mutableStateOf(lowCoagulant.value.format(1)) }
+    val lowCoagulant = rememberDataSaverState(key = "lowCoagulant", default = 0)
+    var lowCoagulant_ex by remember { mutableStateOf(lowCoagulant.value.toString()) }
 
 
     /**
@@ -320,8 +296,8 @@ fun operate(
     /**
      * 高浓度
      */
-    val highCoagulant = rememberDataSaverState(key = "highCoagulant", default = 0f)
-    var highCoagulant_ex by remember { mutableStateOf(highCoagulant.value.format(1)) }
+    val highCoagulant = rememberDataSaverState(key = "highCoagulant", default = 0)
+    var highCoagulant_ex by remember { mutableStateOf(highCoagulant.value.toString()) }
 
 
     /**
@@ -382,20 +358,33 @@ fun operate(
         uiEvent(HomeIntent.Stop)
     }
 
-
-
-    Column(modifier = Modifier.padding(start = 20.dp, top = 20.dp)) {
-
-
+    Column(
+        modifier = Modifier
+            .padding(start = 13.75.dp)
+            .clip(RoundedCornerShape(topEnd = 10.dp, bottomEnd = 10.dp, bottomStart = 10.dp))
+            .background(Color.White)
+            .height(904.9.dp)
+            .width((572.5).dp)
+    ) {
         Text(
-            modifier = Modifier.padding(start = 40.dp),
+            modifier = Modifier.padding(start = 48.92.dp, top = 21.4.dp),
             text = "母液设置",
-            fontSize = 20.sp
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(
+                0,
+                105,
+                52
+            )
         )
         /**
          * 母液设置
          */
-        Row(modifier = Modifier.padding(start = 50.dp, top = 20.dp)) {
+        Row(
+            modifier = Modifier
+                .padding(start = 48.92.dp, top = 18.22.dp)
+                .fillMaxWidth()
+        ) {
 
             Row(
                 modifier = Modifier
@@ -409,7 +398,7 @@ fun operate(
 
             Row(
                 modifier = Modifier
-                    .padding(start = 20.dp)
+                    .padding(start = 22.82.dp)
                     .clickable(onClick = {
                         coagulantDialog.value = true
                     })
@@ -424,7 +413,7 @@ fun operate(
 
             Row(
                 modifier = Modifier
-                    .padding(start = 20.dp)
+                    .padding(start = 22.82.dp)
                     .clickable(onClick = {
                         lowDialog.value = true
                     })
@@ -439,7 +428,7 @@ fun operate(
 
             Row(
                 modifier = Modifier
-                    .padding(start = 20.dp)
+                    .padding(start = 22.82.dp)
                     .clickable(onClick = {
                         highDialog.value = true
                     })
@@ -453,91 +442,168 @@ fun operate(
             }
         }
 
-        /**
-         * 程序设置
-         */
-        Column(
-            modifier = Modifier
-                .padding(start = 20.dp, top = 20.dp)
-                .clickable(onClick = {
-                    programListDialog.value = true
-                })
-        ) {
-            Text(
-                modifier = Modifier.padding(start = 40.dp),
-                text = "程序名称:" + program.displayText,
-                fontSize = 20.sp
-            )
-            Row {
-                Text(
-                    modifier = Modifier.padding(start = 40.dp),
-                    text = "浓度:" + program.startRange + "%~" + program.endRange + "%",
-                    fontSize = 20.sp
-                )
-                Text(
-                    modifier = Modifier.padding(start = 20.dp),
-                    text = "厚度:" + program.thickness + "mm",
-                    fontSize = 20.sp
-                )
-            }
-
-            Row {
-                Text(
-                    modifier = Modifier.padding(start = 40.dp),
-                    text = "胶液体积:" + program.volume + "mL",
-                    fontSize = 20.sp
-                )
-                Text(
-                    modifier = Modifier.padding(start = 20.dp),
-                    text = "促凝剂体积:" + program.coagulant + "μL",
-                    fontSize = 20.sp
-                )
-            }
-
-        }
-
-
-        /**
-         * 制胶数量
-         */
         Row(
-            modifier = Modifier.padding(start = 50.dp, top = 20.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier
+                .padding(top = 22.53.dp)
+                .fillMaxWidth()
         ) {
-            Text(
-                fontSize = 16.sp,
-                text = "预计制胶数量:"
-            )
-
-            OutlinedTextField(
-                modifier = Modifier.width(100.dp),
-                value = expectedMakeNum_ex,
-                onValueChange = {
-                    expectedMakeNum_ex = it
-                    expectedMakeNum.value = it.toIntOrNull() ?: 0
-
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Done,
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        keyboard?.hide()
-                    }
-                )
-            )
-            Text(text = "已制胶数量:$complate")
+            line(Color(0, 105, 5), 48.25f, 528.5f)
         }
 
+        Row(
+            modifier = Modifier
+                .padding(start = 48.92.dp, top = 21.4.dp)
+                .fillMaxWidth()
+        ) {
+            /**
+             * 程序设置
+             */
+            Column(
+                modifier = Modifier
+                    .clickable(onClick = {
+                        programListDialog.value = true
+                    })
+            ) {
+                Text(
+                    text = program.displayText,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(
+                        0,
+                        105,
+                        52
+                    )
+                )
+                Text(
+                    modifier = Modifier.padding(top = 14.dp),
+                    text = "浓 度:" + program.startRange + "%~" + program.endRange + "%",
+                    fontSize = 18.sp
+                )
+                Text(
+                    modifier = Modifier.padding(top = 14.dp),
+                    text = "厚 度:" + program.thickness + "mm",
+                    fontSize = 18.sp
+                )
+
+                Text(
+                    modifier = Modifier.padding(top = 14.dp),
+                    text = "胶液体积:" + program.volume + "mL",
+                    fontSize = 18.sp
+                )
+                Text(
+                    modifier = Modifier.padding(top = 14.dp),
+                    text = "促凝剂体积:" + program.coagulant + "μL",
+                    fontSize = 18.sp
+                )
+
+            }
+
+            Column(modifier = Modifier.padding(start = 80.dp)) {
+                Text(
+                    text = "制胶数量",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(
+                        0,
+                        105,
+                        52
+                    )
+                )
+
+                Text(
+                    modifier = Modifier.padding(top = 21.2.dp),
+                    fontSize = 18.sp,
+                    text = "预计制胶数量"
+                )
+                Row(
+                    modifier = Modifier.padding(top = 13.7.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Image(
+                        painter = painterResource(id = R.mipmap.reduce), contentDescription = null,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clickable {
+                                if (expectedMakeNum.value > 1) {
+                                    expectedMakeNum.value -= 1
+                                    expectedMakeNum_ex = expectedMakeNum.value.toString()
+                                }
+
+                            }
+                    )
+
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .width(60.dp)
+                            .height(60.2.dp),
+                        textStyle = TextStyle.Default.copy(
+                            fontSize = 29.sp,
+                        ),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color(rgb(0, 105, 52)),
+                            focusedLabelColor = Color(rgb(0, 105, 52)),
+                            cursorColor = Color(rgb(0, 105, 52))
+                        ),
+                        value = expectedMakeNum_ex,
+                        onValueChange = {
+                            expectedMakeNum_ex = it
+                            expectedMakeNum.value = it.toIntOrNull() ?: 0
+
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Done,
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                keyboard?.hide()
+                            }
+                        )
+                    )
+                    Image(
+                        painter = painterResource(id = R.mipmap.add), contentDescription = null,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clickable {
+                                if (expectedMakeNum_ex.toIntOrNull() ?: 1 < expectedMakeNum.value) {
+                                    expectedMakeNum.value += 1
+                                    expectedMakeNum_ex = expectedMakeNum.value.toString()
+                                }
+
+                            }
+                    )
+                }
+                Text(
+                    modifier = Modifier.padding(top = 14.0.dp),
+                    fontSize = 18.sp,
+                    text = "已制胶数量:$complate"
+                )
+            }
+
+        }
+
+        Row(
+            modifier = Modifier
+                .padding(top = 22.53.dp)
+                .fillMaxWidth()
+        ) {
+            line(Color(0, 105, 5), 48.25f, 528.5f)
+        }
 
         Text(
-            modifier = Modifier.padding(start = 40.dp, top = 20.dp),
+            modifier = Modifier.padding(start = 48.92.dp, top = 21.4.dp),
             text = "制胶进度",
-            fontSize = 20.sp
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(
+                0,
+                105,
+                52
+            )
         )
-        Row(modifier = Modifier.padding(start = 50.dp, top = 20.dp)) {
+        Row(modifier = Modifier.padding(start = 48.92.dp, top = 21.4.dp)) {
 
             Row(
                 modifier = Modifier
@@ -551,7 +617,7 @@ fun operate(
 
             Row(
                 modifier = Modifier
-                    .padding(start = 20.dp)
+                    .padding(start = 17.8.dp)
                     .clickable(onClick = {
 
                     })
@@ -568,15 +634,24 @@ fun operate(
         /**
          * 操作按钮
          */
-        Row(modifier = Modifier.padding(start = 50.dp, top = 40.dp)) {
+        Row(
+            modifier = Modifier
+                .padding(top = 21.4.dp)
+                .fillMaxWidth()
+                .height(143.98.dp)
+                .background(Color(239, 239, 239))
+        ) {
 
-            Column {
+            Column(
+                modifier = Modifier
+                    .padding(start = 47.55.dp)
+            ) {
                 Row {
                     Image(
                         painter = painterResource(id = if (job == null) R.mipmap.start else R.mipmap.stop),
                         contentDescription = null,
                         modifier = Modifier
-                            .size(100.dp)
+                            .size(63.dp, 63.dp)
                             .clickable {
                                 if (job == null) {
                                     if (uiFlags is UiFlags.None) {
@@ -628,8 +703,8 @@ fun operate(
                         painter = painterResource(id = R.mipmap.filling),
                         contentDescription = null,
                         modifier = Modifier
-                            .padding(start = 20.dp)
-                            .size(100.dp)
+                            .padding(start = 82.0.dp)
+                            .size(63.dp, 63.dp)
                             .clickable {
                                 scope.launch {
                                     Log.d(
@@ -651,8 +726,8 @@ fun operate(
                         painter = painterResource(id = R.mipmap.clean),
                         contentDescription = null,
                         modifier = Modifier
-                            .padding(start = 20.dp)
-                            .size(100.dp)
+                            .padding(start = 80.4.dp)
+                            .size(63.dp, 63.dp)
                             .clickable {
                                 scope.launch {
                                     if (uiFlags is UiFlags.None || (uiFlags is UiFlags.Objects && uiFlags.objects == 2)) {
@@ -667,8 +742,8 @@ fun operate(
                         painter = painterResource(id = R.mipmap.reset),
                         contentDescription = null,
                         modifier = Modifier
-                            .padding(start = 20.dp)
-                            .size(100.dp)
+                            .padding(start = 71.5.dp)
+                            .size(63.dp, 63.dp)
                             .clickable {
                                 if (uiFlags is UiFlags.None) {
                                     waste.value = 0f
@@ -680,26 +755,27 @@ fun operate(
 
                 Row {
                     Text(
-                        modifier = Modifier.padding(start = 10.dp),
                         text = if (job == null) "开始制胶" else "停止制胶",
                         color = if (job == null) Color.Black else Color.Red,
                         fontSize = 18.sp
                     )
                     Text(
-                        modifier = Modifier.padding(start = 50.dp),
+                        modifier = Modifier.padding(start = 70.dp),
                         text = if (uiFlags is UiFlags.Objects && uiFlags.objects == 5) "填充中" else "管路填充",
                         color = if (uiFlags is UiFlags.Objects && uiFlags.objects == 5) Color.Red else Color.Black,
                         fontSize = 18.sp
                     )
                     Text(
-                        modifier = Modifier.padding(start = 50.dp),
+                        modifier = Modifier.padding(start = 68.dp),
                         text = if (uiFlags is UiFlags.Objects && uiFlags.objects == 2) "清洗中" else "管路清洗",
                         color = if (uiFlags is UiFlags.Objects && uiFlags.objects == 2) Color.Red else Color.Black,
                         fontSize = 18.sp
                     )
                     Text(
-                        modifier = Modifier.padding(start = 60.dp),
-                        text = if (uiFlags is UiFlags.Objects && uiFlags.objects == 1) "复位中" else "复位",
+                        modifier = if (uiFlags is UiFlags.Objects && uiFlags.objects == 1) Modifier.padding(
+                            start = 72.dp
+                        ) else Modifier.padding(start = 78.dp),
+                        text = if (uiFlags is UiFlags.Objects && uiFlags.objects == 1) "复位中" else "复 位",
                         color = if (uiFlags is UiFlags.Objects && uiFlags.objects == 1) Color.Red else Color.Black,
                         fontSize = 18.sp
                     )
@@ -713,6 +789,8 @@ fun operate(
 
     }
 
+
+
     if (wasteDialog.value) {
         AlertDialog(
             onDismissRequest = { },
@@ -724,7 +802,9 @@ fun operate(
             },
             text = {
             }, confirmButton = {
-                TextButton(onClick = {
+                TextButton(colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(rgb(0, 105, 52))
+                ), onClick = {
                     wasteDialog.value = false
                     waste.value = 0f
                     waste_ex = "0"
@@ -732,7 +812,9 @@ fun operate(
                     Text(text = "确定")
                 }
             }, dismissButton = {
-                TextButton(onClick = {
+                TextButton(colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(rgb(0, 105, 52))
+                ), onClick = {
                     wasteDialog.value = false
                 }) {
                     Text(text = "取消")
@@ -755,7 +837,9 @@ fun operate(
                 )
 
             }, confirmButton = {
-                TextButton(onClick = {
+                TextButton(colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(rgb(0, 105, 52))
+                ), onClick = {
                     experimentRecord.number = complate
                     uiEvent(HomeIntent.Update(experimentRecord))
                     continueGlueDialog.value = false
@@ -764,7 +848,9 @@ fun operate(
                     Text(text = "继续")
                 }
             }, dismissButton = {
-                TextButton(onClick = {
+                TextButton(colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(rgb(0, 105, 52))
+                ), onClick = {
                     experimentRecord.number = complate
                     experimentRecord.status = EPStatus.ABORT
                     experimentRecord.detail = "手动停止制胶"
@@ -796,6 +882,11 @@ fun operate(
                     )
                     OutlinedTextField(
                         modifier = Modifier.width(100.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color(rgb(0, 105, 52)),
+                            focusedLabelColor = Color(rgb(0, 105, 52)),
+                            cursorColor = Color(rgb(0, 105, 52))
+                        ),
                         value = water_ex,
                         label = { Text(text = "ml") },
                         onValueChange = {
@@ -814,7 +905,9 @@ fun operate(
 
                 }
             }, confirmButton = {
-                TextButton(onClick = {
+                TextButton(colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(rgb(0, 105, 52))
+                ), onClick = {
                     if (water_ex.toFloatOrNull() ?: 0f <= 50) {
                         water.value = water_ex.toFloatOrNull() ?: 0f
                         waterDialog.value = false
@@ -830,7 +923,9 @@ fun operate(
                     Text(text = "确认")
                 }
             }, dismissButton = {
-                TextButton(onClick = {
+                TextButton(colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(rgb(0, 105, 52))
+                ), onClick = {
                     water_ex = water.value.toString()
                     waterDialog.value = false
                 }) {
@@ -863,6 +958,11 @@ fun operate(
                         )
                         OutlinedTextField(
                             modifier = Modifier.width(100.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Color(rgb(0, 105, 52)),
+                                focusedLabelColor = Color(rgb(0, 105, 52)),
+                                cursorColor = Color(rgb(0, 105, 52))
+                            ),
                             value = concentration_ex,
                             label = { Text(text = "%") },
                             onValueChange = {
@@ -895,6 +995,11 @@ fun operate(
                         )
                         OutlinedTextField(
                             modifier = Modifier.width(100.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Color(rgb(0, 105, 52)),
+                                focusedLabelColor = Color(rgb(0, 105, 52)),
+                                cursorColor = Color(rgb(0, 105, 52))
+                            ),
                             value = coagulant_ex,
                             label = { Text(text = "ml") },
                             onValueChange = {
@@ -915,9 +1020,11 @@ fun operate(
                 }
 
             }, confirmButton = {
-                TextButton(onClick = {
+                TextButton(colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(rgb(0, 105, 52))
+                ), onClick = {
                     if (coagulant_ex.toFloatOrNull() ?: 0f <= 50) {
-                        concentration.value = concentration_ex.toFloatOrNull() ?: 0f
+                        concentration.value = concentration_ex.toIntOrNull() ?: 0
                         coagulant.value = coagulant_ex.toFloatOrNull() ?: 0f
                         coagulantDialog.value = false
                     } else {
@@ -932,7 +1039,9 @@ fun operate(
                     Text(text = "确认")
                 }
             }, dismissButton = {
-                TextButton(onClick = {
+                TextButton(colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(rgb(0, 105, 52))
+                ), onClick = {
                     concentration_ex = concentration.value.toString()
                     coagulant_ex = coagulant.value.toString()
                     coagulantDialog.value = false
@@ -967,6 +1076,11 @@ fun operate(
                         )
                         OutlinedTextField(
                             modifier = Modifier.width(100.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Color(rgb(0, 105, 52)),
+                                focusedLabelColor = Color(rgb(0, 105, 52)),
+                                cursorColor = Color(rgb(0, 105, 52))
+                            ),
                             value = lowCoagulant_ex,
                             label = { Text(text = "%") },
                             onValueChange = {
@@ -999,6 +1113,11 @@ fun operate(
                         )
                         OutlinedTextField(
                             modifier = Modifier.width(100.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Color(rgb(0, 105, 52)),
+                                focusedLabelColor = Color(rgb(0, 105, 52)),
+                                cursorColor = Color(rgb(0, 105, 52))
+                            ),
                             value = lowCoagulantVol_ex,
                             label = { Text(text = "ml") },
                             onValueChange = {
@@ -1019,9 +1138,11 @@ fun operate(
                 }
 
             }, confirmButton = {
-                TextButton(onClick = {
+                TextButton(colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(rgb(0, 105, 52))
+                ), onClick = {
                     if (lowCoagulantVol_ex.toFloatOrNull() ?: 0f <= 50) {
-                        lowCoagulant.value = lowCoagulant_ex.toFloatOrNull() ?: 0f
+                        lowCoagulant.value = lowCoagulant_ex.toIntOrNull() ?: 0
                         lowCoagulantVol.value = lowCoagulantVol_ex.toFloatOrNull() ?: 0f
                         lowDialog.value = false
                     } else {
@@ -1036,7 +1157,9 @@ fun operate(
                     Text(text = "确认")
                 }
             }, dismissButton = {
-                TextButton(onClick = {
+                TextButton(colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(rgb(0, 105, 52))
+                ), onClick = {
                     lowCoagulant_ex = lowCoagulant.value.toString()
                     lowCoagulantVol_ex = lowCoagulantVol.value.toString()
                     lowDialog.value = false
@@ -1067,6 +1190,11 @@ fun operate(
                         )
                         OutlinedTextField(
                             modifier = Modifier.width(100.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Color(rgb(0, 105, 52)),
+                                focusedLabelColor = Color(rgb(0, 105, 52)),
+                                cursorColor = Color(rgb(0, 105, 52))
+                            ),
                             value = highCoagulant_ex,
                             label = { Text(text = "%") },
                             onValueChange = {
@@ -1099,6 +1227,11 @@ fun operate(
                         )
                         OutlinedTextField(
                             modifier = Modifier.width(100.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Color(rgb(0, 105, 52)),
+                                focusedLabelColor = Color(rgb(0, 105, 52)),
+                                cursorColor = Color(rgb(0, 105, 52))
+                            ),
                             value = highCoagulantVol_ex,
                             label = { Text(text = "ml") },
                             onValueChange = {
@@ -1119,9 +1252,11 @@ fun operate(
                 }
 
             }, confirmButton = {
-                TextButton(onClick = {
+                TextButton(colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(rgb(0, 105, 52))
+                ), onClick = {
                     if (highCoagulantVol_ex.toFloatOrNull() ?: 0f <= 50) {
-                        highCoagulant.value = highCoagulant_ex.toFloatOrNull() ?: 0f
+                        highCoagulant.value = highCoagulant_ex.toIntOrNull() ?: 0
                         highCoagulantVol.value = highCoagulantVol_ex.toFloatOrNull() ?: 0f
                         highDialog.value = false
                     } else {
@@ -1136,7 +1271,9 @@ fun operate(
                     Text(text = "确认")
                 }
             }, dismissButton = {
-                TextButton(onClick = {
+                TextButton(colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(rgb(0, 105, 52))
+                ), onClick = {
                     highCoagulant_ex = highCoagulant.value.toString()
                     highCoagulantVol_ex = highCoagulantVol.value.toString()
                     highDialog.value = false
@@ -1162,18 +1299,26 @@ fun operate(
                 ) {
                     //	粘性标题
                     stickyHeader {
-                        Row(Modifier.background(Color.Gray)) {
-                            TableText(text = "序号", width = cellWidthList[0])
-                            TableText(text = "名称", width = cellWidthList[1])
-                            TableText(text = "浓度", width = cellWidthList[2])
-                            TableText(text = "厚度", width = cellWidthList[3])
+                        Row(Modifier.background(Color(android.graphics.Color.rgb(0, 105, 52)))) {
+                            TableTextHead(text = "序号", width = cellWidthList[0])
+                            TableTextHead(text = "名称", width = cellWidthList[1])
+                            TableTextHead(text = "浓度", width = cellWidthList[2])
+                            TableTextHead(text = "厚度", width = cellWidthList[3])
                         }
                     }
                     itemsIndexed(entitiesLazy) { index, item ->
                         val selectedEntity = item == entities[selectedIndex]
                         Row(
                             modifier = Modifier
-                                .background(if (selectedEntity) Color.Gray else Color.White)
+                                .background(
+                                    if (index % 2 == 0) Color(
+                                        android.graphics.Color.rgb(
+                                            239,
+                                            239,
+                                            239
+                                        )
+                                    ) else Color.White
+                                )
                                 .clickable(onClick = {
                                     selectedIndex = index
                                     val entity = entities[selectedIndex]
@@ -1188,449 +1333,45 @@ fun operate(
 
                                 })
                         ) {
-                            TableText(text = "" + item.id, width = cellWidthList[0])
-                            TableText(text = item.displayText, width = cellWidthList[1])
-                            TableText(
-                                text = "" + item.startRange + "%~" + item.endRange + "%",
-                                width = cellWidthList[2]
+                            TableTextBody(
+                                text = "" + item.id,
+                                width = cellWidthList[0],
+                                selectedEntity
                             )
-                            TableText(text = item.thickness + "mm", width = cellWidthList[3])
+                            TableTextBody(
+                                text = item.displayText,
+                                width = cellWidthList[1],
+                                selectedEntity
+                            )
+                            TableTextBody(
+                                text = "" + item.startRange + "%~" + item.endRange + "%",
+                                width = cellWidthList[2], selectedEntity
+                            )
+                            TableTextBody(
+                                text = item.thickness + "mm",
+                                width = cellWidthList[3],
+                                selectedEntity
+                            )
                         }
                     }
 
                 }
             }, confirmButton = {
-                TextButton(onClick = {
+                TextButton(colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(rgb(0, 105, 52))
+                ), onClick = {
 
                     programListDialog.value = false
                 }) {
                     Text(text = "确认")
                 }
             }, dismissButton = {
-                TextButton(onClick = { programListDialog.value = false }) {
+                TextButton(colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(rgb(0, 105, 52))
+                ), onClick = { programListDialog.value = false }) {
                     Text(text = "取消")
                 }
             })
     }
 }
 
-
-//@Composable
-//fun ProgramList(
-//    entities: LazyPagingItems<Program>,
-//    dispatch: KFunction1<HomeIntent, Unit>,
-//) {
-//    val scope = rememberCoroutineScope()
-//
-//    LazyVerticalGrid(
-//        modifier = Modifier.padding(16.dp),
-//        contentPadding = PaddingValues(16.dp),
-//        columns = GridCells.Fixed(2),
-//        horizontalArrangement = Arrangement.spacedBy(16.dp),
-//        verticalArrangement = Arrangement.spacedBy(16.dp)
-//    ) {
-//        itemsIndexed(entities) { index, item ->
-//            ListItem(
-//                modifier = Modifier
-//                    .clip(MaterialTheme.shapes.small)
-//                    .clickable {
-//                        scope.launch {
-//                            dispatch(HomeIntent.Selected(item.id))
-//                            dispatch(HomeIntent.NavTo(PageType.HOME))
-//                        }
-//                    },
-//                headlineContent = {
-//                    Text(
-//                        text = item.displayText,
-//                        style = MaterialTheme.typography.titleMedium,
-//                        maxLines = 1,
-//                        overflow = TextOverflow.Ellipsis
-//                    )
-//                },
-//                supportingContent = {
-//                    Text(
-//                        text = item.createTime.dateFormat("yyyy/MM/dd"),
-//                        style = MaterialTheme.typography.bodySmall,
-//                        color = Color.Gray
-//                    )
-//                },
-//                leadingContent = {
-//                    Text(
-//                        text = "${index + 1}、",
-//                        style = MaterialTheme.typography.headlineSmall,
-//                        fontStyle = FontStyle.Italic
-//                    )
-//                },
-//                colors = ListItemDefaults.colors(
-//                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-//                )
-//            )
-//        }
-//    }
-//}
-//
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun HomeContent(
-//    entities: List<Program>,
-//    selected: Long,
-//    uiFlags: UiFlags,
-//    job: Job?,
-//    uiEvent: (HomeIntent) -> Unit
-//) {
-//    val scope = rememberCoroutineScope()
-//    val navigationActions = LocalNavigationActions.current
-//    val snackbarHostState = LocalSnackbarHostState.current
-//    var time by remember { mutableLongStateOf(0L) }
-//    val program = entities.find { it.id == selected } ?: Program()
-//
-//    LaunchedEffect(key1 = job) {
-//        while (true) {
-//            if (job != null) {
-//                time += 1
-//            } else {
-//                time = 0
-//            }
-//            delay(1000L)
-//        }
-//    }
-//
-//    Row(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .padding(16.dp),
-//        verticalAlignment = Alignment.CenterVertically,
-//        horizontalArrangement = Arrangement.spacedBy(16.dp)
-//    ) {
-//        Column(
-//            modifier = Modifier.weight(1f),
-//            verticalArrangement = Arrangement.spacedBy(8.dp),
-//        ) {
-//            Card(
-//                onClick = {
-//                    scope.launch {
-//                        if (job == null) {
-//                            uiEvent(HomeIntent.NavTo(PageType.PROGRAM_LIST))
-//                        }
-//                    }
-//                },
-//            ) {
-//                Row(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(horizontal = 16.dp, vertical = 8.dp),
-//                    verticalAlignment = Alignment.CenterVertically,
-//                    horizontalArrangement = Arrangement.SpaceBetween
-//                ) {
-//                    Column {
-//                        Text(
-//                            text = program.displayText,
-//                            style = TextStyle(
-//                                fontWeight = FontWeight.Bold,
-//                                fontSize = 20.sp,
-//                                fontStyle = FontStyle.Italic,
-//                            )
-//                        )
-//                        Text(
-//                            text = program.createTime.dateFormat("yyyy/MM/dd"),
-//                            style = TextStyle(
-//                                fontFamily = FontFamily.Monospace,
-//                                fontSize = 12.sp,
-//                            ),
-//                            color = Color.Gray,
-//                        )
-//                    }
-//                    Icon(
-//                        modifier = Modifier.size(24.dp),
-//                        imageVector = Icons.Default.ArrowRight,
-//                        contentDescription = null
-//                    )
-//                }
-//            }
-//
-//            Card {
-//                Box(
-//                    modifier = Modifier.padding(8.dp),
-//                ) {
-//                    if (job != null) {
-//                        CircularProgressIndicator(
-//                            modifier = Modifier
-//                                .size(24.dp)
-//                                .align(Alignment.TopStart),
-//                            strokeWidth = 4.dp,
-//                        )
-//                    }
-//                    Text(
-//                        modifier = Modifier.fillMaxWidth(),
-//                        text = time.timeFormat(),
-//                        textAlign = TextAlign.Center,
-//                        style = TextStyle(
-//                            fontSize = 64.sp,
-//                            fontWeight = FontWeight.Bold,
-//                            fontFamily = FontFamily.Monospace,
-//                        )
-//                    )
-//                }
-//            }
-//
-//            Row(
-//                verticalAlignment = Alignment.CenterVertically,
-//                horizontalArrangement = Arrangement.spacedBy(8.dp),
-//            ) {
-//                Card {
-//                    Text(
-//                        modifier = Modifier
-//                            .padding(16.dp),
-//                        text = stringResource(id = R.string.glue_making),
-//                        style = MaterialTheme.typography.titleLarge,
-//                    )
-//                }
-//
-//                Card(
-//                    modifier = Modifier.weight(1f),
-//                ) {
-//                    Text(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(16.dp),
-////                        text = program.dosage.coagulant.format(1),
-//                        text = "",
-//                        style = MaterialTheme.typography.titleLarge,
-//                        textAlign = TextAlign.Center,
-//                        fontFamily = FontFamily.Monospace,
-//                    )
-//                }
-//
-//
-//                Card(
-//                    modifier = Modifier.weight(1f),
-//                ) {
-//                    Text(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(16.dp),
-//                        text = "",
-////                        text = program.dosage.colloid.format(1),
-//                        style = MaterialTheme.typography.titleLarge,
-//                        textAlign = TextAlign.Center,
-//                        fontFamily = FontFamily.Monospace,
-//                    )
-//                }
-//            }
-//
-//            Row(
-//                verticalAlignment = Alignment.CenterVertically,
-//                horizontalArrangement = Arrangement.spacedBy(8.dp),
-//            ) {
-//                Card {
-//                    Text(
-//                        modifier = Modifier
-//                            .padding(16.dp),
-//                        text = stringResource(id = R.string.pre_drain),
-//                        style = MaterialTheme.typography.titleLarge,
-//                    )
-//                }
-//
-//                Card(
-//                    modifier = Modifier.weight(1f),
-//                ) {
-//                    Text(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(16.dp),
-//                        text = "",
-////                        text = program.dosage.preCoagulant.format(1),
-//                        style = MaterialTheme.typography.titleLarge,
-//                        textAlign = TextAlign.Center,
-//                        fontFamily = FontFamily.Monospace,
-//                    )
-//                }
-//
-//                Card(
-//                    modifier = Modifier.weight(1f),
-//                ) {
-//                    Text(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(16.dp),
-//                        text = "",
-////                        text = program.dosage.preColloid.format(1),
-//                        style = MaterialTheme.typography.titleLarge,
-//                        textAlign = TextAlign.Center,
-//                        fontFamily = FontFamily.Monospace,
-//                    )
-//                }
-//            }
-//        }
-//
-//        Box(
-//            modifier = Modifier.weight(1f),
-//            contentAlignment = Alignment.Center
-//        ) {
-//            Icon(
-//                modifier = Modifier
-//                    .size(196.dp)
-//                    .clip(CircleShape)
-//                    .clickable {
-//                        scope.launch {
-//                            if (uiFlags is UiFlags.None) {
-//                                if (job == null) {
-//                                    if (selected == 0L) {
-//                                        navigationActions.navigate(Route.PROGRAM)
-//                                    } else {
-//                                        uiEvent(HomeIntent.Start)
-//                                    }
-//                                } else {
-//                                    uiEvent(HomeIntent.Stop)
-//                                }
-//                            } else {
-//                                snackbarHostState.showSnackbar("请先完成当前操作")
-//                            }
-//                        }
-//                    },
-//                imageVector = if (job == null) Icons.Default.PlayArrow else Icons.Default.Close,
-//                contentDescription = null,
-//                tint = if (job == null) MaterialTheme.colorScheme.primary else Color.Red
-//            )
-//
-//            if (job == null) {
-//                Column(
-//                    modifier = Modifier.align(Alignment.CenterEnd),
-//                    verticalArrangement = Arrangement.spacedBy(8.dp),
-//                    horizontalAlignment = Alignment.End
-//                ) {
-//                    Text(
-//                        modifier = Modifier
-//                            .background(
-//                                color = MaterialTheme.colorScheme.surfaceVariant,
-//                                shape = MaterialTheme.shapes.small
-//                            )
-//                            .clip(MaterialTheme.shapes.small)
-//                            .clickable {
-//                                scope.launch {
-//                                    if (uiFlags !is UiFlags.None) {
-//                                        uiEvent(HomeIntent.Reset)
-//                                    }
-//                                }
-//                            }
-//                            .padding(vertical = 8.dp, horizontal = 16.dp),
-//                        text = if (uiFlags is UiFlags.Objects && uiFlags.objects == 1) "复位中" else "复位",
-//                        style = MaterialTheme.typography.titleMedium,
-//                        color = if (uiFlags is UiFlags.Objects && uiFlags.objects == 1) Color.Red else Color.Unspecified
-//                    )
-//                    Text(
-//                        modifier = Modifier
-//                            .background(
-//                                color = MaterialTheme.colorScheme.surfaceVariant,
-//                                shape = MaterialTheme.shapes.small
-//                            )
-//                            .clip(MaterialTheme.shapes.small)
-//                            .clickable {
-//                                scope.launch {
-//                                    if (uiFlags is UiFlags.None || (uiFlags is UiFlags.Objects && uiFlags.objects == 2)) {
-//                                        uiEvent(HomeIntent.Clean)
-//                                    }
-//                                }
-//                            }
-//                            .padding(vertical = 8.dp, horizontal = 16.dp),
-//                        text = if (uiFlags is UiFlags.Objects && uiFlags.objects == 2) "清洗中" else "清洗",
-//                        style = MaterialTheme.typography.titleMedium,
-//                        color = if (uiFlags is UiFlags.Objects && uiFlags.objects == 2) Color.Red else Color.Unspecified
-//                    )
-//                    Text(
-//                        modifier = Modifier
-//                            .background(
-//                                color = MaterialTheme.colorScheme.surfaceVariant,
-//                                shape = MaterialTheme.shapes.small
-//                            )
-//                            .clip(MaterialTheme.shapes.small)
-//                            .clickable {
-//                                scope.launch {
-//                                    if (uiFlags is UiFlags.None || (uiFlags is UiFlags.Objects && uiFlags.objects == 3)) {
-//                                        if (uiFlags is UiFlags.None) {
-//                                            uiEvent(HomeIntent.Pipeline(1))
-//                                        } else {
-//                                            uiEvent(HomeIntent.Pipeline(0))
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                            .padding(vertical = 8.dp, horizontal = 16.dp),
-//                        text = if (uiFlags is UiFlags.Objects && uiFlags.objects == 3) "填充胶体中" else "填充胶体",
-//                        style = MaterialTheme.typography.titleMedium,
-//                        color = if (uiFlags is UiFlags.Objects && uiFlags.objects == 3) Color.Red else Color.Unspecified
-//                    )
-//                    Text(
-//                        modifier = Modifier
-//                            .background(
-//                                color = MaterialTheme.colorScheme.surfaceVariant,
-//                                shape = MaterialTheme.shapes.small
-//                            )
-//                            .clip(MaterialTheme.shapes.small)
-//                            .clickable {
-//                                scope.launch {
-//                                    if (uiFlags is UiFlags.None || (uiFlags is UiFlags.Objects && uiFlags.objects == 4)) {
-//                                        if (uiFlags is UiFlags.None) {
-//                                            uiEvent(HomeIntent.Pipeline(2))
-//                                        } else {
-//                                            uiEvent(HomeIntent.Pipeline(0))
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                            .padding(vertical = 8.dp, horizontal = 16.dp),
-//                        text = if (uiFlags is UiFlags.Objects && uiFlags.objects == 4) "回吸胶体中" else "回吸胶体",
-//                        style = MaterialTheme.typography.titleMedium,
-//                        color = if (uiFlags is UiFlags.Objects && uiFlags.objects == 4) Color.Red else Color.Unspecified
-//                    )
-//                    Text(
-//                        modifier = Modifier
-//                            .background(
-//                                color = MaterialTheme.colorScheme.surfaceVariant,
-//                                shape = MaterialTheme.shapes.small
-//                            )
-//                            .clip(MaterialTheme.shapes.small)
-//                            .clickable {
-//                                scope.launch {
-//                                    if (uiFlags is UiFlags.None || (uiFlags is UiFlags.Objects && uiFlags.objects == 5)) {
-//                                        if (uiFlags is UiFlags.None) {
-//                                            uiEvent(HomeIntent.Syringe(1))
-//                                        } else {
-//                                            uiEvent(HomeIntent.Syringe(0))
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                            .padding(vertical = 8.dp, horizontal = 16.dp),
-//                        text = if (uiFlags is UiFlags.Objects && uiFlags.objects == 5) "填充促凝剂中" else "填充促凝剂",
-//                        style = MaterialTheme.typography.titleMedium,
-//                        color = if (uiFlags is UiFlags.Objects && uiFlags.objects == 5) Color.Red else Color.Unspecified
-//                    )
-//                    Text(
-//                        modifier = Modifier
-//                            .background(
-//                                color = MaterialTheme.colorScheme.surfaceVariant,
-//                                shape = MaterialTheme.shapes.small
-//                            )
-//                            .clip(MaterialTheme.shapes.small)
-//                            .clickable {
-//                                scope.launch {
-//                                    if (uiFlags is UiFlags.None || (uiFlags is UiFlags.Objects && uiFlags.objects == 6)) {
-//                                        if (uiFlags is UiFlags.None) {
-//                                            uiEvent(HomeIntent.Pipeline(2))
-//                                        } else {
-//                                            uiEvent(HomeIntent.Pipeline(0))
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                            .padding(vertical = 8.dp, horizontal = 16.dp),
-//                        text = if (uiFlags is UiFlags.Objects && uiFlags.objects == 6) "回吸促凝剂中" else "回吸促凝剂",
-//                        style = MaterialTheme.typography.titleMedium,
-//                        color = if (uiFlags is UiFlags.Objects && uiFlags.objects == 6) Color.Red else Color.Unspecified
-//                    )
-//                }
-//            }
-//        }
-//    }
-//}

@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -17,6 +18,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.zktony.android.utils.SerialPortUtils
 
 /**
@@ -30,9 +32,9 @@ fun VerticalProgressBar(
     waterProgress: Float,
     progress: String,
     modifier: Modifier = Modifier,
-    color: Color = Color.Green,
-    backgroundColor: Color = Color.White,
-    size: Size = Size(width = 400f, height = 200f),
+    color: Color = Color(android.graphics.Color.rgb(136, 196, 254)),
+    backgroundColor: Color = Color(245, 245, 245),
+    size: Size = Size(width = 401.9f, height = 227.7f),
     strokeSize: Float = 0.1f,
     strokeColor: Color = Color.Blue
 ) {
@@ -41,16 +43,30 @@ fun VerticalProgressBar(
     var progress = progress.substring(0, index)
 
 
+//    val waterDescLayoutResult = rememberTextMeasurer().measure(
+//        AnnotatedString("$progress%"),
+//        TextStyle(color = Color(18, 95, 202))
+//    )
 
-    val waterDescLayoutResult = rememberTextMeasurer().measure(
-        AnnotatedString("$progress%"),
-        TextStyle(color = Color(178, 193, 209))
+    val zhiDescLayoutResult = rememberTextMeasurer().measure(
+        AnnotatedString("制"),
+        TextStyle(color = Color(18, 95, 202), fontSize = 16.sp)
+    )
+
+    val jiaoDescLayoutResult = rememberTextMeasurer().measure(
+        AnnotatedString("胶"),
+        TextStyle(color = Color(18, 95, 202), fontSize = 16.sp)
+    )
+
+    val jiaDescLayoutResult = rememberTextMeasurer().measure(
+        AnnotatedString("架"),
+        TextStyle(color = Color(18, 95, 202), fontSize = 16.sp)
     )
 
     Canvas(
         modifier = modifier
             .size(size.width.dp, size.height.dp)
-            .border(width = strokeSize.dp, color = strokeColor, shape = RoundedCornerShape(10.dp))
+            .clip(RoundedCornerShape(10.dp))
     ) {
         val canvasWidth = size.width
         val canvasHeight = size.height
@@ -75,13 +91,27 @@ fun VerticalProgressBar(
             cornerRadius = CornerRadius(10f, 10f)
         )
 
-        val textDescWidth = waterDescLayoutResult.size.width
-        //液量
+        val textDescWidth = zhiDescLayoutResult.size.width
+
         drawText(
-            textLayoutResult = waterDescLayoutResult,
+            textLayoutResult = zhiDescLayoutResult,
             topLeft = Offset(
-                canvasWidth / 2 - textDescWidth / 2 - 10,
+                canvasWidth / 2 - textDescWidth / 2,
+                canvasHeight / 2 - 20
+            ),
+        )
+        drawText(
+            textLayoutResult = jiaoDescLayoutResult,
+            topLeft = Offset(
+                canvasWidth / 2 - textDescWidth / 2,
                 canvasHeight / 2
+            ),
+        )
+        drawText(
+            textLayoutResult = jiaDescLayoutResult,
+            topLeft = Offset(
+                canvasWidth / 2 - textDescWidth / 2,
+                canvasHeight / 2 + 20
             ),
         )
 

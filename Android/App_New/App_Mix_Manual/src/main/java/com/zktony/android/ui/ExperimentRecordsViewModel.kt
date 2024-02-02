@@ -69,10 +69,10 @@ sealed class ExperimentRecordsIntent {
     data class Flags(val uiFlags: UiFlags) : ExperimentRecordsIntent()
     data class Selected(val id: Long) : ExperimentRecordsIntent()
     data class Insert(
-        val startRange: Double,
-        val endRange: Double,
+        val startRange: Int,
+        val endRange: Int,
         val thickness: String,
-        val coagulant: Double,
+        val coagulant: Int,
         val volume: Double,
         val number: Int,
         val status: String,

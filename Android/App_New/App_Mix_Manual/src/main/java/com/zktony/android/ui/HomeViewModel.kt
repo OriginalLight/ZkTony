@@ -508,6 +508,7 @@ class HomeViewModel @Inject constructor(
     }
 
 
+
     private fun startJob(status: Int) {
         viewModelScope.launch {
             _uiFlags.value = UiFlags.objects(0)
@@ -1055,6 +1056,25 @@ class HomeViewModel @Inject constructor(
             stop(0, 1, 2, 3, 4)
             delay(200L)
             reset()
+            delay(200L)
+            val slEnetity = slDao.getById(1L).firstOrNull()
+            if (slEnetity!=null){
+                val rinseCleanVolume = slEnetity.rinseCleanVolume
+                /**
+                 * 冲洗转速
+                 */
+                val rinseSpeed = dataStore.readData("rinseSpeed", 600L)
+                start {
+                    timeOut = 1000L * 60L * 10
+                    with(
+                        index = 4,
+                        ads = Triple(rinseSpeed * 20, rinseSpeed * 20, rinseSpeed * 20),
+                        pdv = rinseCleanVolume * 1000
+                    )
+                }
+            }
+
+
         }
     }
 
@@ -1519,10 +1539,10 @@ sealed class HomeIntent {
     data object Stop : HomeIntent()
 
     data class Insert(
-        val startRange: Double,
-        val endRange: Double,
+        val startRange: Int,
+        val endRange: Int,
         val thickness: String,
-        val coagulant: Double,
+        val coagulant: Int,
         val volume: Double,
         var number: Int,
         var status: String,
