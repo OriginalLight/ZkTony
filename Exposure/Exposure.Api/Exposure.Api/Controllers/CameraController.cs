@@ -81,16 +81,15 @@ public class CameraController : ControllerBase
         try
         {
             _cts = new CancellationTokenSource();
-            await _camera.TakeAutoPhotoAsync(_cts.Token);
+            var res = await _camera.TakeAutoPhotoAsync(_cts.Token);
             _operLog.AddOperLog("自动拍照", "自动拍照成功");
+            return Ok(new Dictionary<string, int> { { "exposure", res } });
         }
         catch (Exception e)
         {
             _errorLog.AddErrorLog(e);
             return Problem($"{e.Message}");
         }
-
-        return Ok("自动拍照成功");
     }
 
     [HttpGet]

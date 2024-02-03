@@ -56,14 +56,14 @@ import { useI18n } from 'vue-i18n'
 import useLoading from '@renderer/hooks/loading'
 import type { LoginData } from '@renderer/api/user'
 import { useUserStore } from '@renderer/store'
-import useHomeStore from '@renderer/hooks/home'
+import useHomeState from '@renderer/states/home'
 
 const router = useRouter()
 const { t } = useI18n()
 const errorMessage = ref('')
 const { loading, setLoading } = useLoading()
 const userStore = useUserStore()
-const { init } = useHomeStore()
+const { init } = useHomeState()
 
 const userInfo = reactive({
   username: '',

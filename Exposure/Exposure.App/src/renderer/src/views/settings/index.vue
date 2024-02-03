@@ -20,6 +20,9 @@ import FactortSettings from './components/factory-settings.vue'
   flex-direction: column;
   padding: 16px;
   height: calc(100vh - 98px);
-  overflow-y: auto;
+  overflow-y: scroll;
+}
+.container::-webkit-scrollbar {
+  display: none;
 }
 </style>

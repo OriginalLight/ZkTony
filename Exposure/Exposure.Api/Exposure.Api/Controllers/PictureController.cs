@@ -48,7 +48,7 @@ public class PictureController : ControllerBase
     /// <param name="dto"></param>
     /// <returns></returns>
     [HttpPut]
-    public async Task<IActionResult> Update([FromBody] Picture dto)
+    public async Task<IActionResult> Update([FromBody] PictureUpdateDto dto)
     {
         // 更新
         if (await _picture.Update(dto))

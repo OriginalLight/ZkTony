@@ -3,14 +3,19 @@
     <a-layout-header class="layout-header"> <Navigation /> </a-layout-header>
     <a-layout-content class="layout-content">
       <a-config-provider :locale="locale">
-        <router-view />
+        <router-view v-slot="{ Component, route }">
+          <keep-alive v-if="route.meta.keepAlive">
+            <component :is="Component" />
+          </keep-alive>
+          <component :is="Component" v-else />
+        </router-view>
       </a-config-provider>
     </a-layout-content>
   </a-layout>
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import enUS from '@arco-design/web-vue/es/locale/lang/en-us'
 import zhCN from '@arco-design/web-vue/es/locale/lang/zh-cn'
 import Navigation from '@renderer/components/navigation/index.vue'
@@ -29,8 +34,10 @@ const locale = computed(() => {
       return enUS
   }
 })
-// 初始化主题
-initTheme()
+
+onMounted(() => {
+  initTheme()
+})
 </script>
 
 <style lang="less" scoped>
@@ -44,23 +51,5 @@ initTheme()
     overflow: hidden;
     height: calc(100vh - 66px);
   }
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 0;
-}
-
-::-webkit-scrollbar {
-  -webkit-appearance: none;
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-thumb {
-  cursor: pointer;
-  border-radius: 5px;
-  background: rgba(0, 0, 0, 0.15);
-  transition: color 0.2s ease;
 }
 </style>

@@ -1,4 +1,11 @@
+import localErrLog from '../subpage/err-log/locale/zh-CN'
+import localOperLog from '../subpage/oper-log/locale/zh-CN'
+import localUserManage from '../subpage/user-manage/locale/zh-CN'
+
 export default {
+  ...localErrLog,
+  ...localOperLog,
+  ...localUserManage,
   'settings.system.title': '系统设置',
   'settings.system.theme.title': '系统主题',
   'settings.system.theme.light': '亮色',

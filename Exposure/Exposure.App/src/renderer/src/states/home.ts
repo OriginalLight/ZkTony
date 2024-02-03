@@ -10,6 +10,7 @@ const preview = ref<Picture>({
   width: 1000,
   height: 1000,
   type: 0,
+  thumbnail: '',
   exposureTime: 0,
   exposureGain: 0,
   blackLevel: 0,
@@ -46,6 +47,7 @@ const init = () => {
     width: 1000,
     height: 1000,
     type: 0,
+    thumbnail: '',
     exposureTime: 0,
     exposureGain: 0,
     blackLevel: 0,
@@ -68,7 +70,7 @@ const init = () => {
   }
 }
 
-export default function useHomeStore() {
+export default function useHomeState() {
   return {
     preview,
     thumbnail,

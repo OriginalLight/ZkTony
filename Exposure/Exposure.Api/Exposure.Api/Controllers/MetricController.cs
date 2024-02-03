@@ -24,7 +24,7 @@ public class MetricController : ControllerBase
         {
             Usb = _usb.IsUsbAttached(),
             Door = false,
-            Temperature =_camera.GetTemperature()
+            Temperature = _camera.GetTemperature()
         });
     }
 }

@@ -78,7 +78,7 @@
               :placeholder="t('home.camera.options.minute')"
               mode="button"
               :min="0"
-              :max="59"
+              :max="30"
               :step="1"
               :input-attrs="{ style: { textAlign: 'center' } }"
             />
@@ -176,9 +176,9 @@ import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Message } from '@arco-design/web-vue'
 import { init, preview, pixel, manual, auto, cancel, cache } from '@renderer/api/camera'
-import useHomeStore from '@renderer/hooks/home'
+import useHomeState from '@renderer/states/home'
 
-const { options } = useHomeStore()
+const { options } = useHomeState()
 
 const emit = defineEmits(['shoot', 'preview'])
 
@@ -209,7 +209,11 @@ const handleShoot = async () => {
     await pixel({ index: Number(options.value.quality) })
     delay(100)
     if (options.value.mode === 'auto') {
-      await auto()
+      const res = await auto()
+      progress.value.time = res.data.exposure / 1000 + 1500
+      const seconds = res.data.exposure / 1000000
+      options.value.time.minute = Math.floor(seconds / 60)
+      options.value.time.second = Math.floor(seconds % 60)
     } else {
       await manual({
         exposure: getExposureTime(),

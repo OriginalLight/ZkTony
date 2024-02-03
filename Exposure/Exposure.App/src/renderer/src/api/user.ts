@@ -66,3 +66,7 @@ export function addUser(data: UserAddParam) {
 export function deleteUser(data: number[]) {
   return axios.delete('/User', { data })
 }
+
+export function getUserById(data: number) {
+  return axios.get<User>('/User?id=' + data)
+}

@@ -1,10 +1,8 @@
 import localeLogin from '@renderer/views/login/locale/zh-CN'
 import localeNavigation from '@renderer/components/navigation/locale/zh-CN'
 import localSettings from '@renderer/views/settings/locale/zh-CN'
-import localErrLog from '@renderer/views/errlog/locale/zh-CN'
-import localOperLog from '@renderer/views/operlog/locale/zh-CN'
-import localUserManagement from '@renderer/views/user-management/locale/zh-CN'
 import localHome from '@renderer/views/home/locale/zh-CN'
+import localGallery from '@renderer/views/gallery/locale/zh-CN'
 
 export default {
   'menu.home': '主页',
@@ -13,8 +11,6 @@ export default {
   ...localeNavigation,
   ...localSettings,
   ...localeLogin,
-  ...localErrLog,
-  ...localOperLog,
-  ...localUserManagement,
-  ...localHome
+  ...localHome,
+  ...localGallery
 }

@@ -1,4 +1,11 @@
+import localErrLog from '../subpage/err-log/locale/en-US'
+import localOperLog from '../subpage/oper-log/locale/en-US'
+import localUserManage from '../subpage/user-manage/locale/en-US'
+
 export default {
+  ...localErrLog,
+  ...localOperLog,
+  ...localUserManage,
   'settings.system.title': 'System Settings',
   'settings.system.theme.title': 'System Theme',
   'settings.system.theme.light': 'Light',

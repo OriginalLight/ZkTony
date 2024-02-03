@@ -22,6 +22,11 @@ public class Picture
     ///     图片路径
     /// </summary>
     public string Path { get; set; }
+    
+    /// <summary>
+    ///     缩略图
+    /// </summary>
+    public string Thumbnail { get; set; }
 
     /// <summary>
     ///     宽度

@@ -44,7 +44,7 @@
         <div v-for="item in light" :key="item.id" class="scroll-item" @click="handleSelected(item)">
           <div v-if="showPreview(item)" class="img-preview">Preview</div>
           <icon-check v-if="showSelected(item)" class="selected" />
-          <img class="img" alt="dessert" :src="item.path" />
+          <img class="img" alt="dessert" :src="item.thumbnail" />
           <div class="img-name">{{ item.name }}</div>
         </div>
       </a-space>
@@ -55,7 +55,7 @@
         <div v-for="item in dark" :key="item.id" class="scroll-item" @click="handleSelected(item)">
           <div v-if="showPreview(item)" class="img-preview">Preview</div>
           <icon-check v-if="showSelected(item)" class="selected" />
-          <img class="img" alt="dessert" :src="item.path" />
+          <img class="img" alt="dessert" :src="item.thumbnail" />
           <div class="img-name">{{ item.name }}</div>
         </div>
       </a-space>
@@ -71,7 +71,7 @@
         >
           <div v-if="showPreview(item)" class="img-preview">Preview</div>
           <icon-check v-if="showSelected(item)" class="selected" />
-          <img class="img" alt="dessert" :src="item.path" />
+          <img class="img" alt="dessert" :src="item.thumbnail" />
           <div class="img-name">{{ item.name }}</div>
         </div>
       </a-space>
@@ -219,6 +219,7 @@ const handleExport = async (format: string) => {
   overflow-x: scroll;
 
   .scroll-item {
+    display: flex;
     position: relative;
     .img-preview {
       position: absolute;
@@ -239,7 +240,6 @@ const handleExport = async (format: string) => {
     }
 
     .img {
-      border: 1px solid var(--color-neutral-6);
       height: 100px;
       min-height: 100px;
       width: auto;
@@ -248,7 +248,7 @@ const handleExport = async (format: string) => {
 
     .img-name {
       position: absolute;
-      bottom: 4px;
+      bottom: 0;
       width: 100%;
       background-color: rgba(0, 0, 0, 0.5);
       color: var(--color-neutral-0);

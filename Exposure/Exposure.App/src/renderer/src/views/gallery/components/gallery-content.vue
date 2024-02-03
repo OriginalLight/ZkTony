@@ -1,0 +1,223 @@
+<template>
+  <a-list
+    class="list"
+    :scrollbar="true"
+    :loading="loading"
+    :data="list"
+    :max-height="maxHeight"
+    :pagination-props="paginationProps"
+    @page-change="handlePageChange"
+  >
+    <template #item="{ item }">
+      <a-list-item action-layout="vertical">
+        <a-tag size="large">{{ item.date }}</a-tag>
+        <a-divider v-if="item.light.length > 0" orientation="right">{{
+          t('gallery.content.picture.light')
+        }}</a-divider>
+        <a-space wrap>
+          <div
+            v-for="img in item.light"
+            :key="img.id"
+            class="img-box"
+            @click="handleSelected(item, img)"
+            @dblclick="handleDetail(item, img)"
+          >
+            <img class="img" :src="img.thumbnail" />
+            <icon-check v-if="showSelected(img)" class="selected" />
+            <div class="img-name">{{ img.name }}</div>
+          </div>
+        </a-space>
+        <a-divider v-if="item.dark.length > 0" orientation="right">{{
+          t('gallery.content.picture.dark')
+        }}</a-divider>
+        <a-space wrap>
+          <div
+            v-for="img in item.dark"
+            :key="img.id"
+            class="img-box"
+            @click="handleSelected(item, img)"
+            @dblclick="handleDetail(item, img)"
+          >
+            <img class="img" :src="img.thumbnail" />
+            <icon-check v-if="showSelected(img)" class="selected" />
+            <div class="img-name">{{ img.name }}</div>
+          </div>
+        </a-space>
+        <a-divider v-if="item.combine.length > 0" orientation="right">{{
+          t('gallery.content.picture.combine')
+        }}</a-divider>
+        <a-space wrap>
+          <div
+            v-for="img in item.combine"
+            :key="img.id"
+            class="img-box"
+            @click="handleSelected(item, img)"
+            @dblclick="handleDetail(item, img)"
+          >
+            <img class="img" :src="img.thumbnail" />
+            <icon-check v-if="showSelected(img)" class="selected" />
+            <div class="img-name">{{ img.name }}</div>
+          </div>
+        </a-space>
+      </a-list-item>
+    </template>
+  </a-list>
+</template>
+
+<script lang="ts" setup>
+import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+import dayjs from 'dayjs'
+import { useWindowSize } from '@vueuse/core'
+import { Picture, PictureGallery, getByPage } from '@renderer/api/picture'
+import useGalleryState from '@renderer/states/gallery'
+
+const { t } = useI18n()
+
+const router = useRouter()
+// 窗口高度
+const { height } = useWindowSize()
+// 最大高度
+const maxHeight = computed(() => {
+  return height.value - 208
+})
+// 分页参数
+const { selected, options, paginationProps, subpage } = useGalleryState()
+// 加载状态
+const loading = ref(false)
+// 图片列表
+const data = ref<Picture[]>([])
+// 图片列表
+const list = computed<PictureGallery[]>(() => {
+  // 根据日期分类同一天的放入一个数组并按照时间倒序排列并且按照type分类
+  const map = new Map()
+  data.value.forEach((item) => {
+    const date = dayjs(item.createTime).format('YYYY-MM-DD')
+    if (map.has(date)) {
+      map.get(date).push(item)
+    } else {
+      map.set(date, [item])
+    }
+  })
+  const arr = Array.from(map)
+  arr.sort((a, b) => {
+    return dayjs(b[0]).valueOf() - dayjs(a[0]).valueOf()
+  })
+  const gallery: PictureGallery[] = []
+
+  arr.forEach((item) => {
+    gallery.push({
+      date: item[0],
+      light: item[1].filter((item) => item.type === 0),
+      dark: item[1].filter((item) => item.type === 1),
+      combine: item[1].filter((item) => item.type === 2)
+    })
+  })
+
+  return gallery
+})
+// 是否显示选中
+const showSelected = (item: Picture) => {
+  return selected.value.some((selected) => selected.id === item.id)
+}
+// 选择
+const handleSelected = (list: PictureGallery, item: Picture) => {
+  if (selected.value.find((selected) => selected.id === item.id)) {
+    selected.value = selected.value.filter((selected) => selected.id !== item.id)
+  } else {
+    selected.value.push(item)
+  }
+  subpage.value = {
+    list,
+    item
+  }
+}
+// 分页
+const handlePageChange = (page: number) => {
+  paginationProps.current = page
+  fetchData()
+}
+// 详情
+const handleDetail = (list: PictureGallery, item: Picture) => {
+  subpage.value = {
+    list,
+    item
+  }
+  router.push({
+    name: 'gallery-detail'
+  })
+}
+
+// 加载数据
+const fetchData = async () => {
+  try {
+    loading.value = true
+    const res = await getByPage({
+      page: paginationProps.current ? paginationProps.current : 1,
+      size: paginationProps.defaultPageSize ? paginationProps.defaultPageSize : 200,
+      name: options.value.name,
+      isDeleted: false,
+      startTime: options.value.date ? options.value.date[0] : null,
+      endTime: options.value.date ? options.value.date[1] : null
+    })
+    data.value = res.data.list
+    paginationProps.total = res.data.total
+  } catch (error) {
+    console.log(error)
+  } finally {
+    loading.value = false
+  }
+}
+// 暴露方法
+defineExpose({
+  fetchData
+})
+// 初始化
+onMounted(async () => {
+  fetchData()
+})
+</script>
+
+<style scoped lang="less">
+.list {
+  flex: 1;
+  border-radius: 2px;
+  margin-top: 16px;
+  overflow: hidden;
+}
+.box::-webkit-scrollbar {
+  display: none;
+}
+
+.img-box {
+  display: flex;
+  position: relative;
+
+  .img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+  }
+
+  .selected {
+    position: absolute;
+    top: 0;
+    right: 0;
+    color: rgb(var(--arcoblue-6));
+    font-size: 20px;
+    padding: 2px;
+  }
+
+  .img-name {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: rgb(var(--arcoblue-5));
+    font-size: 10px;
+    text-align: center;
+    overflow: hidden;
+  }
+}
+</style>

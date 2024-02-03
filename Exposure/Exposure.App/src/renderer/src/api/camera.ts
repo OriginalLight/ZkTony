@@ -10,6 +10,10 @@ export interface ManualParam {
   frame: number
 }
 
+export interface AutoResult {
+  exposure: number
+}
+
 export function init() {
   return axios.get('/Camera/Init')
 }
@@ -24,7 +28,7 @@ export function pixel(data: PixelParam) {
 }
 
 export function auto() {
-  return axios.get('/Camera/Auto')
+  return axios.get<AutoResult>('/Camera/Auto')
 }
 
 export function manual(data: ManualParam) {

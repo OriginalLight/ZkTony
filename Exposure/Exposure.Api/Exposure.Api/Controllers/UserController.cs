@@ -78,6 +78,14 @@ public class UserController : ControllerBase
             List = list
         });
     }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetByIds([FromQuery] int id)
+    {
+        // 查询
+        var user = await _user.GetByPrimary(id);
+        return Ok(user);
+    }
 
     /// <summary>
     ///     添加用户

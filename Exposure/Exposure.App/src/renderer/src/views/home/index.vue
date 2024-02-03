@@ -21,9 +21,9 @@ import ImagePreview from './components/image-preview.vue'
 import CameraOptions from './components/camera-options.vue'
 import ThumbnailView from './components/thumbnail-view.vue'
 import { Picture } from '@renderer/api/picture'
-import useHomeStore from '@renderer/hooks/home'
+import useHomeState from '@renderer/states/home'
 
-const { preview, thumbnail, selected } = useHomeStore()
+const { preview, thumbnail, selected } = useHomeState()
 
 // 拍摄
 const handleShoot = (images: Picture[]) => {
@@ -84,3 +84,4 @@ const handleAdjust = (image: Picture) => {
   padding-bottom: 4px;
 }
 </style>
+./state/home-state ../../states/index

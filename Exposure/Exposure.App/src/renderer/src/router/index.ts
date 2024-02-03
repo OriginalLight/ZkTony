@@ -1,12 +1,4 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import NotFound from '@renderer/views/not-found/index.vue'
-import Login from '@renderer/views/login/index.vue'
-import Home from '@renderer/views/home/index.vue'
-import Gallery from '@renderer/views/gallery/index.vue'
-import Settings from '@renderer/views/settings/index.vue'
-import ErrLog from '@renderer/views/errlog/index.vue'
-import OperLog from '@renderer/views/operlog/index.vue'
-import UserManagement from '@renderer/views/user-management/index.vue'
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -18,13 +10,14 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: Login
+      component: () => import('@renderer/views/login/index.vue')
     },
     {
       path: '/home',
       name: 'home',
-      component: Home,
+      component: () => import('@renderer/views/home/index.vue'),
       meta: {
+        keepAlive: true,
         locale: 'menu.home',
         nav: true
       }
@@ -32,17 +25,29 @@ const router = createRouter({
     {
       path: '/gallery',
       name: 'gallery',
-      component: Gallery,
+      component: () => import('@renderer/views/gallery/index.vue'),
       meta: {
+        keepAlive: true,
         locale: 'menu.gallery',
         nav: true
       }
     },
     {
+      path: '/gallery-chart',
+      name: 'gallery-chart',
+      component: () => import('@renderer/views/gallery/subpage/gallery-chart/index.vue')
+    },
+    {
+      path: '/gallery-detail',
+      name: 'gallery-detail',
+      component: () => import('@renderer/views/gallery/subpage/gallery-detail/index.vue')
+    },
+    {
       path: '/settings',
       name: 'settings',
-      component: Settings,
+      component: () => import('@renderer/views/settings/index.vue'),
       meta: {
+        keepAlive: true,
         locale: 'menu.settings',
         nav: true
       }
@@ -50,22 +55,22 @@ const router = createRouter({
     {
       path: '/errlog',
       name: 'errlog',
-      component: ErrLog
+      component: () => import('@renderer/views/settings/subpage/err-log/index.vue')
     },
     {
       path: '/operlog',
       name: 'operlog',
-      component: OperLog
+      component: () => import('@renderer/views/settings/subpage/oper-log/index.vue')
     },
     {
-      path: '/userManagement',
-      name: 'userManagement',
-      component: UserManagement
+      path: '/user-manage',
+      name: 'user-manage',
+      component: () => import('@renderer/views/settings/subpage/user-manage/index.vue')
     },
     {
       path: '/:pathMatch(.*)*',
       name: 'notFound',
-      component: NotFound
+      component: () => import('@renderer/views/not-found/index.vue')
     }
   ],
   scrollBehavior() {

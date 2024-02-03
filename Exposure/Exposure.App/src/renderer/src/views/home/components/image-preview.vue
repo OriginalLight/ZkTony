@@ -18,12 +18,17 @@
             </template>
           </a-button>
           <template #content>
-            <a-slider
-              v-model="imageOptions.brightness"
-              :style="{ width: '300px' }"
-              :max="200"
-              show-input
-            />
+            <a-space size="medium">
+              <Slider
+                v-model="imageOptions.brightness"
+                class="slider"
+                :style="{ width: '300px' }"
+                :max="200"
+                show-tooltip="drag"
+                :lazy="false"
+              />
+              <div style="width: 30px; text-align: center">{{ imageOptions.brightness }}</div>
+            </a-space>
           </template>
         </a-popover>
       </a-tooltip>
@@ -35,21 +40,19 @@
             </template>
           </a-button>
           <template #content>
-            <a-slider
-              v-model="imageOptions.contrast"
-              :style="{ width: '300px' }"
-              :max="200"
-              show-input
-            />
+            <a-space size="medium">
+              <Slider
+                v-model="imageOptions.contrast"
+                class="slider"
+                :style="{ width: '300px' }"
+                :max="200"
+                show-tooltip="drag"
+                :lazy="false"
+              />
+              <div style="width: 30px; text-align: center">{{ imageOptions.contrast }}</div>
+            </a-space>
           </template>
         </a-popover>
-      </a-tooltip>
-      <a-tooltip placement="top" :content="t('home.image.preview.undo')">
-        <a-button type="primary" size="medium" @click="undo">
-          <template #icon>
-            <Undo />
-          </template>
-        </a-button>
       </a-tooltip>
       <a-tooltip placement="top" :content="t('home.image.preview.redo')">
         <a-button
@@ -91,10 +94,10 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Brightness, Contrast, Undo, Refresh, Save } from '@icon-park/vue-next'
-import { useRefHistory } from '@vueuse/core'
+import { Brightness, Contrast, Refresh, Save } from '@icon-park/vue-next'
 import { Picture, adjustPicture } from '@renderer/api/picture'
 import { Message } from '@arco-design/web-vue'
+import Slider from '@vueform/slider'
 
 const props = defineProps({
   image: {
@@ -116,11 +119,6 @@ const imageOptions = ref({
   contrast: 100
 })
 
-// 撤销
-const { undo } = useRefHistory(imageOptions, {
-  deep: true
-})
-
 // 保存
 const handleSave = async () => {
   try {
@@ -128,7 +126,8 @@ const handleSave = async () => {
     const res = await adjustPicture({
       id: props.image.id,
       brightness: imageOptions.value.brightness,
-      contrast: imageOptions.value.contrast
+      contrast: imageOptions.value.contrast,
+      invert: false
     })
     emit('adjust', res.data)
   } catch (error) {
@@ -147,6 +146,8 @@ watch(
 )
 </script>
 
+<style src="@vueform/slider/themes/default.css"></style>
+
 <style scoped lang="less">
 .image-edit {
   position: absolute;
@@ -159,5 +160,11 @@ watch(
   top: 8px;
   left: 8px;
   padding: 12px;
+}
+
+.slider {
+  --slider-connect-bg: rgb(var(--arcoblue-6));
+  --slider-tooltip-bg: rgb(var(--arcoblue-6));
+  --slider-handle-ring-color: rgb(var(--arcoblue-6));
 }
 </style>

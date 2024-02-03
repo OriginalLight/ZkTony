@@ -207,7 +207,7 @@ const handleOperlog = () => {
 // 跳转到用户管理页面
 const handleManage = () => {
   router.push({
-    path: '/userManagement'
+    path: '/user-manage'
   })
 }
 </script>

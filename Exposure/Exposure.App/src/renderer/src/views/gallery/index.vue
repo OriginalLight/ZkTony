@@ -1,23 +1,41 @@
 <template>
   <div class="container">
-    <a-grid :cols="1" :row-gap="16" class="grid-demo-grid" style="height: 100%">
-      <a-grid-item class="demo-item">item</a-grid-item>
-      <a-grid-item class="demo-item">item</a-grid-item>
-      <a-grid-item class="demo-item">item</a-grid-item>
-      <a-grid-item class="demo-item">item</a-grid-item>
-      <a-grid-item class="demo-item">item</a-grid-item>
-      <a-grid-item class="demo-item">item</a-grid-item>
-    </a-grid>
+    <gallery-bar @combine="handleCombine" @search="handleSearch" />
+    <gallery-content ref="content" />
   </div>
 </template>
 
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import { ref } from 'vue'
+import GalleryBar from './components/gallery-bar.vue'
+import GalleryContent from './components/gallery-content.vue'
+import useGalleryState from '@renderer/states/gallery'
+
+const { selected, paginationProps } = useGalleryState()
+
+const content = ref<InstanceType<typeof GalleryContent>>()
+
+const handleCombine = () => {
+  selected.value = []
+  paginationProps.current = 1
+  content.value?.fetchData()
+}
+
+const handleSearch = () => {
+  selected.value = []
+  paginationProps.current = 1
+  content.value?.fetchData()
+}
+
+// 选项
+</script>
 
 <style lang="less" scoped>
 .container {
   display: flex;
+  position: relative;
   flex-direction: column;
-  height: calc(100vh - 66px);
-  background-color: var(--color-bg-2);
+  padding: 16px;
+  height: calc(100vh - 66px - 32px);
 }
 </style>

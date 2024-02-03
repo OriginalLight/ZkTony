@@ -1,5 +1,4 @@
 ﻿using System.Drawing;
-using System.Drawing.Imaging;
 using Exposure.Api.Contracts.Services;
 using Exposure.Api.Contracts.SqlSugar;
 using Exposure.Api.Models;
@@ -10,6 +9,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using SqlSugar;
 using Image = SixLabors.ImageSharp.Image;
+using Size = OpenCvSharp.Size;
 
 namespace Exposure.Api.Services;
 
@@ -39,9 +39,9 @@ public class PictureService : BaseService<Picture>, IPictureService
         var ids = users.Select(u => u.Id).ToList();
         return await context.db.Queryable<Picture>()
             .Where(p => p.IsDelete == dto.IsDeleted)
-            .WhereIF(!string.IsNullOrEmpty(dto.Name), p => p.Name.Contains(dto.Name))
+            .WhereIF(!string.IsNullOrEmpty(dto.Name), p => dto.Name != null && p.Name.Contains(dto.Name))
             .WhereIF(dto.StartTime != null, p => p.CreateTime >= dto.StartTime)
-            .WhereIF(dto.EndTime != null, p => p.CreateTime <= dto.EndTime)
+            .WhereIF(dto.EndTime != null, p => p.CreateTime <= dto.EndTime!.Value.AddDays(1))
             .Where(p => ids.Contains(p.UserId))
             .OrderBy(p => p.CreateTime, OrderByType.Desc)
             .ToPageListAsync(dto.Page, dto.Size, total);
@@ -81,22 +81,40 @@ public class PictureService : BaseService<Picture>, IPictureService
         var mat2 = bitmap2.ToMat();
         var mat = new Mat(list[0].Height, list[1].Width, MatType.CV_8UC3, new Scalar(0));
         Cv2.Add(mat1, mat2, mat);
-        var bitmap = mat.ToBitmap();
 
-        var savePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Exposure");
+        // 保存图片
+        var myPictures = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+        var savePath = Path.Combine(myPictures, "Exposure");
         if (!Directory.Exists(savePath)) Directory.CreateDirectory(savePath);
         var date = DateTime.Now.ToString("yyyyMMddHHmmss");
         var filePath = Path.Combine(savePath, $"{date}.png");
-        bitmap.Save(filePath, ImageFormat.Png);
+        mat.SaveImage(filePath);
+
+        // 保存缩略图
+        var thumbnail = mat.Clone();
+        Cv2.Resize(mat, thumbnail, new Size(500, 500));
+        var thumbnailPath = Path.Combine(myPictures, "Thumbnail");
+        if (!Directory.Exists(thumbnailPath)) Directory.CreateDirectory(thumbnailPath);
+        var thumbnailFilePath = Path.Combine(thumbnailPath, $"{date}.jpg");
+        thumbnail.SaveImage(thumbnailFilePath);
+
+        var width = mat.Width;
+        var height = mat.Height;
+        // 释放资源
+        mat1.Dispose();
+        mat2.Dispose();
+        mat.Dispose();
+        thumbnail.Dispose();
 
         return await AddReturnModel(new Picture
         {
             UserId = _user.GetLogged()?.Id ?? 0,
             Name = date,
             Path = filePath,
-            Width = bitmap.Width,
-            Height = bitmap.Height,
+            Width = width,
+            Height = height,
             Type = 2,
+            Thumbnail = thumbnailFilePath,
             ExposureTime = 0,
             ExposureGain = 0,
             BlackLevel = 0,
@@ -121,22 +139,41 @@ public class PictureService : BaseService<Picture>, IPictureService
         image.Mutate(x => x.Brightness(dto.Brightness / 100.0f));
         // 增强对比度
         image.Mutate(x => x.Contrast(dto.Contrast / 100.0f));
-        // 保存图片 image to bitmap
-        var savePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Exposure");
+
+        if (dto.Invert)
+        {
+            image.Mutate(x => x.Invert());
+        }
+        // 保存图片
+        var myPictures = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+        var savePath = Path.Combine(myPictures, "Exposure");
         if (!Directory.Exists(savePath)) Directory.CreateDirectory(savePath);
         var date = DateTime.Now.ToString("yyyyMMddHHmmss");
         var filePath = Path.Combine(savePath, $"{date}.png");
-
         await image.SaveAsPngAsync(filePath);
+        
+        var width = image.Width;
+        var height = image.Height;
+
+        // 保存缩略图
+        image.Mutate(x => x.Resize(500, 500));
+        var thumbnailPath = Path.Combine(myPictures, "Thumbnail");
+        if (!Directory.Exists(thumbnailPath)) Directory.CreateDirectory(thumbnailPath);
+        var thumbnailFilePath = Path.Combine(thumbnailPath, $"{date}.jpg");
+        await image.SaveAsJpegAsync(thumbnailFilePath);
+
+        // 释放资源
+        image.Dispose();
 
         return await AddReturnModel(new Picture
         {
             UserId = _user.GetLogged()?.Id ?? 0,
             Name = date,
             Path = filePath,
-            Width = image.Width,
-            Height = image.Height,
+            Width = width,
+            Height = height,
             Type = pic.Type,
+            Thumbnail = thumbnailFilePath,
             ExposureTime = pic.ExposureTime,
             ExposureGain = pic.ExposureGain,
             BlackLevel = pic.BlackLevel,
@@ -145,5 +182,15 @@ public class PictureService : BaseService<Picture>, IPictureService
             UpdateTime = DateTime.Now,
             DeleteTime = DateTime.Now
         });
+    }
+
+    public async Task<bool> Update(PictureUpdateDto model)
+    {
+        var pic = await context.db.Queryable<Picture>().InSingleAsync(model.Id);
+        if (pic == null) return false;
+        if (string.IsNullOrEmpty(model.Name)) return false;
+        pic.Name = model.Name;
+        var res = await context.db.Updateable(pic).ExecuteCommandAsync();
+        return res > 0;
     }
 }
