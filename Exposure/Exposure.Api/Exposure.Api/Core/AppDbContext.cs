@@ -11,7 +11,7 @@ public class AppDbContext : IDbContext
 {
     private readonly ILogger<AppDbContext> _logger;
     private readonly IConfiguration _config;
-    private SqlSugarClient _db;
+    private readonly SqlSugarClient _db;
 
     public AppDbContext(IConfiguration config, ILogger<AppDbContext> logger)
     {
@@ -22,18 +22,22 @@ public class AppDbContext : IDbContext
         //打印日志
         _db = new SqlSugarClient(new ConnectionConfig
         {
-            ConnectionString =
-                $"Data Source={Path.Combine(location, dataBase)}",
+            ConnectionString = $"Data Source={Path.Combine(location, dataBase)}",
             DbType = DbType.Sqlite, //数据库类型
             IsAutoCloseConnection = true, //自动释放数据务，如果存在事务，在事务结束后释放
             LanguageType = LanguageType.Chinese,
             InitKeyType = InitKeyType.Attribute //从实体特性中读取主键自增列信息
         });
         
-        _db.Aop.OnLogExecuting = (sql, _) =>
+        // Dev环境打印sql
+        if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
         {
-            _logger.LogInformation(sql);
-        };
+            _db.Aop.OnLogExecuting = (sql, _) =>
+            {
+                _logger.LogInformation(sql);
+            };
+        }
+        
     }
 
 

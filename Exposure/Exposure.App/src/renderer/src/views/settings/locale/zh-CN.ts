@@ -27,6 +27,5 @@ export default {
   'settings.user.operlog.title': '操作日志',
   'settings.user.manage.title': '用户管理',
   'settings.factory.title': '工厂设置',
-  'settings.factory.com.1': '下位机串口',
-  'settings.factory.com.2': 'LED串口'
+  'settings.factory.debug': '调试'
 }

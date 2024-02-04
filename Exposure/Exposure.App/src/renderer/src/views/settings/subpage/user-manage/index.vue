@@ -302,10 +302,10 @@ const handleAdd = async () => {
 const handleReset = async () => {
   try {
     setLoading(true)
-    if (resetIndex.value == 0) {
+    const user = data.value[resetIndex.value]
+    if (!user) {
       return
     }
-    const user = data.value[resetIndex.value]
     await updateUser({
       id: user.id,
       name: user.name,
@@ -327,7 +327,6 @@ const handleChange = async (index: number) => {
   try {
     setLoading(true)
     const user = data.value[index]
-    console.log(user)
     await updateUser({
       id: user.id,
       name: user.name,

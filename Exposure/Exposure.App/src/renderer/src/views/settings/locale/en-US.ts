@@ -28,6 +28,5 @@ export default {
   'settings.user.operlog.title': 'Operation Log',
   'settings.user.manage.title': 'User Management',
   'settings.factory.title': 'Factory Settings',
-  'settings.factory.com.1': 'Lower Computer Serial Port',
-  'settings.factory.com.2': 'LED Serial Port'
+  'settings.factory.debug': 'Debug'
 }
