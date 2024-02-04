@@ -13,11 +13,18 @@ public class OperLogController : ControllerBase
     private readonly IOperLogService _operLog;
     private readonly IUsbService _usb;
 
+    #region 构造函数
+
+    /// <inheritdoc />
     public OperLogController(IUsbService usb, IOperLogService operLog)
     {
         _usb = usb;
         _operLog = operLog;
     }
+
+    #endregion
+
+    #region 分页查询
 
     /// <summary>
     ///     分页查询
@@ -38,6 +45,10 @@ public class OperLogController : ControllerBase
         });
     }
 
+    #endregion
+
+    #region 删除
+
     /// <summary>
     ///     删除
     /// </summary>
@@ -46,15 +57,15 @@ public class OperLogController : ControllerBase
     [HttpDelete]
     public async Task<IActionResult> Delete([FromBody] object[] ids)
     {
-        if (await _operLog.DeleteRange(ids))
-        {
-            // 插入日志
-            _operLog.AddOperLog("删除", "删除操作日志：ids = " + string.Join(",", ids));
-            return Ok("删除成功");
-        }
-
-        return Problem("删除失败");
+        if (!await _operLog.DeleteRange(ids)) return Problem("删除失败");
+        // 插入日志
+        _operLog.AddOperLog("删除", "删除操作日志：ids = " + string.Join(",", ids));
+        return Ok("删除成功");
     }
+
+    #endregion
+
+    #region 导出
 
     /// <summary>
     ///     导出
@@ -87,4 +98,6 @@ public class OperLogController : ControllerBase
         // 返回结果
         return Ok("导出成功");
     }
+
+    #endregion
 }

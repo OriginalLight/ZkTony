@@ -8,6 +8,8 @@ public class UsbService : IUsbService
     private readonly ManagementEventWatcher _insertWatcher;
     private readonly ILogger<UsbService> _logger;
     private readonly ManagementEventWatcher _removeWatcher;
+    
+    #region 构造函数
 
     public UsbService(ILogger<UsbService> logger)
     {
@@ -23,6 +25,10 @@ public class UsbService : IUsbService
         _removeWatcher.Start();
     }
 
+    #endregion
+
+    #region 外设插入
+
     /// <summary>
     ///     外设插入
     /// </summary>
@@ -34,6 +40,10 @@ public class UsbService : IUsbService
         _logger.LogInformation("外设插入");
     }
 
+    #endregion
+
+    #region 外设移除
+
     /// <summary>
     ///     外设移除
     /// </summary>
@@ -43,6 +53,10 @@ public class UsbService : IUsbService
     {
         _logger.LogInformation("外设移除");
     }
+
+    #endregion
+
+    #region 初始化
 
     /// <summary>
     ///     初始化
@@ -55,6 +69,10 @@ public class UsbService : IUsbService
 
         return Task.CompletedTask;
     }
+
+    #endregion
+
+    #region 获取所有的USB设备
 
     /// <summary>
     ///     获取所有的USB设备
@@ -69,6 +87,10 @@ public class UsbService : IUsbService
         return usbDrives;
     }
 
+    #endregion
+
+    #region 获取默认的USB设备
+
     /// <summary>
     ///     获取默认的USB设备
     /// </summary>
@@ -80,6 +102,10 @@ public class UsbService : IUsbService
         return usbDrives.Length > 0 ? usbDrives[0] : null;
     }
 
+    #endregion
+
+    #region 是否有USB设备
+
     /// <summary>
     ///     是否有USB设备
     /// </summary>
@@ -90,4 +116,6 @@ public class UsbService : IUsbService
 
         return usbDrives.Length > 0;
     }
+
+    #endregion
 }

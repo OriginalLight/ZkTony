@@ -10,8 +10,11 @@ public class CameraController : ControllerBase
     private readonly ICameraService _camera;
     private readonly IErrorLogService _errorLog;
     private readonly IOperLogService _operLog;
-    private CancellationTokenSource _cts;
+    private CancellationTokenSource? _cts;
 
+    #region 构造函数
+
+    /// <inheritdoc />
     public CameraController(ICameraService camera, IErrorLogService errorLog, IOperLogService operLog)
     {
         _camera = camera;
@@ -19,6 +22,14 @@ public class CameraController : ControllerBase
         _operLog = operLog;
     }
 
+    #endregion
+
+    #region 初始化
+
+    /// <summary>
+    ///     初始化
+    /// </summary>
+    /// <returns></returns>
     [HttpGet]
     [Route("Init")]
     public IActionResult Init()
@@ -37,9 +48,17 @@ public class CameraController : ControllerBase
         return Ok("初始化成功");
     }
 
+    #endregion
+
+    #region 预览
+
+    /// <summary>
+    ///     预览
+    /// </summary>
+    /// <returns></returns>
     [HttpGet]
     [Route("Preview")]
-    public async Task<IActionResult> Preview()
+    public IActionResult Preview()
     {
         // 预览
         try
@@ -55,6 +74,15 @@ public class CameraController : ControllerBase
         }
     }
 
+    #endregion
+
+    #region 设置分辨率
+
+    /// <summary>
+    ///     设置分辨率
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns></returns>
     [HttpGet]
     [Route("Pixel")]
     public IActionResult Pixel([FromQuery] int index)
@@ -73,6 +101,14 @@ public class CameraController : ControllerBase
         return Ok("设置画质成功");
     }
 
+    #endregion
+
+    #region 自动拍照
+
+    /// <summary>
+    ///     自动拍照
+    /// </summary>
+    /// <returns></returns>
     [HttpGet]
     [Route("Auto")]
     public async Task<IActionResult> Auto()
@@ -83,7 +119,7 @@ public class CameraController : ControllerBase
             _cts = new CancellationTokenSource();
             var res = await _camera.TakeAutoPhotoAsync(_cts.Token);
             _operLog.AddOperLog("自动拍照", "自动拍照成功");
-            return Ok(new Dictionary<string, int> { { "exposure", res } });
+            return Ok(new Dictionary<string, long> { { "exposure", res } });
         }
         catch (Exception e)
         {
@@ -92,6 +128,16 @@ public class CameraController : ControllerBase
         }
     }
 
+    #endregion
+
+    #region 手动拍照
+
+    /// <summary>
+    ///     手动拍照
+    /// </summary>
+    /// <param name="exposure"></param>
+    /// <param name="frame"></param>
+    /// <returns></returns>
     [HttpGet]
     [Route("Manual")]
     public async Task<IActionResult> Manual([FromQuery] int exposure, [FromQuery] int frame)
@@ -112,6 +158,14 @@ public class CameraController : ControllerBase
         return Ok("手动拍照成功");
     }
 
+    #endregion
+
+    #region 取消拍照
+
+    /// <summary>
+    ///     取消拍照
+    /// </summary>
+    /// <returns></returns>
     [HttpGet]
     [Route("Cancel")]
     public IActionResult Cancel()
@@ -131,6 +185,14 @@ public class CameraController : ControllerBase
         return Ok("取消拍照成功");
     }
 
+    #endregion
+
+    #region 获取缓存图片
+
+    /// <summary>
+    ///     获取缓存图片
+    /// </summary>
+    /// <returns></returns>
     [HttpGet]
     [Route("Cache")]
     public async Task<IActionResult> Cache()
@@ -147,4 +209,6 @@ public class CameraController : ControllerBase
             return Problem($"{e.Message}");
         }
     }
+
+    #endregion
 }

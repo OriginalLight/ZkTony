@@ -155,6 +155,7 @@ watch(
   right: 8px;
   padding: 12px;
 }
+
 .image-info {
   position: absolute;
   top: 8px;

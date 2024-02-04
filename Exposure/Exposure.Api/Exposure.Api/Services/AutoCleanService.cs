@@ -6,10 +6,16 @@ public class AutoCleanService : IAutoCleanService
 {
     private readonly IErrorLogService _errorLog;
 
+    #region 构造函数
+
     public AutoCleanService(IErrorLogService errorLog)
     {
         _errorLog = errorLog;
     }
+
+    #endregion
+
+    #region 清理预览图
 
     /// <summary>
     ///     清理预览图
@@ -31,4 +37,6 @@ public class AutoCleanService : IAutoCleanService
 
         return Task.CompletedTask;
     }
+
+    #endregion
 }

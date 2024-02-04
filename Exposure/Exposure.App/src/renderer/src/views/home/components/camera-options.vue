@@ -78,7 +78,7 @@
               :placeholder="t('home.camera.options.minute')"
               mode="button"
               :min="0"
-              :max="30"
+              :max="59"
               :step="1"
               :input-attrs="{ style: { textAlign: 'center' } }"
             />

@@ -21,7 +21,7 @@
     "build:linux": "npm run build && electron-builder --linux --config"
   },
   "dependencies": {
-    "@arco-design/web-vue": "^2.54.3",
+    "@arco-design/web-vue": "^2.54.4",
     "@electron-toolkit/preload": "^3.0.0",
     "@electron-toolkit/utils": "^3.0.0",
     "@icon-park/vue-next": "^1.4.2",

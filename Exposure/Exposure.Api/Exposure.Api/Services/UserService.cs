@@ -8,15 +8,20 @@ namespace Exposure.Api.Services;
 
 public class UserService : BaseService<User>, IUserService
 {
-    private readonly IDbContext context;
-
+    private readonly IDbContext _context;
     // 登录状态
     private User? _logged;
+    
+    #region 构造函数
 
     public UserService(IDbContext dbContext) : base(dbContext)
     {
-        context = dbContext;
+        _context = dbContext;
     }
+
+    #endregion
+
+    #region 初始化
 
     /// <summary>
     ///     初始化
@@ -26,7 +31,7 @@ public class UserService : BaseService<User>, IUserService
     public async Task InitializeAsync()
     {
         // 查询超级管理员是否存在
-        var su = await context.db.Queryable<User>().Where(it => it.Role == 0).FirstAsync();
+        var su = await _context.db.Queryable<User>().Where(it => it.Role == 0).FirstAsync();
         if (su == null)
         {
             su = new User
@@ -39,9 +44,13 @@ public class UserService : BaseService<User>, IUserService
                 UpdateTime = DateTime.Now,
                 LastLoginTime = DateTime.Now
             };
-            await context.db.Insertable(su).ExecuteReturnIdentityAsync();
+            await _context.db.Insertable(su).ExecuteReturnIdentityAsync();
         }
     }
+
+    #endregion
+
+    #region 返回当前登录的用户
 
     /// <summary>
     ///     返回当前登录的用户
@@ -55,6 +64,10 @@ public class UserService : BaseService<User>, IUserService
         return user;
     }
 
+    #endregion
+
+    #region 登录
+
     /// <summary>
     ///     登录
     /// </summary>
@@ -64,7 +77,7 @@ public class UserService : BaseService<User>, IUserService
     public async Task<int> LogIn(string name, string password)
     {
         // 查询用户
-        var list = await context.db.Queryable<User>().Where(u => u.Name == name).ToListAsync();
+        var list = await _context.db.Queryable<User>().Where(u => u.Name == name).ToListAsync();
         // 检查用户是否存在
         if (list.Count == 0) return 1;
         // 获取用户
@@ -77,10 +90,14 @@ public class UserService : BaseService<User>, IUserService
         _logged = user;
         // 更新登录时间
         user.LastLoginTime = DateTime.Now;
-        await context.db.Updateable(user).ExecuteCommandAsync();
+        await _context.db.Updateable(user).ExecuteCommandAsync();
         // 返回成功
         return 0;
     }
+
+    #endregion
+
+    #region 注销
 
     /// <summary>
     ///     注销
@@ -91,6 +108,10 @@ public class UserService : BaseService<User>, IUserService
         _logged = null;
     }
 
+    #endregion
+
+    #region 分页查询
+
     /// <summary>
     ///     分页查询
     /// </summary>
@@ -99,7 +120,7 @@ public class UserService : BaseService<User>, IUserService
     /// <returns></returns>
     public async Task<List<User>> GetByPage(UserQueryDto dto, RefAsync<int> total)
     {
-        return await context.db.Queryable<User>()
+        return await _context.db.Queryable<User>()
             .Select(p => new User
             {
                 Id = p.Id,
@@ -116,6 +137,10 @@ public class UserService : BaseService<User>, IUserService
             .ToPageListAsync(dto.Page, dto.Size, total);
     }
 
+    #endregion
+
+    #region 根据名称查询
+
     /// <summary>
     ///     根据名称查询
     /// </summary>
@@ -123,6 +148,9 @@ public class UserService : BaseService<User>, IUserService
     /// <returns></returns>
     public async Task<User?> GetByName(string dtoName)
     {
-        return await context.db.Queryable<User>().Where(u => u.Name == dtoName).FirstAsync();
+        return await _context.db.Queryable<User>().Where(u => u.Name == dtoName).FirstAsync();
     }
+
+    #endregion
+    
 }

@@ -9,15 +9,25 @@ namespace Exposure.Api.Services;
 public class OperLogService : BaseService<OperLog>, IOperLogService
 {
     private readonly IUserService _user;
-    private readonly IDbContext context;
+    private readonly IDbContext _context;
+    
+    #region 构造函数
 
     public OperLogService(IDbContext dbContext, IUserService userService) : base(dbContext)
     {
-        context = dbContext;
+        _context = dbContext;
         _user = userService;
     }
 
+    #endregion
 
+    #region 添加操作日志
+
+    /// <summary>
+    ///     添加操作日志
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="desc"></param>
     public void AddOperLog(string type, string desc)
     {
         var logged = _user.GetLogged();
@@ -30,13 +40,23 @@ public class OperLogService : BaseService<OperLog>, IOperLogService
                 Description = desc,
                 Time = DateTime.Now
             };
-            context.db.Insertable(operLog).ExecuteReturnIdentity();
+            _context.db.Insertable(operLog).ExecuteReturnIdentity();
         }
     }
 
+    #endregion
+
+    #region 分页查询
+
+    /// <summary>
+    ///     分页查询
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <param name="total"></param>
+    /// <returns></returns>
     public async Task<List<OperLogOutDto>> GetByPage(OperLogQueryDto dto, RefAsync<int> total)
     {
-        var list = await context.db.Queryable<OperLog>()
+        var list = await _context.db.Queryable<OperLog>()
             .WhereIF(dto.Date != null, p => p.Time >= dto.Date)
             .WhereIF(dto.Date != null, p => p.Time < dto.Date!.Value.AddDays(1))
             .OrderBy(p => p.Time, OrderByType.Desc)
@@ -44,7 +64,7 @@ public class OperLogService : BaseService<OperLog>, IOperLogService
         // 提取出userI并去重
         var ids = list.Select(p => p.UserId).Distinct().ToArray();
         // 查询用户
-        var users = await context.db.Queryable<User>().Select(p => new User
+        var users = await _context.db.Queryable<User>().Select(p => new User
         {
             Id = p.Id,
             Name = p.Name,
@@ -65,13 +85,22 @@ public class OperLogService : BaseService<OperLog>, IOperLogService
         }).ToList();
     }
 
+    #endregion
+
+    #region 根据id查询
+
+    /// <summary>
+    ///     根据id查询
+    /// </summary>
+    /// <param name="ids"></param>
+    /// <returns></returns>
     public async Task<List<OperLogOutDto>> GetByIds(object[] ids)
     {
-        var list = await context.db.Queryable<OperLog>().Where(p => ids.Contains(p.Id)).ToListAsync();
+        var list = await _context.db.Queryable<OperLog>().Where(p => ids.Contains(p.Id)).ToListAsync();
         // 提取出userI并去重
         var userIds = list.Select(p => p.UserId).Distinct().ToArray();
         // 查询用户
-        var users = await context.db.Queryable<User>().Select(p => new User
+        var users = await _context.db.Queryable<User>().Select(p => new User
         {
             Id = p.Id,
             Name = p.Name,
@@ -91,4 +120,6 @@ public class OperLogService : BaseService<OperLog>, IOperLogService
             Time = p.Time
         }).ToList();
     }
+
+    #endregion
 }

@@ -16,13 +16,19 @@ namespace Exposure.Api.Services;
 public class PictureService : BaseService<Picture>, IPictureService
 {
     private readonly IUserService _user;
-    private readonly IDbContext context;
+    private readonly IDbContext _context;
+    
+    #region 构造函数
 
     public PictureService(IDbContext dbContext, IUserService user) : base(dbContext)
     {
-        context = dbContext;
+        _context = dbContext;
         _user = user;
     }
+
+    #endregion
+
+    #region 分页查询
 
     /// <summary>
     ///     分页查询
@@ -34,10 +40,10 @@ public class PictureService : BaseService<Picture>, IPictureService
     {
         var logged = _user.GetLogged();
         if (logged == null) return new List<Picture>();
-        var lower = await context.db.Queryable<User>().Where(u => u.Role > logged.Role).ToListAsync();
+        var lower = await _context.db.Queryable<User>().Where(u => u.Role > logged.Role).ToListAsync();
         var users = lower.Append(logged).ToList();
         var ids = users.Select(u => u.Id).ToList();
-        return await context.db.Queryable<Picture>()
+        return await _context.db.Queryable<Picture>()
             .Where(p => p.IsDelete == dto.IsDeleted)
             .WhereIF(!string.IsNullOrEmpty(dto.Name), p => dto.Name != null && p.Name.Contains(dto.Name))
             .WhereIF(dto.StartTime != null, p => p.CreateTime >= dto.StartTime)
@@ -47,6 +53,10 @@ public class PictureService : BaseService<Picture>, IPictureService
             .ToPageListAsync(dto.Page, dto.Size, total);
     }
 
+    #endregion
+
+    #region 添加并返回实体
+
     /// <summary>
     ///     添加并返回实体
     /// </summary>
@@ -54,9 +64,13 @@ public class PictureService : BaseService<Picture>, IPictureService
     /// <returns></returns>
     public Task<Picture> AddReturnModel(Picture picture)
     {
-        var id = context.db.Insertable(picture).ExecuteReturnIdentity();
-        return context.db.Queryable<Picture>().InSingleAsync(id);
+        var id = _context.db.Insertable(picture).ExecuteReturnIdentity();
+        return _context.db.Queryable<Picture>().InSingleAsync(id);
     }
+
+    #endregion
+
+    #region 根据id查询
 
     /// <summary>
     ///     根据id查询
@@ -65,8 +79,12 @@ public class PictureService : BaseService<Picture>, IPictureService
     /// <returns></returns>
     public async Task<List<Picture>> GetByIds(object[] ids)
     {
-        return await context.db.Queryable<Picture>().Where(p => ids.Contains(p.Id)).ToListAsync();
+        return await _context.db.Queryable<Picture>().Where(p => ids.Contains(p.Id)).ToListAsync();
     }
+
+    #endregion
+
+    #region 合并图片
 
     /// <summary>
     ///     合并图片
@@ -125,6 +143,10 @@ public class PictureService : BaseService<Picture>, IPictureService
         });
     }
 
+    #endregion
+
+    #region 删除
+
     /// <summary>
     ///     调整图片
     /// </summary>
@@ -140,10 +162,7 @@ public class PictureService : BaseService<Picture>, IPictureService
         // 增强对比度
         image.Mutate(x => x.Contrast(dto.Contrast / 100.0f));
 
-        if (dto.Invert)
-        {
-            image.Mutate(x => x.Invert());
-        }
+        if (dto.Invert) image.Mutate(x => x.Invert());
         // 保存图片
         var myPictures = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
         var savePath = Path.Combine(myPictures, "Exposure");
@@ -151,7 +170,7 @@ public class PictureService : BaseService<Picture>, IPictureService
         var date = DateTime.Now.ToString("yyyyMMddHHmmss");
         var filePath = Path.Combine(savePath, $"{date}.png");
         await image.SaveAsPngAsync(filePath);
-        
+
         var width = image.Width;
         var height = image.Height;
 
@@ -184,13 +203,25 @@ public class PictureService : BaseService<Picture>, IPictureService
         });
     }
 
+    #endregion
+
+    #region 更新
+
+    /// <summary>
+    ///     更新
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
     public async Task<bool> Update(PictureUpdateDto model)
     {
-        var pic = await context.db.Queryable<Picture>().InSingleAsync(model.Id);
+        var pic = await _context.db.Queryable<Picture>().InSingleAsync(model.Id);
         if (pic == null) return false;
         if (string.IsNullOrEmpty(model.Name)) return false;
         pic.Name = model.Name;
-        var res = await context.db.Updateable(pic).ExecuteCommandAsync();
+        var res = await _context.db.Updateable(pic).ExecuteCommandAsync();
         return res > 0;
     }
+
+    #endregion
+    
 }

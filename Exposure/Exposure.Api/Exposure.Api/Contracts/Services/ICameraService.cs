@@ -34,7 +34,7 @@ public interface ICameraService
     /// </summary>
     /// <param name="ctsToken"></param>
     /// <returns></returns>
-    Task<int> TakeAutoPhotoAsync(CancellationToken ctsToken);
+    Task<long> TakeAutoPhotoAsync(CancellationToken ctsToken);
 
     /// <summary>
     ///     手动拍照

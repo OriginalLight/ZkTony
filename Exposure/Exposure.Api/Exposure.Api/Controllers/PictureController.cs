@@ -16,12 +16,19 @@ public class PictureController : ControllerBase
     private readonly IPictureService _picture;
     private readonly IUsbService _usb;
 
+    #region 构造函数
+
+    /// <inheritdoc />
     public PictureController(IPictureService picture, IOperLogService operLog, IUsbService usb)
     {
         _usb = usb;
         _picture = picture;
         _operLog = operLog;
     }
+
+    #endregion
+
+    #region 分页查询
 
     /// <summary>
     ///     分页查询
@@ -42,6 +49,10 @@ public class PictureController : ControllerBase
         });
     }
 
+    #endregion
+
+    #region 添加
+
     /// <summary>
     ///     添加
     /// </summary>
@@ -51,15 +62,15 @@ public class PictureController : ControllerBase
     public async Task<IActionResult> Update([FromBody] PictureUpdateDto dto)
     {
         // 更新
-        if (await _picture.Update(dto))
-        {
-            // 插入日志
-            _operLog.AddOperLog("更新", $"更新照片: {dto.Id}");
-            return Ok("更新成功");
-        }
-
-        return Problem("更新失败");
+        if (!await _picture.Update(dto)) return Problem("更新失败");
+        // 插入日志
+        _operLog.AddOperLog("更新", $"更新照片: {dto.Id}");
+        return Ok("更新成功");
     }
+
+    #endregion
+
+    #region 删除
 
     /// <summary>
     ///     删除
@@ -70,15 +81,15 @@ public class PictureController : ControllerBase
     public async Task<IActionResult> Delete([FromBody] object[] ids)
     {
         // 删除
-        if (await _picture.DeleteRange(ids))
-        {
-            // 插入日志
-            _operLog.AddOperLog("删除", $"删除照片: {string.Join(',', ids)}");
-            return Ok("删除成功");
-        }
-
-        return Problem("删除失败");
+        if (!await _picture.DeleteRange(ids)) return Problem("删除失败");
+        // 插入日志
+        _operLog.AddOperLog("删除", $"删除照片: {string.Join(',', ids)}");
+        return Ok("删除成功");
     }
+
+    #endregion
+
+    #region 合成
 
     /// <summary>
     ///     合成
@@ -103,6 +114,10 @@ public class PictureController : ControllerBase
             return Problem(e.Message);
         }
     }
+
+    #endregion
+
+    #region 导出
 
     /// <summary>
     ///     导出
@@ -135,6 +150,8 @@ public class PictureController : ControllerBase
                     _ => ImageFormat.Tiff
                 };
                 bitmap.Save(Path.Combine(path, $"{picture.Name}.{dto.Format}"), imageFormat);
+                // 释放资源
+                bitmap.Dispose();
             }
         }
         catch (Exception e)
@@ -147,6 +164,10 @@ public class PictureController : ControllerBase
         // 返回结果
         return Ok("导出成功");
     }
+
+    #endregion
+
+    #region 调整
 
     /// <summary>
     ///     调整
@@ -171,4 +192,6 @@ public class PictureController : ControllerBase
             return Problem(e.Message);
         }
     }
+
+    #endregion
 }

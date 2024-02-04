@@ -13,14 +13,20 @@ public class CameraService : ICameraService
     private string _flag = "auto";
     private Mat? _mat;
     private Nncam? _nncam;
-    private int _target;
     private int _seq;
+    private int _target;
+    
+    #region 构造函数
 
     public CameraService(IPictureService picture, IUserService user)
     {
         _picture = picture;
         _user = user;
     }
+
+    #endregion
+
+    #region 初始化
 
     /// <summary>
     ///     初始化 0: 成功 1: 无设备 2: 打开失败
@@ -50,6 +56,10 @@ public class CameraService : ICameraService
             throw new Exception("设置回调失败");
         }
     }
+
+    #endregion
+
+    #region 预览
 
     /// <summary>
     ///     预览
@@ -81,14 +91,14 @@ public class CameraService : ICameraService
             // 转换成灰度图
             Cv2.CvtColor(mat, mat, ColorConversionCodes.BGR2GRAY);
             mat.SaveImage(filePath);
-            
+
             return new Picture
             {
                 UserId = 0,
                 Name = "Preview",
                 Path = filePath,
-                Width = (int) info.width,
-                Height = (int) info.height,
+                Width = (int)info.width,
+                Height = (int)info.height,
                 Type = 0,
                 ExposureTime = 100000,
                 ExposureGain = info.expogain,
@@ -108,13 +118,17 @@ public class CameraService : ICameraService
         }
     }
 
+    #endregion
+
+    #region 自动拍照
+
     /// <summary>
     ///     自动拍照
     /// </summary>
     /// <param name="ctsToken"></param>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
-    public async Task<int> TakeAutoPhotoAsync(CancellationToken ctsToken)
+    public async Task<long> TakeAutoPhotoAsync(CancellationToken ctsToken)
     {
         Initialize();
         if (_nncam == null) return 0;
@@ -124,7 +138,7 @@ public class CameraService : ICameraService
         _target = 3;
         _seq = 0;
         _flag = "auto";
-        var targetExpo = 1000000;
+        nint targetExpo = 1000000;
 
         // 获取像素
         if (!_nncam.get_Size(out var width, out var height)) throw new Exception("获取像素失败");
@@ -143,10 +157,7 @@ public class CameraService : ICameraService
             // 转换成灰度图
             Cv2.CvtColor(mat, mat, ColorConversionCodes.BGR2GRAY);
             var expo = CalculateExpo(mat, targetExpo, 0.5);
-            if (expo > 1000000 * 60 * 30)
-            {
-                throw new Exception("曝光时间过长");
-            }
+            if (expo > 1000000L * 60L * 60L) throw new Exception("曝光时间过长");
             targetExpo = (int)expo;
         }
         finally
@@ -179,12 +190,16 @@ public class CameraService : ICameraService
         }
 
         // 设置曝光时
-        if (!_nncam.put_ExpoTime((uint) targetExpo)) throw new Exception("设置曝光图曝光时间失败");
+        if (!_nncam.put_ExpoTime((uint)targetExpo)) throw new Exception("设置曝光图曝光时间失败");
 
         if (!_nncam.Trigger(1)) throw new Exception("拍摄曝光图失败");
 
         return targetExpo;
     }
+
+    #endregion
+
+    #region 手动拍照
 
     /// <summary>
     ///     手动拍照
@@ -228,10 +243,14 @@ public class CameraService : ICameraService
         }
 
         // 设置曝光时
-        if (!_nncam.put_ExpoTime((uint) (exposure / frame))) throw new Exception("设置多帧曝光时间失败");
+        if (!_nncam.put_ExpoTime((uint)(exposure / frame))) throw new Exception("设置多帧曝光时间失败");
 
-        if (!_nncam.Trigger((ushort) frame)) throw new Exception("拍摄曝光图失败");
+        if (!_nncam.Trigger((ushort)frame)) throw new Exception("拍摄曝光图失败");
     }
+
+    #endregion
+
+    #region 取消拍照
 
     /// <summary>
     ///     取消拍照
@@ -241,6 +260,10 @@ public class CameraService : ICameraService
         Initialize();
         if (!(_nncam != null && _nncam.Trigger(0))) throw new Exception("取消失败");
     }
+
+    #endregion
+
+    #region 获取缓存
 
     /// <summary>
     ///     获取缓存
@@ -259,6 +282,10 @@ public class CameraService : ICameraService
 
         return _pictureList;
     }
+
+    #endregion
+
+    #region 设置增益
 
     /// <summary>
     ///     设置增益
@@ -281,16 +308,19 @@ public class CameraService : ICameraService
 
         _nncam?.Stop();
         _nncam?.put_eSize(index);
-        if (!SetCallBack())
-        {
-            _nncam?.Close();
-            _nncam = null;
-            throw new Exception("设置回调失败");
-        }
+
+        if (SetCallBack()) return;
+        _nncam?.Close();
+        _nncam = null;
+        throw new Exception("设置回调失败");
     }
 
+    #endregion
+
+    #region 获取温度
+
     /// <summary>
-    ///     设置白平衡
+    ///     获取温度
     /// </summary>
     /// <returns></returns>
     public double GetTemperature()
@@ -299,6 +329,10 @@ public class CameraService : ICameraService
 
         return nTemp / 10.0;
     }
+
+    #endregion
+
+    #region 设置回调
 
     /// <summary>
     ///     设置回调
@@ -324,6 +358,10 @@ public class CameraService : ICameraService
         });
     }
 
+    #endregion
+
+    #region 设备错误
+
     /// <summary>
     ///     设备错误
     /// </summary>
@@ -333,6 +371,10 @@ public class CameraService : ICameraService
         _nncam = null;
     }
 
+    #endregion
+
+    #region 断开连接
+
     /// <summary>
     ///     断开连接
     /// </summary>
@@ -341,6 +383,10 @@ public class CameraService : ICameraService
         _nncam?.Close();
         _nncam = null;
     }
+
+    #endregion
+
+    #region 获取图片
 
     /// <summary>
     ///     获取图片
@@ -363,7 +409,7 @@ public class CameraService : ICameraService
                 if (_mat == null)
                 {
                     _mat = mat.Clone();
-                    _pictureList.Add(await SaveAsync(mat, info, (int) expoTime * _seq, 1));
+                    _pictureList.Add(await SaveAsync(mat, info, (int)expoTime * _seq, 1));
                 }
                 else
                 {
@@ -372,7 +418,7 @@ public class CameraService : ICameraService
                     {
                         Cv2.Add(mat, _mat, mat1);
                         _mat = mat1.Clone();
-                        _pictureList.Add(await SaveAsync(mat1, info, (int) expoTime * _seq, 1));
+                        _pictureList.Add(await SaveAsync(mat1, info, (int)expoTime * _seq, 1));
                     }
                     finally
                     {
@@ -383,14 +429,14 @@ public class CameraService : ICameraService
             }
             else
             {
-                _pictureList.Add(await SaveAsync(mat, info, (int) expoTime * _seq, 1));
+                _pictureList.Add(await SaveAsync(mat, info, (int)expoTime * _seq, 1));
 
                 if (_mat == null) return;
                 var mat1 = new Mat(height, width, MatType.CV_8UC3, new Scalar(0));
                 try
                 {
                     Cv2.Add(mat, _mat, mat1);
-                    _pictureList.Add(await SaveAsync(mat1, info, (int) expoTime * _seq, 2, 1));
+                    _pictureList.Add(await SaveAsync(mat1, info, (int)expoTime * _seq, 2, 1));
                 }
                 finally
                 {
@@ -406,6 +452,10 @@ public class CameraService : ICameraService
             Marshal.FreeHGlobal(buffer);
         }
     }
+
+    #endregion
+
+    #region 保存图片
 
     /// <summary>
     ///     保存图片
@@ -446,8 +496,8 @@ public class CameraService : ICameraService
             UserId = _user.GetLogged()?.Id ?? 0,
             Name = date,
             Path = filePath,
-            Width = (int) info.width,
-            Height = (int) info.height,
+            Width = (int)info.width,
+            Height = (int)info.height,
             Type = type,
             Thumbnail = thumbnailFilePath,
             ExposureTime = exposureTime,
@@ -462,14 +512,18 @@ public class CameraService : ICameraService
         return pic;
     }
 
+    #endregion
+
+    #region 计算曝光时间
+
     /// <summary>
-    ///     计算信噪比
+    ///     计算曝光时间
     /// </summary>
     /// <param name="mat"></param>
     /// <param name="expo"></param>
     /// <param name="snr"></param>
     /// <returns></returns>
-    private double CalculateExpo(Mat mat,int expo, double snr)
+    private long CalculateExpo(Mat mat, nint expo, double snr)
     {
         // 计算信噪比
         Cv2.MeanStdDev(mat, out var mean, out var stddev);
@@ -477,6 +531,8 @@ public class CameraService : ICameraService
         //计算曝光时间比例
         var ratio = Math.Pow(snr / snr1, 2);
         //计算目标曝光时间
-        return expo / ratio;
+        return (long)(expo / ratio);
     }
+
+    #endregion
 }
