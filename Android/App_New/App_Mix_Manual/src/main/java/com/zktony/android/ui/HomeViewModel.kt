@@ -1565,7 +1565,7 @@ class HomeViewModel @Inject constructor(
                         _uiFlags.value = UiFlags.objects(4)
                     }
                     //制胶完成后的声音提示
-                    ApplicationUtils.ctx.playAudio(R.raw.error)
+                    ApplicationUtils.ctx.playAudio(R.raw.startend)
 
                 } catch (ex: Exception) {
                     lightRed()
