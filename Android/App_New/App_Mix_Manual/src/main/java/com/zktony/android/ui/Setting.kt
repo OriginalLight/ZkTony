@@ -2,20 +2,16 @@ package com.zktony.android.ui
 
 import android.graphics.Color.rgb
 import android.util.Log
-import android.widget.TableRow
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,52 +22,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowCircleUp
-import androidx.compose.material.icons.filled.ArrowRight
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Cyclone
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Numbers
-import androidx.compose.material.icons.filled.Speed
-import androidx.compose.material.icons.filled.TextFields
-import androidx.compose.material.icons.filled.TrendingDown
-import androidx.compose.material.icons.filled.TrendingUp
-import androidx.compose.material.icons.filled.Tune
-import androidx.compose.material.icons.outlined.Grade
-import androidx.compose.material.icons.outlined.HelpOutline
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Navigation
-import androidx.compose.material.icons.outlined.Security
-import androidx.compose.material.icons.outlined.Sync
-import androidx.compose.material.icons.outlined.Verified
-import androidx.compose.material.icons.outlined.Wifi
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -82,29 +47,15 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextIndent
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -112,41 +63,33 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 //import com.zktony.android.BuildConfig
 import com.zktony.android.R
+import com.zktony.android.data.dao.ErrorRecordDao
 import com.zktony.android.data.datastore.rememberDataSaverState
-import com.zktony.android.data.entities.Motor
+import com.zktony.android.data.entities.ErrorRecord
 import com.zktony.android.data.entities.NewCalibration
 import com.zktony.android.data.entities.Program
 import com.zktony.android.data.entities.Setting
-import com.zktony.android.data.entities.internal.Point
-import com.zktony.android.ui.components.CoordinateInput
 import com.zktony.android.ui.components.DebugModeAppBar
-import com.zktony.android.ui.components.HomeAppBar
-import com.zktony.android.ui.components.MotorItem
-import com.zktony.android.ui.components.SettingsAppBar
+import com.zktony.android.ui.components.TableTextBody
+import com.zktony.android.ui.components.TableTextHead
 import com.zktony.android.ui.components.VerificationCodeField
 import com.zktony.android.ui.components.VerificationCodeItem
 import com.zktony.android.ui.navigation.NavigationActions
-import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.AnimatedContent
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
-import com.zktony.android.ui.utils.items
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.line
 import com.zktony.android.ui.utils.toList
-import com.zktony.android.utils.AlgorithmUtils
 import com.zktony.android.utils.AlgorithmUtils.calculateCalibrationFactorNew
 import com.zktony.android.utils.AppStateUtils
-import com.zktony.android.utils.ApplicationUtils
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.SerialPortUtils.start
 import com.zktony.android.utils.extra.Application
 import com.zktony.android.utils.extra.dateFormat
-import com.zktony.android.utils.extra.format
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 //import com.zktony.serialport.BuildConfig
 import kotlinx.coroutines.launch
 
@@ -170,6 +113,8 @@ fun SettingRoute(viewModel: SettingViewModel) {
 
     val entities = viewModel.entities.collectAsLazyPagingItems()
     val proEntities = viewModel.proEntities.collectAsLazyPagingItems()
+    val erroeEntities = viewModel.errorEntities.collectAsLazyPagingItems()
+
     val slEntitiy by viewModel.slEntitiy.collectAsStateWithLifecycle(initialValue = null)
     val ncEntitiy by viewModel.ncEntitiy.collectAsStateWithLifecycle(initialValue = null)
     val navigation: () -> Unit = {
@@ -191,13 +136,20 @@ fun SettingRoute(viewModel: SettingViewModel) {
             contentScale = ContentScale.FillBounds
         )
         Column {
-            DebugModeAppBar(page) {
-                navigation()
+            if (page == PageType.SETTINGS) {
+                DebugModeAppBar(page) {
+                    navigation()
+                }
             }
             AnimatedContent(targetState = page) {
                 when (page) {
                     PageType.SETTINGS -> SettingLits(
-                        slEntitiy, ncEntitiy, application, progress, viewModel::dispatch
+                        slEntitiy,
+                        ncEntitiy,
+                        application,
+                        progress,
+                        viewModel::dispatch,
+                        erroeEntities
                     )
 
                     PageType.DEBUGMODE -> debug(
@@ -206,7 +158,6 @@ fun SettingRoute(viewModel: SettingViewModel) {
                         slEntitiy,
                         job,
                         uiFlags,
-                        navigationActions
                     )
 
                     else -> {}
@@ -224,7 +175,8 @@ fun SettingLits(
     c1: NewCalibration?,
     application: Application?,
     progress: Int,
-    uiEvent: (SettingIntent) -> Unit
+    uiEvent: (SettingIntent) -> Unit,
+    erroeEntities: LazyPagingItems<ErrorRecord>
 ) {
     var setting = s1 ?: Setting()
 
@@ -485,6 +437,11 @@ fun SettingLits(
     //================校准数据=============================
 
 
+    var selectedIndex by remember { mutableStateOf(0) }
+    //	定义列宽
+    val cellWidthList = arrayListOf(70, 115, 241)
+
+
     Column(
         modifier = Modifier
             .padding(start = 13.75.dp)
@@ -507,7 +464,7 @@ fun SettingLits(
                         .padding(top = 36.2.dp)
                         .width(39.2.dp)
                         .height(142.1.dp)
-                        .clip(RoundedCornerShape(5.dp))
+                        .clip(RoundedCornerShape(10.dp))
                         .background(
                             if (switchColum == 0) Color(
                                 0, 105, 52
@@ -562,7 +519,7 @@ fun SettingLits(
                         .padding(top = 36.2.dp)
                         .width(39.2.dp)
                         .height(142.1.dp)
-                        .clip(RoundedCornerShape(5.dp))
+                        .clip(RoundedCornerShape(10.dp))
                         .background(
                             if (switchColum == 1) Color(
                                 0, 105, 52
@@ -617,7 +574,7 @@ fun SettingLits(
                         .padding(top = 36.2.dp)
                         .width(39.2.dp)
                         .height(142.1.dp)
-                        .clip(RoundedCornerShape(5.dp))
+                        .clip(RoundedCornerShape(10.dp))
                         .background(
                             if (switchColum == 2) Color(
                                 0, 105, 52
@@ -672,7 +629,7 @@ fun SettingLits(
                         .padding(top = 36.2.dp)
                         .width(39.2.dp)
                         .height(142.1.dp)
-                        .clip(RoundedCornerShape(5.dp))
+                        .clip(RoundedCornerShape(10.dp))
                         .background(
                             if (switchColum == 3) Color(
                                 0, 105, 52
@@ -744,7 +701,9 @@ fun SettingLits(
                         ) {
                             Text(
                                 modifier = Modifier.padding(top = 10.dp, start = 24.7.dp),
-                                text = "高浓度泵", fontSize = 18.sp, fontWeight = FontWeight.Bold
+                                text = "高浓度泵",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold
                             )
                             OutlinedTextField(
                                 modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
@@ -834,7 +793,9 @@ fun SettingLits(
                         ) {
                             Text(
                                 modifier = Modifier.padding(top = 10.dp, start = 24.7.dp),
-                                text = "低浓度泵", fontSize = 18.sp, fontWeight = FontWeight.Bold
+                                text = "低浓度泵",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold
                             )
 
 
@@ -899,7 +860,9 @@ fun SettingLits(
                         ) {
                             Text(
                                 modifier = Modifier.padding(top = 10.dp, start = 24.7.dp),
-                                text = "冲洗液泵", fontSize = 20.sp, fontWeight = FontWeight.Bold
+                                text = "冲洗液泵",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
                             )
 
                             OutlinedTextField(
@@ -963,7 +926,9 @@ fun SettingLits(
                         ) {
                             Text(
                                 modifier = Modifier.padding(top = 10.dp, start = 24.7.dp),
-                                text = "促凝剂泵", fontSize = 20.sp, fontWeight = FontWeight.Bold
+                                text = "促凝剂泵",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
                             )
 
                             OutlinedTextField(
@@ -1025,34 +990,29 @@ fun SettingLits(
                             Button(modifier = Modifier
                                 .padding(start = 60.dp)
                                 .width(112.0.dp)
-                                .height(41.5.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(rgb(0, 105, 52))
-                                ),
-                                shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
-                                onClick = {
-                                    setting.higeCleanVolume =
-                                        higeCleanVolume_ex.toDoubleOrNull() ?: 0.0
-                                    setting.higeRehearsalVolume =
-                                        higeRehearsalVolume_ex.toDoubleOrNull() ?: 0.0
-                                    setting.higeFilling = higeFilling_ex.toDoubleOrNull() ?: 0.0
-                                    setting.lowCleanVolume =
-                                        lowCleanVolume_ex.toDoubleOrNull() ?: 0.0
-                                    setting.lowFilling = lowFilling_ex.toDoubleOrNull() ?: 0.0
-                                    setting.rinseCleanVolume =
-                                        rinseCleanVolume_ex.toDoubleOrNull() ?: 0.0
-                                    setting.rinseFilling = rinseFilling_ex.toDoubleOrNull() ?: 0.0
-                                    setting.coagulantCleanVolume =
-                                        coagulantCleanVolume_ex.toDoubleOrNull() ?: 0.0
-                                    setting.coagulantFilling =
-                                        coagulantFilling_ex.toDoubleOrNull() ?: 0.0
-                                    uiEvent(SettingIntent.UpdateSet(setting))
+                                .height(41.5.dp), colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ), shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp), onClick = {
+                                setting.higeCleanVolume = higeCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                setting.higeRehearsalVolume =
+                                    higeRehearsalVolume_ex.toDoubleOrNull() ?: 0.0
+                                setting.higeFilling = higeFilling_ex.toDoubleOrNull() ?: 0.0
+                                setting.lowCleanVolume = lowCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                setting.lowFilling = lowFilling_ex.toDoubleOrNull() ?: 0.0
+                                setting.rinseCleanVolume =
+                                    rinseCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                setting.rinseFilling = rinseFilling_ex.toDoubleOrNull() ?: 0.0
+                                setting.coagulantCleanVolume =
+                                    coagulantCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                setting.coagulantFilling =
+                                    coagulantFilling_ex.toDoubleOrNull() ?: 0.0
+                                uiEvent(SettingIntent.UpdateSet(setting))
 
-                                    Toast.makeText(
-                                        context, "保存成功！", Toast.LENGTH_SHORT
-                                    ).show()
+                                Toast.makeText(
+                                    context, "保存成功！", Toast.LENGTH_SHORT
+                                ).show()
 
-                                }) {
+                            }) {
                                 Text(text = "保    存", fontSize = 18.sp)
                             }
 
@@ -1060,14 +1020,11 @@ fun SettingLits(
                             Button(modifier = Modifier
                                 .padding(start = 40.dp)
                                 .width(120.0.dp)
-                                .height(41.5.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(rgb(0, 105, 52))
-                                ),
-                                shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
-                                onClick = {
-                                    expectedResetDialog.value = true
-                                }) {
+                                .height(41.5.dp), colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ), shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp), onClick = {
+                                expectedResetDialog.value = true
+                            }) {
                                 Text(text = "恢复默认", fontSize = 18.sp)
                             }
 
@@ -1116,7 +1073,7 @@ fun SettingLits(
                                                 timeOut = 1000L * 30
                                                 with(
                                                     index = 2,
-                                                    pdv = 51200L * 10,
+                                                    pdv = 51200L * 50,
                                                     ads = Triple(
                                                         rinseSpeed.value * 13,
                                                         rinseSpeed.value * 1193,
@@ -1243,7 +1200,7 @@ fun SettingLits(
                                                 timeOut = 1000L * 30
                                                 with(
                                                     index = 3,
-                                                    pdv = 51200L * 10,
+                                                    pdv = 51200L * 50,
                                                     ads = Triple(
                                                         rinseSpeed.value * 13,
                                                         rinseSpeed.value * 1193,
@@ -1369,7 +1326,7 @@ fun SettingLits(
                                                 timeOut = 1000L * 30
                                                 with(
                                                     index = 4,
-                                                    pdv = 32000L,
+                                                    pdv = 3200L * 50,
                                                     ads = Triple(
                                                         rinseSpeed.value * 13,
                                                         rinseSpeed.value * 1193,
@@ -1511,7 +1468,7 @@ fun SettingLits(
 
                             OutlinedTextField(
                                 modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
-                                value = rinseLiquidVolume1_ex,
+                                value = coagulantLiquidVolume1_ex,
                                 textStyle = TextStyle.Default.copy(
                                     fontSize = 18.sp,
                                 ),
@@ -1522,7 +1479,7 @@ fun SettingLits(
                                 ),
                                 label = { Text(text = "加液量1/g", fontSize = 14.sp) },
                                 onValueChange = {
-                                    rinseLiquidVolume1_ex = it
+                                    coagulantLiquidVolume1_ex = it
 
                                 },
                                 keyboardOptions = KeyboardOptions(
@@ -1536,7 +1493,7 @@ fun SettingLits(
 
                             OutlinedTextField(
                                 modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
-                                value = rinseLiquidVolume2_ex,
+                                value = coagulantLiquidVolume2_ex,
                                 textStyle = TextStyle.Default.copy(
                                     fontSize = 18.sp,
                                 ),
@@ -1547,7 +1504,7 @@ fun SettingLits(
                                 ),
                                 label = { Text(text = "加液量2/g", fontSize = 14.sp) },
                                 onValueChange = {
-                                    rinseLiquidVolume2_ex = it
+                                    coagulantLiquidVolume2_ex = it
 
                                 },
                                 keyboardOptions = KeyboardOptions(
@@ -1561,7 +1518,7 @@ fun SettingLits(
 
                             OutlinedTextField(
                                 modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
-                                value = rinseLiquidVolume3_ex,
+                                value = coagulantLiquidVolume3_ex,
                                 textStyle = TextStyle.Default.copy(
                                     fontSize = 18.sp,
                                 ),
@@ -1572,7 +1529,7 @@ fun SettingLits(
                                 ),
                                 label = { Text(text = "加液量3/g", fontSize = 14.sp) },
                                 onValueChange = {
-                                    rinseLiquidVolume3_ex = it
+                                    coagulantLiquidVolume3_ex = it
 
                                 },
                                 keyboardOptions = KeyboardOptions(
@@ -1596,77 +1553,73 @@ fun SettingLits(
                             Button(modifier = Modifier
                                 .padding(start = 60.dp)
                                 .width(112.0.dp)
-                                .height(41.5.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(rgb(0, 105, 52))
-                                ),
-                                shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
-                                onClick = {
-                                    newCalibration.higeLiquidVolume1 =
-                                        higeLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
-                                    newCalibration.higeLiquidVolume2 =
-                                        higeLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
-                                    newCalibration.higeLiquidVolume3 =
-                                        higeLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
+                                .height(41.5.dp), colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ), shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp), onClick = {
+                                newCalibration.higeLiquidVolume1 =
+                                    higeLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.higeLiquidVolume2 =
+                                    higeLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.higeLiquidVolume3 =
+                                    higeLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
 
-                                    newCalibration.lowLiquidVolume1 =
-                                        lowLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
-                                    newCalibration.lowLiquidVolume2 =
-                                        lowLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
-                                    newCalibration.lowLiquidVolume3 =
-                                        lowLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.lowLiquidVolume1 =
+                                    lowLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.lowLiquidVolume2 =
+                                    lowLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.lowLiquidVolume3 =
+                                    lowLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
 
-                                    newCalibration.rinseLiquidVolume1 =
-                                        rinseLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
-                                    newCalibration.rinseLiquidVolume2 =
-                                        rinseLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
-                                    newCalibration.rinseLiquidVolume3 =
-                                        rinseLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.rinseLiquidVolume1 =
+                                    rinseLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.rinseLiquidVolume2 =
+                                    rinseLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.rinseLiquidVolume3 =
+                                    rinseLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
 
-                                    newCalibration.coagulantLiquidVolume1 =
-                                        coagulantLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
-                                    newCalibration.coagulantLiquidVolume2 =
-                                        coagulantLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
-                                    newCalibration.coagulantLiquidVolume3 =
-                                        coagulantLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.coagulantLiquidVolume1 =
+                                    coagulantLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.coagulantLiquidVolume2 =
+                                    coagulantLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.coagulantLiquidVolume3 =
+                                    coagulantLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
 
-                                    newCalibration.higeAvg =
-                                        (newCalibration.higeLiquidVolume1 + newCalibration.higeLiquidVolume2 + newCalibration.higeLiquidVolume3) / 3
-                                    newCalibration.lowAvg =
-                                        (newCalibration.lowLiquidVolume1 + newCalibration.lowLiquidVolume2 + newCalibration.lowLiquidVolume3) / 3
-                                    newCalibration.rinseAvg =
-                                        (newCalibration.rinseLiquidVolume1 + newCalibration.rinseLiquidVolume2 + newCalibration.rinseLiquidVolume3) / 3
-                                    newCalibration.coagulantAvg =
-                                        (newCalibration.coagulantLiquidVolume1 + newCalibration.coagulantLiquidVolume1 + newCalibration.coagulantLiquidVolume1) / 3
+                                newCalibration.higeAvg =
+                                    (newCalibration.higeLiquidVolume1 + newCalibration.higeLiquidVolume2 + newCalibration.higeLiquidVolume3) / 3
+                                newCalibration.lowAvg =
+                                    (newCalibration.lowLiquidVolume1 + newCalibration.lowLiquidVolume2 + newCalibration.lowLiquidVolume3) / 3
+                                newCalibration.rinseAvg =
+                                    (newCalibration.rinseLiquidVolume1 + newCalibration.rinseLiquidVolume2 + newCalibration.rinseLiquidVolume3) / 3
+                                newCalibration.coagulantAvg =
+                                    (newCalibration.coagulantLiquidVolume1 + newCalibration.coagulantLiquidVolume1 + newCalibration.coagulantLiquidVolume1) / 3
 
 
-                                    AppStateUtils.hpc[0] =
-                                        calculateCalibrationFactorNew(64000, 120.0)
+                                AppStateUtils.hpc[0] = calculateCalibrationFactorNew(64000, 120.0)
 
-                                    AppStateUtils.hpc[1] = calculateCalibrationFactorNew(
-                                        coagulantpulse.value, newCalibration.coagulantAvg * 1000
-                                    )
+                                AppStateUtils.hpc[1] = calculateCalibrationFactorNew(
+                                    coagulantpulse.value, newCalibration.coagulantAvg * 1000
+                                )
 
-                                    AppStateUtils.hpc[2] = calculateCalibrationFactorNew(
-                                        51200 * 10, newCalibration.higeAvg * 1000
-                                    )
+                                AppStateUtils.hpc[2] = calculateCalibrationFactorNew(
+                                    51200 * 50, newCalibration.higeAvg * 1000
+                                )
 
-                                    AppStateUtils.hpc[3] = calculateCalibrationFactorNew(
-                                        51200 * 10, newCalibration.lowAvg * 1000
-                                    )
+                                AppStateUtils.hpc[3] = calculateCalibrationFactorNew(
+                                    51200 * 50, newCalibration.lowAvg * 1000
+                                )
 
-                                    AppStateUtils.hpc[4] = calculateCalibrationFactorNew(
-                                        32000, newCalibration.rinseAvg * 1000
-                                    )
+                                AppStateUtils.hpc[4] = calculateCalibrationFactorNew(
+                                    3200 * 50, newCalibration.rinseAvg * 1000
+                                )
 
 
 
-                                    uiEvent(SettingIntent.UpdateNC(newCalibration))
+                                uiEvent(SettingIntent.UpdateNC(newCalibration))
 
-                                    Toast.makeText(
-                                        context, "保存成功！", Toast.LENGTH_SHORT
-                                    ).show()
-                                }) {
+                                Toast.makeText(
+                                    context, "保存成功！", Toast.LENGTH_SHORT
+                                ).show()
+                            }) {
                                 Text(text = "保    存", fontSize = 18.sp)
                             }
 
@@ -1674,15 +1627,12 @@ fun SettingLits(
                             Button(modifier = Modifier
                                 .padding(start = 40.dp)
                                 .width(120.0.dp)
-                                .height(41.5.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(rgb(0, 105, 52))
-                                ),
-                                shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
-                                onClick = {
-                                    calibrationResetDialog.value = true
+                                .height(41.5.dp), colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ), shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp), onClick = {
+                                calibrationResetDialog.value = true
 
-                                }) {
+                            }) {
                                 Text(text = "恢复默认", fontSize = 18.sp)
                             }
 
@@ -1692,6 +1642,54 @@ fun SettingLits(
 
                 }
             } else if (switchColum == 2) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 20.dp, start = 50.dp),
+                ) {
+                    stickyHeader {
+                        Row(
+                            Modifier.background(Color(rgb(0, 105, 52)))
+                        ) {
+                            TableTextHead(text = "序号", width = cellWidthList[0])
+                            TableTextHead(text = "时        间", width = cellWidthList[1])
+                            TableTextHead(text = "故障情况", width = cellWidthList[2])
+                        }
+                    }
+
+                    itemsIndexed(erroeEntities) { index, item ->
+                        val selected = item == erroeEntities[selectedIndex]
+                        Row(
+                            modifier = Modifier
+                                .background(
+                                    if (index % 2 == 0) Color(
+                                        rgb(
+                                            239, 239, 239
+                                        )
+                                    ) else Color.White
+                                )
+                                .clickable(onClick = {
+                                    selectedIndex = index
+                                    Log.d(
+                                        "Test", "点击选中的=========$selectedIndex"
+                                    )
+                                })
+                        ) {
+                            TableTextBody(text = "" + item.id, width = cellWidthList[0], selected)
+                            TableTextBody(
+                                text = "" + item.createTime.dateFormat("yyyy-MM-dd"),
+                                width = cellWidthList[1],
+                                selected
+                            )
+                            TableTextBody(
+                                text = item.detail, width = cellWidthList[2], selected
+                            )
+
+                        }
+                    }
+
+
+                }
 
 
             } else if (switchColum == 3) {
@@ -1727,10 +1725,9 @@ fun SettingLits(
                                     text = "导航栏",
                                     fontSize = 30.sp
                                 )
-                                Switch(
-                                    colors = SwitchDefaults.colors(
-                                        checkedTrackColor = Color(rgb(0, 105, 52)),
-                                    ),
+                                Switch(colors = SwitchDefaults.colors(
+                                    checkedTrackColor = Color(rgb(0, 105, 52)),
+                                ),
                                     modifier = Modifier
                                         .height(32.dp)
                                         .padding(top = 40.dp, start = 220.dp),
@@ -1751,14 +1748,13 @@ fun SettingLits(
                                 line(Color(rgb(240, 240, 240)), 0f, 400f)
                             }
 
-                            Row(modifier = Modifier
-                                .clickable {
-                                    uiEvent(SettingIntent.NavTo(PageType.DEBUGMODE))
-                                }) {
+                            Row(modifier = Modifier.clickable {
+                                uiEvent(SettingIntent.NavTo(PageType.DEBUGMODE))
+                            }) {
                                 Text(
-                                    modifier = Modifier
-                                        .padding(top = 20.dp),
-                                    text = "调试模式", fontSize = 30.sp
+                                    modifier = Modifier.padding(top = 20.dp),
+                                    text = "调试模式",
+                                    fontSize = 30.sp
                                 )
 
                                 Image(
@@ -1779,14 +1775,13 @@ fun SettingLits(
                             }
                         }
 
-                        Row(modifier = Modifier
-                            .clickable {
+                        Row(modifier = Modifier.clickable {
 
-                            }) {
+                        }) {
                             Text(
-                                modifier = Modifier
-                                    .padding(top = 20.dp),
-                                text = "运行日志", fontSize = 30.sp
+                                modifier = Modifier.padding(top = 20.dp),
+                                text = "运行日志",
+                                fontSize = 30.sp
                             )
 
                             Image(
@@ -1806,14 +1801,13 @@ fun SettingLits(
                             line(Color(rgb(240, 240, 240)), 0f, 400f)
                         }
 
-                        Row(modifier = Modifier
-                            .clickable {
-                                uiEvent(SettingIntent.Network)
-                            }) {
+                        Row(modifier = Modifier.clickable {
+                            uiEvent(SettingIntent.Network)
+                        }) {
                             Text(
-                                modifier = Modifier
-                                    .padding(top = 20.dp),
-                                text = "网络设置", fontSize = 30.sp
+                                modifier = Modifier.padding(top = 20.dp),
+                                text = "网络设置",
+                                fontSize = 30.sp
                             )
 
                             Image(
@@ -1833,14 +1827,13 @@ fun SettingLits(
                             line(Color(rgb(240, 240, 240)), 0f, 400f)
                         }
 
-                        Row(modifier = Modifier
-                            .clickable {
+                        Row(modifier = Modifier.clickable {
 
-                            }) {
+                        }) {
                             Text(
-                                modifier = Modifier
-                                    .padding(top = 20.dp),
-                                text = "系统更新", fontSize = 30.sp
+                                modifier = Modifier.padding(top = 20.dp),
+                                text = "系统更新",
+                                fontSize = 30.sp
                             )
 
                             Image(
@@ -1861,14 +1854,13 @@ fun SettingLits(
                         }
 
                         if (superAdminPwd.value == currentPwd.value || deviceAdminPwd.value == currentPwd.value) {
-                            Row(modifier = Modifier
-                                .clickable {
-                                    updatePwdDialog.value = true
-                                }) {
+                            Row(modifier = Modifier.clickable {
+                                updatePwdDialog.value = true
+                            }) {
                                 Text(
-                                    modifier = Modifier
-                                        .padding(top = 20.dp),
-                                    text = "修改密码", fontSize = 30.sp
+                                    modifier = Modifier.padding(top = 20.dp),
+                                    text = "修改密码",
+                                    fontSize = 30.sp
                                 )
 
                                 Image(
@@ -1889,14 +1881,13 @@ fun SettingLits(
                             }
                         }
 
-                        Row(modifier = Modifier
-                            .clickable {
-                                accessoriesDialog.value = true
-                            }) {
+                        Row(modifier = Modifier.clickable {
+                            accessoriesDialog.value = true
+                        }) {
                             Text(
-                                modifier = Modifier
-                                    .padding(top = 20.dp),
-                                text = "配件寿命", fontSize = 30.sp
+                                modifier = Modifier.padding(top = 20.dp),
+                                text = "配件寿命",
+                                fontSize = 30.sp
                             )
 
                             Image(
@@ -1916,14 +1907,13 @@ fun SettingLits(
                             line(Color(rgb(240, 240, 240)), 0f, 400f)
                         }
 
-                        Row(modifier = Modifier
-                            .clickable {
-                                positionDialog.value = true
-                            }) {
+                        Row(modifier = Modifier.clickable {
+                            positionDialog.value = true
+                        }) {
                             Text(
-                                modifier = Modifier
-                                    .padding(top = 20.dp),
-                                text = "位置设置", fontSize = 30.sp
+                                modifier = Modifier.padding(top = 20.dp),
+                                text = "位置设置",
+                                fontSize = 30.sp
                             )
 
                             Image(
@@ -1945,9 +1935,9 @@ fun SettingLits(
 
                         Row {
                             Text(
-                                modifier = Modifier
-                                    .padding(top = 20.dp),
-                                text = "声音设置", fontSize = 30.sp
+                                modifier = Modifier.padding(top = 20.dp),
+                                text = "声音设置",
+                                fontSize = 30.sp
                             )
 
                             Row(
@@ -1955,8 +1945,7 @@ fun SettingLits(
                                     .padding(top = 20.dp)
                                     .padding(horizontal = 16.dp, vertical = 4.dp)
                                     .background(
-                                        color = Color(rgb(238, 238, 238)),
-                                        shape = CircleShape
+                                        color = Color(rgb(238, 238, 238)), shape = CircleShape
                                     )
                                     .padding(horizontal = 4.dp),
                             ) {
@@ -1966,9 +1955,7 @@ fun SettingLits(
                                         colors = ButtonDefaults.buttonColors(
                                             containerColor = if (selectRudio.value == destination.id) Color(
                                                 rgb(
-                                                    0,
-                                                    105,
-                                                    52
+                                                    0, 105, 52
                                                 )
                                             ) else Color(rgb(238, 238, 238)),
                                         ),
@@ -2000,16 +1987,13 @@ fun SettingLits(
                         Button(modifier = Modifier
                             .padding(start = 141.dp, top = 60.dp)
                             .width(131.8.dp)
-                            .height(41.5.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(rgb(0, 105, 52))
-                            ),
-                            shape = RoundedCornerShape(20.dp, 20.dp, 20.dp, 20.dp),
-                            onClick = {
-                                currentPwd.value = ""
-                                switchColum = 0
+                            .height(41.5.dp), colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(rgb(0, 105, 52))
+                        ), shape = RoundedCornerShape(20.dp, 20.dp, 20.dp, 20.dp), onClick = {
+                            currentPwd.value = ""
+                            switchColum = 0
 
-                            }) {
+                        }) {
                             Text(text = "登出", fontSize = 18.sp)
                         }
 
@@ -2279,8 +2263,7 @@ fun SettingLits(
                                 }
 
                                 Text(
-                                    modifier = Modifier.padding(start = 10.dp),
-                                    text = "预期寿命:"
+                                    modifier = Modifier.padding(start = 10.dp), text = "预期寿命:"
                                 )
 
                                 OutlinedTextField(
@@ -2319,8 +2302,7 @@ fun SettingLits(
                                 }
 
                                 Text(
-                                    modifier = Modifier.padding(start = 10.dp),
-                                    text = "预期寿命:"
+                                    modifier = Modifier.padding(start = 10.dp), text = "预期寿命:"
                                 )
                                 Text(
                                     modifier = Modifier.padding(start = 10.dp),
@@ -2367,8 +2349,7 @@ fun SettingLits(
                                 }
 
                                 Text(
-                                    modifier = Modifier.padding(start = 10.dp),
-                                    text = "预期寿命:"
+                                    modifier = Modifier.padding(start = 10.dp), text = "预期寿命:"
                                 )
 
                                 OutlinedTextField(
@@ -2407,8 +2388,7 @@ fun SettingLits(
                                 }
 
                                 Text(
-                                    modifier = Modifier.padding(start = 10.dp),
-                                    text = "预期寿命:"
+                                    modifier = Modifier.padding(start = 10.dp), text = "预期寿命:"
                                 )
                                 Text(
                                     modifier = Modifier.padding(start = 10.dp),
@@ -2457,8 +2437,7 @@ fun SettingLits(
                                 }
 
                                 Text(
-                                    modifier = Modifier.padding(start = 10.dp),
-                                    text = "预期寿命:"
+                                    modifier = Modifier.padding(start = 10.dp), text = "预期寿命:"
                                 )
 
                                 OutlinedTextField(
@@ -2497,8 +2476,7 @@ fun SettingLits(
                                 }
 
                                 Text(
-                                    modifier = Modifier.padding(start = 10.dp),
-                                    text = "预期寿命:"
+                                    modifier = Modifier.padding(start = 10.dp), text = "预期寿命:"
                                 )
                                 Text(
                                     modifier = Modifier.padding(start = 10.dp),
@@ -2711,33 +2689,26 @@ fun debug(
     slEntities: Setting?,
     job: Job?,
     uiFlags: UiFlags,
-    navigationActions: NavigationActions
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        debugMode(uiEvent, proEntities, slEntities, job, uiFlags, navigationActions)
+        debugMode(uiEvent, proEntities, slEntities, job, uiFlags)
     }
 }
 
 
 val AUDIO_DESTINATION = listOf(
     AudioDestination(
-        id = 1,
-        name = "蜂鸣"
-    ),
-    AudioDestination(
-        id = 2,
-        name = "语音"
-    ),
-    AudioDestination(
-        id = 3,
-        name = "静音"
+        id = 1, name = "蜂鸣"
+    ), AudioDestination(
+        id = 2, name = "语音"
+    ), AudioDestination(
+        id = 3, name = "静音"
     )
 )
 
 data class AudioDestination(
-    val id: Int,
-    val name: String
+    val id: Int, val name: String
 )
 

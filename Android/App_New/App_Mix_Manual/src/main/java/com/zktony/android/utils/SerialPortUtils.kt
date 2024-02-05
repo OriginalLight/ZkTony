@@ -363,7 +363,7 @@ object SerialPortUtils {
     }
 
     /**
-     * 运行结束时的闪烁
+     * 黄-快闪
      */
     suspend fun endStartFlashYellow() {
         SerialStoreUtils.get("led")?.sendByteArray(Protocol().apply {

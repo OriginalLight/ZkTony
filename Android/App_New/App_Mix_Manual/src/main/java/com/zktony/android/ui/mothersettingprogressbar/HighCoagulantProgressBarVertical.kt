@@ -12,6 +12,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
@@ -48,12 +49,12 @@ fun HighCoagulantProgressBarVertical(
 
 
     val volumeDescLayoutResult = rememberTextMeasurer().measure(
-        AnnotatedString("液量:" + volume),
+        AnnotatedString("${volume}mL"),
         TextStyle(color = Color(18, 95, 202), fontSize = 16.sp)
     )
 
     val concentrationDescLayoutResult = rememberTextMeasurer().measure(
-        AnnotatedString("浓度:$concentration%"),
+        AnnotatedString("$concentration%"),
         TextStyle(color = Color(18, 95, 202), fontSize = 16.sp),
     )
 

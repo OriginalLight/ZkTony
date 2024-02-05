@@ -27,7 +27,7 @@ data class Setting(
     var lowLife: Double = 0.0,
 
     /**
-     *  高浓度泵预计使用时间
+     *  清洗泵使用时间
      */
     var rinseTime: Double = 0.0,
 

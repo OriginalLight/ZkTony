@@ -113,16 +113,6 @@ fun DebugModeRoute(viewModel: SettingViewModel) {
 
     val slEntitiy by viewModel.slEntitiy.collectAsStateWithLifecycle(initialValue = null)
 
-//    val navigation: () -> Unit = {
-//        scope.launch {
-//            when (page) {
-//                PageType.DEBUGMODE -> navigationActions.navigateUp()
-//                else -> viewModel.dispatch(SettingIntent.NavTo(PageType.SETTINGS))
-//            }
-//        }
-//    }
-
-//    BackHandler { navigation() }
 
     LaunchedEffect(key1 = uiFlags) {
         if (uiFlags is UiFlags.Message) {
@@ -131,25 +121,18 @@ fun DebugModeRoute(viewModel: SettingViewModel) {
     }
 
     Column {
-//        DebugModeAppBar(PageType.DEBUGMODE) { navigation() }
-//        tar()
-        AnimatedContent(targetState = page) {
-            when (page) {
-                PageType.DEBUGMODE -> debugMode(
-                    viewModel::dispatch, proEntities.toList(), slEntitiy, job, uiFlags,navigationActions
-                )
-
-                else -> {}
-            }
-        }
+//        debugMode(
+//            viewModel::dispatch, proEntities.toList(), slEntitiy, job, uiFlags
+//        )
+//        AnimatedContent(targetState = page) {
+//            when (page) {
+//                PageType.DEBUGMODE ->
+//                else -> {}
+//            }
+//        }
     }
 }
 
-@Composable
-fun tar() {
-
-
-}
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -159,7 +142,6 @@ fun debugMode(
     s1: Setting?,
     job: Job?,
     uiFlags: UiFlags,
-    navigationActions:NavigationActions
 ) {
 
 
@@ -170,6 +152,8 @@ fun debugMode(
     val keyboard = LocalSoftwareKeyboardController.current
 
     val context = LocalContext.current
+
+    Log.d("debug", "uiFlags====$uiFlags")
 
     /**
      * 制胶速度，根据这个速度转换其他泵的速度
@@ -296,7 +280,8 @@ fun debugMode(
     /**
      * 制胶数量
      */
-    var glueNum by remember { mutableStateOf(1) }
+    val glueNum = rememberDataSaverState(key = "glueNum", default = 1)
+    var glueNum_ex by remember { mutableStateOf(glueNum.value.toString()) }
 
 
     val liquid = arrayListOf("是", "否")
@@ -332,6 +317,12 @@ fun debugMode(
     var rinseNum by remember { mutableStateOf(0) }
     //===============低浓度弹窗==============================
 
+    if (uiFlags is UiFlags.Objects && uiFlags.objects == 4) {
+        uiEvent(SettingIntent.Start(1))
+    } else if (uiFlags is UiFlags.Objects && uiFlags.objects == 6) {
+        uiEvent(SettingIntent.Stop)
+    }
+
     Column(
         modifier = Modifier
             .padding(start = 26.dp, top = 13.75.dp)
@@ -344,19 +335,13 @@ fun debugMode(
         Row(
             modifier = Modifier
                 .padding(top = 20.dp)
-//                .height(101.dp)
-//                .width(572.5.dp)
-//                .background(Color.White),
-            //垂直对齐
-//            verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
                 modifier = Modifier
                     .padding(start = 25.dp)
                     .size(30.dp)
                     .clickable {
-                        //系统设置
-                        navigationActions.navigate(Route.SETTING)
+                        uiEvent(SettingIntent.NavTo(PageType.SETTINGS))
                     },
                 painter = painterResource(id = R.mipmap.greenarrow),
                 contentDescription = null
@@ -1555,10 +1540,11 @@ fun debugMode(
 
                     OutlinedTextField(
                         modifier = Modifier.width(100.dp),
-                        value = glueNum.toString(),
+                        value = glueNum_ex,
                         label = { Text(text = "不输入默认持续运行") },
                         onValueChange = {
-                            glueNum = it.toIntOrNull() ?: 1
+                            glueNum_ex = it
+                            glueNum.value = glueNum_ex.toIntOrNull() ?: 1
                         },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
@@ -1628,6 +1614,7 @@ fun debugMode(
                             DropdownMenuItem(text = {
                                 Text(text = it.displayText)
                             }, onClick = {
+                                uiEvent(SettingIntent.Selected(it.id))
                                 selectIndex = it.displayText
                                 downMenu = false
 
@@ -1653,8 +1640,6 @@ fun debugMode(
                 } else {
                     uiEvent(SettingIntent.Start(0))
                 }
-
-
             }) {
                 Text(text = "开始")
             }

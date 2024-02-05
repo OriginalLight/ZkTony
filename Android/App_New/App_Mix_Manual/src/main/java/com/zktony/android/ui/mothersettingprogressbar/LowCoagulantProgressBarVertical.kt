@@ -46,12 +46,12 @@ fun LowCoagulantProgressBarVertical(
 
 
     val volumeDescLayoutResult = rememberTextMeasurer().measure(
-        AnnotatedString("液量:$volume"),
+        AnnotatedString("${volume}mL"),
         TextStyle(color = Color(18, 95, 202), fontSize = 16.sp)
     )
 
     val concentrationDescLayoutResult = rememberTextMeasurer().measure(
-        AnnotatedString("浓度:$concentration%"),
+        AnnotatedString("$concentration%"),
         TextStyle(color = Color(18, 95, 202), fontSize = 16.sp)
     )
 

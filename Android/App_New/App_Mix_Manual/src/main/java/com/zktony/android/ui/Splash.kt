@@ -1,5 +1,6 @@
 package com.zktony.android.ui
 
+import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Image
@@ -73,6 +74,7 @@ fun Splash() {
                     modifier = Modifier
                         .size(200.dp)
                         .clickable {
+                            Log.d("navigationActions","navigationActions===$navigationActions")
                             //实验记录
                             navigationActions.navigate(Route.EXPERIMENTRECORDS)
                         }

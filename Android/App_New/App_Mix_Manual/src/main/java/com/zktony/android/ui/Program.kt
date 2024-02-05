@@ -2,18 +2,14 @@ package com.zktony.android.ui
 
 import android.content.Context
 import android.graphics.Color.rgb
-import android.os.Build
-import android.os.Environment
 import android.os.storage.StorageManager
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,7 +28,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.AlertDialogDefaults.containerColor
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
@@ -68,7 +63,6 @@ import com.zktony.android.R
 import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.components.HomeAppBar
-import com.zktony.android.ui.components.ProgramAppBar
 import com.zktony.android.ui.components.TableTextBody
 import com.zktony.android.ui.components.TableTextHead
 import com.zktony.android.ui.utils.AnimatedContent
@@ -78,15 +72,11 @@ import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.toList
-import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.extra.dateFormat
 import com.zktony.android.utils.extra.format
 import kotlinx.coroutines.launch
 import java.io.File
-import java.io.PrintWriter
 import java.lang.reflect.Method
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -193,9 +183,7 @@ fun ProgramList(
      * 开始浓度
      */
     val startRange = rememberDataSaverState(key = "startRange", default = 0)
-    println("startRange===${startRange.value}")
     var startRange_ex by remember { mutableStateOf(startRange.value.toString()) }
-    println("startRange_ex===${startRange_ex}")
 
     /**
      * 结束浓度
@@ -236,7 +224,7 @@ fun ProgramList(
 
 
     //	定义列宽
-    val cellWidthList = arrayListOf(70, 100, 130, 70, 80, 120)
+    val cellWidthList = arrayListOf(70, 100, 120, 70, 90, 120)
     //	使用lazyColumn来解决大数据量时渲染的性能问题
     Column(
         modifier = Modifier
@@ -250,13 +238,13 @@ fun ProgramList(
             modifier = Modifier
                 .height(800.dp)
                 .fillMaxWidth()
-                .padding(top = 20.dp)
+                .padding(top = 20.dp, start = 2.dp)
         ) {
             stickyHeader {
                 Row(Modifier.background(Color(rgb(0, 105, 52)))) {
                     TableTextHead(text = "序号", width = cellWidthList[0])
                     TableTextHead(text = "名        称", width = cellWidthList[1])
-                    TableTextHead(text = "浓               度", width = cellWidthList[2])
+                    TableTextHead(text = "浓             度", width = cellWidthList[2])
                     TableTextHead(text = "厚度", width = cellWidthList[3])
                     TableTextHead(text = "创建人", width = cellWidthList[4])
                     TableTextHead(text = "日期", width = cellWidthList[5])
@@ -661,20 +649,29 @@ fun ProgramList(
                                     "文件名不能包含特殊字符！",
                                     Toast.LENGTH_SHORT
                                 ).show()
-
                             } else {
-
-                                if (entity != null) {
-                                    entity.displayText = displayText
-                                    entity.startRange = startRange_ex.toInt()
-                                    entity.endRange = endRange_ex.toInt()
-                                    entity.thickness = thickness.value
-                                    entity.coagulant = coagulant_ex.toInt()
-                                    entity.volume = volume_ex.toDouble()
-                                    entity.founder = founder
-                                    dispatch(ProgramIntent.Update(entity))
-                                    showingDialog.value = false
+                                if (startRange_ex.toInt() > endRange_ex.toInt()
+                                    || startRange_ex.toInt() < 0 || endRange_ex.toInt() < 0 || coagulant_ex.toInt() < 0 || volume_ex.toDouble() < 0
+                                ) {
+                                    Toast.makeText(
+                                        context,
+                                        "数据错误！",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    if (entity != null) {
+                                        entity.displayText = displayText
+                                        entity.startRange = startRange_ex.toInt()
+                                        entity.endRange = endRange_ex.toInt()
+                                        entity.thickness = thickness.value
+                                        entity.coagulant = coagulant_ex.toInt()
+                                        entity.volume = volume_ex.toDouble()
+                                        entity.founder = founder
+                                        dispatch(ProgramIntent.Update(entity))
+                                        showingDialog.value = false
+                                    }
                                 }
+
                             }
                         }
 
@@ -707,18 +704,30 @@ fun ProgramList(
                                 ).show()
 
                             } else {
-                                dispatch(
-                                    ProgramIntent.Insert(
-                                        displayText,
-                                        startRange_ex.toInt(),
-                                        endRange_ex.toInt(),
-                                        thickness.value,
-                                        coagulant_ex.toInt(),
-                                        volume_ex.toDouble(),
-                                        founder
+                                if (startRange_ex.toInt() > endRange_ex.toInt()
+                                    || startRange_ex.toInt() < 0 || endRange_ex.toInt() < 0 || coagulant_ex.toInt() < 0 || volume_ex.toDouble() < 0
+                                    || coagulant_ex.toInt() > 800 || volume_ex.toDouble() > 20
+                                ) {
+                                    Toast.makeText(
+                                        context,
+                                        "数据错误！",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    dispatch(
+                                        ProgramIntent.Insert(
+                                            displayText,
+                                            startRange_ex.toInt(),
+                                            endRange_ex.toInt(),
+                                            thickness.value,
+                                            coagulant_ex.toInt(),
+                                            volume_ex.toDouble(),
+                                            founder
+                                        )
                                     )
-                                )
-                                showingDialog.value = false
+                                    showingDialog.value = false
+                                }
+
                             }
 
                         }

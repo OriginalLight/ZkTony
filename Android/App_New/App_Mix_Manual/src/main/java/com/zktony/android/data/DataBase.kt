@@ -2,12 +2,14 @@ package com.zktony.android.data
 
 import androidx.room.*
 import com.zktony.android.data.dao.CalibrationDao
+import com.zktony.android.data.dao.ErrorRecordDao
 import com.zktony.android.data.dao.ExperimentRecordDao
 import com.zktony.android.data.dao.MotorDao
 import com.zktony.android.data.dao.NewCalibrationDao
 import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.dao.SettingDao
 import com.zktony.android.data.entities.Calibration
+import com.zktony.android.data.entities.ErrorRecord
 import com.zktony.android.data.entities.ExperimentRecord
 import com.zktony.android.data.entities.Motor
 import com.zktony.android.data.entities.NewCalibration
@@ -24,6 +26,7 @@ import com.zktony.android.data.entities.Setting
         Calibration::class,
         Program::class,
         ExperimentRecord::class,
+        ErrorRecord::class,
         Setting::class,
         NewCalibration::class
     ],
@@ -38,4 +41,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun ExperimentRecordDao(): ExperimentRecordDao
     abstract fun SettingDao(): SettingDao
     abstract fun NewCalibrationDao(): NewCalibrationDao
+    abstract fun ErrorRecordDao(): ErrorRecordDao
 }

@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,8 +27,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -53,7 +50,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.R
-import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.ExperimentRecord
 import com.zktony.android.ui.components.HomeAppBar
 import com.zktony.android.ui.components.TableTextBody
@@ -66,13 +62,9 @@ import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.toList
 import com.zktony.android.utils.extra.dateFormat
-import com.zktony.android.utils.extra.format
 import kotlinx.coroutines.launch
 import java.io.File
 import java.lang.reflect.Method
-import java.time.format.DateTimeFormatter
-import java.util.regex.Pattern
-import javax.inject.Inject
 import kotlin.reflect.KFunction1
 
 /**
@@ -180,7 +172,7 @@ fun experimentList(
             modifier = Modifier
                 .height(800.dp)
                 .fillMaxWidth()
-                .padding(top = 20.dp)
+                .padding(top = 20.dp, start = 15.dp)
         ) {
             stickyHeader {
                 Row(Modifier.background(Color(android.graphics.Color.rgb(0, 105, 52)))) {

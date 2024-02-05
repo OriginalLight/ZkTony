@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -158,37 +157,35 @@ fun DebugModeAppBar(
     val navigationActions = LocalNavigationActions.current
 
     if (page == PageType.DEBUGMODE) {
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 40.dp, vertical = 4.dp)
+                .padding(top = 20.dp),
+            horizontalArrangement = Arrangement.spacedBy(420.dp)
+        ) {
 
-//        Box(
-//            modifier = Modifier
-//                .background(Color.White)
-//                .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
-////                .height(41.dp)
-//        ) {
-//            Row(
-//                modifier = Modifier
-////                    .align(Alignment.BottomStart)
-////                    .offset(x = 13.75.dp)
-//                    .background(Color.Red),
-////                horizontalArrangement = Arrangement.spacedBy(7.6.dp)
-//            ) {
-//                Icon(
-//                    modifier = Modifier
-//                        .size(30.dp)
-//                        .clickable {
-//                            navigation()
-//                        },
-//                    painter = painterResource(id = R.mipmap.greenarrow),
-//                    contentDescription = stringResource(id = TOP_LEVEL_DESTINATIONS[4].iconTextId)
-//                )
-//
-//                if (page == PageType.DEBUGMODE) {
-//                    Text(text = "调试模式", fontSize = 20.sp, color = Color(rgb(112, 112, 112)))
-//                }
-//            }
-//
-//
-//        }
+            Icon(
+                modifier = Modifier
+                    .size(50.dp)
+                    .clickable {
+                        navigation()
+                    },
+                imageVector = Icons.Default.Reply,
+                contentDescription = null
+            )
+
+            Icon(
+                modifier = Modifier
+                    .size(50.dp)
+                    .clickable {
+                        navigationActions.navigateTo(TOP_LEVEL_DESTINATIONS[4])
+                    },
+                imageVector = Icons.Default.Home,
+                contentDescription = null
+            )
+
+
+        }
     } else {
         Box(
             modifier = Modifier

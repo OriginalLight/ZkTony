@@ -41,4 +41,6 @@ object RoomModule {
 
     @Provides
     fun NewCalibrationDao(database: AppDatabase) = database.NewCalibrationDao()
+    @Provides
+    fun ErrorRecordDao(database: AppDatabase) = database.ErrorRecordDao()
 }

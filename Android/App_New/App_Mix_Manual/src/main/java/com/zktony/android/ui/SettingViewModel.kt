@@ -11,11 +11,13 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 //import com.zktony.android.BuildConfig
 import com.zktony.android.R
+import com.zktony.android.data.dao.ErrorRecordDao
 import com.zktony.android.data.dao.MotorDao
 import com.zktony.android.data.dao.NewCalibrationDao
 import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.dao.SettingDao
 import com.zktony.android.data.datastore.DataSaverDataStore
+import com.zktony.android.data.entities.ErrorRecord
 import com.zktony.android.data.entities.Motor
 import com.zktony.android.data.entities.NewCalibration
 import com.zktony.android.data.entities.Setting
@@ -51,6 +53,7 @@ class SettingViewModel @Inject constructor(
     private val proDao: ProgramDao,
     private val slDao: SettingDao,
     private val ncDao: NewCalibrationDao,
+    private val errorDao: ErrorRecordDao,
     private val dataStore: DataSaverDataStore,
 ) : ViewModel() {
 
@@ -67,6 +70,12 @@ class SettingViewModel @Inject constructor(
      */
     private val _complate = MutableStateFlow(0)
 
+    /**
+     * 当前加液次数
+     */
+    private val _current = MutableStateFlow(0)
+
+
     val application = _application.asStateFlow()
     val selected = _selected.asStateFlow()
     val progress = _progress.asStateFlow()
@@ -80,6 +89,10 @@ class SettingViewModel @Inject constructor(
     val proEntities = Pager(
         config = PagingConfig(pageSize = 20, initialLoadSize = 40),
     ) { proDao.getByPage() }.flow.cachedIn(viewModelScope)
+
+    val errorEntities = Pager(
+        config = PagingConfig(pageSize = 20, initialLoadSize = 40),
+    ) { errorDao.getByPage() }.flow.cachedIn(viewModelScope)
 
 
     val slEntitiy = slDao.getById(1L)
@@ -95,6 +108,7 @@ class SettingViewModel @Inject constructor(
             }
         }
     }
+
 
     fun dispatch(intent: SettingIntent) {
         when (intent) {
@@ -171,99 +185,71 @@ class SettingViewModel @Inject constructor(
 
     private fun pipeline() {
         viewModelScope.launch {
-                _uiFlags.value = UiFlags.objects(5)
+            _uiFlags.value = UiFlags.objects(5)
+
+            /**
+             * 高浓度管路填充
+             */
+            val slEnetity = slDao.getById(1L).firstOrNull()
+            if (slEnetity != null) {
+                val higeFilling = slEnetity.higeFilling
 
                 /**
-                 * 高浓度管路填充
+                 * 低浓度管路填充
                  */
-                val slEnetity = slDao.getById(1L).firstOrNull()
-                if (slEnetity != null) {
-                    val higeFilling = slEnetity.higeFilling
+                val lowFilling = slEnetity.lowFilling
 
-                    /**
-                     * 低浓度管路填充
-                     */
-                    val lowFilling = slEnetity.lowFilling
-
-                    /**
-                     * 冲洗液泵管路填充
-                     */
-                    val rinseFilling = slEnetity.rinseFilling
+                /**
+                 * 冲洗液泵管路填充
+                 */
+                val rinseFilling = slEnetity.rinseFilling
 
 
-                    /**
-                     * 促凝剂泵管路填充
-                     */
-                    val coagulantFilling = slEnetity.coagulantFilling
+                /**
+                 * 促凝剂泵管路填充
+                 */
+                val coagulantFilling = slEnetity.coagulantFilling
 
-                    val p1 = SerialPortUtils.pulse(index = 1, dvp = coagulantFilling * 1000)
-                    /**
-                     * 促凝剂总行程
-                     */
-                    val coagulantpulse = dataStore.readData("coagulantpulse", 1080000).toLong()
+                val p1 = SerialPortUtils.pulse(index = 1, dvp = coagulantFilling * 1000)
 
-                    /**
-                     * 促凝剂转速
-                     */
-                    val coagulantSpeed = dataStore.readData("coagulantSpeed", 200L)
+                /**
+                 * 促凝剂总行程
+                 */
+                val coagulantpulse = dataStore.readData("coagulantpulse", 1080000).toLong()
 
-                    /**
-                     * 冲洗转速
-                     */
-                    val rinseSpeed = dataStore.readData("rinseSpeed", 600L)
+                /**
+                 * 促凝剂转速
+                 */
+                val coagulantSpeed = dataStore.readData("coagulantSpeed", 200L)
 
-                    /**
-                     * x轴转速
-                     */
-                    val xSpeed = dataStore.readData("xSpeed", 100L)
+                /**
+                 * 冲洗转速
+                 */
+                val rinseSpeed = dataStore.readData("rinseSpeed", 600L)
 
-                    val p1Count = p1.toDouble() / (coagulantpulse - 51200).toDouble()
+                /**
+                 * x轴转速
+                 */
+                val xSpeed = dataStore.readData("xSpeed", 100L)
 
-                    /**
-                     * 废液槽位置
-                     */
-                    val wastePosition = dataStore.readData("wastePosition", 0.0)
+                val p1Count = p1.toDouble() / (coagulantpulse - 51200).toDouble()
 
-                    SerialPortUtils.start {
-                        timeOut = 1000L * 60L * 10
-                        with(
-                            index = 0,
-                            pdv = wastePosition,
-                            ads = Triple(xSpeed * 20, xSpeed * 20, xSpeed * 20),
-                        )
-                    }
-                    delay(100L)
-                    if (p1Count > 1) {
-                        for (i in 0 until Math.ceil(p1Count).toInt()) {
-                            SerialPortUtils.start {
-                                timeOut = 1000L * 60L * 10
-                                with(
-                                    index = 1,
-                                    ads = Triple(
-                                        coagulantSpeed * 13,
-                                        coagulantSpeed * 1193,
-                                        coagulantSpeed * 1193
-                                    ),
-                                    pdv = coagulantpulse
-                                )
-                            }
-                            delay(100L)
-                            SerialPortUtils.start {
-                                timeOut = 1000L * 60L * 10
-                                with(
-                                    index = 1,
-                                    ads = Triple(
-                                        coagulantSpeed * 13,
-                                        coagulantSpeed * 1193,
-                                        coagulantSpeed * 1193
-                                    ),
-                                    pdv = -coagulantpulse
-                                )
-                            }
-                            delay(100L)
-                        }
+                /**
+                 * 废液槽位置
+                 */
+                val wastePosition = dataStore.readData("wastePosition", 0.0)
 
-                    } else {
+                SerialPortUtils.start {
+                    timeOut = 1000L * 60L * 10
+                    with(
+                        index = 0,
+                        pdv = wastePosition,
+                        ads = Triple(xSpeed * 20, xSpeed * 20, xSpeed * 20),
+                    )
+                }
+                delay(100L)
+                if (p1Count > 1) {
+                    for (i in 0 until Math.ceil(p1Count).toInt()) {
                         SerialPortUtils.start {
                             timeOut = 1000L * 60L * 10
                             with(
@@ -273,35 +259,64 @@ class SettingViewModel @Inject constructor(
                                     coagulantSpeed * 1193,
                                     coagulantSpeed * 1193
                                 ),
-                                pdv = coagulantFilling * 1000
+                                pdv = coagulantpulse
                             )
                         }
+                        delay(100L)
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 60L * 10
+                            with(
+                                index = 1,
+                                ads = Triple(
+                                    coagulantSpeed * 13,
+                                    coagulantSpeed * 1193,
+                                    coagulantSpeed * 1193
+                                ),
+                                pdv = -coagulantpulse
+                            )
+                        }
+                        delay(100L)
                     }
 
-
-                    delay(100L)
-
+                } else {
                     SerialPortUtils.start {
                         timeOut = 1000L * 60L * 10
                         with(
-                            index = 2,
-                            ads = Triple(rinseSpeed * 13, rinseSpeed * 1193, rinseSpeed * 1193),
-                            pdv = higeFilling * 1000
-                        )
-                        with(
-                            index = 3,
-                            ads = Triple(rinseSpeed * 13, rinseSpeed * 1193, rinseSpeed * 1193),
-                            pdv = lowFilling * 1000
-                        )
-                        with(
-                            index = 4,
-                            ads = Triple(rinseSpeed * 20, rinseSpeed * 20, rinseSpeed * 20),
-                            pdv = rinseFilling * 1000
+                            index = 1,
+                            ads = Triple(
+                                coagulantSpeed * 13,
+                                coagulantSpeed * 1193,
+                                coagulantSpeed * 1193
+                            ),
+                            pdv = coagulantFilling * 1000
                         )
                     }
-
-                    reset()
                 }
+
+
+                delay(100L)
+
+                SerialPortUtils.start {
+                    timeOut = 1000L * 60L * 10
+                    with(
+                        index = 2,
+                        ads = Triple(rinseSpeed * 13, rinseSpeed * 1193, rinseSpeed * 1193),
+                        pdv = higeFilling * 1000
+                    )
+                    with(
+                        index = 3,
+                        ads = Triple(rinseSpeed * 13, rinseSpeed * 1193, rinseSpeed * 1193),
+                        pdv = lowFilling * 1000
+                    )
+                    with(
+                        index = 4,
+                        ads = Triple(rinseSpeed * 20, rinseSpeed * 20, rinseSpeed * 20),
+                        pdv = rinseFilling * 1000
+                    )
+                }
+
+                reset()
+            }
 
 
         }
@@ -323,6 +338,7 @@ class SettingViewModel @Inject constructor(
                      * 高浓度清洗液量
                      */
                     val higeCleanVolume = slEnetity.higeCleanVolume
+
                     /**
                      * 低浓度清洗液量
                      */
@@ -451,6 +467,7 @@ class SettingViewModel @Inject constructor(
             }
         }
     }
+
     private fun reset() {
         viewModelScope.launch {
             _uiFlags.value = UiFlags.objects(1)
@@ -1218,18 +1235,395 @@ class SettingViewModel @Inject constructor(
             _job.value?.cancel()
             _job.value = null
             delay(200L)
-//            stop(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
             SerialPortUtils.stop(0, 1, 2, 3, 4)
             delay(200L)
-            reset()
+            try {
+                /**
+                 * 柱塞泵总行程
+                 */
+                val coagulantpulse = dataStore.readData("coagulantpulse", 1080000).toLong()
+
+                /**
+                 * 复位等待时间
+                 */
+                val coagulantTime = dataStore.readData("coagulantTime", 800).toLong()
+
+                /**
+                 * 复位后预排步数
+                 */
+                val coagulantResetPulse = dataStore.readData("coagulantResetPulse", 1500).toLong()
+                withTimeout(60 * 1000L) {
+                    /**
+                     * 0-x轴    3200/圈    0号光电-复位光电；1号光电-限位光电
+                     * 1-柱塞泵 12800/圈    2号光电
+                     * 2-高浓度
+                     * 3-低浓度
+                     * 4-清洗泵
+                     */
+                    /**
+                     * 0-x轴    3200/圈    0号光电-复位光电；1号光电-限位光电
+                     * 1-柱塞泵 12800/圈    2号光电
+                     * 2-高浓度
+                     * 3-低浓度
+                     * 4-清洗泵
+                     */
+
+                    //x轴复位===========================================
+                    SerialPortUtils.gpio(0, 1)
+                    delay(500L)
+                    Log.d(
+                        "HomeViewModel",
+                        "x轴光电状态====0号光电===" + SerialPortUtils.getGpio(0) + "====1号光电===" + SerialPortUtils.getGpio(
+                            1
+                        )
+                    )
+                    if (!SerialPortUtils.getGpio(0) && !SerialPortUtils.getGpio(1)) {
+                        Log.d(
+                            "HomeViewModel",
+                            "x轴反转64000L"
+                        )
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 0,
+                                pdv = -64000L,
+                                ads = Triple(1600, 1600, 1600),
+
+                                )
+                        }
+                        Log.d(
+                            "HomeViewModel",
+                            "x轴正转6400L"
+                        )
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 0,
+                                pdv = 3200L,
+                                ads = Triple(1600, 1600, 1600),
+
+                                )
+                        }
+                        Log.d(
+                            "HomeViewModel",
+                            "x轴反转6500L"
+                        )
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 0,
+                                pdv = -3300L,
+                                ads = Triple(1600, 1600, 1600),
+                            )
+                        }
+                        SerialPortUtils.gpio(0)
+                        delay(500L)
+                        if (SerialPortUtils.getGpio(0)) {
+
+                            Log.d(
+                                "HomeViewModel",
+                                "x轴正转1600L"
+                            )
+                            SerialPortUtils.start {
+                                timeOut = 1000L * 30
+                                with(
+                                    index = 0,
+                                    pdv = 1200L,
+                                    ads = Triple(1600, 1600, 1600),
+                                )
+                            }
+                            Log.d(
+                                "HomeViewModel",
+                                "复位完成"
+                            )
+                            //复位完成
+                        } else {
+                            Log.d(
+                                "HomeViewModel",
+                                "复位失败"
+                            )
+                            //复位失败
+                        }
+
+                    } else if (!SerialPortUtils.getGpio(0) && SerialPortUtils.getGpio(1)) {
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 0,
+                                pdv = -64000L,
+                                ads = Triple(1600, 1600, 1600),
+
+                                )
+                        }
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 0,
+                                pdv = 3200L,
+                                ads = Triple(1600, 1600, 1600),
+
+                                )
+                        }
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 0,
+                                pdv = -3300L,
+                                ads = Triple(1600, 1600, 1600),
+
+                                )
+                        }
+                        SerialPortUtils.gpio(0)
+                        delay(500L)
+                        if (SerialPortUtils.getGpio(0)) {
+                            SerialPortUtils.start {
+                                timeOut = 1000L * 30
+                                with(
+                                    index = 0,
+                                    pdv = 1600L,
+                                    ads = Triple(1600, 1600, 1600),
+
+                                    )
+                            }
+                            Log.d(
+                                "HomeViewModel",
+                                "复位完成"
+                            )
+                            //复位完成
+                        } else {
+                            Log.d(
+                                "HomeViewModel",
+                                "复位失败"
+                            )
+                            //复位失败
+                        }
+
+                    } else if (SerialPortUtils.getGpio(0) && !SerialPortUtils.getGpio(1)) {
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 0,
+                                pdv = 3200L,
+                                ads = Triple(1600, 1600, 1600),
+                            )
+                        }
+                        SerialPortUtils.gpio(0)
+                        delay(500L)
+                        if (SerialPortUtils.getGpio(0)) {
+                            Log.d(
+                                "HomeViewModel",
+                                "复位失败"
+                            )
+                        } else {
+                            SerialPortUtils.start {
+                                timeOut = 1000L * 30
+                                with(
+                                    index = 0,
+                                    pdv = -3300L,
+                                    ads = Triple(1600, 1600, 1600),
+
+                                    )
+                            }
+                            Log.d(
+                                "HomeViewModel",
+                                "复位完成"
+                            )
+                            SerialPortUtils.start {
+                                timeOut = 1000L * 30
+                                with(
+                                    index = 0,
+                                    pdv = 1200L,
+                                    ads = Triple(1600, 1600, 1600),
+                                )
+                            }
+                        }
+                    } else {
+                        Log.d(
+                            "HomeViewModel",
+                            "复位失败"
+                        )
+                    }
+                    //x轴复位===========================================
+
+
+                    // 查询GPIO状态
+                    //柱塞泵复位===========================================
+                    SerialPortUtils.gpio(2)
+                    delay(500L)
+                    Log.d(
+                        "HomeViewModel",
+                        "注射泵光电状态====2号光电===" + SerialPortUtils.getGpio(2)
+                    )
+                    if (!SerialPortUtils.getGpio(2)) {
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 1,
+                                pdv = coagulantpulse + 20000L,
+                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+                            )
+                        }
+                        delay(300L)
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 1,
+                                pdv = -64000L,
+                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+                            )
+                        }
+                        delay(300L)
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 1,
+                                pdv = 64500L,
+                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+                            )
+                        }
+                        delay(coagulantTime)
+
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 1,
+                                pdv = -coagulantpulse,
+                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+                            )
+                        }
+
+                        delay(300L)
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 1,
+                                pdv = coagulantResetPulse,
+                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+                            )
+                        }
+                        delay(300L)
+                        SerialPortUtils.gpio(2)
+                        delay(1500L)
+                        Log.d(
+                            "HomeViewModel",
+                            "注射泵光电状态====2号光电===" + SerialPortUtils.getGpio(2)
+                        )
+                        delay(300L)
+                        if (!SerialPortUtils.getGpio(2)) {
+
+                            delay(300L)
+                            Log.d(
+                                "HomeViewModel",
+                                "柱塞泵复位成功"
+                            )
+                            //复位完成
+                        } else {
+                            Log.d(
+                                "HomeViewModel",
+                                "柱塞泵复位失败"
+                            )
+                            //复位失败
+                        }
+                    } else {
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 1,
+                                pdv = -64000L,
+                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+
+                                )
+                        }
+                        delay(300L)
+
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 1,
+                                pdv = 64500L,
+                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+                            )
+                        }
+                        delay(coagulantTime)
+                        Log.d(
+                            "HomeViewModel",
+                            "柱塞泵复位完成"
+                        )
+                        //复位完成
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 1,
+                                pdv = -coagulantpulse,
+                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+                            )
+                        }
+                        delay(300L)
+
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 1,
+                                pdv = coagulantResetPulse,
+                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+                            )
+                        }
+
+                        delay(300L)
+                        SerialPortUtils.gpio(2)
+                        delay(500L)
+                        Log.d(
+                            "HomeViewModel",
+                            "注射泵光电状态====2号光电===" + SerialPortUtils.getGpio(2)
+                        )
+                        if (SerialPortUtils.getGpio(2)) {
+                            Log.d(
+                                "HomeViewModel",
+                                "柱塞泵复位失败"
+                            )
+                            //复位失败
+                        } else {
+                            Log.d(
+                                "HomeViewModel",
+                                "柱塞泵复位完成"
+                            )
+                        }
+
+                    }
+                    //柱塞泵复位===========================================
+
+                }
+                _uiFlags.value = UiFlags.none()
+            } catch (ex: Exception) {
+                _uiFlags.value = UiFlags.message("复位超时请重试")
+            }
+            delay(200L)
+            val slEnetity = slDao.getById(1L).firstOrNull()
+            if (slEnetity != null) {
+                val rinseCleanVolume = slEnetity.rinseCleanVolume
+
+                /**
+                 * 冲洗转速
+                 */
+                val rinseSpeed = dataStore.readData("rinseSpeed", 600L)
+                SerialPortUtils.start {
+                    timeOut = 1000L * 60L * 10
+                    with(
+                        index = 4,
+                        ads = Triple(rinseSpeed * 20, rinseSpeed * 20, rinseSpeed * 20),
+                        pdv = rinseCleanVolume * 1000
+                    )
+                }
+            }
         }
     }
 
     private fun startJob(status: Int) {
-
         viewModelScope.launch {
+            println("进入startJob")
             _uiFlags.value = UiFlags.objects(0)
             val selected = proDao.getById(_selected.value).firstOrNull()
+            println("selected===$selected")
             if (selected == null) {
                 _uiFlags.value = UiFlags.message("未选择程序")
                 return@launch
@@ -1237,18 +1631,12 @@ class SettingViewModel @Inject constructor(
 
 
             val setting = slDao.getById(1L).firstOrNull()
+            println("setting===$setting")
             if (setting == null) {
                 _uiFlags.value = UiFlags.message("系统参数无数据")
                 return@launch
             }
 
-            if (status == 0) {
-                _complate.value = 0
-            }
-            /**
-             * 要完成的制胶数量
-             */
-            val expectedMakeNum = dataStore.readData("expectedMakenum", 1)
 
             val xSpeed = dataStore.readData("xSpeed", 600L)
 
@@ -1292,7 +1680,7 @@ class SettingViewModel @Inject constructor(
 
             //03制胶所需时间（s）=制胶总步数/每圈脉冲数/制胶速度（rpm）×60
             //制胶速度，根据这个速度转换其他泵的速度
-            val speed = dataStore.readData("speed", 0)
+            val speed = dataStore.readData("speed", 180)
             Log.d(
                 "HomeViewModel_startJob",
                 "===制胶速度===$speed"
@@ -1306,21 +1694,9 @@ class SettingViewModel @Inject constructor(
             //03制胶所需时间（s）=制胶总步数/每圈脉冲数/制胶速度（rpm）×60
 
             //04高浓度泵启动速度（rpm）=制胶速度（rpm）×（制胶高浓度-母液低浓度）/（母液高浓度-母液低浓度）
-            //母液低浓度
-            val lowCoagulant = dataStore.readData("lowCoagulant", 0f)
-            Log.d(
-                "HomeViewModel_startJob",
-                "===母液低浓度===$lowCoagulant"
-            )
-            //母液高浓度
-            val highCoagulant = dataStore.readData("highCoagulant", 0f)
-            Log.d(
-                "HomeViewModel_startJob",
-                "===母液高浓度===$highCoagulant"
-            )
             //高浓度泵启动速度
             val highStartSpeed =
-                speed * (selected.endRange - lowCoagulant) / (highCoagulant - lowCoagulant)
+                speed * (selected.endRange - selected.startRange) / (selected.endRange - selected.startRange)
             Log.d(
                 "HomeViewModel_startJob",
                 "===04高浓度泵启动速度===$highStartSpeed"
@@ -1329,7 +1705,7 @@ class SettingViewModel @Inject constructor(
 
             //05低浓度泵结束速度（rpm）=制胶速度（rpm）×（制胶低浓度-母液高浓度）/（母液低浓度-母液高浓度）
             val lowEndSpeed =
-                speed * (selected.startRange - highCoagulant) / (lowCoagulant - highCoagulant)
+                speed * (selected.startRange - selected.endRange) / (selected.startRange - selected.endRange)
             Log.d(
                 "HomeViewModel_startJob",
                 "===05低浓度泵结束速度===$lowEndSpeed"
@@ -1520,216 +1896,425 @@ class SettingViewModel @Inject constructor(
 
 
 
+
             _job.value?.cancel()
             _job.value = launch {
                 try {
-                    SerialPortUtils.cleanLight()
+                    for (i in 1..8) {
+
+
+                        var coagulantBool = false
+                        var coagulantStart = 0L
+                        var currurStatus = status
+                        Log.d(
+                            "HomeViewModel_startJob",
+                            "===运动次数status===$status"
+                        )
+                        if (currurStatus == 0) {
+                            _complate.value = 0
+                        } else {
+                            //计算柱塞泵是否够下一次运动
+                            /**
+                             * 柱塞泵总行程
+                             */
+                            val coagulantpulse =
+                                dataStore.readData("coagulantpulse", 1080000).toLong()
+
+                            /**
+                             * 已经运动的柱塞泵步数
+                             */
+                            coagulantStart =
+                                coagulantExpectedPulse.toLong() * currurStatus + coagulantPulseCount.toLong() * currurStatus
+                            Log.d(
+                                "HomeViewModel_startJob",
+                                "===已经运动的柱塞泵步数===$coagulantStart"
+                            )
+                            /**
+                             * 柱塞泵剩余步数
+                             */
+                            val coagulantSy = coagulantpulse - coagulantStart
+                            Log.d(
+                                "HomeViewModel_startJob",
+                                "===柱塞泵剩余步数===$coagulantSy"
+                            )
+
+                            if (coagulantSy < coagulantExpectedPulse.toLong() + coagulantPulseCount.toLong()) {
+                                /**
+                                 * 柱塞泵剩余步数不够加液
+                                 */
+                                coagulantBool = true
+                            }
+
+                        }
+
+
+                        SerialPortUtils.cleanLight()
+
+                        if (currurStatus == 0) {
+                            /**
+                             * 高浓度管路填充
+                             */
+                            val slEnetity = slDao.getById(1L).firstOrNull()
+                            if (slEnetity != null) {
+                                val higeFilling = slEnetity.higeFilling
+
+                                /**
+                                 * 低浓度管路填充
+                                 */
+                                val lowFilling = slEnetity.lowFilling
+
+                                /**
+                                 * 冲洗液泵管路填充
+                                 */
+                                val rinseFilling = slEnetity.rinseFilling
+
+
+                                /**
+                                 * 促凝剂泵管路填充
+                                 */
+                                val coagulantFilling = slEnetity.coagulantFilling
+
+                                val p1 =
+                                    SerialPortUtils.pulse(index = 1, dvp = coagulantFilling * 1000)
+
+                                /**
+                                 * 促凝剂总行程
+                                 */
+                                val coagulantpulse =
+                                    dataStore.readData("coagulantpulse", 1080000).toLong()
+
+                                /**
+                                 * 促凝剂转速
+                                 */
+                                val coagulantSpeed = dataStore.readData("coagulantSpeed", 200L)
+
+                                /**
+                                 * 冲洗转速
+                                 */
+                                val rinseSpeed = dataStore.readData("rinseSpeed", 600L)
+
+                                /**
+                                 * x轴转速
+                                 */
+                                val xSpeed = dataStore.readData("xSpeed", 100L)
+
+                                val p1Count = p1.toDouble() / (coagulantpulse - 51200).toDouble()
+
+                                /**
+                                 * 废液槽位置
+                                 */
+                                val wastePosition = dataStore.readData("wastePosition", 0.0)
+
+                                SerialPortUtils.start {
+                                    timeOut = 1000L * 60L * 10
+                                    with(
+                                        index = 0,
+                                        pdv = wastePosition,
+                                        ads = Triple(xSpeed * 20, xSpeed * 20, xSpeed * 20),
+                                    )
+                                }
+                                delay(100L)
+                                if (p1Count > 1) {
+                                    for (i in 0 until Math.ceil(p1Count).toInt()) {
+                                        SerialPortUtils.start {
+                                            timeOut = 1000L * 60L * 10
+                                            with(
+                                                index = 1,
+                                                ads = Triple(
+                                                    coagulantSpeed * 13,
+                                                    coagulantSpeed * 1193,
+                                                    coagulantSpeed * 1193
+                                                ),
+                                                pdv = coagulantpulse
+                                            )
+                                        }
+                                        delay(100L)
+                                        SerialPortUtils.start {
+                                            timeOut = 1000L * 60L * 10
+                                            with(
+                                                index = 1,
+                                                ads = Triple(
+                                                    coagulantSpeed * 13,
+                                                    coagulantSpeed * 1193,
+                                                    coagulantSpeed * 1193
+                                                ),
+                                                pdv = -coagulantpulse
+                                            )
+                                        }
+                                        delay(100L)
+                                    }
+
+                                } else {
+                                    SerialPortUtils.start {
+                                        timeOut = 1000L * 60L * 10
+                                        with(
+                                            index = 1,
+                                            ads = Triple(
+                                                coagulantSpeed * 13,
+                                                coagulantSpeed * 1193,
+                                                coagulantSpeed * 1193
+                                            ),
+                                            pdv = coagulantFilling * 1000
+                                        )
+                                    }
+                                }
+
+
+                                delay(100L)
+
+                                SerialPortUtils.start {
+                                    timeOut = 1000L * 60L * 10
+                                    with(
+                                        index = 2,
+                                        ads = Triple(
+                                            rinseSpeed * 13,
+                                            rinseSpeed * 1193,
+                                            rinseSpeed * 1193
+                                        ),
+                                        pdv = higeFilling * 1000
+                                    )
+                                    with(
+                                        index = 3,
+                                        ads = Triple(
+                                            rinseSpeed * 13,
+                                            rinseSpeed * 1193,
+                                            rinseSpeed * 1193
+                                        ),
+                                        pdv = lowFilling * 1000
+                                    )
+                                    with(
+                                        index = 4,
+                                        ads = Triple(
+                                            rinseSpeed * 20,
+                                            rinseSpeed * 20,
+                                            rinseSpeed * 20
+                                        ),
+                                        pdv = rinseFilling * 1000
+                                    )
+                                }
+
+                            }
+                            delay(100L)
+                        }
+
+                        if (coagulantBool) {
+                            Log.d(
+                                "HomeViewModel_startJob",
+                                "===柱塞泵回到下拉到底==="
+                            )
+                            SerialPortUtils.start {
+                                timeOut = 1000L * 60 * 1
+
+                                with(
+                                    index = 1,
+                                    pdv = -coagulantStart,
+                                    ads = Triple(
+                                        (600 * 13).toLong(),
+                                        (600 * 1193).toLong(),
+                                        (600 * 1193).toLong()
+                                    )
+                                )
+                            }
+                            Log.d(
+                                "HomeViewModel_startJob",
+                                "===柱塞泵回到下拉到底==="
+                            )
+                        }
 
 
 //===================废液槽运动开始=====================
-                    Log.d(
-                        "HomeViewModel_startJob",
-                        "===废液槽运动开始==="
-                    )
-                    //废液槽位置
-                    SerialPortUtils.start {
-                        timeOut = 1000L * 60L
-                        with(
-                            index = 0,
-                            pdv = setting.wastePosition,
-                            ads = Triple(xSpeed * 20, xSpeed * 20, xSpeed * 20),
+                        Log.d(
+                            "HomeViewModel_startJob",
+                            "===废液槽运动开始==="
                         )
-                    }
-                    Log.d(
-                        "HomeViewModel_startJob",
-                        "===废液槽运动结束==="
-                    )
+                        //废液槽位置
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 60L
+                            with(
+                                index = 0,
+                                pdv = setting.wastePosition,
+                                ads = Triple(xSpeed * 20, xSpeed * 20, xSpeed * 20),
+                            )
+                        }
+                        Log.d(
+                            "HomeViewModel_startJob",
+                            "===废液槽运动结束==="
+                        )
 //===================废液槽运动结束=====================
 
-                    /**
-                     * 预排液
-                     */
-                    //===================预排液开始=====================
-                    Log.d(
-                        "HomeViewModel",
-                        "===预排液开始==="
-                    )
-                    SerialPortUtils.start {
-                        timeOut = 1000L * 60 * 1
-
-                        with(
-                            index = 1,
-                            pdv = coagulantExpectedPulse.toLong(),
-                            ads = Triple(
-                                0L,
-                                (expectedCoagulantSpeed * 1193).toLong(),
-                                (expectedCoagulantSpeed * 1193).toLong()
-                            )
+                        /**
+                         * 预排液
+                         */
+                        //===================预排液开始=====================
+                        Log.d(
+                            "HomeViewModel",
+                            "===预排液开始==="
                         )
 
-                        with(
-                            index = 2,
-                            pdv = highExpectedPulse.toLong(),
-                            ads = Triple(
-                                0L,
-                                (highExpectedSpeed * 1193).toLong(),
-                                (highExpectedSpeed * 1193).toLong()
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 60 * 1
+
+                            with(
+                                index = 1,
+                                pdv = coagulantExpectedPulse.toLong(),
+                                ads = Triple(
+                                    0L,
+                                    (expectedCoagulantSpeed * 1193).toLong(),
+                                    (expectedCoagulantSpeed * 1193).toLong()
+                                )
                             )
+
+                            with(
+                                index = 2,
+                                pdv = highExpectedPulse.toLong(),
+                                ads = Triple(
+                                    0L,
+                                    (highExpectedSpeed * 1193).toLong(),
+                                    (highExpectedSpeed * 1193).toLong()
+                                )
+                            )
+
+                            with(
+                                index = 3,
+                                pdv = lowExpectedPulse.toLong(),
+                                ads = Triple(
+                                    0L,
+                                    (lowExpectedSpeed * 1193).toLong(),
+                                    (lowExpectedSpeed * 1193).toLong()
+                                )
+                            )
+                        }
+
+                        //===================预排液结束=====================
+                        Log.d(
+                            "HomeViewModel",
+                            "===预排液结束==="
                         )
 
-                        with(
-                            index = 3,
-                            pdv = lowExpectedPulse.toLong(),
-                            ads = Triple(
-                                0L,
-                                (lowExpectedSpeed * 1193).toLong(),
-                                (lowExpectedSpeed * 1193).toLong()
-                            )
+
+                        //===================制胶位置移动开始=====================
+                        Log.d(
+                            "HomeViewModel",
+                            "===制胶位置移动开始==="
                         )
-                    }
-
-                    //===================预排液结束=====================
-                    Log.d(
-                        "HomeViewModel",
-                        "===预排液结束==="
-                    )
-
-
-                    //===================制胶位置移动开始=====================
-                    Log.d(
-                        "HomeViewModel",
-                        "===制胶位置移动开始==="
-                    )
-                    //制胶位置
-                    SerialPortUtils.start {
-                        timeOut = 1000L * 60L
+                        //制胶位置
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 60L
 //                        with(index = 0, pdv = glueBoardPosition)
-                        with(
-                            index = 0,
-                            pdv = setting.glueBoardPosition,
-                            ads = Triple(xSpeed * 20, xSpeed * 20, xSpeed * 20),
-                        )
-
-                    }
-                    Log.d(
-                        "HomeViewModel",
-                        "===制胶位置移动结束==="
-                    )
-                    delay(100)
-
-                    Log.d(
-                        "HomeViewModel",
-                        "===制胶运动开始==="
-                    )
-
-                    Log.d(
-                        "HomeViewModel",
-                        "===柱塞泵参数===步数===$coagulantPulseCount===加速度===${(coagulantAcc * 13).toLong()}===开始速度===${(coagulantStartSpeed * 1193).toLong()}===结束速度==${(coagulantEndSpeed * 1193).toLong()}"
-                    )
-                    Log.d(
-                        "HomeViewModel",
-                        "===高浓度泵参数===步数===${guleHighPulse.toLong()}===加速度===${(highAcc * 13).toLong()}===开始速度===${(highEndSpeed * 1193).toLong()}===结束速度==${(highStartSpeed * 1193).toLong()}"
-                    )
-                    Log.d(
-                        "HomeViewModel",
-                        "===低浓度泵参数===步数===${guleLowPulse.toLong()}===加速度===${(lowAcc * 13).toLong()}===开始速度===${(lowStartSpeed * 1193).toLong()}===结束速度==${(lowEndSpeed * 1193).toLong()}"
-                    )
-
-
-                    SerialPortUtils.start {
-                        timeOut = 1000L * 60 * 10
-                        with(
-                            index = 1,
-                            pdv = coagulantPulseCount.toLong(),
-                            ads = Triple(
-                                if ((coagulantAcc * 13).toLong() == 0L) 1 else (coagulantAcc * 13).toLong(),
-                                (coagulantStartSpeed * 1193).toLong(),
-                                (coagulantEndSpeed * 1193).toLong()
+                            with(
+                                index = 0,
+                                pdv = setting.glueBoardPosition,
+                                ads = Triple(xSpeed * 20, xSpeed * 20, xSpeed * 20),
                             )
+
+                        }
+                        Log.d(
+                            "HomeViewModel",
+                            "===制胶位置移动结束==="
                         )
-                        with(
-                            index = 2,
-                            pdv = guleHighPulse.toLong(),
-                            ads = Triple(
-                                (highAcc * 13).toLong(),
-                                (highEndSpeed * 1193).toLong(),
-                                (highStartSpeed * 1193).toLong()
+                        delay(100)
+
+                        Log.d(
+                            "HomeViewModel",
+                            "===制胶运动开始==="
+                        )
+
+                        Log.d(
+                            "HomeViewModel",
+                            "===柱塞泵参数===步数===$coagulantPulseCount===加速度===${(coagulantAcc * 13).toLong()}===开始速度===${(coagulantStartSpeed * 1193).toLong()}===结束速度==${(coagulantEndSpeed * 1193).toLong()}"
+                        )
+                        Log.d(
+                            "HomeViewModel",
+                            "===高浓度泵参数===步数===${guleHighPulse.toLong()}===加速度===${(highAcc * 13).toLong()}===开始速度===${(highEndSpeed * 1193).toLong()}===结束速度==${(highStartSpeed * 1193).toLong()}"
+                        )
+                        Log.d(
+                            "HomeViewModel",
+                            "===低浓度泵参数===步数===${guleLowPulse.toLong()}===加速度===${(lowAcc * 13).toLong()}===开始速度===${(lowStartSpeed * 1193).toLong()}===结束速度==${(lowEndSpeed * 1193).toLong()}"
+                        )
+
+
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 60 * 10
+                            with(
+                                index = 1,
+                                pdv = coagulantPulseCount.toLong(),
+                                ads = Triple(
+                                    if ((coagulantAcc * 13).toLong() == 0L) 1 else (coagulantAcc * 13).toLong(),
+                                    (coagulantStartSpeed * 1193).toLong(),
+                                    (coagulantEndSpeed * 1193).toLong()
+                                )
                             )
-                        )
-                        with(
-                            index = 3,
-                            pdv = guleLowPulse.toLong(),
-                            ads = Triple(
-                                (lowAcc * 13).toLong(),
-                                (lowStartSpeed * 1193).toLong(),
-                                (lowEndSpeed * 1193).toLong()
+                            with(
+                                index = 2,
+                                pdv = guleHighPulse.toLong(),
+                                ads = Triple(
+                                    (highAcc * 13).toLong(),
+                                    (highEndSpeed * 1193).toLong(),
+                                    (highStartSpeed * 1193).toLong()
+                                )
                             )
+                            with(
+                                index = 3,
+                                pdv = guleLowPulse.toLong(),
+                                ads = Triple(
+                                    (lowAcc * 13).toLong(),
+                                    (lowStartSpeed * 1193).toLong(),
+                                    (lowEndSpeed * 1193).toLong()
+                                )
+                            )
+                        }
+
+
+                        Log.d(
+                            "HomeViewModel",
+                            "===制胶运动结束==="
                         )
-                    }
 
 
-                    Log.d(
-                        "HomeViewModel",
-                        "===制胶运动结束==="
-                    )
-
-
-                    //===================制胶运动结束=====================
-                    val rinseSpeed = dataStore.readData("rinseSpeed", 600L)
-                    Log.d(
-                        "HomeViewModel_clean",
-                        "冲洗转速===$rinseSpeed"
-                    )
-                    delay(2000)
-                    //制胶完成，清洗运动
-                    /**
-                     * 冲洗液泵清洗液量
-                     */
-                    val rinseP =
-                        SerialPortUtils.pulse(index = 4, dvp = setting.rinseCleanVolume * 1000)
-
-                    SerialPortUtils.start {
-                        timeOut = 1000L * 60L
-                        with(
-                            index = 0,
-                            ads = Triple(xSpeed * 20, xSpeed * 20, xSpeed * 20),
-                            pdv = setting.wastePosition
+                        //===================制胶运动结束=====================
+                        val rinseSpeed = dataStore.readData("rinseSpeed", 600L)
+                        Log.d(
+                            "HomeViewModel_clean",
+                            "冲洗转速===$rinseSpeed"
                         )
+                        delay(2000)
+                        //制胶完成，清洗运动
+                        /**
+                         * 冲洗液泵清洗液量
+                         */
+                        val rinseP =
+                            SerialPortUtils.pulse(index = 4, dvp = setting.rinseCleanVolume * 1000)
+
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 60L
+                            with(
+                                index = 0,
+                                ads = Triple(xSpeed * 20, xSpeed * 20, xSpeed * 20),
+                                pdv = setting.wastePosition
+                            )
+                        }
+
+
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 60L
+                            with(
+                                index = 4,
+                                ads = Triple(rinseSpeed * 20, rinseSpeed * 20, rinseSpeed * 20),
+                                pdv = rinseP
+                            )
+                        }
+
+                        delay(100)
                     }
-
-                    SerialPortUtils.start {
-                        timeOut = 1000L * 60L
-                        with(
-                            index = 1,
-                            ads = Triple(rinseSpeed * 13, rinseSpeed * 1193, rinseSpeed * 1193),
-                            pdv = -(coagulantPulseCount.toLong() + coagulantExpectedPulse.toLong())
-                        )
-                    }
-
-                    SerialPortUtils.start {
-                        timeOut = 1000L * 60L
-                        with(
-                            index = 4,
-                            ads = Triple(rinseSpeed * 20, rinseSpeed * 20, rinseSpeed * 20),
-                            pdv = rinseP
-                        )
-                    }
-
-                    delay(100)
-                    _complate.value += 1
-
-                    if (_complate.value == expectedMakeNum) {
+                    val glueNum = dataStore.readData("glueNum", 1)
+                    if (_complate.value == glueNum) {
                         _uiFlags.value = UiFlags.objects(6)
                     } else {
-                        SerialPortUtils.endStartFlashYellow()
                         _uiFlags.value = UiFlags.objects(4)
                     }
-                    ApplicationUtils.ctx.playAudio(R.raw.error)
-
                 } catch (ex: Exception) {
                     ex.printStackTrace()
                 } finally {
-
                     _job.value?.cancel()
                     _job.value = null
                 }

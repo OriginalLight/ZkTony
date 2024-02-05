@@ -277,11 +277,12 @@ fun TableTextHead(text: String?, width: Int) {
         text = text ?: "",
         Modifier
             .width(width.dp)
-            .height(50.dp)
+            .height(55 .dp)
             .border(1.dp, Color.White)
             .padding(15.dp),
         textAlign = TextAlign.Center,
-        color = Color.White
+        color = Color.White,
+        fontSize = 18.sp
     )
 }
 

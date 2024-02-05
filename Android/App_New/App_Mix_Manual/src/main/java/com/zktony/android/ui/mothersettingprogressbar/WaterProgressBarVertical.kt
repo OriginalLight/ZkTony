@@ -45,7 +45,7 @@ fun WaterVerticalProgressBar(
 
 
     val waterDescLayoutResult = rememberTextMeasurer().measure(
-        AnnotatedString("液量:$water"),
+        AnnotatedString("${water}mL"),
         TextStyle(color = Color(18, 95, 202), fontSize = 16.sp)
     )
 

@@ -65,23 +65,23 @@ class CalibrationService @Inject constructor(
                         )
                     }
                     if (newCalibration.higeAvg == 0.0) {
-                        hpc[2] = calculateCalibrationFactorNew(51200 * 10, 5.0 * 1000)
+                        hpc[2] = calculateCalibrationFactorNew(51200 * 50, 5.0 * 1000)
                     } else {
                         hpc[2] =
-                            calculateCalibrationFactorNew(51200 * 10, newCalibration.higeAvg * 1000)
+                            calculateCalibrationFactorNew(51200 * 50, newCalibration.higeAvg * 1000)
                     }
                     if (newCalibration.lowAvg == 0.0) {
-                        hpc[3] = calculateCalibrationFactorNew(51200 * 10, 5.0 * 1000)
+                        hpc[3] = calculateCalibrationFactorNew(51200 * 50, 5.0 * 1000)
                     } else {
                         hpc[3] =
-                            calculateCalibrationFactorNew(51200 * 10, newCalibration.lowAvg * 1000)
+                            calculateCalibrationFactorNew(51200 * 50, newCalibration.lowAvg * 1000)
 
                     }
                     if (newCalibration.rinseAvg == 0.0) {
-                        hpc[4] = calculateCalibrationFactorNew(32000, 5.0 * 1000)
+                        hpc[4] = calculateCalibrationFactorNew(3200 * 50, 5.0 * 1000)
                     } else {
                         hpc[4] =
-                            calculateCalibrationFactorNew(32000, newCalibration.rinseAvg * 1000)
+                            calculateCalibrationFactorNew(3200 * 50, newCalibration.rinseAvg * 1000)
 
                     }
 
