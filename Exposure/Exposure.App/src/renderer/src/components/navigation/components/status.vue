@@ -66,7 +66,7 @@ const handleLogout = async () => {
   try {
     visible.value = false
     await userStore.logout()
-    router.push({ name: 'login' })
+    router.push('/login')
     Message.success(t('navigation.status.logout.success'))
   } catch (err) {
     Message.error((err as Error).message)

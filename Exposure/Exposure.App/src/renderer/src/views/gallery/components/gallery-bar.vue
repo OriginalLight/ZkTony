@@ -124,7 +124,7 @@ const disableDelete = computed(() => {
 
 // 详细
 const handleDetail = () => {
-  router.push({ name: 'gallery-detail' })
+  router.push('/gallery-detail')
 }
 
 // 搜索

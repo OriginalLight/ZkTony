@@ -144,9 +144,7 @@ const handleDetail = (list: PictureGallery, item: Picture) => {
     list,
     item
   }
-  router.push({
-    name: 'gallery-detail'
-  })
+  router.push('/gallery-detail')
 }
 
 // 加载数据
@@ -213,8 +211,8 @@ onMounted(async () => {
     position: absolute;
     bottom: 0;
     width: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    color: rgb(var(--arcoblue-5));
+    background-color: rgba(0, 0, 0, 1);
+    color: var(--color-bg-2);
     font-size: 10px;
     text-align: center;
     overflow: hidden;

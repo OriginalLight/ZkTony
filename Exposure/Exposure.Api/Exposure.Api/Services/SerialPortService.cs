@@ -1,5 +1,6 @@
 ﻿using System.IO.Ports;
 using Exposure.Api.Contracts.Services;
+using Exposure.Api.Core.SerialPort.Default;
 
 namespace Exposure.Api.Services;
 
@@ -29,11 +30,13 @@ public class SerialPortService : ISerialPortService
     /// <exception cref="NotImplementedException"></exception>
     public void Init()
     {
+        // 读取配置文件
         var com1 = _config["SerialPort:Com1"];
         var com2 = _config["SerialPort:Com2"];
+        // 打开串口
         if (com1 != null) OpenPort(com1, 115200, "Com1");
-
         if (com2 != null) OpenPort(com2, 115200, "Com2");
+        WritePort("Com1", DefaultProtocol.LedGreen().ToBytes());
     }
 
     #endregion

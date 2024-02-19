@@ -41,6 +41,18 @@ function createWindow(): void {
   }
 }
 
+// Set app login item settings for macOS
+if (app.isPackaged) {
+  const ex = process.execPath
+  app.setLoginItemSettings({
+    name: 'Exposure App',
+    openAtLogin: true,
+    path: ex,
+    enabled: true,
+    args: []
+  })
+}
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.

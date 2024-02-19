@@ -1,8 +1,10 @@
+import localDebug from '../subpage/debug/locale/en-US'
 import localErrLog from '../subpage/err-log/locale/en-US'
 import localOperLog from '../subpage/oper-log/locale/en-US'
 import localUserManage from '../subpage/user-manage/locale/en-US'
 
 export default {
+  ...localDebug,
   ...localErrLog,
   ...localOperLog,
   ...localUserManage,

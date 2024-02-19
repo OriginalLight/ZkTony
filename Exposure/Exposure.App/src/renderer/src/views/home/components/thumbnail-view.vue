@@ -250,8 +250,8 @@ const handleExport = async (format: string) => {
       position: absolute;
       bottom: 0;
       width: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      color: var(--color-neutral-0);
+      background-color: rgba(0, 0, 0, 1);
+      color: var(--color-bg-2);
       font-size: 10px;
       text-align: center;
       overflow: hidden;

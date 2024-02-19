@@ -16,6 +16,9 @@
 
     <ItemGroup>
         <None Include="..\.editorconfig" Link=".editorconfig" />
+        <None Update="Start.bat">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
     <ItemGroup>
@@ -25,7 +28,7 @@
         <PackageReference Include="OpenCvSharp4.Extensions" Version="4.9.0.20240103" />
         <PackageReference Include="OpenCvSharp4.Windows" Version="4.9.0.20240103" />
         <PackageReference Include="SixLabors.ImageSharp" Version="3.1.2" />
-        <PackageReference Include="SqlSugarCore" Version="5.1.4.137" />
+        <PackageReference Include="SqlSugarCore" Version="5.1.4.142" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
         <PackageReference Include="System.IO.Ports" Version="8.0.0" />
         <PackageReference Include="System.Management" Version="8.0.0" />

@@ -53,6 +53,11 @@ const router = createRouter({
       }
     },
     {
+      path: '/debug',
+      name: 'debug',
+      component: () => import('@renderer/views/settings/subpage/debug/index.vue')
+    },
+    {
       path: '/errlog',
       name: 'errlog',
       component: () => import('@renderer/views/settings/subpage/err-log/index.vue')

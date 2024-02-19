@@ -84,7 +84,7 @@ const handleSubmit = async ({
     try {
       await userStore.login(values as LoginData)
       init()
-      router.push({ name: 'home' })
+      router.push('/home')
       Message.success(t('login.form.login.success'))
     } catch (err) {
       errorMessage.value = (err as Error).message

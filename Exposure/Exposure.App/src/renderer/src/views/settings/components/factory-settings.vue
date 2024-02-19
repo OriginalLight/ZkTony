@@ -10,7 +10,7 @@
         </template>
       </a-list-item-meta>
       <template #actions>
-        <a-button style="width: 60px">
+        <a-button style="width: 60px" @click="handleDebug">
           <template #icon>
             <icon-launch />
           </template>
@@ -22,10 +22,16 @@
 
 <script lang="ts" setup>
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import { useUserStore } from '@renderer/store'
 import { Bug } from '@icon-park/vue-next'
 
 const { t } = useI18n()
-
+const router = useRouter()
 const userStore = useUserStore()
+
+// 跳转到调试界面
+const handleDebug = () => {
+  router.push('/debug')
+}
 </script>

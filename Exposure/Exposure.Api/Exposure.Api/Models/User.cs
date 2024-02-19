@@ -7,7 +7,6 @@ public class User
 {
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
     public int Id { get; set; }
-
     public string Name { get; set; }
     public string Sha { get; set; }
     public int Role { get; set; }

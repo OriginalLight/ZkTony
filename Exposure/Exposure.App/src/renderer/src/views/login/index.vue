@@ -1,16 +1,13 @@
 <template>
   <div class="container">
     <div class="logo">
-      <img
-        alt="logo"
-        src="//p3-armor.byteimg.com/tos-cn-i-49unhts6dw/dfdba5317c0c20ce20e64fac803d52bc.svg~tplv-49unhts6dw-image.image"
-      />
-      <div class="logo-text">Exposure</div>
+      <img alt="logo" src="../../assets/logo.png" style="height: 64px" />
     </div>
     <div class="content">
-      <div class="content-inner">
-        <LoginForm />
-      </div>
+      <LoginForm />
+    </div>
+    <div class="qrcode">
+      <img alt="qrcode" src="../../assets/qrcode.png" style="height: 96px" />
     </div>
   </div>
 </template>
@@ -21,12 +18,14 @@ import LoginForm from './components/login-form.vue'
 
 <style lang="less" scoped>
 .container {
-  display: flex;
   height: 100vh;
   background-color: var(--color-bg-2);
 
   .content {
-    position: relative;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     display: flex;
     flex: 1;
     align-items: center;
@@ -36,18 +35,20 @@ import LoginForm from './components/login-form.vue'
 }
 
 .logo {
-  position: fixed;
-  top: 24px;
-  left: 22px;
+  position: absolute;
+  top: 16px;
+  left: 16px;
   z-index: 1;
   display: inline-flex;
   align-items: center;
+}
 
-  &-text {
-    margin-right: 4px;
-    margin-left: 4px;
-    font-size: 20px;
-    color: var(--color-text-2);
-  }
+.qrcode {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
 }
 </style>

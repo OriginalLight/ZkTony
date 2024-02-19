@@ -200,14 +200,10 @@ const handleModifyPassword = async () => {
 
 // 跳转到操作日志页面
 const handleOperlog = () => {
-  router.push({
-    path: '/operlog'
-  })
+  router.push('/operlog')
 }
 // 跳转到用户管理页面
 const handleManage = () => {
-  router.push({
-    path: '/user-manage'
-  })
+  router.push('/user-manage')
 }
 </script>

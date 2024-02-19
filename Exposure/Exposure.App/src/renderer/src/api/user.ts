@@ -16,7 +16,7 @@ export interface LoginData {
   password: string
 }
 
-export interface UserQuery {
+export interface UserQueryParam {
   page: number
   size: number
   name: string
@@ -51,7 +51,7 @@ export function logout() {
   return axios.get('/User/Logout')
 }
 
-export function getUserByPage(data: UserQuery) {
+export function getUserByPage(data: UserQueryParam) {
   return axios.post<UserPageResult>('/User/Page', data)
 }
 

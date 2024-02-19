@@ -86,9 +86,7 @@ const router = useRouter()
 
 // 查看错误日志
 const handleErrlog = () => {
-  router.push({
-    path: '/errlog'
-  })
+  router.push('/errlog')
 }
 // 软件版本
 </script>
