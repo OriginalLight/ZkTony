@@ -71,47 +71,47 @@ data class Setting(
     /**
      *  高浓度清洗液量
      */
-    var higeCleanVolume: Double = 0.0,
+    var higeCleanVolume: Double = 5.0,
 
     /**
      *  高浓度预排液量
      */
-    var higeRehearsalVolume: Double = 0.0,
+    var higeRehearsalVolume: Double = 1.0,
 
     /**
      *  高浓度管路填充
      */
-    var higeFilling: Double = 0.0,
+    var higeFilling: Double = 3.0,
 
     /**
      *  低浓度清洗液量
      */
-    var lowCleanVolume: Double = 0.0,
+    var lowCleanVolume: Double = 5.0,
 
     /**
      *  低浓度管路填充
      */
-    var lowFilling: Double = 0.0,
+    var lowFilling: Double = 3.0,
 
     /**
      *  冲洗液泵清洗液量
      */
-    var rinseCleanVolume: Double = 0.0,
+    var rinseCleanVolume: Double = 5.0,
 
     /**
      *  冲洗液泵管路填充
      */
-    var rinseFilling: Double = 0.0,
+    var rinseFilling: Double = 3.0,
 
     /**
      *  促凝剂泵清洗液量
      */
-    var coagulantCleanVolume: Double = 0.0,
+    var coagulantCleanVolume: Double = 5.0,
 
     /**
      *  促凝剂泵管路填充
      */
-    var coagulantFilling: Double = 0.0,
+    var coagulantFilling: Double = 3.0,
 
     //================预排设置=============================
 

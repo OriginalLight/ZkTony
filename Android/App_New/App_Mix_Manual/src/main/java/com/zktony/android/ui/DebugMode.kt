@@ -188,7 +188,7 @@ fun debugMode(
     /**
      * 促凝剂步数
      */
-    val coagulantpulse = rememberDataSaverState(key = "coagulantpulse", default = 1080000)
+    val coagulantpulse = rememberDataSaverState(key = "coagulantpulse", default = 550000)
     var coagulantpulse_ex by remember { mutableStateOf(coagulantpulse.value.toString()) }
 
     /**
@@ -425,8 +425,12 @@ fun debugMode(
                                 onValueChange = {
                                     speed_ex = it
                                     speed.value = speed_ex.toIntOrNull() ?: 180
-                                    if (speed.value > 180) {
-                                        speed.value = 180
+                                    if (speed.value > 600) {
+                                        speed.value = 600
+                                        speed_ex = "600"
+                                    } else if (speed.value < 100) {
+                                        speed.value = 100
+                                        speed_ex = "100"
                                     }
                                 },
                                 keyboardOptions = KeyboardOptions(
@@ -543,7 +547,15 @@ fun debugMode(
 
                             value = higeSpeed.toString(),
                             label = { Text(text = "转速") },
-                            onValueChange = { higeSpeed = if (it == "") 0 else it.toLong() },
+                            onValueChange = {
+                                if ((it.toIntOrNull() ?: 0) < 0) {
+                                    higeSpeed = 0L
+                                } else if ((it.toIntOrNull() ?: 0) > 600) {
+                                    higeSpeed = 600L
+                                } else {
+                                    higeSpeed = it.toLongOrNull() ?: 0L
+                                }
+                            },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number,
                                 imeAction = ImeAction.Done,
@@ -610,7 +622,15 @@ fun debugMode(
 
                             value = lowSpeed.toString(),
                             label = { Text(text = "转速") },
-                            onValueChange = { lowSpeed = if (it == "") 0 else it.toLong() },
+                            onValueChange = {
+                                if ((it.toIntOrNull() ?: 0) < 0) {
+                                    lowSpeed = 0L
+                                } else if ((it.toIntOrNull() ?: 0) > 600) {
+                                    lowSpeed = 600L
+                                } else {
+                                    lowSpeed = it.toLongOrNull() ?: 0L
+                                }
+                            },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number,
                                 imeAction = ImeAction.Done,
@@ -682,6 +702,10 @@ fun debugMode(
                                 rinseSpeed.value = rinseSpeed_ex.toLongOrNull() ?: 600L
                                 if (rinseSpeed.value > 600L) {
                                     rinseSpeed.value = 600L
+                                    rinseSpeed_ex = "600"
+                                } else if (rinseSpeed.value < 0) {
+                                    rinseSpeed.value = 0
+                                    rinseSpeed_ex = "0"
                                 }
                             },
                             keyboardOptions = KeyboardOptions(
@@ -757,6 +781,10 @@ fun debugMode(
                                 coagulantSpeed.value = coagulantSpeed_ex.toLongOrNull() ?: 200L
                                 if (coagulantSpeed.value > 200L) {
                                     coagulantSpeed.value = 200L
+                                    coagulantSpeed_ex = "200"
+                                } else if (coagulantSpeed.value < 0) {
+                                    coagulantSpeed.value = 0
+                                    coagulantSpeed_ex = "0"
                                 }
                             },
                             keyboardOptions = KeyboardOptions(
@@ -781,6 +809,13 @@ fun debugMode(
                             onValueChange = {
                                 coagulantpulse_ex = it
                                 coagulantpulse.value = coagulantpulse_ex.toIntOrNull() ?: 0
+                                if (coagulantpulse.value > 550000) {
+                                    coagulantpulse.value = 550000
+                                    coagulantpulse_ex = "550000"
+                                } else if (coagulantpulse.value < 200000) {
+                                    coagulantSpeed.value = 200000
+                                    coagulantpulse_ex = "200000"
+                                }
                             },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number,
@@ -828,6 +863,13 @@ fun debugMode(
                             onValueChange = {
                                 coagulantTime_ex = it
                                 coagulantTime.value = coagulantTime_ex.toIntOrNull() ?: 800
+                                if (coagulantTime.value < 0) {
+                                    coagulantTime.value = 0
+                                    coagulantTime_ex = "0"
+                                } else if (coagulantTime.value > 2000) {
+                                    coagulantTime.value = 2000
+                                    coagulantTime_ex = "2000"
+                                }
                             },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number,
@@ -849,6 +891,13 @@ fun debugMode(
                                 coagulantResetPulse_ex = it
                                 coagulantResetPulse.value =
                                     coagulantResetPulse_ex.toIntOrNull() ?: 0
+                                if (coagulantResetPulse.value < 0) {
+                                    coagulantResetPulse.value = 0
+                                    coagulantResetPulse_ex = "0"
+                                } else if (coagulantResetPulse.value > 3000) {
+                                    coagulantResetPulse.value = 3000
+                                    coagulantResetPulse_ex = "3000"
+                                }
                             },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number,
@@ -947,6 +996,13 @@ fun debugMode(
                                 onValueChange = {
                                     xSpeed_ex = it
                                     xSpeed.value = xSpeed_ex.toLongOrNull() ?: 0L
+                                    if (xSpeed.value < 0) {
+                                        xSpeed.value = 0L
+                                        xSpeed_ex = "0"
+                                    } else if (xSpeed.value > 200) {
+                                        xSpeed.value = 200L
+                                        xSpeed_ex = "200"
+                                    }
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -976,6 +1032,13 @@ fun debugMode(
                                 onValueChange = {
                                     wastePosition_ex = it
                                     setting.wastePosition = wastePosition_ex.toDoubleOrNull() ?: 0.0
+                                    if (setting.wastePosition < 0) {
+                                        setting.wastePosition = 0.0
+                                        wastePosition_ex = "0"
+                                    } else if (setting.wastePosition > 32) {
+                                        setting.wastePosition = 32.0
+                                        wastePosition_ex = "32"
+                                    }
                                     uiEvent(SettingIntent.UpdateSet(setting))
                                 },
                                 keyboardOptions = KeyboardOptions(
@@ -1030,6 +1093,13 @@ fun debugMode(
                                     glueBoardPosition_ex = it
                                     setting.glueBoardPosition =
                                         glueBoardPosition_ex.toDoubleOrNull() ?: 0.0
+                                    if (setting.glueBoardPosition < 0) {
+                                        setting.glueBoardPosition = 0.0
+                                        glueBoardPosition_ex = "0"
+                                    } else if (setting.glueBoardPosition > 32) {
+                                        setting.glueBoardPosition = 32.0
+                                        glueBoardPosition_ex = "32"
+                                    }
                                     uiEvent(SettingIntent.UpdateSet(setting))
                                 },
                                 keyboardOptions = KeyboardOptions(
@@ -1545,6 +1615,9 @@ fun debugMode(
                         onValueChange = {
                             glueNum_ex = it
                             glueNum.value = glueNum_ex.toIntOrNull() ?: 1
+                            if (glueNum.value < 0) {
+                                glueNum.value = 0
+                            }
                         },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
@@ -1667,6 +1740,9 @@ fun debugMode(
                     label = { Text(text = "不输入默认运行1次") },
                     onValueChange = {
                         xNum = it.toIntOrNull() ?: 1
+                        if (xNum < 0) {
+                            xNum = 0
+                        }
                     },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number,
@@ -1747,6 +1823,9 @@ fun debugMode(
                     label = { Text(text = "不输入默认持续运行") },
                     onValueChange = {
                         highNum = it.toIntOrNull() ?: 0
+                        if (highNum < 0) {
+                            highNum = 0
+                        }
                     },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number,
@@ -1818,11 +1897,12 @@ fun debugMode(
                 OutlinedTextField(
                     modifier = Modifier.width(100.dp),
                     value = lowNum.toString(),
-
-
                     label = { Text(text = "不输入默认持续运行") },
                     onValueChange = {
                         lowNum = it.toIntOrNull() ?: 0
+                        if (lowNum < 0) {
+                            lowNum = 0
+                        }
                     },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number,
@@ -1894,11 +1974,12 @@ fun debugMode(
                 OutlinedTextField(
                     modifier = Modifier.width(100.dp),
                     value = rinseNum.toString(),
-
-
                     label = { Text(text = "不输入默认持续运行") },
                     onValueChange = {
                         rinseNum = it.toIntOrNull() ?: 0
+                        if (rinseNum < 0) {
+                            rinseNum = 0
+                        }
                     },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number,

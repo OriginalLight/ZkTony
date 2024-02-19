@@ -63,22 +63,6 @@ object SerialPortUtils {
                             }
                         }
 
-//                        0x03.toByte() -> {
-//                            for (i in 0 until protocol.data.size / 2) {
-//                                val status = protocol.data.readInt8(offset = i * 2)
-//                                val index = protocol.data.readInt8(offset = i * 2 + 1)
-//                                hpg[index] = status == 1
-//                                Log.d(
-//                                    "SerialPortUtils",
-//                                    "===0x03.toByte()===status===" + status + "===index===" + index + "===hpg[index]===" + hpg[index]
-//                                )
-//                            }
-//
-////                            if (protocol.data[0] == 0x0B.toByte()) {
-////                                hpd[0] = protocol.data[1].toLong()
-////                            }
-//                        }
-
                         else -> {}
                     }
                 }
@@ -88,9 +72,8 @@ object SerialPortUtils {
 
         // rtu串口全局回调
         SerialStoreUtils.get("led")?.callbackHandler = { bytes ->
-            logD(tag = "led", bytes.toHexString())
+            logD(tag = "led","灯光回复的数据====${bytes.toHexString()}")
             Protocol.verifyProtocol(bytes) { protocol ->
-                println("tec===" + protocol.data)
                 if (protocol.func == 0xFF.toByte()) {
                     when (protocol.data.readInt16LE()) {
                         1 -> throw Exception("TX Header Error")

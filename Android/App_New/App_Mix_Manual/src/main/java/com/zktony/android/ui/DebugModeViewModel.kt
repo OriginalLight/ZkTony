@@ -158,7 +158,7 @@ class DebugModeViewModel @Inject constructor(
                 /**
                  * 柱塞泵总行程
                  */
-                val coagulantpulse = dataStore.readData("coagulantpulse", 1080000).toLong()
+                val coagulantpulse = dataStore.readData("coagulantpulse", 550000).toLong()
 
                 /**
                  * 复位等待时间
@@ -1115,7 +1115,7 @@ class DebugModeViewModel @Inject constructor(
                     /**
                      * 促凝剂总长度
                      */
-                    val coagulantpulse = dataStore.readData("coagulantpulse", 1080000).toLong()
+                    val coagulantpulse = dataStore.readData("coagulantpulse", 550000).toLong()
                     Log.d(
                         "HomeViewModel_clean",
                         "促凝剂总长度===$coagulantpulse"
@@ -1346,7 +1346,7 @@ class DebugModeViewModel @Inject constructor(
                     /**
                      * 促凝剂总行程
                      */
-                    val coagulantpulse = dataStore.readData("coagulantpulse", 1080000).toLong()
+                    val coagulantpulse = dataStore.readData("coagulantpulse", 550000).toLong()
 
                     Log.d(
                         "HomeViewModel_pipeline",

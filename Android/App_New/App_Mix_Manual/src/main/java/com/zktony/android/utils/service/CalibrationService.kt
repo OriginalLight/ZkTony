@@ -27,7 +27,7 @@ class CalibrationService @Inject constructor(
 ) : AbstractService() {
     override fun create() {
         job = scope.launch {
-            val coagulantpulse = dataStore.readData("coagulantpulse", 1080000)
+            val coagulantpulse = dataStore.readData("coagulantpulse", 550000)
 
             var newCalibrations = ncDao.getById(1L)
             newCalibrations.collect { newCalibration ->
@@ -93,10 +93,10 @@ class CalibrationService @Inject constructor(
                     )
                     ncDao.insert(
                         NewCalibration(
-                            1, 0.0, 0.0, 0.0,
-                            0.0, 0.0, 0.0, 0.0,
-                            0.0, 0.0, 0.0, 0.0,
-                            0.0, 0.0, 0.0, 0.0, 0.0
+                            1, 1.8, 1.8, 1.8,
+                            1.8, 1.8, 1.8, 1.8,
+                            1.8, 0.9, 0.9, 0.9,
+                            0.9, 4.5, 4.5, 4.5, 4.5
                         )
                     )
                     Log.d(
@@ -105,8 +105,8 @@ class CalibrationService @Inject constructor(
                     )
                     slDao.insert(
                         Setting(
-                            1, 0.0, 0.0, 0.0, 500.0, 500.0, 500.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                            0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+                            1, 0.0, 0.0, 0.0, 500.0, 500.0, 500.0, 0.0, 0.0, 5.0,  1.0, 3.0,
+                            5.0, 3.0, 5.0, 3.0, 5.0, 3.0
                         )
                     )
                     Log.d(
@@ -116,21 +116,6 @@ class CalibrationService @Inject constructor(
                 }
             }
 
-//            var settings = slDao.getById(1L)
-//            settings.collect { setting ->
-//                Log.d(
-//                    "CalibrationService",
-//                    "setting=========$setting"
-//                )
-//                if (setting == null) {
-//                    slDao.insert(
-//                        Setting(
-//                            1, 0.0, 0.0, 0.0, 500.0, 500.0, 500.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-//                            0.0, 0.0, 0.0, 0.0, 0.0, 0.0
-//                        )
-//                    )
-//                }
-//            }
 
         }
 

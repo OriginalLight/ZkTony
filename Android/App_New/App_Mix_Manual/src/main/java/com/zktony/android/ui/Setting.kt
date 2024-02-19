@@ -179,6 +179,7 @@ fun SettingLits(
     erroeEntities: LazyPagingItems<ErrorRecord>
 ) {
     var setting = s1 ?: Setting()
+    Log.d("","setting====$setting")
 
     var newCalibration = c1 ?: NewCalibration()
 
@@ -431,7 +432,7 @@ fun SettingLits(
     /**
      * 促凝剂步数
      */
-    val coagulantpulse = rememberDataSaverState(key = "coagulantpulse", default = 1080000)
+    val coagulantpulse = rememberDataSaverState(key = "coagulantpulse", default = 550000)
 
 
     //================校准数据=============================
@@ -993,24 +994,41 @@ fun SettingLits(
                                 .height(41.5.dp), colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(rgb(0, 105, 52))
                             ), shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp), onClick = {
-                                setting.higeCleanVolume = higeCleanVolume_ex.toDoubleOrNull() ?: 0.0
-                                setting.higeRehearsalVolume =
-                                    higeRehearsalVolume_ex.toDoubleOrNull() ?: 0.0
-                                setting.higeFilling = higeFilling_ex.toDoubleOrNull() ?: 0.0
-                                setting.lowCleanVolume = lowCleanVolume_ex.toDoubleOrNull() ?: 0.0
-                                setting.lowFilling = lowFilling_ex.toDoubleOrNull() ?: 0.0
-                                setting.rinseCleanVolume =
-                                    rinseCleanVolume_ex.toDoubleOrNull() ?: 0.0
-                                setting.rinseFilling = rinseFilling_ex.toDoubleOrNull() ?: 0.0
-                                setting.coagulantCleanVolume =
-                                    coagulantCleanVolume_ex.toDoubleOrNull() ?: 0.0
-                                setting.coagulantFilling =
-                                    coagulantFilling_ex.toDoubleOrNull() ?: 0.0
-                                uiEvent(SettingIntent.UpdateSet(setting))
+                                if ((higeCleanVolume_ex.toDoubleOrNull() ?: 0.0) > 0 ||
+                                    (higeRehearsalVolume_ex.toDoubleOrNull() ?: 0.0) > 0 ||
+                                    (higeFilling_ex.toDoubleOrNull() ?: 0.0) > 0 ||
+                                    (lowCleanVolume_ex.toDoubleOrNull() ?: 0.0) > 0 ||
+                                    (lowFilling_ex.toDoubleOrNull() ?: 0.0) > 0 ||
+                                    (rinseCleanVolume_ex.toDoubleOrNull() ?: 0.0) > 0 ||
+                                    (coagulantCleanVolume_ex.toDoubleOrNull() ?: 0.0) > 0 ||
+                                    (coagulantFilling_ex.toDoubleOrNull() ?: 0.0) > 0
+                                ) {
+                                    setting.higeCleanVolume =
+                                        higeCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                    setting.higeRehearsalVolume =
+                                        higeRehearsalVolume_ex.toDoubleOrNull() ?: 0.0
+                                    setting.higeFilling = higeFilling_ex.toDoubleOrNull() ?: 0.0
+                                    setting.lowCleanVolume =
+                                        lowCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                    setting.lowFilling = lowFilling_ex.toDoubleOrNull() ?: 0.0
+                                    setting.rinseCleanVolume =
+                                        rinseCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                    setting.rinseFilling = rinseFilling_ex.toDoubleOrNull() ?: 0.0
+                                    setting.coagulantCleanVolume =
+                                        coagulantCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                    setting.coagulantFilling =
+                                        coagulantFilling_ex.toDoubleOrNull() ?: 0.0
+                                    uiEvent(SettingIntent.UpdateSet(setting))
 
-                                Toast.makeText(
-                                    context, "保存成功！", Toast.LENGTH_SHORT
-                                ).show()
+                                    Toast.makeText(
+                                        context, "保存成功！", Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    Toast.makeText(
+                                        context, "数据不能小于0！", Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+
 
                             }) {
                                 Text(text = "保    存", fontSize = 18.sp)
@@ -1556,69 +1574,91 @@ fun SettingLits(
                                 .height(41.5.dp), colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(rgb(0, 105, 52))
                             ), shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp), onClick = {
-                                newCalibration.higeLiquidVolume1 =
-                                    higeLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
-                                newCalibration.higeLiquidVolume2 =
-                                    higeLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
-                                newCalibration.higeLiquidVolume3 =
-                                    higeLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
 
-                                newCalibration.lowLiquidVolume1 =
-                                    lowLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
-                                newCalibration.lowLiquidVolume2 =
-                                    lowLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
-                                newCalibration.lowLiquidVolume3 =
-                                    lowLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
+                                if ((higeLiquidVolume1_ex.toDoubleOrNull() ?: 0.0) > 0 ||
+                                    (higeLiquidVolume2_ex.toDoubleOrNull() ?: 0.0) > 0 ||
+                                    (higeLiquidVolume3_ex.toDoubleOrNull() ?: 0.0) > 0 ||
+                                    (lowLiquidVolume1_ex.toDoubleOrNull() ?: 0.0) > 0 ||
+                                    (lowLiquidVolume2_ex.toDoubleOrNull() ?: 0.0) > 0 ||
+                                    (lowLiquidVolume3_ex.toDoubleOrNull() ?: 0.0) > 0 ||
+                                    (rinseLiquidVolume1_ex.toDoubleOrNull() ?: 0.0) > 0 ||
+                                    (rinseLiquidVolume2_ex.toDoubleOrNull() ?: 0.0) > 0 ||
+                                    (rinseLiquidVolume3_ex.toDoubleOrNull() ?: 0.0) > 0 ||
+                                    (coagulantLiquidVolume1_ex.toDoubleOrNull() ?: 0.0) > 0 ||
+                                    (coagulantLiquidVolume2_ex.toDoubleOrNull() ?: 0.0) > 0 ||
+                                    (coagulantLiquidVolume3_ex.toDoubleOrNull() ?: 0.0) > 0
+                                ) {
+                                    newCalibration.higeLiquidVolume1 =
+                                        higeLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                    newCalibration.higeLiquidVolume2 =
+                                        higeLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                    newCalibration.higeLiquidVolume3 =
+                                        higeLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
 
-                                newCalibration.rinseLiquidVolume1 =
-                                    rinseLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
-                                newCalibration.rinseLiquidVolume2 =
-                                    rinseLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
-                                newCalibration.rinseLiquidVolume3 =
-                                    rinseLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
+                                    newCalibration.lowLiquidVolume1 =
+                                        lowLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                    newCalibration.lowLiquidVolume2 =
+                                        lowLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                    newCalibration.lowLiquidVolume3 =
+                                        lowLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
 
-                                newCalibration.coagulantLiquidVolume1 =
-                                    coagulantLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
-                                newCalibration.coagulantLiquidVolume2 =
-                                    coagulantLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
-                                newCalibration.coagulantLiquidVolume3 =
-                                    coagulantLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
+                                    newCalibration.rinseLiquidVolume1 =
+                                        rinseLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                    newCalibration.rinseLiquidVolume2 =
+                                        rinseLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                    newCalibration.rinseLiquidVolume3 =
+                                        rinseLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
 
-                                newCalibration.higeAvg =
-                                    (newCalibration.higeLiquidVolume1 + newCalibration.higeLiquidVolume2 + newCalibration.higeLiquidVolume3) / 3
-                                newCalibration.lowAvg =
-                                    (newCalibration.lowLiquidVolume1 + newCalibration.lowLiquidVolume2 + newCalibration.lowLiquidVolume3) / 3
-                                newCalibration.rinseAvg =
-                                    (newCalibration.rinseLiquidVolume1 + newCalibration.rinseLiquidVolume2 + newCalibration.rinseLiquidVolume3) / 3
-                                newCalibration.coagulantAvg =
-                                    (newCalibration.coagulantLiquidVolume1 + newCalibration.coagulantLiquidVolume1 + newCalibration.coagulantLiquidVolume1) / 3
+                                    newCalibration.coagulantLiquidVolume1 =
+                                        coagulantLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                    newCalibration.coagulantLiquidVolume2 =
+                                        coagulantLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                    newCalibration.coagulantLiquidVolume3 =
+                                        coagulantLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
 
-
-                                AppStateUtils.hpc[0] = calculateCalibrationFactorNew(64000, 120.0)
-
-                                AppStateUtils.hpc[1] = calculateCalibrationFactorNew(
-                                    coagulantpulse.value, newCalibration.coagulantAvg * 1000
-                                )
-
-                                AppStateUtils.hpc[2] = calculateCalibrationFactorNew(
-                                    51200 * 50, newCalibration.higeAvg * 1000
-                                )
-
-                                AppStateUtils.hpc[3] = calculateCalibrationFactorNew(
-                                    51200 * 50, newCalibration.lowAvg * 1000
-                                )
-
-                                AppStateUtils.hpc[4] = calculateCalibrationFactorNew(
-                                    3200 * 50, newCalibration.rinseAvg * 1000
-                                )
+                                    newCalibration.higeAvg =
+                                        (newCalibration.higeLiquidVolume1 + newCalibration.higeLiquidVolume2 + newCalibration.higeLiquidVolume3) / 3
+                                    newCalibration.lowAvg =
+                                        (newCalibration.lowLiquidVolume1 + newCalibration.lowLiquidVolume2 + newCalibration.lowLiquidVolume3) / 3
+                                    newCalibration.rinseAvg =
+                                        (newCalibration.rinseLiquidVolume1 + newCalibration.rinseLiquidVolume2 + newCalibration.rinseLiquidVolume3) / 3
+                                    newCalibration.coagulantAvg =
+                                        (newCalibration.coagulantLiquidVolume1 + newCalibration.coagulantLiquidVolume1 + newCalibration.coagulantLiquidVolume1) / 3
 
 
+                                    AppStateUtils.hpc[0] =
+                                        calculateCalibrationFactorNew(64000, 120.0)
 
-                                uiEvent(SettingIntent.UpdateNC(newCalibration))
+                                    AppStateUtils.hpc[1] = calculateCalibrationFactorNew(
+                                        coagulantpulse.value, newCalibration.coagulantAvg * 1000
+                                    )
 
-                                Toast.makeText(
-                                    context, "保存成功！", Toast.LENGTH_SHORT
-                                ).show()
+                                    AppStateUtils.hpc[2] = calculateCalibrationFactorNew(
+                                        51200 * 50, newCalibration.higeAvg * 1000
+                                    )
+
+                                    AppStateUtils.hpc[3] = calculateCalibrationFactorNew(
+                                        51200 * 50, newCalibration.lowAvg * 1000
+                                    )
+
+                                    AppStateUtils.hpc[4] = calculateCalibrationFactorNew(
+                                        3200 * 50, newCalibration.rinseAvg * 1000
+                                    )
+
+
+
+                                    uiEvent(SettingIntent.UpdateNC(newCalibration))
+
+                                    Toast.makeText(
+                                        context, "保存成功！", Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    Toast.makeText(
+                                        context, "数据不能小于0！", Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+
+
                             }) {
                                 Text(text = "保    存", fontSize = 18.sp)
                             }
@@ -1670,9 +1710,6 @@ fun SettingLits(
                                 )
                                 .clickable(onClick = {
                                     selectedIndex = index
-                                    Log.d(
-                                        "Test", "点击选中的=========$selectedIndex"
-                                    )
                                 })
                         ) {
                             TableTextBody(text = "" + item.id, width = cellWidthList[0], selected)

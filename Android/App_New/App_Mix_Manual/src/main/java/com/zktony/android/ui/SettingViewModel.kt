@@ -215,7 +215,7 @@ class SettingViewModel @Inject constructor(
                 /**
                  * 促凝剂总行程
                  */
-                val coagulantpulse = dataStore.readData("coagulantpulse", 1080000).toLong()
+                val coagulantpulse = dataStore.readData("coagulantpulse", 550000).toLong()
 
                 /**
                  * 促凝剂转速
@@ -359,7 +359,7 @@ class SettingViewModel @Inject constructor(
                     /**
                      * 促凝剂总长度
                      */
-                    val coagulantpulse = dataStore.readData("coagulantpulse", 1080000).toLong()
+                    val coagulantpulse = dataStore.readData("coagulantpulse", 550000).toLong()
 
                     /**
                      * 促凝剂转速
@@ -475,7 +475,7 @@ class SettingViewModel @Inject constructor(
                 /**
                  * 柱塞泵总行程
                  */
-                val coagulantpulse = dataStore.readData("coagulantpulse", 1080000).toLong()
+                val coagulantpulse = dataStore.readData("coagulantpulse", 550000).toLong()
 
                 /**
                  * 复位等待时间
@@ -1046,7 +1046,7 @@ class SettingViewModel @Inject constructor(
                 /**
                  * 柱塞泵总行程
                  */
-                val coagulantpulse = dataStore.readData("coagulantpulse", 1080000).toLong()
+                val coagulantpulse = dataStore.readData("coagulantpulse", 550000).toLong()
 
                 /**
                  * 复位等待时间
@@ -1241,7 +1241,7 @@ class SettingViewModel @Inject constructor(
                 /**
                  * 柱塞泵总行程
                  */
-                val coagulantpulse = dataStore.readData("coagulantpulse", 1080000).toLong()
+                val coagulantpulse = dataStore.readData("coagulantpulse", 550000).toLong()
 
                 /**
                  * 复位等待时间
@@ -1918,7 +1918,7 @@ class SettingViewModel @Inject constructor(
                              * 柱塞泵总行程
                              */
                             val coagulantpulse =
-                                dataStore.readData("coagulantpulse", 1080000).toLong()
+                                dataStore.readData("coagulantpulse", 550000).toLong()
 
                             /**
                              * 已经运动的柱塞泵步数
@@ -1981,7 +1981,7 @@ class SettingViewModel @Inject constructor(
                                  * 促凝剂总行程
                                  */
                                 val coagulantpulse =
-                                    dataStore.readData("coagulantpulse", 1080000).toLong()
+                                    dataStore.readData("coagulantpulse", 550000).toLong()
 
                                 /**
                                  * 促凝剂转速

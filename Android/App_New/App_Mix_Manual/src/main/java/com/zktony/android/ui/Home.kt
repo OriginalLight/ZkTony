@@ -78,6 +78,7 @@ import com.zktony.android.ui.utils.toList
 import com.zktony.android.utils.extra.format
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -98,6 +99,7 @@ fun HomeRoute(viewModel: HomeViewModel) {
 
     val higemother by viewModel.higemother.collectAsStateWithLifecycle()
     val lowmother by viewModel.lowmother.collectAsStateWithLifecycle()
+    val first by viewModel.first.collectAsStateWithLifecycle()
 
 
     val entities = viewModel.entities.collectAsLazyPagingItems()
@@ -147,7 +149,8 @@ fun HomeRoute(viewModel: HomeViewModel) {
                 calculate,
                 wasteprogress,
                 higemother,
-                lowmother
+                lowmother,
+                first
             )
         }
     }
@@ -174,6 +177,7 @@ fun operate(
     wasteprogress: Float,
     higemother: Float,
     lowmother: Float,
+    first: Boolean
 ) {
 
     val scope = rememberCoroutineScope()
@@ -182,6 +186,11 @@ fun operate(
 
     val context = LocalContext.current
 
+    val soundsThickness = rememberDataSaverState(key = "soundsThickness", default = "蜂鸣")
+
+    if (!first) {
+        uiEvent(HomeIntent.First)
+    }
 
     /**
      * 选中的程序
@@ -343,7 +352,6 @@ fun operate(
 
 
 
-    Log.d("", "uiFlags======$uiFlags")
     if (uiFlags is UiFlags.Objects && uiFlags.objects == 4) {
         continueGlueDialog.value = true
     } else if (uiFlags is UiFlags.Objects && uiFlags.objects == 6) {
@@ -578,8 +586,7 @@ fun operate(
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     } else {
-                                        expectedMakeNum.value =
-                                            expectedMakeNum_ex.toIntOrNull() ?: 1
+                                        expectedMakeNum.value = temp
                                         water.value = 50f
                                         water_ex = "50"
                                         coagulantvol.value = 10f
@@ -737,8 +744,8 @@ fun operate(
                             .clickable {
                                 if (job == null) {
                                     if (uiFlags is UiFlags.None) {
-
                                         if (waste.value >= 1f) {
+                                            uiEvent(HomeIntent.CleanWaste)
                                             wasteDialog.value = true
                                         } else {
                                             if (expectedMakeNum.value > 0) {
@@ -754,21 +761,6 @@ fun operate(
                                                     )
                                                     .show()
                                             }
-//                                                startMake = "停止制胶"
-//                                                uiEvent(HomeIntent.Start(0))
-//                                                uiEvent(
-//                                                    HomeIntent.Insert(
-//                                                        program.startRange,
-//                                                        program.endRange,
-//                                                        program.thickness,
-//                                                        program.coagulant,
-//                                                        program.volume,
-//                                                        complate,
-//                                                        EPStatus.RUNNING,
-//                                                        ""
-//                                                    )
-//                                                )
-
 
                                         }
 
@@ -792,7 +784,7 @@ fun operate(
                             .size(63.dp, 63.dp)
                             .clickable {
                                 scope.launch {
-                                    if (waste.value>= 1f) {
+                                    if (waste.value >= 1f) {
                                         wasteDialog.value = true
                                     } else {
                                         if (uiFlags is UiFlags.None) {
@@ -813,7 +805,7 @@ fun operate(
                             .size(63.dp, 63.dp)
                             .clickable {
                                 scope.launch {
-                                    if (waste.value  >= 1f) {
+                                    if (waste.value >= 1f) {
                                         wasteDialog.value = true
                                     } else {
                                         if (uiFlags is UiFlags.None || (uiFlags is UiFlags.Objects && uiFlags.objects == 2)) {
@@ -999,8 +991,17 @@ fun operate(
                 TextButton(colors = ButtonDefaults.buttonColors(
                     containerColor = Color(rgb(0, 105, 52))
                 ), onClick = {
-                    water.value = water_ex.toFloatOrNull() ?: 0f
-                    waterDialog.value = false
+                    if ((water_ex.toIntOrNull() ?: 0) > 0) {
+                        water.value = water_ex.toFloatOrNull() ?: 0f
+                        waterDialog.value = false
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "不能是负数!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
 
                 }) {
                     Text(text = "确认")
@@ -1103,9 +1104,18 @@ fun operate(
                 TextButton(colors = ButtonDefaults.buttonColors(
                     containerColor = Color(rgb(0, 105, 52))
                 ), onClick = {
-                    concentration.value = concentration_ex.toIntOrNull() ?: 0
-                    coagulantvol.value = coagulant_ex.toFloatOrNull() ?: 0f
-                    coagulantDialog.value = false
+                    if ((concentration_ex.toIntOrNull() ?: 0) > 0) {
+                        concentration.value = concentration_ex.toIntOrNull() ?: 0
+                        coagulantvol.value = coagulant_ex.toFloatOrNull() ?: 0f
+                        coagulantDialog.value = false
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "不能是负数!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
 
                 }) {
                     Text(text = "确认")
@@ -1134,8 +1144,6 @@ fun operate(
 
             },
             text = {
-
-
                 Column {
 
                     Row(
@@ -1210,11 +1218,18 @@ fun operate(
                 TextButton(colors = ButtonDefaults.buttonColors(
                     containerColor = Color(rgb(0, 105, 52))
                 ), onClick = {
-                    lowCoagulant.value = lowCoagulant_ex.toIntOrNull() ?: 0
-                    if (lowCoagulant.value <= program.startRange) {
-                        lowCoagulantVol.value = lowCoagulantVol_ex.toFloatOrNull() ?: 0f
-                        uiEvent(HomeIntent.HigeLowMotherVol)
-                        lowDialog.value = false
+                    if ((lowCoagulant_ex.toIntOrNull() ?: 0) <= program.startRange) {
+                        if ((lowCoagulant_ex.toIntOrNull() ?: 0) > 0) {
+                            lowCoagulantVol.value = lowCoagulantVol_ex.toFloatOrNull() ?: 0f
+                            uiEvent(HomeIntent.HigeLowMotherVol)
+                            lowDialog.value = false
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "不能是负数!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     } else {
                         Toast.makeText(
                             context,
@@ -1323,11 +1338,18 @@ fun operate(
                 TextButton(colors = ButtonDefaults.buttonColors(
                     containerColor = Color(rgb(0, 105, 52))
                 ), onClick = {
-                    highCoagulant.value = highCoagulant_ex.toIntOrNull() ?: 0
-                    if (highCoagulant.value >= program.endRange) {
-                        highCoagulantVol.value = highCoagulantVol_ex.toFloatOrNull() ?: 0f
-                        uiEvent(HomeIntent.HigeLowMotherVol)
-                        highDialog.value = false
+                    if ((highCoagulant_ex.toIntOrNull() ?: 0) >= program.endRange) {
+                        if ((highCoagulant_ex.toIntOrNull() ?: 0) > 0) {
+                            highCoagulantVol.value = highCoagulantVol_ex.toFloatOrNull() ?: 0f
+                            uiEvent(HomeIntent.HigeLowMotherVol)
+                            highDialog.value = false
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "不能是负数!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     } else {
                         Toast.makeText(
                             context,
