@@ -13,7 +13,7 @@
         class="img-box"
         @click="handelSelected(img)"
       >
-        <img class="img" :src="img.thumbnail" />
+        <img v-lazy="img.thumbnail" class="img" />
         <icon-check v-if="showSelected(img)" class="selected" />
         <div class="img-name">{{ img.name }}</div>
       </div>
@@ -29,7 +29,7 @@
         class="img-box"
         @click="handelSelected(img)"
       >
-        <img class="img" :src="img.thumbnail" />
+        <img v-lazy="img.thumbnail" class="img" />
         <icon-check v-if="showSelected(img)" class="selected" />
         <div class="img-name">{{ img.name }}</div>
       </div>
@@ -45,7 +45,7 @@
         class="img-box"
         @click="handelSelected(img)"
       >
-        <img class="img" :src="img.thumbnail" />
+        <img v-lazy="img.thumbnail" class="img" />
         <icon-check v-if="showSelected(img)" class="selected" />
         <div class="img-name">{{ img.name }}</div>
       </div>
@@ -56,7 +56,7 @@
         <div class="img-preview-box">
           <img
             id="img-preview"
-            :src="subpage.item?.path"
+            v-lazy="subpage.item?.path"
             class="img"
             :style="{
               filter: `brightness(${options.brightness}%) contrast(${options.contrast}%) invert(${options.invert ? 100 : 0}%)`,

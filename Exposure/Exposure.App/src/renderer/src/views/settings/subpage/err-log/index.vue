@@ -14,7 +14,7 @@
         <a-button
           type="primary"
           status="danger"
-          :disabled="selectedKeys.length === 0"
+          :disabled="isNoSelectedKeys"
           @click="visible = true"
         >
           <template #icon>
@@ -22,7 +22,7 @@
           </template>
           <template #default>{{ t('errlog.bar.delete') }}</template>
         </a-button>
-        <a-button type="primary" :disabled="selectedKeys.length === 0" @click="handleExport">
+        <a-button type="primary" :disabled="isNoSelectedKeys" @click="handleExport">
           <template #icon>
             <icon-export />
           </template>
@@ -61,7 +61,7 @@
 
 <script lang="ts" setup>
 import dayjs from 'dayjs'
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Message, TableColumnData } from '@arco-design/web-vue'
 import useLoading from '@renderer/hooks/loading'
@@ -118,6 +118,14 @@ const columns: TableColumnData[] = [
 // 数据
 const data = ref<ErrLog[]>([])
 
+// 选中的key是否为空
+const isNoSelectedKeys = computed(() => selectedKeys.value.length === 0)
+
+// 搜索日期转换
+const formattedSearchDate = computed(() => {
+  return searchDate.value ? dayjs(searchDate.value).format('YYYY-MM-DD') : null
+})
+
 // 获取数据
 const fetchData = async () => {
   setLoading(true)
@@ -125,7 +133,7 @@ const fetchData = async () => {
     const res = await getErrLogByPage({
       page: pagination.current,
       size: pagination.pageSize,
-      date: searchDate.value ? dayjs(searchDate.value).format('YYYY-MM-DD') : null
+      date: formattedSearchDate.value
     })
     data.value = res.data.list
     pagination.total = res.data.total

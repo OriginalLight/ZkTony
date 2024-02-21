@@ -1,52 +1,52 @@
 <template>
-  <a-list>
-    <template #header>
-      <div style="font-size: 20px">{{ t('settings.user.title') }}</div>
-    </template>
-    <a-list-item>
-      <a-list-item-meta :title="userStore.name" :description="getRoleName(userStore.role)">
-        <template #avatar>
-          <icon-user size="20" />
-        </template>
-      </a-list-item-meta>
-      <template #actions>
-        <a-button @click="visible = true">
-          <template #icon>
-            <icon-edit />
+  <a-card :title="t('settings.user.title')">
+    <a-list>
+      <a-list-item>
+        <a-list-item-meta :title="userStore.name" :description="getRoleName(userStore.role)">
+          <template #avatar>
+            <icon-user size="20" />
           </template>
-          <template #default>{{ t('settings.user.mofify.password') }}</template>
-        </a-button>
-      </template>
-    </a-list-item>
-    <a-list-item v-if="userStore.role < 2">
-      <a-list-item-meta :title="$t('settings.user.operlog.title')">
-        <template #avatar>
-          <icon-file size="20" />
+        </a-list-item-meta>
+        <template #actions>
+          <a-button @click="visible = true">
+            <template #icon>
+              <icon-edit />
+            </template>
+            <template #default>{{ t('settings.user.mofify.password') }}</template>
+          </a-button>
         </template>
-      </a-list-item-meta>
-      <template #actions>
-        <a-button style="width: 60px" @click="handleOperlog">
-          <template #icon>
-            <icon-launch />
+      </a-list-item>
+      <a-list-item v-if="userStore.role < 2">
+        <a-list-item-meta :title="$t('settings.user.operlog.title')">
+          <template #avatar>
+            <icon-file size="20" />
           </template>
-        </a-button>
-      </template>
-    </a-list-item>
-    <a-list-item v-if="userStore.role < 2">
-      <a-list-item-meta :title="$t('settings.user.manage.title')">
-        <template #avatar>
-          <icon-nav size="20" />
+        </a-list-item-meta>
+        <template #actions>
+          <a-button style="width: 60px" @click="handleOperlog">
+            <template #icon>
+              <icon-launch />
+            </template>
+          </a-button>
         </template>
-      </a-list-item-meta>
-      <template #actions>
-        <a-button style="width: 60px" @click="handleManage">
-          <template #icon>
-            <icon-launch />
+      </a-list-item>
+      <a-list-item v-if="userStore.role < 2">
+        <a-list-item-meta :title="$t('settings.user.manage.title')">
+          <template #avatar>
+            <icon-nav size="20" />
           </template>
-        </a-button>
-      </template>
-    </a-list-item>
-  </a-list>
+        </a-list-item-meta>
+        <template #actions>
+          <a-button style="width: 60px" @click="handleManage">
+            <template #icon>
+              <icon-launch />
+            </template>
+          </a-button>
+        </template>
+      </a-list-item>
+    </a-list>
+  </a-card>
+
   <a-modal v-model:visible="visible" draggable @ok="handleModifyPassword" @cancel="visible = false">
     <template #title> {{ t('settings.user.mofify.password') }} </template>
     <div>

@@ -81,6 +81,7 @@
               :max="59"
               :step="1"
               :input-attrs="{ style: { textAlign: 'center' } }"
+              model-event="input"
             />
             <a-input-number
               v-model="options.time.second"
@@ -91,6 +92,7 @@
               :max="59"
               :step="1"
               :input-attrs="{ style: { textAlign: 'center' } }"
+              model-event="input"
             />
             <a-input-number
               v-model="options.time.millisecond"
@@ -101,6 +103,7 @@
               :max="999"
               :step="100"
               :input-attrs="{ style: { textAlign: 'center' } }"
+              model-event="input"
             />
           </a-input-group>
         </div>
@@ -116,6 +119,7 @@
             :max="100"
             :step="1"
             :input-attrs="{ style: { textAlign: 'center' } }"
+            model-event="input"
           />
         </div>
       </a-card>

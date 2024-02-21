@@ -40,29 +40,29 @@
     </div>
     <div class="grid-item">
       <div style="font-size: small">{{ t('home.thumbnail.view.picture.light') }}</div>
-      <a-space v-dragscroll :size="5" class="scroll-wrapper">
+      <a-space id="scroll-light" :size="5" class="scroll-wrapper">
         <div v-for="item in light" :key="item.id" class="scroll-item" @click="handleSelected(item)">
           <div v-if="showPreview(item)" class="img-preview">Preview</div>
           <icon-check v-if="showSelected(item)" class="selected" />
-          <img class="img" alt="dessert" :src="item.thumbnail" />
+          <img v-lazy="item.thumbnail" class="img" alt="dessert" />
           <div class="img-name">{{ item.name }}</div>
         </div>
       </a-space>
     </div>
     <div class="grid-item">
       <div style="font-size: small">{{ t('home.thumbnail.view.picture.dark') }}</div>
-      <a-space v-dragscroll :size="5" class="scroll-wrapper">
+      <a-space id="scroll-dark" :size="5" class="scroll-wrapper">
         <div v-for="item in dark" :key="item.id" class="scroll-item" @click="handleSelected(item)">
           <div v-if="showPreview(item)" class="img-preview">Preview</div>
           <icon-check v-if="showSelected(item)" class="selected" />
-          <img class="img" alt="dessert" :src="item.thumbnail" />
+          <img v-lazy="item.thumbnail" class="img" alt="dessert" />
           <div class="img-name">{{ item.name }}</div>
         </div>
       </a-space>
     </div>
     <div class="grid-item">
       <div style="font-size: small">{{ t('home.thumbnail.view.picture.combine') }}</div>
-      <a-space v-dragscroll :size="5" class="scroll-wrapper">
+      <a-space id="scroll-combine" :size="5" class="scroll-wrapper">
         <div
           v-for="item in combine"
           :key="item.id"
@@ -71,7 +71,7 @@
         >
           <div v-if="showPreview(item)" class="img-preview">Preview</div>
           <icon-check v-if="showSelected(item)" class="selected" />
-          <img class="img" alt="dessert" :src="item.thumbnail" />
+          <img v-lazy="item.thumbnail" class="img" alt="dessert" />
           <div class="img-name">{{ item.name }}</div>
         </div>
       </a-space>
@@ -80,7 +80,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Message } from '@arco-design/web-vue'
 import { Picture, combinePicture, exportPicture } from '@renderer/api/picture'
@@ -194,6 +194,23 @@ const handleExport = async (format: string) => {
     loading.value.export = false
   }
 }
+
+// 给div添加鼠标滚动
+const mouseWhell = (id: string) => {
+  const div = document.getElementById(id)
+  if (div) {
+    div.addEventListener('wheel', (e) => {
+      e.preventDefault()
+      div.scrollLeft += e.deltaY / 2
+    })
+  }
+}
+
+onMounted(() => {
+  mouseWhell('scroll-light')
+  mouseWhell('scroll-dark')
+  mouseWhell('scroll-combine')
+})
 </script>
 
 <style scoped lang="less">
@@ -226,8 +243,6 @@ const handleExport = async (format: string) => {
       top: 0;
       left: 0;
       color: rgb(var(--arcoblue-6));
-      font-size: 12px;
-      padding: 2px;
     }
 
     .selected {
@@ -235,8 +250,6 @@ const handleExport = async (format: string) => {
       top: 0;
       right: 0;
       color: rgb(var(--arcoblue-6));
-      font-size: 20px;
-      padding: 2px;
     }
 
     .img {

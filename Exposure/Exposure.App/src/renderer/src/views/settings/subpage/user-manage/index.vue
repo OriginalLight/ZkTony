@@ -24,7 +24,7 @@
         <a-button
           type="primary"
           status="danger"
-          :disabled="selectedKeys.length === 0"
+          :disabled="isNoSelectedKeys"
           @click="visible.delete = true"
         >
           <template #icon>
@@ -147,7 +147,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Message, TableColumnData } from '@arco-design/web-vue'
 import useLoading from '@renderer/hooks/loading'
@@ -226,6 +226,9 @@ const columns: TableColumnData[] = [
   }
 ]
 const data = ref<User[]>([])
+
+// 选中的key是否为空
+const isNoSelectedKeys = computed(() => selectedKeys.value.length === 0)
 
 // 获取用户列表
 const fetchData = async () => {
@@ -343,7 +346,9 @@ const handleChange = async (index: number) => {
 }
 
 // 初始化
-fetchData()
+onMounted(() => {
+  fetchData()
+})
 </script>
 
 <style lang="less" scoped>

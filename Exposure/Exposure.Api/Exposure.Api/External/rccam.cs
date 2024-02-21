@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Exposure.External;
+namespace Exposure.Api.External;
 
 internal class Rccam
 {

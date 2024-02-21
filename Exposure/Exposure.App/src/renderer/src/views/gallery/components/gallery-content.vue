@@ -22,7 +22,7 @@
             @click="handleSelected(item, img)"
             @dblclick="handleDetail(item, img)"
           >
-            <img class="img" :src="img.thumbnail" />
+            <img v-lazy="img.thumbnail" class="img" />
             <icon-check v-if="showSelected(img)" class="selected" />
             <div class="img-name">{{ img.name }}</div>
           </div>
@@ -38,7 +38,7 @@
             @click="handleSelected(item, img)"
             @dblclick="handleDetail(item, img)"
           >
-            <img class="img" :src="img.thumbnail" />
+            <img v-lazy="img.thumbnail" class="img" />
             <icon-check v-if="showSelected(img)" class="selected" />
             <div class="img-name">{{ img.name }}</div>
           </div>
@@ -54,7 +54,7 @@
             @click="handleSelected(item, img)"
             @dblclick="handleDetail(item, img)"
           >
-            <img class="img" :src="img.thumbnail" />
+            <img v-lazy="img.thumbnail" class="img" />
             <icon-check v-if="showSelected(img)" class="selected" />
             <div class="img-name">{{ img.name }}</div>
           </div>
@@ -203,8 +203,6 @@ onMounted(async () => {
     top: 0;
     right: 0;
     color: rgb(var(--arcoblue-6));
-    font-size: 20px;
-    padding: 2px;
   }
 
   .img-name {

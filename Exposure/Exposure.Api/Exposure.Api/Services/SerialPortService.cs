@@ -1,6 +1,5 @@
 ﻿using System.IO.Ports;
 using Exposure.Api.Contracts.Services;
-using Exposure.Api.Core.SerialPort.Default;
 
 namespace Exposure.Api.Services;
 
@@ -36,20 +35,19 @@ public class SerialPortService : ISerialPortService
         // 打开串口
         if (com1 != null) OpenPort(com1, 115200, "Com1");
         if (com2 != null) OpenPort(com2, 115200, "Com2");
-        WritePort("Com1", DefaultProtocol.LedGreen().ToBytes());
     }
 
     #endregion
 
-    #region 获取所有的串口
+    #region 获取所有可用串口
 
     /// <summary>
-    ///     获取所有的串口
+    ///     获取所有可用串口
     /// </summary>
     /// <returns></returns>
     public string[] GetPorts()
     {
-        return SerialPort.GetPortNames();
+        return _serialPorts.Keys.ToArray();
     }
 
     #endregion
@@ -120,7 +118,7 @@ public class SerialPortService : ISerialPortService
         try
         {
             _serialPorts[alias].Write(bytes, 0, bytes.Length);
-            _logger.LogInformation("向串口: " + alias + " 写入数据: " + BitConverter.ToString(bytes));
+            _logger.LogInformation("向串口 " + alias + " 写入数据: " + BitConverter.ToString(bytes));
         }
         catch (Exception e)
         {

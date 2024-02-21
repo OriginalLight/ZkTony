@@ -1,10 +1,12 @@
 <template>
-  <div v-dragscroll class="container">
-    <a-space size="large" direction="vertical">
-      <SystemSettings />
-      <UserSettings />
-      <FactortSettings />
-    </a-space>
+  <div class="container">
+    <div class="card">
+      <a-space direction="vertical" size="medium">
+        <SystemSettings />
+        <UserSettings />
+        <FactortSettings />
+      </a-space>
+    </div>
   </div>
 </template>
 
@@ -17,12 +19,17 @@ import FactortSettings from './components/factory-settings.vue'
 <style lang="less" scoped>
 .container {
   display: flex;
-  flex-direction: column;
   padding: 16px;
-  height: calc(100vh - 98px);
-  overflow-y: scroll;
+  height: calc(100vh - 66px - 32px);
+
+  .card {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    overflow-y: scroll;
+  }
 }
-.container::-webkit-scrollbar {
+.card::-webkit-scrollbar {
   display: none;
 }
 </style>

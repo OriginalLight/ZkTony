@@ -1,5 +1,6 @@
 ﻿using Exposure.Api.Contracts.Services;
 using Exposure.Api.Core.SerialPort.Default;
+using Exposure.Api.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Exposure.Api.Controllers;
@@ -23,11 +24,61 @@ public class DebugController : ControllerBase
     }
 
     #endregion
-
-    #region 状态
+    
+    #region 串口状态
 
     /// <summary>
-    ///     状态
+    ///     串口状态
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("SerialPort")]
+    public IActionResult SerialPortStatus()
+    {
+        return Ok(_serialPort.GetPorts());
+    }
+    
+    #endregion
+    
+    #region 串口发送
+
+    /// <summary>
+    ///     串口发送
+    /// </summary>
+    /// <returns></returns>
+    [HttpPost]
+    [Route("SerialPort")]
+    public IActionResult SerialPort([FromBody] SerialPortDto dto)
+    {
+        try
+        {
+            var ports = _serialPort.GetPorts();
+            if (!ports.Contains(dto.Port))
+            {
+                return Problem("串口未初始化，或者串口不存在。");
+            }
+            // 将字符串hex转换为byte数组
+            var hex = dto.Hex.Replace(" ", "");
+            var bytes = new byte[hex.Length / 2];
+            for (var i = 0; i < hex.Length; i += 2)
+            {
+                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
+            }
+            _serialPort.WritePort(dto.Port, bytes);
+            return Ok("OK");
+        }
+        catch (Exception e)
+        {
+            return Problem(e.Message);
+        }
+    }
+
+    #endregion
+
+    #region 三色灯
+
+    /// <summary>
+    ///     三色灯
     /// </summary>
     /// <returns></returns>
     [HttpGet]
