@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Reply
@@ -91,7 +92,7 @@ fun HomeAppBar(
                 AnimatedVisibility(visible = page != PageType.HOME) {
                     ElevatedButton(onClick = navigation) {
                         Icon(
-                            imageVector = Icons.Default.Reply,
+                            imageVector = Icons.AutoMirrored.Filled.Reply,
                             contentDescription = null
                         )
                     }
@@ -160,7 +161,7 @@ fun SettingsAppBar(
                 }
                 ElevatedButton(onClick = navigation) {
                     Icon(
-                        imageVector = Icons.Default.Reply,
+                        imageVector = Icons.AutoMirrored.Filled.Reply,
                         contentDescription = null
                     )
                 }
@@ -266,7 +267,7 @@ fun ProgramAppBar(
 
                 ElevatedButton(onClick = navigation) {
                     Icon(
-                        imageVector = Icons.Default.Reply,
+                        imageVector = Icons.AutoMirrored.Filled.Reply,
                         contentDescription = null
                     )
                 }
@@ -373,7 +374,7 @@ fun CalibrationAppBar(
 
                 ElevatedButton(onClick = navigation) {
                     Icon(
-                        imageVector = Icons.Default.Reply,
+                        imageVector = Icons.AutoMirrored.Filled.Reply,
                         contentDescription = null
                     )
                 }
@@ -442,7 +443,7 @@ fun HistoryAppBar(
 
                 ElevatedButton(onClick = navigation) {
                     Icon(
-                        imageVector = Icons.Default.Reply,
+                        imageVector = Icons.AutoMirrored.Filled.Reply,
                         contentDescription = null
                     )
                 }
@@ -480,7 +481,7 @@ fun DebugAppBar(navigation: () -> Unit) {
             ) {
                 ElevatedButton(onClick = navigation) {
                     Icon(
-                        imageVector = Icons.Default.Reply,
+                        imageVector = Icons.AutoMirrored.Filled.Reply,
                         contentDescription = null
                     )
                 }

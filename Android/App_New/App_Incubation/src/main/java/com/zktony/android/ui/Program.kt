@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.ArrowRight
@@ -329,7 +330,7 @@ fun ProgramInput(
                         style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(modifier = Modifier.weight(1f))
-                    Icon(imageVector = Icons.Default.ArrowRight, contentDescription = null)
+                    Icon(imageVector = Icons.AutoMirrored.Filled.ArrowRight, contentDescription = null)
                 }
             }
         }

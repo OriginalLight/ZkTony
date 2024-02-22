@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DoDisturb
@@ -241,7 +242,7 @@ fun HomeContent(
                         )
                     },
                     trailingContent = {
-                        Icon(imageVector = Icons.Default.ArrowRight, contentDescription = null)
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowRight, contentDescription = null)
                     },
                     colors = ListItemDefaults.colors(
                         containerColor = MaterialTheme.colorScheme.secondaryContainer

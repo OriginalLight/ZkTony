@@ -26,6 +26,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowRight
+import androidx.compose.material.icons.automirrored.filled.TrendingDown
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.filled.ArrowCircleUp
 import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.Check
@@ -203,7 +207,7 @@ fun SettingContent(
                     onClick = { navigationActions.navigate(Route.CALIBRATION) }
                 ) {
                     Icon(
-                        imageVector = Icons.Default.ArrowRight,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowRight,
                         contentDescription = null
                     )
                 }
@@ -216,7 +220,7 @@ fun SettingContent(
                     onClick = { navigationActions.navigate(Route.DEBUG) }
                 ) {
                     Icon(
-                        imageVector = Icons.Default.ArrowRight,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowRight,
                         contentDescription = null
                     )
                 }
@@ -243,7 +247,7 @@ fun SettingContent(
                     text = stringResource(id = R.string.network),
                     onClick = { dispatch(SettingIntent.Network) }) {
                     Icon(
-                        imageVector = Icons.Default.ArrowRight,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowRight,
                         contentDescription = null
                     )
                 }
@@ -254,7 +258,7 @@ fun SettingContent(
                     text = stringResource(id = R.string.parameters),
                     onClick = { dispatch(SettingIntent.NavTo(PageType.AUTH)) }) {
                     Icon(
-                        imageVector = Icons.Default.ArrowRight,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowRight,
                         contentDescription = null
                     )
                 }
@@ -287,7 +291,7 @@ fun SettingContent(
             }
 
             item {
-                SettingsCard(icon = Icons.Outlined.HelpOutline,
+                SettingsCard(icon = Icons.AutoMirrored.Outlined.HelpOutline,
                     text = if (helpInfo) stringResource(id = R.string.qrcode) else stringResource(id = R.string.help),
                     onClick = { helpInfo = !helpInfo }) {
                     if (helpInfo) {
@@ -299,7 +303,7 @@ fun SettingContent(
                         )
                     } else {
                         Icon(
-                            imageVector = Icons.Default.ArrowRight, contentDescription = null
+                            imageVector = Icons.AutoMirrored.Filled.ArrowRight, contentDescription = null
                         )
                     }
                 }
@@ -662,7 +666,7 @@ fun MotorDetail(
                 leadingIcon = {
                     Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                         Icon(
-                            imageVector = Icons.Default.TrendingUp,
+                            imageVector = Icons.AutoMirrored.Filled.TrendingUp,
                             contentDescription = stringResource(id = R.string.acceleration)
                         )
                     }
@@ -705,7 +709,7 @@ fun MotorDetail(
                 leadingIcon = {
                     Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                         Icon(
-                            imageVector = Icons.Default.TrendingDown,
+                            imageVector = Icons.AutoMirrored.Filled.TrendingDown,
                             contentDescription = stringResource(id = R.string.deceleration)
                         )
                     }

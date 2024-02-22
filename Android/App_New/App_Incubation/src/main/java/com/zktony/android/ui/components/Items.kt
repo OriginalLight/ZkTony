@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DriveFileRenameOutline
 import androidx.compose.material.icons.filled.FileCopy
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -225,7 +226,7 @@ fun PointItem(
                                 )
                                 innerTextField()
                             }
-                            Divider()
+                            HorizontalDivider()
                         }
                     }
                 )
@@ -259,7 +260,7 @@ fun PointItem(
                                 )
                                 innerTextField()
                             }
-                            Divider()
+                            HorizontalDivider()
                         }
                     }
                 )
@@ -560,7 +561,7 @@ fun IncubationStageItem(
                 color = Color.Red
             )
         }
-        Divider()
+        HorizontalDivider()
         FlowRow(
             modifier = Modifier
                 .fillMaxWidth()
@@ -659,7 +660,7 @@ fun IncubationStageItem(item: IncubationStage) {
                 }
             )
         }
-        Divider()
+        HorizontalDivider()
         FlowRow(
             modifier = Modifier
                 .fillMaxWidth()

@@ -21,6 +21,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Numbers
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -230,7 +231,7 @@ fun CalibrationDetail(
                                 )
                                 innerTextField()
                             }
-                            Divider()
+                            HorizontalDivider()
                         }
                     }
                 )
