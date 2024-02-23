@@ -16,11 +16,7 @@ public class AutoCleanService : IAutoCleanService
     #endregion
 
     #region 清理预览图
-
-    /// <summary>
-    ///     清理预览图
-    /// </summary>
-    /// <returns></returns>
+    
     public Task CleanPreviewAsync()
     {
         var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Preview");

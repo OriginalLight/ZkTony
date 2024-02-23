@@ -15,7 +15,7 @@ public class CameraService : ICameraService
     private Nncam? _nncam;
     private int _seq;
     private int _target;
-    
+
     #region 构造函数
 
     public CameraService(IPictureService picture, IUserService user)
@@ -27,11 +27,7 @@ public class CameraService : ICameraService
     #endregion
 
     #region 初始化
-
-    /// <summary>
-    ///     初始化 0: 成功 1: 无设备 2: 打开失败
-    /// </summary>
-    /// <returns></returns>
+    
     public void Initialize()
     {
         if (_nncam != null) return;
@@ -60,11 +56,7 @@ public class CameraService : ICameraService
     #endregion
 
     #region 预览
-
-    /// <summary>
-    ///     预览
-    /// </summary>
-    /// <returns></returns>
+    
     public Picture PreviewAsync()
     {
         Initialize();
@@ -90,7 +82,7 @@ public class CameraService : ICameraService
             var filePath = Path.Combine(savePath, $"{date}.png");
             // 转换成灰度图
             Cv2.CvtColor(mat, mat, ColorConversionCodes.BGR2GRAY);
-            mat.SaveImage(filePath);
+            Calibrate(mat).SaveImage(filePath);
 
             return new Picture
             {
@@ -121,13 +113,7 @@ public class CameraService : ICameraService
     #endregion
 
     #region 自动拍照
-
-    /// <summary>
-    ///     自动拍照
-    /// </summary>
-    /// <param name="ctsToken"></param>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
+    
     public async Task<long> TakeAutoPhotoAsync(CancellationToken ctsToken)
     {
         Initialize();
@@ -200,13 +186,7 @@ public class CameraService : ICameraService
     #endregion
 
     #region 手动拍照
-
-    /// <summary>
-    ///     手动拍照
-    /// </summary>
-    /// <param name="exposure"></param>
-    /// <param name="frame"></param>
-    /// <param name="ctsToken"></param>
+    
     public async Task TakeManualPhotoAsync(int exposure, int frame, CancellationToken ctsToken)
     {
         Initialize();
@@ -251,10 +231,7 @@ public class CameraService : ICameraService
     #endregion
 
     #region 取消拍照
-
-    /// <summary>
-    ///     取消拍照
-    /// </summary>
+    
     public void CancelTask()
     {
         Initialize();
@@ -264,12 +241,7 @@ public class CameraService : ICameraService
     #endregion
 
     #region 获取缓存
-
-    /// <summary>
-    ///     获取缓存
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
+    
     public async Task<List<Picture>> GetCacheAsync()
     {
         var count = 10;
@@ -282,17 +254,11 @@ public class CameraService : ICameraService
 
         return _pictureList;
     }
-
+    
     #endregion
 
     #region 设置增益
-
-    /// <summary>
-    ///     设置增益
-    /// </summary>
-    /// <param name="index"></param>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
+    
     public void SetPixel(uint index)
     {
         Initialize();
@@ -318,11 +284,7 @@ public class CameraService : ICameraService
     #endregion
 
     #region 获取温度
-
-    /// <summary>
-    ///     获取温度
-    /// </summary>
-    /// <returns></returns>
+    
     public double GetTemperature()
     {
         if (_nncam == null || !_nncam.get_Temperature(out var nTemp)) return -100.0;
@@ -333,11 +295,7 @@ public class CameraService : ICameraService
     #endregion
 
     #region 设置回调
-
-    /// <summary>
-    ///     设置回调
-    /// </summary>
-    /// <returns></returns>
+    
     private bool SetCallBack()
     {
         if (_nncam == null) return false;
@@ -361,10 +319,7 @@ public class CameraService : ICameraService
     #endregion
 
     #region 设备错误
-
-    /// <summary>
-    ///     设备错误
-    /// </summary>
+    
     private void OnEventError()
     {
         _nncam?.Close();
@@ -374,10 +329,7 @@ public class CameraService : ICameraService
     #endregion
 
     #region 断开连接
-
-    /// <summary>
-    ///     断开连接
-    /// </summary>
+    
     private void OnEventDisconnected()
     {
         _nncam?.Close();
@@ -387,10 +339,7 @@ public class CameraService : ICameraService
     #endregion
 
     #region 获取图片
-
-    /// <summary>
-    ///     获取图片
-    /// </summary>
+    
     private async void OnEventImage()
     {
         if (_nncam == null) return;
@@ -456,20 +405,12 @@ public class CameraService : ICameraService
     #endregion
 
     #region 保存图片
-
-    /// <summary>
-    ///     保存图片
-    /// </summary>
-    /// <param name="mat"></param>
-    /// <param name="info"></param>
-    /// <param name="exposureTime"></param>
-    /// <param name="type"></param>
-    /// <param name="offset"></param>
-    /// <returns></returns>
+    
     private async Task<Picture> SaveAsync(Mat mat, Nncam.FrameInfoV3 info, int exposureTime, int type = 0,
         int offset = 0)
     {
-        var tmp = mat.Clone();
+        var cali = Calibrate(mat);
+        var tmp = cali.Clone();
         // 保存原图
         var myPictures = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
         var date = DateTime.Now.AddSeconds(offset).ToString("yyyyMMddHHmmss");
@@ -481,13 +422,15 @@ public class CameraService : ICameraService
         tmp.SaveImage(filePath);
 
         // 保存缩略图
-        var thumbnail = mat.Clone();
-        Cv2.Resize(mat, thumbnail, new Size(500, 500));
+        var thumbnail = new Mat();
+        Cv2.Resize(cali, thumbnail, new Size(500, 500));
         var thumbnailPath = Path.Combine(myPictures, "Thumbnail");
         if (!Directory.Exists(thumbnailPath)) Directory.CreateDirectory(thumbnailPath);
         var thumbnailFilePath = Path.Combine(thumbnailPath, $"{date}.jpg");
         Cv2.CvtColor(thumbnail, thumbnail, ColorConversionCodes.BGR2GRAY);
         thumbnail.SaveImage(thumbnailFilePath);
+        
+        cali.Dispose();
         tmp.Dispose();
         thumbnail.Dispose();
 
@@ -515,14 +458,7 @@ public class CameraService : ICameraService
     #endregion
 
     #region 计算曝光时间
-
-    /// <summary>
-    ///     计算曝光时间
-    /// </summary>
-    /// <param name="mat"></param>
-    /// <param name="expo"></param>
-    /// <param name="snr"></param>
-    /// <returns></returns>
+    
     private long CalculateExpo(Mat mat, nint expo, double snr)
     {
         // 计算信噪比
@@ -535,4 +471,46 @@ public class CameraService : ICameraService
     }
 
     #endregion
+
+    #region 相机标定
+    
+    private Mat Calibrate(Mat src)
+    {
+        InputArray cameraMatrix;
+        InputArray distCoeffs;
+
+        switch (src)
+        {
+            // 3000 分辨率
+            case { Width: 2992, Height: 3000 }:
+                cameraMatrix = InputArray.Create(new[,] {{2082.581708966785, 0.0, 2160.211502932287}, {0.0, 2094.7852108753714, 1187.5229334685396}, {0.0, 0.0, 1.0}});
+                distCoeffs = InputArray.Create([-0.1617693967384295, 0.1016950131734325, 0.009346569357983286, -0.017197424813879016, -0.0356675980080441]);
+                break;
+            // 1500 分辨率
+            case { Width: 1488, Height: 1500 }:
+                cameraMatrix = InputArray.Create(new[,] {{1041.2908544833925, 0.0, 750.0}, {0.0, 1041.2908544833925, 750.0}, {0.0, 0.0, 1.0}});
+                distCoeffs = InputArray.Create([-0.1617693967384295, 0.1016950131734325, 0.009346569357983286, -0.017197424813879016, -0.0356675980080441]);
+                break;
+            // 1000 分辨率
+            case { Width: 992, Height: 998 }:
+                cameraMatrix = InputArray.Create(new[,] {{3825.6296726786163, 0.0, 58.25510255382146}, {0.0, 3732.1071110996054, 178.12444925665798}, {0.0, 0.0, 1.0}});
+                distCoeffs = InputArray.Create([0.5727609203785231, -3.183380300892908, -0.012582903253057848, -0.06289824849038582, -15.481189803695374]);
+                break;
+            default:
+                cameraMatrix = InputArray.Create(new[,] {{2082.581708966785, 0.0, 2160.211502932287}, {0.0, 2094.7852108753714, 1187.5229334685396}, {0.0, 0.0, 1.0}});
+                distCoeffs = InputArray.Create([-0.1617693967384295, 0.1016950131734325, 0.009346569357983286, -0.017197424813879016, -0.0356675980080441]);
+                break;
+        }
+        
+        //根据相机内参和畸变参数矫正图片
+        var dst = new Mat();
+        var newCameraMatrix = Cv2.GetOptimalNewCameraMatrix(cameraMatrix, distCoeffs, src.Size(), 1, src.Size(), out var roi);
+        // cameraMatrix 数组转换成 Mat 类型
+        Cv2.Undistort(src, dst, cameraMatrix, distCoeffs, newCameraMatrix);
+        // 裁剪图片
+        return dst[roi];
+    }
+
+    #endregion
+    
 }

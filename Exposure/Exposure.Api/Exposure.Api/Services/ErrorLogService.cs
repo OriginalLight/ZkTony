@@ -22,11 +22,7 @@ public class ErrorLogService : BaseService<ErrorLog>, IErrorLogService
     #endregion
 
     #region 创建崩溃日志
-
-    /// <summary>
-    ///     创建崩溃日志
-    /// </summary>
-    /// <param name="ex"></param>
+    
     public void AddErrorLog(Exception ex)
     {
         var errLog = new ErrorLog
@@ -43,13 +39,7 @@ public class ErrorLogService : BaseService<ErrorLog>, IErrorLogService
     #endregion
 
     #region 分页查询
-
-    /// <summary>
-    ///     分页查询
-    /// </summary>
-    /// <param name="dto"></param>
-    /// <param name="total"></param>
-    /// <returns></returns>
+    
     public async Task<List<ErrorLog>> GetByPage(ErrorLogQueryDto dto, RefAsync<int> total)
     {
         return await _context.db.Queryable<ErrorLog>()
@@ -62,12 +52,7 @@ public class ErrorLogService : BaseService<ErrorLog>, IErrorLogService
     #endregion
 
     #region 根据id查询
-
-    /// <summary>
-    ///     根据id查询
-    /// </summary>
-    /// <param name="ids"></param>
-    /// <returns></returns>
+    
     public async Task<List<ErrorLog>> GetByIds(object[] ids)
     {
         return await _context.db.Queryable<ErrorLog>().Where(p => ids.Contains(p.Id)).ToListAsync();

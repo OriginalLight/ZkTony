@@ -22,12 +22,7 @@ public class UserService : BaseService<User>, IUserService
     #endregion
 
     #region 初始化
-
-    /// <summary>
-    ///     初始化
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
+    
     public async Task InitializeAsync()
     {
         // 查询超级管理员是否存在
@@ -51,11 +46,7 @@ public class UserService : BaseService<User>, IUserService
     #endregion
 
     #region 返回当前登录的用户
-
-    /// <summary>
-    ///     返回当前登录的用户
-    /// </summary>
-    /// <returns></returns>
+    
     public User? GetLogged()
     {
         // 返回登录状态
@@ -67,13 +58,7 @@ public class UserService : BaseService<User>, IUserService
     #endregion
 
     #region 登录
-
-    /// <summary>
-    ///     登录
-    /// </summary>
-    /// <param name="name"></param>
-    /// <param name="password"></param>
-    /// <returns></returns>
+    
     public async Task<int> LogIn(string name, string password)
     {
         // 查询用户
@@ -98,10 +83,7 @@ public class UserService : BaseService<User>, IUserService
     #endregion
 
     #region 注销
-
-    /// <summary>
-    ///     注销
-    /// </summary>
+    
     public void LogOut()
     {
         // 清除登录状态
@@ -111,13 +93,7 @@ public class UserService : BaseService<User>, IUserService
     #endregion
 
     #region 分页查询
-
-    /// <summary>
-    ///     分页查询
-    /// </summary>
-    /// <param name="dto"></param>
-    /// <param name="total"></param>
-    /// <returns></returns>
+    
     public async Task<List<User>> GetByPage(UserQueryDto dto, RefAsync<int> total)
     {
         return await _context.db.Queryable<User>()
@@ -140,12 +116,7 @@ public class UserService : BaseService<User>, IUserService
     #endregion
 
     #region 根据名称查询
-
-    /// <summary>
-    ///     根据名称查询
-    /// </summary>
-    /// <param name="dtoName"></param>
-    /// <returns></returns>
+    
     public async Task<User?> GetByName(string dtoName)
     {
         return await _context.db.Queryable<User>().Where(u => u.Name == dtoName).FirstAsync();

@@ -28,12 +28,7 @@ public class UsbService : IUsbService
     #endregion
 
     #region 外设插入
-
-    /// <summary>
-    ///     外设插入
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+    
     public void DeviceInsertedEvent(object sender, EventArrivedEventArgs e)
     {
         // 获取到当前插入的什么
@@ -43,12 +38,7 @@ public class UsbService : IUsbService
     #endregion
 
     #region 外设移除
-
-    /// <summary>
-    ///     外设移除
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+    
     public void DeviceRemovedEvent(object sender, EventArrivedEventArgs e)
     {
         _logger.LogInformation("外设移除");
@@ -57,11 +47,7 @@ public class UsbService : IUsbService
     #endregion
 
     #region 初始化
-
-    /// <summary>
-    ///     初始化
-    /// </summary>
-    /// <returns></returns>
+    
     public Task InitializeAsync()
     {
         _insertWatcher.EventArrived += DeviceInsertedEvent;
@@ -73,11 +59,7 @@ public class UsbService : IUsbService
     #endregion
 
     #region 获取所有的USB设备
-
-    /// <summary>
-    ///     获取所有的USB设备
-    /// </summary>
-    /// <returns></returns>
+    
     public DriveInfo[] GetUsbDrives()
     {
         var allDrives = DriveInfo.GetDrives();
@@ -90,11 +72,7 @@ public class UsbService : IUsbService
     #endregion
 
     #region 获取默认的USB设备
-
-    /// <summary>
-    ///     获取默认的USB设备
-    /// </summary>
-    /// <returns></returns>
+    
     public DriveInfo? GetDefaultUsbDrive()
     {
         var usbDrives = GetUsbDrives();
@@ -105,11 +83,7 @@ public class UsbService : IUsbService
     #endregion
 
     #region 是否有USB设备
-
-    /// <summary>
-    ///     是否有USB设备
-    /// </summary>
-    /// <returns></returns>
+    
     public bool IsUsbAttached()
     {
         var usbDrives = GetUsbDrives();

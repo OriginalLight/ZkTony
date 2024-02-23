@@ -56,4 +56,5 @@ public interface ICameraService
     /// </summary>
     /// <returns></returns>
     Task<List<Picture>> GetCacheAsync();
+    
 }

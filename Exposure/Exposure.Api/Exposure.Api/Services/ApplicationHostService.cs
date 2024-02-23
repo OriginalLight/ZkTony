@@ -34,11 +34,7 @@ public class ApplicationHostService : IHostedService
     #endregion
 
     #region 初始化
-
-    /// <summary>
-    ///     初始化
-    /// </summary>
-    /// <param name="cancellationToken"></param>
+    
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         if (!_isInitialized)
@@ -57,11 +53,7 @@ public class ApplicationHostService : IHostedService
     #endregion
 
     #region 停止
-
-    /// <summary>
-    ///     停止
-    /// </summary>
-    /// <param name="cancellationToken"></param>
+    
     public async Task StopAsync(CancellationToken cancellationToken)
     {
         await Task.CompletedTask;

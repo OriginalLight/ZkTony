@@ -10,18 +10,16 @@ public class CameraController : ControllerBase
     private readonly ICameraService _camera;
     private readonly IErrorLogService _errorLog;
     private readonly IOperLogService _operLog;
-    private readonly ISerialPortService _serialPort;
     private CancellationTokenSource? _cts;
 
     #region 构造函数
 
     /// <inheritdoc />
-    public CameraController(ICameraService camera, IErrorLogService errorLog, IOperLogService operLog, ISerialPortService serialPort)
+    public CameraController(ICameraService camera, IErrorLogService errorLog, IOperLogService operLog)
     {
         _camera = camera;
         _errorLog = errorLog;
         _operLog = operLog;
-        _serialPort = serialPort;
     }
 
     #endregion

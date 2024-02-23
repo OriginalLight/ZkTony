@@ -29,13 +29,7 @@ public class PictureService : BaseService<Picture>, IPictureService
     #endregion
 
     #region 分页查询
-
-    /// <summary>
-    ///     分页查询
-    /// </summary>
-    /// <param name="dto"></param>
-    /// <param name="total"></param>
-    /// <returns></returns>
+    
     public async Task<List<Picture>> GetByPage(PictureQueryDto dto, RefAsync<int> total)
     {
         var logged = _user.GetLogged();
@@ -56,12 +50,7 @@ public class PictureService : BaseService<Picture>, IPictureService
     #endregion
 
     #region 添加并返回实体
-
-    /// <summary>
-    ///     添加并返回实体
-    /// </summary>
-    /// <param name="picture"></param>
-    /// <returns></returns>
+    
     public Task<Picture> AddReturnModel(Picture picture)
     {
         var id = _context.db.Insertable(picture).ExecuteReturnIdentity();
@@ -71,12 +60,7 @@ public class PictureService : BaseService<Picture>, IPictureService
     #endregion
 
     #region 根据id查询
-
-    /// <summary>
-    ///     根据id查询
-    /// </summary>
-    /// <param name="ids"></param>
-    /// <returns></returns>
+    
     public async Task<List<Picture>> GetByIds(object[] ids)
     {
         return await _context.db.Queryable<Picture>().Where(p => ids.Contains(p.Id)).ToListAsync();
@@ -85,12 +69,7 @@ public class PictureService : BaseService<Picture>, IPictureService
     #endregion
 
     #region 合并图片
-
-    /// <summary>
-    ///     合并图片
-    /// </summary>
-    /// <param name="list"></param>
-    /// <returns></returns>
+    
     public async Task<Picture> Combine(List<Picture> list)
     {
         var bitmap1 = new Bitmap(list[0].Path);
@@ -146,13 +125,7 @@ public class PictureService : BaseService<Picture>, IPictureService
     #endregion
 
     #region 删除
-
-    /// <summary>
-    ///     调整图片
-    /// </summary>
-    /// <param name="pic"></param>
-    /// <param name="dto"></param>
-    /// <returns></returns>
+    
     public async Task<Picture> Adjust(Picture pic, PictureAdjustDto dto)
     {
         // 使用imageSharp处理图片
@@ -206,12 +179,7 @@ public class PictureService : BaseService<Picture>, IPictureService
     #endregion
 
     #region 更新
-
-    /// <summary>
-    ///     更新
-    /// </summary>
-    /// <param name="model"></param>
-    /// <returns></returns>
+    
     public async Task<bool> Update(PictureUpdateDto model)
     {
         var pic = await _context.db.Queryable<Picture>().InSingleAsync(model.Id);

@@ -53,14 +53,7 @@ public class SerialPortService : ISerialPortService
     #endregion
 
     #region 打开串口
-
-    /// <summary>
-    ///     打开串口
-    /// </summary>
-    /// <param name="portName"></param>
-    /// <param name="baudRate"></param>
-    /// <param name="alias"></param>
-    /// <returns></returns>
+    
     public bool OpenPort(string portName, int baudRate, string alias)
     {
         if (_serialPorts.ContainsKey(portName)) return false;
@@ -84,11 +77,7 @@ public class SerialPortService : ISerialPortService
     #endregion
 
     #region 关闭串口
-
-    /// <summary>
-    ///     关闭串口
-    /// </summary>
-    /// <param name="alias"></param>
+    
     public void ClosePort(string alias)
     {
         try
@@ -107,12 +96,7 @@ public class SerialPortService : ISerialPortService
     #endregion
 
     #region 写入串口
-
-    /// <summary>
-    ///     写入串口
-    /// </summary>
-    /// <param name="alias"></param>
-    /// <param name="bytes"></param>
+    
     public void WritePort(string alias, byte[] bytes)
     {
         try
@@ -130,12 +114,7 @@ public class SerialPortService : ISerialPortService
     #endregion
 
     #region 读取串口
-
-    /// <summary>
-    ///     读取串口
-    /// </summary>
-    /// <param name="alias"></param>
-    /// <returns></returns>
+    
     public string? ReadPort(string alias)
     {
         if (!_serialPorts.TryGetValue(alias, out var value)) return null;
