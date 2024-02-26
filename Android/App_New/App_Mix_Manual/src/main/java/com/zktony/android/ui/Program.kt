@@ -266,7 +266,7 @@ fun ProgramList(
                             )
                         })
                 ) {
-                    TableTextBody(text = "" + item.id, width = cellWidthList[0], selected)
+                    TableTextBody(text = (index + 1).toString(), width = cellWidthList[0], selected)
                     TableTextBody(text = item.displayText, width = cellWidthList[1], selected)
                     TableTextBody(
                         text = "" + item.startRange + "%~" + item.endRange + "%",
@@ -448,7 +448,8 @@ fun ProgramList(
     //新建和打开弹窗
     if (showingDialog.value) {
         AlertDialog(
-            onDismissRequest = { showingDialog.value = false },
+            onDismissRequest = {
+            },
             text = {
 
                 LazyColumn(
@@ -469,13 +470,14 @@ fun ProgramList(
                                 ),
                                 label = { Text(text = "制胶名称") },
                                 onValueChange = {
-                                    displayText = it
-                                    if (displayText.length > 7) {
+                                    if (it.length > 7) {
                                         Toast.makeText(
                                             context,
                                             "名称长度不能过长!",
                                             Toast.LENGTH_SHORT
                                         ).show()
+                                    } else {
+                                        displayText = it
                                     }
                                 })
 
@@ -539,7 +541,9 @@ fun ProgramList(
                     }
 
                     item {
-                        Row {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             Text(
                                 fontSize = 16.sp,
                                 text = "厚度："
@@ -561,7 +565,7 @@ fun ProgramList(
                                             thickness.value = it
                                         }
                                     )
-                                    Text(text = it)
+                                    Text(modifier = Modifier.padding(top = 15.dp), text = it)
                                 }
 
                                 Spacer(modifier = Modifier.width(20.dp))
@@ -638,122 +642,131 @@ fun ProgramList(
                     modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
                         containerColor = Color(rgb(0, 105, 52))
                     ), onClick = {
+                        try {
+                            if (open.value) {
+                                //打开
+                                val entity = entities[selectedIndex]
 
-                        if (open.value) {
-                            //打开
-                            val entity = entities[selectedIndex]
+                                var speChat =
+                                    "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]"
 
-                            var speChat =
-                                "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]"
+                                var nameRepeat = false
 
-                            var nameRepeat = false
-
-                            entitiesList.forEach {
-                                if (displayText == it.displayText) {
-                                    if (entity != null) {
-                                        if (entity.displayText != displayText) {
-                                            nameRepeat = true
+                                entitiesList.forEach {
+                                    if (displayText == it.displayText) {
+                                        if (entity != null) {
+                                            if (entity.displayText != displayText) {
+                                                nameRepeat = true
+                                            }
                                         }
                                     }
                                 }
-                            }
 
-                            if (nameRepeat) {
-                                Toast.makeText(
-                                    context,
-                                    "文件名不能重复！",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            } else {
-                                if (Pattern.compile(speChat).matcher(displayText).find()) {
+                                if (nameRepeat) {
                                     Toast.makeText(
                                         context,
-                                        "文件名不能包含特殊字符！",
+                                        "文件名不能重复！",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 } else {
-                                    if (startRange_ex.toInt() > endRange_ex.toInt()
-                                        || startRange_ex.toInt() < 3 || startRange_ex.toInt() > 30 || endRange_ex.toInt() < 3 || endRange_ex.toInt() > 30 || coagulant_ex.toInt() < 0 || volume_ex.toDouble() < 0
-                                        || coagulant_ex.toInt() > 800 || volume_ex.toDouble() > 20
-                                    ){
+                                    if (Pattern.compile(speChat).matcher(displayText).find()) {
                                         Toast.makeText(
                                             context,
-                                            "数据错误！",
+                                            "文件名不能包含特殊字符！",
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     } else {
-                                        if (entity != null) {
-                                            entity.displayText = displayText
-                                            entity.startRange = startRange_ex.toInt()
-                                            entity.endRange = endRange_ex.toInt()
-                                            entity.thickness = thickness.value
-                                            entity.coagulant = coagulant_ex.toInt()
-                                            entity.volume = volume_ex.toDouble()
-                                            entity.founder = founder
-                                            dispatch(ProgramIntent.Update(entity))
+                                        if (startRange_ex.toInt() > endRange_ex.toInt()
+                                            || startRange_ex.toInt() < 3 || startRange_ex.toInt() > 30 || endRange_ex.toInt() < 3 || endRange_ex.toInt() > 30 || coagulant_ex.toInt() < 0 || volume_ex.toDouble() < 0
+                                            || coagulant_ex.toInt() > 800 || volume_ex.toDouble() > 20
+                                        ) {
+                                            Toast.makeText(
+                                                context,
+                                                "数据错误！",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else {
+                                            if (entity != null) {
+                                                entity.displayText = displayText
+                                                entity.startRange = startRange_ex.toInt()
+                                                entity.endRange = endRange_ex.toInt()
+                                                entity.thickness = thickness.value
+                                                entity.coagulant = coagulant_ex.toInt()
+                                                entity.volume = volume_ex.toDouble()
+                                                entity.founder = founder
+                                                dispatch(ProgramIntent.Update(entity))
+                                                showingDialog.value = false
+                                            }
+                                        }
+
+                                    }
+                                }
+
+
+                            } else {
+                                //新建
+                                var speChat =
+                                    "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]"
+
+                                var nameRepeat = false
+
+                                entitiesList.forEach {
+                                    if (displayText == it.displayText) {
+                                        nameRepeat = true
+                                    }
+                                }
+
+                                if (nameRepeat) {
+                                    Toast.makeText(
+                                        context,
+                                        "文件名不能重复！",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    if (Pattern.compile(speChat).matcher(displayText).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "文件名不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+
+                                    } else {
+                                        if (startRange_ex.toInt() > endRange_ex.toInt()
+                                            || startRange_ex.toInt() < 3 || startRange_ex.toInt() > 30 || endRange_ex.toInt() < 3 || endRange_ex.toInt() > 30 || coagulant_ex.toInt() < 0 || volume_ex.toDouble() < 0
+                                            || coagulant_ex.toInt() > 800 || volume_ex.toDouble() > 20
+                                        ) {
+                                            Toast.makeText(
+                                                context,
+                                                "数据错误！",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else {
+                                            dispatch(
+                                                ProgramIntent.Insert(
+                                                    displayText,
+                                                    startRange_ex.toInt(),
+                                                    endRange_ex.toInt(),
+                                                    thickness.value,
+                                                    coagulant_ex.toInt(),
+                                                    volume_ex.toDouble(),
+                                                    founder
+                                                )
+                                            )
                                             showingDialog.value = false
                                         }
+
                                     }
 
                                 }
                             }
-
-
-                        } else {
-                            //新建
-                            var speChat =
-                                "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]"
-
-                            var nameRepeat = false
-
-                            entitiesList.forEach {
-                                if (displayText == it.displayText) {
-                                    nameRepeat = true
-                                }
-                            }
-
-                            if (nameRepeat) {
-                                Toast.makeText(
-                                    context,
-                                    "文件名不能重复！",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            } else {
-                                if (Pattern.compile(speChat).matcher(displayText).find()) {
-                                    Toast.makeText(
-                                        context,
-                                        "文件名不能包含特殊字符！",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-
-                                } else {
-                                    if (startRange_ex.toInt() > endRange_ex.toInt()
-                                        || startRange_ex.toInt() < 3 || startRange_ex.toInt() > 30 || endRange_ex.toInt() < 3 || endRange_ex.toInt() > 30 || coagulant_ex.toInt() < 0 || volume_ex.toDouble() < 0
-                                        || coagulant_ex.toInt() > 800 || volume_ex.toDouble() > 20
-                                    ) {
-                                        Toast.makeText(
-                                            context,
-                                            "数据错误！",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    } else {
-                                        dispatch(
-                                            ProgramIntent.Insert(
-                                                displayText,
-                                                startRange_ex.toInt(),
-                                                endRange_ex.toInt(),
-                                                thickness.value,
-                                                coagulant_ex.toInt(),
-                                                volume_ex.toDouble(),
-                                                founder
-                                            )
-                                        )
-                                        showingDialog.value = false
-                                    }
-
-                                }
-
-                            }
+                        } catch (e: Exception) {
+                            Toast.makeText(
+                                context,
+                                "数据异常！",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } finally {
+                            thickness.value = "1.0"
                         }
 
 
@@ -764,7 +777,10 @@ fun ProgramList(
                 Button(
                     modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
                         containerColor = Color(rgb(0, 105, 52))
-                    ), onClick = { showingDialog.value = false }) {
+                    ), onClick = {
+                        thickness.value = "1.0"
+                        showingDialog.value = false
+                    }) {
                     Text(text = "取消")
                 }
             })

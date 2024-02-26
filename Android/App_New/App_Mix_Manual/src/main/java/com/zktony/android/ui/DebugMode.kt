@@ -868,7 +868,7 @@ fun debugMode(
 
                                 }
                             }) {
-                            Text(text = "运    动", fontSize = 18.sp)
+                            Text(text = "运    行", fontSize = 18.sp)
                         }
 
                         Button(modifier = Modifier

@@ -81,6 +81,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import java.util.regex.Pattern
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -205,6 +206,9 @@ fun operate(
 
     val context = LocalContext.current
 
+    var speChat =
+        "[`~!@#$%^&*()+=\\-|{}':;',\\[\\]<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]"
+
 
     if (!first) {
         uiEvent(HomeIntent.First)
@@ -256,14 +260,14 @@ fun operate(
     val highDialog = remember { mutableStateOf(false) }
 
     /**
-     * 纯水液量/ml
+     * 纯水液量/mL
      */
     val water = rememberDataSaverState(key = "water", default = 0f)
     var water_ex by remember { mutableStateOf(water.value.format(1)) }
 
 
     /**
-     * 促凝剂液量/ml
+     * 促凝剂液量/mL
      */
     val coagulantvol = rememberDataSaverState(key = "coagulantvol", default = 0f)
     var coagulant_ex by remember { mutableStateOf(coagulantvol.value.format(1)) }
@@ -277,7 +281,7 @@ fun operate(
 
 
     /**
-     * 低浓度液量/ml
+     * 低浓度液量/mL
      */
     val lowCoagulantVol = rememberDataSaverState(key = "lowCoagulantVol", default = 0f)
     var lowCoagulantVol_ex by remember { mutableStateOf(lowCoagulantVol.value.format(1)) }
@@ -290,7 +294,7 @@ fun operate(
 
 
     /**
-     * 高浓度液量/ml
+     * 高浓度液量/mL
      */
     val highCoagulantVol = rememberDataSaverState(key = "highCoagulantVol", default = 0f)
     var highCoagulantVol_ex by remember { mutableStateOf(highCoagulantVol.value.format(1)) }
@@ -378,7 +382,7 @@ fun operate(
 
     var useVol by remember { mutableStateOf(false) }
 
-
+    println("uiFlags====$uiFlags")
     if (uiFlags is UiFlags.Objects && uiFlags.objects == 4) {
         if (useVol) {
             useVol = false
@@ -645,51 +649,58 @@ fun operate(
                         ),
                         value = expectedMakeNum_ex,
                         onValueChange = {
-                            if (job == null) {
-                                if (uiFlags is UiFlags.None) {
-                                    if (program != null) {
-                                        expectedMakeNum_ex = it
-                                        val temp = expectedMakeNum_ex.toIntOrNull() ?: 0
-                                        if (temp > 0) {
-                                            if (temp > 99) {
-                                                Toast.makeText(
-                                                    context,
-                                                    "预计数量不能大于99！",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
+                            if (Pattern.compile(speChat).matcher(it).find()) {
+                                Toast.makeText(
+                                    context,
+                                    "数据不能包含特殊字符！",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }else{
+                                if (job == null) {
+                                    if (uiFlags is UiFlags.None) {
+                                        if (program != null) {
+                                            expectedMakeNum_ex = it
+                                            val temp = expectedMakeNum_ex.toIntOrNull() ?: 0
+                                            if (temp > 0) {
+                                                if (temp > 99) {
+                                                    Toast.makeText(
+                                                        context,
+                                                        "预计数量不能大于99！",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                } else {
+                                                    expectedMakeNum.value = temp
+                                                    expectedMakeNum_ex = temp.toString()
+                                                    water.value = 50f
+                                                    water_ex = "50"
+                                                    coagulantvol.value = 10f
+                                                    coagulant_ex = "10"
+                                                    uiEvent(HomeIntent.HigeLowMotherVol)
+                                                }
                                             } else {
-                                                expectedMakeNum.value = temp
-                                                expectedMakeNum_ex = temp.toString()
-                                                water.value = 50f
-                                                water_ex = "50"
-                                                coagulantvol.value = 10f
-                                                coagulant_ex = "10"
-                                                uiEvent(HomeIntent.HigeLowMotherVol)
+                                                water.value = 0f
+                                                water_ex = "0"
+
+                                                coagulantvol.value = 0f
+                                                coagulant_ex = "0"
+
+                                                lowCoagulantVol.value = 0f
+                                                lowCoagulantVol_ex = "0"
+
+                                                highCoagulantVol.value = 0f
+                                                highCoagulantVol_ex = "0"
                                             }
+
                                         } else {
-                                            water.value = 0f
-                                            water_ex = "0"
-
-                                            coagulantvol.value = 0f
-                                            coagulant_ex = "0"
-
-                                            lowCoagulantVol.value = 0f
-                                            lowCoagulantVol_ex = "0"
-
-                                            highCoagulantVol.value = 0f
-                                            highCoagulantVol_ex = "0"
+                                            Toast.makeText(
+                                                context,
+                                                "没有制胶程序！",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
                                         }
-
-                                    } else {
-                                        Toast.makeText(
-                                            context,
-                                            "没有制胶程序！",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
                                     }
                                 }
                             }
-
 
                         },
                         keyboardOptions = KeyboardOptions(
@@ -825,7 +836,7 @@ fun operate(
                             .clickable {
                                 if (job == null) {
                                     if (uiFlags is UiFlags.None) {
-                                        if (waste.value >= 1f) {
+                                        if (waste.value >= 0.9f) {
                                             uiEvent(HomeIntent.CleanWaste)
                                             wasteDialog.value = true
                                         } else {
@@ -860,7 +871,7 @@ fun operate(
                             .size(63.dp, 63.dp)
                             .clickable {
                                 scope.launch {
-                                    if (waste.value >= 1f) {
+                                    if (waste.value >= 0.9f) {
                                         wasteDialog.value = true
                                     } else {
                                         if (uiFlags is UiFlags.None) {
@@ -883,7 +894,7 @@ fun operate(
                             .size(63.dp, 63.dp)
                             .clickable {
                                 scope.launch {
-                                    if (waste.value >= 1f) {
+                                    if (waste.value >= 0.9f) {
                                         wasteDialog.value = true
                                     } else {
                                         if (uiFlags is UiFlags.None || (uiFlags is UiFlags.Objects && uiFlags.objects == 2)) {
@@ -1019,6 +1030,7 @@ fun operate(
                             modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(rgb(0, 105, 52))
                             ), onClick = {
+                                uiEvent(HomeIntent.CleanWasteState)
                                 wasteBool = true
                                 wasteDialog.value = false
                                 waste.value = 0f
@@ -1111,7 +1123,7 @@ fun operate(
                         ) {
                             Text(
                                 fontSize = 16.sp,
-                                text = "冲洗液量/ml："
+                                text = "冲洗液量/mL："
                             )
                             OutlinedTextField(
                                 modifier = Modifier.width(100.dp),
@@ -1121,9 +1133,17 @@ fun operate(
                                     cursorColor = Color(rgb(0, 105, 52))
                                 ),
                                 value = water_ex,
-                                label = { Text(text = "ml") },
+                                label = { Text(text = "mL") },
                                 onValueChange = {
-                                    water_ex = it
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }else{
+                                        water_ex = it
+                                    }
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1142,7 +1162,7 @@ fun operate(
                             modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(rgb(0, 105, 52))
                             ), onClick = {
-                                if ((water_ex.toIntOrNull() ?: 0) > 0) {
+                                if ((water_ex.toFloatOrNull() ?: 0f) > 0) {
                                     water.value = water_ex.toFloatOrNull() ?: 0f
                                     waterDialog.value = false
                                 } else {
@@ -1209,7 +1229,15 @@ fun operate(
                                     value = concentration_ex,
                                     label = { Text(text = "%") },
                                     onValueChange = {
-                                        concentration_ex = it
+                                        if (Pattern.compile(speChat).matcher(it).find()) {
+                                            Toast.makeText(
+                                                context,
+                                                "数据不能包含特殊字符！",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }else{
+                                            concentration_ex = it
+                                        }
                                     },
                                     keyboardOptions = KeyboardOptions(
                                         keyboardType = KeyboardType.Number,
@@ -1230,7 +1258,7 @@ fun operate(
                             ) {
                                 Text(
                                     fontSize = 16.sp,
-                                    text = "促凝剂液量/ml："
+                                    text = "促凝剂液量/mL："
                                 )
                                 OutlinedTextField(
                                     modifier = Modifier.width(100.dp),
@@ -1241,9 +1269,17 @@ fun operate(
                                     ),
                                     value = coagulant_ex,
                                     enabled = false,
-                                    label = { Text(text = "ml") },
+                                    label = { Text(text = "mL") },
                                     onValueChange = {
-                                        coagulant_ex = it
+                                        if (Pattern.compile(speChat).matcher(it).find()) {
+                                            Toast.makeText(
+                                                context,
+                                                "数据不能包含特殊字符！",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }else{
+                                            coagulant_ex = it
+                                        }
                                     },
                                     keyboardOptions = KeyboardOptions(
                                         keyboardType = KeyboardType.Number,
@@ -1332,7 +1368,15 @@ fun operate(
                                     value = lowCoagulant_ex,
                                     label = { Text(text = "%") },
                                     onValueChange = {
-                                        lowCoagulant_ex = it
+                                        if (Pattern.compile(speChat).matcher(it).find()) {
+                                            Toast.makeText(
+                                                context,
+                                                "数据不能包含特殊字符！",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }else{
+                                            lowCoagulant_ex = it
+                                        }
                                     },
                                     keyboardOptions = KeyboardOptions(
                                         keyboardType = KeyboardType.Number,
@@ -1353,7 +1397,7 @@ fun operate(
                             ) {
                                 Text(
                                     fontSize = 16.sp,
-                                    text = "低浓度液量/ml："
+                                    text = "低浓度液量/mL："
                                 )
                                 OutlinedTextField(
                                     modifier = Modifier.width(100.dp),
@@ -1364,9 +1408,17 @@ fun operate(
                                     ),
                                     value = lowCoagulantVol_ex,
                                     enabled = false,
-                                    label = { Text(text = "ml") },
+                                    label = { Text(text = "mL") },
                                     onValueChange = {
-                                        lowCoagulantVol_ex = it
+                                        if (Pattern.compile(speChat).matcher(it).find()) {
+                                            Toast.makeText(
+                                                context,
+                                                "数据不能包含特殊字符！",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }else{
+                                            lowCoagulantVol_ex = it
+                                        }
                                     },
                                     keyboardOptions = KeyboardOptions(
                                         keyboardType = KeyboardType.Number,
@@ -1461,7 +1513,15 @@ fun operate(
                                     value = highCoagulant_ex,
                                     label = { Text(text = "%") },
                                     onValueChange = {
-                                        highCoagulant_ex = it
+                                        if (Pattern.compile(speChat).matcher(it).find()) {
+                                            Toast.makeText(
+                                                context,
+                                                "数据不能包含特殊字符！",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }else{
+                                            highCoagulant_ex = it
+                                        }
                                     },
                                     keyboardOptions = KeyboardOptions(
                                         keyboardType = KeyboardType.Number,
@@ -1482,7 +1542,7 @@ fun operate(
                             ) {
                                 Text(
                                     fontSize = 16.sp,
-                                    text = "高浓度液量/ml："
+                                    text = "高浓度液量/mL："
                                 )
                                 OutlinedTextField(
                                     modifier = Modifier.width(100.dp),
@@ -1493,9 +1553,17 @@ fun operate(
                                     ),
                                     value = highCoagulantVol_ex,
                                     enabled = false,
-                                    label = { Text(text = "ml") },
+                                    label = { Text(text = "mL") },
                                     onValueChange = {
-                                        highCoagulantVol_ex = it
+                                        if (Pattern.compile(speChat).matcher(it).find()) {
+                                            Toast.makeText(
+                                                context,
+                                                "数据不能包含特殊字符！",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }else{
+                                            highCoagulantVol_ex = it
+                                        }
                                     },
                                     keyboardOptions = KeyboardOptions(
                                         keyboardType = KeyboardType.Number,
@@ -1536,8 +1604,6 @@ fun operate(
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }
-
-
                             }) {
                             Text(text = "确认")
                         }
@@ -1613,7 +1679,7 @@ fun operate(
                                         })
                                 ) {
                                     TableTextBody(
-                                        text = "" + item.id,
+                                        text = (index + 1).toString(),
                                         width = cellWidthList[0],
                                         selectedEntity
                                     )

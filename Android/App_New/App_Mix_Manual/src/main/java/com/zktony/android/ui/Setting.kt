@@ -93,8 +93,10 @@ import com.zktony.android.utils.SerialPortUtils.start
 import com.zktony.android.utils.extra.Application
 import com.zktony.android.utils.extra.dateFormat
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 //import com.zktony.serialport.BuildConfig
 import kotlinx.coroutines.launch
+import java.util.regex.Pattern
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -108,6 +110,7 @@ fun SettingRoute(viewModel: SettingViewModel) {
     val selected by viewModel.selected.collectAsStateWithLifecycle()
     val progress by viewModel.progress.collectAsStateWithLifecycle()
     val page by viewModel.page.collectAsStateWithLifecycle()
+    val currentpwd by viewModel.currentpwd.collectAsStateWithLifecycle()
     val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
 
     val job by viewModel.job.collectAsStateWithLifecycle()
@@ -167,7 +170,8 @@ fun SettingRoute(viewModel: SettingViewModel) {
                         progress,
                         viewModel::dispatch,
                         erroeEntities,
-                        uiFlags
+                        uiFlags,
+                        currentpwd
                     )
 
                     PageType.DEBUGMODE -> debug(
@@ -177,6 +181,7 @@ fun SettingRoute(viewModel: SettingViewModel) {
                         job,
                         uiFlags,
                     )
+
                     PageType.SPORTSLOG -> sportsLog(
                         viewModel::dispatch,
                         sportsLogEntitiesDis,
@@ -202,6 +207,7 @@ fun SettingLits(
     uiEvent: (SettingIntent) -> Unit,
     erroeEntities: LazyPagingItems<ErrorRecord>,
     uiFlags: UiFlags,
+    currentpwd: String
 ) {
     var setting = s1 ?: Setting()
 
@@ -220,6 +226,10 @@ fun SettingLits(
     var selectRudio = rememberDataSaverState(key = "selectRudio", default = 1)
 
     val snackbarHostState = LocalSnackbarHostState.current
+
+    var speChat =
+        "[`~!@#$%^&*()+=\\-|{}':;',\\[\\]<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]"
+
     /**
      * 判断首页是否再运动中，true在运动，false不在运动
      */
@@ -236,17 +246,13 @@ fun SettingLits(
     /**
      * 超级管理员
      */
-    val superAdminPwd = rememberDataSaverState(key = "superAdminPwd", default = "234567")
+    val superAdminPwd = rememberDataSaverState(key = "superAdminPwd", default = "922042")
 
     /**
      * 厂家管理员
      */
-    val factoryAdminPwd = rememberDataSaverState(key = "superAdminPwd", default = "345678")
+    val factoryAdminPwd = rememberDataSaverState(key = "superAdminPwd", default = "240229")
 
-    /**
-     * 当前使用密码
-     */
-    val currentPwd = rememberDataSaverState(key = "currentPwd", default = "")
 
     /**
      * 修改密码的弹窗
@@ -749,15 +755,21 @@ fun SettingLits(
                                 ),
                                 label = { Text(text = "清洗液量/mL", fontSize = 14.sp) },
                                 onValueChange = {
-                                    higeCleanVolume_ex = it
-                                    val temp = higeCleanVolume_ex.toDoubleOrNull() ?: 0.0
-                                    if (temp < 0) {
-                                        higeCleanVolume_ex = "0"
-                                    } else if (temp > 20) {
-                                        higeCleanVolume_ex = "20"
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        higeCleanVolume_ex = it
+                                        val temp = higeCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            higeCleanVolume_ex = "0"
+                                        } else if (temp > 20) {
+                                            higeCleanVolume_ex = "20"
+                                        }
                                     }
-
-
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -781,13 +793,22 @@ fun SettingLits(
                                 ),
                                 label = { Text(text = "预排液量/mL", fontSize = 14.sp) },
                                 onValueChange = {
-                                    higeRehearsalVolume_ex = it
-                                    val temp = higeRehearsalVolume_ex.toDoubleOrNull() ?: 0.0
-                                    if (temp < 0) {
-                                        higeRehearsalVolume_ex = "0"
-                                    } else if (temp > 20) {
-                                        higeRehearsalVolume_ex = "20"
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        higeRehearsalVolume_ex = it
+                                        val temp = higeRehearsalVolume_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            higeRehearsalVolume_ex = "0"
+                                        } else if (temp > 20) {
+                                            higeRehearsalVolume_ex = "20"
+                                        }
                                     }
+
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -812,13 +833,22 @@ fun SettingLits(
                                 ),
                                 label = { Text(text = "管路填充/mL", fontSize = 14.sp) },
                                 onValueChange = {
-                                    higeFilling_ex = it
-                                    val temp = higeFilling_ex.toDoubleOrNull() ?: 0.0
-                                    if (temp < 0) {
-                                        higeFilling_ex = "0"
-                                    } else if (temp > 20) {
-                                        higeFilling_ex = "20"
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        higeFilling_ex = it
+                                        val temp = higeFilling_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            higeFilling_ex = "0"
+                                        } else if (temp > 20) {
+                                            higeFilling_ex = "20"
+                                        }
                                     }
+
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -862,14 +892,23 @@ fun SettingLits(
                                 ),
                                 label = { Text(text = "清洗液量/mL", fontSize = 14.sp) },
                                 onValueChange = {
-                                    lowCleanVolume_ex = it
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        lowCleanVolume_ex = it
 
-                                    val temp = lowCleanVolume_ex.toDoubleOrNull() ?: 0.0
-                                    if (temp < 0) {
-                                        lowCleanVolume_ex = "0"
-                                    } else if (temp > 20) {
-                                        lowCleanVolume_ex = "20"
+                                        val temp = lowCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            lowCleanVolume_ex = "0"
+                                        } else if (temp > 20) {
+                                            lowCleanVolume_ex = "20"
+                                        }
                                     }
+
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -894,14 +933,23 @@ fun SettingLits(
                                 ),
                                 label = { Text(text = "管路填充/mL", fontSize = 14.sp) },
                                 onValueChange = {
-                                    lowFilling_ex = it
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        lowFilling_ex = it
 
-                                    val temp = lowFilling_ex.toDoubleOrNull() ?: 0.0
-                                    if (temp < 0) {
-                                        lowFilling_ex = "0"
-                                    } else if (temp > 20) {
-                                        lowFilling_ex = "20"
+                                        val temp = lowFilling_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            lowFilling_ex = "0"
+                                        } else if (temp > 20) {
+                                            lowFilling_ex = "20"
+                                        }
                                     }
+
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -946,14 +994,23 @@ fun SettingLits(
                                 ),
                                 label = { Text(text = "冲洗液量/mL", fontSize = 14.sp) },
                                 onValueChange = {
-                                    rinseCleanVolume_ex = it
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        rinseCleanVolume_ex = it
 
-                                    val temp = rinseCleanVolume_ex.toDoubleOrNull() ?: 0.0
-                                    if (temp < 0) {
-                                        rinseCleanVolume_ex = "0"
-                                    } else if (temp > 20) {
-                                        rinseCleanVolume_ex = "20"
+                                        val temp = rinseCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            rinseCleanVolume_ex = "0"
+                                        } else if (temp > 20) {
+                                            rinseCleanVolume_ex = "20"
+                                        }
                                     }
+
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -978,14 +1035,23 @@ fun SettingLits(
                                 ),
                                 label = { Text(text = "管路填充/mL", fontSize = 14.sp) },
                                 onValueChange = {
-                                    rinseFilling_ex = it
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        rinseFilling_ex = it
 
-                                    val temp = rinseFilling_ex.toDoubleOrNull() ?: 0.0
-                                    if (temp < 0) {
-                                        rinseFilling_ex = "0"
-                                    } else if (temp > 20) {
-                                        rinseFilling_ex = "20"
+                                        val temp = rinseFilling_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            rinseFilling_ex = "0"
+                                        } else if (temp > 20) {
+                                            rinseFilling_ex = "20"
+                                        }
                                     }
+
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1030,14 +1096,23 @@ fun SettingLits(
                                 ),
                                 label = { Text(text = "清洗液量/mL", fontSize = 14.sp) },
                                 onValueChange = {
-                                    coagulantCleanVolume_ex = it
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        coagulantCleanVolume_ex = it
 
-                                    val temp = coagulantCleanVolume_ex.toDoubleOrNull() ?: 0.0
-                                    if (temp < 0) {
-                                        coagulantCleanVolume_ex = "0"
-                                    } else if (temp > 20) {
-                                        coagulantCleanVolume_ex = "20"
+                                        val temp = coagulantCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            coagulantCleanVolume_ex = "0"
+                                        } else if (temp > 20) {
+                                            coagulantCleanVolume_ex = "20"
+                                        }
                                     }
+
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1062,14 +1137,23 @@ fun SettingLits(
                                 ),
                                 label = { Text(text = "管路填充/mL", fontSize = 14.sp) },
                                 onValueChange = {
-                                    coagulantFilling_ex = it
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        coagulantFilling_ex = it
 
-                                    val temp = coagulantFilling_ex.toDoubleOrNull() ?: 0.0
-                                    if (temp < 0) {
-                                        coagulantFilling_ex = "0"
-                                    } else if (temp > 20) {
-                                        coagulantFilling_ex = "20"
+                                        val temp = coagulantFilling_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            coagulantFilling_ex = "0"
+                                        } else if (temp > 20) {
+                                            coagulantFilling_ex = "20"
+                                        }
                                     }
+
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1211,14 +1295,23 @@ fun SettingLits(
                                 ),
                                 label = { Text(text = "加液量1/g", fontSize = 14.sp) },
                                 onValueChange = {
-                                    higeLiquidVolume1_ex = it
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        higeLiquidVolume1_ex = it
 
-                                    val temp = higeLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
-                                    if (temp < 0) {
-                                        higeLiquidVolume1_ex = "0"
-                                    } else if (temp > 50) {
-                                        higeLiquidVolume1_ex = "50"
+                                        val temp = higeLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            higeLiquidVolume1_ex = "0"
+                                        } else if (temp > 50) {
+                                            higeLiquidVolume1_ex = "50"
+                                        }
                                     }
+
 
                                 },
                                 keyboardOptions = KeyboardOptions(
@@ -1243,14 +1336,23 @@ fun SettingLits(
                                 ),
                                 label = { Text(text = "加液量2/g", fontSize = 14.sp) },
                                 onValueChange = {
-                                    higeLiquidVolume2_ex = it
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        higeLiquidVolume2_ex = it
 
-                                    val temp = higeLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
-                                    if (temp < 0) {
-                                        higeLiquidVolume2_ex = "0"
-                                    } else if (temp > 50) {
-                                        higeLiquidVolume2_ex = "50"
+                                        val temp = higeLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            higeLiquidVolume2_ex = "0"
+                                        } else if (temp > 50) {
+                                            higeLiquidVolume2_ex = "50"
+                                        }
                                     }
+
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1274,14 +1376,23 @@ fun SettingLits(
                                 ),
                                 label = { Text(text = "加液量3/g", fontSize = 14.sp) },
                                 onValueChange = {
-                                    higeLiquidVolume3_ex = it
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        higeLiquidVolume3_ex = it
 
-                                    val temp = higeLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
-                                    if (temp < 0) {
-                                        higeLiquidVolume3_ex = "0"
-                                    } else if (temp > 50) {
-                                        higeLiquidVolume3_ex = "50"
+                                        val temp = higeLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            higeLiquidVolume3_ex = "0"
+                                        } else if (temp > 50) {
+                                            higeLiquidVolume3_ex = "50"
+                                        }
                                     }
+
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1360,14 +1471,23 @@ fun SettingLits(
                                 ),
                                 label = { Text(text = "加液量1/g", fontSize = 14.sp) },
                                 onValueChange = {
-                                    lowLiquidVolume1_ex = it
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        lowLiquidVolume1_ex = it
 
-                                    val temp = lowLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
-                                    if (temp < 0) {
-                                        lowLiquidVolume1_ex = "0"
-                                    } else if (temp > 50) {
-                                        lowLiquidVolume1_ex = "50"
+                                        val temp = lowLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            lowLiquidVolume1_ex = "0"
+                                        } else if (temp > 50) {
+                                            lowLiquidVolume1_ex = "50"
+                                        }
                                     }
+
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1391,14 +1511,23 @@ fun SettingLits(
                                 ),
                                 label = { Text(text = "加液量2/g", fontSize = 14.sp) },
                                 onValueChange = {
-                                    lowLiquidVolume2_ex = it
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        lowLiquidVolume2_ex = it
 
-                                    val temp = lowLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
-                                    if (temp < 0) {
-                                        lowLiquidVolume2_ex = "0"
-                                    } else if (temp > 50) {
-                                        lowLiquidVolume2_ex = "50"
+                                        val temp = lowLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            lowLiquidVolume2_ex = "0"
+                                        } else if (temp > 50) {
+                                            lowLiquidVolume2_ex = "50"
+                                        }
                                     }
+
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1422,14 +1551,23 @@ fun SettingLits(
                                 ),
                                 label = { Text(text = "加液量3/g", fontSize = 14.sp) },
                                 onValueChange = {
-                                    lowLiquidVolume3_ex = it
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        lowLiquidVolume3_ex = it
 
-                                    val temp = lowLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
-                                    if (temp < 0) {
-                                        lowLiquidVolume3_ex = "0"
-                                    } else if (temp > 50) {
-                                        lowLiquidVolume3_ex = "50"
+                                        val temp = lowLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            lowLiquidVolume3_ex = "0"
+                                        } else if (temp > 50) {
+                                            lowLiquidVolume3_ex = "50"
+                                        }
                                     }
+
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1508,14 +1646,23 @@ fun SettingLits(
                                 ),
                                 label = { Text(text = "加液量1/g", fontSize = 14.sp) },
                                 onValueChange = {
-                                    rinseLiquidVolume1_ex = it
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        rinseLiquidVolume1_ex = it
 
-                                    val temp = rinseLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
-                                    if (temp < 0) {
-                                        rinseLiquidVolume1_ex = "0"
-                                    } else if (temp > 50) {
-                                        rinseLiquidVolume1_ex = "50"
+                                        val temp = rinseLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            rinseLiquidVolume1_ex = "0"
+                                        } else if (temp > 50) {
+                                            rinseLiquidVolume1_ex = "50"
+                                        }
                                     }
+
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1539,14 +1686,23 @@ fun SettingLits(
                                 ),
                                 label = { Text(text = "加液量2/g", fontSize = 14.sp) },
                                 onValueChange = {
-                                    rinseLiquidVolume2_ex = it
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        rinseLiquidVolume2_ex = it
 
-                                    val temp = rinseLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
-                                    if (temp < 0) {
-                                        rinseLiquidVolume2_ex = "0"
-                                    } else if (temp > 50) {
-                                        rinseLiquidVolume2_ex = "50"
+                                        val temp = rinseLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            rinseLiquidVolume2_ex = "0"
+                                        } else if (temp > 50) {
+                                            rinseLiquidVolume2_ex = "50"
+                                        }
                                     }
+
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1570,14 +1726,23 @@ fun SettingLits(
                                 ),
                                 label = { Text(text = "加液量3/g", fontSize = 14.sp) },
                                 onValueChange = {
-                                    rinseLiquidVolume3_ex = it
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        rinseLiquidVolume3_ex = it
 
-                                    val temp = rinseLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
-                                    if (temp < 0) {
-                                        rinseLiquidVolume3_ex = "0"
-                                    } else if (temp > 50) {
-                                        rinseLiquidVolume3_ex = "50"
+                                        val temp = rinseLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            rinseLiquidVolume3_ex = "0"
+                                        } else if (temp > 50) {
+                                            rinseLiquidVolume3_ex = "50"
+                                        }
                                     }
+
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1618,14 +1783,27 @@ fun SettingLits(
                                     ),
                                     shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                     onClick = {
-
-                                        if (homestart.value == false) {
+                                        if (!homestart.value) {
                                             scope.launch {
                                                 start {
                                                     timeOut = 1000L * 30
                                                     with(
                                                         index = 1,
                                                         pdv = coagulantpulse.value.toLong(),
+                                                        ads = Triple(
+                                                            rinseSpeed.value * 13,
+                                                            rinseSpeed.value * 1193,
+                                                            rinseSpeed.value * 1193
+                                                        ),
+
+                                                        )
+                                                }
+                                                delay(1000)
+                                                start {
+                                                    timeOut = 1000L * 30
+                                                    with(
+                                                        index = 1,
+                                                        pdv = -coagulantpulse.value.toLong(),
                                                         ads = Triple(
                                                             rinseSpeed.value * 13,
                                                             rinseSpeed.value * 1193,
@@ -1655,14 +1833,23 @@ fun SettingLits(
                                 ),
                                 label = { Text(text = "加液量1/g", fontSize = 14.sp) },
                                 onValueChange = {
-                                    coagulantLiquidVolume1_ex = it
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        coagulantLiquidVolume1_ex = it
 
-                                    val temp = coagulantLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
-                                    if (temp < 0) {
-                                        coagulantLiquidVolume1_ex = "0"
-                                    } else if (temp > 50) {
-                                        coagulantLiquidVolume1_ex = "50"
+                                        val temp = coagulantLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            coagulantLiquidVolume1_ex = "0"
+                                        } else if (temp > 50) {
+                                            coagulantLiquidVolume1_ex = "50"
+                                        }
                                     }
+
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1686,14 +1873,23 @@ fun SettingLits(
                                 ),
                                 label = { Text(text = "加液量2/g", fontSize = 14.sp) },
                                 onValueChange = {
-                                    coagulantLiquidVolume2_ex = it
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        coagulantLiquidVolume2_ex = it
 
-                                    val temp = coagulantLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
-                                    if (temp < 0) {
-                                        coagulantLiquidVolume2_ex = "0"
-                                    } else if (temp > 50) {
-                                        coagulantLiquidVolume2_ex = "50"
+                                        val temp = coagulantLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            coagulantLiquidVolume2_ex = "0"
+                                        } else if (temp > 50) {
+                                            coagulantLiquidVolume2_ex = "50"
+                                        }
                                     }
+
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1717,14 +1913,23 @@ fun SettingLits(
                                 ),
                                 label = { Text(text = "加液量3/g", fontSize = 14.sp) },
                                 onValueChange = {
-                                    coagulantLiquidVolume3_ex = it
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        coagulantLiquidVolume3_ex = it
 
-                                    val temp = coagulantLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
-                                    if (temp < 0) {
-                                        coagulantLiquidVolume3_ex = "0"
-                                    } else if (temp > 50) {
-                                        coagulantLiquidVolume3_ex = "50"
+                                        val temp = coagulantLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            coagulantLiquidVolume3_ex = "0"
+                                        } else if (temp > 50) {
+                                            coagulantLiquidVolume3_ex = "50"
+                                        }
                                     }
+
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1828,7 +2033,6 @@ fun SettingLits(
                                 containerColor = Color(rgb(0, 105, 52))
                             ), shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp), onClick = {
                                 calibrationResetDialog.value = true
-
                             }) {
                                 Text(text = "恢复默认", fontSize = 18.sp)
                             }
@@ -1869,7 +2073,11 @@ fun SettingLits(
                                     selectedIndex = index
                                 })
                         ) {
-                            TableTextBody(text = "" + item.id, width = cellWidthList[0], selected)
+                            TableTextBody(
+                                text = (index + 1).toString(),
+                                width = cellWidthList[0],
+                                selected
+                            )
                             TableTextBody(
                                 text = "" + item.createTime.dateFormat("yyyy-MM-dd"),
                                 width = cellWidthList[1],
@@ -1897,7 +2105,7 @@ fun SettingLits(
                     /**
                      * 未输入密码或登出
                      */
-                    if (currentPwd.value == "") {
+                    if (currentpwd == "") {
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -1906,13 +2114,13 @@ fun SettingLits(
                         ) {
                             VerificationCodeField(digits = 6, inputCallback = {
                                 pwdShow = true
-                                currentPwd.value = it
+                                uiEvent(SettingIntent.Login(it))
                             }) { text, focused ->
                                 VerificationCodeItem(text, focused)
                             }
                         }
                     } else {
-                        if (factoryAdminPwd.value == currentPwd.value) {
+                        if (factoryAdminPwd.value == currentpwd) {
                             Row {
                                 Text(
                                     modifier = Modifier.padding(top = 20.dp),
@@ -2053,7 +2261,7 @@ fun SettingLits(
                             line(Color(rgb(240, 240, 240)), 0f, 400f)
                         }
 
-                        if (superAdminPwd.value == currentPwd.value || deviceAdminPwd.value == currentPwd.value) {
+                        if (superAdminPwd.value == currentpwd || deviceAdminPwd.value == currentpwd) {
                             Row(modifier = Modifier.clickable {
                                 updatePwdDialog.value = true
                             }) {
@@ -2190,7 +2398,7 @@ fun SettingLits(
                             .height(41.5.dp), colors = ButtonDefaults.buttonColors(
                             containerColor = Color(rgb(0, 105, 52))
                         ), shape = RoundedCornerShape(20.dp, 20.dp, 20.dp, 20.dp), onClick = {
-                            currentPwd.value = ""
+                            uiEvent(SettingIntent.Login(""))
                             switchColum = 0
 
                         }) {
@@ -2213,64 +2421,71 @@ fun SettingLits(
             }, text = {
 
             }, confirmButton = {
-                  Button(
-                modifier = Modifier.width(100.dp),colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = {
-                    newCalibration.higeLiquidVolume1 = 0.0
-                    newCalibration.higeLiquidVolume2 = 0.0
-                    newCalibration.higeLiquidVolume3 = 0.0
-                    newCalibration.higeAvg = 0.0
-                    newCalibration.lowLiquidVolume1 = 0.0
-                    newCalibration.lowLiquidVolume2 = 0.0
-                    newCalibration.lowLiquidVolume3 = 0.0
-                    newCalibration.lowAvg = 0.0
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = {
+                        newCalibration.higeLiquidVolume1 = 1.6
+                        newCalibration.higeLiquidVolume2 = 1.6
+                        newCalibration.higeLiquidVolume3 = 1.6
+                        newCalibration.higeAvg = 1.6
+                        newCalibration.lowLiquidVolume1 = 1.6
+                        newCalibration.lowLiquidVolume2 = 1.6
+                        newCalibration.lowLiquidVolume3 = 1.6
+                        newCalibration.lowAvg = 1.6
 
-                    newCalibration.rinseLiquidVolume1 = 0.0
-                    newCalibration.rinseLiquidVolume2 = 0.0
-                    newCalibration.rinseLiquidVolume3 = 0.0
-                    newCalibration.rinseAvg = 0.0
+                        newCalibration.rinseLiquidVolume1 = 1.6
+                        newCalibration.rinseLiquidVolume2 = 1.6
+                        newCalibration.rinseLiquidVolume3 = 1.6
+                        newCalibration.rinseAvg = 1.6
 
-                    newCalibration.coagulantLiquidVolume1 = 0.0
-                    newCalibration.coagulantLiquidVolume2 = 0.0
-                    newCalibration.coagulantLiquidVolume3 = 0.0
-                    newCalibration.coagulantAvg = 0.0
+                        newCalibration.coagulantLiquidVolume1 = 1.0
+                        newCalibration.coagulantLiquidVolume2 = 1.0
+                        newCalibration.coagulantLiquidVolume3 = 1.0
+                        newCalibration.coagulantAvg = 1.0
 
+                        uiEvent(SettingIntent.UpdateNC(newCalibration))
+                        higeLiquidVolume1_ex = "1.6"
+                        higeLiquidVolume2_ex = "1.6"
+                        higeLiquidVolume3_ex = "1.6"
 
-                    higeLiquidVolume1_ex = "0.0"
-                    higeLiquidVolume2_ex = "0.0"
-                    higeLiquidVolume3_ex = "0.0"
+                        lowLiquidVolume1_ex = "1.6"
+                        lowLiquidVolume2_ex = "1.6"
+                        lowLiquidVolume3_ex = "1.6"
 
-                    lowLiquidVolume1_ex = "0.0"
-                    lowLiquidVolume2_ex = "0.0"
-                    lowLiquidVolume3_ex = "0.0"
+                        rinseLiquidVolume1_ex = "1.6"
+                        rinseLiquidVolume2_ex = "1.6"
+                        rinseLiquidVolume3_ex = "1.6"
 
-                    rinseLiquidVolume1_ex = "0.0"
-                    rinseLiquidVolume2_ex = "0.0"
-                    rinseLiquidVolume3_ex = "0.0"
+                        coagulantLiquidVolume1_ex = "1.0"
+                        coagulantLiquidVolume2_ex = "1.0"
+                        coagulantLiquidVolume3_ex = "1.0"
 
-                    coagulantLiquidVolume1_ex = "0.0"
-                    coagulantLiquidVolume2_ex = "0.0"
-                    coagulantLiquidVolume3_ex = "0.0"
+                        AppStateUtils.hpc[1] = calculateCalibrationFactorNew(
+                            coagulantpulse.value, newCalibration.coagulantAvg * 1000
+                        )
 
-                    AppStateUtils.hpc[1] = calculateCalibrationFactorNew(
-                        0, 0.0
-                    )
+                        AppStateUtils.hpc[2] = calculateCalibrationFactorNew(
+                            51200 * 50, newCalibration.higeAvg * 1000
+                        )
 
-                    AppStateUtils.hpc[2] = calculateCalibrationFactorNew(0, 0.0)
+                        AppStateUtils.hpc[3] = calculateCalibrationFactorNew(
+                            51200 * 50, newCalibration.lowAvg * 1000
+                        )
 
-                    AppStateUtils.hpc[3] = calculateCalibrationFactorNew(0, 0.0)
+                        AppStateUtils.hpc[4] = calculateCalibrationFactorNew(
+                            3200 * 50, newCalibration.rinseAvg * 1000
+                        )
 
-                    AppStateUtils.hpc[4] = calculateCalibrationFactorNew(0, 0.0)
-                    calibrationResetDialog.value = false
-                }) {
+                        calibrationResetDialog.value = false
+                    }) {
                     Text(text = "确认")
                 }
             }, dismissButton = {
-                  Button(
-                modifier = Modifier.width(100.dp),colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = { calibrationResetDialog.value = false }) {
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = { calibrationResetDialog.value = false }) {
                     Text(text = "取消")
                 }
             })
@@ -2283,39 +2498,39 @@ fun SettingLits(
             }, text = {
 
             }, confirmButton = {
-                  Button(
-                modifier = Modifier.width(100.dp),colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = {
-                    setting.higeCleanVolume = 0.0
-                    setting.higeRehearsalVolume = 0.0
-                    setting.higeFilling = 0.0
-                    setting.lowCleanVolume = 0.0
-                    setting.lowFilling = 0.0
-                    setting.rinseCleanVolume = 0.0
-                    setting.rinseFilling = 0.0
-                    setting.coagulantCleanVolume = 0.0
-                    setting.coagulantFilling = 0.0
-                    uiEvent(SettingIntent.UpdateSet(setting))
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = {
+                        setting.higeCleanVolume = 5.0
+                        setting.higeRehearsalVolume = 1.0
+                        setting.higeFilling = 3.0
+                        setting.lowCleanVolume = 5.0
+                        setting.lowFilling = 3.0
+                        setting.rinseCleanVolume = 5.0
+                        setting.rinseFilling = 3.0
+                        setting.coagulantCleanVolume = 5.0
+                        setting.coagulantFilling = 3.0
+                        uiEvent(SettingIntent.UpdateSet(setting))
 
-                    higeCleanVolume_ex = "0.0"
-                    higeRehearsalVolume_ex = "0.0"
-                    higeFilling_ex = "0.0"
-                    lowCleanVolume_ex = "0.0"
-                    lowFilling_ex = "0.0"
-                    rinseCleanVolume_ex = "0.0"
-                    rinseFilling_ex = "0.0"
-                    coagulantCleanVolume_ex = "0.0"
-                    coagulantFilling_ex = "0.0"
-                    expectedResetDialog.value = false
-                }) {
+                        higeCleanVolume_ex = "5.0"
+                        higeRehearsalVolume_ex = "1.0"
+                        higeFilling_ex = "3.0"
+                        lowCleanVolume_ex = "5.0"
+                        lowFilling_ex = "3.0"
+                        rinseCleanVolume_ex = "5.0"
+                        rinseFilling_ex = "3.0"
+                        coagulantCleanVolume_ex = "5.0"
+                        coagulantFilling_ex = "3.0"
+                        expectedResetDialog.value = false
+                    }) {
                     Text(text = "确认")
                 }
             }, dismissButton = {
-                  Button(
-                modifier = Modifier.width(100.dp),colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = { expectedResetDialog.value = false }) {
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = { expectedResetDialog.value = false }) {
                     Text(text = "取消")
                 }
             })
@@ -2336,7 +2551,25 @@ fun SettingLits(
                             cursorColor = Color(rgb(0, 105, 52))
                         ),
                         label = { Text(text = "请输入原密码") },
-                        onValueChange = { oldPwd.value = it },
+                        onValueChange = {
+                            if (Pattern.compile(speChat).matcher(it).find()) {
+                                Toast.makeText(
+                                    context,
+                                    "数据不能包含特殊字符！",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                if (it.length > 6) {
+                                    Toast.makeText(
+                                        context,
+                                        "长度不能大于6！",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    oldPwd.value = it
+                                }
+                            }
+                        },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
                             imeAction = ImeAction.Done,
@@ -2354,7 +2587,17 @@ fun SettingLits(
                             cursorColor = Color(rgb(0, 105, 52))
                         ),
                         label = { Text(text = "请输入新密码") },
-                        onValueChange = { newPwd.value = it },
+                        onValueChange = {
+                            if (Pattern.compile(speChat).matcher(it).find()) {
+                                Toast.makeText(
+                                    context,
+                                    "数据不能包含特殊字符！",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                newPwd.value = it
+                            }
+                        },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
                             imeAction = ImeAction.Done,
@@ -2372,7 +2615,17 @@ fun SettingLits(
                             cursorColor = Color(rgb(0, 105, 52))
                         ),
                         label = { Text(text = "请确认新密码") },
-                        onValueChange = { newPwd2.value = it },
+                        onValueChange = {
+                            if (Pattern.compile(speChat).matcher(it).find()) {
+                                Toast.makeText(
+                                    context,
+                                    "数据不能包含特殊字符！",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                newPwd2.value = it
+                            }
+                        },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
                             imeAction = ImeAction.Done,
@@ -2386,44 +2639,44 @@ fun SettingLits(
 
 
             }, confirmButton = {
-                  Button(
-                modifier = Modifier.width(100.dp),colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = {
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = {
 
-                    if (oldPwd.value == deviceAdminPwd.value) {
-                        if (newPwd.value == newPwd2.value) {
-                            if (newPwd.value.length != 6) {
-                                Toast.makeText(
-                                    context, "新密码要6位数字！", Toast.LENGTH_SHORT
-                                ).show()
+                        if (oldPwd.value == deviceAdminPwd.value) {
+                            if (newPwd.value == newPwd2.value) {
+                                if (newPwd.value.length != 6) {
+                                    Toast.makeText(
+                                        context, "新密码要6位数字！", Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    deviceAdminPwd.value = newPwd.value
+                                    updatePwdDialog.value = false
+                                    uiEvent(SettingIntent.Login(""))
+                                    switchColum = 0
+                                }
+
                             } else {
-                                deviceAdminPwd.value = newPwd.value
-                                updatePwdDialog.value = false
-                                currentPwd.value = ""
-                                switchColum = 0
+                                Toast.makeText(
+                                    context, "新密码不一致！", Toast.LENGTH_SHORT
+                                ).show()
                             }
-
                         } else {
                             Toast.makeText(
-                                context, "新密码不一致！", Toast.LENGTH_SHORT
+                                context, "原密码错误！", Toast.LENGTH_SHORT
                             ).show()
                         }
-                    } else {
-                        Toast.makeText(
-                            context, "原密码错误！", Toast.LENGTH_SHORT
-                        ).show()
-                    }
 
 
-                }) {
+                    }) {
                     Text(text = "确认")
                 }
             }, dismissButton = {
-                  Button(
-                modifier = Modifier.width(100.dp),colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = { updatePwdDialog.value = false }) {
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = { updatePwdDialog.value = false }) {
                     Text(text = "取消")
                 }
             })
@@ -2431,7 +2684,7 @@ fun SettingLits(
 
         //配件寿命弹窗
         if (accessoriesDialog.value) {
-            AlertDialog(onDismissRequest = { accessoriesDialog.value = false }, title = {
+            AlertDialog(onDismissRequest = { }, title = {
                 Text(text = "配件寿命")
             }, text = {
                 Column {
@@ -2452,7 +2705,7 @@ fun SettingLits(
                             horizontalArrangement = Arrangement.spacedBy(16.dp),
                             verticalAlignment = CenterVertically
                         ) {
-                            if (factoryAdminPwd.value == currentPwd.value) {
+                            if (factoryAdminPwd.value == currentpwd) {
                                 Button(modifier = Modifier
                                     .width(100.dp)
                                     .height(50.dp),
@@ -2482,13 +2735,22 @@ fun SettingLits(
                                     ),
                                     label = { },
                                     onValueChange = {
-                                        highTimeExpected_ex = it
-                                        val temp = highTimeExpected_ex.toDoubleOrNull() ?: 0.0
-                                        if (temp < 0) {
-                                            highTimeExpected_ex = "0"
-                                        } else if (temp > 2000) {
-                                            highTimeExpected_ex = "2000"
+                                        if (Pattern.compile(speChat).matcher(it).find()) {
+                                            Toast.makeText(
+                                                context,
+                                                "数据不能包含特殊字符！",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else {
+                                            highTimeExpected_ex = it
+                                            val temp = highTimeExpected_ex.toDoubleOrNull() ?: 0.0
+                                            if (temp < 0) {
+                                                highTimeExpected_ex = "0"
+                                            } else if (temp > 2000) {
+                                                highTimeExpected_ex = "2000"
+                                            }
                                         }
+
                                     },
                                     keyboardOptions = KeyboardOptions(
                                         keyboardType = KeyboardType.Number,
@@ -2522,6 +2784,7 @@ fun SettingLits(
                                     modifier = Modifier.padding(start = 10.dp),
                                     text = setting.highTimeExpected.toString()
                                 )
+                                Text(modifier = Modifier.padding(start = 10.dp), text = "小时")
                             }
 
                         }
@@ -2546,7 +2809,7 @@ fun SettingLits(
                             verticalAlignment = CenterVertically
                         ) {
 
-                            if (factoryAdminPwd.value == currentPwd.value) {
+                            if (factoryAdminPwd.value == currentpwd) {
                                 Button(modifier = Modifier
                                     .width(100.dp)
                                     .height(50.dp),
@@ -2576,14 +2839,23 @@ fun SettingLits(
                                     ),
                                     label = { },
                                     onValueChange = {
-                                        lowTimeExpected_ex = it
+                                        if (Pattern.compile(speChat).matcher(it).find()) {
+                                            Toast.makeText(
+                                                context,
+                                                "数据不能包含特殊字符！",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else {
+                                            lowTimeExpected_ex = it
 
-                                        val temp = lowTimeExpected_ex.toDoubleOrNull() ?: 0.0
-                                        if (temp < 0) {
-                                            lowTimeExpected_ex = "0"
-                                        } else if (temp > 2000) {
-                                            lowTimeExpected_ex = "2000"
+                                            val temp = lowTimeExpected_ex.toDoubleOrNull() ?: 0.0
+                                            if (temp < 0) {
+                                                lowTimeExpected_ex = "0"
+                                            } else if (temp > 2000) {
+                                                lowTimeExpected_ex = "2000"
+                                            }
                                         }
+
                                     },
                                     keyboardOptions = KeyboardOptions(
                                         keyboardType = KeyboardType.Number,
@@ -2643,7 +2915,7 @@ fun SettingLits(
                             horizontalArrangement = Arrangement.spacedBy(16.dp),
                             verticalAlignment = CenterVertically
                         ) {
-                            if (factoryAdminPwd.value == currentPwd.value) {
+                            if (factoryAdminPwd.value == currentpwd) {
                                 Button(modifier = Modifier
                                     .width(100.dp)
                                     .height(50.dp),
@@ -2673,14 +2945,23 @@ fun SettingLits(
                                     ),
                                     label = { },
                                     onValueChange = {
-                                        rinseTimeExpected_ex = it
+                                        if (Pattern.compile(speChat).matcher(it).find()) {
+                                            Toast.makeText(
+                                                context,
+                                                "数据不能包含特殊字符！",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else {
+                                            rinseTimeExpected_ex = it
 
-                                        val temp = rinseTimeExpected_ex.toDoubleOrNull() ?: 0.0
-                                        if (temp < 0) {
-                                            rinseTimeExpected_ex = "0"
-                                        } else if (temp > 2000) {
-                                            rinseTimeExpected_ex = "2000"
+                                            val temp = rinseTimeExpected_ex.toDoubleOrNull() ?: 0.0
+                                            if (temp < 0) {
+                                                rinseTimeExpected_ex = "0"
+                                            } else if (temp > 2000) {
+                                                rinseTimeExpected_ex = "2000"
+                                            }
                                         }
+
                                     },
                                     keyboardOptions = KeyboardOptions(
                                         keyboardType = KeyboardType.Number,
@@ -2725,39 +3006,39 @@ fun SettingLits(
 
 
             }, confirmButton = {
-                if (factoryAdminPwd.value == currentPwd.value) {
-                      Button(
-                modifier = Modifier.width(100.dp),colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(rgb(0, 105, 52))
-                    ), onClick = {
-                        setting.lowTimeExpected = lowTimeExpected_ex.toDoubleOrNull() ?: 0.0
-                        setting.highTimeExpected = highTimeExpected_ex.toDoubleOrNull() ?: 0.0
-                        setting.rinseTimeExpected = rinseTimeExpected_ex.toDoubleOrNull() ?: 0.0
-                        uiEvent(SettingIntent.UpdateSet(setting))
-                        accessoriesDialog.value = false
-                    }) {
+                if (factoryAdminPwd.value == currentpwd) {
+                    Button(
+                        modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(rgb(0, 105, 52))
+                        ), onClick = {
+                            setting.lowTimeExpected = lowTimeExpected_ex.toDoubleOrNull() ?: 0.0
+                            setting.highTimeExpected = highTimeExpected_ex.toDoubleOrNull() ?: 0.0
+                            setting.rinseTimeExpected = rinseTimeExpected_ex.toDoubleOrNull() ?: 0.0
+                            uiEvent(SettingIntent.UpdateSet(setting))
+                            accessoriesDialog.value = false
+                        }) {
                         Text(text = "保存")
                     }
                 } else {
-                      Button(
-                modifier = Modifier.width(100.dp),colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(rgb(0, 105, 52))
-                    ), onClick = {
-                        setting.highTime = 0.0
-                        setting.lowLife = 0.0
-                        setting.rinseTime = 0.0
-                        uiEvent(SettingIntent.UpdateSet(setting))
-                        accessoriesDialog.value = false
-                    }) {
+                    Button(
+                        modifier = Modifier.width(120.dp), colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(rgb(0, 105, 52))
+                        ), onClick = {
+                            setting.highTime = 0.0
+                            setting.lowLife = 0.0
+                            setting.rinseTime = 0.0
+                            uiEvent(SettingIntent.UpdateSet(setting))
+                            accessoriesDialog.value = false
+                        }) {
                         Text(text = "全部重置")
                     }
                 }
 
             }, dismissButton = {
-                  Button(
-                modifier = Modifier.width(100.dp),colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = { accessoriesDialog.value = false }) {
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = { accessoriesDialog.value = false }) {
                     Text(text = "返回")
                 }
             })
@@ -2765,7 +3046,7 @@ fun SettingLits(
 
         //位置设置弹窗
         if (positionDialog.value) {
-            AlertDialog(onDismissRequest = { positionDialog.value = false }, title = {
+            AlertDialog(onDismissRequest = { }, title = {
                 Text(text = "位置设置")
             }, text = {
                 Column {
@@ -2783,12 +3064,20 @@ fun SettingLits(
                             ),
                             label = { Text(text = "胶板位置") },
                             onValueChange = {
-                                glueBoardPosition_ex = it
-                                val temp = glueBoardPosition_ex.toDoubleOrNull() ?: 0.0
-                                if (temp < 0) {
-                                    glueBoardPosition_ex = "0"
-                                } else if (temp > 30) {
-                                    glueBoardPosition_ex = "30"
+                                if (Pattern.compile(speChat).matcher(it).find()) {
+                                    Toast.makeText(
+                                        context,
+                                        "数据不能包含特殊字符！",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    glueBoardPosition_ex = it
+                                    val temp = glueBoardPosition_ex.toDoubleOrNull() ?: 0.0
+                                    if (temp < 0) {
+                                        glueBoardPosition_ex = "0"
+                                    } else if (temp > 30) {
+                                        glueBoardPosition_ex = "30"
+                                    }
                                 }
                             },
                             keyboardOptions = KeyboardOptions(
@@ -2808,7 +3097,7 @@ fun SettingLits(
                             ),
                             shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                             onClick = {
-                                if (homestart.value == false) {
+                                if (!homestart.value) {
                                     scope.launch {
                                         start {
                                             timeOut = 1000L * 60L
@@ -2841,12 +3130,20 @@ fun SettingLits(
                             ),
                             label = { Text(text = "废液槽位置") },
                             onValueChange = {
-                                wastePosition_ex = it
-                                val temp = wastePosition_ex.toDoubleOrNull() ?: 0.0
-                                if (temp < 0) {
-                                    wastePosition_ex = "0"
-                                } else if (temp > 30) {
-                                    wastePosition_ex = "30"
+                                if (Pattern.compile(speChat).matcher(it).find()) {
+                                    Toast.makeText(
+                                        context,
+                                        "数据不能包含特殊字符！",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    wastePosition_ex = it
+                                    val temp = wastePosition_ex.toDoubleOrNull() ?: 0.0
+                                    if (temp < 0) {
+                                        wastePosition_ex = "0"
+                                    } else if (temp > 30) {
+                                        wastePosition_ex = "30"
+                                    }
                                 }
                             },
                             keyboardOptions = KeyboardOptions(
@@ -2901,8 +3198,9 @@ fun SettingLits(
                             onClick = {
                                 setting.glueBoardPosition = 0.0
                                 setting.wastePosition = 0.0
+                                glueBoardPosition_ex = "0.0"
+                                wastePosition_ex = "0.0"
                                 uiEvent(SettingIntent.UpdateSet(setting))
-                                positionDialog.value = false
                             }) {
                             Text(text = "恢复默认", fontSize = 18.sp)
                         }
@@ -2912,22 +3210,22 @@ fun SettingLits(
 
 
             }, confirmButton = {
-                  Button(
-                modifier = Modifier.width(100.dp),colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = {
-                    setting.wastePosition = wastePosition_ex.toDoubleOrNull() ?: 0.0
-                    setting.glueBoardPosition = glueBoardPosition_ex.toDoubleOrNull() ?: 0.0
-                    uiEvent(SettingIntent.UpdateSet(setting))
-                    positionDialog.value = false
-                }) {
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = {
+                        setting.wastePosition = wastePosition_ex.toDoubleOrNull() ?: 0.0
+                        setting.glueBoardPosition = glueBoardPosition_ex.toDoubleOrNull() ?: 0.0
+                        uiEvent(SettingIntent.UpdateSet(setting))
+                        positionDialog.value = false
+                    }) {
                     Text(text = "保存")
                 }
             }, dismissButton = {
-                  Button(
-                modifier = Modifier.width(100.dp),colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = { positionDialog.value = false }) {
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = { positionDialog.value = false }) {
                     Text(text = "取消")
                 }
             })
@@ -2963,7 +3261,7 @@ fun sportsLog(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        sportsLogMode(uiEvent, sportsLogEntitiesDis,entitiesListDis,entitiesList)
+        sportsLogMode(uiEvent, sportsLogEntitiesDis, entitiesListDis, entitiesList)
     }
 }
 

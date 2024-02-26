@@ -208,7 +208,7 @@ fun experimentList(
                             )
                         })
                 ) {
-                    TableTextBody(text = "" + item.id, width = cellWidthList[0], selected)
+                    TableTextBody(text = (index + 1).toString(), width = cellWidthList[0], selected)
                     TableTextBody(
                         text = "" + item.createTime.dateFormat("yyyy-MM-dd"),
                         width = cellWidthList[5], selected

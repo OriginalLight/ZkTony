@@ -321,7 +321,7 @@ class HomeViewModel @Inject constructor(
                             timeOut = 1000L * 60L * 10
                             with(
                                 index = 4,
-                                ads = Triple(rinseSpeed * 20, rinseSpeed * 20, rinseSpeed * 20),
+                                ads = Triple(rinseSpeed * 40, rinseSpeed * 40, rinseSpeed * 40),
                                 pdv = rinseCleanVolume * 1000
                             )
                         }
@@ -1993,16 +1993,13 @@ class HomeViewModel @Inject constructor(
                         "HomeViewModel",
                         "===预排液结束时间1小时的百分比未精确小数点===$time"
                     )
-                    var number3digits = String.format("%.3f", time).toDouble()
-                    var number2digits = String.format("%.2f", number3digits).toDouble()
-                    var solution = String.format("%.1f", number2digits).toDouble()
+                    var number3digits = String.format("%.4f", time).toDouble()
                     Log.d(
                         "HomeViewModel",
-                        "===预排液结束时间1小时的百分比精确小数点后1位===$solution"
+                        "===预排液结束时间1小时的百分比精确小数点后4位===$number3digits"
                     )
-                    setting.highTime += solution
-                    setting.lowLife += solution
-                    setting.rinseTime += solution
+                    setting.highTime += number3digits
+                    setting.lowLife += number3digits
                     slDao.update(setting)
 
                     //===================预排液结束=====================
@@ -2117,21 +2114,14 @@ class HomeViewModel @Inject constructor(
                         "HomeViewModel",
                         "===预排液结束时间1小时的百分比未精确小数点===$time"
                     )
-                    number3digits = String.format("%.3f", time).toDouble()
-                    number2digits = String.format("%.2f", number3digits).toDouble()
-                    solution = String.format("%.1f", number2digits).toDouble()
+                    number3digits = String.format("%.4f", time).toDouble()
                     Log.d(
                         "HomeViewModel",
-                        "===预排液结束时间1小时的百分比精确小数点后1位===$solution"
+                        "===预排液结束时间1小时的百分比精确小数点后4位===$number3digits"
                     )
-                    setting.highTime += solution
-                    setting.lowLife += solution
-                    setting.rinseTime += solution
+                    setting.highTime += number3digits
+                    setting.lowLife += number3digits
                     slDao.update(setting)
-
-
-
-
 
                     Log.d(
                         "HomeViewModel",
@@ -2162,15 +2152,39 @@ class HomeViewModel @Inject constructor(
                         )
                     }
 
-
+                    //测算使用时间
+                    startTime = Calendar.getInstance().timeInMillis
                     start {
                         timeOut = 1000L * 60L
                         with(
                             index = 4,
-                            ads = Triple(rinseSpeed * 20, rinseSpeed * 20, rinseSpeed * 20),
+                            ads = Triple(rinseSpeed * 40, rinseSpeed * 40, rinseSpeed * 40),
                             pdv = rinseP
                         )
                     }
+                    endTime = Calendar.getInstance().timeInMillis
+                    Log.d(
+                        "HomeViewModel",
+                        "===冲洗结束时间===$startTime"
+                    )
+                    //秒
+                    dTime = (endTime - startTime) / 1000
+                    Log.d(
+                        "HomeViewModel",
+                        "===冲洗结束时间差===$dTime"
+                    )
+                    time = (dTime / 3600.0)
+                    Log.d(
+                        "HomeViewModel",
+                        "===冲洗结束时间1小时的百分比未精确小数点===$time"
+                    )
+                    number3digits = String.format("%.4f", time).toDouble()
+                    Log.d(
+                        "HomeViewModel",
+                        "===冲洗结束时间1小时的百分比精确小数点后4位===$number3digits"
+                    )
+                    setting.rinseTime += number3digits
+                    slDao.update(setting)
 
                     delay(100)
 
@@ -2185,7 +2199,6 @@ class HomeViewModel @Inject constructor(
                     _uselow.value += (guleLowPulse / p3jz / 1000).toFloat()
                     _usecoagulant.value += (coagulantPulseCount / p1jz / 1000).toFloat()
                     _userinse.value = setting.rinseCleanVolume.toFloat()
-
                     //制胶使用液量
 
 
@@ -2289,7 +2302,7 @@ class HomeViewModel @Inject constructor(
                 timeOut = 1000L * 60L
                 with(
                     index = 4,
-                    ads = Triple(rinseSpeed * 20, rinseSpeed * 20, rinseSpeed * 20),
+                    ads = Triple(rinseSpeed * 40, rinseSpeed * 40, rinseSpeed * 40),
                     pdv = setting.rinseCleanVolume * 1000
                 )
             }
@@ -2694,7 +2707,7 @@ class HomeViewModel @Inject constructor(
                     timeOut = 1000L * 60L * 10
                     with(
                         index = 4,
-                        ads = Triple(rinseSpeed * 20, rinseSpeed * 20, rinseSpeed * 20),
+                        ads = Triple(rinseSpeed * 40, rinseSpeed * 40, rinseSpeed * 40),
                         pdv = rinseCleanVolume * 1000
                     )
                 }
@@ -2721,6 +2734,10 @@ class HomeViewModel @Inject constructor(
                 }
 
                 val slEnetity = slDao.getById(1L).firstOrNull()
+                Log.d(
+                    "HomeViewModel_clean",
+                    "计时前的slEnetity===$slEnetity"
+                )
                 if (slEnetity != null) {
 
                     _waitTimeRinseJob.value?.cancel()
@@ -2890,6 +2907,9 @@ class HomeViewModel @Inject constructor(
                         )
                     }
                     delay(100L)
+
+
+
                     for (i in 1..count) {
                         if (i == 1) {
                             start {
@@ -3039,6 +3059,10 @@ class HomeViewModel @Inject constructor(
 
                     delay(100L)
                     var startTime = Calendar.getInstance().timeInMillis
+                    Log.d(
+                        "HomeViewModel",
+                        "===预排液开始时间===$startTime"
+                    )
                     start {
                         timeOut = 1000L * 60L * 10
                         with(
@@ -3053,14 +3077,14 @@ class HomeViewModel @Inject constructor(
                         )
                         with(
                             index = 4,
-                            ads = Triple(rinseSpeed * 20, rinseSpeed * 20, rinseSpeed * 20),
+                            ads = Triple(rinseSpeed * 40, rinseSpeed * 40, rinseSpeed * 40),
                             pdv = rinseCleanVolume * 1000
                         )
                     }
                     var endTime = Calendar.getInstance().timeInMillis
                     Log.d(
                         "HomeViewModel",
-                        "===预排液结束时间===$startTime"
+                        "===预排液结束时间===$endTime"
                     )
                     //秒
                     val dTime = (endTime - startTime) / 1000
@@ -3073,17 +3097,19 @@ class HomeViewModel @Inject constructor(
                         "HomeViewModel",
                         "===预排液结束时间1小时的百分比未精确小数点===$time"
                     )
-                    val number3digits: Double = String.format("%.3f", time).toDouble()
-                    val number2digits: Double = String.format("%.2f", number3digits).toDouble()
-                    val solution: Double = String.format("%.1f", number2digits).toDouble()
+                    val number3digits: Double = String.format("%.4f", time).toDouble()
                     Log.d(
                         "HomeViewModel",
-                        "===预排液结束时间1小时的百分比精确小数点后1位===$solution"
+                        "===预排液结束时间1小时的百分比精确小数点后4位===$number3digits"
                     )
-                    slEnetity.highTime += solution
-                    slEnetity.lowLife += solution
-                    slEnetity.rinseTime += solution
+                    slEnetity.highTime += number3digits
+                    slEnetity.lowLife += number3digits
+                    slEnetity.rinseTime += number3digits
                     slDao.update(slEnetity)
+                    Log.d(
+                        "HomeViewModel_clean",
+                        "计时后的slEnetity===$slEnetity"
+                    )
                     delay(200)
                     if (selectRudio == 2) {
                         ApplicationUtils.ctx.playAudio(R.raw.cleanend_voice)
@@ -3449,6 +3475,10 @@ class HomeViewModel @Inject constructor(
 
                     delay(100L)
                     var startTime = Calendar.getInstance().timeInMillis
+                    Log.d(
+                        "HomeViewModel",
+                        "===填充开始时间===$startTime"
+                    )
                     start {
                         timeOut = 1000L * 60L * 10
                         with(
@@ -3463,36 +3493,34 @@ class HomeViewModel @Inject constructor(
                         )
                         with(
                             index = 4,
-                            ads = Triple(rinseSpeed * 20, rinseSpeed * 20, rinseSpeed * 20),
+                            ads = Triple(rinseSpeed * 40, rinseSpeed * 40, rinseSpeed * 40),
                             pdv = rinseFilling * 1000
                         )
                     }
                     var endTime = Calendar.getInstance().timeInMillis
                     Log.d(
                         "HomeViewModel",
-                        "===预排液结束时间===$startTime"
+                        "===填充结束时间===$endTime"
                     )
                     //秒
                     val dTime = (endTime - startTime) / 1000
                     Log.d(
                         "HomeViewModel",
-                        "===预排液结束时间差===$dTime"
+                        "===填充结束时间差===$dTime"
                     )
                     val time = (dTime / 3600.0)
                     Log.d(
                         "HomeViewModel",
                         "===预排液结束时间1小时的百分比未精确小数点===$time"
                     )
-                    val number3digits: Double = String.format("%.3f", time).toDouble()
-                    val number2digits: Double = String.format("%.2f", number3digits).toDouble()
-                    val solution: Double = String.format("%.1f", number2digits).toDouble()
+                    val number3digits: Double = String.format("%.4f", time).toDouble()
                     Log.d(
                         "HomeViewModel",
-                        "===预排液结束时间1小时的百分比精确小数点后1位===$solution"
+                        "===预排液结束时间1小时的百分比精确小数点后1位===$number3digits"
                     )
-                    slEnetity.highTime += solution
-                    slEnetity.lowLife += solution
-                    slEnetity.rinseTime += solution
+                    slEnetity.highTime += number3digits
+                    slEnetity.lowLife += number3digits
+                    slEnetity.rinseTime += number3digits
                     slDao.update(slEnetity)
                     delay(100L)
 

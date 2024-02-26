@@ -159,7 +159,7 @@ fun sportsLogMode(
 
             Text(
                 modifier = Modifier.padding(start = 150.dp),
-                text = "运动日志",
+                text = "运行日志",
                 fontSize = 20.sp,
                 color = Color(rgb(112, 112, 112))
             )
@@ -198,7 +198,7 @@ fun sportsLogMode(
                             selectedIndex = index
                         })
                 ) {
-                    TableTextBody(text = "" + item.id, width = cellWidthList[0], selected)
+                    TableTextBody(text = (index + 1).toString(), width = cellWidthList[0], selected)
                     TableTextBody(
                         text = "" + item.createTime.dateFormat("yyyy-MM-dd"),
                         width = cellWidthList[1],

@@ -74,6 +74,8 @@ class SettingViewModel @Inject constructor(
 
     private val _job = MutableStateFlow<Job?>(null)
 
+    private val _currentpwd = MutableStateFlow("")
+
     /**
      * 加液次数
      */
@@ -89,6 +91,7 @@ class SettingViewModel @Inject constructor(
     val selected = _selected.asStateFlow()
     val progress = _progress.asStateFlow()
     val page = _page.asStateFlow()
+    val currentpwd = _currentpwd.asStateFlow()
 
     val uiFlags = _uiFlags.asStateFlow()
     val entities = Pager(
@@ -217,6 +220,11 @@ class SettingViewModel @Inject constructor(
                 sportsLogDao.deleteAll()
                 erDao.deleteAll()
             }
+
+            is SettingIntent.Login -> viewModelScope.launch {
+                _currentpwd.value = intent.pwd
+            }
+
 
         }
     }
@@ -348,7 +356,7 @@ class SettingViewModel @Inject constructor(
                     )
                     with(
                         index = 4,
-                        ads = Triple(rinseSpeed * 20, rinseSpeed * 20, rinseSpeed * 20),
+                        ads = Triple(rinseSpeed * 40, rinseSpeed * 40, rinseSpeed * 40),
                         pdv = rinseFilling * 1000
                     )
                 }
@@ -491,7 +499,7 @@ class SettingViewModel @Inject constructor(
                         )
                         with(
                             index = 4,
-                            ads = Triple(rinseSpeed * 20, rinseSpeed * 20, rinseSpeed * 20),
+                            ads = Triple(rinseSpeed * 40, rinseSpeed * 40, rinseSpeed * 40),
                             pdv = rinseCleanVolume * 1000
                         )
                     }
@@ -1648,7 +1656,7 @@ class SettingViewModel @Inject constructor(
                     timeOut = 1000L * 60L * 10
                     with(
                         index = 4,
-                        ads = Triple(rinseSpeed * 20, rinseSpeed * 20, rinseSpeed * 20),
+                        ads = Triple(rinseSpeed * 40, rinseSpeed * 40, rinseSpeed * 40),
                         pdv = rinseCleanVolume * 1000
                     )
                 }
@@ -2123,9 +2131,9 @@ class SettingViewModel @Inject constructor(
                                     with(
                                         index = 4,
                                         ads = Triple(
-                                            rinseSpeed * 20,
-                                            rinseSpeed * 20,
-                                            rinseSpeed * 20
+                                            rinseSpeed * 40,
+                                            rinseSpeed * 40,
+                                            rinseSpeed * 40
                                         ),
                                         pdv = rinseFilling * 1000
                                     )
@@ -2337,7 +2345,7 @@ class SettingViewModel @Inject constructor(
                             timeOut = 1000L * 60L
                             with(
                                 index = 4,
-                                ads = Triple(rinseSpeed * 20, rinseSpeed * 20, rinseSpeed * 20),
+                                ads = Triple(rinseSpeed * 40, rinseSpeed * 40, rinseSpeed * 40),
                                 pdv = rinseP
                             )
                         }
@@ -2500,5 +2508,7 @@ sealed class SettingIntent {
     data class Sound(val state: Int) : SettingIntent()
 
     data object ClearAll : SettingIntent()
+
+    data class Login(val pwd: String) : SettingIntent()
 
 }

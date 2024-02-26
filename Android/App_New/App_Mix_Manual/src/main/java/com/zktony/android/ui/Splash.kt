@@ -74,7 +74,7 @@ fun Splash() {
                     modifier = Modifier
                         .size(200.dp)
                         .clickable {
-                            Log.d("navigationActions","navigationActions===$navigationActions")
+                            Log.d("navigationActions", "navigationActions===$navigationActions")
                             //实验记录
                             navigationActions.navigate(Route.EXPERIMENTRECORDS)
                         }
@@ -93,6 +93,14 @@ fun Splash() {
             }
         }
 
+        Row(modifier = Modifier.padding(top = 820.dp)) {
+            Text(
+                modifier = Modifier.padding(start = 350.dp),
+                fontSize = 18.sp,
+                color = Color.White,
+                text = "V1.1.1_202402260947"
+            )
+        }
 
     }
 
