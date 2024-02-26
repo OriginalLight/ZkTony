@@ -9,13 +9,15 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
-//import com.zktony.android.BuildConfig
+import com.zktony.android.BuildConfig
 import com.zktony.android.R
 import com.zktony.android.data.dao.ErrorRecordDao
+import com.zktony.android.data.dao.ExperimentRecordDao
 import com.zktony.android.data.dao.MotorDao
 import com.zktony.android.data.dao.NewCalibrationDao
 import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.dao.SettingDao
+import com.zktony.android.data.dao.SportsLogDao
 import com.zktony.android.data.datastore.DataSaverDataStore
 import com.zktony.android.data.entities.ErrorRecord
 import com.zktony.android.data.entities.Motor
@@ -27,6 +29,8 @@ import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.ApplicationUtils
 import com.zktony.android.utils.SerialPortUtils
 import com.zktony.android.utils.extra.Application
+import com.zktony.android.utils.extra.DownloadState
+import com.zktony.android.utils.extra.download
 import com.zktony.android.utils.extra.httpCall
 import com.zktony.android.utils.extra.playAudio
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,8 +41,11 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
+import java.io.File
+import java.io.FileWriter
 import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -55,6 +62,8 @@ class SettingViewModel @Inject constructor(
     private val ncDao: NewCalibrationDao,
     private val errorDao: ErrorRecordDao,
     private val dataStore: DataSaverDataStore,
+    private val sportsLogDao: SportsLogDao,
+    private val erDao: ExperimentRecordDao,
 ) : ViewModel() {
 
     private val _application = MutableStateFlow<Application?>(null)
@@ -93,6 +102,14 @@ class SettingViewModel @Inject constructor(
     val errorEntities = Pager(
         config = PagingConfig(pageSize = 20, initialLoadSize = 40),
     ) { errorDao.getByPage() }.flow.cachedIn(viewModelScope)
+
+    val sportsLogEntitiesDis = Pager(
+        config = PagingConfig(pageSize = 20, initialLoadSize = 40),
+    ) { sportsLogDao.getByPageDis() }.flow.cachedIn(viewModelScope)
+
+    val sportsLogEntities = Pager(
+        config = PagingConfig(pageSize = 50, initialLoadSize = 100),
+    ) { sportsLogDao.getByPage() }.flow.cachedIn(viewModelScope)
 
 
     val slEntitiy = slDao.getById(1L)
@@ -180,6 +197,27 @@ class SettingViewModel @Inject constructor(
             is SettingIntent.ZSReset -> zsreset()
             is SettingIntent.Clean -> clean()
             is SettingIntent.Pipeline -> pipeline()
+
+            is SettingIntent.Sound -> viewModelScope.launch {
+                delay(100)
+                if (intent.state == 1) {
+                    //蜂鸣
+                    ApplicationUtils.ctx.playAudio(R.raw.setting_buzz)
+                } else if (intent.state == 2) {
+                    //语音
+                    ApplicationUtils.ctx.playAudio(R.raw.power_voice)
+                }
+
+
+            }
+
+            is SettingIntent.ClearAll -> viewModelScope.launch {
+                proDao.deleteAll()
+                errorDao.deleteAll()
+                sportsLogDao.deleteAll()
+                erDao.deleteAll()
+            }
+
         }
     }
 
@@ -2350,34 +2388,34 @@ class SettingViewModel @Inject constructor(
         viewModelScope.launch {
             val application = _application.value
             if (application != null) {
-//                if (application.versionCode > BuildConfig.VERSION_CODE
-//                    && application.downloadUrl.isNotEmpty()
-//                    && _progress.value == 0
-//                ) {
-//                    _progress.value = 1
-//                    application.downloadUrl.download(
-//                        File(
-//                            ApplicationUtils.ctx.getExternalFilesDir(null),
-//                            "update.apk"
-//                        )
-//                    ).collect {
-//                        when (it) {
-//                            is DownloadState.Success -> {
-//                                _progress.value = 0
-//                                ApplicationUtils.installApp(it.file)
-//                            }
-//
-//                            is DownloadState.Err -> {
-//                                _progress.value = 0
-//                                _uiFlags.value = UiFlags.message("下载失败: ${it.t.message}")
-//                            }
-//
-//                            is DownloadState.Progress -> {
-//                                _progress.value = maxOf(it.progress, 1)
-//                            }
-//                        }
-//                    }
-//                }
+                if (application.versionCode > BuildConfig.VERSION_CODE
+                    && application.downloadUrl.isNotEmpty()
+                    && _progress.value == 0
+                ) {
+                    _progress.value = 1
+                    application.downloadUrl.download(
+                        File(
+                            ApplicationUtils.ctx.getExternalFilesDir(null),
+                            "update.apk"
+                        )
+                    ).collect {
+                        when (it) {
+                            is DownloadState.Success -> {
+                                _progress.value = 0
+                                ApplicationUtils.installApp(it.file)
+                            }
+
+                            is DownloadState.Err -> {
+                                _progress.value = 0
+                                _uiFlags.value = UiFlags.message("下载失败: ${it.t.message}")
+                            }
+
+                            is DownloadState.Progress -> {
+                                _progress.value = maxOf(it.progress, 1)
+                            }
+                        }
+                    }
+                }
             } else {
                 httpCall(exception = {
                     _uiFlags.value = UiFlags.message(it.message ?: "Unknown")
@@ -2458,5 +2496,9 @@ sealed class SettingIntent {
     data object Clean : SettingIntent()
 
     data object Pipeline : SettingIntent()
+
+    data class Sound(val state: Int) : SettingIntent()
+
+    data object ClearAll : SettingIntent()
 
 }

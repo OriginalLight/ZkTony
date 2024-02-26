@@ -15,10 +15,13 @@ import com.zktony.android.data.dao.ErrorRecordDao
 import com.zktony.android.data.dao.ExperimentRecordDao
 import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.dao.SettingDao
+import com.zktony.android.data.dao.SportsLogDao
 import com.zktony.android.data.datastore.DataSaverDataStore
+import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.ErrorRecord
 import com.zktony.android.data.entities.ExperimentRecord
 import com.zktony.android.data.entities.Setting
+import com.zktony.android.data.entities.SportsLog
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.utils.AppStateUtils
@@ -37,6 +40,7 @@ import com.zktony.android.utils.SerialPortUtils.pulse
 import com.zktony.android.utils.SerialPortUtils.start
 import com.zktony.android.utils.SerialPortUtils.stop
 import com.zktony.android.utils.SerialPortUtils.valve
+import com.zktony.android.utils.extra.dateFormat
 import com.zktony.android.utils.extra.playAudio
 import com.zktony.android.utils.internal.ExecuteType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -67,6 +71,7 @@ class HomeViewModel @Inject constructor(
     private val erDao: ExperimentRecordDao,
     private val slDao: SettingDao,
     private val errorDao: ErrorRecordDao,
+    private val sportsLogDao: SportsLogDao,
 ) : ViewModel() {
 
     private val _selected = MutableStateFlow(1L)
@@ -74,6 +79,9 @@ class HomeViewModel @Inject constructor(
     private val _page = MutableStateFlow(PageType.HOME)
     private val _uiFlags = MutableStateFlow<UiFlags>(UiFlags.none())
     private val _job = MutableStateFlow<Job?>(null)
+    private val _job2 = MutableStateFlow<Job?>(null)
+    private val _waitTimeRinseJob = MutableStateFlow<Job?>(null)
+    private val _hintJob = MutableStateFlow<Job?>(null)
 
     /**
      * 加液次数
@@ -129,6 +137,13 @@ class HomeViewModel @Inject constructor(
 
     private val _first = MutableStateFlow(false)
 
+    /**
+     * 检测是否更换制胶架
+     * true:更换过
+     * false:未更换
+     */
+    private val _hint = MutableStateFlow(false)
+
 
     private var syringeJob: Job? = null
 
@@ -137,6 +152,7 @@ class HomeViewModel @Inject constructor(
     val page = _page.asStateFlow()
     val uiFlags = _uiFlags.asStateFlow()
     val job = _job.asStateFlow()
+    val job2 = _job2.asStateFlow()
     val complate = _complate.asStateFlow()
     val progress = _progress.asStateFlow()
     val calculate = _calculate.asStateFlow()
@@ -145,7 +161,14 @@ class HomeViewModel @Inject constructor(
     val lowmother = _lowmother.asStateFlow()
     val first = _first.asStateFlow()
 
-    val soundsThickness = dataStore.readData("soundsThickness", "蜂鸣")
+    val userinse = _userinse.asStateFlow()
+    val usehigh = _usehigh.asStateFlow()
+    val uselow = _uselow.asStateFlow()
+    val usecoagulant = _usecoagulant.asStateFlow()
+
+    val hint = _hint.asStateFlow()
+
+    val selectRudio = dataStore.readData("selectRudio", 1)
 
     /**
      * 制胶程序dao
@@ -163,10 +186,10 @@ class HomeViewModel @Inject constructor(
 
 
     init {
-        if (soundsThickness == "蜂鸣") {
+        if (selectRudio == 1) {
             //开机
             ApplicationUtils.ctx.playAudio(R.raw.power_buzz)
-        } else if (soundsThickness == "语音") {
+        } else if (selectRudio == 2) {
 
         }
         reset()
@@ -210,20 +233,139 @@ class HomeViewModel @Inject constructor(
 
             is HomeIntent.First -> viewModelScope.launch {
                 _first.value = true
-                if (soundsThickness == "语音") {
+                if (selectRudio == 2) {
                     ApplicationUtils.ctx.playAudio(R.raw.first_voice)
                 }
             }
 
             is HomeIntent.CleanWaste -> viewModelScope.launch {
-                if (soundsThickness == "语音") {
+                if (selectRudio == 2) {
                     ApplicationUtils.ctx.playAudio(R.raw.cleanwaste_voice)
-                } else if (soundsThickness == "蜂鸣") {
+                } else if (selectRudio == 1) {
                     ApplicationUtils.ctx.playAudio(R.raw.detection_buzz)
                 }
             }
 
+            is HomeIntent.CleanWasteState -> viewModelScope.launch {
+                _wasteprogress.value = 0f
+            }
+
         }
+    }
+
+
+    private fun hintBuzz() {
+        viewModelScope.launch {
+            if (selectRudio == 1) {
+                _job2.value = launch {
+                    var num = 0f
+                    while (num < 30) {
+                        if (_job2.value == null) {
+                            break
+                        }
+                        ApplicationUtils.ctx.playAudio(R.raw.hint_buzz)
+                        num += 2
+                        delay(2000L)
+                    }
+                }
+            }
+
+        }
+    }
+
+    /**
+     * 等待半小时后冲洗
+     */
+    private fun waitTimeRinse() {
+        viewModelScope.launch {
+            _waitTimeRinseJob.value = launch {
+                var num = 0
+                var waitTime = 60 * 30
+                while (num < waitTime) {
+                    if (_waitTimeRinseJob.value == null) {
+                        break
+                    }
+                    num += 1
+                    delay(1000L)
+                }
+                if (num >= waitTime) {
+                    val slEnetity = slDao.getById(1L).firstOrNull()
+                    if (slEnetity != null) {
+                        val rinseCleanVolume = slEnetity.rinseCleanVolume
+                        _wasteprogress.value += (rinseCleanVolume / 150).toFloat()
+
+                        /**
+                         * 废液槽位置
+                         */
+                        val wastePosition = slEnetity.wastePosition
+
+                        /**
+                         * x轴转速
+                         */
+                        val xSpeed = dataStore.readData("xSpeed", 100L)
+
+                        start {
+                            timeOut = 1000L * 60L * 10
+                            with(
+                                index = 0,
+                                pdv = wastePosition,
+                                ads = Triple(xSpeed * 20, xSpeed * 20, xSpeed * 20),
+                            )
+                        }
+
+                        /**
+                         * 冲洗转速
+                         */
+                        val rinseSpeed = dataStore.readData("rinseSpeed", 600L)
+                        start {
+                            timeOut = 1000L * 60L * 10
+                            with(
+                                index = 4,
+                                ads = Triple(rinseSpeed * 20, rinseSpeed * 20, rinseSpeed * 20),
+                                pdv = rinseCleanVolume * 1000
+                            )
+                        }
+                    }
+                    _waitTimeRinseJob.value?.cancel()
+                    _waitTimeRinseJob.value = null
+                    waitTimeRinse()
+                }
+            }
+
+        }
+    }
+
+    /**
+     * 检测是否更换制胶架
+     */
+    private fun hint() {
+        viewModelScope.launch {
+            _hintJob.value = launch {
+                var state1 = 0
+                var state2 = 0
+                while (!_hint.value) {
+                    println("更换制胶架状态====$state1====$state2")
+                    if (_hint.value == null) {
+                        break
+                    }
+
+                    if (state1 == 1 && state2 == 1) {
+                        _hint.value = true
+                        break
+                    }
+                    gpio(3)
+                    delay(500)
+                    if (!getGpio(3)) {
+                        state1 = 1
+                    } else {
+                        state2 = 1
+                    }
+
+                }
+
+            }
+        }
+
     }
 
 
@@ -249,8 +391,12 @@ class HomeViewModel @Inject constructor(
             _uiFlags.value = UiFlags.objects(1)
             try {
 
+
                 lightFlashYellow()
                 delay(100)
+
+                _waitTimeRinseJob.value?.cancel()
+                _waitTimeRinseJob.value = null
 
                 /**
                  * 柱塞泵总行程
@@ -266,6 +412,17 @@ class HomeViewModel @Inject constructor(
                  * 复位后预排步数
                  */
                 val coagulantResetPulse = dataStore.readData("coagulantResetPulse", 1500).toLong()
+
+                val date = Date(System.currentTimeMillis()).dateFormat("yyyy-MM-dd")
+                sportsLogDao.insert(
+                    SportsLog(
+                        logName = "${date}-MBG1500",
+                        startModel = "复位",
+                        detail = "柱塞泵总行程:$coagulantpulse,复位等待时间:$coagulantTime,复位后预排步数:$coagulantResetPulse,"
+                    )
+                )
+                delay(100)
+
                 withTimeout(60 * 1000L) {
                     /**
                      * 0-x轴    3200/圈    0号光电-复位光电；1号光电-限位光电
@@ -598,6 +755,7 @@ class HomeViewModel @Inject constructor(
                     delay(100)
                     lightGreed()
                 }
+                waitTimeRinse()
                 _uiFlags.value = UiFlags.none()
             } catch (ex: Exception) {
                 lightRed()
@@ -611,7 +769,7 @@ class HomeViewModel @Inject constructor(
     }
 
 
-    //预计制胶数量=INT（MIN（（高浓度母液量-高浓度泵填充液量）/（制胶体积×制胶高浓度步数/制胶总步数+预排胶液体积×预排高浓度步数/预排总步数），（低浓度母液量-低浓度泵填充液量）/（制胶体积×制胶低浓度泵步数/制胶总步数+预排胶液体积×预排低浓度步数/预排总步数）））
+    //预计制胶数量=INT（MIN（（高浓度母液量-高浓度泵填充液量）/（（预排高浓度泵步数+制胶高浓度步数）/高浓度泵校准数据（步/μL）/1000），（低浓度母液量-低浓度泵填充液量）/（（预排低浓度泵步数+制胶低浓度步数）/低浓度泵校准数据（步/μL）/1000）））
     private fun calculate() {
         viewModelScope.launch {
             try {
@@ -631,89 +789,279 @@ class HomeViewModel @Inject constructor(
 
                 //01胶液总步数=制胶体积（mL）×1000×高低浓度平均校准因子（步/μL）
                 //1.1   获取高低浓度的平均校准因子
+                val p1jz = (AppStateUtils.hpc[1] ?: { x -> x * 100 }).invoke(1.0)
                 val p2jz = (AppStateUtils.hpc[2] ?: { x -> x * 100 }).invoke(1.0)
-                Log.d("", "p2jz===$p2jz")
                 val p3jz = (AppStateUtils.hpc[3] ?: { x -> x * 100 }).invoke(1.0)
-                Log.d("", "p3jz===$p3jz")
                 val highLowAvg = (p2jz + p3jz) / 2
-                val number3digits: Double = String.format("%.3f", highLowAvg).toDouble()
-                Log.d("", "highLowAvg===$highLowAvg")
-                Log.d("", "number3digits===$number3digits")
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===获取高低浓度的平均校准因子===$highLowAvg"
+                )
                 //1.2   胶液总步数
-                val volume = selected.volume
-                val volumePulseCount = volume * 1000 * highLowAvg
-                Log.d("", "volumePulseCount===$volumePulseCount")
+                val volumePulseCount = selected.volume * 1000 * highLowAvg
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===01胶液总步数===$volumePulseCount"
+                )
                 //01胶液总步数=制胶体积（mL）×1000×高低浓度平均校准因子（步/μL）
+
+                //02促凝剂总步数=促凝剂体积（μL）×校准数据（步/μL）
+                val coagulantVol = selected.coagulant
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===促凝剂加液量===$coagulantVol"
+                )
+                //促凝剂总步数
+                val coagulantPulseCount = coagulantVol * p1jz
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===02促凝剂总步数===$coagulantPulseCount"
+                )
+                //02促凝剂总步数=促凝剂体积（μL）×校准数据（步/μL）
 
                 //03制胶所需时间（s）=制胶总步数/每圈脉冲数/制胶速度（rpm）×60
                 //制胶速度，根据这个速度转换其他泵的速度
                 val speed = dataStore.readData("speed", 180)
-                Log.d("", "speed===$speed")
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===制胶速度===$speed"
+                )
                 //制胶所需时间
                 val guleTime = volumePulseCount / 51200 / speed * 60
-                Log.d("", "guleTime===$guleTime")
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===03制胶所需时间===$guleTime"
+                )
                 //03制胶所需时间（s）=制胶总步数/每圈脉冲数/制胶速度（rpm）×60
 
-                //04高浓度泵启动速度（rpm）=制胶速度（rpm）×（制胶高浓度-母液低浓度）/（母液高浓度-母液低浓度）
+                //03A制胶总流速（μL/s）=制胶体积（mL）×1000/制胶所需时间（s）
+                val guleFlow = selected.volume * 1000 / guleTime
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===03A制胶总流速===$guleFlow"
+                )
+                //03A制胶总流速（μL/s）=制胶体积（mL）×1000/制胶所需时间（s）
+
+                //04高浓度泵启动速度（rpm）=制胶总流速（μL/s）×（制胶高浓度-母液低浓度）/（母液高浓度-母液低浓度）×高浓度泵校准数据（步/μL）*60/每圈脉冲数
                 //母液低浓度
                 val lowCoagulant = dataStore.readData("lowCoagulant", 4)
-                Log.d("", "lowCoagulant===$lowCoagulant")
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===母液低浓度===$lowCoagulant"
+                )
                 //母液高浓度
                 val highCoagulant = dataStore.readData("highCoagulant", 20)
-                Log.d("", "highCoagulant===$highCoagulant")
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===母液高浓度===$highCoagulant"
+                )
                 //高浓度泵启动速度
                 val highStartSpeed =
-                    speed * (selected.endRange - lowCoagulant) / (highCoagulant - lowCoagulant)
-                Log.d("", "highStartSpeed===$highStartSpeed")
-                //04高浓度泵启动速度（rpm）=制胶速度（rpm）×（制胶高浓度-母液低浓度）/（母液高浓度-母液低浓度）
+                    guleFlow * (selected.endRange - lowCoagulant) / (highCoagulant - lowCoagulant) * p2jz * 60 / 51200
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===04高浓度泵启动速度===$highStartSpeed"
+                )
+                //04高浓度泵启动速度（rpm）=制胶总流速（μL/s）×（制胶高浓度-母液低浓度）/（母液高浓度-母液低浓度）×高浓度泵校准数据（步/μL）*60/每圈脉冲数
 
-                //05低浓度泵结束速度（rpm）=制胶速度（rpm）×（制胶低浓度-母液高浓度）/（母液低浓度-母液高浓度）
+                //05低浓度泵结束速度（rpm）=制胶总流速（μL/s）×（制胶低浓度-母液高浓度）/（母液低浓度-母液高浓度）×低浓度泵校准数据（步/μL）*60/每圈脉冲数
                 val lowEndSpeed =
-                    speed * (selected.startRange - highCoagulant) / (lowCoagulant - highCoagulant)
-                Log.d("", "lowEndSpeed===$lowEndSpeed")
-                //05低浓度泵结束速度（rpm）=制胶速度（rpm）×（制胶低浓度-母液高浓度）/（母液低浓度-母液高浓度）
+                    guleFlow * (selected.startRange - highCoagulant) / (lowCoagulant - highCoagulant) * p3jz * 60 / 51200
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===05低浓度泵结束速度===$lowEndSpeed"
+                )
+                //05低浓度泵结束速度（rpm）=制胶总流速（μL/s）×（制胶低浓度-母液高浓度）/（母液低浓度-母液高浓度）×低浓度泵校准数据（步/μL）*60/每圈脉冲数
 
-                //06高浓度泵结束速度（rpm）=制胶速度-低浓度泵结束速度
-                val highEndSpeed = speed - lowEndSpeed
-                Log.d("", "highEndSpeed===$highEndSpeed")
-                //06高浓度泵结束速度（rpm）=制胶速度-低浓度泵结束速度
+                //06高浓度泵结束速度（rpm）=制胶总流速（μL/s）×（母液低浓度-制胶低浓度）/（母液低浓度-母液高浓度）×高浓度泵校准数据（步/μL）*60/每圈脉冲数
+                val highEndSpeed =
+                    guleFlow * (lowCoagulant - selected.startRange) / (lowCoagulant - highCoagulant) * p2jz * 60 / 51200
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===06高浓度泵结束速度===$highEndSpeed"
+                )
+                //06高浓度泵结束速度（rpm）=制胶总流速（μL/s）×（母液低浓度-制胶低浓度）/（母液低浓度-母液高浓度）×高浓度泵校准数据（步/μL）*60/每圈脉冲数
 
-                //07低浓度泵启动速度（rpm）=制胶速度-高浓度泵启动速度
-                val lowStartSpeed = speed - highStartSpeed
-                Log.d("", "lowStartSpeed===$lowStartSpeed")
-                //07低浓度泵启动速度（rpm）=制胶速度-高浓度泵启动速度
+                //07低浓度泵启动速度（rpm）=制胶总流速（μL/s）×（母液高浓度-制胶高浓度）/（母液高浓度-母液低浓度）×低浓度泵校准数据（步/μL）*60/每圈脉冲数
+                val lowStartSpeed =
+                    guleFlow * (highCoagulant - selected.endRange) / (highCoagulant - lowCoagulant) * p3jz * 60 / 51200
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===07低浓度泵启动速度===$lowStartSpeed"
+                )
+                //07低浓度泵启动速度（rpm）=制胶总流速（μL/s）×（母液高浓度-制胶高浓度）/（母液高浓度-母液低浓度）×低浓度泵校准数据（步/μL）*60/每圈脉冲数
 
+                //08促凝剂泵启动速度（rpm）=促凝剂泵总步数/每圈脉冲数/制胶所需时间（s）×60×促凝剂变速比
+                //促凝剂变速比-默认1
+                val ratio = 1
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===促凝剂变速比===$ratio"
+                )
+                //促凝剂泵启动速度
+                val coagulantStartSpeed = coagulantPulseCount / 51200 / guleTime * 60 * ratio
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===08促凝剂泵启动速度===$coagulantStartSpeed"
+                )
+                //08促凝剂泵启动速度（rpm）=促凝剂泵总步数/每圈脉冲数/制胶所需时间（s）×60×促凝剂变速比
+
+                //09促凝剂泵结束速度（rpm）=促凝剂泵总步数/每圈脉冲数/制胶所需时间（s）×60×（2-促凝剂变速比）
+                val coagulantEndSpeed = coagulantPulseCount / 51200 / guleTime * 60 * (2 - ratio)
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===09促凝剂泵结束速度===$coagulantEndSpeed"
+                )
+                //09促凝剂泵结束速度（rpm）=促凝剂泵总步数/每圈脉冲数/制胶所需时间（s）×60×（2-促凝剂变速比）
 
                 //10制胶高浓度泵步数=（高浓度泵启动速度（rpm）+高浓度泵结束速度（rpm））/2×制胶所需时间（s）/60×每圈脉冲数
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===高浓度泵启动速度===$highStartSpeed====高浓度泵结束速度===$highEndSpeed===制胶所需时间===$guleTime==="
+                )
                 val guleHighPulse = (highStartSpeed + highEndSpeed) / 2 * guleTime / 60 * 51200
-                Log.d("", "guleHighPulse===$guleHighPulse")
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===10制胶高浓度泵步数===$guleHighPulse"
+                )
                 //10制胶高浓度泵步数=（高浓度泵启动速度（rpm）+高浓度泵结束速度（rpm））/2×制胶所需时间（s）/60×每圈脉冲数
 
                 //11制胶低浓度泵步数=（低浓度泵启动速度（rpm）+低浓度泵结束速度（rpm））/2×制胶所需时间（s）/60×每圈脉冲数
                 val guleLowPulse = (lowStartSpeed + lowEndSpeed) / 2 * guleTime / 60 * 51200
-                Log.d("", "guleLowPulse===$guleLowPulse")
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===11制胶低浓度泵步数===$guleLowPulse"
+                )
                 //11制胶低浓度泵步数=（低浓度泵启动速度（rpm）+低浓度泵结束速度（rpm））/2×制胶所需时间（s）/60×每圈脉冲数
 
+                //12高浓度泵加速度（rpm/s）=ABS（（高浓度泵启动速度（rpm）-高浓度泵结束速度（rpm））/制胶所需时间（s））
+                val highAcc = abs(highStartSpeed - highEndSpeed) / guleTime
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===12高浓度泵加速度===$highAcc"
+                )
+                //12高浓度泵加速度（rpm/s）=ABS（（高浓度泵启动速度（rpm）-高浓度泵结束速度（rpm））/制胶所需时间（s））
 
+                //13低浓度泵加速度（rpm/s）=ABS（（低浓度泵启动速度（rpm）-低浓度泵结束速度（rpm））/制胶所需时间（s）)
+                val lowAcc = abs(lowStartSpeed - lowEndSpeed) / guleTime
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===13低浓度泵加速度===$lowAcc"
+                )
+                //13低浓度泵加速度（rpm/s）=ABS（（低浓度泵启动速度（rpm）-低浓度泵结束速度（rpm））/制胶所需时间（s）)
+
+                //14促凝剂泵加速度（rpm/s）=ABS（促凝剂泵启动速度（rpm）-促凝剂泵结束速度（rpm））/制胶所需时间（s）
+                val coagulantAcc = abs(coagulantStartSpeed - coagulantEndSpeed) / guleTime
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===14促凝剂泵加速度===$coagulantAcc"
+                )
+                //14促凝剂泵加速度（rpm/s）=ABS（促凝剂泵启动速度（rpm）-促凝剂泵结束速度（rpm））/制胶所需时间（s）
+
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===制胶前期准备数据结束==="
+                )
+
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===预排前期准备数据开始==="
+                )
+
+                //15预排总步数=预排胶液体积（mL）×1000×平均校准数据（步/μL）
                 /**
                  * 高浓度预排液量
                  */
-                val higeRehearsalVolume = setting.higeRehearsalVolume
-                Log.d("", "higeRehearsalVolume===$higeRehearsalVolume")
+                val higeRehearsalVolume = setting.higeRehearsalVolume * 1000
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===高浓度预排液量===$higeRehearsalVolume"
+                )
 
                 val highExpectedPulseCount = higeRehearsalVolume * highLowAvg
-                Log.d("", "highExpectedPulseCount===$highExpectedPulseCount")
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===15预排总步数===$highExpectedPulseCount"
+                )
                 //15预排总步数=预排胶液体积（mL）×1000×平均校准数据（步/μL）
 
-                //16预排高浓度步数=预排总步数×高浓度泵启动速度（rpm）/制胶速度（rpm）
-                val highExpectedPulse = highExpectedPulseCount * highStartSpeed / speed
-                Log.d("", "highExpectedPulse===$highExpectedPulse")
-                //16预排高浓度步数=预排总步数×高浓度泵启动速度（rpm）/制胶速度（rpm）
+                /**
+                 *冲洗液泵转速
+                 */
+                val rinseSpeed = dataStore.readData("rinseSpeed", 600L)
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===冲洗液泵转速===$rinseSpeed"
+                )
 
-                //17预排低浓度步数=预排总步数×低浓度泵启动速度（rpm）/制胶速度（rpm）
-                val lowExpectedPulse = highExpectedPulseCount * lowStartSpeed / speed
-                Log.d("", "lowExpectedPulse===$lowExpectedPulse")
-                //17预排低浓度步数=预排总步数×低浓度泵启动速度（rpm）/制胶速度（rpm）
+                //16预排时间=预排总步数/每圈步数/冲洗液泵速度（rpm）×60
+                val expectedTime = highExpectedPulseCount / 51200 / rinseSpeed * 60
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===16预排时间===$expectedTime"
+                )
+                //16预排时间=预排总步数/每圈步数/冲洗液泵速度（rpm）×60
+
+                //17预排总流速（μL/s）=高浓度泵预排液量（mL）×1000/预排时间（s）
+                val expectedFlow = higeRehearsalVolume / expectedTime
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===17预排总流速===$expectedFlow"
+                )
+                //17预排总流速（μL/s）=高浓度泵预排液量（mL）×1000/预排时间（s）
+
+                //18预排高浓度泵速度（rpm）=预排总流速（μL/s）×（制胶高浓度-母液低浓度）/（母液高浓度-母液低浓度）×高浓度泵校准数据（步/μL）*60/每圈脉冲数
+                val highExpectedSpeed =
+                    expectedFlow * (selected.endRange - lowCoagulant) / (highCoagulant - lowCoagulant) * p2jz * 60 / 51200
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===18预排高浓度泵速度===$highExpectedSpeed"
+                )
+                //18预排高浓度泵速度（rpm）=预排总流速（μL/s）×（制胶高浓度-母液低浓度）/（母液高浓度-母液低浓度）×高浓度泵校准数据（步/μL）*60/每圈脉冲数
+
+                //19预排低浓度泵速度（rpm）=预排总流速（μL/s）×（母液高浓度-制胶高浓度）/（母液高浓度-母液低浓度）×低浓度泵校准数据（步/μL）*60/每圈脉冲数
+                val lowExpectedSpeed =
+                    expectedFlow * (highCoagulant - selected.endRange) / (highCoagulant - lowCoagulant) * p3jz * 60 / 51200
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===19预排低浓度泵速度===$lowExpectedSpeed"
+                )
+                //19预排低浓度泵速度（rpm）=预排总流速（μL/s）×（母液高浓度-制胶高浓度）/（母液高浓度-母液低浓度）×低浓度泵校准数据（步/μL）*60/每圈脉冲数
+
+                //20预排促凝剂步数=预排胶液体积（mL）×促凝剂体积（μL）/制胶体积（mL）×校准数据（步/μL）×促凝剂变速比
+                val coagulantExpectedPulse =
+                    setting.higeRehearsalVolume * selected.coagulant / selected.volume * p1jz * ratio
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===20预排促凝剂步数===$coagulantExpectedPulse"
+                )
+                //20预排促凝剂步数=预排胶液体积（mL）×促凝剂体积（μL）/制胶体积（mL）×校准数据（步/μL）×促凝剂变速比
+
+
+                //21预排高浓度泵步数=预排高浓度泵速度（rpm）*预排时间（s）/60×每圈脉冲数
+                val highExpectedPulse = highExpectedSpeed * expectedTime / 60 * 51200
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===21预排高浓度泵步数===$highExpectedPulse"
+                )
+                //21预排高浓度泵步数=预排高浓度泵速度（rpm）*预排时间（s）/60×每圈脉冲数
+
+                //22预排低浓度泵步数=预排低浓度泵速度（rpm）*预排时间（s）/60×每圈脉冲数
+                val lowExpectedPulse = lowExpectedSpeed * expectedTime / 60 * 51200
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===22预排低浓度泵步数===$lowExpectedPulse"
+                )
+                //22预排低浓度泵步数=预排低浓度泵速度（rpm）*预排时间（s）/60×每圈脉冲数
+
+                //23预排促凝剂泵速度=预排促凝剂泵步数/每圈步数/预排时间（s）×60×促凝剂转速比
+                val coagulantExpectedSpeed =
+                    coagulantExpectedPulse / 51200 / expectedTime * 60 * ratio
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===23预排促凝剂泵速度===$coagulantExpectedSpeed"
+                )
+                //23预排促凝剂泵速度=预排促凝剂泵总步数/每圈步数/预排时间（s）×60×促凝剂转速比
 
 
                 /**
@@ -728,6 +1076,12 @@ class HomeViewModel @Inject constructor(
                 val higeFilling = setting.higeFilling
                 Log.d("", "higeFilling===$higeFilling")
 
+                /**
+                 * 低浓度泵填充液量
+                 */
+                val lowFilling = setting.lowFilling
+                Log.d("", "lowFilling===$lowFilling")
+
 
                 /**
                  * 低浓度母液量
@@ -738,38 +1092,26 @@ class HomeViewModel @Inject constructor(
 
 
                 Log.d("", "==============================================")
-                Log.d("", "高浓度母液量===$highCoagulantVol")
-                Log.d("", "高浓度泵填充液量===$higeFilling")
-                Log.d("", "高浓度母液量-高浓度泵填充液量===${highCoagulantVol - higeFilling}")
-                Log.d("", "制胶体积===$volume")
-                Log.d("", "制胶高浓度步数===$guleHighPulse")
-                Log.d("", "制胶总步数===$volumePulseCount")
-                Log.d("", "预排胶液体积===$higeRehearsalVolume")
-                Log.d("", "预排高浓度步数===$highExpectedPulse")
-                Log.d("", "预排总步数===$highExpectedPulseCount")
                 Log.d(
                     "",
-                    "计算1===${(highCoagulantVol - higeFilling) / (volume * guleHighPulse / volumePulseCount + higeRehearsalVolume * highExpectedPulse / highExpectedPulseCount)}"
+                    "计算1===${((highCoagulantVol - higeFilling) / ((highExpectedPulse + guleHighPulse) / p2jz / 1000))}"
                 )
 
 
-                Log.d("", "低浓度母液量===$lowCoagulantVol")
-                Log.d("", "低浓度泵填充液量===${setting.lowFilling}")
-                Log.d("", "制胶低浓度泵步数===$guleLowPulse")
-                Log.d("", "预排低浓度步数===$lowExpectedPulse")
-                Log.d("", "制胶低浓度泵步数===$guleLowPulse")
-                Log.d("", "预排低浓度步数===$lowExpectedPulse")
-
                 Log.d(
                     "",
-                    "计算2===${(lowCoagulantVol - setting.lowFilling) / (volume * guleLowPulse / volumePulseCount + higeRehearsalVolume * lowExpectedPulse / highExpectedPulseCount)}"
+                    "计算2===${(lowCoagulantVol - lowFilling) / ((lowExpectedPulse + guleLowPulse) / p3jz / 1000)}"
                 )
-//预计制胶数量=INT（MIN（（高浓度母液量-高浓度泵填充液量）/（制胶体积×制胶高浓度步数/制胶总步数+预排胶液体积×预排高浓度步数/预排总步数），
-// （低浓度母液量-低浓度泵填充液量）/（制胶体积×制胶低浓度泵步数/制胶总步数+预排胶液体积×预排低浓度步数/预排总步数）））
+                /**
+                 *  预计制胶数量=INT（MIN
+                 *  （（高浓度母液量-高浓度泵填充液量）/（（预排高浓度泵步数+制胶高浓度步数）/高浓度泵校准数据（步/μL）/1000），
+                 *  （低浓度母液量-低浓度泵填充液量）/（（预排低浓度泵步数+制胶低浓度步数）/低浓度泵校准数据（步/μL）/1000）））
+                 *
+                 */
 
                 _calculate.value = Math.min(
-                    ((highCoagulantVol) / (volume * guleHighPulse / volumePulseCount + higeRehearsalVolume * highExpectedPulse / highExpectedPulseCount)),
-                    ((lowCoagulantVol) / (volume * guleLowPulse / volumePulseCount + higeRehearsalVolume * lowExpectedPulse / highExpectedPulseCount))
+                    ((highCoagulantVol - higeFilling) / ((highExpectedPulse + guleHighPulse) / p2jz / 1000)),
+                    (lowCoagulantVol - lowFilling) / ((lowExpectedPulse + guleLowPulse) / p3jz / 1000)
                 ).toInt()
                 delay(500)
                 _uiFlags.value = UiFlags.none()
@@ -781,8 +1123,8 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    //高浓度预计所需母液体积（mL）=（制胶体积×制胶高浓度泵步数/制胶总步数+预排胶液体积×预排高浓度泵步数/预排总步数）×预计制胶数量+高浓度泵填充液量×2
-    //低浓度预计所需母液体积（mL）=（制胶体积×制胶低浓度泵步数/制胶总步数+预排胶液体积×预排低浓度泵步数/预排总步数）×预计制胶数量+低浓度泵填充液量×2
+    //高浓度预计所需母液体积（mL）=（预排高浓度泵步数+制胶高浓度步数）/高浓度泵校准数据（步/μL）/1000×预计制胶数量+高浓度泵填充液量×2
+    //低浓度预计所需母液体积（mL）=（预排低浓度泵步数+制胶低浓度步数）/低浓度泵校准数据（步/μL）/1000×预计制胶数量+低浓度泵填充液量×2
     private fun higeLowMotherVol() {
         viewModelScope.launch {
             try {
@@ -806,89 +1148,225 @@ class HomeViewModel @Inject constructor(
                 //01胶液总步数=制胶体积（mL）×1000×高低浓度平均校准因子（步/μL）
                 //1.1   获取高低浓度的平均校准因子
                 val p2jz = (AppStateUtils.hpc[2] ?: { x -> x * 100 }).invoke(1.0)
-                Log.d("", "p2jz===$p2jz")
                 val p3jz = (AppStateUtils.hpc[3] ?: { x -> x * 100 }).invoke(1.0)
-                Log.d("", "p3jz===$p3jz")
                 val highLowAvg = (p2jz + p3jz) / 2
-                val number3digits: Double = String.format("%.3f", highLowAvg).toDouble()
-                Log.d("", "highLowAvg===$highLowAvg")
-                Log.d("", "number3digits===$number3digits")
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===获取高低浓度的平均校准因子===$highLowAvg"
+                )
                 //1.2   胶液总步数
-                val volume = selected.volume
-                val volumePulseCount = volume * 1000 * highLowAvg
-                Log.d("", "volumePulseCount===$volumePulseCount")
+                val volumePulseCount = selected.volume * 1000 * highLowAvg
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===01胶液总步数===$volumePulseCount"
+                )
                 //01胶液总步数=制胶体积（mL）×1000×高低浓度平均校准因子（步/μL）
+
 
                 //03制胶所需时间（s）=制胶总步数/每圈脉冲数/制胶速度（rpm）×60
                 //制胶速度，根据这个速度转换其他泵的速度
                 val speed = dataStore.readData("speed", 180)
-                Log.d("", "speed===$speed")
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===制胶速度===$speed"
+                )
                 //制胶所需时间
                 val guleTime = volumePulseCount / 51200 / speed * 60
-                Log.d("", "guleTime===$guleTime")
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===03制胶所需时间===$guleTime"
+                )
                 //03制胶所需时间（s）=制胶总步数/每圈脉冲数/制胶速度（rpm）×60
 
-                //04高浓度泵启动速度（rpm）=制胶速度（rpm）×（制胶高浓度-母液低浓度）/（母液高浓度-母液低浓度）
+                //03A制胶总流速（μL/s）=制胶体积（mL）×1000/制胶所需时间（s）
+                val guleFlow = selected.volume * 1000 / guleTime
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===03A制胶总流速===$guleFlow"
+                )
+                //03A制胶总流速（μL/s）=制胶体积（mL）×1000/制胶所需时间（s）
+
+                //04高浓度泵启动速度（rpm）=制胶总流速（μL/s）×（制胶高浓度-母液低浓度）/（母液高浓度-母液低浓度）×高浓度泵校准数据（步/μL）*60/每圈脉冲数
                 //母液低浓度
                 val lowCoagulant = dataStore.readData("lowCoagulant", 4)
-                Log.d("", "lowCoagulant===$lowCoagulant")
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===母液低浓度===$lowCoagulant"
+                )
                 //母液高浓度
                 val highCoagulant = dataStore.readData("highCoagulant", 20)
-                Log.d("", "highCoagulant===$highCoagulant")
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===母液高浓度===$highCoagulant"
+                )
                 //高浓度泵启动速度
                 val highStartSpeed =
-                    speed * (selected.endRange - lowCoagulant) / (highCoagulant - lowCoagulant)
-                Log.d("", "highStartSpeed===$highStartSpeed")
-                //04高浓度泵启动速度（rpm）=制胶速度（rpm）×（制胶高浓度-母液低浓度）/（母液高浓度-母液低浓度）
+                    guleFlow * (selected.endRange - lowCoagulant) / (highCoagulant - lowCoagulant) * p2jz * 60 / 51200
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===04高浓度泵启动速度===$highStartSpeed"
+                )
+                //04高浓度泵启动速度（rpm）=制胶总流速（μL/s）×（制胶高浓度-母液低浓度）/（母液高浓度-母液低浓度）×高浓度泵校准数据（步/μL）*60/每圈脉冲数
 
-                //05低浓度泵结束速度（rpm）=制胶速度（rpm）×（制胶低浓度-母液高浓度）/（母液低浓度-母液高浓度）
+                //05低浓度泵结束速度（rpm）=制胶总流速（μL/s）×（制胶低浓度-母液高浓度）/（母液低浓度-母液高浓度）×低浓度泵校准数据（步/μL）*60/每圈脉冲数
                 val lowEndSpeed =
-                    speed * (selected.startRange - highCoagulant) / (lowCoagulant - highCoagulant)
-                Log.d("", "lowEndSpeed===$lowEndSpeed")
-                //05低浓度泵结束速度（rpm）=制胶速度（rpm）×（制胶低浓度-母液高浓度）/（母液低浓度-母液高浓度）
+                    guleFlow * (selected.startRange - highCoagulant) / (lowCoagulant - highCoagulant) * p3jz * 60 / 51200
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===05低浓度泵结束速度===$lowEndSpeed"
+                )
+                //05低浓度泵结束速度（rpm）=制胶总流速（μL/s）×（制胶低浓度-母液高浓度）/（母液低浓度-母液高浓度）×低浓度泵校准数据（步/μL）*60/每圈脉冲数
 
-                //06高浓度泵结束速度（rpm）=制胶速度-低浓度泵结束速度
-                val highEndSpeed = speed - lowEndSpeed
-                Log.d("", "highEndSpeed===$highEndSpeed")
-                //06高浓度泵结束速度（rpm）=制胶速度-低浓度泵结束速度
+                //06高浓度泵结束速度（rpm）=制胶总流速（μL/s）×（母液低浓度-制胶低浓度）/（母液低浓度-母液高浓度）×高浓度泵校准数据（步/μL）*60/每圈脉冲数
+                val highEndSpeed =
+                    guleFlow * (lowCoagulant - selected.startRange) / (lowCoagulant - highCoagulant) * p2jz * 60 / 51200
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===06高浓度泵结束速度===$highEndSpeed"
+                )
+                //06高浓度泵结束速度（rpm）=制胶总流速（μL/s）×（母液低浓度-制胶低浓度）/（母液低浓度-母液高浓度）×高浓度泵校准数据（步/μL）*60/每圈脉冲数
 
-                //07低浓度泵启动速度（rpm）=制胶速度-高浓度泵启动速度
-                val lowStartSpeed = speed - highStartSpeed
-                Log.d("", "lowStartSpeed===$lowStartSpeed")
-                //07低浓度泵启动速度（rpm）=制胶速度-高浓度泵启动速度
+                //07低浓度泵启动速度（rpm）=制胶总流速（μL/s）×（母液高浓度-制胶高浓度）/（母液高浓度-母液低浓度）×低浓度泵校准数据（步/μL）*60/每圈脉冲数
+                val lowStartSpeed =
+                    guleFlow * (highCoagulant - selected.endRange) / (highCoagulant - lowCoagulant) * p3jz * 60 / 51200
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===07低浓度泵启动速度===$lowStartSpeed"
+                )
+                //07低浓度泵启动速度（rpm）=制胶总流速（μL/s）×（母液高浓度-制胶高浓度）/（母液高浓度-母液低浓度）×低浓度泵校准数据（步/μL）*60/每圈脉冲数
+
+                //08促凝剂泵启动速度（rpm）=促凝剂泵总步数/每圈脉冲数/制胶所需时间（s）×60×促凝剂变速比
+                //促凝剂变速比-默认1
+                val ratio = 1
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===促凝剂变速比===$ratio"
+                )
 
 
                 //10制胶高浓度泵步数=（高浓度泵启动速度（rpm）+高浓度泵结束速度（rpm））/2×制胶所需时间（s）/60×每圈脉冲数
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===高浓度泵启动速度===$highStartSpeed====高浓度泵结束速度===$highEndSpeed===制胶所需时间===$guleTime==="
+                )
                 val guleHighPulse = (highStartSpeed + highEndSpeed) / 2 * guleTime / 60 * 51200
-                Log.d("", "guleHighPulse===$guleHighPulse")
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===10制胶高浓度泵步数===$guleHighPulse"
+                )
                 //10制胶高浓度泵步数=（高浓度泵启动速度（rpm）+高浓度泵结束速度（rpm））/2×制胶所需时间（s）/60×每圈脉冲数
 
                 //11制胶低浓度泵步数=（低浓度泵启动速度（rpm）+低浓度泵结束速度（rpm））/2×制胶所需时间（s）/60×每圈脉冲数
                 val guleLowPulse = (lowStartSpeed + lowEndSpeed) / 2 * guleTime / 60 * 51200
-                Log.d("", "guleLowPulse===$guleLowPulse")
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===11制胶低浓度泵步数===$guleLowPulse"
+                )
                 //11制胶低浓度泵步数=（低浓度泵启动速度（rpm）+低浓度泵结束速度（rpm））/2×制胶所需时间（s）/60×每圈脉冲数
 
+                //12高浓度泵加速度（rpm/s）=ABS（（高浓度泵启动速度（rpm）-高浓度泵结束速度（rpm））/制胶所需时间（s））
+                val highAcc = abs(highStartSpeed - highEndSpeed) / guleTime
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===12高浓度泵加速度===$highAcc"
+                )
+                //12高浓度泵加速度（rpm/s）=ABS（（高浓度泵启动速度（rpm）-高浓度泵结束速度（rpm））/制胶所需时间（s））
 
+                //13低浓度泵加速度（rpm/s）=ABS（（低浓度泵启动速度（rpm）-低浓度泵结束速度（rpm））/制胶所需时间（s）)
+                val lowAcc = abs(lowStartSpeed - lowEndSpeed) / guleTime
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===13低浓度泵加速度===$lowAcc"
+                )
+                //13低浓度泵加速度（rpm/s）=ABS（（低浓度泵启动速度（rpm）-低浓度泵结束速度（rpm））/制胶所需时间（s）)
+
+
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===制胶前期准备数据结束==="
+                )
+
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===预排前期准备数据开始==="
+                )
+
+                //15预排总步数=预排胶液体积（mL）×1000×平均校准数据（步/μL）
                 /**
                  * 高浓度预排液量
                  */
-                val higeRehearsalVolume = setting.higeRehearsalVolume
-                Log.d("", "higeRehearsalVolume===$higeRehearsalVolume")
+                val higeRehearsalVolume = setting.higeRehearsalVolume * 1000
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===高浓度预排液量===$higeRehearsalVolume"
+                )
 
                 val highExpectedPulseCount = higeRehearsalVolume * highLowAvg
-                Log.d("", "highExpectedPulseCount===$highExpectedPulseCount")
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===15预排总步数===$highExpectedPulseCount"
+                )
                 //15预排总步数=预排胶液体积（mL）×1000×平均校准数据（步/μL）
 
-                //16预排高浓度步数=预排总步数×高浓度泵启动速度（rpm）/制胶速度（rpm）
-                val highExpectedPulse = highExpectedPulseCount * highStartSpeed / speed
-                Log.d("", "highExpectedPulse===$highExpectedPulse")
-                //16预排高浓度步数=预排总步数×高浓度泵启动速度（rpm）/制胶速度（rpm）
+                /**
+                 *冲洗液泵转速
+                 */
+                val rinseSpeed = dataStore.readData("rinseSpeed", 600L)
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===冲洗液泵转速===$rinseSpeed"
+                )
 
-                //17预排低浓度步数=预排总步数×低浓度泵启动速度（rpm）/制胶速度（rpm）
-                val lowExpectedPulse = highExpectedPulseCount * lowStartSpeed / speed
-                Log.d("", "lowExpectedPulse===$lowExpectedPulse")
-                //17预排低浓度步数=预排总步数×低浓度泵启动速度（rpm）/制胶速度（rpm）
+                //16预排时间=预排总步数/每圈步数/冲洗液泵速度（rpm）×60
+                val expectedTime = highExpectedPulseCount / 51200 / rinseSpeed * 60
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===16预排时间===$expectedTime"
+                )
+                //16预排时间=预排总步数/每圈步数/冲洗液泵速度（rpm）×60
 
+                //17预排总流速（μL/s）=高浓度泵预排液量（mL）×1000/预排时间（s）
+                val expectedFlow = higeRehearsalVolume / expectedTime
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===17预排总流速===$expectedFlow"
+                )
+                //17预排总流速（μL/s）=高浓度泵预排液量（mL）×1000/预排时间（s）
+
+                //18预排高浓度泵速度（rpm）=预排总流速（μL/s）×（制胶高浓度-母液低浓度）/（母液高浓度-母液低浓度）×高浓度泵校准数据（步/μL）*60/每圈脉冲数
+                val highExpectedSpeed =
+                    expectedFlow * (selected.endRange - lowCoagulant) / (highCoagulant - lowCoagulant) * p2jz * 60 / 51200
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===18预排高浓度泵速度===$highExpectedSpeed"
+                )
+                //18预排高浓度泵速度（rpm）=预排总流速（μL/s）×（制胶高浓度-母液低浓度）/（母液高浓度-母液低浓度）×高浓度泵校准数据（步/μL）*60/每圈脉冲数
+
+                //19预排低浓度泵速度（rpm）=预排总流速（μL/s）×（母液高浓度-制胶高浓度）/（母液高浓度-母液低浓度）×低浓度泵校准数据（步/μL）*60/每圈脉冲数
+                val lowExpectedSpeed =
+                    expectedFlow * (highCoagulant - selected.endRange) / (highCoagulant - lowCoagulant) * p3jz * 60 / 51200
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===19预排低浓度泵速度===$lowExpectedSpeed"
+                )
+                //19预排低浓度泵速度（rpm）=预排总流速（μL/s）×（母液高浓度-制胶高浓度）/（母液高浓度-母液低浓度）×低浓度泵校准数据（步/μL）*60/每圈脉冲数
+
+
+                //21预排高浓度泵步数=预排高浓度泵速度（rpm）*预排时间（s）/60×每圈脉冲数
+                val highExpectedPulse = highExpectedSpeed * expectedTime / 60 * 51200
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===21预排高浓度泵步数===$highExpectedPulse"
+                )
+                //21预排高浓度泵步数=预排高浓度泵速度（rpm）*预排时间（s）/60×每圈脉冲数
+
+                //22预排低浓度泵步数=预排低浓度泵速度（rpm）*预排时间（s）/60×每圈脉冲数
+                val lowExpectedPulse = lowExpectedSpeed * expectedTime / 60 * 51200
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===22预排低浓度泵步数===$lowExpectedPulse"
+                )
+                //22预排低浓度泵步数=预排低浓度泵速度（rpm）*预排时间（s）/60×每圈脉冲数
 
                 /**
                  * 高浓度母液量
@@ -916,23 +1394,27 @@ class HomeViewModel @Inject constructor(
 
                 val expectedMakenum = dataStore.readData("expectedMakenum", 0)
 
+                //高浓度预计所需母液体积（mL）=（预排高浓度泵步数+制胶高浓度步数）/高浓度泵校准数据（步/μL）/1000×预计制胶数量+高浓度泵填充液量×2
                 val higeMother =
-                    ((volume * guleHighPulse / volumePulseCount + higeRehearsalVolume * highExpectedPulse / highExpectedPulseCount) * expectedMakenum + higeFilling * 2).toFloat()
+                    (highExpectedPulse + guleHighPulse) / p2jz / 1000 * expectedMakenum + higeFilling * 2
+                //高浓度预计所需母液体积（mL）=（预排高浓度泵步数+制胶高浓度步数）/高浓度泵校准数据（步/μL）/1000×预计制胶数量+高浓度泵填充液量×2
+
                 Log.d("", "higeMother=========$higeMother")
                 val higeNumber2digits = String.format("%.2f", higeMother).toFloat()
                 Log.d("", "higeNumber2digits=========$higeNumber2digits")
                 val higeSolution = String.format("%.1f", higeMother).toFloat()
                 Log.d("", "higeSolution=========$higeSolution")
 
+
+                //低浓度预计所需母液体积（mL）=（预排低浓度泵步数+制胶低浓度步数）/低浓度泵校准数据（步/μL）/1000×预计制胶数量+低浓度泵填充液量×2
                 val lowMother =
-                    ((volume * guleLowPulse / volumePulseCount + higeRehearsalVolume * lowExpectedPulse / highExpectedPulseCount) * expectedMakenum + lowFilling * 2).toFloat()
+                    (lowExpectedPulse + guleLowPulse) / p3jz / 1000 * expectedMakenum + lowFilling * 2
+                //低浓度预计所需母液体积（mL）=（预排低浓度泵步数+制胶低浓度步数）/低浓度泵校准数据（步/μL）/1000×预计制胶数量+低浓度泵填充液量×2
                 Log.d("", "lowMother=========$lowMother")
                 val lowNumber2digits = String.format("%.2f", lowMother).toFloat()
                 Log.d("", "lowNumber2digits=========$lowNumber2digits")
                 val lowSolution = String.format("%.1f", lowMother).toFloat()
                 Log.d("", "lowSolution=========$lowSolution")
-
-
 
                 _higemother.value = higeSolution
                 _lowmother.value = lowSolution
@@ -964,16 +1446,27 @@ class HomeViewModel @Inject constructor(
                 _uiFlags.value = UiFlags.message("系统参数无数据")
                 return@launch
             }
-//            gpio(4)
-//            if (getGpio(4)) {
-//                if (soundsThickness == "语音") {
-//                    ApplicationUtils.ctx.playAudio(R.raw.hint_voice)
-//                } else if (soundsThickness == "蜂鸣") {
-//                    ApplicationUtils.ctx.playAudio(R.raw.hint_buzz)
-//                }
-//                _uiFlags.value = UiFlags.message("制胶架没有正确放置")
-//                return@launch
-//            }
+            /**
+             * 第一次进入方法检测是否有制胶架
+             */
+            if (status == 0) {
+                gpio(3)
+                delay(500)
+                if (!getGpio(3)) {
+                    if (selectRudio == 2) {
+                        ApplicationUtils.ctx.playAudio(R.raw.hint_voice)
+                    } else if (selectRudio == 1) {
+                        ApplicationUtils.ctx.playAudio(R.raw.hint_buzz)
+                    }
+                    _uiFlags.value = UiFlags.message("制胶架没有正确放置")
+                    return@launch
+                }
+            }
+
+            _waitTimeRinseJob.value?.cancel()
+            _waitTimeRinseJob.value = null
+            _hintJob.value?.cancel()
+            _hintJob.value = null
 
             lightYellow()
             delay(100)
@@ -1032,7 +1525,15 @@ class HomeViewModel @Inject constructor(
             )
             //03制胶所需时间（s）=制胶总步数/每圈脉冲数/制胶速度（rpm）×60
 
-            //04高浓度泵启动速度（rpm）=制胶速度（rpm）×（制胶高浓度-母液低浓度）/（母液高浓度-母液低浓度）
+            //03A制胶总流速（μL/s）=制胶体积（mL）×1000/制胶所需时间（s）
+            val guleFlow = selected.volume * 1000 / guleTime
+            Log.d(
+                "HomeViewModel_startJob",
+                "===03A制胶总流速===$guleFlow"
+            )
+            //03A制胶总流速（μL/s）=制胶体积（mL）×1000/制胶所需时间（s）
+
+            //04高浓度泵启动速度（rpm）=制胶总流速（μL/s）×（制胶高浓度-母液低浓度）/（母液高浓度-母液低浓度）×高浓度泵校准数据（步/μL）*60/每圈脉冲数
             //母液低浓度
             val lowCoagulant = dataStore.readData("lowCoagulant", 4)
             Log.d(
@@ -1047,37 +1548,39 @@ class HomeViewModel @Inject constructor(
             )
             //高浓度泵启动速度
             val highStartSpeed =
-                speed * (selected.endRange - lowCoagulant) / (highCoagulant - lowCoagulant)
+                guleFlow * (selected.endRange - lowCoagulant) / (highCoagulant - lowCoagulant) * p2jz * 60 / 51200
             Log.d(
                 "HomeViewModel_startJob",
                 "===04高浓度泵启动速度===$highStartSpeed"
             )
-            //04高浓度泵启动速度（rpm）=制胶速度（rpm）×（制胶高浓度-母液低浓度）/（母液高浓度-母液低浓度）
+            //04高浓度泵启动速度（rpm）=制胶总流速（μL/s）×（制胶高浓度-母液低浓度）/（母液高浓度-母液低浓度）×高浓度泵校准数据（步/μL）*60/每圈脉冲数
 
-            //05低浓度泵结束速度（rpm）=制胶速度（rpm）×（制胶低浓度-母液高浓度）/（母液低浓度-母液高浓度）
+            //05低浓度泵结束速度（rpm）=制胶总流速（μL/s）×（制胶低浓度-母液高浓度）/（母液低浓度-母液高浓度）×低浓度泵校准数据（步/μL）*60/每圈脉冲数
             val lowEndSpeed =
-                speed * (selected.startRange - highCoagulant) / (lowCoagulant - highCoagulant)
+                guleFlow * (selected.startRange - highCoagulant) / (lowCoagulant - highCoagulant) * p3jz * 60 / 51200
             Log.d(
                 "HomeViewModel_startJob",
                 "===05低浓度泵结束速度===$lowEndSpeed"
             )
-            //05低浓度泵结束速度（rpm）=制胶速度（rpm）×（制胶低浓度-母液高浓度）/（母液低浓度-母液高浓度）
+            //05低浓度泵结束速度（rpm）=制胶总流速（μL/s）×（制胶低浓度-母液高浓度）/（母液低浓度-母液高浓度）×低浓度泵校准数据（步/μL）*60/每圈脉冲数
 
-            //06高浓度泵结束速度（rpm）=制胶速度-低浓度泵结束速度
-            val highEndSpeed = speed - lowEndSpeed
+            //06高浓度泵结束速度（rpm）=制胶总流速（μL/s）×（母液低浓度-制胶低浓度）/（母液低浓度-母液高浓度）×高浓度泵校准数据（步/μL）*60/每圈脉冲数
+            val highEndSpeed =
+                guleFlow * (lowCoagulant - selected.startRange) / (lowCoagulant - highCoagulant) * p2jz * 60 / 51200
             Log.d(
                 "HomeViewModel_startJob",
                 "===06高浓度泵结束速度===$highEndSpeed"
             )
-            //06高浓度泵结束速度（rpm）=制胶速度-低浓度泵结束速度
+            //06高浓度泵结束速度（rpm）=制胶总流速（μL/s）×（母液低浓度-制胶低浓度）/（母液低浓度-母液高浓度）×高浓度泵校准数据（步/μL）*60/每圈脉冲数
 
-            //07低浓度泵启动速度（rpm）=制胶速度-高浓度泵启动速度
-            val lowStartSpeed = speed - highStartSpeed
+            //07低浓度泵启动速度（rpm）=制胶总流速（μL/s）×（母液高浓度-制胶高浓度）/（母液高浓度-母液低浓度）×低浓度泵校准数据（步/μL）*60/每圈脉冲数
+            val lowStartSpeed =
+                guleFlow * (highCoagulant - selected.endRange) / (highCoagulant - lowCoagulant) * p3jz * 60 / 51200
             Log.d(
                 "HomeViewModel_startJob",
                 "===07低浓度泵启动速度===$lowStartSpeed"
             )
-            //07低浓度泵启动速度（rpm）=制胶速度-高浓度泵启动速度
+            //07低浓度泵启动速度（rpm）=制胶总流速（μL/s）×（母液高浓度-制胶高浓度）/（母液高浓度-母液低浓度）×低浓度泵校准数据（步/μL）*60/每圈脉冲数
 
             //08促凝剂泵启动速度（rpm）=促凝剂泵总步数/每圈脉冲数/制胶所需时间（s）×60×促凝剂变速比
             //促凝剂变速比-默认1
@@ -1173,32 +1676,6 @@ class HomeViewModel @Inject constructor(
             )
             //15预排总步数=预排胶液体积（mL）×1000×平均校准数据（步/μL）
 
-            //16预排高浓度步数=预排总步数×高浓度泵启动速度（rpm）/制胶速度（rpm）
-            val highExpectedPulse = highExpectedPulseCount * highStartSpeed / speed
-            Log.d(
-                "HomeViewModel_startJob",
-                "===16预排高浓度步数===$highExpectedPulse"
-            )
-            //16预排高浓度步数=预排总步数×高浓度泵启动速度（rpm）/制胶速度（rpm）
-
-            //17预排低浓度步数=预排总步数×低浓度泵启动速度（rpm）/制胶速度（rpm）
-            val lowExpectedPulse = highExpectedPulseCount * lowStartSpeed / speed
-            Log.d(
-                "HomeViewModel_startJob",
-                "===17预排低浓度步数===$lowExpectedPulse"
-            )
-            //17预排低浓度步数=预排总步数×低浓度泵启动速度（rpm）/制胶速度（rpm）
-
-            //18预排促凝剂步数=高浓度预排液量（mL）×促凝剂体积（μL）/胶液体积（mL）×促凝剂校准数据（步/μL）×促凝剂变速比
-            val coagulantExpectedPulse =
-                setting.higeRehearsalVolume * coagulantVol / selected.volume * p1jz * ratio
-            Log.d(
-                "HomeViewModel_startJob",
-                "===18预排促凝剂步数===$coagulantExpectedPulse"
-            )
-            //18预排促凝剂步数=高浓度预排液量（mL）×促凝剂体积（μL）/胶液体积（mL）×促凝剂校准数据（步/μL）×促凝剂变速比
-
-            //19预排高浓度泵速度（rpm）=高浓度泵启动速度（rpm）/制胶速度（rpm）×冲洗液泵速度（rpm）
             /**
              *冲洗液泵转速
              */
@@ -1207,36 +1684,74 @@ class HomeViewModel @Inject constructor(
                 "HomeViewModel_startJob",
                 "===冲洗液泵转速===$rinseSpeed"
             )
-            val highExpectedSpeed = highStartSpeed * rinseSpeed / speed
-            Log.d(
-                "HomeViewModel_startJob",
-                "===19预排高浓度泵速度===$highExpectedSpeed"
-            )
-            //19预排高浓度泵速度（rpm）=高浓度泵启动速度（rpm）/制胶速度（rpm）×冲洗液泵速度（rpm）
 
-            //20预排低浓度泵速度（rpm）=低浓度泵启动速度（rpm）/制胶速度（rpm）×冲洗液泵速度（rpm）
-            val lowExpectedSpeed = lowStartSpeed * rinseSpeed / speed
-            Log.d(
-                "HomeViewModel_startJob",
-                "===20预排低浓度泵速度===$lowExpectedSpeed"
-            )
-            //20预排低浓度泵速度（rpm）=低浓度泵启动速度（rpm）/制胶速度（rpm）×冲洗液泵速度（rpm）
-
-            //21预排时间s
+            //16预排时间=预排总步数/每圈步数/冲洗液泵速度（rpm）×60
             val expectedTime = highExpectedPulseCount / 51200 / rinseSpeed * 60
             Log.d(
                 "HomeViewModel_startJob",
-                "===21预排时间s===$expectedTime"
+                "===16预排时间===$expectedTime"
             )
-            //21预排时间s
+            //16预排时间=预排总步数/每圈步数/冲洗液泵速度（rpm）×60
 
-            //22预排促凝剂泵速度
-            val expectedCoagulantSpeed = coagulantExpectedPulse / 51200 / expectedTime * 60 * ratio
+            //17预排总流速（μL/s）=高浓度泵预排液量（mL）×1000/预排时间（s）
+            val expectedFlow = higeRehearsalVolume / expectedTime
             Log.d(
                 "HomeViewModel_startJob",
-                "===22预排促凝剂泵速度===$expectedCoagulantSpeed"
+                "===17预排总流速===$expectedFlow"
             )
-            //22预排促凝剂泵速度
+            //17预排总流速（μL/s）=高浓度泵预排液量（mL）×1000/预排时间（s）
+
+            //18预排高浓度泵速度（rpm）=预排总流速（μL/s）×（制胶高浓度-母液低浓度）/（母液高浓度-母液低浓度）×高浓度泵校准数据（步/μL）*60/每圈脉冲数
+            val highExpectedSpeed =
+                expectedFlow * (selected.endRange - lowCoagulant) / (highCoagulant - lowCoagulant) * p2jz * 60 / 51200
+            Log.d(
+                "HomeViewModel_startJob",
+                "===18预排高浓度泵速度===$highExpectedSpeed"
+            )
+            //18预排高浓度泵速度（rpm）=预排总流速（μL/s）×（制胶高浓度-母液低浓度）/（母液高浓度-母液低浓度）×高浓度泵校准数据（步/μL）*60/每圈脉冲数
+
+            //19预排低浓度泵速度（rpm）=预排总流速（μL/s）×（母液高浓度-制胶高浓度）/（母液高浓度-母液低浓度）×低浓度泵校准数据（步/μL）*60/每圈脉冲数
+            val lowExpectedSpeed =
+                expectedFlow * (highCoagulant - selected.endRange) / (highCoagulant - lowCoagulant) * p3jz * 60 / 51200
+            Log.d(
+                "HomeViewModel_startJob",
+                "===19预排低浓度泵速度===$lowExpectedSpeed"
+            )
+            //19预排低浓度泵速度（rpm）=预排总流速（μL/s）×（母液高浓度-制胶高浓度）/（母液高浓度-母液低浓度）×低浓度泵校准数据（步/μL）*60/每圈脉冲数
+
+            //20预排促凝剂步数=预排胶液体积（mL）×促凝剂体积（μL）/制胶体积（mL）×校准数据（步/μL）×促凝剂变速比
+            val coagulantExpectedPulse =
+                setting.higeRehearsalVolume * selected.coagulant / selected.volume * p1jz * ratio
+            Log.d(
+                "HomeViewModel_startJob",
+                "===20预排促凝剂步数===$coagulantExpectedPulse"
+            )
+            //20预排促凝剂步数=预排胶液体积（mL）×促凝剂体积（μL）/制胶体积（mL）×校准数据（步/μL）×促凝剂变速比
+
+
+            //21预排高浓度泵步数=预排高浓度泵速度（rpm）*预排时间（s）/60×每圈脉冲数
+            val highExpectedPulse = highExpectedSpeed * expectedTime / 60 * 51200
+            Log.d(
+                "HomeViewModel_startJob",
+                "===21预排高浓度泵步数===$highExpectedPulse"
+            )
+            //21预排高浓度泵步数=预排高浓度泵速度（rpm）*预排时间（s）/60×每圈脉冲数
+
+            //22预排低浓度泵步数=预排低浓度泵速度（rpm）*预排时间（s）/60×每圈脉冲数
+            val lowExpectedPulse = lowExpectedSpeed * expectedTime / 60 * 51200
+            Log.d(
+                "HomeViewModel_startJob",
+                "===22预排低浓度泵步数===$lowExpectedPulse"
+            )
+            //22预排低浓度泵步数=预排低浓度泵速度（rpm）*预排时间（s）/60×每圈脉冲数
+
+            //23预排促凝剂泵速度=预排促凝剂泵步数/每圈步数/预排时间（s）×60×促凝剂转速比
+            val coagulantExpectedSpeed = coagulantExpectedPulse / 51200 / expectedTime * 60 * ratio
+            Log.d(
+                "HomeViewModel_startJob",
+                "===23预排促凝剂泵速度===$coagulantExpectedSpeed"
+            )
+            //23预排促凝剂泵速度=预排促凝剂泵总步数/每圈步数/预排时间（s）×60×促凝剂转速比
 
 
             Log.d(
@@ -1302,13 +1817,54 @@ class HomeViewModel @Inject constructor(
                 "HomeViewModel_startJob",
                 "===计算后的废液槽加液量===${_wasteprogress.value}"
             )
+            val date = Date(System.currentTimeMillis()).dateFormat("yyyy-MM-dd")
+            sportsLogDao.insert(
+                SportsLog(
+                    logName = "${date}-MBG1500",
+                    startModel = "开始制胶",
+                    detail = "高低浓度的平均校准因子:$highLowAvg," +
+                            "01胶液总步数:$volumePulseCount," +
+                            "促凝剂加液量:$coagulantVol," +
+                            "02促凝剂总步数:$coagulantPulseCount," +
+                            "制胶速度:$speed," +
+                            "03制胶所需时间:$guleTime," +
+                            "03A制胶总流速:$guleFlow," +
+                            "母液低浓度:$lowCoagulant," +
+                            "母液高浓度:$highCoagulant," +
+                            "04高浓度泵启动速度:$highStartSpeed," +
+                            "05低浓度泵结束速度:$lowEndSpeed," +
+                            "06高浓度泵结束速度:$highEndSpeed," +
+                            "07低浓度泵启动速度:$lowStartSpeed," +
+                            "促凝剂变速比:$ratio," +
+                            "08促凝剂泵启动速度:$coagulantStartSpeed," +
+                            "09促凝剂泵结束速度:$coagulantEndSpeed," +
+                            "10制胶高浓度泵步数:$guleHighPulse," +
+                            "11制胶低浓度泵步数:$guleLowPulse," +
+                            "12高浓度泵加速度:$highLowAvg," +
+                            "13低浓度泵加速度:$lowAcc," +
+                            "14促凝剂泵加速度:$coagulantAcc," +
+                            "15预排总步数:$highExpectedPulseCount," +
+                            "16预排时间:$expectedTime," +
+                            "17预排总流速:$expectedFlow" +
+                            "18预排高浓度泵速度:$highExpectedSpeed," +
+                            "19预排低浓度泵速度:$lowExpectedSpeed," +
+                            "20预排促凝剂步数:$coagulantExpectedPulse," +
+                            "21预排高浓度泵步数:$highExpectedPulse," +
+                            "22预排低浓度泵步数:$lowExpectedPulse," +
+                            "23预排促凝剂泵速度:$coagulantExpectedSpeed,"
+                )
+            )
+            delay(100)
 
+
+            _job2.value?.cancel()
+            _job2.value = null
             _job.value?.cancel()
             _job.value = launch {
                 try {
-                    if (soundsThickness == "语音") {
+                    if (selectRudio == 2) {
                         ApplicationUtils.ctx.playAudio(R.raw.startjob_voice)
-                    } else if (soundsThickness == "蜂鸣") {
+                    } else if (selectRudio == 1) {
                         ApplicationUtils.ctx.playAudio(R.raw.start_buzz)
                     }
                     if (coagulantBool) {
@@ -1373,7 +1929,7 @@ class HomeViewModel @Inject constructor(
 
                     Log.d(
                         "HomeViewModel",
-                        "===柱塞泵的加液步数===${coagulantExpectedPulse.toLong()}====启动速度===$expectedCoagulantSpeed===结束速度===$expectedCoagulantSpeed"
+                        "===柱塞泵的加液步数===${coagulantExpectedPulse.toLong()}====启动速度===$coagulantExpectedSpeed===结束速度===$coagulantExpectedSpeed"
                     )
 
 
@@ -1396,8 +1952,8 @@ class HomeViewModel @Inject constructor(
                             pdv = coagulantExpectedPulse.toLong(),
                             ads = Triple(
                                 0L,
-                                (expectedCoagulantSpeed * 1193).toLong(),
-                                (expectedCoagulantSpeed * 1193).toLong()
+                                (coagulantExpectedSpeed * 1193).toLong(),
+                                (coagulantExpectedSpeed * 1193).toLong()
                             )
                         )
 
@@ -1503,13 +2059,6 @@ class HomeViewModel @Inject constructor(
                             delay(1000L)
                             startTime += 1
                             var pro = (startTime / guleTimeToInt).toFloat()
-                            Log.d(
-                                "HomeViewModel",
-                                "===制胶时间取整===$guleTimeToInt===制胶进度===$pro"
-                            )
-//                            if (pro > 1.0f) {
-//                                pro = 1f
-//                            }
                             _progress.value = pro
                         }
                     }
@@ -1602,7 +2151,8 @@ class HomeViewModel @Inject constructor(
                      * 冲洗液泵清洗液量
                      */
                     val rinseP = pulse(index = 4, dvp = setting.rinseCleanVolume * 1000)
-
+                    //制胶进度归0
+                    _progress.value = 0f
                     start {
                         timeOut = 1000L * 60L
                         with(
@@ -1612,14 +2162,6 @@ class HomeViewModel @Inject constructor(
                         )
                     }
 
-//                    start {
-//                        timeOut = 1000L * 60L
-//                        with(
-//                            index = 1,
-//                            ads = Triple(rinseSpeed * 13, rinseSpeed * 1193, rinseSpeed * 1193),
-//                            pdv = -(coagulantPulseCount.toLong() + coagulantExpectedPulse.toLong())
-//                        )
-//                    }
 
                     start {
                         timeOut = 1000L * 60L
@@ -1631,15 +2173,32 @@ class HomeViewModel @Inject constructor(
                     }
 
                     delay(100)
+
+                    //预排使用液量
+                    _usehigh.value = (highExpectedPulse / p2jz / 1000).toFloat()
+                    _uselow.value = (lowExpectedPulse / p3jz / 1000).toFloat()
+                    _usecoagulant.value = (coagulantExpectedPulse / p1jz / 1000).toFloat()
+                    //预排使用液量
+
+                    //制胶使用液量
+                    _usehigh.value += (guleHighPulse / p2jz / 1000).toFloat()
+                    _uselow.value += (guleLowPulse / p3jz / 1000).toFloat()
+                    _usecoagulant.value += (coagulantPulseCount / p1jz / 1000).toFloat()
+                    _userinse.value = setting.rinseCleanVolume.toFloat()
+
+                    //制胶使用液量
+
+
                     _complate.value += 1
                     val expectedMakenum = dataStore.readData("expectedMakenum", 0)
+                    waitTimeRinse()
                     if (_complate.value == expectedMakenum) {
                         lightGreed()
                         delay(100)
                         //运动结束
-                        if (soundsThickness == "语音") {
+                        if (selectRudio == 2) {
                             ApplicationUtils.ctx.playAudio(R.raw.startend_voice)
-                        } else if (soundsThickness == "蜂鸣") {
+                        } else if (selectRudio == 1) {
                             ApplicationUtils.ctx.playAudio(R.raw.startend_buzz)
                         }
                         _uiFlags.value = UiFlags.objects(6)
@@ -1647,11 +2206,14 @@ class HomeViewModel @Inject constructor(
                         //更换制胶架
                         endStartFlashYellow()
                         delay(100)
-                        if (soundsThickness == "语音") {
+                        if (selectRudio == 2) {
                             ApplicationUtils.ctx.playAudio(R.raw.replace_voice)
-                        } else if (soundsThickness == "蜂鸣") {
-                            ApplicationUtils.ctx.playAudio(R.raw.hint_buzz)
+                        } else if (selectRudio == 1) {
+//                            ApplicationUtils.ctx.playAudio(R.raw.hint_buzz)
+                            hintBuzz()
                         }
+                        _hint.value = false
+                        hint()
                         _uiFlags.value = UiFlags.objects(4)
                     }
 
@@ -1688,6 +2250,8 @@ class HomeViewModel @Inject constructor(
          */
         viewModelScope.launch {
             _uiFlags.value = UiFlags.objects(12)
+            _job2.value?.cancel()
+            _job2.value = null
             val selected = dao.getById(_selected.value).firstOrNull()
             if (selected == null) {
                 _uiFlags.value = UiFlags.message("未选择程序")
@@ -1739,10 +2303,23 @@ class HomeViewModel @Inject constructor(
 
     private fun stopJob() {
         viewModelScope.launch {
-            if (soundsThickness == "语音") {
+            _waitTimeRinseJob.value?.cancel()
+            _waitTimeRinseJob.value = null
+
+            val date = Date(System.currentTimeMillis()).dateFormat("yyyy-MM-dd")
+            sportsLogDao.insert(SportsLog(logName = "${date}-MBG1500", startModel = "停止制胶"))
+            delay(100)
+
+            if (selectRudio == 2) {
                 ApplicationUtils.ctx.playAudio(R.raw.startend_voice)
             }
             _uiFlags.value = UiFlags.objects(1)
+            _job2.value?.cancel()
+            _job2.value = null
+
+            _hintJob.value?.cancel()
+            _hintJob.value = null
+
             _job.value?.cancel()
             _job.value = null
             delay(200L)
@@ -2098,8 +2675,6 @@ class HomeViewModel @Inject constructor(
                 }
 
 
-
-                _uiFlags.value = UiFlags.none()
             } catch (ex: Exception) {
                 errorDao.insert(ErrorRecord(detail = "复位超时请重试"))
                 _uiFlags.value = UiFlags.message("复位超时请重试")
@@ -2126,7 +2701,8 @@ class HomeViewModel @Inject constructor(
             }
             delay(100)
             lightGreed()
-
+            waitTimeRinse()
+            _uiFlags.value = UiFlags.none()
 
         }
     }
@@ -2139,12 +2715,17 @@ class HomeViewModel @Inject constructor(
                 stop(1, 2, 3, 4)
             } else {
                 _uiFlags.value = UiFlags.objects(2)
-                if (soundsThickness == "语音") {
+
+                if (selectRudio == 2) {
                     ApplicationUtils.ctx.playAudio(R.raw.cleanstart_voice)
                 }
 
                 val slEnetity = slDao.getById(1L).firstOrNull()
                 if (slEnetity != null) {
+
+                    _waitTimeRinseJob.value?.cancel()
+                    _waitTimeRinseJob.value = null
+
 
                     /**
                      * 高浓度清洗液量
@@ -2274,6 +2855,30 @@ class HomeViewModel @Inject constructor(
                         "HomeViewModel_pipeline",
                         "废液槽位置===$wastePosition"
                     )
+
+                    val date = Date(System.currentTimeMillis()).dateFormat("yyyy-MM-dd")
+                    sportsLogDao.insert(
+                        SportsLog(
+                            logName = "${date}-MBG1500",
+                            startModel = "管路清洗",
+                            detail = "高浓度清洗液量:$higeCleanVolume," +
+                                    "低浓度清洗液量:$lowCleanVolume," +
+                                    "冲洗液泵清洗液量:$rinseCleanVolume," +
+                                    "促凝剂泵清洗液量:$coagulantCleanVolume," +
+                                    "促凝剂泵校准因子:$p1jz," +
+                                    "促凝剂泵管路填充加液步数:$p1," +
+                                    "促凝剂复位后预排步数:$coagulantResetPulse," +
+                                    "促凝剂总长度:$coagulantpulse," +
+                                    "促凝剂转速:$coagulantSpeed," +
+                                    "冲洗转速:$rinseSpeed," +
+                                    "x轴转速:$xSpeed," +
+                                    "促凝剂运动次数:$p1Count," +
+                                    "循环向下取整:$count," +
+                                    "取余:$qyu," +
+                                    "废液槽位置:$wastePosition,"
+                        )
+                    )
+                    delay(100)
 
                     start {
                         timeOut = 1000L * 60L * 10
@@ -2480,7 +3085,7 @@ class HomeViewModel @Inject constructor(
                     slEnetity.rinseTime += solution
                     slDao.update(slEnetity)
                     delay(200)
-                    if (soundsThickness == "语音") {
+                    if (selectRudio == 2) {
                         ApplicationUtils.ctx.playAudio(R.raw.cleanend_voice)
                     }
                     reset()
@@ -2533,15 +3138,17 @@ class HomeViewModel @Inject constructor(
 
     private fun pipeline(index: Int) {
         viewModelScope.launch {
-            println("index===$index")
             if (index == 0) {
                 _uiFlags.value = UiFlags.none()
                 stop(1, 2, 3, 4)
                 delay(100L)
                 reset()
             } else {
+
                 _uiFlags.value = UiFlags.objects(4 + index)
 
+                _waitTimeRinseJob.value?.cancel()
+                _waitTimeRinseJob.value = null
                 /**
                  * 高浓度管路填充
                  */
@@ -2639,11 +3246,34 @@ class HomeViewModel @Inject constructor(
                     /**
                      * 废液槽位置
                      */
-                    val wastePosition = dataStore.readData("wastePosition", 0.0)
+                    val wastePosition = slEnetity.wastePosition
                     Log.d(
                         "HomeViewModel_pipeline",
                         "废液槽位置===$wastePosition"
                     )
+
+
+                    val date = Date(System.currentTimeMillis()).dateFormat("yyyy-MM-dd")
+                    sportsLogDao.insert(
+                        SportsLog(
+                            logName = "${date}-MBG1500",
+                            startModel = "管路清洗",
+                            detail = "高浓度管路填充液量:$higeFilling," +
+                                    "低浓度管路填充液量:$lowFilling," +
+                                    "冲洗液泵管路填充液量:$rinseFilling," +
+                                    "促凝剂泵管路填充液量:$coagulantFilling," +
+                                    "促凝剂泵校准因子:$p1jz," +
+                                    "促凝剂泵管路填充加液步数:$p1," +
+                                    "促凝剂复位后预排步数:$coagulantResetPulse," +
+                                    "促凝剂总长度:$coagulantpulse," +
+                                    "促凝剂转速:$coagulantSpeed," +
+                                    "冲洗转速:$rinseSpeed," +
+                                    "x轴转速:$xSpeed," +
+                                    "废液槽位置:$wastePosition,"
+                        )
+                    )
+                    delay(100)
+
 
                     start {
                         timeOut = 1000L * 60L * 10
@@ -2865,9 +3495,16 @@ class HomeViewModel @Inject constructor(
                     slEnetity.rinseTime += solution
                     slDao.update(slEnetity)
                     delay(100L)
-                    if (soundsThickness == "语音") {
+
+                    _userinse.value += rinseFilling.toFloat()
+                    _usehigh.value += higeFilling.toFloat()
+                    _uselow.value += lowFilling.toFloat()
+                    _usecoagulant.value += coagulantFilling.toFloat()
+
+                    if (selectRudio == 2) {
                         ApplicationUtils.ctx.playAudio(R.raw.pipeline_voice)
                     }
+                    waitTimeRinse()
                     _uiFlags.value = UiFlags.none()
 //                    reset()
                 }
@@ -2937,4 +3574,7 @@ sealed class HomeIntent {
     data object First : HomeIntent()
 
     data object CleanWaste : HomeIntent()
+
+    data object CleanWasteState : HomeIntent()
+
 }

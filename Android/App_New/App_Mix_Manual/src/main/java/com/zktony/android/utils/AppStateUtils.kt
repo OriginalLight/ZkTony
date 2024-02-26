@@ -34,9 +34,9 @@ object AppStateUtils {
     val hpc: MutableMap<Int, (Double) -> Double> = ConcurrentHashMap()
 
     /**
-     * 进度
+     * 灯光回复
      */
-    val hpd: MutableMap<Int, Long> = ConcurrentHashMap()
+    val hpd: MutableMap<Int, Boolean> = ConcurrentHashMap()
 
 
 }

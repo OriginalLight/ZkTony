@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -106,6 +107,14 @@ fun HomeRoute(viewModel: HomeViewModel) {
     val erEntities = viewModel.erEntities.collectAsLazyPagingItems()
 
 
+    val userinse by viewModel.userinse.collectAsStateWithLifecycle()
+    val usehigh by viewModel.usehigh.collectAsStateWithLifecycle()
+    val uselow by viewModel.uselow.collectAsStateWithLifecycle()
+    val usecoagulant by viewModel.usecoagulant.collectAsStateWithLifecycle()
+
+    val hint by viewModel.hint.collectAsStateWithLifecycle()
+
+
     val navigation: () -> Unit = {
         scope.launch {
             when (page) {
@@ -150,7 +159,12 @@ fun HomeRoute(viewModel: HomeViewModel) {
                 wasteprogress,
                 higemother,
                 lowmother,
-                first
+                first,
+                userinse,
+                usehigh,
+                uselow,
+                usecoagulant,
+                hint
             )
         }
     }
@@ -177,7 +191,12 @@ fun operate(
     wasteprogress: Float,
     higemother: Float,
     lowmother: Float,
-    first: Boolean
+    first: Boolean,
+    userinse: Float,
+    usehigh: Float,
+    uselow: Float,
+    usecoagulant: Float,
+    hint: Boolean
 ) {
 
     val scope = rememberCoroutineScope()
@@ -186,7 +205,6 @@ fun operate(
 
     val context = LocalContext.current
 
-    val soundsThickness = rememberDataSaverState(key = "soundsThickness", default = "蜂鸣")
 
     if (!first) {
         uiEvent(HomeIntent.First)
@@ -199,7 +217,6 @@ fun operate(
 
     var programId = rememberDataSaverState(key = "programid", default = 1L)
 
-    var erSelectedIndex by remember { mutableStateOf(0L) }
 
     /**
      * 选中的实体
@@ -213,6 +230,9 @@ fun operate(
     } ?: ExperimentRecord()
 
     uiEvent(HomeIntent.Selected(program.id))
+
+
+    val homestart = rememberDataSaverState(key = "homestart", default = false)
 
 
     /**
@@ -247,6 +267,7 @@ fun operate(
      */
     val coagulantvol = rememberDataSaverState(key = "coagulantvol", default = 0f)
     var coagulant_ex by remember { mutableStateOf(coagulantvol.value.format(1)) }
+
 
     /**
      * 促凝剂浓度
@@ -286,7 +307,6 @@ fun operate(
      */
     val waste = rememberDataSaverState(key = "waste", default = 0f)
     var wasteBool by remember { mutableStateOf(false) }
-
     if (wasteprogress > 0f && !wasteBool) {
         waste.value = wasteprogress
     }
@@ -311,6 +331,12 @@ fun operate(
      * 继续制胶弹窗
      */
     val continueGlueDialog = remember { mutableStateOf(false) }
+
+
+    /**
+     * 停止制胶弹窗
+     */
+    val stopGlueDialog = remember { mutableStateOf(false) }
 
     /**
      * 清空废液槽弹窗
@@ -350,23 +376,61 @@ fun operate(
         mutableStateOf(0f)
     }
 
+    var useVol by remember { mutableStateOf(false) }
 
 
     if (uiFlags is UiFlags.Objects && uiFlags.objects == 4) {
+        if (useVol) {
+            useVol = false
+            if (userinse > 0) {
+                water.value -= userinse
+                water.value = String.format("%.1f", water.value).toFloat()
+                println("water.value====${water.value}")
+                water_ex = water.value.toString()
+            }
+
+            if (usecoagulant > 0) {
+                coagulantvol.value -= usecoagulant
+                coagulantvol.value = String.format("%.1f", coagulantvol.value).toFloat()
+                println("coagulantvol.value====${coagulantvol.value}")
+                coagulant_ex = coagulantvol.value.toString()
+            }
+
+            if (uselow > 0) {
+                lowCoagulantVol.value -= uselow
+                lowCoagulantVol.value = String.format("%.1f", lowCoagulantVol.value).toFloat()
+                println("lowCoagulantVol.value====${lowCoagulantVol.value}")
+                lowCoagulantVol_ex = lowCoagulantVol.value.toString()
+            }
+
+            if (usehigh > 0) {
+                highCoagulantVol.value -= usehigh
+                highCoagulantVol.value = String.format("%.1f", highCoagulantVol.value).toFloat()
+                println("highCoagulantVol.value====${highCoagulantVol.value}")
+                highCoagulantVol_ex = highCoagulantVol.value.toString()
+            }
+        }
         continueGlueDialog.value = true
     } else if (uiFlags is UiFlags.Objects && uiFlags.objects == 6) {
+        expectedMakeNum.value = 0
+        expectedMakeNum_ex = "0"
+        highCoagulantVol.value = 0f
+        highCoagulantVol_ex = "0"
+        lowCoagulantVol.value = 0f
+        lowCoagulantVol_ex = "0"
+
         experimentRecord.status = EPStatus.COMPLETED
         experimentRecord.number = complate
         uiEvent(HomeIntent.Update(experimentRecord))
         continueGlueDialog.value = false
         uiEvent(HomeIntent.MoveCom(complate))
-    } else if (uiFlags is UiFlags.Objects && uiFlags.objects == 10) {
-        expectedMakeNum.value = calculate
     } else if (uiFlags is UiFlags.Objects && uiFlags.objects == 11) {
         highCoagulantVol.value = higemother
         highCoagulantVol_ex = higemother.toString()
         lowCoagulantVol.value = lowmother
         lowCoagulantVol_ex = lowmother.toString()
+    } else if (uiFlags !is UiFlags.Objects) {
+        homestart.value = false
     }
 
     Column(
@@ -537,26 +601,32 @@ fun operate(
                         modifier = Modifier
                             .size(40.dp)
                             .clickable {
-                                if (program != null) {
-                                    if (expectedMakeNum.value > 1) {
-                                        expectedMakeNum.value -= 1
-                                        expectedMakeNum_ex = expectedMakeNum.value.toString()
-                                        water.value = 50f
-                                        water_ex = "50"
-                                        coagulantvol.value = 10f
-                                        coagulant_ex = "10"
-                                        uiEvent(HomeIntent.HigeLowMotherVol)
+                                if (job == null) {
+                                    if (uiFlags is UiFlags.None) {
+                                        if (program != null) {
+                                            if (expectedMakeNum.value > 1) {
+                                                expectedMakeNum.value -= 1
+                                                expectedMakeNum_ex =
+                                                    expectedMakeNum.value.toString()
+                                                water.value = 50f
+                                                water_ex = "50"
+                                                coagulantvol.value = 10f
+                                                coagulant_ex = "10"
+                                                uiEvent(HomeIntent.HigeLowMotherVol)
 
+                                            }
+                                        } else {
+                                            Toast
+                                                .makeText(
+                                                    context,
+                                                    "没有制胶程序！",
+                                                    Toast.LENGTH_SHORT
+                                                )
+                                                .show()
+                                        }
                                     }
-                                } else {
-                                    Toast
-                                        .makeText(
-                                            context,
-                                            "没有制胶程序！",
-                                            Toast.LENGTH_SHORT
-                                        )
-                                        .show()
                                 }
+
 
                             }
                     )
@@ -575,45 +645,51 @@ fun operate(
                         ),
                         value = expectedMakeNum_ex,
                         onValueChange = {
-                            if (program != null) {
-                                expectedMakeNum_ex = it
-                                val temp = expectedMakeNum_ex.toIntOrNull() ?: 0
-                                if (temp > 0) {
-                                    if (temp > 99) {
+                            if (job == null) {
+                                if (uiFlags is UiFlags.None) {
+                                    if (program != null) {
+                                        expectedMakeNum_ex = it
+                                        val temp = expectedMakeNum_ex.toIntOrNull() ?: 0
+                                        if (temp > 0) {
+                                            if (temp > 99) {
+                                                Toast.makeText(
+                                                    context,
+                                                    "预计数量不能大于99！",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            } else {
+                                                expectedMakeNum.value = temp
+                                                expectedMakeNum_ex = temp.toString()
+                                                water.value = 50f
+                                                water_ex = "50"
+                                                coagulantvol.value = 10f
+                                                coagulant_ex = "10"
+                                                uiEvent(HomeIntent.HigeLowMotherVol)
+                                            }
+                                        } else {
+                                            water.value = 0f
+                                            water_ex = "0"
+
+                                            coagulantvol.value = 0f
+                                            coagulant_ex = "0"
+
+                                            lowCoagulantVol.value = 0f
+                                            lowCoagulantVol_ex = "0"
+
+                                            highCoagulantVol.value = 0f
+                                            highCoagulantVol_ex = "0"
+                                        }
+
+                                    } else {
                                         Toast.makeText(
                                             context,
-                                            "预计数量不能大于99！",
+                                            "没有制胶程序！",
                                             Toast.LENGTH_SHORT
                                         ).show()
-                                    } else {
-                                        expectedMakeNum.value = temp
-                                        water.value = 50f
-                                        water_ex = "50"
-                                        coagulantvol.value = 10f
-                                        coagulant_ex = "10"
-                                        uiEvent(HomeIntent.HigeLowMotherVol)
                                     }
-                                } else {
-                                    water.value = 0f
-                                    water_ex = "0"
-
-                                    coagulantvol.value = 0f
-                                    coagulant_ex = "0"
-
-                                    lowCoagulantVol.value = 0f
-                                    lowCoagulantVol_ex = "0"
-
-                                    highCoagulantVol.value = 0f
-                                    highCoagulantVol_ex = "0"
                                 }
-
-                            } else {
-                                Toast.makeText(
-                                    context,
-                                    "没有制胶程序！",
-                                    Toast.LENGTH_SHORT
-                                ).show()
                             }
+
 
                         },
                         keyboardOptions = KeyboardOptions(
@@ -631,34 +707,39 @@ fun operate(
                         modifier = Modifier
                             .size(40.dp)
                             .clickable {
-                                if (program != null) {
-                                    var temp = expectedMakeNum_ex.toIntOrNull() ?: 0
-                                    temp += 1
-                                    if (temp > 99) {
-                                        Toast
-                                            .makeText(
-                                                context,
-                                                "预计数量不能大于99！",
-                                                Toast.LENGTH_SHORT
-                                            )
-                                            .show()
-                                    } else {
-                                        expectedMakeNum.value += 1
-                                        expectedMakeNum_ex = expectedMakeNum.value.toString()
-                                        water.value = 50f
-                                        water_ex = "50"
-                                        coagulantvol.value = 10f
-                                        coagulant_ex = "10"
-                                        uiEvent(HomeIntent.HigeLowMotherVol)
+                                if (job == null) {
+                                    if (uiFlags is UiFlags.None) {
+                                        if (program != null) {
+                                            var temp = expectedMakeNum_ex.toIntOrNull() ?: 0
+                                            temp += 1
+                                            if (temp > 99) {
+                                                Toast
+                                                    .makeText(
+                                                        context,
+                                                        "预计数量不能大于99！",
+                                                        Toast.LENGTH_SHORT
+                                                    )
+                                                    .show()
+                                            } else {
+                                                expectedMakeNum.value += 1
+                                                expectedMakeNum_ex =
+                                                    expectedMakeNum.value.toString()
+                                                water.value = 50f
+                                                water_ex = "50"
+                                                coagulantvol.value = 10f
+                                                coagulant_ex = "10"
+                                                uiEvent(HomeIntent.HigeLowMotherVol)
+                                            }
+                                        } else {
+                                            Toast
+                                                .makeText(
+                                                    context,
+                                                    "没有制胶程序！",
+                                                    Toast.LENGTH_SHORT
+                                                )
+                                                .show()
+                                        }
                                     }
-                                } else {
-                                    Toast
-                                        .makeText(
-                                            context,
-                                            "没有制胶程序！",
-                                            Toast.LENGTH_SHORT
-                                        )
-                                        .show()
                                 }
 
                             }
@@ -697,7 +778,7 @@ fun operate(
             Row(
                 modifier = Modifier
                     .clickable(onClick = {
-
+                        wasteDialog.value = true
                     })
             ) {
                 //废液进度条
@@ -766,12 +847,7 @@ fun operate(
 
                                     }
                                 } else {
-                                    experimentRecord.status = EPStatus.ABORT
-                                    experimentRecord.detail = "手动停止制胶"
-                                    uiEvent(HomeIntent.Update(experimentRecord))
-                                    startMake = "开始制胶"
-                                    uiEvent(HomeIntent.Stop)
-
+                                    stopGlueDialog.value = true
                                 }
                             }
                     )
@@ -789,6 +865,8 @@ fun operate(
                                     } else {
                                         if (uiFlags is UiFlags.None) {
                                             wasteBool = false
+                                            homestart.value = true
+                                            useVol = true
                                             uiEvent(HomeIntent.Pipeline(1))
                                         }
                                     }
@@ -810,6 +888,7 @@ fun operate(
                                     } else {
                                         if (uiFlags is UiFlags.None || (uiFlags is UiFlags.Objects && uiFlags.objects == 2)) {
                                             wasteBool = false
+                                            homestart.value = true
                                             uiEvent(HomeIntent.Clean)
                                         }
                                     }
@@ -826,6 +905,7 @@ fun operate(
                             .size(63.dp, 63.dp)
                             .clickable {
                                 if (uiFlags is UiFlags.None) {
+                                    homestart.value = true
                                     uiEvent(HomeIntent.Reset)
                                 }
                             }
@@ -870,37 +950,95 @@ fun operate(
 
 
     /**
-     * 清空废液槽弹窗
+     * 停止制胶弹窗
      */
-    if (wasteDialog.value) {
+    if (stopGlueDialog.value) {
         AlertDialog(
             onDismissRequest = { },
             title = {
-                Text(
-                    fontSize = 16.sp,
-                    text = "废液槽已满，请清空废液槽！"
-                )
             },
             text = {
+                Text(
+                    fontSize = 16.sp,
+                    text = "是否停止制胶!"
+                )
+
             }, confirmButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = {
-                    wasteBool = true
-                    wasteDialog.value = false
-                    waste.value = 0f
-                }) {
-                    Text(text = "确定")
-                }
-            }, dismissButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = {
-                    wasteDialog.value = false
-                }) {
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = {
+                        stopGlueDialog.value = false
+                    }) {
                     Text(text = "取消")
                 }
+            }, dismissButton = {
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = {
+                        useVol = false
+                        expectedMakeNum.value = 0
+                        expectedMakeNum_ex = "0"
+                        highCoagulantVol.value = 0f
+                        highCoagulantVol_ex = "0"
+                        lowCoagulantVol.value = 0f
+                        lowCoagulantVol_ex = "0"
+
+                        experimentRecord.status = EPStatus.ABORT
+                        experimentRecord.detail = "手动停止制胶"
+                        uiEvent(HomeIntent.Update(experimentRecord))
+                        startMake = "开始制胶"
+                        uiEvent(HomeIntent.Stop)
+                        stopGlueDialog.value = false
+                    }) {
+                    Text(text = "停止")
+                }
             })
+    }
+
+
+    /**
+     * 清空废液槽弹窗
+     */
+    if (wasteDialog.value) {
+
+        if (job == null) {
+            if (uiFlags is UiFlags.None) {
+                AlertDialog(
+                    onDismissRequest = { },
+                    title = {
+                        Text(
+                            fontSize = 16.sp,
+                            text = "废液槽已满，请清空废液槽！"
+                        )
+                    },
+                    text = {
+                    }, confirmButton = {
+                        Button(
+                            modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ), onClick = {
+                                wasteBool = true
+                                wasteDialog.value = false
+                                waste.value = 0f
+                            }) {
+                            Text(text = "确定")
+                        }
+                    }, dismissButton = {
+                        Button(
+                            modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ), onClick = {
+                                wasteDialog.value = false
+                            }) {
+                            Text(text = "取消")
+                        }
+                    })
+            }
+        }
+
+
     }
 
     /**
@@ -918,29 +1056,39 @@ fun operate(
                 )
 
             }, confirmButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = {
-                    experimentRecord.number = complate
-                    uiEvent(HomeIntent.Update(experimentRecord))
-                    continueGlueDialog.value = false
-                    uiEvent(HomeIntent.Start(complate))
-                }) {
+                Button(
+                    enabled = hint,
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = {
+                        useVol = true
+                        experimentRecord.number = complate
+                        uiEvent(HomeIntent.Update(experimentRecord))
+                        continueGlueDialog.value = false
+                        uiEvent(HomeIntent.Start(complate))
+                    }) {
                     Text(text = "继续")
                 }
             }, dismissButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = {
-                    println("进入停止")
-                    experimentRecord.number = complate
-                    experimentRecord.status = EPStatus.ABORT
-                    experimentRecord.detail = "手动停止制胶"
-                    uiEvent(HomeIntent.Update(experimentRecord))
-                    uiEvent(HomeIntent.MoveCom(complate))
-                    continueGlueDialog.value = false
-                    println("continueGlueDialog====${continueGlueDialog.value}")
-                }) {
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = {
+                        useVol = false
+                        expectedMakeNum.value = 0
+                        expectedMakeNum_ex = "0"
+                        highCoagulantVol.value = 0f
+                        highCoagulantVol_ex = "0"
+                        lowCoagulantVol.value = 0f
+                        lowCoagulantVol_ex = "0"
+
+                        experimentRecord.number = complate
+                        experimentRecord.status = EPStatus.ABORT
+                        experimentRecord.detail = "手动停止制胶"
+                        uiEvent(HomeIntent.Update(experimentRecord))
+                        uiEvent(HomeIntent.MoveCom(complate))
+                        continueGlueDialog.value = false
+                    }) {
                     Text(text = "停止")
                 }
             })
@@ -950,72 +1098,80 @@ fun operate(
      * 纯水弹窗
      */
     if (waterDialog.value) {
-        AlertDialog(
-            onDismissRequest = { },
-            title = {
-            },
-            text = {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        fontSize = 16.sp,
-                        text = "冲洗液量/ml："
-                    )
-                    OutlinedTextField(
-                        modifier = Modifier.width(100.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color(rgb(0, 105, 52)),
-                            focusedLabelColor = Color(rgb(0, 105, 52)),
-                            cursorColor = Color(rgb(0, 105, 52))
-                        ),
-                        value = water_ex,
-                        label = { Text(text = "ml") },
-                        onValueChange = {
-                            water_ex = it
-                        },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Done,
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                keyboard?.hide()
-                            }
-                        )
-                    )
+        if (job == null) {
+            if (uiFlags is UiFlags.None) {
+                AlertDialog(
+                    onDismissRequest = { },
+                    title = {
+                    },
+                    text = {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                fontSize = 16.sp,
+                                text = "冲洗液量/ml："
+                            )
+                            OutlinedTextField(
+                                modifier = Modifier.width(100.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(rgb(0, 105, 52)),
+                                    focusedLabelColor = Color(rgb(0, 105, 52)),
+                                    cursorColor = Color(rgb(0, 105, 52))
+                                ),
+                                value = water_ex,
+                                label = { Text(text = "ml") },
+                                onValueChange = {
+                                    water_ex = it
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        keyboard?.hide()
+                                    }
+                                )
+                            )
 
-                }
-            }, confirmButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = {
-                    if ((water_ex.toIntOrNull() ?: 0) > 0) {
-                        water.value = water_ex.toFloatOrNull() ?: 0f
-                        waterDialog.value = false
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "不能是负数!",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                        }
+                    }, confirmButton = {
+                        Button(
+                            modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ), onClick = {
+                                if ((water_ex.toIntOrNull() ?: 0) > 0) {
+                                    water.value = water_ex.toFloatOrNull() ?: 0f
+                                    waterDialog.value = false
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "不能是负数!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
 
 
-                }) {
-                    Text(text = "确认")
-                }
-            }, dismissButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = {
-                    water_ex = water.value.toString()
-                    waterDialog.value = false
-                }) {
-                    Text(text = "取消")
-                }
-            })
+                            }) {
+                            Text(text = "确认")
+                        }
+                    }, dismissButton = {
+                        Button(
+                            modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ), onClick = {
+                                water_ex = water.value.toString()
+                                waterDialog.value = false
+                            }) {
+                            Text(text = "取消")
+                        }
+                    })
+            }
+        }
+
+
     }
 
 
@@ -1023,114 +1179,123 @@ fun operate(
      * 促凝剂弹窗
      */
     if (coagulantDialog.value) {
-        AlertDialog(
-            onDismissRequest = { },
-            title = {
 
-            },
-            text = {
+        if (job == null) {
+            if (uiFlags is UiFlags.None) {
+                AlertDialog(
+                    onDismissRequest = { },
+                    title = {
 
-                Column {
+                    },
+                    text = {
 
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            fontSize = 16.sp,
-                            text = "促凝剂浓度/%："
-                        )
-                        OutlinedTextField(
-                            modifier = Modifier.width(100.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(rgb(0, 105, 52)),
-                                focusedLabelColor = Color(rgb(0, 105, 52)),
-                                cursorColor = Color(rgb(0, 105, 52))
-                            ),
-                            value = concentration_ex,
-                            label = { Text(text = "%") },
-                            onValueChange = {
-                                concentration_ex = it
-                            },
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number,
-                                imeAction = ImeAction.Done,
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    keyboard?.hide()
+                        Column {
+
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    fontSize = 16.sp,
+                                    text = "促凝剂浓度/%："
+                                )
+                                OutlinedTextField(
+                                    modifier = Modifier.width(100.dp),
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = Color(rgb(0, 105, 52)),
+                                        focusedLabelColor = Color(rgb(0, 105, 52)),
+                                        cursorColor = Color(rgb(0, 105, 52))
+                                    ),
+                                    value = concentration_ex,
+                                    label = { Text(text = "%") },
+                                    onValueChange = {
+                                        concentration_ex = it
+                                    },
+                                    keyboardOptions = KeyboardOptions(
+                                        keyboardType = KeyboardType.Number,
+                                        imeAction = ImeAction.Done,
+                                    ),
+                                    keyboardActions = KeyboardActions(
+                                        onDone = {
+                                            keyboard?.hide()
+                                        }
+                                    )
+                                )
+
+                            }
+
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    fontSize = 16.sp,
+                                    text = "促凝剂液量/ml："
+                                )
+                                OutlinedTextField(
+                                    modifier = Modifier.width(100.dp),
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = Color(rgb(0, 105, 52)),
+                                        focusedLabelColor = Color(rgb(0, 105, 52)),
+                                        cursorColor = Color(rgb(0, 105, 52))
+                                    ),
+                                    value = coagulant_ex,
+                                    enabled = false,
+                                    label = { Text(text = "ml") },
+                                    onValueChange = {
+                                        coagulant_ex = it
+                                    },
+                                    keyboardOptions = KeyboardOptions(
+                                        keyboardType = KeyboardType.Number,
+                                        imeAction = ImeAction.Done,
+                                    ),
+                                    keyboardActions = KeyboardActions(
+                                        onDone = {
+                                            keyboard?.hide()
+                                        }
+                                    )
+                                )
+
+                            }
+                        }
+
+                    }, confirmButton = {
+                        Button(
+                            modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ), onClick = {
+                                if ((concentration_ex.toIntOrNull() ?: 0) > 0) {
+                                    concentration.value = concentration_ex.toIntOrNull() ?: 0
+                                    coagulantvol.value = coagulant_ex.toFloatOrNull() ?: 0f
+                                    coagulantDialog.value = false
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "不能是负数!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
-                            )
-                        )
-
-                    }
-
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            fontSize = 16.sp,
-                            text = "促凝剂液量/ml："
-                        )
-                        OutlinedTextField(
-                            modifier = Modifier.width(100.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(rgb(0, 105, 52)),
-                                focusedLabelColor = Color(rgb(0, 105, 52)),
-                                cursorColor = Color(rgb(0, 105, 52))
-                            ),
-                            value = coagulant_ex,
-                            enabled = false,
-                            label = { Text(text = "ml") },
-                            onValueChange = {
-                                coagulant_ex = it
-                            },
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number,
-                                imeAction = ImeAction.Done,
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    keyboard?.hide()
-                                }
-                            )
-                        )
-
-                    }
-                }
-
-            }, confirmButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = {
-                    if ((concentration_ex.toIntOrNull() ?: 0) > 0) {
-                        concentration.value = concentration_ex.toIntOrNull() ?: 0
-                        coagulantvol.value = coagulant_ex.toFloatOrNull() ?: 0f
-                        coagulantDialog.value = false
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "不能是负数!",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
 
 
-                }) {
-                    Text(text = "确认")
-                }
-            }, dismissButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = {
-                    concentration_ex = concentration.value.toString()
-                    coagulant_ex = coagulantvol.value.toString()
-                    coagulantDialog.value = false
-                }) {
-                    Text(text = "取消")
-                }
-            })
+                            }) {
+                            Text(text = "确认")
+                        }
+                    }, dismissButton = {
+                        Button(
+                            modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ), onClick = {
+                                concentration_ex = concentration.value.toString()
+                                coagulant_ex = coagulantvol.value.toString()
+                                coagulantDialog.value = false
+                            }) {
+                            Text(text = "取消")
+                        }
+                    })
+            }
+        }
+
+
     }
 
 
@@ -1138,121 +1303,131 @@ fun operate(
      * 低浓度弹窗
      */
     if (lowDialog.value) {
-        AlertDialog(
-            onDismissRequest = { },
-            title = {
 
-            },
-            text = {
-                Column {
+        if (job == null) {
+            if (uiFlags is UiFlags.None) {
+                AlertDialog(
+                    onDismissRequest = { },
+                    title = {
 
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            fontSize = 16.sp,
-                            text = "低浓度浓度/%："
-                        )
-                        OutlinedTextField(
-                            modifier = Modifier.width(100.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(rgb(0, 105, 52)),
-                                focusedLabelColor = Color(rgb(0, 105, 52)),
-                                cursorColor = Color(rgb(0, 105, 52))
-                            ),
-                            value = lowCoagulant_ex,
-                            label = { Text(text = "%") },
-                            onValueChange = {
-                                lowCoagulant_ex = it
-                            },
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number,
-                                imeAction = ImeAction.Done,
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    keyboard?.hide()
-                                }
-                            )
-                        )
+                    },
+                    text = {
+                        Column {
 
-                    }
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    fontSize = 16.sp,
+                                    text = "低浓度浓度/%："
+                                )
+                                OutlinedTextField(
+                                    modifier = Modifier.width(100.dp),
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = Color(rgb(0, 105, 52)),
+                                        focusedLabelColor = Color(rgb(0, 105, 52)),
+                                        cursorColor = Color(rgb(0, 105, 52))
+                                    ),
+                                    value = lowCoagulant_ex,
+                                    label = { Text(text = "%") },
+                                    onValueChange = {
+                                        lowCoagulant_ex = it
+                                    },
+                                    keyboardOptions = KeyboardOptions(
+                                        keyboardType = KeyboardType.Number,
+                                        imeAction = ImeAction.Done,
+                                    ),
+                                    keyboardActions = KeyboardActions(
+                                        onDone = {
+                                            keyboard?.hide()
+                                        }
+                                    )
+                                )
 
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            fontSize = 16.sp,
-                            text = "低浓度液量/ml："
-                        )
-                        OutlinedTextField(
-                            modifier = Modifier.width(100.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(rgb(0, 105, 52)),
-                                focusedLabelColor = Color(rgb(0, 105, 52)),
-                                cursorColor = Color(rgb(0, 105, 52))
-                            ),
-                            value = lowCoagulantVol_ex,
-                            enabled = false,
-                            label = { Text(text = "ml") },
-                            onValueChange = {
-                                lowCoagulantVol_ex = it
-                            },
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number,
-                                imeAction = ImeAction.Done,
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    keyboard?.hide()
-                                }
-                            )
-                        )
+                            }
 
-                    }
-                }
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    fontSize = 16.sp,
+                                    text = "低浓度液量/ml："
+                                )
+                                OutlinedTextField(
+                                    modifier = Modifier.width(100.dp),
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = Color(rgb(0, 105, 52)),
+                                        focusedLabelColor = Color(rgb(0, 105, 52)),
+                                        cursorColor = Color(rgb(0, 105, 52))
+                                    ),
+                                    value = lowCoagulantVol_ex,
+                                    enabled = false,
+                                    label = { Text(text = "ml") },
+                                    onValueChange = {
+                                        lowCoagulantVol_ex = it
+                                    },
+                                    keyboardOptions = KeyboardOptions(
+                                        keyboardType = KeyboardType.Number,
+                                        imeAction = ImeAction.Done,
+                                    ),
+                                    keyboardActions = KeyboardActions(
+                                        onDone = {
+                                            keyboard?.hide()
+                                        }
+                                    )
+                                )
 
-            }, confirmButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = {
-                    if ((lowCoagulant_ex.toIntOrNull() ?: 0) <= program.startRange) {
-                        if ((lowCoagulant_ex.toIntOrNull() ?: 0) > 0) {
-                            lowCoagulantVol.value = lowCoagulantVol_ex.toFloatOrNull() ?: 0f
-                            uiEvent(HomeIntent.HigeLowMotherVol)
-                            lowDialog.value = false
-                        } else {
-                            Toast.makeText(
-                                context,
-                                "不能是负数!",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            }
                         }
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "母液低浓度不能比制胶程序低浓度高",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+
+                    }, confirmButton = {
+                        Button(
+                            modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ), onClick = {
+                                if ((lowCoagulant_ex.toIntOrNull() ?: 0) <= program.startRange) {
+                                    if ((lowCoagulant_ex.toIntOrNull() ?: 0) > 0) {
+                                        lowCoagulantVol.value =
+                                            lowCoagulantVol_ex.toFloatOrNull() ?: 0f
+                                        uiEvent(HomeIntent.HigeLowMotherVol)
+                                        lowDialog.value = false
+                                    } else {
+                                        Toast.makeText(
+                                            context,
+                                            "不能是负数!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "母液低浓度不能比制胶程序低浓度高",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
 
 
-                }) {
-                    Text(text = "确认")
-                }
-            }, dismissButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = {
-                    lowCoagulant_ex = lowCoagulant.value.toString()
-                    lowCoagulantVol_ex = lowCoagulantVol.value.toString()
-                    lowDialog.value = false
-                }) {
-                    Text(text = "取消")
-                }
-            })
+                            }) {
+                            Text(text = "确认")
+                        }
+                    }, dismissButton = {
+                        Button(
+                            modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ), onClick = {
+                                lowCoagulant_ex = lowCoagulant.value.toString()
+                                lowCoagulantVol_ex = lowCoagulantVol.value.toString()
+                                lowDialog.value = false
+                            }) {
+                            Text(text = "取消")
+                        }
+                    })
+            }
+        }
+
+
     }
 
 
@@ -1260,219 +1435,263 @@ fun operate(
      * 高浓度弹窗
      */
     if (highDialog.value) {
-        AlertDialog(
-            onDismissRequest = {},
-            title = {
-            },
-            text = {
-                Column {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            fontSize = 16.sp,
-                            text = "高浓度浓度/%："
-                        )
-                        OutlinedTextField(
-                            modifier = Modifier.width(100.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(rgb(0, 105, 52)),
-                                focusedLabelColor = Color(rgb(0, 105, 52)),
-                                cursorColor = Color(rgb(0, 105, 52))
-                            ),
-                            value = highCoagulant_ex,
-                            label = { Text(text = "%") },
-                            onValueChange = {
-                                highCoagulant_ex = it
-                            },
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number,
-                                imeAction = ImeAction.Done,
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    keyboard?.hide()
-                                }
-                            )
-                        )
+        if (job == null) {
+            if (uiFlags is UiFlags.None) {
+                AlertDialog(
+                    onDismissRequest = {},
+                    title = {
+                    },
+                    text = {
+                        Column {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    fontSize = 16.sp,
+                                    text = "高浓度浓度/%："
+                                )
+                                OutlinedTextField(
+                                    modifier = Modifier.width(100.dp),
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = Color(rgb(0, 105, 52)),
+                                        focusedLabelColor = Color(rgb(0, 105, 52)),
+                                        cursorColor = Color(rgb(0, 105, 52))
+                                    ),
+                                    value = highCoagulant_ex,
+                                    label = { Text(text = "%") },
+                                    onValueChange = {
+                                        highCoagulant_ex = it
+                                    },
+                                    keyboardOptions = KeyboardOptions(
+                                        keyboardType = KeyboardType.Number,
+                                        imeAction = ImeAction.Done,
+                                    ),
+                                    keyboardActions = KeyboardActions(
+                                        onDone = {
+                                            keyboard?.hide()
+                                        }
+                                    )
+                                )
 
-                    }
+                            }
 
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            fontSize = 16.sp,
-                            text = "高浓度液量/ml："
-                        )
-                        OutlinedTextField(
-                            modifier = Modifier.width(100.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(rgb(0, 105, 52)),
-                                focusedLabelColor = Color(rgb(0, 105, 52)),
-                                cursorColor = Color(rgb(0, 105, 52))
-                            ),
-                            value = highCoagulantVol_ex,
-                            enabled = false,
-                            label = { Text(text = "ml") },
-                            onValueChange = {
-                                highCoagulantVol_ex = it
-                            },
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number,
-                                imeAction = ImeAction.Done,
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    keyboard?.hide()
-                                }
-                            )
-                        )
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    fontSize = 16.sp,
+                                    text = "高浓度液量/ml："
+                                )
+                                OutlinedTextField(
+                                    modifier = Modifier.width(100.dp),
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = Color(rgb(0, 105, 52)),
+                                        focusedLabelColor = Color(rgb(0, 105, 52)),
+                                        cursorColor = Color(rgb(0, 105, 52))
+                                    ),
+                                    value = highCoagulantVol_ex,
+                                    enabled = false,
+                                    label = { Text(text = "ml") },
+                                    onValueChange = {
+                                        highCoagulantVol_ex = it
+                                    },
+                                    keyboardOptions = KeyboardOptions(
+                                        keyboardType = KeyboardType.Number,
+                                        imeAction = ImeAction.Done,
+                                    ),
+                                    keyboardActions = KeyboardActions(
+                                        onDone = {
+                                            keyboard?.hide()
+                                        }
+                                    )
+                                )
 
-                    }
-                }
-
-            }, confirmButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = {
-                    if ((highCoagulant_ex.toIntOrNull() ?: 0) >= program.endRange) {
-                        if ((highCoagulant_ex.toIntOrNull() ?: 0) > 0) {
-                            highCoagulantVol.value = highCoagulantVol_ex.toFloatOrNull() ?: 0f
-                            uiEvent(HomeIntent.HigeLowMotherVol)
-                            highDialog.value = false
-                        } else {
-                            Toast.makeText(
-                                context,
-                                "不能是负数!",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            }
                         }
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "母液高浓度不能比制胶程序高浓度低",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+
+                    }, confirmButton = {
+                        Button(
+                            modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ), onClick = {
+                                if ((highCoagulant_ex.toIntOrNull() ?: 0) >= program.endRange) {
+                                    if ((highCoagulant_ex.toIntOrNull() ?: 0) > 0) {
+                                        highCoagulantVol.value =
+                                            highCoagulantVol_ex.toFloatOrNull() ?: 0f
+                                        uiEvent(HomeIntent.HigeLowMotherVol)
+                                        highDialog.value = false
+                                    } else {
+                                        Toast.makeText(
+                                            context,
+                                            "不能是负数!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "母液高浓度不能比制胶程序高浓度低",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
 
 
-                }) {
-                    Text(text = "确认")
-                }
-            }, dismissButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = {
-                    highCoagulant_ex = highCoagulant.value.toString()
-                    highCoagulantVol_ex = highCoagulantVol.value.toString()
-                    highDialog.value = false
-                }) {
-                    Text(text = "取消")
-                }
-            })
+                            }) {
+                            Text(text = "确认")
+                        }
+                    }, dismissButton = {
+                        Button(
+                            modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ), onClick = {
+                                highCoagulant_ex = highCoagulant.value.toString()
+                                highCoagulantVol_ex = highCoagulantVol.value.toString()
+                                highDialog.value = false
+                            }) {
+                            Text(text = "取消")
+                        }
+                    })
+            }
+        }
+
+
     }
 
     /**
      * 程序列表弹窗
      */
     if (programListDialog.value) {
-        AlertDialog(
-            onDismissRequest = { },
-            text = {
-                //	定义列宽
-                val cellWidthList = arrayListOf(70, 100, 130, 90, 100, 120)
-                //	使用lazyColumn来解决大数据量时渲染的性能问题
-                LazyColumn(
-                    modifier = Modifier
-                        .height(300.dp)
-                ) {
-                    //	粘性标题
-                    stickyHeader {
-                        Row(Modifier.background(Color(android.graphics.Color.rgb(0, 105, 52)))) {
-                            TableTextHead(text = "序号", width = cellWidthList[0])
-                            TableTextHead(text = "名称", width = cellWidthList[1])
-                            TableTextHead(text = "浓度", width = cellWidthList[2])
-                            TableTextHead(text = "厚度", width = cellWidthList[3])
-                        }
-                    }
-                    itemsIndexed(entitiesLazy) { index, item ->
-                        val selectedEntity = item == entities[selectedIndex]
-                        Row(
+        if (job == null) {
+            if (uiFlags is UiFlags.None) {
+                AlertDialog(
+                    onDismissRequest = { },
+                    text = {
+                        //	定义列宽
+                        val cellWidthList = arrayListOf(70, 100, 130, 90, 100, 120)
+                        //	使用lazyColumn来解决大数据量时渲染的性能问题
+                        LazyColumn(
                             modifier = Modifier
-                                .background(
-                                    if (index % 2 == 0) Color(
-                                        android.graphics.Color.rgb(
-                                            239,
-                                            239,
-                                            239
-                                        )
-                                    ) else Color.White
-                                )
-                                .clickable(onClick = {
-                                    selectedIndex = index
-
-                                })
+                                .height(300.dp)
                         ) {
-                            TableTextBody(
-                                text = "" + item.id,
-                                width = cellWidthList[0],
-                                selectedEntity
-                            )
-                            TableTextBody(
-                                text = item.displayText,
-                                width = cellWidthList[1],
-                                selectedEntity
-                            )
-                            TableTextBody(
-                                text = "" + item.startRange + "%~" + item.endRange + "%",
-                                width = cellWidthList[2], selectedEntity
-                            )
-                            TableTextBody(
-                                text = item.thickness + "mm",
-                                width = cellWidthList[3],
-                                selectedEntity
-                            )
+                            //	粘性标题
+                            stickyHeader {
+                                Row(
+                                    Modifier.background(
+                                        Color(
+                                            android.graphics.Color.rgb(
+                                                0,
+                                                105,
+                                                52
+                                            )
+                                        )
+                                    )
+                                ) {
+                                    TableTextHead(text = "序号", width = cellWidthList[0])
+                                    TableTextHead(text = "名称", width = cellWidthList[1])
+                                    TableTextHead(text = "浓度", width = cellWidthList[2])
+                                    TableTextHead(text = "厚度", width = cellWidthList[3])
+                                }
+                            }
+                            itemsIndexed(entitiesLazy) { index, item ->
+                                val selectedEntity = item == entities[selectedIndex]
+                                Row(
+                                    modifier = Modifier
+                                        .background(
+                                            if (index % 2 == 0) Color(
+                                                android.graphics.Color.rgb(
+                                                    239,
+                                                    239,
+                                                    239
+                                                )
+                                            ) else Color.White
+                                        )
+                                        .clickable(onClick = {
+                                            selectedIndex = index
+
+                                        })
+                                ) {
+                                    TableTextBody(
+                                        text = "" + item.id,
+                                        width = cellWidthList[0],
+                                        selectedEntity
+                                    )
+                                    TableTextBody(
+                                        text = item.displayText,
+                                        width = cellWidthList[1],
+                                        selectedEntity
+                                    )
+                                    TableTextBody(
+                                        text = "" + item.startRange + "%~" + item.endRange + "%",
+                                        width = cellWidthList[2], selectedEntity
+                                    )
+                                    TableTextBody(
+                                        text = item.thickness + "mm",
+                                        width = cellWidthList[3],
+                                        selectedEntity
+                                    )
+                                }
+                            }
+
                         }
-                    }
+                    }, confirmButton = {
+                        Button(
+                            modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ), onClick = {
+                                val entity = entities[selectedIndex]
+                                if (entity != null) {
+                                    programId.value = entity.id
+                                    uiEvent(HomeIntent.Selected(entity.id))
 
-                }
-            }, confirmButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = {
-                    val entity = entities[selectedIndex]
-                    if (entity != null) {
-                        programId.value = entity.id
-                        uiEvent(HomeIntent.Selected(entity.id))
-                        expectedMakeNum.value = 0
-                        expectedMakeNum_ex = "0"
-                        water.value = 0f
-                        water_ex = "0"
+                                    if (entity.endRange > 20) {
+                                        highCoagulant.value = 30
+                                        highCoagulant_ex = "30"
+                                    } else {
+                                        highCoagulant.value = 20
+                                        highCoagulant_ex = "20"
+                                    }
+                                    if (entity.startRange < 4) {
+                                        lowCoagulant.value = 3
+                                        lowCoagulant_ex = "3"
+                                    } else {
+                                        lowCoagulant.value = 4
+                                        lowCoagulant_ex = "4"
+                                    }
 
-                        coagulantvol.value = 0f
-                        coagulant_ex = "0"
 
-                        lowCoagulantVol.value = 0f
-                        lowCoagulantVol_ex = "0"
+                                    expectedMakeNum.value = 0
+                                    expectedMakeNum_ex = "0"
+                                    water.value = 0f
+                                    water_ex = "0"
 
-                        highCoagulantVol.value = 0f
-                        highCoagulantVol_ex = "0"
+                                    coagulantvol.value = 0f
+                                    coagulant_ex = "0"
 
-                        programListDialog.value = false
-                    }
-                }) {
-                    Text(text = "确认")
-                }
-            }, dismissButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = { programListDialog.value = false }) {
-                    Text(text = "取消")
-                }
-            })
+                                    lowCoagulantVol.value = 0f
+                                    lowCoagulantVol_ex = "0"
+
+                                    highCoagulantVol.value = 0f
+                                    highCoagulantVol_ex = "0"
+
+                                    programListDialog.value = false
+                                }
+                            }) {
+                            Text(text = "确认")
+                        }
+                    }, dismissButton = {
+                        Button(
+                            modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ), onClick = { programListDialog.value = false }) {
+                            Text(text = "取消")
+                        }
+                    })
+            }
+        }
+
+
     }
 
     /**
@@ -1490,40 +1709,46 @@ fun operate(
                 )
 
             }, confirmButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = {
-                    if (calculate >= expectedMakeNum.value) {
-                        startMake = "停止制胶"
-                        uiEvent(HomeIntent.Start(0))
-                        uiEvent(
-                            HomeIntent.Insert(
-                                program.startRange,
-                                program.endRange,
-                                program.thickness,
-                                program.coagulant,
-                                program.volume,
-                                complate,
-                                EPStatus.RUNNING,
-                                ""
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = {
+                        if (calculate >= expectedMakeNum.value) {
+                            useVol = true
+                            homestart.value = true
+                            startMake = "停止制胶"
+                            uiEvent(HomeIntent.Start(0))
+                            uiEvent(
+                                HomeIntent.Insert(
+                                    program.startRange,
+                                    program.endRange,
+                                    program.thickness,
+                                    program.coagulant,
+                                    program.volume,
+                                    complate,
+                                    EPStatus.RUNNING,
+                                    ""
+                                )
                             )
-                        )
-                        guleDialog.value = false
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "剩余液量不足,请补充!",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                            guleDialog.value = false
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "剩余液量不足,请补充!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
 
 
-                }) {
+                    }) {
                     Text(text = "确认")
                 }
             }, dismissButton = {
-                TextButton(
-                    modifier = Modifier.padding(end = 10.dp), colors = ButtonDefaults.buttonColors(
+                Button(
+                    modifier = Modifier
+                        .width(100.dp)
+                        .padding(end = 10.dp),
+                    colors = ButtonDefaults.buttonColors(
                         containerColor = Color(rgb(0, 105, 52))
                     ), onClick = {
 

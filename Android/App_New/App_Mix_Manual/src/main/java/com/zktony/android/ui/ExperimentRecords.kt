@@ -162,7 +162,8 @@ fun experimentList(
     val cellWidthList = arrayListOf(70, 100, 70, 130, 120, 120)
     //	使用lazyColumn来解决大数据量时渲染的性能问题
     Column(
-        modifier = Modifier.padding(start = 13.75.dp)
+        modifier = Modifier
+            .padding(start = 13.75.dp)
             .clip(RoundedCornerShape(topEnd = 10.dp, bottomEnd = 10.dp, bottomStart = 10.dp))
             .background(Color.White)
             .height(904.9.dp)
@@ -284,7 +285,15 @@ fun experimentList(
 
                                 val entity = entities[selectedIndex]
                                 if (entity != null) {
-                                    File(path + "/zktony/test.txt").writeText(
+                                    val filePath = "$path/zktony/erlog.txt"
+
+                                    val file =
+                                        File(filePath)
+                                    if (!file.exists()) {
+                                        file.createNewFile() // 创建新文件（若不存在）
+                                    }
+
+                                    File(filePath).writeText(
                                         "实验记录:" + ",日期：" + entity.createTime.dateFormat("yyyy-MM-dd")
                                                 + ",开始浓度:" + entity.startRange.toString()
                                                 + ",结束浓度:" + entity.endRange.toString()
@@ -473,34 +482,36 @@ fun experimentList(
                 text = {
 
                 }, confirmButton = {
-                    TextButton(colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(rgb(0, 105, 52))
-                    ), onClick = {
-                        val entity = entities[selectedIndex]
-                        if (entity != null) {
-                            if (entity.status != EPStatus.RUNNING) {
-                                dispatch(ExperimentRecordsIntent.Delete(entity.id))
-                                if (selectedIndex > 0) {
-                                    selectedIndex -= 1
+                    Button(
+                        modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(rgb(0, 105, 52))
+                        ), onClick = {
+                            val entity = entities[selectedIndex]
+                            if (entity != null) {
+                                if (entity.status != EPStatus.RUNNING) {
+                                    dispatch(ExperimentRecordsIntent.Delete(entity.id))
+                                    if (selectedIndex > 0) {
+                                        selectedIndex -= 1
+                                    }
+                                    deleteDialog.value = false
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "制胶程序还在运动中,不能删除！",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
-                                deleteDialog.value = false
-                            } else {
-                                Toast.makeText(
-                                    context,
-                                    "制胶程序还在运动中,不能删除！",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+
                             }
 
-                        }
-
-                    }) {
+                        }) {
                         Text(text = "确认")
                     }
                 }, dismissButton = {
-                    TextButton(colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(rgb(0, 105, 52))
-                    ), onClick = { deleteDialog.value = false }) {
+                    Button(
+                        modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(rgb(0, 105, 52))
+                        ), onClick = { deleteDialog.value = false }) {
                         Text(text = "取消")
                     }
                 })

@@ -37,6 +37,7 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -69,6 +70,7 @@ import com.zktony.android.data.entities.ErrorRecord
 import com.zktony.android.data.entities.NewCalibration
 import com.zktony.android.data.entities.Program
 import com.zktony.android.data.entities.Setting
+import com.zktony.android.data.entities.SportsLog
 import com.zktony.android.ui.components.DebugModeAppBar
 import com.zktony.android.ui.components.TableTextBody
 import com.zktony.android.ui.components.TableTextHead
@@ -85,6 +87,7 @@ import com.zktony.android.ui.utils.line
 import com.zktony.android.ui.utils.toList
 import com.zktony.android.utils.AlgorithmUtils.calculateCalibrationFactorNew
 import com.zktony.android.utils.AppStateUtils
+import com.zktony.android.utils.ApplicationUtils
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.SerialPortUtils.start
 import com.zktony.android.utils.extra.Application
@@ -117,6 +120,12 @@ fun SettingRoute(viewModel: SettingViewModel) {
 
     val slEntitiy by viewModel.slEntitiy.collectAsStateWithLifecycle(initialValue = null)
     val ncEntitiy by viewModel.ncEntitiy.collectAsStateWithLifecycle(initialValue = null)
+
+    //去重后的数据
+    val sportsLogEntitiesDis = viewModel.sportsLogEntitiesDis.collectAsLazyPagingItems()
+
+    val sportsLogEntities = viewModel.sportsLogEntities.collectAsLazyPagingItems()
+
     val navigation: () -> Unit = {
         scope.launch {
             when (page) {
@@ -127,6 +136,14 @@ fun SettingRoute(viewModel: SettingViewModel) {
     }
 
     BackHandler { navigation() }
+
+    LaunchedEffect(key1 = uiFlags) {
+        if (uiFlags is UiFlags.Message) {
+            snackbarHostState.showSnackbar((uiFlags as UiFlags.Message).message)
+            viewModel.dispatch(SettingIntent.Flags(UiFlags.none()))
+        }
+    }
+
 
     Box {
         Image(
@@ -149,7 +166,8 @@ fun SettingRoute(viewModel: SettingViewModel) {
                         application,
                         progress,
                         viewModel::dispatch,
-                        erroeEntities
+                        erroeEntities,
+                        uiFlags
                     )
 
                     PageType.DEBUGMODE -> debug(
@@ -158,6 +176,12 @@ fun SettingRoute(viewModel: SettingViewModel) {
                         slEntitiy,
                         job,
                         uiFlags,
+                    )
+                    PageType.SPORTSLOG -> sportsLog(
+                        viewModel::dispatch,
+                        sportsLogEntitiesDis,
+                        sportsLogEntitiesDis.toList(),
+                        sportsLogEntities.toList()
                     )
 
                     else -> {}
@@ -176,10 +200,10 @@ fun SettingLits(
     application: Application?,
     progress: Int,
     uiEvent: (SettingIntent) -> Unit,
-    erroeEntities: LazyPagingItems<ErrorRecord>
+    erroeEntities: LazyPagingItems<ErrorRecord>,
+    uiFlags: UiFlags,
 ) {
     var setting = s1 ?: Setting()
-    Log.d("","setting====$setting")
 
     var newCalibration = c1 ?: NewCalibration()
 
@@ -194,6 +218,12 @@ fun SettingLits(
     var navigation by rememberDataSaverState(key = Constants.NAVIGATION, default = false)
 
     var selectRudio = rememberDataSaverState(key = "selectRudio", default = 1)
+
+    val snackbarHostState = LocalSnackbarHostState.current
+    /**
+     * 判断首页是否再运动中，true在运动，false不在运动
+     */
+    val homestart = rememberDataSaverState(key = "homestart", default = false)
 
     //================密码相关=============================
     var pwdShow by remember { mutableStateOf(false) }
@@ -720,6 +750,13 @@ fun SettingLits(
                                 label = { Text(text = "清洗液量/mL", fontSize = 14.sp) },
                                 onValueChange = {
                                     higeCleanVolume_ex = it
+                                    val temp = higeCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                    if (temp < 0) {
+                                        higeCleanVolume_ex = "0"
+                                    } else if (temp > 20) {
+                                        higeCleanVolume_ex = "20"
+                                    }
+
 
                                 },
                                 keyboardOptions = KeyboardOptions(
@@ -745,6 +782,12 @@ fun SettingLits(
                                 label = { Text(text = "预排液量/mL", fontSize = 14.sp) },
                                 onValueChange = {
                                     higeRehearsalVolume_ex = it
+                                    val temp = higeRehearsalVolume_ex.toDoubleOrNull() ?: 0.0
+                                    if (temp < 0) {
+                                        higeRehearsalVolume_ex = "0"
+                                    } else if (temp > 20) {
+                                        higeRehearsalVolume_ex = "20"
+                                    }
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -770,6 +813,12 @@ fun SettingLits(
                                 label = { Text(text = "管路填充/mL", fontSize = 14.sp) },
                                 onValueChange = {
                                     higeFilling_ex = it
+                                    val temp = higeFilling_ex.toDoubleOrNull() ?: 0.0
+                                    if (temp < 0) {
+                                        higeFilling_ex = "0"
+                                    } else if (temp > 20) {
+                                        higeFilling_ex = "20"
+                                    }
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -812,7 +861,16 @@ fun SettingLits(
                                     cursorColor = Color(rgb(0, 105, 52))
                                 ),
                                 label = { Text(text = "清洗液量/mL", fontSize = 14.sp) },
-                                onValueChange = { lowCleanVolume_ex = it },
+                                onValueChange = {
+                                    lowCleanVolume_ex = it
+
+                                    val temp = lowCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                    if (temp < 0) {
+                                        lowCleanVolume_ex = "0"
+                                    } else if (temp > 20) {
+                                        lowCleanVolume_ex = "20"
+                                    }
+                                },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
                                     imeAction = ImeAction.Done,
@@ -835,7 +893,16 @@ fun SettingLits(
                                     cursorColor = Color(rgb(0, 105, 52))
                                 ),
                                 label = { Text(text = "管路填充/mL", fontSize = 14.sp) },
-                                onValueChange = { lowFilling_ex = it },
+                                onValueChange = {
+                                    lowFilling_ex = it
+
+                                    val temp = lowFilling_ex.toDoubleOrNull() ?: 0.0
+                                    if (temp < 0) {
+                                        lowFilling_ex = "0"
+                                    } else if (temp > 20) {
+                                        lowFilling_ex = "20"
+                                    }
+                                },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
                                     imeAction = ImeAction.Done,
@@ -878,7 +945,16 @@ fun SettingLits(
                                     cursorColor = Color(rgb(0, 105, 52))
                                 ),
                                 label = { Text(text = "冲洗液量/mL", fontSize = 14.sp) },
-                                onValueChange = { rinseCleanVolume_ex = it },
+                                onValueChange = {
+                                    rinseCleanVolume_ex = it
+
+                                    val temp = rinseCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                    if (temp < 0) {
+                                        rinseCleanVolume_ex = "0"
+                                    } else if (temp > 20) {
+                                        rinseCleanVolume_ex = "20"
+                                    }
+                                },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
                                     imeAction = ImeAction.Done,
@@ -901,7 +977,16 @@ fun SettingLits(
                                     cursorColor = Color(rgb(0, 105, 52))
                                 ),
                                 label = { Text(text = "管路填充/mL", fontSize = 14.sp) },
-                                onValueChange = { rinseFilling_ex = it },
+                                onValueChange = {
+                                    rinseFilling_ex = it
+
+                                    val temp = rinseFilling_ex.toDoubleOrNull() ?: 0.0
+                                    if (temp < 0) {
+                                        rinseFilling_ex = "0"
+                                    } else if (temp > 20) {
+                                        rinseFilling_ex = "20"
+                                    }
+                                },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
                                     imeAction = ImeAction.Done,
@@ -944,7 +1029,16 @@ fun SettingLits(
                                     cursorColor = Color(rgb(0, 105, 52))
                                 ),
                                 label = { Text(text = "清洗液量/mL", fontSize = 14.sp) },
-                                onValueChange = { coagulantCleanVolume_ex = it },
+                                onValueChange = {
+                                    coagulantCleanVolume_ex = it
+
+                                    val temp = coagulantCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                    if (temp < 0) {
+                                        coagulantCleanVolume_ex = "0"
+                                    } else if (temp > 20) {
+                                        coagulantCleanVolume_ex = "20"
+                                    }
+                                },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
                                     imeAction = ImeAction.Done,
@@ -967,7 +1061,16 @@ fun SettingLits(
                                     cursorColor = Color(rgb(0, 105, 52))
                                 ),
                                 label = { Text(text = "管路填充/mL", fontSize = 14.sp) },
-                                onValueChange = { coagulantFilling_ex = it },
+                                onValueChange = {
+                                    coagulantFilling_ex = it
+
+                                    val temp = coagulantFilling_ex.toDoubleOrNull() ?: 0.0
+                                    if (temp < 0) {
+                                        coagulantFilling_ex = "0"
+                                    } else if (temp > 20) {
+                                        coagulantFilling_ex = "20"
+                                    }
+                                },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
                                     imeAction = ImeAction.Done,
@@ -994,40 +1097,26 @@ fun SettingLits(
                                 .height(41.5.dp), colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(rgb(0, 105, 52))
                             ), shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp), onClick = {
-                                if ((higeCleanVolume_ex.toDoubleOrNull() ?: 0.0) > 0 ||
-                                    (higeRehearsalVolume_ex.toDoubleOrNull() ?: 0.0) > 0 ||
-                                    (higeFilling_ex.toDoubleOrNull() ?: 0.0) > 0 ||
-                                    (lowCleanVolume_ex.toDoubleOrNull() ?: 0.0) > 0 ||
-                                    (lowFilling_ex.toDoubleOrNull() ?: 0.0) > 0 ||
-                                    (rinseCleanVolume_ex.toDoubleOrNull() ?: 0.0) > 0 ||
-                                    (coagulantCleanVolume_ex.toDoubleOrNull() ?: 0.0) > 0 ||
-                                    (coagulantFilling_ex.toDoubleOrNull() ?: 0.0) > 0
-                                ) {
-                                    setting.higeCleanVolume =
-                                        higeCleanVolume_ex.toDoubleOrNull() ?: 0.0
-                                    setting.higeRehearsalVolume =
-                                        higeRehearsalVolume_ex.toDoubleOrNull() ?: 0.0
-                                    setting.higeFilling = higeFilling_ex.toDoubleOrNull() ?: 0.0
-                                    setting.lowCleanVolume =
-                                        lowCleanVolume_ex.toDoubleOrNull() ?: 0.0
-                                    setting.lowFilling = lowFilling_ex.toDoubleOrNull() ?: 0.0
-                                    setting.rinseCleanVolume =
-                                        rinseCleanVolume_ex.toDoubleOrNull() ?: 0.0
-                                    setting.rinseFilling = rinseFilling_ex.toDoubleOrNull() ?: 0.0
-                                    setting.coagulantCleanVolume =
-                                        coagulantCleanVolume_ex.toDoubleOrNull() ?: 0.0
-                                    setting.coagulantFilling =
-                                        coagulantFilling_ex.toDoubleOrNull() ?: 0.0
-                                    uiEvent(SettingIntent.UpdateSet(setting))
+                                setting.higeCleanVolume =
+                                    higeCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                setting.higeRehearsalVolume =
+                                    higeRehearsalVolume_ex.toDoubleOrNull() ?: 0.0
+                                setting.higeFilling = higeFilling_ex.toDoubleOrNull() ?: 0.0
+                                setting.lowCleanVolume =
+                                    lowCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                setting.lowFilling = lowFilling_ex.toDoubleOrNull() ?: 0.0
+                                setting.rinseCleanVolume =
+                                    rinseCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                setting.rinseFilling = rinseFilling_ex.toDoubleOrNull() ?: 0.0
+                                setting.coagulantCleanVolume =
+                                    coagulantCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                setting.coagulantFilling =
+                                    coagulantFilling_ex.toDoubleOrNull() ?: 0.0
+                                uiEvent(SettingIntent.UpdateSet(setting))
 
-                                    Toast.makeText(
-                                        context, "保存成功！", Toast.LENGTH_SHORT
-                                    ).show()
-                                } else {
-                                    Toast.makeText(
-                                        context, "数据不能小于0！", Toast.LENGTH_SHORT
-                                    ).show()
-                                }
+                                Toast.makeText(
+                                    context, "保存成功！", Toast.LENGTH_SHORT
+                                ).show()
 
 
                             }) {
@@ -1086,21 +1175,24 @@ fun SettingLits(
                                     ),
                                     shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                     onClick = {
-                                        scope.launch {
-                                            start {
-                                                timeOut = 1000L * 30
-                                                with(
-                                                    index = 2,
-                                                    pdv = 51200L * 50,
-                                                    ads = Triple(
-                                                        rinseSpeed.value * 13,
-                                                        rinseSpeed.value * 1193,
-                                                        rinseSpeed.value * 1193
-                                                    ),
+                                        if (!homestart.value) {
+                                            scope.launch {
+                                                start {
+                                                    timeOut = 1000L * 30
+                                                    with(
+                                                        index = 2,
+                                                        pdv = 51200L * 50,
+                                                        ads = Triple(
+                                                            rinseSpeed.value * 13,
+                                                            rinseSpeed.value * 1193,
+                                                            rinseSpeed.value * 1193
+                                                        ),
 
-                                                    )
+                                                        )
+                                                }
                                             }
                                         }
+
                                     }) {
                                     Text(text = "加    液", fontSize = 16.sp)
                                 }
@@ -1120,6 +1212,13 @@ fun SettingLits(
                                 label = { Text(text = "加液量1/g", fontSize = 14.sp) },
                                 onValueChange = {
                                     higeLiquidVolume1_ex = it
+
+                                    val temp = higeLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                    if (temp < 0) {
+                                        higeLiquidVolume1_ex = "0"
+                                    } else if (temp > 50) {
+                                        higeLiquidVolume1_ex = "50"
+                                    }
 
                                 },
                                 keyboardOptions = KeyboardOptions(
@@ -1146,6 +1245,12 @@ fun SettingLits(
                                 onValueChange = {
                                     higeLiquidVolume2_ex = it
 
+                                    val temp = higeLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                    if (temp < 0) {
+                                        higeLiquidVolume2_ex = "0"
+                                    } else if (temp > 50) {
+                                        higeLiquidVolume2_ex = "50"
+                                    }
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1171,6 +1276,12 @@ fun SettingLits(
                                 onValueChange = {
                                     higeLiquidVolume3_ex = it
 
+                                    val temp = higeLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
+                                    if (temp < 0) {
+                                        higeLiquidVolume3_ex = "0"
+                                    } else if (temp > 50) {
+                                        higeLiquidVolume3_ex = "50"
+                                    }
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1213,21 +1324,24 @@ fun SettingLits(
                                     ),
                                     shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                     onClick = {
-                                        scope.launch {
-                                            start {
-                                                timeOut = 1000L * 30
-                                                with(
-                                                    index = 3,
-                                                    pdv = 51200L * 50,
-                                                    ads = Triple(
-                                                        rinseSpeed.value * 13,
-                                                        rinseSpeed.value * 1193,
-                                                        rinseSpeed.value * 1193
-                                                    ),
+                                        if (homestart.value == false) {
+                                            scope.launch {
+                                                start {
+                                                    timeOut = 1000L * 30
+                                                    with(
+                                                        index = 3,
+                                                        pdv = 51200L * 50,
+                                                        ads = Triple(
+                                                            rinseSpeed.value * 13,
+                                                            rinseSpeed.value * 1193,
+                                                            rinseSpeed.value * 1193
+                                                        ),
 
-                                                    )
+                                                        )
+                                                }
                                             }
                                         }
+
                                     }) {
                                     Text(text = "加    液", fontSize = 16.sp)
                                 }
@@ -1248,6 +1362,12 @@ fun SettingLits(
                                 onValueChange = {
                                     lowLiquidVolume1_ex = it
 
+                                    val temp = lowLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                    if (temp < 0) {
+                                        lowLiquidVolume1_ex = "0"
+                                    } else if (temp > 50) {
+                                        lowLiquidVolume1_ex = "50"
+                                    }
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1273,6 +1393,12 @@ fun SettingLits(
                                 onValueChange = {
                                     lowLiquidVolume2_ex = it
 
+                                    val temp = lowLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                    if (temp < 0) {
+                                        lowLiquidVolume2_ex = "0"
+                                    } else if (temp > 50) {
+                                        lowLiquidVolume2_ex = "50"
+                                    }
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1298,6 +1424,12 @@ fun SettingLits(
                                 onValueChange = {
                                     lowLiquidVolume3_ex = it
 
+                                    val temp = lowLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
+                                    if (temp < 0) {
+                                        lowLiquidVolume3_ex = "0"
+                                    } else if (temp > 50) {
+                                        lowLiquidVolume3_ex = "50"
+                                    }
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1339,21 +1471,25 @@ fun SettingLits(
                                     ),
                                     shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                     onClick = {
-                                        scope.launch {
-                                            start {
-                                                timeOut = 1000L * 30
-                                                with(
-                                                    index = 4,
-                                                    pdv = 3200L * 50,
-                                                    ads = Triple(
-                                                        rinseSpeed.value * 13,
-                                                        rinseSpeed.value * 1193,
-                                                        rinseSpeed.value * 1193
-                                                    ),
 
-                                                    )
+                                        if (homestart.value == false) {
+                                            scope.launch {
+                                                start {
+                                                    timeOut = 1000L * 30
+                                                    with(
+                                                        index = 4,
+                                                        pdv = 3200L * 50,
+                                                        ads = Triple(
+                                                            rinseSpeed.value * 20,
+                                                            rinseSpeed.value * 20,
+                                                            rinseSpeed.value * 20
+                                                        ),
+
+                                                        )
+                                                }
                                             }
                                         }
+
                                     }) {
                                     Text(text = "加    液", fontSize = 16.sp)
                                 }
@@ -1374,6 +1510,12 @@ fun SettingLits(
                                 onValueChange = {
                                     rinseLiquidVolume1_ex = it
 
+                                    val temp = rinseLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                    if (temp < 0) {
+                                        rinseLiquidVolume1_ex = "0"
+                                    } else if (temp > 50) {
+                                        rinseLiquidVolume1_ex = "50"
+                                    }
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1399,6 +1541,12 @@ fun SettingLits(
                                 onValueChange = {
                                     rinseLiquidVolume2_ex = it
 
+                                    val temp = rinseLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                    if (temp < 0) {
+                                        rinseLiquidVolume2_ex = "0"
+                                    } else if (temp > 50) {
+                                        rinseLiquidVolume2_ex = "50"
+                                    }
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1424,6 +1572,12 @@ fun SettingLits(
                                 onValueChange = {
                                     rinseLiquidVolume3_ex = it
 
+                                    val temp = rinseLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
+                                    if (temp < 0) {
+                                        rinseLiquidVolume3_ex = "0"
+                                    } else if (temp > 50) {
+                                        rinseLiquidVolume3_ex = "50"
+                                    }
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1464,21 +1618,25 @@ fun SettingLits(
                                     ),
                                     shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                     onClick = {
-                                        scope.launch {
-                                            start {
-                                                timeOut = 1000L * 30
-                                                with(
-                                                    index = 1,
-                                                    pdv = coagulantpulse.value.toLong(),
-                                                    ads = Triple(
-                                                        rinseSpeed.value * 13,
-                                                        rinseSpeed.value * 1193,
-                                                        rinseSpeed.value * 1193
-                                                    ),
 
-                                                    )
+                                        if (homestart.value == false) {
+                                            scope.launch {
+                                                start {
+                                                    timeOut = 1000L * 30
+                                                    with(
+                                                        index = 1,
+                                                        pdv = coagulantpulse.value.toLong(),
+                                                        ads = Triple(
+                                                            rinseSpeed.value * 13,
+                                                            rinseSpeed.value * 1193,
+                                                            rinseSpeed.value * 1193
+                                                        ),
+
+                                                        )
+                                                }
                                             }
                                         }
+
                                     }) {
                                     Text(text = "加    液", fontSize = 16.sp)
                                 }
@@ -1499,6 +1657,12 @@ fun SettingLits(
                                 onValueChange = {
                                     coagulantLiquidVolume1_ex = it
 
+                                    val temp = coagulantLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                    if (temp < 0) {
+                                        coagulantLiquidVolume1_ex = "0"
+                                    } else if (temp > 50) {
+                                        coagulantLiquidVolume1_ex = "50"
+                                    }
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1524,6 +1688,12 @@ fun SettingLits(
                                 onValueChange = {
                                     coagulantLiquidVolume2_ex = it
 
+                                    val temp = coagulantLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                    if (temp < 0) {
+                                        coagulantLiquidVolume2_ex = "0"
+                                    } else if (temp > 50) {
+                                        coagulantLiquidVolume2_ex = "50"
+                                    }
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1549,6 +1719,12 @@ fun SettingLits(
                                 onValueChange = {
                                     coagulantLiquidVolume3_ex = it
 
+                                    val temp = coagulantLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
+                                    if (temp < 0) {
+                                        coagulantLiquidVolume3_ex = "0"
+                                    } else if (temp > 50) {
+                                        coagulantLiquidVolume3_ex = "50"
+                                    }
                                 },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -1574,89 +1750,70 @@ fun SettingLits(
                                 .height(41.5.dp), colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(rgb(0, 105, 52))
                             ), shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp), onClick = {
+                                newCalibration.higeLiquidVolume1 =
+                                    higeLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.higeLiquidVolume2 =
+                                    higeLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.higeLiquidVolume3 =
+                                    higeLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
 
-                                if ((higeLiquidVolume1_ex.toDoubleOrNull() ?: 0.0) > 0 ||
-                                    (higeLiquidVolume2_ex.toDoubleOrNull() ?: 0.0) > 0 ||
-                                    (higeLiquidVolume3_ex.toDoubleOrNull() ?: 0.0) > 0 ||
-                                    (lowLiquidVolume1_ex.toDoubleOrNull() ?: 0.0) > 0 ||
-                                    (lowLiquidVolume2_ex.toDoubleOrNull() ?: 0.0) > 0 ||
-                                    (lowLiquidVolume3_ex.toDoubleOrNull() ?: 0.0) > 0 ||
-                                    (rinseLiquidVolume1_ex.toDoubleOrNull() ?: 0.0) > 0 ||
-                                    (rinseLiquidVolume2_ex.toDoubleOrNull() ?: 0.0) > 0 ||
-                                    (rinseLiquidVolume3_ex.toDoubleOrNull() ?: 0.0) > 0 ||
-                                    (coagulantLiquidVolume1_ex.toDoubleOrNull() ?: 0.0) > 0 ||
-                                    (coagulantLiquidVolume2_ex.toDoubleOrNull() ?: 0.0) > 0 ||
-                                    (coagulantLiquidVolume3_ex.toDoubleOrNull() ?: 0.0) > 0
-                                ) {
-                                    newCalibration.higeLiquidVolume1 =
-                                        higeLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
-                                    newCalibration.higeLiquidVolume2 =
-                                        higeLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
-                                    newCalibration.higeLiquidVolume3 =
-                                        higeLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.lowLiquidVolume1 =
+                                    lowLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.lowLiquidVolume2 =
+                                    lowLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.lowLiquidVolume3 =
+                                    lowLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
 
-                                    newCalibration.lowLiquidVolume1 =
-                                        lowLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
-                                    newCalibration.lowLiquidVolume2 =
-                                        lowLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
-                                    newCalibration.lowLiquidVolume3 =
-                                        lowLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.rinseLiquidVolume1 =
+                                    rinseLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.rinseLiquidVolume2 =
+                                    rinseLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.rinseLiquidVolume3 =
+                                    rinseLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
 
-                                    newCalibration.rinseLiquidVolume1 =
-                                        rinseLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
-                                    newCalibration.rinseLiquidVolume2 =
-                                        rinseLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
-                                    newCalibration.rinseLiquidVolume3 =
-                                        rinseLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.coagulantLiquidVolume1 =
+                                    coagulantLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.coagulantLiquidVolume2 =
+                                    coagulantLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.coagulantLiquidVolume3 =
+                                    coagulantLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
 
-                                    newCalibration.coagulantLiquidVolume1 =
-                                        coagulantLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
-                                    newCalibration.coagulantLiquidVolume2 =
-                                        coagulantLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
-                                    newCalibration.coagulantLiquidVolume3 =
-                                        coagulantLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
-
-                                    newCalibration.higeAvg =
-                                        (newCalibration.higeLiquidVolume1 + newCalibration.higeLiquidVolume2 + newCalibration.higeLiquidVolume3) / 3
-                                    newCalibration.lowAvg =
-                                        (newCalibration.lowLiquidVolume1 + newCalibration.lowLiquidVolume2 + newCalibration.lowLiquidVolume3) / 3
-                                    newCalibration.rinseAvg =
-                                        (newCalibration.rinseLiquidVolume1 + newCalibration.rinseLiquidVolume2 + newCalibration.rinseLiquidVolume3) / 3
-                                    newCalibration.coagulantAvg =
-                                        (newCalibration.coagulantLiquidVolume1 + newCalibration.coagulantLiquidVolume1 + newCalibration.coagulantLiquidVolume1) / 3
+                                newCalibration.higeAvg =
+                                    (newCalibration.higeLiquidVolume1 + newCalibration.higeLiquidVolume2 + newCalibration.higeLiquidVolume3) / 3
+                                newCalibration.lowAvg =
+                                    (newCalibration.lowLiquidVolume1 + newCalibration.lowLiquidVolume2 + newCalibration.lowLiquidVolume3) / 3
+                                newCalibration.rinseAvg =
+                                    (newCalibration.rinseLiquidVolume1 + newCalibration.rinseLiquidVolume2 + newCalibration.rinseLiquidVolume3) / 3
+                                newCalibration.coagulantAvg =
+                                    (newCalibration.coagulantLiquidVolume1 + newCalibration.coagulantLiquidVolume1 + newCalibration.coagulantLiquidVolume1) / 3
 
 
-                                    AppStateUtils.hpc[0] =
-                                        calculateCalibrationFactorNew(64000, 120.0)
+                                AppStateUtils.hpc[0] =
+                                    calculateCalibrationFactorNew(64000, 120.0)
 
-                                    AppStateUtils.hpc[1] = calculateCalibrationFactorNew(
-                                        coagulantpulse.value, newCalibration.coagulantAvg * 1000
-                                    )
+                                AppStateUtils.hpc[1] = calculateCalibrationFactorNew(
+                                    coagulantpulse.value, newCalibration.coagulantAvg * 1000
+                                )
 
-                                    AppStateUtils.hpc[2] = calculateCalibrationFactorNew(
-                                        51200 * 50, newCalibration.higeAvg * 1000
-                                    )
+                                AppStateUtils.hpc[2] = calculateCalibrationFactorNew(
+                                    51200 * 50, newCalibration.higeAvg * 1000
+                                )
 
-                                    AppStateUtils.hpc[3] = calculateCalibrationFactorNew(
-                                        51200 * 50, newCalibration.lowAvg * 1000
-                                    )
+                                AppStateUtils.hpc[3] = calculateCalibrationFactorNew(
+                                    51200 * 50, newCalibration.lowAvg * 1000
+                                )
 
-                                    AppStateUtils.hpc[4] = calculateCalibrationFactorNew(
-                                        3200 * 50, newCalibration.rinseAvg * 1000
-                                    )
+                                AppStateUtils.hpc[4] = calculateCalibrationFactorNew(
+                                    3200 * 50, newCalibration.rinseAvg * 1000
+                                )
 
 
 
-                                    uiEvent(SettingIntent.UpdateNC(newCalibration))
+                                uiEvent(SettingIntent.UpdateNC(newCalibration))
 
-                                    Toast.makeText(
-                                        context, "保存成功！", Toast.LENGTH_SHORT
-                                    ).show()
-                                } else {
-                                    Toast.makeText(
-                                        context, "数据不能小于0！", Toast.LENGTH_SHORT
-                                    ).show()
-                                }
+                                Toast.makeText(
+                                    context, "保存成功！", Toast.LENGTH_SHORT
+                                ).show()
 
 
                             }) {
@@ -1813,7 +1970,7 @@ fun SettingLits(
                         }
 
                         Row(modifier = Modifier.clickable {
-
+                            uiEvent(SettingIntent.NavTo(PageType.SPORTSLOG))
                         }) {
                             Text(
                                 modifier = Modifier.padding(top = 20.dp),
@@ -1865,7 +2022,13 @@ fun SettingLits(
                         }
 
                         Row(modifier = Modifier.clickable {
-
+                            scope.launch {
+                                if (ApplicationUtils.isNetworkAvailable()) {
+                                    uiEvent(SettingIntent.CheckUpdate)
+                                } else {
+                                    snackbarHostState.showSnackbar(message = "网络不可用")
+                                }
+                            }
                         }) {
                             Text(
                                 modifier = Modifier.padding(top = 20.dp),
@@ -1998,7 +2161,7 @@ fun SettingLits(
                                         ),
                                         onClick = {
                                             selectRudio.value = destination.id
-
+                                            uiEvent(SettingIntent.Sound(selectRudio.value))
                                         },
                                     ) {
                                         Text(
@@ -2050,7 +2213,8 @@ fun SettingLits(
             }, text = {
 
             }, confirmButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
+                  Button(
+                modifier = Modifier.width(100.dp),colors = ButtonDefaults.buttonColors(
                     containerColor = Color(rgb(0, 105, 52))
                 ), onClick = {
                     newCalibration.higeLiquidVolume1 = 0.0
@@ -2103,7 +2267,8 @@ fun SettingLits(
                     Text(text = "确认")
                 }
             }, dismissButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
+                  Button(
+                modifier = Modifier.width(100.dp),colors = ButtonDefaults.buttonColors(
                     containerColor = Color(rgb(0, 105, 52))
                 ), onClick = { calibrationResetDialog.value = false }) {
                     Text(text = "取消")
@@ -2118,7 +2283,8 @@ fun SettingLits(
             }, text = {
 
             }, confirmButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
+                  Button(
+                modifier = Modifier.width(100.dp),colors = ButtonDefaults.buttonColors(
                     containerColor = Color(rgb(0, 105, 52))
                 ), onClick = {
                     setting.higeCleanVolume = 0.0
@@ -2146,7 +2312,8 @@ fun SettingLits(
                     Text(text = "确认")
                 }
             }, dismissButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
+                  Button(
+                modifier = Modifier.width(100.dp),colors = ButtonDefaults.buttonColors(
                     containerColor = Color(rgb(0, 105, 52))
                 ), onClick = { expectedResetDialog.value = false }) {
                     Text(text = "取消")
@@ -2219,7 +2386,8 @@ fun SettingLits(
 
 
             }, confirmButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
+                  Button(
+                modifier = Modifier.width(100.dp),colors = ButtonDefaults.buttonColors(
                     containerColor = Color(rgb(0, 105, 52))
                 ), onClick = {
 
@@ -2252,7 +2420,8 @@ fun SettingLits(
                     Text(text = "确认")
                 }
             }, dismissButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
+                  Button(
+                modifier = Modifier.width(100.dp),colors = ButtonDefaults.buttonColors(
                     containerColor = Color(rgb(0, 105, 52))
                 ), onClick = { updatePwdDialog.value = false }) {
                     Text(text = "取消")
@@ -2312,7 +2481,15 @@ fun SettingLits(
                                         cursorColor = Color(rgb(0, 105, 52))
                                     ),
                                     label = { },
-                                    onValueChange = { highTimeExpected_ex = it },
+                                    onValueChange = {
+                                        highTimeExpected_ex = it
+                                        val temp = highTimeExpected_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            highTimeExpected_ex = "0"
+                                        } else if (temp > 2000) {
+                                            highTimeExpected_ex = "2000"
+                                        }
+                                    },
                                     keyboardOptions = KeyboardOptions(
                                         keyboardType = KeyboardType.Number,
                                         imeAction = ImeAction.Done,
@@ -2398,7 +2575,16 @@ fun SettingLits(
                                         cursorColor = Color(rgb(0, 105, 52))
                                     ),
                                     label = { },
-                                    onValueChange = { lowTimeExpected_ex = it },
+                                    onValueChange = {
+                                        lowTimeExpected_ex = it
+
+                                        val temp = lowTimeExpected_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            lowTimeExpected_ex = "0"
+                                        } else if (temp > 2000) {
+                                            lowTimeExpected_ex = "2000"
+                                        }
+                                    },
                                     keyboardOptions = KeyboardOptions(
                                         keyboardType = KeyboardType.Number,
                                         imeAction = ImeAction.Done,
@@ -2486,7 +2672,16 @@ fun SettingLits(
                                         cursorColor = Color(rgb(0, 105, 52))
                                     ),
                                     label = { },
-                                    onValueChange = { rinseTimeExpected_ex = it },
+                                    onValueChange = {
+                                        rinseTimeExpected_ex = it
+
+                                        val temp = rinseTimeExpected_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            rinseTimeExpected_ex = "0"
+                                        } else if (temp > 2000) {
+                                            rinseTimeExpected_ex = "2000"
+                                        }
+                                    },
                                     keyboardOptions = KeyboardOptions(
                                         keyboardType = KeyboardType.Number,
                                         imeAction = ImeAction.Done,
@@ -2531,7 +2726,8 @@ fun SettingLits(
 
             }, confirmButton = {
                 if (factoryAdminPwd.value == currentPwd.value) {
-                    TextButton(colors = ButtonDefaults.buttonColors(
+                      Button(
+                modifier = Modifier.width(100.dp),colors = ButtonDefaults.buttonColors(
                         containerColor = Color(rgb(0, 105, 52))
                     ), onClick = {
                         setting.lowTimeExpected = lowTimeExpected_ex.toDoubleOrNull() ?: 0.0
@@ -2543,7 +2739,8 @@ fun SettingLits(
                         Text(text = "保存")
                     }
                 } else {
-                    TextButton(colors = ButtonDefaults.buttonColors(
+                      Button(
+                modifier = Modifier.width(100.dp),colors = ButtonDefaults.buttonColors(
                         containerColor = Color(rgb(0, 105, 52))
                     ), onClick = {
                         setting.highTime = 0.0
@@ -2557,7 +2754,8 @@ fun SettingLits(
                 }
 
             }, dismissButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
+                  Button(
+                modifier = Modifier.width(100.dp),colors = ButtonDefaults.buttonColors(
                     containerColor = Color(rgb(0, 105, 52))
                 ), onClick = { accessoriesDialog.value = false }) {
                     Text(text = "返回")
@@ -2586,6 +2784,12 @@ fun SettingLits(
                             label = { Text(text = "胶板位置") },
                             onValueChange = {
                                 glueBoardPosition_ex = it
+                                val temp = glueBoardPosition_ex.toDoubleOrNull() ?: 0.0
+                                if (temp < 0) {
+                                    glueBoardPosition_ex = "0"
+                                } else if (temp > 30) {
+                                    glueBoardPosition_ex = "30"
+                                }
                             },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number,
@@ -2604,16 +2808,19 @@ fun SettingLits(
                             ),
                             shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                             onClick = {
-                                scope.launch {
-                                    start {
-                                        timeOut = 1000L * 60L
-                                        with(
-                                            index = 0,
-                                            ads = Triple(600 * 100, 600 * 100, 600 * 100),
-                                            pdv = glueBoardPosition_ex.toDoubleOrNull() ?: 0.0
-                                        )
+                                if (homestart.value == false) {
+                                    scope.launch {
+                                        start {
+                                            timeOut = 1000L * 60L
+                                            with(
+                                                index = 0,
+                                                ads = Triple(600 * 100, 600 * 100, 600 * 100),
+                                                pdv = glueBoardPosition_ex.toDoubleOrNull() ?: 0.0
+                                            )
+                                        }
                                     }
                                 }
+
                             }) {
                             Text(text = "移    动", fontSize = 18.sp)
                         }
@@ -2635,6 +2842,12 @@ fun SettingLits(
                             label = { Text(text = "废液槽位置") },
                             onValueChange = {
                                 wastePosition_ex = it
+                                val temp = wastePosition_ex.toDoubleOrNull() ?: 0.0
+                                if (temp < 0) {
+                                    wastePosition_ex = "0"
+                                } else if (temp > 30) {
+                                    wastePosition_ex = "30"
+                                }
                             },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number,
@@ -2653,15 +2866,19 @@ fun SettingLits(
                             ),
                             shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                             onClick = {
-                                scope.launch {
-                                    start {
-                                        timeOut = 1000L * 60L
-                                        with(
-                                            index = 0,
-                                            ads = Triple(600 * 100, 600 * 100, 600 * 100),
-                                            pdv = wastePosition_ex.toDoubleOrNull() ?: 0.0
-                                        )
+
+                                if (homestart.value == false) {
+                                    scope.launch {
+                                        start {
+                                            timeOut = 1000L * 60L
+                                            with(
+                                                index = 0,
+                                                ads = Triple(600 * 100, 600 * 100, 600 * 100),
+                                                pdv = wastePosition_ex.toDoubleOrNull() ?: 0.0
+                                            )
+                                        }
                                     }
+
                                 }
 
                             }) {
@@ -2695,7 +2912,8 @@ fun SettingLits(
 
 
             }, confirmButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
+                  Button(
+                modifier = Modifier.width(100.dp),colors = ButtonDefaults.buttonColors(
                     containerColor = Color(rgb(0, 105, 52))
                 ), onClick = {
                     setting.wastePosition = wastePosition_ex.toDoubleOrNull() ?: 0.0
@@ -2706,7 +2924,8 @@ fun SettingLits(
                     Text(text = "保存")
                 }
             }, dismissButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
+                  Button(
+                modifier = Modifier.width(100.dp),colors = ButtonDefaults.buttonColors(
                     containerColor = Color(rgb(0, 105, 52))
                 ), onClick = { positionDialog.value = false }) {
                     Text(text = "取消")
@@ -2731,6 +2950,20 @@ fun debug(
         modifier = Modifier.fillMaxSize()
     ) {
         debugMode(uiEvent, proEntities, slEntities, job, uiFlags)
+    }
+}
+
+@Composable
+fun sportsLog(
+    uiEvent: (SettingIntent) -> Unit,
+    sportsLogEntitiesDis: LazyPagingItems<SportsLog>,
+    entitiesListDis: List<SportsLog>,
+    entitiesList: List<SportsLog>,
+) {
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        sportsLogMode(uiEvent, sportsLogEntitiesDis,entitiesListDis,entitiesList)
     }
 }
 

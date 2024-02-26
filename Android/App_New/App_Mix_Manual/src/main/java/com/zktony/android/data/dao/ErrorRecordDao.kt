@@ -43,4 +43,5 @@ abstract class ErrorRecordDao : BaseDao<ErrorRecord> {
         """
     )
     abstract suspend fun deleteById(id: Long)
+
 }

@@ -2,12 +2,15 @@ package com.zktony.android.ui
 
 import android.graphics.Color.rgb
 import android.util.Log
+import android.view.View.OnLongClickListener
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -77,6 +80,7 @@ import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.ui.utils.line
 import com.zktony.android.ui.utils.toList
 import com.zktony.android.utils.AppStateUtils
+import com.zktony.android.utils.AppStateUtils.hpd
 import com.zktony.android.utils.ApplicationUtils
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.SerialPortUtils
@@ -134,7 +138,7 @@ fun DebugModeRoute(viewModel: SettingViewModel) {
 }
 
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun debugMode(
     uiEvent: (SettingIntent) -> Unit,
@@ -153,7 +157,6 @@ fun debugMode(
 
     val context = LocalContext.current
 
-    Log.d("debug", "uiFlags====$uiFlags")
 
     /**
      * 制胶速度，根据这个速度转换其他泵的速度
@@ -257,12 +260,6 @@ fun debugMode(
 
 
     /**
-     * 声音
-     */
-    var sound by remember { mutableStateOf(false) }
-
-
-    /**
      * 手动控制
      */
     var soundControl by rememberDataSaverState(key = Constants.NAVIGATION, default = false)
@@ -316,6 +313,12 @@ fun debugMode(
 
     var rinseNum by remember { mutableStateOf(0) }
     //===============低浓度弹窗==============================
+
+    /**
+     * 一键清除的弹窗
+     */
+    val clearAllDialog = remember { mutableStateOf(false) }
+
 
     if (uiFlags is UiFlags.Objects && uiFlags.objects == 4) {
         uiEvent(SettingIntent.Start(1))
@@ -506,7 +509,7 @@ fun debugMode(
                             ),
                             shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                             onClick = {
-
+                                clearAllDialog.value = true
                             }) {
                             Text(text = "一键清除", fontSize = 18.sp)
                         }
@@ -582,29 +585,6 @@ fun debugMode(
                             Text(text = "运    行", fontSize = 18.sp)
                         }
 
-                        Button(modifier = Modifier
-                            .padding(start = 20.dp)
-                            .width(100.dp)
-                            .height(50.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(rgb(0, 105, 52))
-                            ),
-                            shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
-                            onClick = {
-                                scope.launch {
-                                    SerialPortUtils.start {
-                                        timeOut = 1000L * 30
-                                        with(
-                                            index = 2,
-                                            pdv = -32000L,
-                                            ads = Triple(600 * 100, 600 * 100, higeSpeed),
-                                        )
-                                    }
-                                }
-                            }) {
-                            Text(text = "反    向", fontSize = 18.sp)
-                        }
-
 
                     }
 
@@ -656,30 +636,6 @@ fun debugMode(
                             }) {
                             Text(text = "运    行", fontSize = 18.sp)
                         }
-
-                        Button(modifier = Modifier
-                            .padding(start = 20.dp)
-                            .width(100.dp)
-                            .height(50.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(rgb(0, 105, 52))
-                            ),
-                            shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
-                            onClick = {
-                                scope.launch {
-                                    SerialPortUtils.start {
-                                        timeOut = 1000L * 30
-                                        with(
-                                            index = 3,
-                                            pdv = -32000L,
-                                            ads = Triple(600 * 100, 600 * 100, lowSpeed),
-                                        )
-                                    }
-                                }
-                            }) {
-                            Text(text = "反    向", fontSize = 18.sp)
-                        }
-
 
                     }
 
@@ -733,32 +689,6 @@ fun debugMode(
                             }) {
                             Text(text = "运    行", fontSize = 18.sp)
                         }
-
-                        Button(modifier = Modifier
-                            .padding(start = 20.dp)
-                            .width(100.dp)
-                            .height(50.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(rgb(0, 105, 52))
-                            ),
-                            shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
-                            onClick = {
-                                scope.launch {
-                                    SerialPortUtils.start {
-                                        timeOut = 1000L * 30
-                                        with(
-                                            index = 4,
-                                            pdv = -32000L,
-                                            ads = Triple(
-                                                600 * 100, 600 * 100, rinseSpeed.value
-                                            ),
-                                        )
-                                    }
-                                }
-                            }) {
-                            Text(text = "反    向", fontSize = 18.sp)
-                        }
-
 
                     }
 
@@ -1035,9 +965,9 @@ fun debugMode(
                                     if (setting.wastePosition < 0) {
                                         setting.wastePosition = 0.0
                                         wastePosition_ex = "0"
-                                    } else if (setting.wastePosition > 32) {
-                                        setting.wastePosition = 32.0
-                                        wastePosition_ex = "32"
+                                    } else if (setting.wastePosition > 30) {
+                                        setting.wastePosition = 30.0
+                                        wastePosition_ex = "30"
                                     }
                                     uiEvent(SettingIntent.UpdateSet(setting))
                                 },
@@ -1065,9 +995,9 @@ fun debugMode(
                                             with(
                                                 index = 0,
                                                 ads = Triple(
-                                                    xSpeed.value,
-                                                    xSpeed.value,
-                                                    xSpeed.value
+                                                    xSpeed.value * 20,
+                                                    xSpeed.value * 20,
+                                                    xSpeed.value * 20
                                                 ),
                                                 pdv = setting.wastePosition
                                             )
@@ -1096,9 +1026,9 @@ fun debugMode(
                                     if (setting.glueBoardPosition < 0) {
                                         setting.glueBoardPosition = 0.0
                                         glueBoardPosition_ex = "0"
-                                    } else if (setting.glueBoardPosition > 32) {
-                                        setting.glueBoardPosition = 32.0
-                                        glueBoardPosition_ex = "32"
+                                    } else if (setting.glueBoardPosition > 30) {
+                                        setting.glueBoardPosition = 30.0
+                                        glueBoardPosition_ex = "30"
                                     }
                                     uiEvent(SettingIntent.UpdateSet(setting))
                                 },
@@ -1126,9 +1056,9 @@ fun debugMode(
                                             with(
                                                 index = 0,
                                                 ads = Triple(
-                                                    xSpeed.value,
-                                                    xSpeed.value,
-                                                    xSpeed.value
+                                                    xSpeed.value * 20,
+                                                    xSpeed.value * 20,
+                                                    xSpeed.value * 20
                                                 ),
                                                 pdv = setting.glueBoardPosition
                                             )
@@ -1198,7 +1128,7 @@ fun debugMode(
 
                             Text(
                                 modifier = Modifier.padding(top = 10.dp, start = 5.dp),
-                                text = "光耦1"
+                                text = "X轴左"
                             )
 
                             Button(modifier = Modifier
@@ -1210,6 +1140,14 @@ fun debugMode(
                                 ),
                                 shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                 onClick = {
+                                    Optocoupler1 = false
+                                    scope.launch {
+                                        SerialPortUtils.gpio(0)
+                                        delay(500L)
+                                        if (SerialPortUtils.getGpio(0)) {
+                                            Optocoupler1 = true
+                                        }
+                                    }
 
                                 }) {
                                 Text(text = "检    测", fontSize = 18.sp)
@@ -1227,7 +1165,7 @@ fun debugMode(
 
                             Text(
                                 modifier = Modifier.padding(top = 10.dp, start = 5.dp),
-                                text = "光耦2"
+                                text = "X轴右"
                             )
 
                             Button(modifier = Modifier
@@ -1239,7 +1177,14 @@ fun debugMode(
                                 ),
                                 shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                 onClick = {
-
+                                    Optocoupler2 = false
+                                    scope.launch {
+                                        SerialPortUtils.gpio(1)
+                                        delay(500L)
+                                        if (SerialPortUtils.getGpio(1)) {
+                                            Optocoupler2 = true
+                                        }
+                                    }
                                 }) {
                                 Text(text = "检    测", fontSize = 18.sp)
                             }
@@ -1256,7 +1201,7 @@ fun debugMode(
 
                             Text(
                                 modifier = Modifier.padding(top = 10.dp, start = 5.dp),
-                                text = "光耦3"
+                                text = "柱塞泵"
                             )
 
                             Button(modifier = Modifier
@@ -1268,7 +1213,14 @@ fun debugMode(
                                 ),
                                 shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                 onClick = {
-
+                                    Optocoupler3 = false
+                                    scope.launch {
+                                        SerialPortUtils.gpio(2)
+                                        delay(500L)
+                                        if (SerialPortUtils.getGpio(2)) {
+                                            Optocoupler3 = true
+                                        }
+                                    }
                                 }) {
                                 Text(text = "检    测", fontSize = 18.sp)
                             }
@@ -1285,7 +1237,7 @@ fun debugMode(
 
                             Text(
                                 modifier = Modifier.padding(top = 10.dp, start = 5.dp),
-                                text = "光耦4"
+                                text = "制胶架"
                             )
 
                             Button(modifier = Modifier
@@ -1297,7 +1249,19 @@ fun debugMode(
                                 ),
                                 shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                 onClick = {
+                                    Optocoupler4 = false
+                                    scope.launch {
+                                        while (true) {
+                                            SerialPortUtils.gpio(3)
+                                            delay(500L)
+                                            println("制胶架光耦状态===${SerialPortUtils.getGpio(3)}")
+                                            if (SerialPortUtils.getGpio(3)) {
+                                                Optocoupler4 = true
+                                                break
+                                            }
+                                        }
 
+                                    }
                                 }) {
                                 Text(text = "检    测", fontSize = 18.sp)
                             }
@@ -1348,6 +1312,42 @@ fun debugMode(
                                 ),
                                 shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                 onClick = {
+                                    var state = 0
+                                    statusLight = false
+                                    hpd[11] = false
+                                    hpd[12] = false
+                                    hpd[13] = false
+                                    scope.launch {
+                                        delay(100)
+                                        lightRed()
+                                        delay(100)
+                                        if (hpd[11] == true) {
+                                            state = 1
+                                        }
+                                        delay(100)
+                                        lightYellow()
+                                        delay(100)
+                                        if (hpd[12] == true) {
+                                            state = 2
+                                        }
+                                        delay(100)
+                                        lightGreed()
+                                        delay(100)
+                                        if (hpd[13] == true) {
+                                            state = 3
+                                        }
+
+                                        if (state != 3) {
+                                            Toast.makeText(
+                                                context,
+                                                "灯光检测异常",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else {
+                                            statusLight = true
+                                        }
+
+                                    }
 
                                 }) {
                                 Text(text = "检    测", fontSize = 18.sp)
@@ -1515,31 +1515,8 @@ fun debugMode(
                                 text = "声音"
                             )
 
-                            Button(modifier = Modifier
-                                .padding(start = 20.dp)
-                                .width(100.dp)
-                                .height(50.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(rgb(0, 105, 52))
-                                ),
-                                shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
-                                onClick = {
-
-                                }) {
-                                Text(text = "检    测", fontSize = 18.sp)
-                            }
-
-                            Checkbox(checked = sound, enabled = false, onCheckedChange = {
-                                sound = it
-                            })
-                        }
-
-                        Row(
-                            modifier = Modifier.padding(top = 10.dp, start = 20.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
                             Text(
-                                modifier = Modifier.padding(top = 10.dp, start = 5.dp),
+                                modifier = Modifier.padding(top = 10.dp, start = 20.dp),
                                 text = "手动控制"
                             )
                             Switch(
@@ -1553,6 +1530,7 @@ fun debugMode(
                                 onCheckedChange = {
                                     soundControl = it
                                 })
+
                         }
 
                         Row(
@@ -1575,6 +1553,11 @@ fun debugMode(
                                         selected = it == soundsThickness.value,
                                         onClick = {
                                             soundsThickness.value = it
+                                            if (soundsThickness.value == "蜂鸣") {
+                                                uiEvent(SettingIntent.Sound(1))
+                                            } else if (soundsThickness.value == "语音") {
+                                                uiEvent(SettingIntent.Sound(2))
+                                            }
                                         })
                                     Text(text = it)
                                 }
@@ -1598,6 +1581,33 @@ fun debugMode(
 
     }
 
+    //一键清除弹窗
+    if (clearAllDialog.value) {
+        AlertDialog(onDismissRequest = { }, title = {}, text = {
+            Text(fontSize = 18.sp, text = "是否清除全部数据?")
+        }, confirmButton = {
+            Button(
+                modifier = Modifier.width(100.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(rgb(0, 105, 52))
+                ), onClick = {
+                    uiEvent(SettingIntent.ClearAll)
+                    clearAllDialog.value = false
+                }) {
+                Text(text = "确     定")
+            }
+        }, dismissButton = {
+            Button(
+                modifier = Modifier.width(100.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(rgb(0, 105, 52))
+                ), onClick = {
+                    clearAllDialog.value = false
+                }) {
+                Text(text = "取     消")
+            }
+        })
+    }
 
     //制胶弹窗
     if (glueDialog.value) {
@@ -1605,18 +1615,30 @@ fun debugMode(
 
             Column {
 
-                Row {
-                    Text(text = "请输入制胶数量:")
+                Row(
+                    modifier = Modifier.padding(top = 20.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        fontSize = 18.sp,
+                        text = "请输入制胶数量:"
+                    )
 
                     OutlinedTextField(
-                        modifier = Modifier.width(100.dp),
+                        modifier = Modifier
+                            .width(200.dp)
+                            .padding(start = 10.dp),
                         value = glueNum_ex,
-                        label = { Text(text = "不输入默认持续运行") },
+                        label = { Text(fontSize = 13.sp, text = "不输入默认持续运行") },
                         onValueChange = {
                             glueNum_ex = it
                             glueNum.value = glueNum_ex.toIntOrNull() ?: 1
                             if (glueNum.value < 0) {
                                 glueNum.value = 0
+                                glueNum_ex = "0"
+                            } else if (glueNum.value > 100) {
+                                glueNum.value = 100
+                                glueNum_ex = "100"
                             }
                         },
                         keyboardOptions = KeyboardOptions(
@@ -1635,11 +1657,13 @@ fun debugMode(
                 ) {
 
                     Text(
-                        modifier = Modifier.padding(top = 10.dp, start = 5.dp), text = "是否加液:"
+                        modifier = Modifier.padding(top = 10.dp, start = 5.dp),
+                        fontSize = 18.sp,
+                        text = "是否加液:"
                     )
 
                     liquid.forEach {
-                        Row {
+                        Row(modifier = Modifier.padding(top = 20.dp)) {
                             RadioButton(
                                 colors = RadioButtonDefaults.colors(
                                     Color(
@@ -1653,7 +1677,7 @@ fun debugMode(
                                 selected = it == liquidThickness.value, onClick = {
                                     liquidThickness.value = it
                                 })
-                            Text(text = it)
+                            Text(fontSize = 13.sp, text = it)
                         }
 
                         Spacer(modifier = Modifier.width(20.dp))
@@ -1665,7 +1689,9 @@ fun debugMode(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        modifier = Modifier.padding(top = 10.dp, start = 5.dp), text = "程序名称:"
+                        modifier = Modifier.padding(top = 10.dp, start = 5.dp),
+                        fontSize = 18.sp,
+                        text = "程序名称:"
                     )
                     Text(
                         modifier = Modifier
@@ -1674,7 +1700,9 @@ fun debugMode(
                                 if (proEntities.isNotEmpty()) {
                                     downMenu = true
                                 }
-                            }, text = if (selectIndex == "") "请选择程序" else selectIndex
+                            },
+                        fontSize = 13.sp,
+                        text = if (selectIndex == "") "请选择程序" else selectIndex
                     )
 
 
@@ -1701,29 +1729,33 @@ fun debugMode(
 
 
         }, confirmButton = {
-            TextButton(colors = ButtonDefaults.buttonColors(
-                containerColor = Color(rgb(0, 105, 52))
-            ), onClick = {
-                if (selectIndex == "" || speed.value == 0) {
-                    Toast.makeText(
-                        context,
-                        "请选择制胶程序或制胶速度不能等于0！",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                    uiEvent(SettingIntent.Start(0))
-                }
-            }) {
-                Text(text = "开始")
+            Button(
+                modifier = Modifier.width(100.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(rgb(0, 105, 52))
+                ), onClick = {
+                    if (selectIndex == "" || speed.value == 0) {
+                        Toast.makeText(
+                            context,
+                            "请选择制胶程序或制胶速度不能等于0！",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        uiEvent(SettingIntent.Start(0))
+                    }
+                }) {
+                Text(text = "开     始")
             }
         }, dismissButton = {
-            TextButton(colors = ButtonDefaults.buttonColors(
-                containerColor = Color(rgb(0, 105, 52))
-            ), onClick = {
-                uiEvent(SettingIntent.Stop)
-                glueDialog.value = false
-            }) {
-                Text(text = "停止")
+            Button(
+                modifier = Modifier.width(100.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(rgb(0, 105, 52))
+                ), onClick = {
+                    uiEvent(SettingIntent.Stop)
+                    glueDialog.value = false
+                }) {
+                Text(text = "停     止")
             }
         })
     }
@@ -1732,12 +1764,18 @@ fun debugMode(
     if (xDialog.value) {
         AlertDialog(onDismissRequest = { xDialog.value = false }, title = {}, text = {
             Row {
-                Text(text = "请输入制胶数量:")
+                Text(
+                    fontSize = 18.sp, text = "请输入制胶数量:"
+                )
 
                 OutlinedTextField(
-                    modifier = Modifier.width(100.dp),
+                    modifier = Modifier.width(200.dp),
                     value = xNum.toString(),
-                    label = { Text(text = "不输入默认运行1次") },
+                    label = {
+                        Text(
+                            fontSize = 13.sp, text = "不输入默认运行1次"
+                        )
+                    },
                     onValueChange = {
                         xNum = it.toIntOrNull() ?: 1
                         if (xNum < 0) {
@@ -1756,7 +1794,8 @@ fun debugMode(
 
 
         }, confirmButton = {
-            TextButton(
+            Button(
+                modifier = Modifier.width(100.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(rgb(0, 105, 52))
                 ),
@@ -1788,18 +1827,20 @@ fun debugMode(
 
 
                 }) {
-                Text(text = "开始")
+                Text(text = "开     始")
             }
         }, dismissButton = {
-            TextButton(colors = ButtonDefaults.buttonColors(
-                containerColor = Color(rgb(0, 105, 52))
-            ), onClick = {
-                scope.launch {
-                    SerialPortUtils.stop(0, 1, 2, 3, 4)
-                    xDialog.value = false
-                }
-            }) {
-                Text(text = "停止")
+            Button(
+                modifier = Modifier.width(100.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(rgb(0, 105, 52))
+                ), onClick = {
+                    scope.launch {
+                        SerialPortUtils.stop(0, 1, 2, 3, 4)
+                        xDialog.value = false
+                    }
+                }) {
+                Text(text = "停     止")
             }
         })
     }
@@ -1812,15 +1853,17 @@ fun debugMode(
                 highDialog.value = false
             }
         }, title = {}, text = {
-            Row {
-                Text(text = "请输入运行步数:")
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(fontSize = 18.sp, text = "请输入运行步数:")
 
                 OutlinedTextField(
-                    modifier = Modifier.width(100.dp),
+                    modifier = Modifier.width(200.dp),
                     value = highNum.toString(),
 
 
-                    label = { Text(text = "不输入默认持续运行") },
+                    label = { Text(fontSize = 13.sp, text = "不输入默认持续运行") },
                     onValueChange = {
                         highNum = it.toIntOrNull() ?: 0
                         if (highNum < 0) {
@@ -1839,46 +1882,58 @@ fun debugMode(
 
 
         }, confirmButton = {
-            TextButton(colors = ButtonDefaults.buttonColors(
-                containerColor = Color(rgb(0, 105, 52))
-            ), onClick = {
-                if (highNum == 0) {
-                    scope.launch {
-                        SerialPortUtils.start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 2,
-                                pdv = 3200L * 1000,
-                                ads = Triple(600 * 100, 600 * 100, higeSpeed * 100),
-                            )
+            Button(
+                modifier = Modifier.width(100.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(rgb(0, 105, 52))
+                ), onClick = {
+                    if (highNum == 0) {
+                        scope.launch {
+                            SerialPortUtils.start {
+                                timeOut = 1000L * 30
+                                with(
+                                    index = 2,
+                                    pdv = 3200L * 1000,
+                                    ads = Triple(
+                                        higeSpeed * 13,
+                                        higeSpeed * 1193,
+                                        higeSpeed * 1193
+                                    ),
+                                )
+                            }
+                        }
+                    } else {
+                        scope.launch {
+                            SerialPortUtils.start {
+                                timeOut = 1000L * 30
+                                with(
+                                    index = 2,
+                                    pdv = highNum,
+                                    ads = Triple(
+                                        higeSpeed * 13,
+                                        higeSpeed * 1193,
+                                        higeSpeed * 1193
+                                    ),
+                                )
+                            }
                         }
                     }
-                } else {
-                    scope.launch {
-                        SerialPortUtils.start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 2,
-                                pdv = highNum,
-                                ads = Triple(600 * 100, 600 * 100, higeSpeed * 100),
-                            )
-                        }
-                    }
-                }
 
-            }) {
-                Text(text = "开始")
+                }) {
+                Text(text = "开     始")
             }
         }, dismissButton = {
-            TextButton(colors = ButtonDefaults.buttonColors(
-                containerColor = Color(rgb(0, 105, 52))
-            ), onClick = {
-                scope.launch {
-                    SerialPortUtils.stop(0, 1, 2, 3, 4)
-                    highDialog.value = false
-                }
-            }) {
-                Text(text = "停止")
+            Button(
+                modifier = Modifier.width(100.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(rgb(0, 105, 52))
+                ), onClick = {
+                    scope.launch {
+                        SerialPortUtils.stop(0, 1, 2, 3, 4)
+                        highDialog.value = false
+                    }
+                }) {
+                Text(text = "停     止")
             }
         })
     }
@@ -1892,12 +1947,12 @@ fun debugMode(
             }
         }, title = {}, text = {
             Row {
-                Text(text = "请输入运行步数:")
+                Text(fontSize = 18.sp, text = "请输入运行步数:")
 
                 OutlinedTextField(
-                    modifier = Modifier.width(100.dp),
+                    modifier = Modifier.width(200.dp),
                     value = lowNum.toString(),
-                    label = { Text(text = "不输入默认持续运行") },
+                    label = { Text(fontSize = 13.sp, text = "不输入默认持续运行") },
                     onValueChange = {
                         lowNum = it.toIntOrNull() ?: 0
                         if (lowNum < 0) {
@@ -1916,46 +1971,48 @@ fun debugMode(
 
 
         }, confirmButton = {
-            TextButton(colors = ButtonDefaults.buttonColors(
-                containerColor = Color(rgb(0, 105, 52))
-            ), onClick = {
-                if (lowNum == 0) {
-                    scope.launch {
-                        SerialPortUtils.start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 3,
-                                pdv = 3200L * 1000,
-                                ads = Triple(600 * 100, 600 * 100, lowSpeed * 100),
-                            )
+            Button(
+                modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(rgb(0, 105, 52))
+                ), onClick = {
+                    if (lowNum == 0) {
+                        scope.launch {
+                            SerialPortUtils.start {
+                                timeOut = 1000L * 30
+                                with(
+                                    index = 3,
+                                    pdv = 3200L * 1000,
+                                    ads = Triple(lowSpeed * 13, lowSpeed * 1193, lowSpeed * 1193),
+                                )
+                            }
+                        }
+                    } else {
+                        scope.launch {
+                            SerialPortUtils.start {
+                                timeOut = 1000L * 30
+                                with(
+                                    index = 3,
+                                    pdv = lowNum,
+                                    ads = Triple(lowSpeed * 13, lowSpeed * 1193, lowSpeed * 1193),
+                                )
+                            }
                         }
                     }
-                } else {
-                    scope.launch {
-                        SerialPortUtils.start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 3,
-                                pdv = lowNum,
-                                ads = Triple(600 * 100, 600 * 100, lowSpeed * 100),
-                            )
-                        }
-                    }
-                }
 
-            }) {
-                Text(text = "开始")
+                }) {
+                Text(text = "开     始")
             }
         }, dismissButton = {
-            TextButton(colors = ButtonDefaults.buttonColors(
-                containerColor = Color(rgb(0, 105, 52))
-            ), onClick = {
-                scope.launch {
-                    SerialPortUtils.stop(0, 1, 2, 3, 4)
-                    lowDialog.value = false
-                }
-            }) {
-                Text(text = "停止")
+            Button(
+                modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(rgb(0, 105, 52))
+                ), onClick = {
+                    scope.launch {
+                        SerialPortUtils.stop(0, 1, 2, 3, 4)
+                        lowDialog.value = false
+                    }
+                }) {
+                Text(text = "停     止")
             }
         })
     }
@@ -1969,12 +2026,12 @@ fun debugMode(
             }
         }, title = {}, text = {
             Row {
-                Text(text = "请输入运行步数:")
+                Text(fontSize = 18.sp, text = "请输入运行步数:")
 
                 OutlinedTextField(
-                    modifier = Modifier.width(100.dp),
+                    modifier = Modifier.width(200.dp),
                     value = rinseNum.toString(),
-                    label = { Text(text = "不输入默认持续运行") },
+                    label = { Text(fontSize = 13.sp, text = "不输入默认持续运行") },
                     onValueChange = {
                         rinseNum = it.toIntOrNull() ?: 0
                         if (rinseNum < 0) {
@@ -1993,46 +2050,48 @@ fun debugMode(
 
 
         }, confirmButton = {
-            TextButton(colors = ButtonDefaults.buttonColors(
-                containerColor = Color(rgb(0, 105, 52))
-            ), onClick = {
-                if (rinseNum == 0) {
-                    scope.launch {
-                        SerialPortUtils.start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 4,
-                                pdv = 3200L * 1000,
-                                ads = Triple(600 * 100, 600 * 100, rinseSpeed.value * 100),
-                            )
+            Button(
+                modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(rgb(0, 105, 52))
+                ), onClick = {
+                    if (rinseNum == 0) {
+                        scope.launch {
+                            SerialPortUtils.start {
+                                timeOut = 1000L * 30
+                                with(
+                                    index = 4,
+                                    pdv = 3200L * 1000,
+                                    ads = Triple(600 * 100, 600 * 100, rinseSpeed.value * 100),
+                                )
+                            }
+                        }
+                    } else {
+                        scope.launch {
+                            SerialPortUtils.start {
+                                timeOut = 1000L * 30
+                                with(
+                                    index = 4,
+                                    pdv = rinseNum,
+                                    ads = Triple(600 * 100, 600 * 100, rinseSpeed.value * 100),
+                                )
+                            }
                         }
                     }
-                } else {
-                    scope.launch {
-                        SerialPortUtils.start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 4,
-                                pdv = rinseNum,
-                                ads = Triple(600 * 100, 600 * 100, rinseSpeed.value * 100),
-                            )
-                        }
-                    }
-                }
 
-            }) {
-                Text(text = "开始")
+                }) {
+                Text(text = "开     始")
             }
         }, dismissButton = {
-            TextButton(colors = ButtonDefaults.buttonColors(
-                containerColor = Color(rgb(0, 105, 52))
-            ), onClick = {
-                scope.launch {
-                    SerialPortUtils.stop(0, 1, 2, 3, 4)
-                    rinseDialog.value = false
-                }
-            }) {
-                Text(text = "停止")
+            Button(
+                modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(rgb(0, 105, 52))
+                ), onClick = {
+                    scope.launch {
+                        SerialPortUtils.stop(0, 1, 2, 3, 4)
+                        rinseDialog.value = false
+                    }
+                }) {
+                Text(text = "停     止")
             }
         })
     }

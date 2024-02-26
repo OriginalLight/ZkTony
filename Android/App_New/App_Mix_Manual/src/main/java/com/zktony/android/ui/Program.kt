@@ -76,6 +76,7 @@ import com.zktony.android.utils.extra.dateFormat
 import com.zktony.android.utils.extra.format
 import kotlinx.coroutines.launch
 import java.io.File
+import java.io.IOException
 import java.lang.reflect.Method
 import java.util.regex.Pattern
 
@@ -295,7 +296,7 @@ fun ProgramList(
             ) {
                 Button(
                     modifier = Modifier
-                        .padding(start = 10.dp)
+                        .padding(start = 25.dp)
                         .width(90.dp)
                         .height(50.dp),
                     colors = ButtonDefaults.buttonColors(
@@ -394,24 +395,35 @@ fun ProgramList(
                     onClick = {
                         var path = getStoragePath(context, true)
                         if ("" != path) {
-                            if (entitiesList.size > 0) {
+                            if (entitiesList.isNotEmpty()) {
                                 val entity = entities[selectedIndex]
                                 if (entity != null) {
-                                    File(path + "/zktony/" + entity.displayText + ".txt").writeText(
-                                        "制胶程序:" + entity.displayText
-                                                + ",开始浓度:" + entity.startRange.toString()
-                                                + ",结束浓度:" + entity.endRange.toString()
-                                                + ",常用厚度:" + entity.thickness
-                                                + ",促凝剂体积:" + entity.coagulant.toString()
-                                                + ",胶液体积:" + entity.volume.toString()
-                                                + ",创建人:" + entity.founder
-                                                + ",日期：" + entity.createTime.dateFormat("yyyy-MM-dd")
-                                    )
-                                    Toast.makeText(
-                                        context,
-                                        "导出成功！",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                    try {
+
+
+                                        File(path + "/zktony/" + entity.displayText + ".txt").writeText(
+                                            "制胶程序:" + entity.displayText
+                                                    + ",开始浓度:" + entity.startRange.toString()
+                                                    + ",结束浓度:" + entity.endRange.toString()
+                                                    + ",常用厚度:" + entity.thickness
+                                                    + ",促凝剂体积:" + entity.coagulant.toString()
+                                                    + ",胶液体积:" + entity.volume.toString()
+                                                    + ",创建人:" + entity.founder
+                                                    + ",日期：" + entity.createTime.dateFormat("yyyy-MM-dd")
+                                        )
+                                        Toast.makeText(
+                                            context,
+                                            "导出成功！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } catch (e: IOException) {
+                                        Toast.makeText(
+                                            context,
+                                            "导出异常===${e.printStackTrace()}",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+
                                 }
                             }
                         } else {
@@ -456,7 +468,16 @@ fun ProgramList(
                                     cursorColor = Color(rgb(0, 105, 52))
                                 ),
                                 label = { Text(text = "制胶名称") },
-                                onValueChange = { displayText = it })
+                                onValueChange = {
+                                    displayText = it
+                                    if (displayText.length > 7) {
+                                        Toast.makeText(
+                                            context,
+                                            "名称长度不能过长!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                })
 
                         }
                     }
@@ -613,134 +634,137 @@ fun ProgramList(
 
 
             }, confirmButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = {
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = {
 
-                    if (open.value) {
-                        //打开
-                        val entity = entities[selectedIndex]
+                        if (open.value) {
+                            //打开
+                            val entity = entities[selectedIndex]
 
-                        var speChat =
-                            "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]"
+                            var speChat =
+                                "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]"
 
-                        var nameRepeat = false
+                            var nameRepeat = false
 
-                        entitiesList.forEach {
-                            if (displayText == it.displayText) {
-                                if (entity != null) {
-                                    if (entity.displayText != displayText) {
-                                        nameRepeat = true
+                            entitiesList.forEach {
+                                if (displayText == it.displayText) {
+                                    if (entity != null) {
+                                        if (entity.displayText != displayText) {
+                                            nameRepeat = true
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        if (nameRepeat) {
-                            Toast.makeText(
-                                context,
-                                "文件名不能重复！",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        } else {
-                            if (Pattern.compile(speChat).matcher(displayText).find()) {
+                            if (nameRepeat) {
                                 Toast.makeText(
                                     context,
-                                    "文件名不能包含特殊字符！",
+                                    "文件名不能重复！",
                                     Toast.LENGTH_SHORT
                                 ).show()
                             } else {
-                                if (startRange_ex.toInt() > endRange_ex.toInt()
-                                    || startRange_ex.toInt() < 0 || endRange_ex.toInt() < 0 || coagulant_ex.toInt() < 0 || volume_ex.toDouble() < 0
-                                ) {
+                                if (Pattern.compile(speChat).matcher(displayText).find()) {
                                     Toast.makeText(
                                         context,
-                                        "数据错误！",
+                                        "文件名不能包含特殊字符！",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 } else {
-                                    if (entity != null) {
-                                        entity.displayText = displayText
-                                        entity.startRange = startRange_ex.toInt()
-                                        entity.endRange = endRange_ex.toInt()
-                                        entity.thickness = thickness.value
-                                        entity.coagulant = coagulant_ex.toInt()
-                                        entity.volume = volume_ex.toDouble()
-                                        entity.founder = founder
-                                        dispatch(ProgramIntent.Update(entity))
+                                    if (startRange_ex.toInt() > endRange_ex.toInt()
+                                        || startRange_ex.toInt() < 3 || startRange_ex.toInt() > 30 || endRange_ex.toInt() < 3 || endRange_ex.toInt() > 30 || coagulant_ex.toInt() < 0 || volume_ex.toDouble() < 0
+                                        || coagulant_ex.toInt() > 800 || volume_ex.toDouble() > 20
+                                    ){
+                                        Toast.makeText(
+                                            context,
+                                            "数据错误！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        if (entity != null) {
+                                            entity.displayText = displayText
+                                            entity.startRange = startRange_ex.toInt()
+                                            entity.endRange = endRange_ex.toInt()
+                                            entity.thickness = thickness.value
+                                            entity.coagulant = coagulant_ex.toInt()
+                                            entity.volume = volume_ex.toDouble()
+                                            entity.founder = founder
+                                            dispatch(ProgramIntent.Update(entity))
+                                            showingDialog.value = false
+                                        }
+                                    }
+
+                                }
+                            }
+
+
+                        } else {
+                            //新建
+                            var speChat =
+                                "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]"
+
+                            var nameRepeat = false
+
+                            entitiesList.forEach {
+                                if (displayText == it.displayText) {
+                                    nameRepeat = true
+                                }
+                            }
+
+                            if (nameRepeat) {
+                                Toast.makeText(
+                                    context,
+                                    "文件名不能重复！",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                if (Pattern.compile(speChat).matcher(displayText).find()) {
+                                    Toast.makeText(
+                                        context,
+                                        "文件名不能包含特殊字符！",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+
+                                } else {
+                                    if (startRange_ex.toInt() > endRange_ex.toInt()
+                                        || startRange_ex.toInt() < 3 || startRange_ex.toInt() > 30 || endRange_ex.toInt() < 3 || endRange_ex.toInt() > 30 || coagulant_ex.toInt() < 0 || volume_ex.toDouble() < 0
+                                        || coagulant_ex.toInt() > 800 || volume_ex.toDouble() > 20
+                                    ) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据错误！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        dispatch(
+                                            ProgramIntent.Insert(
+                                                displayText,
+                                                startRange_ex.toInt(),
+                                                endRange_ex.toInt(),
+                                                thickness.value,
+                                                coagulant_ex.toInt(),
+                                                volume_ex.toDouble(),
+                                                founder
+                                            )
+                                        )
                                         showingDialog.value = false
                                     }
+
                                 }
 
                             }
                         }
 
 
-                    } else {
-                        //新建
-                        var speChat =
-                            "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]"
-
-                        var nameRepeat = false
-
-                        entitiesList.forEach {
-                            if (displayText == it.displayText) {
-                                nameRepeat = true
-                            }
-                        }
-
-                        if (nameRepeat) {
-                            Toast.makeText(
-                                context,
-                                "文件名不能重复！",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        } else {
-                            if (Pattern.compile(speChat).matcher(displayText).find()) {
-                                Toast.makeText(
-                                    context,
-                                    "文件名不能包含特殊字符！",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-
-                            } else {
-                                if (startRange_ex.toInt() > endRange_ex.toInt()
-                                    || startRange_ex.toInt() < 0 || endRange_ex.toInt() < 0 || coagulant_ex.toInt() < 0 || volume_ex.toDouble() < 0
-                                    || coagulant_ex.toInt() > 800 || volume_ex.toDouble() > 20
-                                ) {
-                                    Toast.makeText(
-                                        context,
-                                        "数据错误！",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                } else {
-                                    dispatch(
-                                        ProgramIntent.Insert(
-                                            displayText,
-                                            startRange_ex.toInt(),
-                                            endRange_ex.toInt(),
-                                            thickness.value,
-                                            coagulant_ex.toInt(),
-                                            volume_ex.toDouble(),
-                                            founder
-                                        )
-                                    )
-                                    showingDialog.value = false
-                                }
-
-                            }
-
-                        }
-                    }
-
-
-                }) {
+                    }) {
                     Text(text = "确认")
                 }
             }, dismissButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = { showingDialog.value = false }) {
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = { showingDialog.value = false }) {
                     Text(text = "取消")
                 }
             })
@@ -757,44 +781,46 @@ fun ProgramList(
             text = {
 
             }, confirmButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = {
-                    Log.d(
-                        "Test",
-                        "删除选中的selectedIndex===$selectedIndex"
-                    )
-                    if (entitiesList.size > 0) {
-                        val entity = entities[selectedIndex]
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = {
                         Log.d(
                             "Test",
-                            "删除选中的entity===$entity==="
+                            "删除选中的selectedIndex===$selectedIndex"
                         )
-                        if (entity != null) {
-                            if (programId.value == entity.id) {
-                                Toast.makeText(
-                                    context,
-                                    "已在制胶操作选中,不能删除！",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            } else {
-                                if (selectedIndex > 0) {
-                                    selectedIndex -= 1
+                        if (entitiesList.size > 0) {
+                            val entity = entities[selectedIndex]
+                            Log.d(
+                                "Test",
+                                "删除选中的entity===$entity==="
+                            )
+                            if (entity != null) {
+                                if (programId.value == entity.id) {
+                                    Toast.makeText(
+                                        context,
+                                        "已在制胶操作选中,不能删除！",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    if (selectedIndex > 0) {
+                                        selectedIndex -= 1
+                                    }
+                                    dispatch(ProgramIntent.Delete(entity.id))
+                                    deleteDialog.value = false
                                 }
-                                dispatch(ProgramIntent.Delete(entity.id))
-                                deleteDialog.value = false
+
                             }
 
                         }
-
-                    }
-                }) {
+                    }) {
                     Text(text = "确认")
                 }
             }, dismissButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = { deleteDialog.value = false }) {
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = { deleteDialog.value = false }) {
                     Text(text = "取消")
                 }
             })
@@ -808,99 +834,101 @@ fun ProgramList(
             text = {
                 Text(text = "导入格式为(制胶名称:test,开始浓度:20,结束浓度:40....)以此类推,一行是一个制胶程序！")
             }, confirmButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = {
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = {
 
-                    //获取usb地址
-                    var path = getStoragePath(context, true)
-                    println("path========" + path)
-                    if (!"".equals(path)) {
+                        //获取usb地址
+                        var path = getStoragePath(context, true)
+                        println("path========" + path)
+                        if (!"".equals(path)) {
 
-                        try {
-                            var textList = ArrayList<String>()
+                            try {
+                                var textList = ArrayList<String>()
 
-                            //读取文件内容
-                            val content = File(path + "/zktony/test.txt").readText()
-                            println("content========" + content)
-                            var contents = content.split(",")
-                            contents.forEach {
-                                val entityy = it.split(":").get(1)
-                                textList.add(entityy)
-                            }
-                            println("textList====" + textList)
-
-                            //新建
-                            var speChat =
-                                "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]"
-
-                            var nameRepeat = false
-
-                            entitiesList.forEach {
-                                if (textList.get(0) == it.displayText) {
-                                    nameRepeat = true
+                                //读取文件内容
+                                val content = File(path + "/zktony/test.txt").readText()
+                                println("content========" + content)
+                                var contents = content.split(",")
+                                contents.forEach {
+                                    val entityy = it.split(":").get(1)
+                                    textList.add(entityy)
                                 }
-                            }
+                                println("textList====" + textList)
 
-                            if (nameRepeat) {
-                                Toast.makeText(
-                                    context,
-                                    "文件名不能重复！",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            } else {
-                                if (Pattern.compile(speChat).matcher(textList.get(0)).find()) {
+                                //新建
+                                var speChat =
+                                    "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]"
+
+                                var nameRepeat = false
+
+                                entitiesList.forEach {
+                                    if (textList.get(0) == it.displayText) {
+                                        nameRepeat = true
+                                    }
+                                }
+
+                                if (nameRepeat) {
                                     Toast.makeText(
                                         context,
-                                        "文件名不能包含特殊字符！",
+                                        "文件名不能重复！",
                                         Toast.LENGTH_SHORT
                                     ).show()
-
                                 } else {
-                                    dispatch(
-                                        ProgramIntent.Insert(
-                                            textList.get(0),
-                                            textList.get(1).toInt(),
-                                            textList.get(2).toInt(),
-                                            textList.get(3),
-                                            textList.get(4).toInt(),
-                                            textList.get(5).toDouble(),
-                                            textList.get(6)
+                                    if (Pattern.compile(speChat).matcher(textList.get(0)).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "文件名不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+
+                                    } else {
+                                        dispatch(
+                                            ProgramIntent.Insert(
+                                                textList.get(0),
+                                                textList.get(1).toInt(),
+                                                textList.get(2).toInt(),
+                                                textList.get(3),
+                                                textList.get(4).toInt(),
+                                                textList.get(5).toDouble(),
+                                                textList.get(6)
+                                            )
                                         )
-                                    )
-                                    showingDialog.value = false
+                                        showingDialog.value = false
+                                    }
+
                                 }
 
+
+
+                                importDialog.value = false
+                            } catch (exception: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "数据有误！",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
 
 
-
-                            importDialog.value = false
-                        } catch (exception: Exception) {
+                        } else {
                             Toast.makeText(
                                 context,
-                                "数据有误！",
+                                "U盘不存在！",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
 
 
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "U盘不存在！",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-
-
-                }) {
+                    }) {
                     Text(text = "开始导入")
                 }
             }, dismissButton = {
-                TextButton(colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = { importDialog.value = false }) {
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = { importDialog.value = false }) {
                     Text(text = "取消")
                 }
             })

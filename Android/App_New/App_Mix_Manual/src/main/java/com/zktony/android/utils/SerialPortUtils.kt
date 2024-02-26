@@ -72,7 +72,6 @@ object SerialPortUtils {
 
         // rtu串口全局回调
         SerialStoreUtils.get("led")?.callbackHandler = { bytes ->
-            logD(tag = "led","灯光回复的数据====${bytes.toHexString()}")
             Protocol.verifyProtocol(bytes) { protocol ->
                 if (protocol.func == 0xFF.toByte()) {
                     when (protocol.data.readInt16LE()) {
@@ -82,27 +81,17 @@ object SerialPortUtils {
                         4 -> throw Exception("TX No Com")
                     }
                 } else {
-                    when (protocol.func) {
-                        0x01.toByte() -> {
-                            for (i in 0 until protocol.data.size / 2) {
-                                val index = protocol.data.readInt8(offset = i * 2)
-                                val status = protocol.data.readInt8(offset = i * 2 + 1)
-                                hpa[index] = status == 1
-                            }
+                    when (protocol.data[0]) {
+                        0x0B.toByte() -> {
+                            hpd[protocol.data[0].toInt()]=true
                         }
 
-                        0x02.toByte() -> {
-                            for (i in 0 until protocol.data.size / 2) {
-                                val index = protocol.data.readInt8(offset = i * 2)
-                                val status = protocol.data.readInt8(offset = i * 2 + 1)
-                                hpg[index] = status == 1
-                            }
+                        0x0C.toByte() -> {
+                            hpd[protocol.data[0].toInt()]=true
                         }
 
-                        0x03.toByte() -> {
-                            if (protocol.data[0] == 0x0B.toByte()) {
-                                hpd[0] = protocol.data[1].toLong()
-                            }
+                        0x0D.toByte() -> {
+                            hpd[protocol.data[0].toInt()]=true
                         }
 
                         else -> {}
