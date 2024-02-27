@@ -5,7 +5,7 @@ const useAppStore = defineStore('app', {
   state: (): AppState => ({
     device: 'desktop',
     usb: false,
-    door: false,
+    hatch: false,
     temperature: 0
   }),
 
@@ -35,8 +35,8 @@ const useAppStore = defineStore('app', {
     toggleUsb(usb: boolean) {
       this.usb = usb
     },
-    toggleDoor(door: boolean) {
-      this.door = door
+    toggleHatch(hatch: boolean) {
+      this.hatch = hatch
     },
     toggleTemperature(temperature: number) {
       this.temperature = temperature

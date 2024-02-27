@@ -38,6 +38,10 @@ const options = ref({
   frame: 1
 })
 
+// 是否初始化
+const isInit = ref(false)
+
+// 初始化
 const init = () => {
   preview.value = {
     id: 0,
@@ -76,6 +80,7 @@ export default function useHomeState() {
     thumbnail,
     selected,
     options,
+    isInit,
     init
   }
 }

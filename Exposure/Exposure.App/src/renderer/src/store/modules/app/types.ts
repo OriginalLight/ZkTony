@@ -1,7 +1,7 @@
 export interface AppState {
   device: string
   usb: boolean
-  door: boolean
+  hatch: boolean
   temperature: number
   [key: string]: unknown
 }

@@ -14,7 +14,7 @@ public class ErrorLog
     /// <summary>
     ///     错误的详细信息
     /// </summary>
-    public string Message { get; set; }
+    public string Message { get; set; } = string.Empty;
 
     /// <summary>
     ///     错误源
@@ -29,7 +29,7 @@ public class ErrorLog
     /// <summary>
     ///     错误类型
     /// </summary>
-    public string Type { get; set; }
+    public string Type { get; set; } = string.Empty;
 
     /// <summary>
     ///     错误发生的时间

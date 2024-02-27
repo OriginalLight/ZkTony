@@ -2,6 +2,6 @@
 
 public class SerialPortDto
 {
-    public string Port { get; set; }
-    public string Hex { get; set; }
+    public string Port { get; set; } = string.Empty;
+    public string Hex { get; set; } = string.Empty;
 }

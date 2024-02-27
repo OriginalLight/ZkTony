@@ -210,7 +210,7 @@ onMounted(async () => {
     bottom: 0;
     width: 100%;
     background-color: rgba(0, 0, 0, 1);
-    color: var(--color-bg-2);
+    color: rgba(255, 255, 255, 1);
     font-size: 10px;
     text-align: center;
     overflow: hidden;

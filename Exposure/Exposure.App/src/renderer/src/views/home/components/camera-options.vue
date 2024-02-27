@@ -56,7 +56,13 @@
       </a-card>
       <a-card v-if="switchIndex === '1'">
         <div class="card-div">
-          <a-radio-group v-model="options.quality" type="button" size="large" style="width: 100%">
+          <a-radio-group
+            v-model="options.quality"
+            type="button"
+            size="large"
+            style="width: 100%"
+            @change="handleQualityChange"
+          >
             <a-radio value="0" style="width: 100%; text-align: center">{{
               t('home.camera.options.3000.pixel')
             }}</a-radio>
@@ -125,11 +131,20 @@
       </a-card>
 
       <div style="display: flex; justify-content: space-between">
-        <a-button type="primary" size="large" style="width: 120px">
+        <a-button
+          type="primary"
+          size="large"
+          style="width: 120px"
+          :loading="loading.hatch"
+          :disabled="loading.hatch"
+          @click="handleHatch"
+        >
           <template #icon>
             <icon-expand />
           </template>
-          {{ t('home.camera.options.out') }}</a-button
+          {{
+            hatchStatus === 0 ? t('home.camera.options.in') : t('home.camera.options.out')
+          }}</a-button
         >
         <a-button
           type="primary"
@@ -179,10 +194,13 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Message } from '@arco-design/web-vue'
-import { init, preview, pixel, manual, auto, cancel, cache } from '@renderer/api/camera'
+import { init, preview, pixel, manual, auto, cancel, result } from '@renderer/api/camera'
+import { hatch } from '@renderer/api/machine'
 import useHomeState from '@renderer/states/home'
 
-const { options } = useHomeState()
+const { options, isInit } = useHomeState()
+
+const hatchStatus = ref(0)
 
 const emit = defineEmits(['shoot', 'preview'])
 
@@ -200,25 +218,45 @@ const progress = ref({
 
 // loading状态
 const loading = ref({
-  door: false,
+  hatch: false,
   preview: false
 })
+
+const handleQualityChange = async (value: unknown) => {
+  try {
+    await pixel({ index: Number(value) })
+  } catch (error) {
+    Message.error((error as Error).message)
+  }
+}
+
+const handleHatch = async () => {
+  loading.value.hatch = true
+  try {
+    await hatch({ code: hatchStatus.value === 0 ? 1 : 0 })
+    hatchStatus.value = hatchStatus.value === 0 ? 1 : 0
+  } catch (error) {
+    Message.error((error as Error).message)
+  } finally {
+    loading.value.hatch = false
+  }
+}
 
 // 拍摄
 const handleShoot = async () => {
   progress.value.visible = true
   progress.value.message = t('home.camera.options.shooting')
-  progress.value.time = getExposureTime() / 1000 + 1500
   try {
-    await pixel({ index: Number(options.value.quality) })
-    delay(100)
     if (options.value.mode === 'auto') {
+      progress.value.time = 5000
       const res = await auto()
       progress.value.time = res.data.exposure / 1000 + 1500
-      const seconds = res.data.exposure / 1000000
-      options.value.time.minute = Math.floor(seconds / 60)
-      options.value.time.second = Math.floor(seconds % 60)
+      const ms = res.data.exposure / 1000
+      options.value.time.minute = Math.floor(ms / 1000 / 60)
+      options.value.time.second = Math.floor((ms / 1000) % 60)
+      options.value.time.millisecond = Math.floor(ms % 1000)
     } else {
+      progress.value.time = getExposureTime() / 1000 + 1500
       await manual({
         exposure: getExposureTime(),
         frame: options.value.frame
@@ -234,8 +272,11 @@ const handleShoot = async () => {
 const handlePreview = async () => {
   try {
     loading.value.preview = true
-    const res = await preview()
-    emit('preview', res.data)
+    await preview()
+    // 延时500ms
+    await delay(500)
+    const res = await result()
+    emit('preview', res.data[0])
   } catch (error) {
     Message.error((error as Error).message)
   } finally {
@@ -268,7 +309,7 @@ const handleFinish = async () => {
   if (progress.value.visible) {
     progress.value.visible = false
     try {
-      const res = await cache()
+      const res = await result()
       if (res.data.length > 0) {
         emit('shoot', res.data)
       }
@@ -286,7 +327,10 @@ const delay = (ms: number) => {
 // 初始化
 onMounted(async () => {
   try {
-    await init()
+    if (!isInit.value) {
+      await init()
+      isInit.value = true
+    }
   } catch (error) {
     console.log(error)
   }

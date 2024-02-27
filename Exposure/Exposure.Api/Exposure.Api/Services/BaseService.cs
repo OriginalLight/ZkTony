@@ -44,7 +44,7 @@ public class BaseService<T> : IBaseService<T> where T : class, new()
         return await context.db.Updateable(list).ExecuteCommandAsync() > 0;
     }
 
-    public async Task<List<T>> GetAll(bool isOrderBy = false, Expression<Func<T, object>> orderBy = null,
+    public async Task<List<T>> GetAll(bool isOrderBy = false, Expression<Func<T, object>>? orderBy = null,
         OrderByType orderByType = OrderByType.Asc)
     {
         return await context.db.Queryable<T>().OrderByIF(isOrderBy, orderBy, orderByType).ToListAsync();

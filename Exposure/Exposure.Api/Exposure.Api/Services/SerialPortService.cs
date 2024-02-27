@@ -22,11 +22,7 @@ public class SerialPortService : ISerialPortService
     #endregion
 
     #region 初始化
-
-    /// <summary>
-    ///     初始化
-    /// </summary>
-    /// <exception cref="NotImplementedException"></exception>
+    
     public void Init()
     {
         // 读取配置文件
@@ -40,16 +36,21 @@ public class SerialPortService : ISerialPortService
     #endregion
 
     #region 获取所有可用串口
-
-    /// <summary>
-    ///     获取所有可用串口
-    /// </summary>
-    /// <returns></returns>
+    
     public string[] GetPorts()
     {
         return _serialPorts.Keys.ToArray();
     }
 
+    #endregion
+    
+    #region 获取串口
+    
+    public SerialPort? GetSerialPort(string alias)
+    {
+        return !_serialPorts.TryGetValue(alias, out var serialPort) ? null : serialPort;
+    }
+    
     #endregion
 
     #region 打开串口

@@ -12,12 +12,12 @@ public class OperLogOutDto
     /// <summary>
     ///     操作类型
     /// </summary>
-    public string Type { get; set; }
+    public string Type { get; set; } = string.Empty;
 
     /// <summary>
     ///     操作的详细描述
     /// </summary>
-    public string Description { get; set; }
+    public string Description { get; set; } = string.Empty;
 
     /// <summary>
     ///     操作发生的时间

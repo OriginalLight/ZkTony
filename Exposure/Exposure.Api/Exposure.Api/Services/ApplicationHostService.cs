@@ -12,6 +12,7 @@ public class ApplicationHostService : IHostedService
     private readonly ISerialPortService _serialPortService;
     private readonly IUsbService _usbService;
     private readonly IUserService _userService;
+    private readonly ICameraService _cameraService;
     private bool _isInitialized;
     
     #region 构造函数
@@ -20,6 +21,7 @@ public class ApplicationHostService : IHostedService
         IDbContext dbContext,
         IUserService userService,
         IUsbService usbService,
+        ICameraService cameraService,
         IAutoCleanService autoCleanService,
         ISerialPortService serialPortService
     )
@@ -27,6 +29,7 @@ public class ApplicationHostService : IHostedService
         _dbContext = dbContext;
         _usbService = usbService;
         _userService = userService;
+        _cameraService = cameraService;
         _autoCleanService = autoCleanService;
         _serialPortService = serialPortService;
     }
@@ -56,6 +59,7 @@ public class ApplicationHostService : IHostedService
     
     public async Task StopAsync(CancellationToken cancellationToken)
     {
+        _cameraService.Stop();
         await Task.CompletedTask;
     }
 

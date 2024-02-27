@@ -1,4 +1,6 @@
-﻿namespace Exposure.Api.Contracts.Services;
+﻿using System.IO.Ports;
+
+namespace Exposure.Api.Contracts.Services;
 
 public interface ISerialPortService
 {
@@ -12,6 +14,13 @@ public interface ISerialPortService
     /// </summary>
     /// <returns></returns>
     string[] GetPorts();
+    
+    /// <summary>
+    ///   获取串口
+    /// </summary>
+    /// <param name="alias"></param>
+    /// <returns></returns>
+    SerialPort? GetSerialPort(string alias);
 
     /// <summary>
     ///     打开串口

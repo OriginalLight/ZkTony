@@ -3,13 +3,12 @@ using Exposure.Api.Contracts.SqlSugar;
 using Exposure.Api.Core;
 using Exposure.Api.Services;
 using Microsoft.OpenApi.Models;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Loggers
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-builder.Logging.AddDebug();
+builder.Host.UseSerilog((_, config) => config.ReadFrom.Configuration(builder.Configuration));
 
 // Add services to the container.
 builder.Services.AddControllers().AddJsonOptions(options =>

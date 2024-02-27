@@ -16,17 +16,17 @@ public class Picture
     /// <summary>
     ///     图片名称
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>
     ///     图片路径
     /// </summary>
-    public string Path { get; set; }
+    public string Path { get; set; } = string.Empty;
     
     /// <summary>
     ///     缩略图
     /// </summary>
-    public string Thumbnail { get; set; }
+    public string Thumbnail { get; set; }  = string.Empty;
 
     /// <summary>
     ///     宽度

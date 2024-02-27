@@ -9,8 +9,8 @@
     <a-tooltip :content="$t('navigation.status.usb')">
       <usb size="24" :fill="status.usb" />
     </a-tooltip>
-    <a-tooltip :content="$t('navigation.status.door')">
-      <open-door size="24" :fill="status.door" />
+    <a-tooltip :content="$t('navigation.status.hatch')">
+      <open-door size="24" :fill="status.hatch" />
     </a-tooltip>
     <a-tooltip :content="$t('navigation.status.time')">
       <div style="font-size: 10px">{{ now }}</div>
@@ -55,7 +55,7 @@ const status = ref({
   // usb图标颜色
   usb: '#808080',
   // 舱门图标颜色
-  door: '#808080',
+  hatch: '#808080',
   // 温度
   temperature: '0°C'
 })
@@ -79,9 +79,9 @@ const timer = setInterval(async () => {
     const data = res.data
     status.value.usb = data.usb ? '#1890ff' : '#808080'
     status.value.temperature = data.temperature <= -100 ? '/' : `${data.temperature} °C`
-    status.value.door = data.door ? '#1890ff' : '#808080'
+    status.value.hatch = data.hatch ? '#1890ff' : '#808080'
     appStore.toggleUsb(data.usb)
-    appStore.toggleDoor(data.door)
+    appStore.toggleHatch(data.hatch)
     appStore.toggleTemperature(data.temperature)
   } catch (err) {
     console.log(err)

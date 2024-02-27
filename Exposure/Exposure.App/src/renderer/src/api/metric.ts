@@ -2,7 +2,7 @@ import axios from 'axios'
 
 export interface Status {
   usb: boolean
-  door: boolean
+  hatch: boolean
   temperature: number
 }
 

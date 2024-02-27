@@ -2,6 +2,6 @@
 
 public class PictureExportDto
 {
-    public object[] Ids { get; set; }
-    public string Format { get; set; }
+    public object[] Ids { get; set; } = Array.Empty<object>();
+    public string Format { get; set; } = string.Empty;
 }

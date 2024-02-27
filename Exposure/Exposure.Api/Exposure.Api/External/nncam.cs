@@ -1,9 +1,16 @@
-﻿using System.Runtime.ConstrainedExecution;
+﻿// 忽略所有警告
+#pragma warning disable 1591
+#pragma warning disable 8600
+#pragma warning disable 8601
+#pragma warning disable 8603
+#pragma warning disable 8618
+#pragma warning disable 8625
+#pragma warning disable SYSLIB0004
+
+using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 #if !(NETFX_CORE || NETCOREAPP || WINDOWS_UWP)
-using System.Security.Permissions;
-using System.Runtime.ConstrainedExecution;
 #endif
 
 /*

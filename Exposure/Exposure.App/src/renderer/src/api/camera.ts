@@ -19,7 +19,7 @@ export function init() {
 }
 
 export function preview() {
-  return axios.get<Picture>('/Camera/Preview')
+  return axios.get('/Camera/Preview')
 }
 
 // url传参index
@@ -39,6 +39,6 @@ export function cancel() {
   return axios.get('/Camera/Cancel')
 }
 
-export function cache() {
-  return axios.get<Picture[]>('/Camera/Cache')
+export function result() {
+  return axios.get<Picture[]>('/Camera/Result')
 }

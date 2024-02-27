@@ -7,30 +7,17 @@ namespace Exposure.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class DebugController : ControllerBase
+public class MachineController : ControllerBase
 {
     private readonly ISerialPortService _serialPort;
-    private readonly ICameraService _camera;
-    private readonly IUsbService _usb;
-
-    #region 构造函数
-
-    /// <inheritdoc />
-    public DebugController(IUsbService usb, ICameraService camera, ISerialPortService serialPort)
+    
+    public MachineController(ISerialPortService serialPort)
     {
-        _usb = usb;
-        _camera = camera;
         _serialPort = serialPort;
     }
-
-    #endregion
     
     #region 串口状态
-
-    /// <summary>
-    ///     串口状态
-    /// </summary>
-    /// <returns></returns>
+    
     [HttpGet]
     [Route("SerialPort")]
     public IActionResult SerialPortStatus()
@@ -41,11 +28,7 @@ public class DebugController : ControllerBase
     #endregion
     
     #region 串口发送
-
-    /// <summary>
-    ///     串口发送
-    /// </summary>
-    /// <returns></returns>
+    
     [HttpPost]
     [Route("SerialPort")]
     public IActionResult SerialPort([FromBody] SerialPortDto dto)
@@ -76,11 +59,7 @@ public class DebugController : ControllerBase
     #endregion
 
     #region 三色灯
-
-    /// <summary>
-    ///     三色灯
-    /// </summary>
-    /// <returns></returns>
+    
     [HttpGet]
     [Route("Led")]
     public IActionResult Led([FromQuery] int code)
@@ -117,4 +96,86 @@ public class DebugController : ControllerBase
     }
 
     #endregion
+
+
+    #region 舱门
+
+    [HttpGet]
+    [Route("Hatch")]
+    public async Task<ActionResult> Hatch([FromQuery] int code)
+    {
+        if (code == 1)
+        {
+            _serialPort.WritePort("Com2", DefaultProtocol.OpenHatch().ToBytes());
+            await Task.Delay(5000);
+            
+        }
+        else
+        {
+            _serialPort.WritePort("Com2", DefaultProtocol.CloseHatch().ToBytes());
+            await Task.Delay(5000);
+        }
+        return Ok();
+    }
+
+    #endregion
+
+    #region 灯光
+
+    [HttpGet]
+    [Route("Light")]
+    public ActionResult Light([FromQuery] int code)
+    {
+        if (code == 1)
+        {
+            _serialPort.WritePort("Com2", DefaultProtocol.OpenLight().ToBytes());
+        }
+        else
+        {
+            _serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
+        }
+        return Ok();
+    }
+
+    #endregion
+
+    #region 相机
+
+    [HttpGet]
+    [Route("Camera")]
+    public ActionResult Camera([FromQuery] int code)
+    {
+        if (code == 1)
+        {
+            _serialPort.WritePort("Com2", DefaultProtocol.OpenCameraPower().ToBytes());
+        }
+        else
+        {
+            _serialPort.WritePort("Com2", DefaultProtocol.CloseCameraPower().ToBytes());
+        }
+        return Ok();
+    }
+
+    #endregion
+
+    #region 屏幕
+
+    [HttpGet]
+    [Route("Screen")]
+    public ActionResult Screen([FromQuery] int code)
+    {
+        if (code == 1)
+        {
+            _serialPort.WritePort("Com2", DefaultProtocol.OpenScreenPower().ToBytes());
+        }
+        else
+        {
+            _serialPort.WritePort("Com2", DefaultProtocol.CloseScreenPower().ToBytes());
+        }
+        return Ok();
+    }
+
+    #endregion
+    
+    
 }

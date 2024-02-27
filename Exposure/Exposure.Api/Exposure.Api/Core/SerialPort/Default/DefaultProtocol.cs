@@ -2,7 +2,9 @@
 
 public class DefaultProtocol
 {
-    public static Protocol LedRed()
+    #region LED
+
+     public static Protocol LedRed()
     {
         return new Protocol
         {
@@ -235,5 +237,90 @@ public class DefaultProtocol
             Data = [0xFF, 0x00]
         };
     }
+
+    #endregion
+
+    #region 下位机
+
+    public static Protocol OpenHatch()
+    {
+        return new Protocol
+        {
+            Address = 0x01,
+            Function = 0x05,
+            Data = [0x00, 0x01]
+        };
+    }
     
+    public static Protocol CloseHatch()
+    {
+        return new Protocol
+        {
+            Address = 0x01,
+            Function = 0x05,
+            Data = [0x00, 0x00]
+        };
+    }
+    
+    public static Protocol OpenLight()
+    {
+        return new Protocol
+        {
+            Address = 0x01,
+            Function = 0x05,
+            Data = [0x01, 0x01]
+        };
+    }
+    
+    public static Protocol CloseLight()
+    {
+        return new Protocol
+        {
+            Address = 0x01,
+            Function = 0x05,
+            Data = [0x01, 0x00]
+        };
+    }
+    
+    public static Protocol OpenCameraPower()
+    {
+        return new Protocol
+        {
+            Address = 0x01,
+            Function = 0x05,
+            Data = [0x02, 0x01]
+        };
+    }
+    
+    public static Protocol CloseCameraPower()
+    {
+        return new Protocol
+        {
+            Address = 0x01,
+            Function = 0x05,
+            Data = [0x02, 0x00]
+        };
+    }
+    
+    public static Protocol OpenScreenPower()
+    {
+        return new Protocol
+        {
+            Address = 0x01,
+            Function = 0x05,
+            Data = [0x03, 0x01]
+        };
+    }
+    
+    public static Protocol CloseScreenPower()
+    {
+        return new Protocol
+        {
+            Address = 0x01,
+            Function = 0x05,
+            Data = [0x03, 0x00]
+        };
+    }
+
+    #endregion
 }

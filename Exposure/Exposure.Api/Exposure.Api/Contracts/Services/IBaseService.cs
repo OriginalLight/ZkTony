@@ -69,7 +69,7 @@ public interface IBaseService<T> where T : class, new()
     ///     查询所有数据
     /// </summary>
     /// <returns></returns>
-    public Task<List<T>> GetAll(bool isOrderBy = false, Expression<Func<T, object>> orderBy = null,
+    public Task<List<T>> GetAll(bool isOrderBy = false, Expression<Func<T, object>>? orderBy = null,
         OrderByType orderByType = OrderByType.Asc);
 
     /// <summary>

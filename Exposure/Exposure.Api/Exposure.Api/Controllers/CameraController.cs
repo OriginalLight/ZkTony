@@ -63,9 +63,9 @@ public class CameraController : ControllerBase
         // 预览
         try
         {
-            var res = _camera.PreviewAsync();
+            _camera.PreviewAsync();
             _operLog.AddOperLog("预览", "预览成功");
-            return Ok(res);
+            return Ok();
         }
         catch (Exception e)
         {
@@ -194,8 +194,8 @@ public class CameraController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpGet]
-    [Route("Cache")]
-    public async Task<IActionResult> Cache()
+    [Route("Result")]
+    public async Task<IActionResult> Result()
     {
         // 获取温度
         try

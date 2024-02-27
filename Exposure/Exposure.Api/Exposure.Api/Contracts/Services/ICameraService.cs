@@ -11,6 +11,11 @@ public interface ICameraService
     void Initialize();
 
     /// <summary>
+    ///  停止
+    /// </summary>
+    void Stop();
+
+    /// <summary>
     ///     设置像素
     /// </summary>
     /// <param name="index"></param>
@@ -27,7 +32,7 @@ public interface ICameraService
     ///     预览
     /// </summary>
     /// <returns></returns>
-    Picture PreviewAsync();
+    void PreviewAsync();
 
     /// <summary>
     ///     自动拍照
