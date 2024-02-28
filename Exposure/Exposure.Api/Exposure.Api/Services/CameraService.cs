@@ -18,7 +18,6 @@ public class CameraService : ICameraService
     private Nncam? _nncam;
     private int _seq;
     private int _target;
-    
 
     #region 构造函数
 
@@ -37,24 +36,32 @@ public class CameraService : ICameraService
     {
         if (_nncam != null) return;
 
-        var arr = Nncam.EnumV2();
-        if (arr.Length <= 0) throw new Exception("未找到设备");
+        try
+        {
+            var arr = Nncam.EnumV2();
+            if (arr.Length == 0) throw new Exception("未找到设备");
 
-        // 打开设备
-        _nncam = Nncam.Open(arr[0].id);
-        if (_nncam == null) throw new Exception("打开设备失败");
+            // 打开设备
+            _nncam = Nncam.Open(arr[0].id);
+            if (_nncam == null) throw new Exception("打开设备失败");
 
-        // 设置参数
-        if (!_nncam.put_Option(Nncam.eOPTION.OPTION_TRIGGER, 1)) throw new Exception("设置模式失败");
+            // 设置参数
+            if (!_nncam.put_Temperature(-200)) throw new Exception("设置温度失败");
 
-        if (!_nncam.put_AutoExpoEnable(false)) throw new Exception("参数自动曝光设置失败");
+            if (!_nncam.put_Option(Nncam.eOPTION.OPTION_TRIGGER, 1)) throw new Exception("设置模式失败");
 
-        // 设置回调
-        if (!SetCallBack())
+            if (!_nncam.put_AutoExpoEnable(false)) throw new Exception("参数自动曝光设置失败");
+
+            // 设置回调
+            if (!SetCallBack()) throw new Exception("设置回调失败");
+        }
+        catch (Exception)
         {
             _nncam?.Close();
             _nncam = null;
-            throw new Exception("设置回调失败");
+            _serialPort.WritePort("Com1", DefaultProtocol.LedRed().ToBytes());
+            _serialPort.SetFlag("led", 5);
+            throw;
         }
     }
 
@@ -83,15 +90,23 @@ public class CameraService : ICameraService
         // 目标张数
         _target = 1;
 
-        //打开灯光
-        _serialPort.WritePort("Com2", DefaultProtocol.OpenLight().ToBytes());
-        // 延时100ms
-        await Task.Delay(100);
+        try
+        {
+            //打开灯光
+            _serialPort.WritePort("Com2", DefaultProtocol.OpenLight().ToBytes());
+            // 延时100ms
+            await Task.Delay(100);
 
-        // 设置曝光时间
-        if (!_nncam.put_ExpoTime(_expoTime)) throw new Exception("设置曝光时间失败");
-        // 触发拍摄
-        if (!_nncam.Trigger(1)) throw new Exception("预览失败");
+            // 设置曝光时间
+            if (!_nncam.put_ExpoTime(_expoTime)) throw new Exception("设置曝光时间失败");
+            // 触发拍摄
+            if (!_nncam.Trigger(1)) throw new Exception("预览失败");
+        }
+        catch (Exception)
+        {
+            _serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
+            throw;
+        }
     }
 
     #endregion
@@ -101,7 +116,7 @@ public class CameraService : ICameraService
     public async Task<long> TakeAutoPhotoAsync(CancellationToken ctsToken)
     {
         Initialize();
-        if (_nncam == null) return 0;
+        if (_nncam == null) throw new Exception("自动拍照失败");
         
         _mat = null;
         _flag = "sampling";
@@ -129,15 +144,24 @@ public class CameraService : ICameraService
         _seq = 0;
         _flag = "auto";
         
-        //打开灯光
-        _serialPort.WritePort("Com2", DefaultProtocol.OpenLight().ToBytes());
-        // 延时100ms
-        await Task.Delay(100, ctsToken);
-        
-        // 设置曝光时间
-        if (!_nncam.put_ExpoTime(_expoTime)) throw new Exception("设置白光曝光时间失败");
-        // 触发拍摄
-        if (!_nncam.Trigger(1)) throw new Exception("拍摄白光图失败");
+        try
+        {
+            //打开灯光
+            _serialPort.WritePort("Com2", DefaultProtocol.OpenLight().ToBytes());
+            // 延时100ms
+            await Task.Delay(100, ctsToken);
+
+            // 设置曝光时间
+            if (!_nncam.put_ExpoTime(_expoTime)) throw new Exception("设置白光曝光时间失败");
+            // 触发拍摄
+            if (!_nncam.Trigger(1)) throw new Exception("拍摄白光图失败");
+        }
+        catch (Exception)
+        {
+            // 关闭灯光
+            _serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
+            throw;
+        }
 
         // 延时500ms
         await Task.Delay(500, ctsToken);
@@ -157,7 +181,7 @@ public class CameraService : ICameraService
     public async Task TakeManualPhotoAsync(int exposure, int frame, CancellationToken ctsToken)
     {
         Initialize();
-        if (_nncam == null) return;
+        if (_nncam == null) throw new Exception("手动拍照失败");
 
         _mat = null;
         _pictureList.Clear();
@@ -165,15 +189,23 @@ public class CameraService : ICameraService
         _seq = 0;
         _flag = "manual";
         
-        //打开灯光
-        _serialPort.WritePort("Com2", DefaultProtocol.OpenLight().ToBytes());
-        // 延时100ms
-        await Task.Delay(100, ctsToken);
-        
-        // 设置曝光时间
-        if (!_nncam.put_ExpoTime(_expoTime)) throw new Exception("设置白光曝光时间失败");
-        // 触发拍摄
-        if (!_nncam.Trigger(1)) throw new Exception("拍摄白光图失败");
+        try
+        {
+            //打开灯光
+            _serialPort.WritePort("Com2", DefaultProtocol.OpenLight().ToBytes());
+            // 延时100ms
+            await Task.Delay(100, ctsToken);
+
+            // 设置曝光时间
+            if (!_nncam.put_ExpoTime(_expoTime)) throw new Exception("设置白光曝光时间失败");
+            // 触发拍摄
+            if (!_nncam.Trigger(1)) throw new Exception("拍摄白光图失败");
+        }
+        catch (Exception)
+        {
+            _serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
+            throw;
+        }
 
         // 延时500ms
         await Task.Delay(500, ctsToken);
@@ -191,7 +223,8 @@ public class CameraService : ICameraService
     public void CancelTask()
     {
         Initialize();
-        if (!(_nncam != null && _nncam.Trigger(0))) throw new Exception("取消失败");
+        if (_nncam == null) throw new Exception("取消失败");
+        if (!_nncam.Trigger(0)) throw new Exception("取消失败");
     }
 
     #endregion

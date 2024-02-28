@@ -64,7 +64,7 @@ public class MachineController : ControllerBase
     [Route("Led")]
     public IActionResult Led([FromQuery] int code)
     {
-        var p = code switch
+        var protocol = code switch
         {
             0 => DefaultProtocol.LedRed(),
             1 => DefaultProtocol.LedGreen(),
@@ -91,13 +91,12 @@ public class MachineController : ControllerBase
             255 => DefaultProtocol.LedAllClose(),
             _ => DefaultProtocol.LedAllClose()
         };
-        _serialPort.WritePort("Com1", p.ToBytes());
+        _serialPort.WritePort("Com1", protocol.ToBytes());
         return Ok("OK");
     }
 
     #endregion
-
-
+    
     #region 舱门
 
     [HttpGet]
@@ -106,14 +105,29 @@ public class MachineController : ControllerBase
     {
         if (code == 1)
         {
+            if (_serialPort.GetFlag("led") < 2)
+            {
+                _serialPort.WritePort("Com1", DefaultProtocol.LedYellowFastFlash().ToBytes());
+                _serialPort.SetFlag("led", 2);
+            }
             _serialPort.WritePort("Com2", DefaultProtocol.OpenHatch().ToBytes());
             await Task.Delay(5000);
-            
+            _serialPort.WritePort("Com1", DefaultProtocol.LedAllClose().ToBytes());
+            _serialPort.SetFlag("led", 0);
+            _serialPort.SetFlag("hatch", 1);
         }
         else
         {
+            if (_serialPort.GetFlag("led") < 2)
+            {
+                _serialPort.WritePort("Com1", DefaultProtocol.LedYellowFastFlash().ToBytes());
+                _serialPort.SetFlag("led", 2);
+            }
             _serialPort.WritePort("Com2", DefaultProtocol.CloseHatch().ToBytes());
             await Task.Delay(5000);
+            _serialPort.WritePort("Com1", DefaultProtocol.LedAllClose().ToBytes());
+            _serialPort.SetFlag("led", 0);
+            _serialPort.SetFlag("hatch", 0);
         }
         return Ok();
     }
@@ -126,14 +140,14 @@ public class MachineController : ControllerBase
     [Route("Light")]
     public ActionResult Light([FromQuery] int code)
     {
-        if (code == 1)
+        var protocol = code switch
         {
-            _serialPort.WritePort("Com2", DefaultProtocol.OpenLight().ToBytes());
-        }
-        else
-        {
-            _serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
-        }
+            0 => DefaultProtocol.CloseLight(),
+            1 => DefaultProtocol.OpenLight(),
+            _ => DefaultProtocol.CloseLight()
+        };
+        _serialPort.WritePort("Com2", protocol.ToBytes());
+        _serialPort.SetFlag("light", code);
         return Ok();
     }
 
@@ -145,14 +159,14 @@ public class MachineController : ControllerBase
     [Route("Camera")]
     public ActionResult Camera([FromQuery] int code)
     {
-        if (code == 1)
+        var protocol = code switch
         {
-            _serialPort.WritePort("Com2", DefaultProtocol.OpenCameraPower().ToBytes());
-        }
-        else
-        {
-            _serialPort.WritePort("Com2", DefaultProtocol.CloseCameraPower().ToBytes());
-        }
+            0 => DefaultProtocol.CloseCameraPower(),
+            1 => DefaultProtocol.OpenCameraPower(),
+            _ => DefaultProtocol.CloseCameraPower()
+        };
+        _serialPort.WritePort("Com2", protocol.ToBytes());
+        _serialPort.SetFlag("camera", code);
         return Ok();
     }
 
@@ -164,18 +178,16 @@ public class MachineController : ControllerBase
     [Route("Screen")]
     public ActionResult Screen([FromQuery] int code)
     {
-        if (code == 1)
+        var protocol = code switch
         {
-            _serialPort.WritePort("Com2", DefaultProtocol.OpenScreenPower().ToBytes());
-        }
-        else
-        {
-            _serialPort.WritePort("Com2", DefaultProtocol.CloseScreenPower().ToBytes());
-        }
+            0 => DefaultProtocol.CloseScreenPower(),
+            1 => DefaultProtocol.OpenScreenPower(),
+            _ => DefaultProtocol.CloseScreenPower()
+        };
+        _serialPort.WritePort("Com2", protocol.ToBytes());
+        _serialPort.SetFlag("screen", code);
         return Ok();
     }
 
     #endregion
-    
-    
 }

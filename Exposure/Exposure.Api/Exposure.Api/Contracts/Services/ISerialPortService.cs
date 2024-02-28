@@ -10,6 +10,18 @@ public interface ISerialPortService
     /// <returns></returns>
     void Init();
     /// <summary>
+    ///  获取标志
+    /// </summary>
+    /// <param name="alias"></param>
+    /// <returns></returns>
+    int GetFlag(string alias);
+    /// <summary>
+    ///  设置标志
+    /// </summary>
+    /// <param name="alias"></param>
+    /// <param name="flag"></param>
+    void SetFlag(string alias, int flag);
+    /// <summary>
     ///     获取所有的串口
     /// </summary>
     /// <returns></returns>

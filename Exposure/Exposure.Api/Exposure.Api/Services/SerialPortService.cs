@@ -9,6 +9,7 @@ public class SerialPortService : ISerialPortService
     private readonly IErrorLogService _errorLog;
     private readonly ILogger<SerialPortService> _logger;
     private readonly Dictionary<string, SerialPort> _serialPorts = new();
+    private readonly Dictionary<string, int> _flags = new();
     
     #region 构造函数
 
@@ -31,8 +32,38 @@ public class SerialPortService : ISerialPortService
         // 打开串口
         if (com1 != null) OpenPort(com1, 115200, "Com1");
         if (com2 != null) OpenPort(com2, 115200, "Com2");
+        // 设置串口接收事件
+        if (!_serialPorts.TryGetValue("Com2", out var serialPort)) return;
+        serialPort.DataReceived += (sender, _) =>
+        {
+            var sp = (SerialPort) sender;
+            var bytes = new byte[sp.BytesToRead];
+            sp.Read(bytes, 0, bytes.Length);
+            var hex = BitConverter.ToString(bytes);
+            _logger.LogInformation("Com2 接收到数据: " + hex);
+        };
+        
+        // TODO: 查询门的状态
     }
 
+    #endregion
+    
+    #region 获取标志
+    
+    public int GetFlag(string alias)
+    {
+        return _flags.TryGetValue(alias, out var flag) ? flag : 0;
+    }
+    
+    #endregion
+    
+    #region 设置标志
+    
+    public void SetFlag(string alias, int flag)
+    {
+        _flags[alias] = flag;
+    }
+    
     #endregion
 
     #region 获取所有可用串口
@@ -133,4 +164,5 @@ public class SerialPortService : ISerialPortService
     }
 
     #endregion
+    
 }

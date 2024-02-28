@@ -24,3 +24,15 @@ export function led(data: CodeParam) {
 export function hatch(data: CodeParam) {
   return axios.get('/Machine/Hatch', { params: data })
 }
+
+export function light(data: CodeParam) {
+  return axios.get('/Machine/Light', { params: data })
+}
+
+export function camera(data: CodeParam) {
+  return axios.get('/Machine/Camera', { params: data })
+}
+
+export function screen(data: CodeParam) {
+  return axios.get('/Machine/Screen', { params: data })
+}

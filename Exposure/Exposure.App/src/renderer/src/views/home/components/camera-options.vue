@@ -143,7 +143,7 @@
             <icon-expand />
           </template>
           {{
-            hatchStatus === 0 ? t('home.camera.options.in') : t('home.camera.options.out')
+            hatchStatus === 0 ? t('home.camera.options.out') : t('home.camera.options.in')
           }}</a-button
         >
         <a-button

@@ -12,7 +12,20 @@ export default {
   'debug.led.red': 'Red',
   'debug.led.green': 'Green',
   'debug.led.blue': 'Blue',
-  'debug.led.yellow': '黄色',
-  'debug.led.purple': '紫色',
-  'debug.led.white': '白色'
+  'debug.led.yellow': 'Yellow',
+  'debug.led.purple': 'Purple',
+  'debug.led.white': 'White',
+  'debug.machine.title': 'Lower Computer Debugging',
+  'debug.machine.hatch': 'Hatch',
+  'debug.machine.hatch.open': 'Open',
+  'debug.machine.hatch.close': 'Close',
+  'debug.machine.light': 'Light',
+  'debug.machine.light.open': 'Open',
+  'debug.machine.light.close': 'Close',
+  'debug.machine.camera': 'Camera',
+  'debug.machine.camera.open': 'Open',
+  'debug.machine.camera.close': 'Close',
+  'debug.machine.screen': 'Screen',
+  'debug.machine.screen.open': 'Open',
+  'debug.machine.screen.close': 'Close'
 }

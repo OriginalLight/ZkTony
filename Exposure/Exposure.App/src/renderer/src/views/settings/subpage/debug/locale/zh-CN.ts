@@ -14,5 +14,18 @@ export default {
   'debug.led.blue': '蓝色',
   'debug.led.yellow': '黄色',
   'debug.led.purple': '紫色',
-  'debug.led.white': '白色'
+  'debug.led.white': '白色',
+  'debug.machine.title': '下位机调试',
+  'debug.machine.hatch': '舱门',
+  'debug.machine.hatch.open': '打开',
+  'debug.machine.hatch.close': '关闭',
+  'debug.machine.light': '灯光',
+  'debug.machine.light.open': '打开',
+  'debug.machine.light.close': '关闭',
+  'debug.machine.camera': '相机',
+  'debug.machine.camera.open': '打开',
+  'debug.machine.camera.close': '关闭',
+  'debug.machine.screen': '屏幕',
+  'debug.machine.screen.open': '打开',
+  'debug.machine.screen.close': '关闭'
 }

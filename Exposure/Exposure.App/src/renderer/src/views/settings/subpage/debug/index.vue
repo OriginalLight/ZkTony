@@ -50,6 +50,62 @@
             </a-list-item>
           </a-list>
         </a-card>
+        <a-card :title="t('debug.machine.title')">
+          <a-list>
+            <a-list-item>
+              <a-list-item-meta :title="t('debug.machine.hatch')"></a-list-item-meta>
+              <template #actions>
+                <a-space>
+                  <a-button type="primary" @click="hatch({ code: 1 })">
+                    {{ t('debug.machine.hatch.open') }}
+                  </a-button>
+                  <a-button type="primary" @click="hatch({ code: 0 })">
+                    {{ t('debug.machine.hatch.close') }}
+                  </a-button>
+                </a-space>
+              </template>
+            </a-list-item>
+            <a-list-item>
+              <a-list-item-meta :title="t('debug.machine.light')"></a-list-item-meta>
+              <template #actions>
+                <a-space>
+                  <a-button type="primary" @click="light({ code: 1 })">
+                    {{ t('debug.machine.light.open') }}
+                  </a-button>
+                  <a-button type="primary" @click="light({ code: 0 })">
+                    {{ t('debug.machine.light.close') }}
+                  </a-button>
+                </a-space>
+              </template>
+            </a-list-item>
+            <a-list-item>
+              <a-list-item-meta :title="t('debug.machine.camera')"></a-list-item-meta>
+              <template #actions>
+                <a-space>
+                  <a-button type="primary" @click="camera({ code: 1 })">
+                    {{ t('debug.machine.camera.open') }}
+                  </a-button>
+                  <a-button type="primary" @click="camera({ code: 0 })">
+                    {{ t('debug.machine.camera.close') }}
+                  </a-button>
+                </a-space>
+              </template>
+            </a-list-item>
+            <a-list-item>
+              <a-list-item-meta :title="t('debug.machine.screen')"></a-list-item-meta>
+              <template #actions>
+                <a-space>
+                  <a-button type="primary" @click="screen({ code: 1 })">
+                    {{ t('debug.machine.screen.open') }}
+                  </a-button>
+                  <a-button type="primary" @click="screen({ code: 0 })">
+                    {{ t('debug.machine.screen.close') }}
+                  </a-button>
+                </a-space>
+              </template>
+            </a-list-item>
+          </a-list>
+        </a-card>
       </a-space>
     </div>
   </div>
@@ -58,7 +114,15 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { led, serialPort, serialPortStatus } from '@renderer/api/machine'
+import {
+  led,
+  serialPort,
+  serialPortStatus,
+  hatch,
+  light,
+  camera,
+  screen
+} from '@renderer/api/machine'
 import { Message } from '@arco-design/web-vue'
 
 const { t } = useI18n()
