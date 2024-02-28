@@ -1,6 +1,8 @@
 package com.zktony.android.ui
 
+import android.content.Context
 import android.graphics.Color.rgb
+import android.os.storage.StorageManager
 import android.util.Log
 import android.view.View.OnLongClickListener
 import android.widget.Toast
@@ -95,6 +97,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import java.io.File
+import java.lang.reflect.Method
 import kotlin.math.abs
 import kotlin.math.ceil
 
@@ -102,20 +106,9 @@ import kotlin.math.ceil
 @Composable
 fun DebugModeRoute(viewModel: SettingViewModel) {
 
-    val scope = rememberCoroutineScope()
-    val navigationActions = LocalNavigationActions.current
     val snackbarHostState = LocalSnackbarHostState.current
 
-    val page by viewModel.page.collectAsStateWithLifecycle()
-    val selected by viewModel.selected.collectAsStateWithLifecycle()
     val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
-    val entities = viewModel.entities.collectAsLazyPagingItems()
-    val proEntities = viewModel.proEntities.collectAsLazyPagingItems()
-    val job by viewModel.job.collectAsStateWithLifecycle()
-    val complate by viewModel.complate.collectAsStateWithLifecycle()
-    val process by viewModel.progress.collectAsStateWithLifecycle()
-
-    val slEntitiy by viewModel.slEntitiy.collectAsStateWithLifecycle(initialValue = null)
 
 
     LaunchedEffect(key1 = uiFlags) {
@@ -124,17 +117,6 @@ fun DebugModeRoute(viewModel: SettingViewModel) {
         }
     }
 
-    Column {
-//        debugMode(
-//            viewModel::dispatch, proEntities.toList(), slEntitiy, job, uiFlags
-//        )
-//        AnimatedContent(targetState = page) {
-//            when (page) {
-//                PageType.DEBUGMODE ->
-//                else -> {}
-//            }
-//        }
-    }
 }
 
 
@@ -146,6 +128,13 @@ fun debugMode(
     s1: Setting?,
     job: Job?,
     uiFlags: UiFlags,
+    speedFlow: Int,
+    rinseSpeedFlow: Long,
+    xSpeedFlow: Long,
+    coagulantSpeedFlow: Long,
+    coagulantpulseFlow: Int,
+    coagulantTimeFlow: Int,
+    coagulantResetPulseFlow: Int,
 ) {
 
 
@@ -300,18 +289,21 @@ fun debugMode(
     val highDialog = remember { mutableStateOf(false) }
 
     var highNum by remember { mutableStateOf(0) }
+    var highNum_ex by remember { mutableStateOf(highNum.toString()) }
     //===============高浓度弹窗==============================
 
     //===============低浓度弹窗==============================
     val lowDialog = remember { mutableStateOf(false) }
 
     var lowNum by remember { mutableStateOf(0) }
+    var lowNum_ex by remember { mutableStateOf(lowNum.toString()) }
     //===============低浓度弹窗==============================
 
     //===============低浓度弹窗==============================
     val rinseDialog = remember { mutableStateOf(false) }
 
     var rinseNum by remember { mutableStateOf(0) }
+    var rinseNum_ex by remember { mutableStateOf(rinseNum.toString()) }
     //===============低浓度弹窗==============================
 
     /**
@@ -324,6 +316,21 @@ fun debugMode(
         uiEvent(SettingIntent.Start(1))
     } else if (uiFlags is UiFlags.Objects && uiFlags.objects == 6) {
         uiEvent(SettingIntent.Stop)
+    } else if (uiFlags is UiFlags.Objects && uiFlags.objects == 11) {
+        speed.value = speedFlow
+        speed_ex = speedFlow.toString()
+        rinseSpeed.value = rinseSpeedFlow
+        rinseSpeed_ex = rinseSpeedFlow.toString()
+        xSpeed.value = xSpeedFlow
+        xSpeed_ex = xSpeedFlow.toString()
+        coagulantSpeed.value = coagulantSpeedFlow
+        coagulantSpeed_ex = coagulantSpeedFlow.toString()
+        coagulantpulse.value = coagulantpulseFlow
+        coagulantpulse_ex = coagulantpulseFlow.toString()
+        coagulantTime.value = coagulantTimeFlow
+        coagulantTime_ex = coagulantTimeFlow.toString()
+        coagulantResetPulse.value = coagulantResetPulseFlow
+        coagulantResetPulse_ex = coagulantResetPulseFlow.toString()
     }
 
     Column(
@@ -426,14 +433,16 @@ fun debugMode(
                                 value = speed_ex,
                                 label = { Text(text = "制胶速度") },
                                 onValueChange = {
-                                    speed_ex = it
-                                    speed.value = speed_ex.toIntOrNull() ?: 180
-                                    if (speed.value > 600) {
-                                        speed.value = 600
-                                        speed_ex = "600"
-                                    } else if (speed.value < 100) {
-                                        speed.value = 100
-                                        speed_ex = "100"
+                                    val temp = it.toIntOrNull() ?: 0
+                                    if (temp > 300) {
+                                        speed.value = 300
+                                        speed_ex = "300"
+                                    } else if (temp <= 0) {
+                                        speed.value = 0
+                                        speed_ex = "0"
+                                    } else {
+                                        speed_ex = it
+                                        speed.value = speed_ex.toIntOrNull() ?: 0
                                     }
                                 },
                                 keyboardOptions = KeyboardOptions(
@@ -480,25 +489,35 @@ fun debugMode(
                             shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                             onClick = {
 
-                            }) {
-                            Text(text = "保    存", fontSize = 18.sp)
-                        }
 
+                            }) {
+                            Text(text = "重    置", fontSize = 18.sp)
+                        }
 
                         Button(modifier = Modifier
                             .padding(top = 20.dp)
-                            .width(100.dp)
+                            .width(120.dp)
                             .height(50.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(rgb(0, 105, 52))
                             ),
                             shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                             onClick = {
-
+                                //获取usb地址
+                                val path = getStoragePath(context, true)
+                                if (!"".equals(path)) {
+                                    val filePath = "$path/zktony/config.txt"
+                                    uiEvent(SettingIntent.ImportData(filePath = filePath))
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "U盘不存在！",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                             }) {
-                            Text(text = "重    置", fontSize = 18.sp)
+                            Text(text = "导入数据", fontSize = 18.sp)
                         }
-
 
                         Button(modifier = Modifier
                             .padding(top = 20.dp)
@@ -514,8 +533,8 @@ fun debugMode(
                             Text(text = "一键清除", fontSize = 18.sp)
                         }
 
-
                     }
+
 
                 }
 
@@ -1141,7 +1160,23 @@ fun debugMode(
                                 shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                 onClick = {
                                     Optocoupler1 = false
+
                                     scope.launch {
+                                        SerialPortUtils.start {
+                                            timeOut = 1000L * 30
+                                            with(
+                                                index = 0,
+                                                pdv = 0L,
+                                                ads = Triple(
+                                                    xSpeed.value * 20,
+                                                    xSpeed.value * 20,
+                                                    xSpeed.value * 20
+                                                ),
+                                            )
+                                        }
+
+                                        delay(100)
+
                                         SerialPortUtils.gpio(0)
                                         delay(500L)
                                         if (SerialPortUtils.getGpio(0)) {
@@ -1179,6 +1214,21 @@ fun debugMode(
                                 onClick = {
                                     Optocoupler2 = false
                                     scope.launch {
+                                        SerialPortUtils.start {
+                                            timeOut = 1000L * 30
+                                            with(
+                                                index = 0,
+                                                pdv = 30.0,
+                                                ads = Triple(
+                                                    xSpeed.value * 20,
+                                                    xSpeed.value * 20,
+                                                    xSpeed.value * 20
+                                                ),
+                                            )
+                                        }
+
+                                        delay(100)
+
                                         SerialPortUtils.gpio(1)
                                         delay(500L)
                                         if (SerialPortUtils.getGpio(1)) {
@@ -1215,6 +1265,15 @@ fun debugMode(
                                 onClick = {
                                     Optocoupler3 = false
                                     scope.launch {
+                                        SerialPortUtils.start {
+                                            timeOut = 1000L * 30
+                                            with(
+                                                index = 1,
+                                                pdv = -64000L,
+                                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+                                            )
+                                        }
+
                                         SerialPortUtils.gpio(2)
                                         delay(500L)
                                         if (SerialPortUtils.getGpio(2)) {
@@ -1808,7 +1867,11 @@ fun debugMode(
                                 with(
                                     index = 0,
                                     pdv = setting.wastePosition,
-                                    ads = Triple(xSpeed.value, xSpeed.value, xSpeed.value),
+                                    ads = Triple(
+                                        xSpeed.value * 20,
+                                        xSpeed.value * 20,
+                                        xSpeed.value * 20
+                                    ),
                                 )
                             }
                             delay(100)
@@ -1817,7 +1880,11 @@ fun debugMode(
                                 with(
                                     index = 0,
                                     pdv = setting.glueBoardPosition,
-                                    ads = Triple(xSpeed.value, xSpeed.value, xSpeed.value),
+                                    ads = Triple(
+                                        xSpeed.value * 20,
+                                        xSpeed.value * 20,
+                                        xSpeed.value * 20
+                                    ),
                                 )
                             }
 
@@ -1860,15 +1927,10 @@ fun debugMode(
 
                 OutlinedTextField(
                     modifier = Modifier.width(200.dp),
-                    value = highNum.toString(),
-
-
-                    label = { Text(fontSize = 13.sp, text = "不输入默认持续运行") },
+                    value = highNum_ex,
+                    label = { },
                     onValueChange = {
-                        highNum = it.toIntOrNull() ?: 0
-                        if (highNum < 0) {
-                            highNum = 0
-                        }
+                        highNum_ex = it
                     },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number,
@@ -1879,43 +1941,25 @@ fun debugMode(
                     })
                 )
             }
-
-
         }, confirmButton = {
             Button(
                 modifier = Modifier.width(100.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(rgb(0, 105, 52))
                 ), onClick = {
-                    if (highNum == 0) {
-                        scope.launch {
-                            SerialPortUtils.start {
-                                timeOut = 1000L * 30
-                                with(
-                                    index = 2,
-                                    pdv = 3200L * 1000,
-                                    ads = Triple(
-                                        higeSpeed * 13,
-                                        higeSpeed * 1193,
-                                        higeSpeed * 1193
-                                    ),
-                                )
-                            }
-                        }
-                    } else {
-                        scope.launch {
-                            SerialPortUtils.start {
-                                timeOut = 1000L * 30
-                                with(
-                                    index = 2,
-                                    pdv = highNum,
-                                    ads = Triple(
-                                        higeSpeed * 13,
-                                        higeSpeed * 1193,
-                                        higeSpeed * 1193
-                                    ),
-                                )
-                            }
+                    highNum = highNum_ex.toIntOrNull() ?: 0
+                    scope.launch {
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 2,
+                                pdv = highNum,
+                                ads = Triple(
+                                    higeSpeed * 13,
+                                    higeSpeed * 1193,
+                                    higeSpeed * 1193
+                                ),
+                            )
                         }
                     }
 
@@ -1951,13 +1995,10 @@ fun debugMode(
 
                 OutlinedTextField(
                     modifier = Modifier.width(200.dp),
-                    value = lowNum.toString(),
-                    label = { Text(fontSize = 13.sp, text = "不输入默认持续运行") },
+                    value = lowNum_ex,
+                    label = { },
                     onValueChange = {
-                        lowNum = it.toIntOrNull() ?: 0
-                        if (lowNum < 0) {
-                            lowNum = 0
-                        }
+                        lowNum_ex = it
                     },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number,
@@ -1975,27 +2016,15 @@ fun debugMode(
                 modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
                     containerColor = Color(rgb(0, 105, 52))
                 ), onClick = {
-                    if (lowNum == 0) {
-                        scope.launch {
-                            SerialPortUtils.start {
-                                timeOut = 1000L * 30
-                                with(
-                                    index = 3,
-                                    pdv = 3200L * 1000,
-                                    ads = Triple(lowSpeed * 13, lowSpeed * 1193, lowSpeed * 1193),
-                                )
-                            }
-                        }
-                    } else {
-                        scope.launch {
-                            SerialPortUtils.start {
-                                timeOut = 1000L * 30
-                                with(
-                                    index = 3,
-                                    pdv = lowNum,
-                                    ads = Triple(lowSpeed * 13, lowSpeed * 1193, lowSpeed * 1193),
-                                )
-                            }
+                    scope.launch {
+                        lowNum = lowNum_ex.toIntOrNull() ?: 0
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 3,
+                                pdv = lowNum,
+                                ads = Triple(lowSpeed * 13, lowSpeed * 1193, lowSpeed * 1193),
+                            )
                         }
                     }
 
@@ -2030,13 +2059,10 @@ fun debugMode(
 
                 OutlinedTextField(
                     modifier = Modifier.width(200.dp),
-                    value = rinseNum.toString(),
-                    label = { Text(fontSize = 13.sp, text = "不输入默认持续运行") },
+                    value = rinseNum_ex,
+                    label = { },
                     onValueChange = {
-                        rinseNum = it.toIntOrNull() ?: 0
-                        if (rinseNum < 0) {
-                            rinseNum = 0
-                        }
+                        rinseNum_ex = it
                     },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number,
@@ -2054,27 +2080,15 @@ fun debugMode(
                 modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
                     containerColor = Color(rgb(0, 105, 52))
                 ), onClick = {
-                    if (rinseNum == 0) {
-                        scope.launch {
-                            SerialPortUtils.start {
-                                timeOut = 1000L * 30
-                                with(
-                                    index = 4,
-                                    pdv = 3200L * 1000,
-                                    ads = Triple(600 * 100, 600 * 100, rinseSpeed.value * 100),
-                                )
-                            }
-                        }
-                    } else {
-                        scope.launch {
-                            SerialPortUtils.start {
-                                timeOut = 1000L * 30
-                                with(
-                                    index = 4,
-                                    pdv = rinseNum,
-                                    ads = Triple(600 * 100, 600 * 100, rinseSpeed.value * 100),
-                                )
-                            }
+                    rinseNum = rinseNum_ex.toIntOrNull() ?: 0
+                    scope.launch {
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 4,
+                                pdv = rinseNum,
+                                ads = Triple(600 * 100, 600 * 100, rinseSpeed.value * 100),
+                            )
                         }
                     }
 
@@ -2097,4 +2111,53 @@ fun debugMode(
     }
 
 
+}
+
+
+private fun getStoragePath(context: Context, isUsb: Boolean): String? {
+    var path = ""
+    val mStorageManager: StorageManager =
+        context.getSystemService(Context.STORAGE_SERVICE) as StorageManager
+    val volumeInfoClazz: Class<*>
+    val diskInfoClaszz: Class<*>
+    try {
+        volumeInfoClazz = Class.forName("android.os.storage.VolumeInfo")
+        diskInfoClaszz = Class.forName("android.os.storage.DiskInfo")
+        val StorageManager_getVolumes: Method =
+            Class.forName("android.os.storage.StorageManager").getMethod("getVolumes")
+        val VolumeInfo_GetDisk: Method = volumeInfoClazz.getMethod("getDisk")
+        val VolumeInfo_GetPath: Method = volumeInfoClazz.getMethod("getPath")
+        val DiskInfo_IsUsb: Method = diskInfoClaszz.getMethod("isUsb")
+        val DiskInfo_IsSd: Method = diskInfoClaszz.getMethod("isSd")
+        val List_VolumeInfo = (StorageManager_getVolumes.invoke(mStorageManager) as List<Any>)
+        for (i in List_VolumeInfo.indices) {
+            val volumeInfo = List_VolumeInfo[i]
+            val diskInfo: Any = VolumeInfo_GetDisk.invoke(volumeInfo) ?: continue
+            val sd = DiskInfo_IsSd.invoke(diskInfo) as Boolean
+            val usb = DiskInfo_IsUsb.invoke(diskInfo) as Boolean
+            val file: File = VolumeInfo_GetPath.invoke(volumeInfo) as File
+            if (isUsb == usb) { //usb
+                assert(file != null)
+                path = file.getAbsolutePath()
+                Log.d(
+                    "Progarm",
+                    "usb的path=====$path"
+                )
+            } else if (!isUsb == sd) { //sd
+                assert(file != null)
+                path = file.getAbsolutePath()
+            }
+        }
+    } catch (e: Exception) {
+        Log.d(
+            "Progarm",
+            "获取usb地址异常=====" + e.printStackTrace()
+        )
+        e.printStackTrace()
+    }
+    Log.d(
+        "Progarm",
+        "usb的path===未获取到==$path"
+    )
+    return path
 }

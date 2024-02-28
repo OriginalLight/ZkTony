@@ -1,9 +1,14 @@
 package com.zktony.android.ui
 
+import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Color.rgb
+import android.os.Build
+import android.os.storage.StorageManager
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -62,6 +67,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.zktony.android.BuildConfig
 //import com.zktony.android.BuildConfig
 import com.zktony.android.R
 import com.zktony.android.data.dao.ErrorRecordDao
@@ -96,8 +102,11 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 //import com.zktony.serialport.BuildConfig
 import kotlinx.coroutines.launch
+import java.io.File
+import java.lang.reflect.Method
 import java.util.regex.Pattern
 
+@RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun SettingRoute(viewModel: SettingViewModel) {
@@ -107,22 +116,27 @@ fun SettingRoute(viewModel: SettingViewModel) {
     val snackbarHostState = LocalSnackbarHostState.current
 
     val application by viewModel.application.collectAsStateWithLifecycle()
-    val selected by viewModel.selected.collectAsStateWithLifecycle()
     val progress by viewModel.progress.collectAsStateWithLifecycle()
     val page by viewModel.page.collectAsStateWithLifecycle()
     val currentpwd by viewModel.currentpwd.collectAsStateWithLifecycle()
     val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
 
     val job by viewModel.job.collectAsStateWithLifecycle()
-    val complate by viewModel.complate.collectAsStateWithLifecycle()
-    val process by viewModel.progress.collectAsStateWithLifecycle()
-
-    val entities = viewModel.entities.collectAsLazyPagingItems()
     val proEntities = viewModel.proEntities.collectAsLazyPagingItems()
     val erroeEntities = viewModel.errorEntities.collectAsLazyPagingItems()
 
     val slEntitiy by viewModel.slEntitiy.collectAsStateWithLifecycle(initialValue = null)
     val ncEntitiy by viewModel.ncEntitiy.collectAsStateWithLifecycle(initialValue = null)
+
+
+    //导入数据更新
+    val speedFlow by viewModel.speedFlow.collectAsStateWithLifecycle()
+    val rinseSpeedFlow by viewModel.rinseSpeedFlow.collectAsStateWithLifecycle()
+    val xSpeedFlow by viewModel.xSpeedFlow.collectAsStateWithLifecycle()
+    val coagulantSpeedFlow by viewModel.coagulantSpeedFlow.collectAsStateWithLifecycle()
+    val coagulantpulseFlow by viewModel.coagulantpulseFlow.collectAsStateWithLifecycle()
+    val coagulantTimeFlow by viewModel.coagulantTimeFlow.collectAsStateWithLifecycle()
+    val coagulantResetPulseFlow by viewModel.coagulantResetPulseFlow.collectAsStateWithLifecycle()
 
     //去重后的数据
     val sportsLogEntitiesDis = viewModel.sportsLogEntitiesDis.collectAsLazyPagingItems()
@@ -180,6 +194,13 @@ fun SettingRoute(viewModel: SettingViewModel) {
                         slEntitiy,
                         job,
                         uiFlags,
+                        speedFlow,
+                        rinseSpeedFlow,
+                        xSpeedFlow,
+                        coagulantSpeedFlow,
+                        coagulantpulseFlow,
+                        coagulantTimeFlow,
+                        coagulantResetPulseFlow,
                     )
 
                     PageType.SPORTSLOG -> sportsLog(
@@ -230,10 +251,6 @@ fun SettingLits(
     var speChat =
         "[`~!@#$%^&*()+=\\-|{}':;',\\[\\]<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]"
 
-    /**
-     * 判断首页是否再运动中，true在运动，false不在运动
-     */
-    val homestart = rememberDataSaverState(key = "homestart", default = false)
 
     //================密码相关=============================
     var pwdShow by remember { mutableStateOf(false) }
@@ -1259,21 +1276,19 @@ fun SettingLits(
                                     ),
                                     shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                     onClick = {
-                                        if (!homestart.value) {
-                                            scope.launch {
-                                                start {
-                                                    timeOut = 1000L * 30
-                                                    with(
-                                                        index = 2,
-                                                        pdv = 51200L * 50,
-                                                        ads = Triple(
-                                                            rinseSpeed.value * 13,
-                                                            rinseSpeed.value * 1193,
-                                                            rinseSpeed.value * 1193
-                                                        ),
+                                        scope.launch {
+                                            start {
+                                                timeOut = 1000L * 30
+                                                with(
+                                                    index = 2,
+                                                    pdv = 51200L * 50,
+                                                    ads = Triple(
+                                                        rinseSpeed.value * 13,
+                                                        rinseSpeed.value * 1193,
+                                                        rinseSpeed.value * 1193
+                                                    ),
 
-                                                        )
-                                                }
+                                                    )
                                             }
                                         }
 
@@ -1435,21 +1450,19 @@ fun SettingLits(
                                     ),
                                     shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                     onClick = {
-                                        if (homestart.value == false) {
-                                            scope.launch {
-                                                start {
-                                                    timeOut = 1000L * 30
-                                                    with(
-                                                        index = 3,
-                                                        pdv = 51200L * 50,
-                                                        ads = Triple(
-                                                            rinseSpeed.value * 13,
-                                                            rinseSpeed.value * 1193,
-                                                            rinseSpeed.value * 1193
-                                                        ),
+                                        scope.launch {
+                                            start {
+                                                timeOut = 1000L * 30
+                                                with(
+                                                    index = 3,
+                                                    pdv = 51200L * 50,
+                                                    ads = Triple(
+                                                        rinseSpeed.value * 13,
+                                                        rinseSpeed.value * 1193,
+                                                        rinseSpeed.value * 1193
+                                                    ),
 
-                                                        )
-                                                }
+                                                    )
                                             }
                                         }
 
@@ -1610,21 +1623,19 @@ fun SettingLits(
                                     shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                     onClick = {
 
-                                        if (homestart.value == false) {
-                                            scope.launch {
-                                                start {
-                                                    timeOut = 1000L * 30
-                                                    with(
-                                                        index = 4,
-                                                        pdv = 3200L * 50,
-                                                        ads = Triple(
-                                                            rinseSpeed.value * 20,
-                                                            rinseSpeed.value * 20,
-                                                            rinseSpeed.value * 20
-                                                        ),
+                                        scope.launch {
+                                            start {
+                                                timeOut = 1000L * 30
+                                                with(
+                                                    index = 4,
+                                                    pdv = 3200L * 50,
+                                                    ads = Triple(
+                                                        rinseSpeed.value * 20,
+                                                        rinseSpeed.value * 20,
+                                                        rinseSpeed.value * 20
+                                                    ),
 
-                                                        )
-                                                }
+                                                    )
                                             }
                                         }
 
@@ -1783,35 +1794,33 @@ fun SettingLits(
                                     ),
                                     shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                     onClick = {
-                                        if (!homestart.value) {
-                                            scope.launch {
-                                                start {
-                                                    timeOut = 1000L * 30
-                                                    with(
-                                                        index = 1,
-                                                        pdv = coagulantpulse.value.toLong(),
-                                                        ads = Triple(
-                                                            rinseSpeed.value * 13,
-                                                            rinseSpeed.value * 1193,
-                                                            rinseSpeed.value * 1193
-                                                        ),
+                                        scope.launch {
+                                            start {
+                                                timeOut = 1000L * 30
+                                                with(
+                                                    index = 1,
+                                                    pdv = coagulantpulse.value.toLong(),
+                                                    ads = Triple(
+                                                        rinseSpeed.value * 13,
+                                                        rinseSpeed.value * 1193,
+                                                        rinseSpeed.value * 1193
+                                                    ),
 
-                                                        )
-                                                }
-                                                delay(1000)
-                                                start {
-                                                    timeOut = 1000L * 30
-                                                    with(
-                                                        index = 1,
-                                                        pdv = -coagulantpulse.value.toLong(),
-                                                        ads = Triple(
-                                                            rinseSpeed.value * 13,
-                                                            rinseSpeed.value * 1193,
-                                                            rinseSpeed.value * 1193
-                                                        ),
+                                                    )
+                                            }
+                                            delay(1000)
+                                            start {
+                                                timeOut = 1000L * 30
+                                                with(
+                                                    index = 1,
+                                                    pdv = -coagulantpulse.value.toLong(),
+                                                    ads = Triple(
+                                                        rinseSpeed.value * 13,
+                                                        rinseSpeed.value * 1193,
+                                                        rinseSpeed.value * 1193
+                                                    ),
 
-                                                        )
-                                                }
+                                                    )
                                             }
                                         }
 
@@ -2230,12 +2239,27 @@ fun SettingLits(
                         }
 
                         Row(modifier = Modifier.clickable {
-                            scope.launch {
-                                if (ApplicationUtils.isNetworkAvailable()) {
-                                    uiEvent(SettingIntent.CheckUpdate)
-                                } else {
-                                    snackbarHostState.showSnackbar(message = "网络不可用")
+                            //获取usb地址
+                            val path = getStoragePath(context, true)
+                            if (!"".equals(path)) {
+                                try {
+                                    val apkPath = "$path/zktony/apk/update.apk"
+                                    uiEvent(SettingIntent.UpdateApkU(context, apkPath))
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                    Toast.makeText(
+                                        context,
+                                        "版本信息错误！",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
+
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "U盘不存在！",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         }) {
                             Text(
@@ -3097,16 +3121,14 @@ fun SettingLits(
                             ),
                             shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                             onClick = {
-                                if (!homestart.value) {
-                                    scope.launch {
-                                        start {
-                                            timeOut = 1000L * 60L
-                                            with(
-                                                index = 0,
-                                                ads = Triple(600 * 100, 600 * 100, 600 * 100),
-                                                pdv = glueBoardPosition_ex.toDoubleOrNull() ?: 0.0
-                                            )
-                                        }
+                                scope.launch {
+                                    start {
+                                        timeOut = 1000L * 60L
+                                        with(
+                                            index = 0,
+                                            ads = Triple(600 * 100, 600 * 100, 600 * 100),
+                                            pdv = glueBoardPosition_ex.toDoubleOrNull() ?: 0.0
+                                        )
                                     }
                                 }
 
@@ -3163,19 +3185,15 @@ fun SettingLits(
                             ),
                             shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                             onClick = {
-
-                                if (homestart.value == false) {
-                                    scope.launch {
-                                        start {
-                                            timeOut = 1000L * 60L
-                                            with(
-                                                index = 0,
-                                                ads = Triple(600 * 100, 600 * 100, 600 * 100),
-                                                pdv = wastePosition_ex.toDoubleOrNull() ?: 0.0
-                                            )
-                                        }
+                                scope.launch {
+                                    start {
+                                        timeOut = 1000L * 60L
+                                        with(
+                                            index = 0,
+                                            ads = Triple(600 * 100, 600 * 100, 600 * 100),
+                                            pdv = wastePosition_ex.toDoubleOrNull() ?: 0.0
+                                        )
                                     }
-
                                 }
 
                             }) {
@@ -3243,11 +3261,31 @@ fun debug(
     slEntities: Setting?,
     job: Job?,
     uiFlags: UiFlags,
+    speedFlow: Int,
+    rinseSpeedFlow: Long,
+    xSpeedFlow: Long,
+    coagulantSpeedFlow: Long,
+    coagulantpulseFlow: Int,
+    coagulantTimeFlow: Int,
+    coagulantResetPulseFlow: Int,
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        debugMode(uiEvent, proEntities, slEntities, job, uiFlags)
+        debugMode(
+            uiEvent,
+            proEntities,
+            slEntities,
+            job,
+            uiFlags,
+            speedFlow,
+            rinseSpeedFlow,
+            xSpeedFlow,
+            coagulantSpeedFlow,
+            coagulantpulseFlow,
+            coagulantTimeFlow,
+            coagulantResetPulseFlow
+        )
     }
 }
 
@@ -3280,3 +3318,51 @@ data class AudioDestination(
     val id: Int, val name: String
 )
 
+
+private fun getStoragePath(context: Context, isUsb: Boolean): String? {
+    var path = ""
+    val mStorageManager: StorageManager =
+        context.getSystemService(Context.STORAGE_SERVICE) as StorageManager
+    val volumeInfoClazz: Class<*>
+    val diskInfoClaszz: Class<*>
+    try {
+        volumeInfoClazz = Class.forName("android.os.storage.VolumeInfo")
+        diskInfoClaszz = Class.forName("android.os.storage.DiskInfo")
+        val StorageManager_getVolumes: Method =
+            Class.forName("android.os.storage.StorageManager").getMethod("getVolumes")
+        val VolumeInfo_GetDisk: Method = volumeInfoClazz.getMethod("getDisk")
+        val VolumeInfo_GetPath: Method = volumeInfoClazz.getMethod("getPath")
+        val DiskInfo_IsUsb: Method = diskInfoClaszz.getMethod("isUsb")
+        val DiskInfo_IsSd: Method = diskInfoClaszz.getMethod("isSd")
+        val List_VolumeInfo = (StorageManager_getVolumes.invoke(mStorageManager) as List<Any>)
+        for (i in List_VolumeInfo.indices) {
+            val volumeInfo = List_VolumeInfo[i]
+            val diskInfo: Any = VolumeInfo_GetDisk.invoke(volumeInfo) ?: continue
+            val sd = DiskInfo_IsSd.invoke(diskInfo) as Boolean
+            val usb = DiskInfo_IsUsb.invoke(diskInfo) as Boolean
+            val file: File = VolumeInfo_GetPath.invoke(volumeInfo) as File
+            if (isUsb == usb) { //usb
+                assert(file != null)
+                path = file.getAbsolutePath()
+                Log.d(
+                    "Progarm",
+                    "usb的path=====$path"
+                )
+            } else if (!isUsb == sd) { //sd
+                assert(file != null)
+                path = file.getAbsolutePath()
+            }
+        }
+    } catch (e: Exception) {
+        Log.d(
+            "Progarm",
+            "获取usb地址异常=====" + e.printStackTrace()
+        )
+        e.printStackTrace()
+    }
+    Log.d(
+        "Progarm",
+        "usb的path===未获取到==$path"
+    )
+    return path
+}

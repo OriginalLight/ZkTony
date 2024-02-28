@@ -42,4 +42,11 @@ abstract class ExperimentRecordDao : BaseDao<ExperimentRecord> {
         """
     )
     abstract suspend fun deleteById(id: Long)
+
+    @Query(
+        """
+        DELETE FROM sportslog
+        """
+    )
+    abstract suspend fun deleteByAll()
 }

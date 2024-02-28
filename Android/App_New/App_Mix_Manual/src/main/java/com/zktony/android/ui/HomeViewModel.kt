@@ -138,6 +138,16 @@ class HomeViewModel @Inject constructor(
     private val _first = MutableStateFlow(false)
 
     /**
+     * 填充是否弹出弹窗
+     */
+    private val _pipelineDialogOpen = MutableStateFlow(false)
+
+    /**
+     * 清洗是否弹出弹窗
+     */
+    private val _cleanDialogOpen = MutableStateFlow(false)
+
+    /**
      * 检测是否更换制胶架
      * true:更换过
      * false:未更换
@@ -168,6 +178,10 @@ class HomeViewModel @Inject constructor(
 
     val hint = _hint.asStateFlow()
 
+    val pipelineDialogOpen = _pipelineDialogOpen.asStateFlow()
+    val cleanDialogOpen = _cleanDialogOpen.asStateFlow()
+
+
     val selectRudio = dataStore.readData("selectRudio", 1)
 
     /**
@@ -186,13 +200,13 @@ class HomeViewModel @Inject constructor(
 
 
     init {
+        reset()
         if (selectRudio == 1) {
             //开机
             ApplicationUtils.ctx.playAudio(R.raw.power_buzz)
         } else if (selectRudio == 2) {
 
         }
-        reset()
     }
 
     fun dispatch(intent: HomeIntent) {
@@ -250,6 +264,15 @@ class HomeViewModel @Inject constructor(
                 _wasteprogress.value = 0f
             }
 
+            is HomeIntent.CleanDialog -> viewModelScope.launch {
+                _cleanDialogOpen.value = intent.cleanState
+            }
+
+            is HomeIntent.PipelineDialog -> viewModelScope.launch {
+                _pipelineDialogOpen.value = intent.pipelineState
+            }
+
+            else -> {}
         }
     }
 
@@ -344,8 +367,7 @@ class HomeViewModel @Inject constructor(
                 var state1 = 0
                 var state2 = 0
                 while (!_hint.value) {
-                    println("更换制胶架状态====$state1====$state2")
-                    if (_hint.value == null) {
+                    if (_hintJob.value == null) {
                         break
                     }
 
@@ -1433,7 +1455,7 @@ class HomeViewModel @Inject constructor(
 
     private fun startJob(status: Int) {
         viewModelScope.launch {
-            _uiFlags.value = UiFlags.objects(0)
+
             val selected = dao.getById(_selected.value).firstOrNull()
             if (selected == null) {
                 _uiFlags.value = UiFlags.message("未选择程序")
@@ -1758,6 +1780,20 @@ class HomeViewModel @Inject constructor(
                 "HomeViewModel_startJob",
                 "===预排前期准备数据结束==="
             )
+            //预排使用液量
+            _usehigh.value = (highExpectedPulse / p2jz / 1000).toFloat()
+            _uselow.value = (lowExpectedPulse / p3jz / 1000).toFloat()
+            _usecoagulant.value = (coagulantExpectedPulse / p1jz / 1000).toFloat()
+            //预排使用液量
+
+            //制胶使用液量
+            _usehigh.value = (guleHighPulse / p2jz / 1000).toFloat()
+            _uselow.value = (guleLowPulse / p3jz / 1000).toFloat()
+            _usecoagulant.value = (coagulantPulseCount / p1jz / 1000).toFloat()
+            _userinse.value = setting.rinseCleanVolume.toFloat()
+            //制胶使用液量
+
+            _uiFlags.value = UiFlags.objects(0)
 
             var coagulantBool = false
             var coagulantStart = 0L
@@ -2188,20 +2224,6 @@ class HomeViewModel @Inject constructor(
 
                     delay(100)
 
-                    //预排使用液量
-                    _usehigh.value = (highExpectedPulse / p2jz / 1000).toFloat()
-                    _uselow.value = (lowExpectedPulse / p3jz / 1000).toFloat()
-                    _usecoagulant.value = (coagulantExpectedPulse / p1jz / 1000).toFloat()
-                    //预排使用液量
-
-                    //制胶使用液量
-                    _usehigh.value += (guleHighPulse / p2jz / 1000).toFloat()
-                    _uselow.value += (guleLowPulse / p3jz / 1000).toFloat()
-                    _usecoagulant.value += (coagulantPulseCount / p1jz / 1000).toFloat()
-                    _userinse.value = setting.rinseCleanVolume.toFloat()
-                    //制胶使用液量
-
-
                     _complate.value += 1
                     val expectedMakenum = dataStore.readData("expectedMakenum", 0)
                     waitTimeRinse()
@@ -2265,6 +2287,9 @@ class HomeViewModel @Inject constructor(
             _uiFlags.value = UiFlags.objects(12)
             _job2.value?.cancel()
             _job2.value = null
+            _hintJob.value?.cancel()
+            _hintJob.value = null
+
             val selected = dao.getById(_selected.value).firstOrNull()
             if (selected == null) {
                 _uiFlags.value = UiFlags.message("未选择程序")
@@ -2319,6 +2344,19 @@ class HomeViewModel @Inject constructor(
             _waitTimeRinseJob.value?.cancel()
             _waitTimeRinseJob.value = null
 
+            _job2.value?.cancel()
+            _job2.value = null
+
+            println("停止前的${_hintJob.value}")
+
+            _hintJob.value?.cancel()
+            _hintJob.value = null
+            println("停止后的${_hintJob.value}")
+//            _hint.value = true
+
+            _job.value?.cancel()
+            _job.value = null
+
             val date = Date(System.currentTimeMillis()).dateFormat("yyyy-MM-dd")
             sportsLogDao.insert(SportsLog(logName = "${date}-MBG1500", startModel = "停止制胶"))
             delay(100)
@@ -2327,14 +2365,7 @@ class HomeViewModel @Inject constructor(
                 ApplicationUtils.ctx.playAudio(R.raw.startend_voice)
             }
             _uiFlags.value = UiFlags.objects(1)
-            _job2.value?.cancel()
-            _job2.value = null
 
-            _hintJob.value?.cancel()
-            _hintJob.value = null
-
-            _job.value?.cancel()
-            _job.value = null
             delay(200L)
 //            stop(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
             stop(0, 1, 2, 3, 4)
@@ -2873,6 +2904,8 @@ class HomeViewModel @Inject constructor(
                         "废液槽位置===$wastePosition"
                     )
 
+                    delay(100)
+
                     val date = Date(System.currentTimeMillis()).dateFormat("yyyy-MM-dd")
                     sportsLogDao.insert(
                         SportsLog(
@@ -3171,7 +3204,7 @@ class HomeViewModel @Inject constructor(
                 reset()
             } else {
 
-                _uiFlags.value = UiFlags.objects(4 + index)
+                _uiFlags.value = UiFlags.objects(5)
 
                 _waitTimeRinseJob.value?.cancel()
                 _waitTimeRinseJob.value = null
@@ -3277,7 +3310,13 @@ class HomeViewModel @Inject constructor(
                         "HomeViewModel_pipeline",
                         "废液槽位置===$wastePosition"
                     )
-
+                    val expectedMakenum = dataStore.readData("expectedMakenum", 0)
+                    println("expectedMakenum===$expectedMakenum")
+                    _userinse.value = rinseFilling.toFloat()
+                    _usehigh.value = higeFilling.toFloat()
+                    _uselow.value = lowFilling.toFloat()
+                    _usecoagulant.value = coagulantFilling.toFloat()
+                    delay(100)
 
                     val date = Date(System.currentTimeMillis()).dateFormat("yyyy-MM-dd")
                     sportsLogDao.insert(
@@ -3524,11 +3563,6 @@ class HomeViewModel @Inject constructor(
                     slDao.update(slEnetity)
                     delay(100L)
 
-                    _userinse.value += rinseFilling.toFloat()
-                    _usehigh.value += higeFilling.toFloat()
-                    _uselow.value += lowFilling.toFloat()
-                    _usecoagulant.value += coagulantFilling.toFloat()
-
                     if (selectRudio == 2) {
                         ApplicationUtils.ctx.playAudio(R.raw.pipeline_voice)
                     }
@@ -3604,5 +3638,8 @@ sealed class HomeIntent {
     data object CleanWaste : HomeIntent()
 
     data object CleanWasteState : HomeIntent()
+
+    data class CleanDialog(val cleanState: Boolean) : HomeIntent()
+    data class PipelineDialog(val pipelineState: Boolean) : HomeIntent()
 
 }

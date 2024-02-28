@@ -1,9 +1,17 @@
 package com.zktony.android.ui
 
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
+import android.os.storage.StorageManager
 import android.provider.Settings
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -22,6 +30,7 @@ import com.zktony.android.data.datastore.DataSaverDataStore
 import com.zktony.android.data.entities.ErrorRecord
 import com.zktony.android.data.entities.Motor
 import com.zktony.android.data.entities.NewCalibration
+import com.zktony.android.data.entities.Program
 import com.zktony.android.data.entities.Setting
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
@@ -44,11 +53,16 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
+import org.xmlpull.v1.XmlPullParser
+import org.xmlpull.v1.XmlPullParserFactory
 import java.io.File
 import java.io.FileWriter
+import java.lang.reflect.Method
+import java.util.zip.ZipFile
 import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.math.ceil
+import kotlin.math.floor
 
 /**
  * @author: 刘贺贺
@@ -86,6 +100,22 @@ class SettingViewModel @Inject constructor(
      */
     private val _current = MutableStateFlow(0)
 
+    //导入数据更新
+    private val _speed = MutableStateFlow(0)
+    private val _rinseSpeed = MutableStateFlow(0L)
+    private val _xSpeed = MutableStateFlow(0L)
+    private val _coagulantSpeed = MutableStateFlow(0L)
+    private val _coagulantpulse = MutableStateFlow(0)
+    private val _coagulantTime = MutableStateFlow(0)
+    private val _coagulantResetPulse = MutableStateFlow(0)
+
+    val speedFlow = _speed.asStateFlow()
+    val rinseSpeedFlow = _rinseSpeed.asStateFlow()
+    val xSpeedFlow = _xSpeed.asStateFlow()
+    val coagulantSpeedFlow = _coagulantSpeed.asStateFlow()
+    val coagulantpulseFlow = _coagulantpulse.asStateFlow()
+    val coagulantTimeFlow = _coagulantTime.asStateFlow()
+    val coagulantResetPulseFlow = _coagulantResetPulse.asStateFlow()
 
     val application = _application.asStateFlow()
     val selected = _selected.asStateFlow()
@@ -121,6 +151,7 @@ class SettingViewModel @Inject constructor(
     val job = _job.asStateFlow()
     val complate = _complate.asStateFlow()
 
+
     init {
         viewModelScope.launch {
             if (ApplicationUtils.isNetworkAvailable()) {
@@ -130,6 +161,7 @@ class SettingViewModel @Inject constructor(
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.P)
     fun dispatch(intent: SettingIntent) {
         when (intent) {
             is SettingIntent.CheckUpdate -> checkUpdate()
@@ -215,19 +247,264 @@ class SettingViewModel @Inject constructor(
             }
 
             is SettingIntent.ClearAll -> viewModelScope.launch {
-                proDao.deleteAll()
-                errorDao.deleteAll()
-                sportsLogDao.deleteAll()
-                erDao.deleteAll()
+                proDao.deleteByAll()
+                errorDao.deleteByAll()
+                sportsLogDao.deleteByAll()
+                erDao.deleteByAll()
             }
 
             is SettingIntent.Login -> viewModelScope.launch {
                 _currentpwd.value = intent.pwd
             }
 
+            is SettingIntent.ImportData -> importData(intent.filePath)
+
+            is SettingIntent.UpdateApkU -> updateApkU(intent.context, intent.apkPath)
 
         }
     }
+
+    @RequiresApi(Build.VERSION_CODES.P)
+    private fun updateApkU(context: Context, apkPath: String) {
+        viewModelScope.launch {
+            try {
+                //获取未安装apk的版本
+                val versionCode = getApkCode(context, apkPath)
+                println("versionCode: $versionCode")
+                var currentCode = BuildConfig.VERSION_CODE
+                println("当前: $currentCode")
+                if (versionCode > currentCode) {
+                    val apkFile = File(apkPath)
+                    ApplicationUtils.installApp(apkFile)
+                } else {
+                    _uiFlags.value = UiFlags.message("安装程序版本错误")
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _uiFlags.value = UiFlags.message("数据错误！")
+                return@launch
+            } finally {
+                _uiFlags.value = UiFlags.none()
+            }
+        }
+
+    }
+
+    @RequiresApi(Build.VERSION_CODES.P)
+    fun getApkCode(context: Context, apkFilePath: String): Int {
+        val info =
+            context.packageManager.getPackageArchiveInfo(apkFilePath, PackageManager.GET_ACTIVITIES)
+        if (info != null) {
+            //当前使用的android7系统，android9之后使用longVersionCode
+            return info.versionCode
+        }
+        return -1
+    }
+
+    fun getApkVersionInfo(apkFilePath: String): Pair<Int, String> {
+        var versionCode = 0
+        var versionName = ""
+
+        try {
+            // 打开APK文件作为ZipFile
+            val zipFile = ZipFile(apkFilePath)
+            // 获取APK中的AndroidManifest.xml文件
+            val manifestEntry = zipFile.getEntry("AndroidManifest.xml")
+            if (manifestEntry != null) {
+                // 读取AndroidManifest.xml文件内容
+                val inputStream = zipFile.getInputStream(manifestEntry)
+                val xmlPullParserFactory = XmlPullParserFactory.newInstance()
+                val xmlPullParser = xmlPullParserFactory.newPullParser()
+                xmlPullParser.setInput(inputStream, null)
+
+                // 解析XML文件，查找versionCode和versionName
+                var eventType = xmlPullParser.getEventType()
+                while (eventType != XmlPullParser.END_DOCUMENT) {
+                    if (eventType == XmlPullParser.START_TAG) {
+                        if (xmlPullParser.getName() == "manifest") {
+                            val versionCodeAttr =
+                                xmlPullParser.getAttributeValue(null, "versionCode")
+                            val versionNameAttr =
+                                xmlPullParser.getAttributeValue(null, "versionName")
+                            if (versionCodeAttr != null) {
+                                versionCode = versionCodeAttr.toInt()
+                            }
+                            if (versionNameAttr != null) {
+                                versionName = versionNameAttr
+                            }
+                        }
+                    }
+                    eventType = xmlPullParser.next()
+                }
+                inputStream.close()
+            }
+            zipFile.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        return Pair(versionCode, versionName)
+    }
+
+    private fun importData(filePath: String) {
+        viewModelScope.launch {
+            _uiFlags.value = UiFlags.objects(11)
+            try {
+                //新建
+                var speChat =
+                    "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]"
+
+                val pro1 = proDao.getById(1L).firstOrNull()
+                var proBool = false
+                if (pro1 == null) {
+                    proBool = true
+                }
+
+                var num = 0
+
+                File(filePath).bufferedReader().useLines { lines ->
+                    for (line in lines) {
+                        if (line.isNotEmpty()) {
+                            println("导入的每行line数据是$line")
+                            var textList = ArrayList<String>()
+                            var contents = line.split(",")
+                            contents.forEach {
+                                val byte = it.split(":").get(1)
+                                textList.add(byte)
+                            }
+                            println("导入的每行list数据是$textList")
+                            if (num < 3) {
+                                if (proBool) {
+                                    programInsert(
+                                        textList[0],
+                                        textList[1].toInt(),
+                                        textList[2].toInt(),
+                                        textList[3],
+                                        textList[4].toInt(),
+                                        textList[5].toDouble(),
+                                        textList[6]
+                                    )
+                                } else {
+                                    var progrm = proDao.getById((num + 1).toLong()).firstOrNull()
+                                    if (progrm != null) {
+                                        progrm.displayText = textList[0]
+                                        progrm.startRange = textList[1].toInt()
+                                        progrm.endRange = textList[2].toInt()
+                                        progrm.thickness = textList[3]
+                                        progrm.coagulant = textList[4].toInt()
+                                        progrm.volume = textList[5].toDouble()
+                                        progrm.founder = textList[6]
+                                        programUpdate(progrm)
+                                    }
+                                }
+                            } else if (num == 3) {
+                                val setting = slEntitiy.firstOrNull()
+                                if (setting != null) {
+                                    setting.higeCleanVolume =
+                                        textList[0].toDouble()
+                                    setting.higeRehearsalVolume =
+                                        textList[1].toDouble()
+                                    setting.higeFilling = textList[2].toDouble()
+                                    setting.lowCleanVolume =
+                                        textList[3].toDouble()
+                                    setting.lowFilling = textList[4].toDouble()
+                                    setting.rinseCleanVolume =
+                                        textList[5].toDouble()
+                                    setting.rinseFilling = textList[6].toDouble()
+                                    setting.coagulantCleanVolume =
+                                        textList[7].toDouble()
+                                    setting.coagulantFilling =
+                                        textList[8].toDouble()
+                                    SettingIntent.UpdateSet(setting)
+                                }
+
+                            } else if (num == 4) {
+                                val newCalibration = ncEntitiy.firstOrNull()
+                                if (newCalibration != null) {
+                                    newCalibration.higeLiquidVolume1 = textList[0].toDouble()
+                                    newCalibration.higeLiquidVolume2 = textList[1].toDouble()
+                                    newCalibration.higeLiquidVolume3 = textList[2].toDouble()
+                                    newCalibration.higeAvg =
+                                        (textList[0].toDouble() + textList[1].toDouble() + textList[2].toDouble()) / 3
+
+                                    newCalibration.lowLiquidVolume1 = textList[3].toDouble()
+                                    newCalibration.lowLiquidVolume2 = textList[4].toDouble()
+                                    newCalibration.lowLiquidVolume3 = textList[5].toDouble()
+                                    newCalibration.lowAvg =
+                                        (textList[4].toDouble() + textList[5].toDouble() + textList[6].toDouble()) / 3
+
+                                    newCalibration.rinseLiquidVolume1 = textList[6].toDouble()
+                                    newCalibration.rinseLiquidVolume2 = textList[7].toDouble()
+                                    newCalibration.rinseLiquidVolume3 = textList[8].toDouble()
+                                    newCalibration.rinseAvg =
+                                        (textList[7].toDouble() + textList[8].toDouble() + textList[9].toDouble()) / 3
+
+                                    newCalibration.coagulantLiquidVolume1 = textList[9].toDouble()
+                                    newCalibration.coagulantLiquidVolume2 = textList[10].toDouble()
+                                    newCalibration.coagulantLiquidVolume3 = textList[11].toDouble()
+                                    newCalibration.coagulantAvg =
+                                        (textList[9].toDouble() + textList[10].toDouble() + textList[11].toDouble()) / 3
+                                    SettingIntent.UpdateNC(newCalibration)
+                                }
+                            } else {
+                                _speed.value = textList[0].toInt()
+                                _rinseSpeed.value = textList[1].toLong()
+                                _xSpeed.value = textList[2].toLong()
+                                _coagulantSpeed.value = textList[3].toLong()
+                                _coagulantpulse.value = textList[4].toInt()
+                                _coagulantTime.value = textList[5].toInt()
+                                _coagulantResetPulse.value = textList[6].toInt()
+                            }
+                        }
+                        num++
+                    }
+                }
+                delay(500)
+                _uiFlags.value = UiFlags.message("导入完成！")
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _uiFlags.value = UiFlags.message("数据错误！")
+                _uiFlags.value = UiFlags.none()
+                return@launch
+            } finally {
+                _uiFlags.value = UiFlags.none()
+            }
+        }
+
+
+    }
+
+    private fun programUpdate(entity: Program) {
+        viewModelScope.launch {
+            proDao.update(entity)
+        }
+    }
+
+
+    private fun programInsert(
+        displayText: String,
+        startRange: Int,
+        endRange: Int,
+        thickness: String,
+        coagulant: Int,
+        volume: Double,
+        founder: String
+    ) {
+        viewModelScope.launch {
+            proDao.insert(
+                Program(
+                    displayText = displayText,
+                    startRange = startRange,
+                    endRange = endRange,
+                    thickness = thickness,
+                    coagulant = coagulant,
+                    volume = volume,
+                    founder = founder
+                )
+            )
+        }
+    }
+
 
     private fun pipeline() {
         viewModelScope.launch {
@@ -264,6 +541,12 @@ class SettingViewModel @Inject constructor(
                 val coagulantpulse = dataStore.readData("coagulantpulse", 550000).toLong()
 
                 /**
+                 * 复位后预排步数
+                 */
+                val coagulantResetPulse =
+                    dataStore.readData("coagulantResetPulse", 1500).toLong()
+
+                /**
                  * 促凝剂转速
                  */
                 val coagulantSpeed = dataStore.readData("coagulantSpeed", 200L)
@@ -279,6 +562,10 @@ class SettingViewModel @Inject constructor(
                 val xSpeed = dataStore.readData("xSpeed", 100L)
 
                 val p1Count = p1.toDouble() / (coagulantpulse - 51200).toDouble()
+                //向下取整
+                val count = floor(p1Count).toInt()
+
+                val qyu = p1 % (coagulantpulse - 50000)
 
                 /**
                  * 废液槽位置
@@ -294,8 +581,9 @@ class SettingViewModel @Inject constructor(
                     )
                 }
                 delay(100L)
-                if (p1Count > 1) {
-                    for (i in 0 until Math.ceil(p1Count).toInt()) {
+
+                for (i in 1..count) {
+                    if (i == 1) {
                         SerialPortUtils.start {
                             timeOut = 1000L * 60L * 10
                             with(
@@ -305,7 +593,7 @@ class SettingViewModel @Inject constructor(
                                     coagulantSpeed * 1193,
                                     coagulantSpeed * 1193
                                 ),
-                                pdv = coagulantpulse
+                                pdv = coagulantpulse - 50000
                             )
                         }
                         delay(100L)
@@ -318,13 +606,42 @@ class SettingViewModel @Inject constructor(
                                     coagulantSpeed * 1193,
                                     coagulantSpeed * 1193
                                 ),
-                                pdv = -coagulantpulse
+                                pdv = -(coagulantpulse - 50000 + coagulantResetPulse)
+                            )
+                        }
+                        delay(100L)
+                    } else {
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 60L * 10
+                            with(
+                                index = 1,
+                                ads = Triple(
+                                    coagulantSpeed * 13,
+                                    coagulantSpeed * 1193,
+                                    coagulantSpeed * 1193
+                                ),
+                                pdv = (coagulantpulse - 50000)
+                            )
+                        }
+                        delay(100L)
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 60L * 10
+                            with(
+                                index = 1,
+                                ads = Triple(
+                                    coagulantSpeed * 13,
+                                    coagulantSpeed * 1193,
+                                    coagulantSpeed * 1193
+                                ),
+                                pdv = -(coagulantpulse - 50000)
                             )
                         }
                         delay(100L)
                     }
+                }
 
-                } else {
+                if (count == 0) {
+                    //没有进上面的循环
                     SerialPortUtils.start {
                         timeOut = 1000L * 60L * 10
                         with(
@@ -334,9 +651,81 @@ class SettingViewModel @Inject constructor(
                                 coagulantSpeed * 1193,
                                 coagulantSpeed * 1193
                             ),
-                            pdv = coagulantFilling * 1000
+                            pdv = qyu
                         )
                     }
+                    delay(100L)
+                    SerialPortUtils.start {
+                        timeOut = 1000L * 60L * 10
+                        with(
+                            index = 1,
+                            ads = Triple(
+                                coagulantSpeed * 13,
+                                coagulantSpeed * 1193,
+                                coagulantSpeed * 1193
+                            ),
+                            pdv = -(qyu + coagulantResetPulse)
+                        )
+                    }
+                    delay(100L)
+
+                    SerialPortUtils.start {
+                        timeOut = 1000L * 60L * 10
+                        with(
+                            index = 1,
+                            ads = Triple(
+                                coagulantSpeed * 13,
+                                coagulantSpeed * 1193,
+                                coagulantSpeed * 1193
+                            ),
+                            pdv = coagulantResetPulse
+                        )
+                    }
+                    delay(100L)
+
+                } else {
+                    //进入上面的循环
+                    SerialPortUtils.start {
+                        timeOut = 1000L * 60L * 10
+                        with(
+                            index = 1,
+                            ads = Triple(
+                                coagulantSpeed * 13,
+                                coagulantSpeed * 1193,
+                                coagulantSpeed * 1193
+                            ),
+                            pdv = qyu
+                        )
+                    }
+                    delay(100L)
+                    SerialPortUtils.start {
+                        timeOut = 1000L * 60L * 10
+                        with(
+                            index = 1,
+                            ads = Triple(
+                                coagulantSpeed * 13,
+                                coagulantSpeed * 1193,
+                                coagulantSpeed * 1193
+                            ),
+                            pdv = -qyu
+                        )
+                    }
+                    delay(100L)
+
+                    SerialPortUtils.start {
+                        timeOut = 1000L * 60L * 10
+                        with(
+                            index = 1,
+                            ads = Triple(
+                                coagulantSpeed * 13,
+                                coagulantSpeed * 1193,
+                                coagulantSpeed * 1193
+                            ),
+                            pdv = coagulantResetPulse
+                        )
+                    }
+                    delay(100L)
+
                 }
 
 
@@ -408,6 +797,12 @@ class SettingViewModel @Inject constructor(
                     val coagulantpulse = dataStore.readData("coagulantpulse", 550000).toLong()
 
                     /**
+                     * 复位后预排步数
+                     */
+                    val coagulantResetPulse =
+                        dataStore.readData("coagulantResetPulse", 1500).toLong()
+
+                    /**
                      * 促凝剂转速
                      */
                     val coagulantSpeed = dataStore.readData("coagulantSpeed", 200L)
@@ -424,6 +819,18 @@ class SettingViewModel @Inject constructor(
 
                     val p1Count = p1.toDouble() / coagulantpulse.toDouble()
 
+                    //向下取整
+                    val count = floor(p1Count).toInt()
+                    Log.d(
+                        "HomeViewModel_pipeline",
+                        "循环向下取整===$count"
+                    )
+                    val qyu = p1 % (coagulantpulse - 50000)
+                    Log.d(
+                        "HomeViewModel_pipeline",
+                        "取余===$qyu"
+                    )
+
                     /**
                      * 废液槽位置
                      */
@@ -439,8 +846,10 @@ class SettingViewModel @Inject constructor(
                         )
                     }
                     delay(100L)
-                    if (p1Count > 1) {
-                        for (i in 0 until Math.ceil(p1Count).toInt()) {
+
+
+                    for (i in 1..count) {
+                        if (i == 1) {
                             SerialPortUtils.start {
                                 timeOut = 1000L * 60L * 10
                                 with(
@@ -450,7 +859,7 @@ class SettingViewModel @Inject constructor(
                                         coagulantSpeed * 1193,
                                         coagulantSpeed * 1193
                                     ),
-                                    pdv = coagulantpulse
+                                    pdv = coagulantpulse - 50000
                                 )
                             }
                             delay(100L)
@@ -463,13 +872,42 @@ class SettingViewModel @Inject constructor(
                                         coagulantSpeed * 1193,
                                         coagulantSpeed * 1193
                                     ),
-                                    pdv = -coagulantpulse
+                                    pdv = -(coagulantpulse - 50000 + coagulantResetPulse)
+                                )
+                            }
+                            delay(100L)
+                        } else {
+                            SerialPortUtils.start {
+                                timeOut = 1000L * 60L * 10
+                                with(
+                                    index = 1,
+                                    ads = Triple(
+                                        coagulantSpeed * 13,
+                                        coagulantSpeed * 1193,
+                                        coagulantSpeed * 1193
+                                    ),
+                                    pdv = (coagulantpulse - 50000)
+                                )
+                            }
+                            delay(100L)
+                            SerialPortUtils.start {
+                                timeOut = 1000L * 60L * 10
+                                with(
+                                    index = 1,
+                                    ads = Triple(
+                                        coagulantSpeed * 13,
+                                        coagulantSpeed * 1193,
+                                        coagulantSpeed * 1193
+                                    ),
+                                    pdv = -(coagulantpulse - 50000)
                                 )
                             }
                             delay(100L)
                         }
+                    }
 
-                    } else {
+                    if (count == 0) {
+                        //没有进上面的循环
                         SerialPortUtils.start {
                             timeOut = 1000L * 60L * 10
                             with(
@@ -479,9 +917,81 @@ class SettingViewModel @Inject constructor(
                                     coagulantSpeed * 1193,
                                     coagulantSpeed * 1193
                                 ),
-                                pdv = coagulantCleanVolume * 1000
+                                pdv = qyu
                             )
                         }
+                        delay(100L)
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 60L * 10
+                            with(
+                                index = 1,
+                                ads = Triple(
+                                    coagulantSpeed * 13,
+                                    coagulantSpeed * 1193,
+                                    coagulantSpeed * 1193
+                                ),
+                                pdv = -(qyu + coagulantResetPulse)
+                            )
+                        }
+                        delay(100L)
+
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 60L * 10
+                            with(
+                                index = 1,
+                                ads = Triple(
+                                    coagulantSpeed * 13,
+                                    coagulantSpeed * 1193,
+                                    coagulantSpeed * 1193
+                                ),
+                                pdv = coagulantResetPulse
+                            )
+                        }
+                        delay(100L)
+
+                    } else {
+                        //进入上面的循环
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 60L * 10
+                            with(
+                                index = 1,
+                                ads = Triple(
+                                    coagulantSpeed * 13,
+                                    coagulantSpeed * 1193,
+                                    coagulantSpeed * 1193
+                                ),
+                                pdv = qyu
+                            )
+                        }
+                        delay(100L)
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 60L * 10
+                            with(
+                                index = 1,
+                                ads = Triple(
+                                    coagulantSpeed * 13,
+                                    coagulantSpeed * 1193,
+                                    coagulantSpeed * 1193
+                                ),
+                                pdv = -qyu
+                            )
+                        }
+                        delay(100L)
+
+                        SerialPortUtils.start {
+                            timeOut = 1000L * 60L * 10
+                            with(
+                                index = 1,
+                                ads = Triple(
+                                    coagulantSpeed * 13,
+                                    coagulantSpeed * 1193,
+                                    coagulantSpeed * 1193
+                                ),
+                                pdv = coagulantResetPulse
+                            )
+                        }
+                        delay(100L)
+
                     }
 
                     delay(100L)
@@ -2510,5 +3020,9 @@ sealed class SettingIntent {
     data object ClearAll : SettingIntent()
 
     data class Login(val pwd: String) : SettingIntent()
+
+    data class ImportData(val filePath: String) : SettingIntent()
+
+    data class UpdateApkU(val context: Context, val apkPath: String) : SettingIntent()
 
 }

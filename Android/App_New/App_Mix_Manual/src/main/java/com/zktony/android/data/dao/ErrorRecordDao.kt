@@ -36,6 +36,14 @@ abstract class ErrorRecordDao : BaseDao<ErrorRecord> {
     )
     abstract fun getById(id: Long): Flow<ErrorRecord?>
 
+
+    @Query(
+        """
+        DELETE FROM errorrecord
+        """
+    )
+    abstract suspend fun deleteByAll()
+
     @Query(
         """
         DELETE FROM errorrecord

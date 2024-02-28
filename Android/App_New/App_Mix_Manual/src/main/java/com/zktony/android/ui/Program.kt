@@ -119,7 +119,7 @@ fun ProgramRoute(viewModel: ProgramViewModel) {
             contentScale = ContentScale.FillBounds
         )
         Column {
-            HomeAppBar(page) { navigation() }
+            HomeAppBar(page, false) { navigation() }
             AnimatedContent(targetState = page) {
                 when (page) {
                     PageType.PROGRAM -> ProgramList(
@@ -174,6 +174,7 @@ fun ProgramList(
 
     var selectedIndex by remember { mutableStateOf(0) }
 
+    var selectedId by remember { mutableStateOf(0L) }
 
     /**
      * 制胶名称
@@ -260,10 +261,7 @@ fun ProgramList(
                         .background(if (index % 2 == 0) Color(rgb(239, 239, 239)) else Color.White)
                         .clickable(onClick = {
                             selectedIndex = index
-                            Log.d(
-                                "Test",
-                                "点击选中的=========$selectedIndex"
-                            )
+                            selectedId = item.id
                         })
                 ) {
                     TableTextBody(text = (index + 1).toString(), width = cellWidthList[0], selected)
@@ -358,7 +356,7 @@ fun ProgramList(
                 Button(modifier = Modifier
                     .padding(start = 15.dp)
                     .width(90.dp)
-                    .height(50.dp), colors = ButtonDefaults.buttonColors(
+                    .height(50.dp),enabled = selectedId !in 1..3, colors = ButtonDefaults.buttonColors(
                     containerColor = Color(rgb(0, 105, 52))
                 ),
                     shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
@@ -639,7 +637,7 @@ fun ProgramList(
 
             }, confirmButton = {
                 Button(
-                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                    modifier = Modifier.width(100.dp), enabled = selectedId !in 1..3, colors = ButtonDefaults.buttonColors(
                         containerColor = Color(rgb(0, 105, 52))
                     ), onClick = {
                         try {
@@ -677,7 +675,7 @@ fun ProgramList(
                                         ).show()
                                     } else {
                                         if (startRange_ex.toInt() > endRange_ex.toInt()
-                                            || startRange_ex.toInt() < 3 || startRange_ex.toInt() > 30 || endRange_ex.toInt() < 3 || endRange_ex.toInt() > 30 || coagulant_ex.toInt() < 0 || volume_ex.toDouble() < 0
+                                            || startRange_ex.toInt() < 3 || startRange_ex.toInt() > 30 || endRange_ex.toInt() < 3 || endRange_ex.toInt() > 30 || coagulant_ex.toInt() <= 0 || volume_ex.toDouble() <= 0
                                             || coagulant_ex.toInt() > 800 || volume_ex.toDouble() > 20
                                         ) {
                                             Toast.makeText(
@@ -732,7 +730,7 @@ fun ProgramList(
 
                                     } else {
                                         if (startRange_ex.toInt() > endRange_ex.toInt()
-                                            || startRange_ex.toInt() < 3 || startRange_ex.toInt() > 30 || endRange_ex.toInt() < 3 || endRange_ex.toInt() > 30 || coagulant_ex.toInt() < 0 || volume_ex.toDouble() < 0
+                                            || startRange_ex.toInt() < 3 || startRange_ex.toInt() > 30 || endRange_ex.toInt() < 3 || endRange_ex.toInt() > 30 || coagulant_ex.toInt() <= 0 || volume_ex.toDouble() <= 0
                                             || coagulant_ex.toInt() > 800 || volume_ex.toDouble() > 20
                                         ) {
                                             Toast.makeText(
@@ -864,14 +862,12 @@ fun ProgramList(
                                 var textList = ArrayList<String>()
 
                                 //读取文件内容
-                                val content = File(path + "/zktony/test.txt").readText()
-                                println("content========" + content)
+                                val content = File("$path/zktony/program.txt").readText()
                                 var contents = content.split(",")
                                 contents.forEach {
                                     val entityy = it.split(":").get(1)
                                     textList.add(entityy)
                                 }
-                                println("textList====" + textList)
 
                                 //新建
                                 var speChat =
@@ -928,12 +924,6 @@ fun ProgramList(
                             }
 
 
-                        } else {
-                            Toast.makeText(
-                                context,
-                                "U盘不存在！",
-                                Toast.LENGTH_SHORT
-                            ).show()
                         }
 
 

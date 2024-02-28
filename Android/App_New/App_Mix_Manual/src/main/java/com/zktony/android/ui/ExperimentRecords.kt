@@ -108,7 +108,7 @@ fun ExperimentRecords(viewModel: ExperimentRecordsViewModel) {
             contentScale = ContentScale.FillBounds
         )
         Column {
-            HomeAppBar(page) { navigation() }
+            HomeAppBar(page,false) { navigation() }
             AnimatedContent(targetState = page) {
                 when (page) {
                     PageType.EXPERIMENTRECORDS -> experimentList(

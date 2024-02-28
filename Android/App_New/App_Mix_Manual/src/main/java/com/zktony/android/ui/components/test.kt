@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -46,6 +48,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -61,71 +64,73 @@ import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.PageType
 
 @OptIn(ExperimentalComposeUiApi::class)
-//@Preview
+@Preview
 @Composable
 fun test() {
 
-//    val keyboard = LocalSoftwareKeyboardController.current
-//    /**
-//     * 复位等待时间
-//     */
-//    val coagulantTime = rememberDataSaverState(key = "coagulantTime", default = 800)
-//    var coagulantTime_ex by remember { mutableStateOf(coagulantTime.value.toString()) }
-//
-//    Row(
-//        modifier = Modifier.padding(top = 20.dp, start = 50.dp)
-//    ) {
-//        OutlinedTextField(
-//            modifier = Modifier.width(200.dp),
-//            colors = OutlinedTextFieldDefaults.colors(
-//                focusedBorderColor = Color(rgb(0, 105, 52)),
-//                focusedLabelColor = Color(rgb(0, 105, 52)),
-//                cursorColor = Color(rgb(0, 105, 52))
-//            ),
-//            value = coagulantTime_ex,
-//            label = { Text(text = "复位等待时间") },
-//            onValueChange = {
-//                coagulantTime_ex = it
-//                coagulantTime.value = coagulantTime_ex.toIntOrNull() ?: 800
-//            },
-//            keyboardOptions = KeyboardOptions(
-//                keyboardType = KeyboardType.Number,
-//                imeAction = ImeAction.Done,
-//            ),
-//            keyboardActions = KeyboardActions(onDone = {
-//                keyboard?.hide()
-//            })
-//        )
-//    }
-
-
-}
-
-
-@Preview
-@Composable
-fun testTar() {
-    Row(
+    LazyRow(
         modifier = Modifier
-            .height(101.dp)
-            .width(572.5.dp)
-            .background(Color.White),
-        //垂直对齐
-        verticalAlignment = Alignment.CenterVertically,
+            .background(Color(
+                rgb(
+                    239,
+                    239,
+                    239
+                )
+            )
+            ).fillMaxWidth()
+            .clickable {
+            },
+        horizontalArrangement = Arrangement.SpaceBetween
+//        contentPadding = PaddingValues(
+//            horizontal = 16.dp,
+//            vertical = 8.dp
+//        ),
+//        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Icon(
-            modifier = Modifier
-                .size(30.dp)
-                .clickable {
-//                            navigation()
-                },
-            painter = painterResource(id = R.mipmap.greenarrow),
-            contentDescription = stringResource(id = TOP_LEVEL_DESTINATIONS[4].iconTextId)
-        )
 
-        Text(modifier = Modifier.padding(start = 200.dp),text = "调试模式", fontSize = 20.sp, color = Color(rgb(112, 112, 112)))
+        items(10) { index ->
+            Text(
+                text = "Item$index",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .background(Color.LightGray)
+                    .padding(16.dp)
+            )
+
+        }
+
     }
+
+
 }
+
+
+//@Preview
+//@Composable
+//fun testTar() {
+//    Row(
+//        modifier = Modifier
+//            .height(101.dp)
+//            .width(572.5.dp)
+//            .background(Color.White),
+//        //垂直对齐
+//        verticalAlignment = Alignment.CenterVertically,
+//    ) {
+//        Icon(
+//            modifier = Modifier
+//                .size(30.dp)
+//                .clickable {
+////                            navigation()
+//                },
+//            painter = painterResource(id = R.mipmap.greenarrow),
+//            contentDescription = stringResource(id = TOP_LEVEL_DESTINATIONS[4].iconTextId)
+//        )
+//
+//        Text(modifier = Modifier.padding(start = 200.dp),text = "调试模式", fontSize = 20.sp, color = Color(rgb(112, 112, 112)))
+//    }
+//}
 
 
 @Composable

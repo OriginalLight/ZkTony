@@ -72,5 +72,12 @@ abstract class SportsLogDao : BaseDao<SportsLog> {
     )
     abstract suspend fun deleteByDate(createTime: Date)
 
+    @Query(
+        """
+        DELETE FROM sportslog
+        """
+    )
+    abstract suspend fun deleteByAll()
+
 
 }

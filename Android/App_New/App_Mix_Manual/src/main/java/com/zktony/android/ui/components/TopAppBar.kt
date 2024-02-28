@@ -3,6 +3,7 @@ package com.zktony.android.ui.components
 import android.graphics.Color.rgb
 import android.text.style.BackgroundColorSpan
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -45,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -69,14 +71,13 @@ import kotlinx.coroutines.launch
  * @author 刘贺贺
  * @date 2023/8/23 9:03
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeAppBar(
-    page: Int, navigation: () -> Unit
+    page: Int,start: Boolean, navigation: () -> Unit
 ) {
 
     val navigationActions = LocalNavigationActions.current
-
+    val context = LocalContext.current
 
     Box(
         modifier = Modifier
@@ -105,7 +106,15 @@ fun HomeAppBar(
                                 )
                             )
                             .clickable {
-                                navigationActions.navigateTo(destination)
+                                if (start) {
+                                    Toast.makeText(
+                                        context,
+                                        "程序运行中,无法前往其他页面！",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }else{
+                                    navigationActions.navigateTo(destination)
+                                }
                             }
                     ) {
 
@@ -134,7 +143,15 @@ fun HomeAppBar(
                 .clip(RoundedCornerShape(20.dp))
                 .background(Color.White)
                 .clickable {
-                    navigationActions.navigateTo(TOP_LEVEL_DESTINATIONS[4])
+                    if (start) {
+                        Toast.makeText(
+                            context,
+                            "程序运行中,无法前往其他页面！",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }else{
+                        navigationActions.navigateTo(TOP_LEVEL_DESTINATIONS[4])
+                    }
                 }
         ) {
             Icon(

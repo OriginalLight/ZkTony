@@ -42,4 +42,12 @@ abstract class ProgramDao : BaseDao<Program> {
         """
     )
     abstract suspend fun deleteById(id: Long)
+
+
+    @Query(
+        """
+        DELETE FROM program
+        """
+    )
+    abstract suspend fun deleteByAll()
 }

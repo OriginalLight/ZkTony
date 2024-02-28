@@ -24,6 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zktony.android.BuildConfig
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.R
@@ -98,7 +99,7 @@ fun Splash() {
                 modifier = Modifier.padding(start = 350.dp),
                 fontSize = 18.sp,
                 color = Color.White,
-                text = "V1.1.1_202402260947"
+                text = "V${BuildConfig.VERSION_NAME}"
             )
         }
 
