@@ -134,6 +134,10 @@ class HomeViewModel @Inject constructor(
      */
     private val _usecoagulant = MutableStateFlow(0f)
 
+    /**
+     * 使用状态
+     */
+    private val _useState = MutableStateFlow(false)
 
     private val _first = MutableStateFlow(false)
 
@@ -175,6 +179,8 @@ class HomeViewModel @Inject constructor(
     val usehigh = _usehigh.asStateFlow()
     val uselow = _uselow.asStateFlow()
     val usecoagulant = _usecoagulant.asStateFlow()
+    val useState = _useState.asStateFlow()
+
 
     val hint = _hint.asStateFlow()
 
@@ -183,6 +189,9 @@ class HomeViewModel @Inject constructor(
 
 
     val selectRudio = dataStore.readData("selectRudio", 1)
+
+
+    val slEntitiy = slDao.getById(1L)
 
     /**
      * 制胶程序dao
@@ -1455,7 +1464,8 @@ class HomeViewModel @Inject constructor(
 
     private fun startJob(status: Int) {
         viewModelScope.launch {
-
+            _useState.value = false
+            _uiFlags.value = UiFlags.objects(0)
             val selected = dao.getById(_selected.value).firstOrNull()
             if (selected == null) {
                 _uiFlags.value = UiFlags.message("未选择程序")
@@ -1780,6 +1790,7 @@ class HomeViewModel @Inject constructor(
                 "HomeViewModel_startJob",
                 "===预排前期准备数据结束==="
             )
+            _useState.value = true
             //预排使用液量
             _usehigh.value = (highExpectedPulse / p2jz / 1000).toFloat()
             _uselow.value = (lowExpectedPulse / p3jz / 1000).toFloat()
@@ -1787,13 +1798,13 @@ class HomeViewModel @Inject constructor(
             //预排使用液量
 
             //制胶使用液量
-            _usehigh.value = (guleHighPulse / p2jz / 1000).toFloat()
-            _uselow.value = (guleLowPulse / p3jz / 1000).toFloat()
-            _usecoagulant.value = (coagulantPulseCount / p1jz / 1000).toFloat()
+            _usehigh.value += (guleHighPulse / p2jz / 1000).toFloat()
+            _uselow.value += (guleLowPulse / p3jz / 1000).toFloat()
+            _usecoagulant.value += (coagulantPulseCount / p1jz / 1000).toFloat()
             _userinse.value = setting.rinseCleanVolume.toFloat()
+            delay(100)
             //制胶使用液量
-
-            _uiFlags.value = UiFlags.objects(0)
+            _useState.value = false
 
             var coagulantBool = false
             var coagulantStart = 0L
@@ -2289,6 +2300,7 @@ class HomeViewModel @Inject constructor(
             _job2.value = null
             _hintJob.value?.cancel()
             _hintJob.value = null
+            _useState.value = false
 
             val selected = dao.getById(_selected.value).firstOrNull()
             if (selected == null) {
@@ -2347,15 +2359,14 @@ class HomeViewModel @Inject constructor(
             _job2.value?.cancel()
             _job2.value = null
 
-            println("停止前的${_hintJob.value}")
 
             _hintJob.value?.cancel()
             _hintJob.value = null
-            println("停止后的${_hintJob.value}")
-//            _hint.value = true
 
             _job.value?.cancel()
             _job.value = null
+
+            _useState.value = false
 
             val date = Date(System.currentTimeMillis()).dateFormat("yyyy-MM-dd")
             sportsLogDao.insert(SportsLog(logName = "${date}-MBG1500", startModel = "停止制胶"))
@@ -3203,7 +3214,7 @@ class HomeViewModel @Inject constructor(
                 delay(100L)
                 reset()
             } else {
-
+                _useState.value = false
                 _uiFlags.value = UiFlags.objects(5)
 
                 _waitTimeRinseJob.value?.cancel()
@@ -3312,11 +3323,13 @@ class HomeViewModel @Inject constructor(
                     )
                     val expectedMakenum = dataStore.readData("expectedMakenum", 0)
                     println("expectedMakenum===$expectedMakenum")
+                    _useState.value = true
                     _userinse.value = rinseFilling.toFloat()
                     _usehigh.value = higeFilling.toFloat()
                     _uselow.value = lowFilling.toFloat()
                     _usecoagulant.value = coagulantFilling.toFloat()
                     delay(100)
+                    _useState.value = false
 
                     val date = Date(System.currentTimeMillis()).dateFormat("yyyy-MM-dd")
                     sportsLogDao.insert(

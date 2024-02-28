@@ -87,6 +87,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.util.regex.Pattern
+import kotlin.math.floor
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -119,8 +120,12 @@ fun HomeRoute(viewModel: HomeViewModel) {
     val usehigh by viewModel.usehigh.collectAsStateWithLifecycle()
     val uselow by viewModel.uselow.collectAsStateWithLifecycle()
     val usecoagulant by viewModel.usecoagulant.collectAsStateWithLifecycle()
+    val useState by viewModel.useState.collectAsStateWithLifecycle()
 
     val hint by viewModel.hint.collectAsStateWithLifecycle()
+
+
+    val slEntitiy by viewModel.slEntitiy.collectAsStateWithLifecycle(initialValue = null)
 
 
     val navigation: () -> Unit = {
@@ -176,7 +181,9 @@ fun HomeRoute(viewModel: HomeViewModel) {
                 usecoagulant,
                 hint,
                 pipelineDialogOpen,
-                cleanDialogOpen
+                cleanDialogOpen,
+                useState,
+                slEntitiy,
             )
         }
     }
@@ -211,6 +218,8 @@ fun operate(
     hint: Boolean,
     pipelineDialogOpen: Boolean,
     cleanDialogOpen: Boolean,
+    useState: Boolean,
+    s1: Setting?,
 ) {
 
     val scope = rememberCoroutineScope()
@@ -218,6 +227,8 @@ fun operate(
     val keyboard = LocalSoftwareKeyboardController.current
 
     val context = LocalContext.current
+
+    var setting = s1 ?: Setting()
 
     var speChat =
         "[`~!@#$%^&*()+=\\-|{}':;',\\[\\]<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]"
@@ -410,7 +421,6 @@ fun operate(
         highCoagulantVol_ex = "0"
         lowCoagulantVol.value = 0f
         lowCoagulantVol_ex = "0"
-
         experimentRecord.status = EPStatus.COMPLETED
         experimentRecord.number = complate
         uiEvent(HomeIntent.Update(experimentRecord))
@@ -424,36 +434,40 @@ fun operate(
     } else if (uiFlags is UiFlags.Objects && uiFlags.objects == 0
         || uiFlags is UiFlags.Objects && uiFlags.objects == 5 && expectedMakeNum.value > 0
     ) {
-        if (useVol) {
-            useVol = false
-            if (userinse > 0) {
-                water.value -= userinse
-                water.value = String.format("%.1f", water.value).toFloat()
-                println("water.value====${water.value}")
-                water_ex = water.value.toString()
-            }
+        if (useState) {
+            useVol = true
+            if (useVol) {
+                useVol = false
+                if (userinse > 0) {
+                    water.value -= userinse
+                    water.value = String.format("%.1f", water.value).toFloat()
+                    println("water.value====${water.value}")
+                    water_ex = water.value.toString()
+                }
 
-            if (usecoagulant > 0) {
-                coagulantvol.value -= usecoagulant
-                coagulantvol.value = String.format("%.1f", coagulantvol.value).toFloat()
-                println("coagulantvol.value====${coagulantvol.value}")
-                coagulant_ex = coagulantvol.value.toString()
-            }
+                if (usecoagulant > 0) {
+                    coagulantvol.value -= usecoagulant
+                    coagulantvol.value = String.format("%.1f", coagulantvol.value).toFloat()
+                    println("coagulantvol.value====${coagulantvol.value}")
+                    coagulant_ex = coagulantvol.value.toString()
+                }
 
-            if (uselow > 0) {
-                lowCoagulantVol.value -= uselow
-                lowCoagulantVol.value = String.format("%.1f", lowCoagulantVol.value).toFloat()
-                println("lowCoagulantVol.value====${lowCoagulantVol.value}")
-                lowCoagulantVol_ex = lowCoagulantVol.value.toString()
-            }
+                if (uselow > 0) {
+                    lowCoagulantVol.value -= uselow
+                    lowCoagulantVol.value = String.format("%.1f", lowCoagulantVol.value).toFloat()
+                    println("lowCoagulantVol.value====${lowCoagulantVol.value}")
+                    lowCoagulantVol_ex = lowCoagulantVol.value.toString()
+                }
 
-            if (usehigh > 0) {
-                highCoagulantVol.value -= usehigh
-                highCoagulantVol.value = String.format("%.1f", highCoagulantVol.value).toFloat()
-                println("highCoagulantVol.value====${highCoagulantVol.value}")
-                highCoagulantVol_ex = highCoagulantVol.value.toString()
+                if (usehigh > 0) {
+                    highCoagulantVol.value -= usehigh
+                    highCoagulantVol.value = String.format("%.1f", highCoagulantVol.value).toFloat()
+                    println("highCoagulantVol.value====${highCoagulantVol.value}")
+                    highCoagulantVol_ex = highCoagulantVol.value.toString()
+                }
             }
         }
+
     }
     Column(
         modifier = Modifier
@@ -630,10 +644,14 @@ fun operate(
                                                 expectedMakeNum.value -= 1
                                                 expectedMakeNum_ex =
                                                     expectedMakeNum.value.toString()
-                                                water.value = 50f
-                                                water_ex = "50"
                                                 coagulantvol.value = 10f
                                                 coagulant_ex = "10"
+
+                                                val a =
+                                                    (setting.rinseCleanVolume * (expectedMakeNum.value + 1) + setting.rinseFilling * 2) / 50
+                                                val b = ((floor(a).toInt()) + 1) * 50
+                                                water.value = b.toFloat()
+                                                water_ex = water.value.toString()
                                                 uiEvent(HomeIntent.HigeLowMotherVol)
 
                                             }
@@ -689,10 +707,13 @@ fun operate(
                                                 } else {
                                                     expectedMakeNum.value = temp
                                                     expectedMakeNum_ex = temp.toString()
-                                                    water.value = 50f
-                                                    water_ex = "50"
                                                     coagulantvol.value = 10f
                                                     coagulant_ex = "10"
+                                                    val a =
+                                                        (setting.rinseCleanVolume * (expectedMakeNum.value + 1) + setting.rinseFilling * 2) / 50
+                                                    val b = ((floor(a).toInt()) + 1) * 50
+                                                    water.value = b.toFloat()
+                                                    water_ex = water.value.toString()
                                                     uiEvent(HomeIntent.HigeLowMotherVol)
                                                 }
                                             } else {
@@ -753,10 +774,13 @@ fun operate(
                                                 expectedMakeNum.value += 1
                                                 expectedMakeNum_ex =
                                                     expectedMakeNum.value.toString()
-                                                water.value = 50f
-                                                water_ex = "50"
                                                 coagulantvol.value = 10f
                                                 coagulant_ex = "10"
+                                                val a =
+                                                    (setting.rinseCleanVolume * (expectedMakeNum.value + 1) + setting.rinseFilling * 2) / 50
+                                                val b = ((floor(a).toInt()) + 1) * 50
+                                                water.value = b.toFloat()
+                                                water_ex = water.value.toString()
                                                 uiEvent(HomeIntent.HigeLowMotherVol)
                                             }
                                         } else {
@@ -896,7 +920,6 @@ fun operate(
                                             } else {
                                                 if (uiFlags is UiFlags.None) {
                                                     wasteBool = false
-                                                    useVol = true
                                                     uiEvent(HomeIntent.Pipeline(1))
                                                 }
                                             }
@@ -924,7 +947,6 @@ fun operate(
                                             } else {
                                                 if (uiFlags is UiFlags.None || (uiFlags is UiFlags.Objects && uiFlags.objects == 2)) {
                                                     wasteBool = false
-                                                    useVol = true
                                                     uiEvent(HomeIntent.Clean)
                                                 }
                                             }
@@ -1037,7 +1059,6 @@ fun operate(
                             } else {
                                 if (uiFlags is UiFlags.None || (uiFlags is UiFlags.Objects && uiFlags.objects == 2)) {
                                     wasteBool = false
-                                    useVol = true
                                     cleanDialog.value = false
                                     uiEvent(HomeIntent.Clean)
                                 }
@@ -1105,7 +1126,6 @@ fun operate(
                                 if (uiFlags is UiFlags.None) {
                                     wasteBool = false
                                     pipelineDialog.value = false
-                                    useVol = true
                                     uiEvent(HomeIntent.Pipeline(1))
                                 }
                             }
@@ -1161,7 +1181,8 @@ fun operate(
                         highCoagulantVol_ex = "0"
                         lowCoagulantVol.value = 0f
                         lowCoagulantVol_ex = "0"
-
+                        water.value = 0f
+                        water_ex = "0"
                         experimentRecord.status = EPStatus.ABORT
                         experimentRecord.detail = "手动停止制胶"
                         uiEvent(HomeIntent.Update(experimentRecord))
@@ -1257,7 +1278,8 @@ fun operate(
                         highCoagulantVol_ex = "0"
                         lowCoagulantVol.value = 0f
                         lowCoagulantVol_ex = "0"
-
+                        water.value = 0f
+                        water_ex = "0"
                         experimentRecord.number = complate
                         experimentRecord.status = EPStatus.ABORT
                         experimentRecord.detail = "手动停止制胶"
@@ -1298,6 +1320,7 @@ fun operate(
                                 ),
                                 value = water_ex,
                                 label = { Text(text = "mL") },
+                                enabled = false,
                                 onValueChange = {
                                     if (Pattern.compile(speChat).matcher(it).find()) {
                                         Toast.makeText(
@@ -1847,12 +1870,6 @@ fun operate(
                                             selectedIndex = index
                                         },
                                     horizontalArrangement = Arrangement.SpaceBetween
-//                                    contentPadding = PaddingValues(
-//                                        horizontal = 16.dp,
-//                                        vertical = 8.dp
-//                                    ),
-//                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-
                                 ) {
                                     item {
                                         TableTextBody(
@@ -1973,31 +1990,32 @@ fun operate(
                     modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
                         containerColor = Color(rgb(0, 105, 52))
                     ), onClick = {
-                        if (calculate >= expectedMakeNum.value) {
-                            useVol = true
-                            startMake = "停止制胶"
-                            uiEvent(HomeIntent.Start(0))
-                            uiEvent(
-                                HomeIntent.Insert(
-                                    program.startRange,
-                                    program.endRange,
-                                    program.thickness,
-                                    program.coagulant,
-                                    program.volume,
-                                    complate,
-                                    EPStatus.RUNNING,
-                                    ""
+                        scope.launch {
+                            if (calculate >= expectedMakeNum.value) {
+                                startMake = "停止制胶"
+                                uiEvent(HomeIntent.Start(0))
+                                uiEvent(
+                                    HomeIntent.Insert(
+                                        program.startRange,
+                                        program.endRange,
+                                        program.thickness,
+                                        program.coagulant,
+                                        program.volume,
+                                        complate,
+                                        EPStatus.RUNNING,
+                                        ""
+                                    )
                                 )
-                            )
-                            guleDialog.value = false
-                        } else {
-                            Toast.makeText(
-                                context,
-                                "剩余液量不足,请补充!",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                                delay(500)
+                                guleDialog.value = false
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "剩余液量不足,请补充!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }
-
 
                     }) {
                     Text(text = "确认")

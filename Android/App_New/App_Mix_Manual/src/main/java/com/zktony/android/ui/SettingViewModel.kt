@@ -400,6 +400,7 @@ class SettingViewModel @Inject constructor(
                             } else if (num == 3) {
                                 val setting = slEntitiy.firstOrNull()
                                 if (setting != null) {
+                                    println("导入数据之前的setting====$setting")
                                     setting.higeCleanVolume =
                                         textList[0].toDouble()
                                     setting.higeRehearsalVolume =
@@ -415,12 +416,17 @@ class SettingViewModel @Inject constructor(
                                         textList[7].toDouble()
                                     setting.coagulantFilling =
                                         textList[8].toDouble()
-                                    SettingIntent.UpdateSet(setting)
+                                    setting.wastePosition =
+                                        textList[9].toDouble()
+                                    setting.glueBoardPosition =
+                                        textList[10].toDouble()
+                                    slDao.update(setting)
                                 }
 
                             } else if (num == 4) {
                                 val newCalibration = ncEntitiy.firstOrNull()
                                 if (newCalibration != null) {
+                                    println("导入数据之前的newCalibration====$newCalibration")
                                     newCalibration.higeLiquidVolume1 = textList[0].toDouble()
                                     newCalibration.higeLiquidVolume2 = textList[1].toDouble()
                                     newCalibration.higeLiquidVolume3 = textList[2].toDouble()
@@ -444,7 +450,8 @@ class SettingViewModel @Inject constructor(
                                     newCalibration.coagulantLiquidVolume3 = textList[11].toDouble()
                                     newCalibration.coagulantAvg =
                                         (textList[9].toDouble() + textList[10].toDouble() + textList[11].toDouble()) / 3
-                                    SettingIntent.UpdateNC(newCalibration)
+
+                                    ncDao.update(newCalibration)
                                 }
                             } else {
                                 _speed.value = textList[0].toInt()

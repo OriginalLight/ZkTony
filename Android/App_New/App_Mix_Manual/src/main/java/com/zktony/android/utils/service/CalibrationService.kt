@@ -33,10 +33,6 @@ class CalibrationService @Inject constructor(
     override fun create() {
         job = scope.launch {
             val coagulantpulse = dataStore.readData("coagulantpulse", 550000)
-            val waste = dataStore.readData(key = "waste", default = 0f)
-            if (waste > 0) {
-                dataStore.saveData("waste", 0f)
-            }
 
             var newCalibrations = ncDao.getById(1L)
             newCalibrations.collect { newCalibration ->
