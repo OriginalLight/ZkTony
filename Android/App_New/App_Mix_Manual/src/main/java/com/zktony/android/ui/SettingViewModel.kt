@@ -37,6 +37,8 @@ import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.ApplicationUtils
 import com.zktony.android.utils.SerialPortUtils
+import com.zktony.android.utils.SerialPortUtils.start
+import com.zktony.android.utils.SerialPortUtils.stop
 import com.zktony.android.utils.extra.Application
 import com.zktony.android.utils.extra.DownloadState
 import com.zktony.android.utils.extra.download
@@ -87,6 +89,7 @@ class SettingViewModel @Inject constructor(
     private val _uiFlags = MutableStateFlow<UiFlags>(UiFlags.none())
 
     private val _job = MutableStateFlow<Job?>(null)
+    private val _job2 = MutableStateFlow<Job?>(null)
 
     private val _currentpwd = MutableStateFlow("")
 
@@ -108,6 +111,7 @@ class SettingViewModel @Inject constructor(
     private val _coagulantpulse = MutableStateFlow(0)
     private val _coagulantTime = MutableStateFlow(0)
     private val _coagulantResetPulse = MutableStateFlow(0)
+
 
     val speedFlow = _speed.asStateFlow()
     val rinseSpeedFlow = _rinseSpeed.asStateFlow()
@@ -260,6 +264,63 @@ class SettingViewModel @Inject constructor(
             is SettingIntent.ImportData -> importData(intent.filePath)
 
             is SettingIntent.UpdateApkU -> updateApkU(intent.context, intent.apkPath)
+
+            is SettingIntent.XStart -> viewModelScope.launch {
+
+                val setting = slEntitiy.firstOrNull()
+                if (setting != null) {
+                    val xSpeed = dataStore.readData("xSpeed", 100L)
+
+                    _job2.value?.cancel()
+                    _job2.value = launch {
+                        try {
+                            for (i in 1..intent.xNum) {
+                                println("xStart====i===$i")
+                                start {
+                                    timeOut = 1000L * 30
+                                    with(
+                                        index = 0,
+                                        pdv = setting.wastePosition,
+                                        ads = Triple(
+                                            xSpeed * 20,
+                                            xSpeed * 20,
+                                            xSpeed * 20
+                                        ),
+                                    )
+                                }
+                                delay(100)
+                                start {
+                                    timeOut = 1000L * 30
+                                    with(
+                                        index = 0,
+                                        pdv = setting.glueBoardPosition,
+                                        ads = Triple(
+                                            xSpeed * 20,
+                                            xSpeed * 20,
+                                            xSpeed * 20
+                                        ),
+                                    )
+                                }
+                                delay(100)
+                            }
+                        } catch (e: Exception) {
+                            println("xstart====${e.printStackTrace()}")
+                        } finally {
+                            _job2.value?.cancel()
+                            _job2.value = null
+                        }
+                    }
+
+                }
+            }
+
+            is SettingIntent.XStop -> viewModelScope.launch {
+                _job2.value?.cancel()
+                _job2.value = null
+                delay(200L)
+                stop(0, 1, 2, 3, 4)
+            }
+
 
         }
     }
@@ -1793,7 +1854,6 @@ class SettingViewModel @Inject constructor(
 
     private fun stopJob() {
         viewModelScope.launch {
-            SerialPortUtils.cleanLight()
             _uiFlags.value = UiFlags.objects(1)
             _job.value?.cancel()
             _job.value = null
@@ -2510,9 +2570,6 @@ class SettingViewModel @Inject constructor(
 
                         }
 
-
-                        SerialPortUtils.cleanLight()
-
                         if (currurStatus == 0) {
                             /**
                              * 高浓度管路填充
@@ -3032,4 +3089,8 @@ sealed class SettingIntent {
 
     data class UpdateApkU(val context: Context, val apkPath: String) : SettingIntent()
 
+
+    data class XStart(val xNum: Int) : SettingIntent()
+
+    data object XStop : SettingIntent()
 }

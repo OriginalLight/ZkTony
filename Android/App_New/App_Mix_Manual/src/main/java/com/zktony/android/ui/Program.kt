@@ -849,7 +849,7 @@ fun ProgramList(
                 Text(text = "导入格式为(制胶名称:test,开始浓度:20,结束浓度:40....)以此类推,一行是一个制胶程序！")
             }, confirmButton = {
                 Button(
-                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                    modifier = Modifier.width(120.dp), colors = ButtonDefaults.buttonColors(
                         containerColor = Color(rgb(0, 105, 52))
                     ), onClick = {
 

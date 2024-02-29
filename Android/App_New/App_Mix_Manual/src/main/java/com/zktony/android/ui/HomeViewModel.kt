@@ -110,34 +110,20 @@ class HomeViewModel @Inject constructor(
     private val _lowmother = MutableStateFlow(0f)
 
     /**
+     * 计算出的纯水母液液量mL
+     */
+    private val _watermother = MutableStateFlow(0f)
+
+    /**
+     * 计算出的促凝剂母液液量mL
+     */
+    private val _coagulantmother = MutableStateFlow(0f)
+
+    /**
      * 废液进度
      */
     private val _wasteprogress = MutableStateFlow(0f)
 
-    /**
-     * 使用的冲洗液量
-     */
-    private val _userinse = MutableStateFlow(0f)
-
-    /**
-     * 使用的高浓度液量
-     */
-    private val _usehigh = MutableStateFlow(0f)
-
-    /**
-     * 使用的低浓度液量
-     */
-    private val _uselow = MutableStateFlow(0f)
-
-    /**
-     * 使用的促凝剂液量
-     */
-    private val _usecoagulant = MutableStateFlow(0f)
-
-    /**
-     * 使用状态
-     */
-    private val _useState = MutableStateFlow(false)
 
     private val _first = MutableStateFlow(false)
 
@@ -173,14 +159,9 @@ class HomeViewModel @Inject constructor(
     val wasteprogress = _wasteprogress.asStateFlow()
     val higemother = _higemother.asStateFlow()
     val lowmother = _lowmother.asStateFlow()
+    val watermother = _watermother.asStateFlow()
+    val coagulantmother = _coagulantmother.asStateFlow()
     val first = _first.asStateFlow()
-
-    val userinse = _userinse.asStateFlow()
-    val usehigh = _usehigh.asStateFlow()
-    val uselow = _uselow.asStateFlow()
-    val usecoagulant = _usecoagulant.asStateFlow()
-    val useState = _useState.asStateFlow()
-
 
     val hint = _hint.asStateFlow()
 
@@ -190,8 +171,6 @@ class HomeViewModel @Inject constructor(
 
     val selectRudio = dataStore.readData("selectRudio", 1)
 
-
-    val slEntitiy = slDao.getById(1L)
 
     /**
      * 制胶程序dao
@@ -209,6 +188,7 @@ class HomeViewModel @Inject constructor(
 
 
     init {
+        dataStore.saveData("expectedMakenum", 0)
         reset()
         if (selectRudio == 1) {
             //开机
@@ -280,6 +260,14 @@ class HomeViewModel @Inject constructor(
             is HomeIntent.PipelineDialog -> viewModelScope.launch {
                 _pipelineDialogOpen.value = intent.pipelineState
             }
+
+            is HomeIntent.MotherVolZero -> viewModelScope.launch {
+                _higemother.value = 0f
+                _lowmother.value = 0f
+                _watermother.value = 0f
+                _coagulantmother.value = 0f
+            }
+
 
             else -> {}
         }
@@ -380,19 +368,36 @@ class HomeViewModel @Inject constructor(
                         break
                     }
 
-                    if (state1 == 1 && state2 == 1) {
-                        _hint.value = true
+                    if (state1 == 1) {
                         break
                     }
                     gpio(3)
                     delay(500)
                     if (!getGpio(3)) {
                         state1 = 1
-                    } else {
+                    }
+
+                }
+
+                while (!_hint.value) {
+                    if (_hintJob.value == null) {
+                        break
+                    }
+                    if (state2 == 1) {
+                        break
+                    }
+                    gpio(3)
+                    delay(500)
+                    if (getGpio(3)) {
                         state2 = 1
                     }
 
                 }
+
+                if (state1 == 1 && state2 == 1) {
+                    _hint.value = true
+                }
+
 
             }
         }
@@ -1098,7 +1103,7 @@ class HomeViewModel @Inject constructor(
                 /**
                  * 高浓度母液量
                  */
-                val highCoagulantVol = dataStore.readData("highCoagulantVol", 0f)
+                val highCoagulantVol = _higemother.value
                 Log.d("", "highCoagulantVol===$highCoagulantVol")
 
                 /**
@@ -1117,7 +1122,7 @@ class HomeViewModel @Inject constructor(
                 /**
                  * 低浓度母液量
                  */
-                val lowCoagulantVol = dataStore.readData("lowCoagulantVol", 0f)
+                val lowCoagulantVol = _lowmother.value
                 Log.d("", "lowCoagulantVol===$lowCoagulantVol")
 
 
@@ -1125,25 +1130,28 @@ class HomeViewModel @Inject constructor(
                 Log.d("", "==============================================")
                 Log.d(
                     "",
-                    "计算1===${((highCoagulantVol - higeFilling) / ((highExpectedPulse + guleHighPulse) / p2jz / 1000))}"
+                    "计算1===${(highCoagulantVol / ((highExpectedPulse + guleHighPulse) / p2jz / 1000))}"
                 )
 
 
                 Log.d(
                     "",
-                    "计算2===${(lowCoagulantVol - lowFilling) / ((lowExpectedPulse + guleLowPulse) / p3jz / 1000)}"
+                    "计算2===${(lowCoagulantVol / ((lowExpectedPulse + guleLowPulse) / p3jz / 1000))}"
                 )
                 /**
                  *  预计制胶数量=INT（MIN
-                 *  （（高浓度母液量-高浓度泵填充液量）/（（预排高浓度泵步数+制胶高浓度步数）/高浓度泵校准数据（步/μL）/1000），
-                 *  （低浓度母液量-低浓度泵填充液量）/（（预排低浓度泵步数+制胶低浓度步数）/低浓度泵校准数据（步/μL）/1000）））
+                 *  （高浓度母液量/（（预排高浓度泵步数+制胶高浓度步数）/高浓度泵校准数据（步/μL）/1000），
+                 *  低浓度母液量/（（预排低浓度泵步数+制胶低浓度步数）/低浓度泵校准数据（步/μL）/1000）））
                  *
                  */
-
-                _calculate.value = Math.min(
-                    ((highCoagulantVol - higeFilling) / ((highExpectedPulse + guleHighPulse) / p2jz / 1000)),
-                    (lowCoagulantVol - lowFilling) / ((lowExpectedPulse + guleLowPulse) / p3jz / 1000)
-                ).toInt()
+                _calculate.value =
+                    (highCoagulantVol / ((highExpectedPulse + guleHighPulse) / p2jz / 1000)).coerceAtMost(
+                        (lowCoagulantVol / ((lowExpectedPulse + guleLowPulse) / p3jz / 1000))
+                    ).toInt()
+                Log.d(
+                    "",
+                    " _calculate.value===${_calculate.value}"
+                )
                 delay(500)
                 _uiFlags.value = UiFlags.none()
             } catch (ex: Exception) {
@@ -1402,7 +1410,7 @@ class HomeViewModel @Inject constructor(
                 /**
                  * 高浓度母液量
                  */
-                val highCoagulantVol = dataStore.readData("highCoagulantVol", 0f)
+                val highCoagulantVol = _higemother.value
                 Log.d("", "highCoagulantVol===$highCoagulantVol")
 
                 /**
@@ -1420,7 +1428,7 @@ class HomeViewModel @Inject constructor(
                 /**
                  * 低浓度母液量
                  */
-                val lowCoagulantVol = dataStore.readData("lowCoagulantVol", 0f)
+                val lowCoagulantVol = _lowmother.value
                 Log.d("", "lowCoagulantVol===$lowCoagulantVol")
 
                 val expectedMakenum = dataStore.readData("expectedMakenum", 0)
@@ -1447,10 +1455,19 @@ class HomeViewModel @Inject constructor(
                 val lowSolution = String.format("%.1f", lowMother).toFloat()
                 Log.d("", "lowSolution=========$lowSolution")
 
+                val a =
+                    (setting.rinseCleanVolume * (expectedMakenum + 1) + setting.rinseFilling * 2) / 50
+                val b = ((floor(a).toInt()) + 1) * 50
+
                 _higemother.value = higeSolution
                 _lowmother.value = lowSolution
+                _watermother.value = b.toFloat()
+                _coagulantmother.value = 10f
+
                 Log.d("", "_higemother=========${_higemother.value}")
                 Log.d("", "_lowmother=========${_lowmother.value}")
+                Log.d("", "__watermother=========${_watermother.value}")
+                Log.d("", "_coagulantmother=========${_coagulantmother.value}")
 
                 delay(200)
                 _uiFlags.value = UiFlags.none()
@@ -1464,7 +1481,6 @@ class HomeViewModel @Inject constructor(
 
     private fun startJob(status: Int) {
         viewModelScope.launch {
-            _useState.value = false
             _uiFlags.value = UiFlags.objects(0)
             val selected = dao.getById(_selected.value).firstOrNull()
             if (selected == null) {
@@ -1790,21 +1806,36 @@ class HomeViewModel @Inject constructor(
                 "HomeViewModel_startJob",
                 "===预排前期准备数据结束==="
             )
-            _useState.value = true
-            //预排使用液量
-            _usehigh.value = (highExpectedPulse / p2jz / 1000).toFloat()
-            _uselow.value = (lowExpectedPulse / p3jz / 1000).toFloat()
-            _usecoagulant.value = (coagulantExpectedPulse / p1jz / 1000).toFloat()
-            //预排使用液量
 
             //制胶使用液量
-            _usehigh.value += (guleHighPulse / p2jz / 1000).toFloat()
-            _uselow.value += (guleLowPulse / p3jz / 1000).toFloat()
-            _usecoagulant.value += (coagulantPulseCount / p1jz / 1000).toFloat()
-            _userinse.value = setting.rinseCleanVolume.toFloat()
+
+            _higemother.value -= ((guleHighPulse + highExpectedPulse) / p2jz / 1000).toFloat()
+            _lowmother.value -= ((guleLowPulse + lowExpectedPulse) / p3jz / 1000).toFloat()
+            _coagulantmother.value -= ((coagulantPulseCount + coagulantExpectedPulse) / p1jz / 1000).toFloat()
+            _watermother.value -= setting.rinseCleanVolume.toFloat()
+
+            println("_higemother.value===use===${((guleHighPulse + highExpectedPulse) / p2jz / 1000).toFloat()}")
+            println("_lowmother.value===use===${((guleLowPulse + lowExpectedPulse) / p3jz / 1000).toFloat()}")
+            println("_coagulantmother.value===use===${((coagulantPulseCount + coagulantExpectedPulse) / p1jz / 1000).toFloat()}")
+            println("_watermother.value===use===${setting.rinseCleanVolume.toFloat()}")
+            println("=======================================")
+            println("_higemother.value===init===${_higemother.value}")
+            println("_lowmother.value===init===${_lowmother.value}")
+            println("_coagulantmother.value===init===${_coagulantmother.value}")
+            println("_watermother.value===init===${_watermother.value}")
+
+            println("=======================================")
+            _higemother.value = String.format("%.1f", _higemother.value).toFloat()
+            _lowmother.value = String.format("%.1f", _lowmother.value).toFloat()
+            _coagulantmother.value = String.format("%.1f", _coagulantmother.value).toFloat()
+            _watermother.value = String.format("%.1f", _watermother.value).toFloat()
+            println("_higemother.value======${_higemother.value}")
+            println("_lowmother.value======${_lowmother.value}")
+            println("_coagulantmother.value======${_coagulantmother.value}")
+            println("_watermother.value======${_watermother.value}")
+
             delay(100)
             //制胶使用液量
-            _useState.value = false
 
             var coagulantBool = false
             var coagulantStart = 0L
@@ -2040,13 +2071,14 @@ class HomeViewModel @Inject constructor(
                         "HomeViewModel",
                         "===预排液结束时间1小时的百分比未精确小数点===$time"
                     )
-                    var number3digits = String.format("%.4f", time).toDouble()
-                    Log.d(
-                        "HomeViewModel",
-                        "===预排液结束时间1小时的百分比精确小数点后4位===$number3digits"
-                    )
-                    setting.highTime += number3digits
-                    setting.lowLife += number3digits
+
+                    setting.highTime += time
+                    setting.lowLife += time
+
+
+                    setting.highTime=String.format("%.4f", setting.highTime).toDouble()
+                    setting.lowLife=String.format("%.4f", setting.lowLife).toDouble()
+
                     slDao.update(setting)
 
                     //===================预排液结束=====================
@@ -2161,13 +2193,11 @@ class HomeViewModel @Inject constructor(
                         "HomeViewModel",
                         "===预排液结束时间1小时的百分比未精确小数点===$time"
                     )
-                    number3digits = String.format("%.4f", time).toDouble()
-                    Log.d(
-                        "HomeViewModel",
-                        "===预排液结束时间1小时的百分比精确小数点后4位===$number3digits"
-                    )
-                    setting.highTime += number3digits
-                    setting.lowLife += number3digits
+                    setting.highTime += time
+                    setting.lowLife += time
+
+                    setting.highTime=String.format("%.4f", setting.highTime).toDouble()
+                    setting.lowLife=String.format("%.4f", setting.lowLife).toDouble()
                     slDao.update(setting)
 
                     Log.d(
@@ -2225,12 +2255,8 @@ class HomeViewModel @Inject constructor(
                         "HomeViewModel",
                         "===冲洗结束时间1小时的百分比未精确小数点===$time"
                     )
-                    number3digits = String.format("%.4f", time).toDouble()
-                    Log.d(
-                        "HomeViewModel",
-                        "===冲洗结束时间1小时的百分比精确小数点后4位===$number3digits"
-                    )
-                    setting.rinseTime += number3digits
+                    setting.rinseTime += time
+                    setting.rinseTime=String.format("%.4f", setting.rinseTime).toDouble()
                     slDao.update(setting)
 
                     delay(100)
@@ -2239,7 +2265,6 @@ class HomeViewModel @Inject constructor(
                     val expectedMakenum = dataStore.readData("expectedMakenum", 0)
                     waitTimeRinse()
                     if (_complate.value == expectedMakenum) {
-                        lightGreed()
                         delay(100)
                         //运动结束
                         if (selectRudio == 2) {
@@ -2300,7 +2325,6 @@ class HomeViewModel @Inject constructor(
             _job2.value = null
             _hintJob.value?.cancel()
             _hintJob.value = null
-            _useState.value = false
 
             val selected = dao.getById(_selected.value).firstOrNull()
             if (selected == null) {
@@ -2343,6 +2367,7 @@ class HomeViewModel @Inject constructor(
                     pdv = setting.rinseCleanVolume * 1000
                 )
             }
+            lightGreed()
             _uiFlags.value = UiFlags.none()
             delay(200)
 
@@ -2366,7 +2391,6 @@ class HomeViewModel @Inject constructor(
             _job.value?.cancel()
             _job.value = null
 
-            _useState.value = false
 
             val date = Date(System.currentTimeMillis()).dateFormat("yyyy-MM-dd")
             sportsLogDao.insert(SportsLog(logName = "${date}-MBG1500", startModel = "停止制胶"))
@@ -2782,6 +2806,8 @@ class HomeViewModel @Inject constructor(
                 )
                 if (slEnetity != null) {
 
+                    lightYellow()
+
                     _waitTimeRinseJob.value?.cancel()
                     _waitTimeRinseJob.value = null
 
@@ -2951,8 +2977,6 @@ class HomeViewModel @Inject constructor(
                         )
                     }
                     delay(100L)
-
-
 
                     for (i in 1..count) {
                         if (i == 1) {
@@ -3141,14 +3165,15 @@ class HomeViewModel @Inject constructor(
                         "HomeViewModel",
                         "===预排液结束时间1小时的百分比未精确小数点===$time"
                     )
-                    val number3digits: Double = String.format("%.4f", time).toDouble()
-                    Log.d(
-                        "HomeViewModel",
-                        "===预排液结束时间1小时的百分比精确小数点后4位===$number3digits"
-                    )
-                    slEnetity.highTime += number3digits
-                    slEnetity.lowLife += number3digits
-                    slEnetity.rinseTime += number3digits
+
+                    slEnetity.highTime += time
+                    slEnetity.lowLife += time
+                    slEnetity.rinseTime += time
+
+                    slEnetity.highTime=String.format("%.4f", slEnetity.highTime).toDouble()
+                    slEnetity.lowLife=String.format("%.4f", slEnetity.lowLife).toDouble()
+                    slEnetity.rinseTime=String.format("%.4f", slEnetity.rinseTime).toDouble()
+
                     slDao.update(slEnetity)
                     Log.d(
                         "HomeViewModel_clean",
@@ -3214,7 +3239,6 @@ class HomeViewModel @Inject constructor(
                 delay(100L)
                 reset()
             } else {
-                _useState.value = false
                 _uiFlags.value = UiFlags.objects(5)
 
                 _waitTimeRinseJob.value?.cancel()
@@ -3224,6 +3248,7 @@ class HomeViewModel @Inject constructor(
                  */
                 val slEnetity = slDao.getById(1L).firstOrNull()
                 if (slEnetity != null) {
+                    lightYellow()
                     val higeFilling = slEnetity.higeFilling
                     Log.d(
                         "HomeViewModel_pipeline",
@@ -3323,13 +3348,13 @@ class HomeViewModel @Inject constructor(
                     )
                     val expectedMakenum = dataStore.readData("expectedMakenum", 0)
                     println("expectedMakenum===$expectedMakenum")
-                    _useState.value = true
-                    _userinse.value = rinseFilling.toFloat()
-                    _usehigh.value = higeFilling.toFloat()
-                    _uselow.value = lowFilling.toFloat()
-                    _usecoagulant.value = coagulantFilling.toFloat()
-                    delay(100)
-                    _useState.value = false
+                    if (expectedMakenum > 0) {
+                        _higemother.value -= higeFilling.toFloat()
+                        _lowmother.value -= lowFilling.toFloat()
+                        _coagulantmother.value -= coagulantFilling.toFloat()
+                        _watermother.value -= rinseFilling.toFloat()
+                        delay(100)
+                    }
 
                     val date = Date(System.currentTimeMillis()).dateFormat("yyyy-MM-dd")
                     sportsLogDao.insert(
@@ -3565,23 +3590,24 @@ class HomeViewModel @Inject constructor(
                         "HomeViewModel",
                         "===预排液结束时间1小时的百分比未精确小数点===$time"
                     )
-                    val number3digits: Double = String.format("%.4f", time).toDouble()
-                    Log.d(
-                        "HomeViewModel",
-                        "===预排液结束时间1小时的百分比精确小数点后1位===$number3digits"
-                    )
-                    slEnetity.highTime += number3digits
-                    slEnetity.lowLife += number3digits
-                    slEnetity.rinseTime += number3digits
+                    slEnetity.highTime += time
+                    slEnetity.lowLife += time
+                    slEnetity.rinseTime += time
+
+
+                    slEnetity.highTime=String.format("%.4f", slEnetity.highTime).toDouble()
+                    slEnetity.lowLife=String.format("%.4f", slEnetity.lowLife).toDouble()
+                    slEnetity.rinseTime=String.format("%.4f", slEnetity.rinseTime).toDouble()
+
                     slDao.update(slEnetity)
                     delay(100L)
 
                     if (selectRudio == 2) {
                         ApplicationUtils.ctx.playAudio(R.raw.pipeline_voice)
                     }
+                    lightGreed()
                     waitTimeRinse()
                     _uiFlags.value = UiFlags.none()
-//                    reset()
                 }
 
 
@@ -3654,5 +3680,8 @@ sealed class HomeIntent {
 
     data class CleanDialog(val cleanState: Boolean) : HomeIntent()
     data class PipelineDialog(val pipelineState: Boolean) : HomeIntent()
+
+
+    data object MotherVolZero : HomeIntent()
 
 }

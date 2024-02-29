@@ -41,6 +41,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -156,12 +157,12 @@ fun debugMode(
     /**
      * 胶板位置
      */
-    var glueBoardPosition_ex by remember { mutableStateOf(setting.glueBoardPosition.toString()) }
+    var glueBoardPosition_ex by remember(setting) { mutableStateOf(setting.glueBoardPosition.toString()) }
 
     /**
      * 废液位置
      */
-    var wastePosition_ex by remember { mutableStateOf(setting.wastePosition.toString()) }
+    var wastePosition_ex by remember(setting) { mutableStateOf(setting.wastePosition.toString()) }
 
     //高浓度泵转速
     var higeSpeed by remember { mutableStateOf(0L) }
@@ -174,7 +175,7 @@ fun debugMode(
     var rinseSpeed_ex by remember { mutableStateOf(rinseSpeed.value.toString()) }
 
     //促凝剂泵转速
-    var coagulantSpeed = rememberDataSaverState(key = "coagulantSpeed", default = 200L)
+    var coagulantSpeed = rememberDataSaverState(key = "coagulantSpeed", default = 300L)
     var coagulantSpeed_ex by remember { mutableStateOf(coagulantSpeed.value.toString()) }
 
     /**
@@ -246,12 +247,6 @@ fun debugMode(
      */
     val flashing = arrayListOf("常亮", "闪烁", "关闭")
     var flashingThickness = rememberDataSaverState(key = "flashingThickness", default = flashing[0])
-
-
-    /**
-     * 手动控制
-     */
-    var soundControl by rememberDataSaverState(key = Constants.NAVIGATION, default = false)
 
 
     val sounds = arrayListOf("蜂鸣", "语音", "静音")
@@ -728,9 +723,9 @@ fun debugMode(
                             onValueChange = {
                                 coagulantSpeed_ex = it
                                 coagulantSpeed.value = coagulantSpeed_ex.toLongOrNull() ?: 200L
-                                if (coagulantSpeed.value > 200L) {
-                                    coagulantSpeed.value = 200L
-                                    coagulantSpeed_ex = "200"
+                                if (coagulantSpeed.value > 500L) {
+                                    coagulantSpeed.value = 500L
+                                    coagulantSpeed_ex = "500L"
                                 } else if (coagulantSpeed.value < 0) {
                                     coagulantSpeed.value = 0
                                     coagulantSpeed_ex = "0"
@@ -761,9 +756,9 @@ fun debugMode(
                                 if (coagulantpulse.value > 550000) {
                                     coagulantpulse.value = 550000
                                     coagulantpulse_ex = "550000"
-                                } else if (coagulantpulse.value < 200000) {
-                                    coagulantSpeed.value = 200000
-                                    coagulantpulse_ex = "200000"
+                                } else if (coagulantpulse.value < 0) {
+                                    coagulantpulse.value = 0
+                                    coagulantpulse_ex = "0"
                                 }
                             },
                             keyboardOptions = KeyboardOptions(
@@ -1181,6 +1176,12 @@ fun debugMode(
                                         delay(500L)
                                         if (SerialPortUtils.getGpio(0)) {
                                             Optocoupler1 = true
+                                        } else {
+                                            Toast.makeText(
+                                                context,
+                                                "未检测到X轴左！",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
                                         }
                                     }
 
@@ -1233,6 +1234,12 @@ fun debugMode(
                                         delay(500L)
                                         if (SerialPortUtils.getGpio(1)) {
                                             Optocoupler2 = true
+                                        } else {
+                                            Toast.makeText(
+                                                context,
+                                                "未检测到X轴右！",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
                                         }
                                     }
                                 }) {
@@ -1251,7 +1258,7 @@ fun debugMode(
 
                             Text(
                                 modifier = Modifier.padding(top = 10.dp, start = 5.dp),
-                                text = "柱塞泵"
+                                text = "促凝剂"
                             )
 
                             Button(modifier = Modifier
@@ -1278,6 +1285,12 @@ fun debugMode(
                                         delay(500L)
                                         if (SerialPortUtils.getGpio(2)) {
                                             Optocoupler3 = true
+                                        } else {
+                                            Toast.makeText(
+                                                context,
+                                                "未检测到促凝剂！",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
                                         }
                                     }
                                 }) {
@@ -1310,14 +1323,16 @@ fun debugMode(
                                 onClick = {
                                     Optocoupler4 = false
                                     scope.launch {
-                                        while (true) {
-                                            SerialPortUtils.gpio(3)
-                                            delay(500L)
-                                            println("制胶架光耦状态===${SerialPortUtils.getGpio(3)}")
-                                            if (SerialPortUtils.getGpio(3)) {
-                                                Optocoupler4 = true
-                                                break
-                                            }
+                                        SerialPortUtils.gpio(3)
+                                        delay(500L)
+                                        if (SerialPortUtils.getGpio(3)) {
+                                            Optocoupler4 = true
+                                        } else {
+                                            Toast.makeText(
+                                                context,
+                                                "未检测到制胶架！",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
                                         }
 
                                     }
@@ -1574,22 +1589,6 @@ fun debugMode(
                                 text = "声音"
                             )
 
-                            Text(
-                                modifier = Modifier.padding(top = 10.dp, start = 20.dp),
-                                text = "手动控制"
-                            )
-                            Switch(
-                                colors = SwitchDefaults.colors(
-                                    checkedTrackColor = Color(rgb(0, 105, 52)),
-                                ),
-                                modifier = Modifier
-                                    .height(32.dp)
-                                    .padding(start = 10.dp),
-                                checked = soundControl,
-                                onCheckedChange = {
-                                    soundControl = it
-                                })
-
                         }
 
                         Row(
@@ -1608,7 +1607,6 @@ fun debugMode(
                                                 )
                                             )
                                         ),
-                                        enabled = soundControl,
                                         selected = it == soundsThickness.value,
                                         onClick = {
                                             soundsThickness.value = it
@@ -1768,7 +1766,9 @@ fun debugMode(
                     DropdownMenu(
                         expanded = downMenu,
                         onDismissRequest = {},
-                        modifier = Modifier.width(100.dp)
+                        modifier = Modifier
+                            .width(100.dp)
+                            .height(150.dp)
                     ) {
                         proEntities.forEach {
                             DropdownMenuItem(text = {
@@ -1858,41 +1858,9 @@ fun debugMode(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(rgb(0, 105, 52))
                 ),
-                enabled = if (job == null) true else false,
+                enabled = job == null,
                 onClick = {
-                    for (i in 1..xNum) {
-                        scope.launch {
-                            SerialPortUtils.start {
-                                timeOut = 1000L * 30
-                                with(
-                                    index = 0,
-                                    pdv = setting.wastePosition,
-                                    ads = Triple(
-                                        xSpeed.value * 20,
-                                        xSpeed.value * 20,
-                                        xSpeed.value * 20
-                                    ),
-                                )
-                            }
-                            delay(100)
-                            SerialPortUtils.start {
-                                timeOut = 1000L * 30
-                                with(
-                                    index = 0,
-                                    pdv = setting.glueBoardPosition,
-                                    ads = Triple(
-                                        xSpeed.value * 20,
-                                        xSpeed.value * 20,
-                                        xSpeed.value * 20
-                                    ),
-                                )
-                            }
-
-                            delay(100)
-                        }
-                    }
-
-
+                    uiEvent(SettingIntent.XStart(xNum))
                 }) {
                 Text(text = "开     始")
             }
@@ -1902,10 +1870,8 @@ fun debugMode(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(rgb(0, 105, 52))
                 ), onClick = {
-                    scope.launch {
-                        SerialPortUtils.stop(0, 1, 2, 3, 4)
-                        xDialog.value = false
-                    }
+                    uiEvent(SettingIntent.XStop)
+                    xDialog.value = false
                 }) {
                 Text(text = "停     止")
             }
@@ -2087,7 +2053,11 @@ fun debugMode(
                             with(
                                 index = 4,
                                 pdv = rinseNum,
-                                ads = Triple(600 * 100, 600 * 100, rinseSpeed.value * 100),
+                                ads = Triple(
+                                    rinseSpeed.value * 40,
+                                    rinseSpeed.value * 40,
+                                    rinseSpeed.value * 40
+                                ),
                             )
                         }
                     }

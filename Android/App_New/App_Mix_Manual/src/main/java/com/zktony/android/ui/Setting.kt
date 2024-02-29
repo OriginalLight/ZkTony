@@ -95,6 +95,8 @@ import com.zktony.android.utils.AlgorithmUtils.calculateCalibrationFactorNew
 import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.ApplicationUtils
 import com.zktony.android.utils.Constants
+import com.zktony.android.utils.SerialPortUtils.lightGreed
+import com.zktony.android.utils.SerialPortUtils.lightYellow
 import com.zktony.android.utils.SerialPortUtils.start
 import com.zktony.android.utils.extra.Application
 import com.zktony.android.utils.extra.dateFormat
@@ -232,6 +234,8 @@ fun SettingLits(
 ) {
     var setting = s1 ?: Setting()
 
+    println("setting的====$setting")
+
 
     var newCalibration = c1 ?: NewCalibration()
 
@@ -285,6 +289,7 @@ fun SettingLits(
 
     //===============配件寿命==============================
 
+
     /**
      *  高浓度泵预计使用时间
      */
@@ -299,6 +304,12 @@ fun SettingLits(
      *  冲洗液泵预计使用时间
      */
     var rinseTimeExpected_ex by remember(setting) { mutableStateOf(setting.rinseTimeExpected.toString()) }
+
+    var useHighTime by remember(setting) { mutableStateOf(setting.highTime.toString()) }
+
+    var useLowTime by remember(setting) { mutableStateOf(setting.lowLife.toString()) }
+
+    var useRinseTime by remember(setting) { mutableStateOf(setting.rinseTime.toString()) }
 
 
     /**
@@ -1278,6 +1289,7 @@ fun SettingLits(
                                     shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                     onClick = {
                                         scope.launch {
+                                            lightYellow()
                                             start {
                                                 timeOut = 1000L * 30
                                                 with(
@@ -1291,6 +1303,7 @@ fun SettingLits(
 
                                                     )
                                             }
+                                            lightGreed()
                                         }
 
                                     }) {
@@ -1452,6 +1465,7 @@ fun SettingLits(
                                     shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                     onClick = {
                                         scope.launch {
+                                            lightYellow()
                                             start {
                                                 timeOut = 1000L * 30
                                                 with(
@@ -1465,6 +1479,7 @@ fun SettingLits(
 
                                                     )
                                             }
+                                            lightGreed()
                                         }
 
                                     }) {
@@ -1625,6 +1640,7 @@ fun SettingLits(
                                     onClick = {
 
                                         scope.launch {
+                                            lightYellow()
                                             start {
                                                 timeOut = 1000L * 30
                                                 with(
@@ -1638,6 +1654,7 @@ fun SettingLits(
 
                                                     )
                                             }
+                                            lightGreed()
                                         }
 
                                     }) {
@@ -1796,6 +1813,7 @@ fun SettingLits(
                                     shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                     onClick = {
                                         scope.launch {
+                                            lightYellow()
                                             start {
                                                 timeOut = 1000L * 30
                                                 with(
@@ -1823,6 +1841,7 @@ fun SettingLits(
 
                                                     )
                                             }
+                                            lightGreed()
                                         }
 
                                     }) {
@@ -2722,7 +2741,7 @@ fun SettingLits(
                             Text(modifier = Modifier.padding(start = 10.dp), text = "已使用:")
                             Text(
                                 modifier = Modifier.padding(start = 10.dp),
-                                text = setting.highTime.toString()
+                                text = useHighTime
                             )
                             Text(modifier = Modifier.padding(start = 10.dp), text = "小时")
                         }
@@ -2796,6 +2815,7 @@ fun SettingLits(
                                     ),
                                     shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                     onClick = {
+                                        useHighTime = "0.0"
                                         setting.highTime = 0.0
                                         uiEvent(SettingIntent.UpdateSet(setting))
                                     }) {
@@ -2824,7 +2844,7 @@ fun SettingLits(
                             Text(modifier = Modifier.padding(start = 10.dp), text = "已使用:")
                             Text(
                                 modifier = Modifier.padding(start = 10.dp),
-                                text = setting.lowLife.toString()
+                                text = useLowTime
                             )
                             Text(modifier = Modifier.padding(start = 10.dp), text = "小时")
                         }
@@ -2901,6 +2921,7 @@ fun SettingLits(
                                     ),
                                     shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                     onClick = {
+                                        useLowTime = "0.0"
                                         setting.lowLife = 0.0
                                         uiEvent(SettingIntent.UpdateSet(setting))
                                     }) {
@@ -2931,7 +2952,7 @@ fun SettingLits(
 
                             Text(
                                 modifier = Modifier.padding(start = 10.dp),
-                                text = setting.rinseTime.toString()
+                                text = useRinseTime
                             )
                             Text(modifier = Modifier.padding(start = 10.dp), text = "小时")
                         }
@@ -3007,6 +3028,7 @@ fun SettingLits(
                                     ),
                                     shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                     onClick = {
+                                        useRinseTime = "0.0"
                                         setting.rinseTime = 0.0
                                         uiEvent(SettingIntent.UpdateSet(setting))
                                     }) {
