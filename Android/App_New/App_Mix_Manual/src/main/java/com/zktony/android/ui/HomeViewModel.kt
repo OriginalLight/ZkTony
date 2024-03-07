@@ -83,10 +83,23 @@ class HomeViewModel @Inject constructor(
     private val _waitTimeRinseJob = MutableStateFlow<Job?>(null)
     private val _hintJob = MutableStateFlow<Job?>(null)
 
+
+    /**
+     * 等待5分钟后清洗的次数
+     * 清洗6次后，自动停止
+     */
+    private val _waitTimeRinseNum = MutableStateFlow(0)
+
     /**
      * 加液次数
      */
     private val _complate = MutableStateFlow(0)
+
+    /**
+     * 柱塞泵加液计数
+     */
+    private val _stautsNum = MutableStateFlow(1)
+
 
     /**
      * 单次加液进度
@@ -144,6 +157,8 @@ class HomeViewModel @Inject constructor(
      */
     private val _hint = MutableStateFlow(false)
 
+    private val coagulantStart = MutableStateFlow(0L)
+
 
     private var syringeJob: Job? = null
 
@@ -169,9 +184,6 @@ class HomeViewModel @Inject constructor(
     val cleanDialogOpen = _cleanDialogOpen.asStateFlow()
 
 
-    val selectRudio = dataStore.readData("selectRudio", 1)
-
-
     /**
      * 制胶程序dao
      */
@@ -189,7 +201,8 @@ class HomeViewModel @Inject constructor(
 
     init {
         dataStore.saveData("expectedMakenum", 0)
-        reset()
+        val selectRudio = dataStore.readData("selectRudio", 1)
+        initreset()
         if (selectRudio == 1) {
             //开机
             ApplicationUtils.ctx.playAudio(R.raw.power_buzz)
@@ -205,7 +218,6 @@ class HomeViewModel @Inject constructor(
             is HomeIntent.Flags -> _uiFlags.value = intent.uiFlags
             is HomeIntent.Pipeline -> pipeline(intent.index)
             is HomeIntent.Reset -> reset()
-            is HomeIntent.deng -> dengguang()
             is HomeIntent.tuopan -> guangdian3()
             is HomeIntent.Start -> startJob(intent.count)
             is HomeIntent.Stop -> stopJob()
@@ -221,12 +233,15 @@ class HomeViewModel @Inject constructor(
                         volume = intent.volume,
                         number = intent.number,
                         status = intent.status,
-                        detail = intent.detail
+                        detail = intent.detail,
+                        createTime = Date(System.currentTimeMillis())
                     )
                 )
             }
 
-            is HomeIntent.Update -> viewModelScope.launch { erDao.update(intent.entity) }
+            is HomeIntent.Update -> viewModelScope.launch {
+                erDao.update(intent.entity)
+            }
 
 
             is HomeIntent.Calculate -> calculate()
@@ -236,12 +251,14 @@ class HomeViewModel @Inject constructor(
 
             is HomeIntent.First -> viewModelScope.launch {
                 _first.value = true
+                val selectRudio = dataStore.readData("selectRudio", 1)
                 if (selectRudio == 2) {
                     ApplicationUtils.ctx.playAudio(R.raw.first_voice)
                 }
             }
 
             is HomeIntent.CleanWaste -> viewModelScope.launch {
+                val selectRudio = dataStore.readData("selectRudio", 1)
                 if (selectRudio == 2) {
                     ApplicationUtils.ctx.playAudio(R.raw.cleanwaste_voice)
                 } else if (selectRudio == 1) {
@@ -267,15 +284,13 @@ class HomeViewModel @Inject constructor(
                 _watermother.value = 0f
                 _coagulantmother.value = 0f
             }
-
-
-            else -> {}
         }
     }
 
 
     private fun hintBuzz() {
         viewModelScope.launch {
+            val selectRudio = dataStore.readData("selectRudio", 1)
             if (selectRudio == 1) {
                 _job2.value = launch {
                     var num = 0f
@@ -300,8 +315,11 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _waitTimeRinseJob.value = launch {
                 var num = 0
-                var waitTime = 60 * 30
+                var waitTime = 60 * 5
                 while (num < waitTime) {
+                    if (_waitTimeRinseNum.value == 6) {
+                        break
+                    }
                     if (_waitTimeRinseJob.value == null) {
                         break
                     }
@@ -309,6 +327,7 @@ class HomeViewModel @Inject constructor(
                     delay(1000L)
                 }
                 if (num >= waitTime) {
+                    _waitTimeRinseNum.value += 1
                     val slEnetity = slDao.getById(1L).firstOrNull()
                     if (slEnetity != null) {
                         val rinseCleanVolume = slEnetity.rinseCleanVolume
@@ -341,7 +360,7 @@ class HomeViewModel @Inject constructor(
                             timeOut = 1000L * 60L * 10
                             with(
                                 index = 4,
-                                ads = Triple(rinseSpeed * 40, rinseSpeed * 40, rinseSpeed * 40),
+                                ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
                                 pdv = rinseCleanVolume * 1000
                             )
                         }
@@ -405,14 +424,6 @@ class HomeViewModel @Inject constructor(
     }
 
 
-    private fun dengguang() {
-        viewModelScope.launch {
-            lightRed()
-            delay(3000L)
-            cleanLight()
-        }
-    }
-
     //托盘检测
     private fun guangdian3() {
         viewModelScope.launch {
@@ -421,6 +432,387 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private fun initreset() {
+        viewModelScope.launch {
+            _uiFlags.value = UiFlags.objects(1)
+            try {
+
+
+                lightFlashYellow()
+                delay(100)
+
+                _waitTimeRinseJob.value?.cancel()
+                _waitTimeRinseJob.value = null
+                _waitTimeRinseNum.value = 0
+
+                /**
+                 * 柱塞泵总行程
+                 */
+                val coagulantpulse = dataStore.readData("coagulantpulse", 550000).toLong()
+
+                /**
+                 * 复位等待时间
+                 */
+                val coagulantTime = dataStore.readData("coagulantTime", 800).toLong()
+
+                /**
+                 * 复位后预排步数
+                 */
+                val coagulantResetPulse = dataStore.readData("coagulantResetPulse", 1500).toLong()
+
+                val date = Date(System.currentTimeMillis()).dateFormat("yyyy-MM-dd")
+                sportsLogDao.insert(
+                    SportsLog(
+                        logName = "${date}-MBG1500",
+                        startModel = "复位",
+                        detail = "柱塞泵总行程:$coagulantpulse,复位等待时间:$coagulantTime,复位后预排步数:$coagulantResetPulse,"
+                    )
+                )
+                delay(100)
+
+                withTimeout(60 * 1000L) {
+                    /**
+                     * 0-x轴    3200/圈    0号光电-复位光电；1号光电-限位光电
+                     * 1-柱塞泵 12800/圈    2号光电
+                     * 2-高浓度
+                     * 3-低浓度
+                     * 4-清洗泵
+                     */
+                    //x轴复位===========================================
+                    gpio(0, 1)
+                    delay(500L)
+                    Log.d(
+                        "HomeViewModel",
+                        "x轴光电状态====0号光电===" + getGpio(0) + "====1号光电===" + getGpio(1)
+                    )
+                    if (!getGpio(0) && !getGpio(1)) {
+                        Log.d(
+                            "HomeViewModel",
+                            "x轴反转64000L"
+                        )
+                        start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 0,
+                                pdv = -64000L,
+                                ads = Triple(1600, 1600, 1600),
+
+                                )
+                        }
+                        Log.d(
+                            "HomeViewModel",
+                            "x轴正转6400L"
+                        )
+                        start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 0,
+                                pdv = 3200L,
+                                ads = Triple(1600, 1600, 1600),
+
+                                )
+                        }
+                        Log.d(
+                            "HomeViewModel",
+                            "x轴反转6500L"
+                        )
+                        start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 0,
+                                pdv = -3300L,
+                                ads = Triple(1600, 1600, 1600),
+                            )
+                        }
+                        gpio(0)
+                        delay(500L)
+                        if (getGpio(0)) {
+
+                            Log.d(
+                                "HomeViewModel",
+                                "x轴正转1600L"
+                            )
+                            start {
+                                timeOut = 1000L * 30
+                                with(
+                                    index = 0,
+                                    pdv = 1200L,
+                                    ads = Triple(1600, 1600, 1600),
+                                )
+                            }
+                            Log.d(
+                                "HomeViewModel",
+                                "复位完成"
+                            )
+                            //复位完成
+                        } else {
+                            Log.d(
+                                "HomeViewModel",
+                                "复位失败"
+                            )
+                            //复位失败
+                        }
+
+                    } else if (!getGpio(0) && getGpio(1)) {
+                        start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 0,
+                                pdv = -64000L,
+                                ads = Triple(1600, 1600, 1600),
+
+                                )
+                        }
+                        start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 0,
+                                pdv = 3200L,
+                                ads = Triple(1600, 1600, 1600),
+
+                                )
+                        }
+                        start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 0,
+                                pdv = -3300L,
+                                ads = Triple(1600, 1600, 1600),
+
+                                )
+                        }
+                        gpio(0)
+                        delay(500L)
+                        if (getGpio(0)) {
+                            start {
+                                timeOut = 1000L * 30
+                                with(
+                                    index = 0,
+                                    pdv = 1600L,
+                                    ads = Triple(1600, 1600, 1600),
+
+                                    )
+                            }
+                            Log.d(
+                                "HomeViewModel",
+                                "复位完成"
+                            )
+                            //复位完成
+                        } else {
+                            Log.d(
+                                "HomeViewModel",
+                                "复位失败"
+                            )
+                            //复位失败
+                        }
+
+                    } else if (getGpio(0) && !getGpio(1)) {
+                        start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 0,
+                                pdv = 3200L,
+                                ads = Triple(1600, 1600, 1600),
+                            )
+                        }
+                        gpio(0)
+                        delay(500L)
+                        if (getGpio(0)) {
+                            Log.d(
+                                "HomeViewModel",
+                                "复位失败"
+                            )
+                        } else {
+                            start {
+                                timeOut = 1000L * 30
+                                with(
+                                    index = 0,
+                                    pdv = -3300L,
+                                    ads = Triple(1600, 1600, 1600),
+
+                                    )
+                            }
+                            Log.d(
+                                "HomeViewModel",
+                                "复位完成"
+                            )
+                            start {
+                                timeOut = 1000L * 30
+                                with(
+                                    index = 0,
+                                    pdv = 1200L,
+                                    ads = Triple(1600, 1600, 1600),
+                                )
+                            }
+                        }
+                    } else {
+                        Log.d(
+                            "HomeViewModel",
+                            "复位失败"
+                        )
+                    }
+                    //x轴复位===========================================
+
+
+                    // 查询GPIO状态
+                    //柱塞泵复位===========================================
+                    gpio(2)
+                    delay(500L)
+                    Log.d(
+                        "HomeViewModel",
+                        "注射泵光电状态====2号光电===" + getGpio(2)
+                    )
+                    if (!getGpio(2)) {
+                        start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 1,
+                                pdv = coagulantpulse + 20000L,
+                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+                            )
+                        }
+                        delay(300L)
+                        start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 1,
+                                pdv = -64000L,
+                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+                            )
+                        }
+                        delay(300L)
+                        start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 1,
+                                pdv = 64500L,
+                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+                            )
+                        }
+                        delay(coagulantTime)
+
+                        start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 1,
+                                pdv = -coagulantpulse,
+                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+                            )
+                        }
+
+                        delay(300L)
+                        start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 1,
+                                pdv = coagulantResetPulse,
+                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+                            )
+                        }
+                        delay(300L)
+                        gpio(2)
+                        delay(1500L)
+                        Log.d(
+                            "HomeViewModel",
+                            "注射泵光电状态====2号光电===" + getGpio(2)
+                        )
+                        delay(300L)
+                        if (!getGpio(2)) {
+
+                            delay(300L)
+                            Log.d(
+                                "HomeViewModel",
+                                "柱塞泵复位成功"
+                            )
+                            //复位完成
+                        } else {
+                            Log.d(
+                                "HomeViewModel",
+                                "柱塞泵复位失败"
+                            )
+                            //复位失败
+                        }
+                    } else {
+                        start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 1,
+                                pdv = -64000L,
+                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+
+                                )
+                        }
+                        delay(300L)
+
+                        start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 1,
+                                pdv = 64500L,
+                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+                            )
+                        }
+                        delay(coagulantTime)
+                        Log.d(
+                            "HomeViewModel",
+                            "柱塞泵复位完成"
+                        )
+                        //复位完成
+                        start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 1,
+                                pdv = -coagulantpulse,
+                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+                            )
+                        }
+                        delay(300L)
+
+                        start {
+                            timeOut = 1000L * 30
+                            with(
+                                index = 1,
+                                pdv = coagulantResetPulse,
+                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+                            )
+                        }
+
+                        delay(300L)
+                        gpio(2)
+                        delay(500L)
+                        Log.d(
+                            "HomeViewModel",
+                            "注射泵光电状态====2号光电===" + getGpio(2)
+                        )
+                        if (getGpio(2)) {
+                            Log.d(
+                                "HomeViewModel",
+                                "柱塞泵复位失败"
+                            )
+                            //复位失败
+                        } else {
+                            Log.d(
+                                "HomeViewModel",
+                                "柱塞泵复位完成"
+                            )
+                        }
+
+                    }
+                    //柱塞泵复位===========================================
+                    delay(100)
+                    lightGreed()
+                }
+                _uiFlags.value = UiFlags.none()
+            } catch (ex: Exception) {
+                lightRed()
+                delay(100)
+                errorDao.insert(ErrorRecord(detail = "复位超时请重试"))
+                delay(100)
+                ApplicationUtils.ctx.playAudio(R.raw.error_buzz)
+                _uiFlags.value = UiFlags.message("复位超时请重试")
+            }
+        }
+    }
 
     private fun reset() {
         viewModelScope.launch {
@@ -433,6 +825,7 @@ class HomeViewModel @Inject constructor(
 
                 _waitTimeRinseJob.value?.cancel()
                 _waitTimeRinseJob.value = null
+                _waitTimeRinseNum.value = 0
 
                 /**
                  * 柱塞泵总行程
@@ -1432,7 +1825,7 @@ class HomeViewModel @Inject constructor(
                 Log.d("", "lowCoagulantVol===$lowCoagulantVol")
 
                 val expectedMakenum = dataStore.readData("expectedMakenum", 0)
-
+                Log.d("", "expectedMakenum=========$expectedMakenum")
                 //高浓度预计所需母液体积（mL）=（预排高浓度泵步数+制胶高浓度步数）/高浓度泵校准数据（步/μL）/1000×预计制胶数量+高浓度泵填充液量×2
                 val higeMother =
                     (highExpectedPulse + guleHighPulse) / p2jz / 1000 * expectedMakenum + higeFilling * 2
@@ -1497,6 +1890,7 @@ class HomeViewModel @Inject constructor(
             /**
              * 第一次进入方法检测是否有制胶架
              */
+            val selectRudio = dataStore.readData("selectRudio", 1)
             if (status == 0) {
                 gpio(3)
                 delay(500)
@@ -1513,6 +1907,7 @@ class HomeViewModel @Inject constructor(
 
             _waitTimeRinseJob.value?.cancel()
             _waitTimeRinseJob.value = null
+            _waitTimeRinseNum.value = 0
             _hintJob.value?.cancel()
             _hintJob.value = null
 
@@ -1814,58 +2209,50 @@ class HomeViewModel @Inject constructor(
             _coagulantmother.value -= ((coagulantPulseCount + coagulantExpectedPulse) / p1jz / 1000).toFloat()
             _watermother.value -= setting.rinseCleanVolume.toFloat()
 
-            println("_higemother.value===use===${((guleHighPulse + highExpectedPulse) / p2jz / 1000).toFloat()}")
-            println("_lowmother.value===use===${((guleLowPulse + lowExpectedPulse) / p3jz / 1000).toFloat()}")
-            println("_coagulantmother.value===use===${((coagulantPulseCount + coagulantExpectedPulse) / p1jz / 1000).toFloat()}")
-            println("_watermother.value===use===${setting.rinseCleanVolume.toFloat()}")
-            println("=======================================")
-            println("_higemother.value===init===${_higemother.value}")
-            println("_lowmother.value===init===${_lowmother.value}")
-            println("_coagulantmother.value===init===${_coagulantmother.value}")
-            println("_watermother.value===init===${_watermother.value}")
-
-            println("=======================================")
             _higemother.value = String.format("%.1f", _higemother.value).toFloat()
             _lowmother.value = String.format("%.1f", _lowmother.value).toFloat()
             _coagulantmother.value = String.format("%.1f", _coagulantmother.value).toFloat()
             _watermother.value = String.format("%.1f", _watermother.value).toFloat()
-            println("_higemother.value======${_higemother.value}")
-            println("_lowmother.value======${_lowmother.value}")
-            println("_coagulantmother.value======${_coagulantmother.value}")
-            println("_watermother.value======${_watermother.value}")
 
             delay(100)
             //制胶使用液量
 
             var coagulantBool = false
-            var coagulantStart = 0L
+
 
             Log.d(
                 "HomeViewModel_startJob",
                 "===运动次数status===$status"
             )
+
+
             if (status == 0) {
+                _stautsNum.value = 1
                 _complate.value = 0
+                
+                coagulantStart.value =
+                    (coagulantExpectedPulse.toLong() + coagulantPulseCount.toLong()) * _stautsNum.value
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===已经运动${_stautsNum.value}次的柱塞泵步数===${coagulantStart.value}"
+                )
             } else {
+
                 //计算柱塞泵是否够下一次运动
                 /**
                  * 柱塞泵总行程
                  */
                 val coagulantpulse = dataStore.readData("coagulantpulse", 550000).toLong()
 
-                /**
-                 * 已经运动的柱塞泵步数
-                 */
-                coagulantStart =
-                    coagulantExpectedPulse.toLong() * status + coagulantPulseCount.toLong() * status
-                Log.d(
-                    "HomeViewModel_startJob",
-                    "===已经运动的柱塞泵步数===$coagulantStart"
-                )
+
                 /**
                  * 柱塞泵剩余步数
                  */
-                val coagulantSy = coagulantpulse - coagulantStart
+                val coagulantSy = coagulantpulse - coagulantStart.value
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===已经运动${_stautsNum.value}次的柱塞泵剩余步数===${coagulantSy}"
+                )
                 Log.d(
                     "HomeViewModel_startJob",
                     "===柱塞泵剩余步数===$coagulantSy"
@@ -1875,11 +2262,28 @@ class HomeViewModel @Inject constructor(
                     /**
                      * 柱塞泵剩余步数不够加液
                      */
+                    _stautsNum.value = 1
                     coagulantBool = true
+                    Log.d(
+                        "HomeViewModel_startJob",
+                        "===柱塞泵剩余步数的_stautsNum.value===${_stautsNum.value}"
+                    )
+                } else {
+                    _stautsNum.value += 1
+                    /**
+                     * 已经运动的柱塞泵步数
+                     */
+                    coagulantStart.value =
+                            (coagulantExpectedPulse.toLong() + coagulantPulseCount.toLong()) * _stautsNum.value
+
                 }
 
-            }
+                Log.d(
+                    "HomeViewModel_startJob",
+                    "===已经运动${_stautsNum.value}次的柱塞泵步数===${coagulantStart.value}"
+                )
 
+            }
             /**
              * 计算废液槽
              */
@@ -1955,7 +2359,7 @@ class HomeViewModel @Inject constructor(
 
                             with(
                                 index = 1,
-                                pdv = -coagulantStart,
+                                pdv = -coagulantStart.value,
                                 ads = Triple(
                                     (600 * 13).toLong(),
                                     (600 * 1193).toLong(),
@@ -1967,6 +2371,11 @@ class HomeViewModel @Inject constructor(
                             "HomeViewModel_startJob",
                             "===柱塞泵回到下拉到底==="
                         )
+
+                        
+                        coagulantStart.value =
+                            (coagulantExpectedPulse.toLong() + coagulantPulseCount.toLong()) * _stautsNum.value
+
                     }
 
 
@@ -2076,8 +2485,8 @@ class HomeViewModel @Inject constructor(
                     setting.lowLife += time
 
 
-                    setting.highTime=String.format("%.4f", setting.highTime).toDouble()
-                    setting.lowLife=String.format("%.4f", setting.lowLife).toDouble()
+                    setting.highTime = String.format("%.4f", setting.highTime).toDouble()
+                    setting.lowLife = String.format("%.4f", setting.lowLife).toDouble()
 
                     slDao.update(setting)
 
@@ -2196,8 +2605,8 @@ class HomeViewModel @Inject constructor(
                     setting.highTime += time
                     setting.lowLife += time
 
-                    setting.highTime=String.format("%.4f", setting.highTime).toDouble()
-                    setting.lowLife=String.format("%.4f", setting.lowLife).toDouble()
+                    setting.highTime = String.format("%.4f", setting.highTime).toDouble()
+                    setting.lowLife = String.format("%.4f", setting.lowLife).toDouble()
                     slDao.update(setting)
 
                     Log.d(
@@ -2235,10 +2644,12 @@ class HomeViewModel @Inject constructor(
                         timeOut = 1000L * 60L
                         with(
                             index = 4,
-                            ads = Triple(rinseSpeed * 40, rinseSpeed * 40, rinseSpeed * 40),
+                            ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
                             pdv = rinseP
                         )
                     }
+                    _wasteprogress.value += (setting.rinseCleanVolume / 150).toFloat()
+
                     endTime = Calendar.getInstance().timeInMillis
                     Log.d(
                         "HomeViewModel",
@@ -2256,7 +2667,7 @@ class HomeViewModel @Inject constructor(
                         "===冲洗结束时间1小时的百分比未精确小数点===$time"
                     )
                     setting.rinseTime += time
-                    setting.rinseTime=String.format("%.4f", setting.rinseTime).toDouble()
+                    setting.rinseTime = String.format("%.4f", setting.rinseTime).toDouble()
                     slDao.update(setting)
 
                     delay(100)
@@ -2289,7 +2700,6 @@ class HomeViewModel @Inject constructor(
                     }
 
                 } catch (ex: Exception) {
-                    lightRed()
                     delay(100)
                     var experimentRecord = erDao.getById(_selectedER.value).firstOrNull()
                     if (experimentRecord != null) {
@@ -2326,12 +2736,6 @@ class HomeViewModel @Inject constructor(
             _hintJob.value?.cancel()
             _hintJob.value = null
 
-            val selected = dao.getById(_selected.value).firstOrNull()
-            if (selected == null) {
-                _uiFlags.value = UiFlags.message("未选择程序")
-                return@launch
-            }
-
             val setting = slDao.getById(1L).firstOrNull()
             if (setting == null) {
                 _uiFlags.value = UiFlags.message("系统参数无数据")
@@ -2340,22 +2744,17 @@ class HomeViewModel @Inject constructor(
 
             val rinseSpeed = dataStore.readData("rinseSpeed", 600L)
 
-
-            val p1jz = (AppStateUtils.hpc[1] ?: { x -> x * 100 }).invoke(1.0)
-            val coagulantVol = selected.coagulant
-            val coagulantPulseCount = coagulantVol * p1jz
-
-            val coagulantExpectedPulse =
-                setting.higeRehearsalVolume * coagulantVol / selected.volume * p1jz * 1
-            _wasteprogress.value += (setting.rinseCleanVolume / 150).toFloat()
-
+            Log.d(
+                "HomeViewModel_startJob",
+                "===停止运动的柱塞泵步数===${coagulantStart.value}"
+            )
 
             start {
                 timeOut = 1000L * 60L
                 with(
                     index = 1,
                     ads = Triple(rinseSpeed * 13, rinseSpeed * 1193, rinseSpeed * 1193),
-                    pdv = -(coagulantPulseCount.toLong() * startNum + coagulantExpectedPulse.toLong())
+                    pdv = -coagulantStart.value
                 )
             }
 
@@ -2363,7 +2762,7 @@ class HomeViewModel @Inject constructor(
                 timeOut = 1000L * 60L
                 with(
                     index = 4,
-                    ads = Triple(rinseSpeed * 40, rinseSpeed * 40, rinseSpeed * 40),
+                    ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
                     pdv = setting.rinseCleanVolume * 1000
                 )
             }
@@ -2380,6 +2779,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _waitTimeRinseJob.value?.cancel()
             _waitTimeRinseJob.value = null
+            _waitTimeRinseNum.value = 0
 
             _job2.value?.cancel()
             _job2.value = null
@@ -2391,11 +2791,12 @@ class HomeViewModel @Inject constructor(
             _job.value?.cancel()
             _job.value = null
 
+            lightFlashYellow()
 
             val date = Date(System.currentTimeMillis()).dateFormat("yyyy-MM-dd")
             sportsLogDao.insert(SportsLog(logName = "${date}-MBG1500", startModel = "停止制胶"))
             delay(100)
-
+            val selectRudio = dataStore.readData("selectRudio", 1)
             if (selectRudio == 2) {
                 ApplicationUtils.ctx.playAudio(R.raw.startend_voice)
             }
@@ -2773,7 +3174,7 @@ class HomeViewModel @Inject constructor(
                     timeOut = 1000L * 60L * 10
                     with(
                         index = 4,
-                        ads = Triple(rinseSpeed * 40, rinseSpeed * 40, rinseSpeed * 40),
+                        ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
                         pdv = rinseCleanVolume * 1000
                     )
                 }
@@ -2794,7 +3195,7 @@ class HomeViewModel @Inject constructor(
                 stop(1, 2, 3, 4)
             } else {
                 _uiFlags.value = UiFlags.objects(2)
-
+                val selectRudio = dataStore.readData("selectRudio", 1)
                 if (selectRudio == 2) {
                     ApplicationUtils.ctx.playAudio(R.raw.cleanstart_voice)
                 }
@@ -2810,6 +3211,7 @@ class HomeViewModel @Inject constructor(
 
                     _waitTimeRinseJob.value?.cancel()
                     _waitTimeRinseJob.value = null
+                    _waitTimeRinseNum.value = 0
 
 
                     /**
@@ -3145,7 +3547,7 @@ class HomeViewModel @Inject constructor(
                         )
                         with(
                             index = 4,
-                            ads = Triple(rinseSpeed * 40, rinseSpeed * 40, rinseSpeed * 40),
+                            ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
                             pdv = rinseCleanVolume * 1000
                         )
                     }
@@ -3170,9 +3572,9 @@ class HomeViewModel @Inject constructor(
                     slEnetity.lowLife += time
                     slEnetity.rinseTime += time
 
-                    slEnetity.highTime=String.format("%.4f", slEnetity.highTime).toDouble()
-                    slEnetity.lowLife=String.format("%.4f", slEnetity.lowLife).toDouble()
-                    slEnetity.rinseTime=String.format("%.4f", slEnetity.rinseTime).toDouble()
+                    slEnetity.highTime = String.format("%.4f", slEnetity.highTime).toDouble()
+                    slEnetity.lowLife = String.format("%.4f", slEnetity.lowLife).toDouble()
+                    slEnetity.rinseTime = String.format("%.4f", slEnetity.rinseTime).toDouble()
 
                     slDao.update(slEnetity)
                     Log.d(
@@ -3243,6 +3645,7 @@ class HomeViewModel @Inject constructor(
 
                 _waitTimeRinseJob.value?.cancel()
                 _waitTimeRinseJob.value = null
+                _waitTimeRinseNum.value = 0
                 /**
                  * 高浓度管路填充
                  */
@@ -3287,8 +3690,21 @@ class HomeViewModel @Inject constructor(
                         "HomeViewModel_pipeline",
                         "促凝剂泵校准因子===$p1jz"
                     )
-//                    val p1 = pulse(index = 1, dvp = coagulantFilling * 1000)
-                    val p1 = (coagulantFilling * 1000 * p1jz).toLong()
+
+                    val coagulantpipeline = dataStore.readData("coagulantpipeline", 50)
+
+                    Log.d(
+                        "HomeViewModel_pipeline",
+                        "coagulantpipeline===$coagulantpipeline"
+                    )
+
+                    var p1 = (coagulantFilling * 1000 * p1jz).toLong()
+                    val p2 = (coagulantpipeline * p1jz).toLong()
+                    Log.d(
+                        "HomeViewModel_pipeline",
+                        "p2===$p2"
+                    )
+                    p1 -= p2
                     Log.d(
                         "HomeViewModel_pipeline",
                         "促凝剂泵管路填充加液步数===$p1"
@@ -3347,12 +3763,30 @@ class HomeViewModel @Inject constructor(
                         "废液槽位置===$wastePosition"
                     )
                     val expectedMakenum = dataStore.readData("expectedMakenum", 0)
-                    println("expectedMakenum===$expectedMakenum")
                     if (expectedMakenum > 0) {
                         _higemother.value -= higeFilling.toFloat()
                         _lowmother.value -= lowFilling.toFloat()
                         _coagulantmother.value -= coagulantFilling.toFloat()
                         _watermother.value -= rinseFilling.toFloat()
+
+                        if (_coagulantmother.value < 0) {
+                            _coagulantmother.value = 0f
+                        }
+
+                        if (_lowmother.value < 0) {
+                            _lowmother.value = 0f
+                        }
+                        if (_higemother.value < 0) {
+                            _higemother.value = 0f
+                        }
+                        if (_watermother.value < 0) {
+                            _watermother.value = 0f
+                        }
+                        _higemother.value = String.format("%.1f", _higemother.value).toFloat()
+                        _lowmother.value = String.format("%.1f", _lowmother.value).toFloat()
+                        _coagulantmother.value =
+                            String.format("%.1f", _coagulantmother.value).toFloat()
+                        _watermother.value = String.format("%.1f", _watermother.value).toFloat()
                         delay(100)
                     }
 
@@ -3417,7 +3851,7 @@ class HomeViewModel @Inject constructor(
                                     pdv = coagulantpulse - 50000
                                 )
                             }
-                            delay(100L)
+                            delay(1000L)
                             start {
                                 timeOut = 1000L * 60L * 10
                                 with(
@@ -3430,7 +3864,7 @@ class HomeViewModel @Inject constructor(
                                     pdv = -(coagulantpulse - 50000 + coagulantResetPulse)
                                 )
                             }
-                            delay(100L)
+                            delay(1000L)
                         } else {
                             start {
                                 timeOut = 1000L * 60L * 10
@@ -3444,7 +3878,7 @@ class HomeViewModel @Inject constructor(
                                     pdv = (coagulantpulse - 50000)
                                 )
                             }
-                            delay(100L)
+                            delay(1000L)
                             start {
                                 timeOut = 1000L * 60L * 10
                                 with(
@@ -3457,7 +3891,7 @@ class HomeViewModel @Inject constructor(
                                     pdv = -(coagulantpulse - 50000)
                                 )
                             }
-                            delay(100L)
+                            delay(1000L)
                         }
                     }
 
@@ -3475,7 +3909,7 @@ class HomeViewModel @Inject constructor(
                                 pdv = qyu
                             )
                         }
-                        delay(100L)
+                        delay(1000L)
                         start {
                             timeOut = 1000L * 60L * 10
                             with(
@@ -3488,7 +3922,7 @@ class HomeViewModel @Inject constructor(
                                 pdv = -(qyu + coagulantResetPulse)
                             )
                         }
-                        delay(100L)
+                        delay(1000L)
 
                         start {
                             timeOut = 1000L * 60L * 10
@@ -3502,7 +3936,7 @@ class HomeViewModel @Inject constructor(
                                 pdv = coagulantResetPulse
                             )
                         }
-                        delay(100L)
+                        delay(1000L)
 
                     } else {
                         //进入上面的循环
@@ -3518,7 +3952,7 @@ class HomeViewModel @Inject constructor(
                                 pdv = qyu
                             )
                         }
-                        delay(100L)
+                        delay(1000L)
                         start {
                             timeOut = 1000L * 60L * 10
                             with(
@@ -3531,7 +3965,7 @@ class HomeViewModel @Inject constructor(
                                 pdv = -qyu
                             )
                         }
-                        delay(100L)
+                        delay(1000L)
 
                         start {
                             timeOut = 1000L * 60L * 10
@@ -3545,10 +3979,9 @@ class HomeViewModel @Inject constructor(
                                 pdv = coagulantResetPulse
                             )
                         }
-                        delay(100L)
+                        delay(1000L)
 
                     }
-
 
                     delay(100L)
                     var startTime = Calendar.getInstance().timeInMillis
@@ -3570,10 +4003,56 @@ class HomeViewModel @Inject constructor(
                         )
                         with(
                             index = 4,
-                            ads = Triple(rinseSpeed * 40, rinseSpeed * 40, rinseSpeed * 40),
+                            ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
                             pdv = rinseFilling * 1000
                         )
                     }
+
+                    start {
+                        timeOut = 1000L * 60L * 10
+                        with(
+                            index = 1,
+                            ads = Triple(
+                                coagulantSpeed * 13,
+                                coagulantSpeed * 1193,
+                                coagulantSpeed * 1193
+                            ),
+                            pdv = p2
+                        )
+                    }
+
+                    start {
+                        timeOut = 1000L * 60L * 10
+                        with(
+                            index = 1,
+                            ads = Triple(
+                                coagulantSpeed * 13,
+                                coagulantSpeed * 1193,
+                                coagulantSpeed * 1193
+                            ),
+                            pdv = -(p2 + coagulantResetPulse)
+                        )
+                    }
+
+                    start {
+                        timeOut = 1000L * 60L * 10
+                        with(
+                            index = 1,
+                            ads = Triple(
+                                coagulantSpeed * 13,
+                                coagulantSpeed * 1193,
+                                coagulantSpeed * 1193
+                            ),
+                            pdv = coagulantResetPulse
+                        )
+                    }
+
+                    /**
+                     *  1.柱塞泵加200微升
+                     *  2.冲洗加1毫升
+                     */
+
+
                     var endTime = Calendar.getInstance().timeInMillis
                     Log.d(
                         "HomeViewModel",
@@ -3595,13 +4074,14 @@ class HomeViewModel @Inject constructor(
                     slEnetity.rinseTime += time
 
 
-                    slEnetity.highTime=String.format("%.4f", slEnetity.highTime).toDouble()
-                    slEnetity.lowLife=String.format("%.4f", slEnetity.lowLife).toDouble()
-                    slEnetity.rinseTime=String.format("%.4f", slEnetity.rinseTime).toDouble()
+                    slEnetity.highTime = String.format("%.4f", slEnetity.highTime).toDouble()
+                    slEnetity.lowLife = String.format("%.4f", slEnetity.lowLife).toDouble()
+                    slEnetity.rinseTime = String.format("%.4f", slEnetity.rinseTime).toDouble()
 
                     slDao.update(slEnetity)
                     delay(100L)
 
+                    val selectRudio = dataStore.readData("selectRudio", 1)
                     if (selectRudio == 2) {
                         ApplicationUtils.ctx.playAudio(R.raw.pipeline_voice)
                     }
@@ -3650,7 +4130,6 @@ sealed class HomeIntent {
     data object tuopan : HomeIntent()
     data object Clean : HomeIntent()
     data object Reset : HomeIntent()
-    data object deng : HomeIntent()
     data class Start(val count: Int) : HomeIntent()
     data object Stop : HomeIntent()
 

@@ -35,7 +35,6 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -257,7 +256,6 @@ fun ProgramList(
                 val selected = item == entities[selectedIndex]
                 Row(
                     modifier = Modifier
-//                        .background(if (selected) Color.Gray else Color.White)
                         .background(if (index % 2 == 0) Color(rgb(239, 239, 239)) else Color.White)
                         .clickable(onClick = {
                             selectedIndex = index
@@ -324,7 +322,7 @@ fun ProgramList(
                     ),
                     shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                     onClick = {
-                        if (entitiesList.size > 0) {
+                        if (entitiesList.isNotEmpty()) {
                             val entity = entities[selectedIndex]
                             if (entity != null) {
                                 if (programId.value == entity.id) {
@@ -356,9 +354,11 @@ fun ProgramList(
                 Button(modifier = Modifier
                     .padding(start = 15.dp)
                     .width(90.dp)
-                    .height(50.dp),enabled = selectedId !in 1..3, colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ),
+                    .height(50.dp),
+                    enabled = selectedIndex !in 0..2,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ),
                     shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                     onClick = {
                         deleteDialog.value = true
@@ -637,16 +637,19 @@ fun ProgramList(
 
             }, confirmButton = {
                 Button(
-                    modifier = Modifier.width(100.dp), enabled = selectedId !in 1..3, colors = ButtonDefaults.buttonColors(
+                    modifier = Modifier.width(100.dp),
+                    enabled = !(open.value && selectedId in 1..3),
+                    colors = ButtonDefaults.buttonColors(
                         containerColor = Color(rgb(0, 105, 52))
-                    ), onClick = {
+                    ),
+                    onClick = {
                         try {
                             if (open.value) {
                                 //打开
                                 val entity = entities[selectedIndex]
 
                                 var speChat =
-                                    "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]"
+                                    "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？\\s]"
 
                                 var nameRepeat = false
 
@@ -674,13 +677,34 @@ fun ProgramList(
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     } else {
-                                        if (startRange_ex.toInt() > endRange_ex.toInt()
-                                            || startRange_ex.toInt() < 3 || startRange_ex.toInt() > 30 || endRange_ex.toInt() < 3 || endRange_ex.toInt() > 30 || coagulant_ex.toInt() <= 0 || volume_ex.toDouble() <= 0
-                                            || coagulant_ex.toInt() > 800 || volume_ex.toDouble() > 20
-                                        ) {
+                                        if (startRange_ex.toInt() > endRange_ex.toInt()) {
                                             Toast.makeText(
                                                 context,
-                                                "数据错误！",
+                                                "浓度范围不能由大到小",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else if (startRange_ex.toInt() < 3 || startRange_ex.toInt() > 30) {
+                                            Toast.makeText(
+                                                context,
+                                                "低浓度不能小于3或大于30",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else if (endRange_ex.toInt() < 3 || endRange_ex.toInt() > 30) {
+                                            Toast.makeText(
+                                                context,
+                                                "高浓度不能小于3或大于30",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else if (coagulant_ex.toInt() <= 0 || coagulant_ex.toInt() > 800) {
+                                            Toast.makeText(
+                                                context,
+                                                "促凝剂体积不能小于1或大于800",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else if (volume_ex.toDouble() <= 0 || volume_ex.toDouble() > 20) {
+                                            Toast.makeText(
+                                                context,
+                                                "胶液体积不能小于1或大于20",
                                                 Toast.LENGTH_SHORT
                                             ).show()
                                         } else {
@@ -704,7 +728,7 @@ fun ProgramList(
                             } else {
                                 //新建
                                 var speChat =
-                                    "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]"
+                                    "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？\\s]"
 
                                 var nameRepeat = false
 
@@ -729,13 +753,34 @@ fun ProgramList(
                                         ).show()
 
                                     } else {
-                                        if (startRange_ex.toInt() > endRange_ex.toInt()
-                                            || startRange_ex.toInt() < 3 || startRange_ex.toInt() > 30 || endRange_ex.toInt() < 3 || endRange_ex.toInt() > 30 || coagulant_ex.toInt() <= 0 || volume_ex.toDouble() <= 0
-                                            || coagulant_ex.toInt() > 800 || volume_ex.toDouble() > 20
-                                        ) {
+                                        if (startRange_ex.toInt() > endRange_ex.toInt()) {
                                             Toast.makeText(
                                                 context,
-                                                "数据错误！",
+                                                "浓度范围不能由大到小",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else if (startRange_ex.toInt() < 3 || startRange_ex.toInt() > 30) {
+                                            Toast.makeText(
+                                                context,
+                                                "低浓度不能小于3或大于30",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else if (endRange_ex.toInt() < 3 || endRange_ex.toInt() > 30) {
+                                            Toast.makeText(
+                                                context,
+                                                "高浓度不能小于3或大于30",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else if (coagulant_ex.toInt() <= 0 || coagulant_ex.toInt() > 800) {
+                                            Toast.makeText(
+                                                context,
+                                                "促凝剂体积不能小于1或大于800",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else if (volume_ex.toDouble() <= 0 || volume_ex.toDouble() > 20) {
+                                            Toast.makeText(
+                                                context,
+                                                "胶液体积不能小于1或大于20",
                                                 Toast.LENGTH_SHORT
                                             ).show()
                                         } else {
@@ -846,7 +891,12 @@ fun ProgramList(
         AlertDialog(
             onDismissRequest = { importDialog.value = false },
             text = {
-                Text(text = "导入格式为(制胶名称:test,开始浓度:20,结束浓度:40....)以此类推,一行是一个制胶程序！")
+                Column {
+                    Text(text = "导入zktony文件夹下的program.txt文件")
+                    Text(text = "导入格式为:")
+                    Text(text = "(制胶程序名称:test,开始浓度:4,结束浓度:20,厚度:1.5,促凝剂体积:75,胶液体积:9.5,创建人:)")
+                    Text(text = "以此类推,一行是一个制胶程序！")
+                }
             }, confirmButton = {
                 Button(
                     modifier = Modifier.width(120.dp), colors = ButtonDefaults.buttonColors(
@@ -855,70 +905,123 @@ fun ProgramList(
 
                         //获取usb地址
                         var path = getStoragePath(context, true)
-                        println("path========" + path)
                         if (!"".equals(path)) {
 
                             try {
-                                var textList = ArrayList<String>()
-
-                                //读取文件内容
-                                val content = File("$path/zktony/program.txt").readText()
-                                var contents = content.split(",")
-                                contents.forEach {
-                                    val entityy = it.split(":").get(1)
-                                    textList.add(entityy)
-                                }
-
-                                //新建
                                 var speChat =
-                                    "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]"
+                                    "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？\\s]"
 
                                 var nameRepeat = false
 
-                                entitiesList.forEach {
-                                    if (textList.get(0) == it.displayText) {
-                                        nameRepeat = true
+                                File("$path/zktony/program.txt").bufferedReader()
+                                    .useLines { lines ->
+                                        for (line in lines) {
+                                            if (line.isNotEmpty()) {
+                                                var textList = ArrayList<String>()
+                                                var contents = line.split(",")
+                                                contents.forEach {
+                                                    val byte = it.split(":").get(1)
+                                                    textList.add(byte)
+                                                }
+
+                                                entitiesList.forEach {
+                                                    if (textList.get(0) == it.displayText) {
+                                                        nameRepeat = true
+                                                    }
+                                                }
+
+                                                if (nameRepeat) {
+                                                    Toast.makeText(
+                                                        context,
+                                                        "文件名不能重复！",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                } else {
+                                                    if (Pattern.compile(speChat)
+                                                            .matcher(textList.get(0)).find()
+                                                    ) {
+                                                        Toast.makeText(
+                                                            context,
+                                                            "文件名不能包含特殊字符！",
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+
+                                                    } else {
+
+                                                        if (textList.get(1)
+                                                                .toInt() > textList.get(2)
+                                                                .toInt()
+                                                        ) {
+                                                            Toast.makeText(
+                                                                context,
+                                                                "浓度范围不能由大到小",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                        } else if (textList.get(1)
+                                                                .toInt() < 3 || textList.get(1)
+                                                                .toInt() > 30
+                                                        ) {
+                                                            Toast.makeText(
+                                                                context,
+                                                                "低浓度不能小于3或大于30",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                        } else if (textList.get(2)
+                                                                .toInt() < 3 || textList.get(2)
+                                                                .toInt() > 30
+                                                        ) {
+                                                            Toast.makeText(
+                                                                context,
+                                                                "高浓度不能小于3或大于30",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                        } else if (textList.get(4)
+                                                                .toInt() <= 0 || textList.get(4)
+                                                                .toInt() > 800
+                                                        ) {
+                                                            Toast.makeText(
+                                                                context,
+                                                                "促凝剂体积不能小于1或大于800",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                        } else if (textList.get(5)
+                                                                .toDouble() <= 0 || textList.get(
+                                                                5
+                                                            ).toDouble() > 20
+                                                        ) {
+                                                            Toast.makeText(
+                                                                context,
+                                                                "胶液体积不能小于1或大于20",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                        } else {
+                                                            dispatch(
+                                                                ProgramIntent.Insert(
+                                                                    textList.get(0),
+                                                                    textList.get(1).toInt(),
+                                                                    textList.get(2).toInt(),
+                                                                    textList.get(3),
+                                                                    textList.get(4).toInt(),
+                                                                    textList.get(5).toDouble(),
+                                                                    textList.get(6)
+                                                                )
+                                                            )
+                                                            showingDialog.value = false
+                                                        }
+                                                    }
+
+                                                }
+
+                                            }
+                                        }
+
                                     }
-                                }
-
-                                if (nameRepeat) {
-                                    Toast.makeText(
-                                        context,
-                                        "文件名不能重复！",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                } else {
-                                    if (Pattern.compile(speChat).matcher(textList.get(0)).find()) {
-                                        Toast.makeText(
-                                            context,
-                                            "文件名不能包含特殊字符！",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-
-                                    } else {
-                                        dispatch(
-                                            ProgramIntent.Insert(
-                                                textList.get(0),
-                                                textList.get(1).toInt(),
-                                                textList.get(2).toInt(),
-                                                textList.get(3),
-                                                textList.get(4).toInt(),
-                                                textList.get(5).toDouble(),
-                                                textList.get(6)
-                                            )
-                                        )
-                                        showingDialog.value = false
-                                    }
-
-                                }
-
-
 
                                 importDialog.value = false
-                            } catch (exception: Exception) {
+                            } catch (e: Exception) {
                                 Toast.makeText(
                                     context,
-                                    "数据有误！",
+                                    "数据有误===${e.printStackTrace()}",
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }

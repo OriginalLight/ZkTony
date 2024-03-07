@@ -163,7 +163,6 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                         // 如果电机未初始化，则进行初始化
                         if (it == 3) {
                             if (getGpio(it)) {
-                                println("第一次反向运动")
                                 // 进行电机初始化
                                 tx {
                                     timeout = 1000L * 60
@@ -177,7 +176,6 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                             }
                         } else {
                             if (!getGpio(it)) {
-                                println("第一次反向运动")
                                 // 进行电机初始化
                                 tx {
                                     timeout = 1000L * 60
@@ -297,7 +295,6 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 spydbs += runIndex * 3198
             }
 
-            println("runIndex===" + runIndex + "spydbs===" + spydbs)
 
             /**
              * 1.举升1到上盘高度
@@ -802,7 +799,6 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                                 } else {
                                     _spCount.value += 1
                                 }
-                                println("上盘运动步数===" + spydjl * 3200 + spStartNum * 3198)
                                 tx {
                                     //上盘移动1格
                                     move(MoveType.MOVE_PULSE) {

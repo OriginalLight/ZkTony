@@ -159,7 +159,6 @@ fun Splash(
                                         // 如果电机未初始化，则进行初始化
                                         if (it == 3) {
                                             if (getGpio(it)) {
-                                                println("第一次反向运动")
                                                 // 进行电机初始化
                                                 tx {
                                                     timeout = 1000L * 60

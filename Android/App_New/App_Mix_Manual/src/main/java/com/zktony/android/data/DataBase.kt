@@ -3,6 +3,7 @@ package com.zktony.android.data
 import androidx.room.*
 import com.zktony.android.data.dao.CalibrationDao
 import com.zktony.android.data.dao.ErrorRecordDao
+import com.zktony.android.data.dao.ExpectedDao
 import com.zktony.android.data.dao.ExperimentRecordDao
 import com.zktony.android.data.dao.MotorDao
 import com.zktony.android.data.dao.NewCalibrationDao
@@ -11,6 +12,7 @@ import com.zktony.android.data.dao.SettingDao
 import com.zktony.android.data.dao.SportsLogDao
 import com.zktony.android.data.entities.Calibration
 import com.zktony.android.data.entities.ErrorRecord
+import com.zktony.android.data.entities.Expected
 import com.zktony.android.data.entities.ExperimentRecord
 import com.zktony.android.data.entities.Motor
 import com.zktony.android.data.entities.NewCalibration
@@ -31,7 +33,8 @@ import com.zktony.android.data.entities.SportsLog
         ErrorRecord::class,
         SportsLog::class,
         Setting::class,
-        NewCalibration::class
+        NewCalibration::class,
+        Expected::class,
     ],
     version = 1,
     exportSchema = false
@@ -46,4 +49,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun NewCalibrationDao(): NewCalibrationDao
     abstract fun ErrorRecordDao(): ErrorRecordDao
     abstract fun SportsLogDao(): SportsLogDao
+    abstract fun ExpectedDao(): ExpectedDao
 }

@@ -75,7 +75,6 @@ fun Splash() {
                     modifier = Modifier
                         .size(200.dp)
                         .clickable {
-                            Log.d("navigationActions", "navigationActions===$navigationActions")
                             //实验记录
                             navigationActions.navigate(Route.EXPERIMENTRECORDS)
                         }

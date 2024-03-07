@@ -201,10 +201,17 @@ fun debugMode(
     val coagulantResetPulse = rememberDataSaverState(key = "coagulantResetPulse", default = 1500)
     var coagulantResetPulse_ex by remember { mutableStateOf(coagulantResetPulse.value.toString()) }
 
+
+    /**
+     * 柱塞泵填充微升
+     */
+    val coagulantPipeline = rememberDataSaverState(key = "coagulantpipeline", default = 50)
+    var coagulantPipeline_ex by remember { mutableStateOf(coagulantPipeline.value.toString()) }
+
     /**
      * x轴转速
      */
-    val xSpeed = rememberDataSaverState(key = "xSpeed", default = 100L)
+    val xSpeed = rememberDataSaverState(key = "xSpeed", default = 250L)
     var xSpeed_ex by remember { mutableStateOf(xSpeed.value.toString()) }
 
 
@@ -265,8 +272,6 @@ fun debugMode(
     var glueNum_ex by remember { mutableStateOf(glueNum.value.toString()) }
 
 
-    val liquid = arrayListOf("是", "否")
-    var liquidThickness = remember { mutableStateOf(liquid[0]) }
 
     var selectIndex by remember { mutableStateOf("") }
 
@@ -801,7 +806,7 @@ fun debugMode(
                     ) {
                         OutlinedTextField(
 
-                            modifier = Modifier.width(200.dp),
+                            modifier = Modifier.width(150.dp),
                             value = coagulantTime_ex,
                             label = { Text(text = "复位等待时间") },
                             onValueChange = {
@@ -827,7 +832,7 @@ fun debugMode(
                         OutlinedTextField(
                             modifier = Modifier
                                 .padding(start = 20.dp)
-                                .width(200.dp),
+                                .width(150.dp),
 
                             value = coagulantResetPulse_ex,
                             label = { Text(text = "复位后预排步数") },
@@ -851,6 +856,35 @@ fun debugMode(
                                 keyboard?.hide()
                             })
                         )
+
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .padding(start = 20.dp)
+                                .width(100.dp),
+
+                            value = coagulantPipeline_ex,
+                            label = { Text(text = "填充微升") },
+                            onValueChange = {
+                                coagulantPipeline_ex = it
+                                coagulantPipeline.value =
+                                    coagulantPipeline_ex.toIntOrNull() ?: 0
+                                if (coagulantPipeline.value < 0) {
+                                    coagulantPipeline.value = 0
+                                    coagulantPipeline_ex = "0"
+                                } else if (coagulantPipeline.value > 500) {
+                                    coagulantPipeline.value = 500
+                                    coagulantPipeline_ex = "500"
+                                }
+                            },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Done,
+                            ),
+                            keyboardActions = KeyboardActions(onDone = {
+                                keyboard?.hide()
+                            })
+                        )
+
                     }
 
                     Row(
@@ -943,9 +977,9 @@ fun debugMode(
                                     if (xSpeed.value < 0) {
                                         xSpeed.value = 0L
                                         xSpeed_ex = "0"
-                                    } else if (xSpeed.value > 200) {
-                                        xSpeed.value = 200L
-                                        xSpeed_ex = "200"
+                                    } else if (xSpeed.value > 400) {
+                                        xSpeed.value = 400L
+                                        xSpeed_ex = "400"
                                     }
                                 },
                                 keyboardOptions = KeyboardOptions(
@@ -1712,39 +1746,6 @@ fun debugMode(
                     modifier = Modifier.padding(start = 20.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-
-                    Text(
-                        modifier = Modifier.padding(top = 10.dp, start = 5.dp),
-                        fontSize = 18.sp,
-                        text = "是否加液:"
-                    )
-
-                    liquid.forEach {
-                        Row(modifier = Modifier.padding(top = 20.dp)) {
-                            RadioButton(
-                                colors = RadioButtonDefaults.colors(
-                                    Color(
-                                        rgb(
-                                            0,
-                                            105,
-                                            52
-                                        )
-                                    )
-                                ),
-                                selected = it == liquidThickness.value, onClick = {
-                                    liquidThickness.value = it
-                                })
-                            Text(fontSize = 13.sp, text = it)
-                        }
-
-                        Spacer(modifier = Modifier.width(20.dp))
-                    }
-                }
-
-                Row(
-                    modifier = Modifier.padding(start = 20.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
                     Text(
                         modifier = Modifier.padding(top = 10.dp, start = 5.dp),
                         fontSize = 18.sp,
@@ -2052,7 +2053,7 @@ fun debugMode(
                             timeOut = 1000L * 30
                             with(
                                 index = 4,
-                                pdv = rinseNum,
+                                pdv = rinseNum.toLong(),
                                 ads = Triple(
                                     rinseSpeed.value * 40,
                                     rinseSpeed.value * 40,

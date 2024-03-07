@@ -19,6 +19,14 @@ abstract class ExperimentRecordDao : BaseDao<ExperimentRecord> {
     )
     abstract fun getAll(): Flow<List<ExperimentRecord>>
 
+
+    @Query(
+        """
+        SELECT * FROM ExperimentRecord
+        """
+    )
+    abstract fun getList(): List<ExperimentRecord>
+
     @Query(
         """
         SELECT * FROM ExperimentRecord
@@ -45,7 +53,7 @@ abstract class ExperimentRecordDao : BaseDao<ExperimentRecord> {
 
     @Query(
         """
-        DELETE FROM sportslog
+        DELETE FROM ExperimentRecord
         """
     )
     abstract suspend fun deleteByAll()

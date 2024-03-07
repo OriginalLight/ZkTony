@@ -20,6 +20,7 @@ import androidx.paging.cachedIn
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
 import com.zktony.android.data.dao.ErrorRecordDao
+import com.zktony.android.data.dao.ExpectedDao
 import com.zktony.android.data.dao.ExperimentRecordDao
 import com.zktony.android.data.dao.MotorDao
 import com.zktony.android.data.dao.NewCalibrationDao
@@ -80,6 +81,7 @@ class SettingViewModel @Inject constructor(
     private val dataStore: DataSaverDataStore,
     private val sportsLogDao: SportsLogDao,
     private val erDao: ExperimentRecordDao,
+    private val expectedDao: ExpectedDao,
 ) : ViewModel() {
 
     private val _application = MutableStateFlow<Application?>(null)
@@ -98,10 +100,6 @@ class SettingViewModel @Inject constructor(
      */
     private val _complate = MutableStateFlow(0)
 
-    /**
-     * 当前加液次数
-     */
-    private val _current = MutableStateFlow(0)
 
     //导入数据更新
     private val _speed = MutableStateFlow(0)
@@ -111,7 +109,6 @@ class SettingViewModel @Inject constructor(
     private val _coagulantpulse = MutableStateFlow(0)
     private val _coagulantTime = MutableStateFlow(0)
     private val _coagulantResetPulse = MutableStateFlow(0)
-
 
     val speedFlow = _speed.asStateFlow()
     val rinseSpeedFlow = _rinseSpeed.asStateFlow()
@@ -126,6 +123,7 @@ class SettingViewModel @Inject constructor(
     val progress = _progress.asStateFlow()
     val page = _page.asStateFlow()
     val currentpwd = _currentpwd.asStateFlow()
+
 
     val uiFlags = _uiFlags.asStateFlow()
     val entities = Pager(
@@ -148,12 +146,12 @@ class SettingViewModel @Inject constructor(
         config = PagingConfig(pageSize = 50, initialLoadSize = 100),
     ) { sportsLogDao.getByPage() }.flow.cachedIn(viewModelScope)
 
+    val expected = expectedDao.getById(1L)
 
     val slEntitiy = slDao.getById(1L)
 
     val ncEntitiy = ncDao.getById(1L)
     val job = _job.asStateFlow()
-    val complate = _complate.asStateFlow()
 
 
     init {
@@ -275,7 +273,6 @@ class SettingViewModel @Inject constructor(
                     _job2.value = launch {
                         try {
                             for (i in 1..intent.xNum) {
-                                println("xStart====i===$i")
                                 start {
                                     timeOut = 1000L * 30
                                     with(
@@ -304,7 +301,6 @@ class SettingViewModel @Inject constructor(
                                 delay(100)
                             }
                         } catch (e: Exception) {
-                            println("xstart====${e.printStackTrace()}")
                         } finally {
                             _job2.value?.cancel()
                             _job2.value = null
@@ -331,9 +327,7 @@ class SettingViewModel @Inject constructor(
             try {
                 //获取未安装apk的版本
                 val versionCode = getApkCode(context, apkPath)
-                println("versionCode: $versionCode")
                 var currentCode = BuildConfig.VERSION_CODE
-                println("当前: $currentCode")
                 if (versionCode > currentCode) {
                     val apkFile = File(apkPath)
                     ApplicationUtils.installApp(apkFile)
@@ -426,17 +420,16 @@ class SettingViewModel @Inject constructor(
                 File(filePath).bufferedReader().useLines { lines ->
                     for (line in lines) {
                         if (line.isNotEmpty()) {
-                            println("导入的每行line数据是$line")
                             var textList = ArrayList<String>()
                             var contents = line.split(",")
                             contents.forEach {
                                 val byte = it.split(":").get(1)
                                 textList.add(byte)
                             }
-                            println("导入的每行list数据是$textList")
                             if (num < 3) {
                                 if (proBool) {
                                     programInsert(
+                                        (num + 1).toLong(),
                                         textList[0],
                                         textList[1].toInt(),
                                         textList[2].toInt(),
@@ -461,7 +454,6 @@ class SettingViewModel @Inject constructor(
                             } else if (num == 3) {
                                 val setting = slEntitiy.firstOrNull()
                                 if (setting != null) {
-                                    println("导入数据之前的setting====$setting")
                                     setting.higeCleanVolume =
                                         textList[0].toDouble()
                                     setting.higeRehearsalVolume =
@@ -481,13 +473,32 @@ class SettingViewModel @Inject constructor(
                                         textList[9].toDouble()
                                     setting.glueBoardPosition =
                                         textList[10].toDouble()
+
                                     slDao.update(setting)
+
+                                    val expectedEntity = expected.firstOrNull()
+
+                                    if (expectedEntity != null) {
+                                        expectedEntity.higeCleanDefault = setting.higeCleanVolume
+                                        expectedEntity.higeRehearsalDefault =
+                                            setting.higeRehearsalVolume
+                                        expectedEntity.higeFillingDefault = setting.higeFilling
+                                        expectedEntity.lowCleanDefault = setting.lowCleanVolume
+                                        expectedEntity.lowFillingDefault = setting.lowFilling
+                                        expectedEntity.rinseCleanDefault = setting.rinseCleanVolume
+                                        expectedEntity.rinseFillingDefault = setting.rinseFilling
+                                        expectedEntity.coagulantCleanDefault =
+                                            setting.coagulantCleanVolume
+                                        expectedEntity.coagulantFillingDefault =
+                                            setting.coagulantFilling
+                                        expectedDao.update(expectedEntity)
+                                    }
+
                                 }
 
                             } else if (num == 4) {
                                 val newCalibration = ncEntitiy.firstOrNull()
                                 if (newCalibration != null) {
-                                    println("导入数据之前的newCalibration====$newCalibration")
                                     newCalibration.higeLiquidVolume1 = textList[0].toDouble()
                                     newCalibration.higeLiquidVolume2 = textList[1].toDouble()
                                     newCalibration.higeLiquidVolume3 = textList[2].toDouble()
@@ -550,6 +561,7 @@ class SettingViewModel @Inject constructor(
 
 
     private fun programInsert(
+        id: Long,
         displayText: String,
         startRange: Int,
         endRange: Int,
@@ -561,6 +573,7 @@ class SettingViewModel @Inject constructor(
         viewModelScope.launch {
             proDao.insert(
                 Program(
+                    id = id,
                     displayText = displayText,
                     startRange = startRange,
                     endRange = endRange,
@@ -813,7 +826,7 @@ class SettingViewModel @Inject constructor(
                     )
                     with(
                         index = 4,
-                        ads = Triple(rinseSpeed * 40, rinseSpeed * 40, rinseSpeed * 40),
+                        ads = Triple(rinseSpeed * 30, rinseSpeed  * 30, rinseSpeed * 30),
                         pdv = rinseFilling * 1000
                     )
                 }
@@ -1077,7 +1090,7 @@ class SettingViewModel @Inject constructor(
                         )
                         with(
                             index = 4,
-                            ads = Triple(rinseSpeed * 40, rinseSpeed * 40, rinseSpeed * 40),
+                            ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
                             pdv = rinseCleanVolume * 1000
                         )
                     }
@@ -2233,7 +2246,7 @@ class SettingViewModel @Inject constructor(
                     timeOut = 1000L * 60L * 10
                     with(
                         index = 4,
-                        ads = Triple(rinseSpeed * 40, rinseSpeed * 40, rinseSpeed * 40),
+                        ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
                         pdv = rinseCleanVolume * 1000
                     )
                 }
@@ -2243,10 +2256,8 @@ class SettingViewModel @Inject constructor(
 
     private fun startJob(status: Int) {
         viewModelScope.launch {
-            println("进入startJob")
             _uiFlags.value = UiFlags.objects(0)
             val selected = proDao.getById(_selected.value).firstOrNull()
-            println("selected===$selected")
             if (selected == null) {
                 _uiFlags.value = UiFlags.message("未选择程序")
                 return@launch
@@ -2254,7 +2265,6 @@ class SettingViewModel @Inject constructor(
 
 
             val setting = slDao.getById(1L).firstOrNull()
-            println("setting===$setting")
             if (setting == null) {
                 _uiFlags.value = UiFlags.message("系统参数无数据")
                 return@launch
@@ -2705,9 +2715,9 @@ class SettingViewModel @Inject constructor(
                                     with(
                                         index = 4,
                                         ads = Triple(
-                                            rinseSpeed * 40,
-                                            rinseSpeed * 40,
-                                            rinseSpeed * 40
+                                            rinseSpeed * 30,
+                                            rinseSpeed * 30,
+                                            rinseSpeed * 30
                                         ),
                                         pdv = rinseFilling * 1000
                                     )
@@ -2919,7 +2929,7 @@ class SettingViewModel @Inject constructor(
                             timeOut = 1000L * 60L
                             with(
                                 index = 4,
-                                ads = Triple(rinseSpeed * 40, rinseSpeed * 40, rinseSpeed * 40),
+                                ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
                                 pdv = rinseP
                             )
                         }

@@ -1,7 +1,6 @@
 package com.zktony.android.ui
 
 import android.graphics.Color.rgb
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -12,7 +11,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,22 +19,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxColors
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -57,7 +55,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -67,7 +64,6 @@ import com.zktony.android.R
 import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.ExperimentRecord
 import com.zktony.android.data.entities.Program
-import com.zktony.android.data.entities.Setting
 import com.zktony.android.ui.components.HomeAppBar
 import com.zktony.android.ui.components.TableTextBody
 import com.zktony.android.ui.components.TableTextHead
@@ -83,13 +79,9 @@ import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.line
 import com.zktony.android.ui.utils.toList
-import com.zktony.android.utils.extra.format
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.util.regex.Pattern
-import kotlin.math.floor
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -242,6 +234,7 @@ fun operate(
         it.id == selectedER
     } ?: ExperimentRecord()
 
+
     uiEvent(HomeIntent.Selected(program.id))
 
 
@@ -290,11 +283,6 @@ fun operate(
     /**
      *  废液
      */
-    val waste = rememberDataSaverState(key = "waste", default = 0f)
-    var wasteBool by remember { mutableStateOf(false) }
-    if (wasteprogress > 0f && !wasteBool) {
-        waste.value = wasteprogress
-    }
     /**
      * 程序列表弹窗
      */
@@ -391,9 +379,6 @@ fun operate(
     }
 
 
-
-
-    println("uiFlags===$uiFlags")
     if (uiFlags is UiFlags.Objects && uiFlags.objects == 4) {
         continueGlueDialog.value = true
     } else if (uiFlags is UiFlags.Objects && uiFlags.objects == 6) {
@@ -512,16 +497,34 @@ fun operate(
                         programListDialog.value = true
                     })
             ) {
-                Text(
-                    text = program.displayText,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(
-                        0,
-                        105,
-                        52
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = program.displayText,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(
+                            0,
+                            105,
+                            52
+                        )
                     )
-                )
+
+                    Icon(
+                        modifier = Modifier
+                            .height(50.dp)
+                            .width(50.dp),
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = null
+                    )
+
+//                    Image(
+//                        painter = painterResource(id = R.drawable), contentDescription = null,
+//                        modifier = Modifier
+//                            .padding(start = 20.dp)
+//                    )
+
+                }
+
                 Text(
                     modifier = Modifier.padding(top = 14.dp),
                     text = "浓 度:" + program.startRange + "%~" + program.endRange + "%",
@@ -546,7 +549,7 @@ fun operate(
 
             }
 
-            Column(modifier = Modifier.padding(start = 80.dp)) {
+            Column(modifier = Modifier.padding(start = 120.dp)) {
                 Text(
                     text = "制胶数量",
                     fontSize = 20.sp,
@@ -740,7 +743,8 @@ fun operate(
                     })
             ) {
                 //废液进度条
-                WasteVerticalProgressBar(waste.value, waste.value.toString())
+
+                WasteVerticalProgressBar(wasteprogress, wasteprogress.toString())
             }
 
             Row(
@@ -783,13 +787,12 @@ fun operate(
                             .clickable {
                                 if (job == null) {
                                     if (uiFlags is UiFlags.None) {
-                                        if (waste.value >= 0.9f) {
+                                        if (wasteprogress >= 0.9f) {
                                             uiEvent(HomeIntent.CleanWaste)
                                             wasteDialog.value = true
                                         } else {
                                             if (expectedMakeNum.value > 0) {
                                                 uiEvent(HomeIntent.Calculate)
-                                                wasteBool = false
                                                 guleDialog.value = true
                                             } else {
                                                 Toast
@@ -820,11 +823,10 @@ fun operate(
                                 if (uiFlags is UiFlags.None) {
                                     if (pipelineDialogOpen) {
                                         scope.launch {
-                                            if (waste.value >= 0.9f) {
+                                            if (wasteprogress >= 0.9f) {
                                                 wasteDialog.value = true
                                             } else {
                                                 if (uiFlags is UiFlags.None) {
-                                                    wasteBool = false
                                                     uiEvent(HomeIntent.Pipeline(1))
                                                 }
                                             }
@@ -847,11 +849,10 @@ fun operate(
                                 if (uiFlags is UiFlags.None) {
                                     if (cleanDialogOpen) {
                                         scope.launch {
-                                            if (waste.value >= 0.9f) {
+                                            if (wasteprogress >= 0.9f) {
                                                 wasteDialog.value = true
                                             } else {
                                                 if (uiFlags is UiFlags.None || (uiFlags is UiFlags.Objects && uiFlags.objects == 2)) {
-                                                    wasteBool = false
                                                     uiEvent(HomeIntent.Clean)
                                                 }
                                             }
@@ -959,11 +960,10 @@ fun operate(
                         containerColor = Color(rgb(0, 105, 52))
                     ), onClick = {
                         scope.launch {
-                            if (waste.value >= 0.9f) {
+                            if (wasteprogress >= 0.9f) {
                                 wasteDialog.value = true
                             } else {
                                 if (uiFlags is UiFlags.None || (uiFlags is UiFlags.Objects && uiFlags.objects == 2)) {
-                                    wasteBool = false
                                     cleanDialog.value = false
                                     uiEvent(HomeIntent.Clean)
                                 }
@@ -1025,11 +1025,10 @@ fun operate(
                         containerColor = Color(rgb(0, 105, 52))
                     ), onClick = {
                         scope.launch {
-                            if (waste.value >= 0.9f) {
+                            if (wasteprogress >= 0.9f) {
                                 wasteDialog.value = true
                             } else {
                                 if (uiFlags is UiFlags.None) {
-                                    wasteBool = false
                                     pipelineDialog.value = false
                                     uiEvent(HomeIntent.Pipeline(1))
                                 }
@@ -1108,8 +1107,9 @@ fun operate(
                     onDismissRequest = { },
                     title = {
                         Text(
+                            modifier = Modifier.padding(start = 80.dp),
                             fontSize = 16.sp,
-                            text = "废液槽已满，请清空废液槽！"
+                            text = "清空废液槽！"
                         )
                     },
                     text = {
@@ -1119,9 +1119,7 @@ fun operate(
                                 containerColor = Color(rgb(0, 105, 52))
                             ), onClick = {
                                 uiEvent(HomeIntent.CleanWasteState)
-                                wasteBool = true
                                 wasteDialog.value = false
-                                waste.value = 0f
                             }) {
                             Text(text = "确定")
                         }
@@ -1175,7 +1173,6 @@ fun operate(
                     ), onClick = {
                         expectedMakeNum.value = 0
                         expectedMakeNum_ex = "0"
-
                         experimentRecord.number = complate
                         experimentRecord.status = EPStatus.ABORT
                         experimentRecord.detail = "手动停止制胶"
@@ -1185,6 +1182,68 @@ fun operate(
                         continueGlueDialog.value = false
                     }) {
                     Text(text = "停止")
+                }
+            })
+    }
+
+    /**
+     * 开始制胶弹窗
+     */
+    if (guleDialog.value) {
+        AlertDialog(
+            onDismissRequest = {},
+            title = {
+            },
+            text = {
+                Text(
+                    fontSize = 16.sp,
+                    text = "请确认母液量不少于推荐量!"
+                )
+
+            }, confirmButton = {
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = {
+                        if (calculate >= expectedMakeNum.value) {
+                            startMake = "停止制胶"
+                            uiEvent(HomeIntent.Start(0))
+                            uiEvent(
+                                HomeIntent.Insert(
+                                    program.startRange,
+                                    program.endRange,
+                                    program.thickness,
+                                    program.coagulant,
+                                    program.volume,
+                                    0,
+                                    EPStatus.RUNNING,
+                                    ""
+                                )
+                            )
+                            guleDialog.value = false
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "剩余液量不足,请补充!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                    }) {
+                    Text(text = "确认")
+                }
+            }, dismissButton = {
+                Button(
+                    modifier = Modifier
+                        .width(100.dp)
+                        .padding(end = 10.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = {
+
+                        guleDialog.value = false
+                    }) {
+                    Text(text = "取消")
                 }
             })
     }
@@ -1300,6 +1359,8 @@ fun operate(
                                             ).show()
                                         } else {
                                             concentration_ex = it
+                                            concentration.value =
+                                                concentration_ex.toIntOrNull() ?: 0
                                         }
                                     },
                                     keyboardOptions = KeyboardOptions(
@@ -1354,7 +1415,6 @@ fun operate(
                             modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(rgb(0, 105, 52))
                             ), onClick = {
-
                                 coagulantDialog.value = false
                             }) {
                             Text(text = "确认")
@@ -1473,6 +1533,7 @@ fun operate(
                             ), onClick = {
                                 if ((lowCoagulant_ex.toIntOrNull() ?: 0) <= program.startRange) {
                                     if ((lowCoagulant_ex.toIntOrNull() ?: 0) > 0) {
+                                        lowCoagulant.value = lowCoagulant_ex.toIntOrNull() ?: 0
                                         uiEvent(HomeIntent.HigeLowMotherVol)
                                         lowDialog.value = false
                                     } else {
@@ -1606,6 +1667,7 @@ fun operate(
                             ), onClick = {
                                 if ((highCoagulant_ex.toIntOrNull() ?: 0) >= program.endRange) {
                                     if ((highCoagulant_ex.toIntOrNull() ?: 0) > 0) {
+                                        highCoagulant.value = highCoagulant_ex.toIntOrNull() ?: 0
                                         uiEvent(HomeIntent.HigeLowMotherVol)
                                         highDialog.value = false
                                     } else {
@@ -1801,70 +1863,7 @@ fun operate(
 
     }
 
-    /**
-     * 开始制胶弹窗
-     */
-    if (guleDialog.value) {
-        AlertDialog(
-            onDismissRequest = {},
-            title = {
-            },
-            text = {
-                Text(
-                    fontSize = 16.sp,
-                    text = "请确认母液量不少于推荐量!"
-                )
 
-            }, confirmButton = {
-                Button(
-                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(rgb(0, 105, 52))
-                    ), onClick = {
-                        scope.launch {
-                            if (calculate >= expectedMakeNum.value) {
-                                startMake = "停止制胶"
-                                uiEvent(HomeIntent.Start(0))
-                                uiEvent(
-                                    HomeIntent.Insert(
-                                        program.startRange,
-                                        program.endRange,
-                                        program.thickness,
-                                        program.coagulant,
-                                        program.volume,
-                                        complate,
-                                        EPStatus.RUNNING,
-                                        ""
-                                    )
-                                )
-                                delay(500)
-                                guleDialog.value = false
-                            } else {
-                                Toast.makeText(
-                                    context,
-                                    "剩余液量不足,请补充!",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        }
-
-                    }) {
-                    Text(text = "确认")
-                }
-            }, dismissButton = {
-                Button(
-                    modifier = Modifier
-                        .width(100.dp)
-                        .padding(end = 10.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(rgb(0, 105, 52))
-                    ), onClick = {
-
-                        guleDialog.value = false
-                    }) {
-                    Text(text = "取消")
-                }
-            })
-    }
 }
 
 

@@ -33,7 +33,6 @@ object AlgorithmUtils {
         if (point == 0.0) return { x -> x * 100 }
         val slopeList = mutableListOf<Double>()
         slopeList.add(pulse / point)
-        println("校准因子=====$slopeList")
         if (slopeList.isEmpty()) {
             return { x -> x * 100 }
         } else {

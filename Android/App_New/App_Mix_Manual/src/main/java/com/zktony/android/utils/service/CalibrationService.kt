@@ -2,16 +2,21 @@ package com.zktony.android.utils.service
 
 import android.util.Log
 import com.zktony.android.data.dao.CalibrationDao
+import com.zktony.android.data.dao.ExpectedDao
+import com.zktony.android.data.dao.ExperimentRecordDao
 import com.zktony.android.data.dao.NewCalibrationDao
 import com.zktony.android.data.dao.SettingDao
 import com.zktony.android.data.dao.SportsLogDao
 import com.zktony.android.data.datastore.DataSaverDataStore
+import com.zktony.android.data.entities.Expected
 import com.zktony.android.data.entities.NewCalibration
 import com.zktony.android.data.entities.Setting
+import com.zktony.android.ui.EPStatus
 import com.zktony.android.utils.AlgorithmUtils.calculateCalibrationFactor
 import com.zktony.android.utils.AlgorithmUtils.calculateCalibrationFactorNew
 import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.AppStateUtils.hpc
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
@@ -29,9 +34,45 @@ class CalibrationService @Inject constructor(
     private val ncDao: NewCalibrationDao,
     private val slDao: SettingDao,
     private val sportsLogDao: SportsLogDao,
+    private val expectedDao: ExpectedDao,
+    private val erDao: ExperimentRecordDao,
 ) : AbstractService() {
     override fun create() {
         job = scope.launch {
+
+            val calendar = Calendar.getInstance() // 创建一个 Calendar 对象表示当前时间
+
+            calendar.add(Calendar.DAY_OF_MONTH, -3) // 将日期向前调整三天
+
+            val year = calendar[Calendar.YEAR] // 年份
+            val month = calendar[Calendar.MONTH] + 1 // 月份（注意需要加上1）
+            val dayOfMonth = calendar[Calendar.DAY_OF_MONTH] // 日期
+
+            val date = "$year-$month-$dayOfMonth"
+
+            val format = SimpleDateFormat("yyyy-MM-dd")
+            val date1 = format.parse(date)
+
+            sportsLogDao.deleteByDate(date1)
+            val erAll = erDao.getList()
+
+            Log.d(
+                "experimentRecord",
+                "=========experimentRecord========${erAll.size}"
+            )
+            if (erAll.isNotEmpty()) {
+                erAll.forEach {
+                    Log.d(
+                        "experimentRecord",
+                        "=========experimentRecord========$it"
+                    )
+                    if (it.status == EPStatus.RUNNING) {
+                        it.status = EPStatus.ABORT
+                        erDao.update(it)
+                    }
+                }
+            }
+
             val coagulantpulse = dataStore.readData("coagulantpulse", 550000)
 
             var newCalibrations = ncDao.getById(1L)
@@ -40,6 +81,7 @@ class CalibrationService @Inject constructor(
                     "CalibrationService",
                     "newCalibration=========$newCalibration"
                 )
+
                 if (newCalibration != null) {
                     Log.d(
                         "CalibrationService",
@@ -114,6 +156,9 @@ class CalibrationService @Inject constructor(
                             5.0, 3.0, 5.0, 3.0, 5.0, 3.0
                         )
                     )
+
+                    expectedDao.insert(Expected())
+
                     Log.d(
                         "CalibrationService",
                         "=========插入默认设置数据完成========"
@@ -121,22 +166,6 @@ class CalibrationService @Inject constructor(
                 }
             }
 
-
-            val calendar = Calendar.getInstance() // 创建一个 Calendar 对象表示当前时间
-
-            calendar.add(Calendar.DAY_OF_MONTH, -3) // 将日期向前调整三天
-
-            val year = calendar[Calendar.YEAR] // 年份
-            val month = calendar[Calendar.MONTH] + 1 // 月份（注意需要加上1）
-            val dayOfMonth = calendar[Calendar.DAY_OF_MONTH] // 日期
-
-            val date = "$year-$month-$dayOfMonth"
-
-            val format = SimpleDateFormat("yyyy-MM-dd")
-            val date1 = format.parse(date)
-            sportsLogDao.deleteByDate(date1)
         }
-
-
     }
 }

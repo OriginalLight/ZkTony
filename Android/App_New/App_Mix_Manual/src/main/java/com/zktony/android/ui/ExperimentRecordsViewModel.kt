@@ -1,5 +1,6 @@
 package com.zktony.android.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -14,6 +15,7 @@ import com.zktony.android.ui.utils.UiFlags
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -51,14 +53,15 @@ class ExperimentRecordsViewModel @Inject constructor(
                         coagulant = intent.coagulant,
                         volume = intent.volume,
                         number = intent.number,
-                        status=intent.status,
-                        detail=intent.detail,
+                        status = intent.status,
+                        detail = intent.detail,
                     )
                 )
             }
 
             is ExperimentRecordsIntent.Update -> viewModelScope.launch { dao.update(intent.entity) }
             is ExperimentRecordsIntent.Delete -> viewModelScope.launch { dao.deleteById(intent.id) }
+
         }
     }
 }
@@ -81,4 +84,5 @@ sealed class ExperimentRecordsIntent {
 
     data class Update(val entity: ExperimentRecord) : ExperimentRecordsIntent()
     data class Delete(val id: Long) : ExperimentRecordsIntent()
+
 }

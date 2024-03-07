@@ -108,7 +108,7 @@ fun ExperimentRecords(viewModel: ExperimentRecordsViewModel) {
             contentScale = ContentScale.FillBounds
         )
         Column {
-            HomeAppBar(page,false) { navigation() }
+            HomeAppBar(page, false) { navigation() }
             AnimatedContent(targetState = page) {
                 when (page) {
                     PageType.EXPERIMENTRECORDS -> experimentList(
@@ -132,8 +132,6 @@ fun experimentList(
     entitiesList: List<ExperimentRecord>,
     dispatch: KFunction1<ExperimentRecordsIntent, Unit>
 ) {
-    val scope = rememberCoroutineScope()
-    val snackbarHostState = LocalSnackbarHostState.current
     val context = LocalContext.current
 
 
@@ -208,6 +206,7 @@ fun experimentList(
                             )
                         })
                 ) {
+                    //(index + 1).toString()
                     TableTextBody(text = (index + 1).toString(), width = cellWidthList[0], selected)
                     TableTextBody(
                         text = "" + item.createTime.dateFormat("yyyy-MM-dd"),
@@ -348,7 +347,6 @@ fun experimentList(
                             verticalArrangement = Arrangement.spacedBy(16.dp),
                             contentPadding = PaddingValues(16.dp),
                         ) {
-
                             item {
                                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
 
@@ -358,7 +356,7 @@ fun experimentList(
                                     )
                                     Text(
                                         fontSize = 16.sp,
-                                        text = entity.createTime.dateFormat("yyyy-MM-dd")
+                                        text = entity.createTime.dateFormat("yyyy-MM-dd HH:mm:ss")
                                     )
 
                                 }
@@ -551,11 +549,9 @@ private fun getStoragePath(context: Context, isUsb: Boolean): String? {
             if (isUsb == usb) { //usb
                 assert(file != null)
                 path = file.getAbsolutePath()
-                println("usb的path=====" + path)
             } else if (!isUsb == sd) { //sd
                 assert(file != null)
                 path = file.getAbsolutePath()
-                println("sd的path=====" + path)
             }
         }
     } catch (e: Exception) {

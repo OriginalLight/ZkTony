@@ -1024,7 +1024,7 @@ class DebugModeViewModel @Inject constructor(
                         timeOut = 1000L * 60L
                         with(
                             index = 4,
-                            ads = Triple(rinseSpeed * 40, rinseSpeed * 40, rinseSpeed * 40),
+                            ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
                             pdv = rinseP
                         )
                     }
@@ -1264,7 +1264,7 @@ class DebugModeViewModel @Inject constructor(
                         )
                         with(
                             index = 4,
-                            ads = Triple(rinseSpeed * 40, rinseSpeed * 40, rinseSpeed * 40),
+                            ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
                             pdv = rinseCleanVolume * 1000
                         )
                     }
@@ -1319,7 +1319,6 @@ class DebugModeViewModel @Inject constructor(
 
     private fun pipeline(index: Int) {
         viewModelScope.launch {
-            println("index===$index")
             if (index == 0) {
                 _uiFlags.value = UiFlags.none()
                 stop(1, 2, 3, 4)
@@ -1496,7 +1495,7 @@ class DebugModeViewModel @Inject constructor(
                         )
                         with(
                             index = 4,
-                            ads = Triple(rinseSpeed * 40, rinseSpeed * 40, rinseSpeed * 40),
+                            ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
                             pdv = rinseFilling * 1000
                         )
                     }

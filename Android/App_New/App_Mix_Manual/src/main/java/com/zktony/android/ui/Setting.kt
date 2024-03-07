@@ -1,7 +1,6 @@
 package com.zktony.android.ui
 
 import android.content.Context
-import android.content.pm.PackageManager
 import android.graphics.Color.rgb
 import android.os.Build
 import android.os.storage.StorageManager
@@ -40,7 +39,6 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -67,12 +65,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.zktony.android.BuildConfig
 //import com.zktony.android.BuildConfig
 import com.zktony.android.R
-import com.zktony.android.data.dao.ErrorRecordDao
 import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.ErrorRecord
+import com.zktony.android.data.entities.Expected
 import com.zktony.android.data.entities.NewCalibration
 import com.zktony.android.data.entities.Program
 import com.zktony.android.data.entities.Setting
@@ -82,7 +79,6 @@ import com.zktony.android.ui.components.TableTextBody
 import com.zktony.android.ui.components.TableTextHead
 import com.zktony.android.ui.components.VerificationCodeField
 import com.zktony.android.ui.components.VerificationCodeItem
-import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.utils.AnimatedContent
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
@@ -93,12 +89,10 @@ import com.zktony.android.ui.utils.line
 import com.zktony.android.ui.utils.toList
 import com.zktony.android.utils.AlgorithmUtils.calculateCalibrationFactorNew
 import com.zktony.android.utils.AppStateUtils
-import com.zktony.android.utils.ApplicationUtils
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.SerialPortUtils.lightGreed
 import com.zktony.android.utils.SerialPortUtils.lightYellow
 import com.zktony.android.utils.SerialPortUtils.start
-import com.zktony.android.utils.extra.Application
 import com.zktony.android.utils.extra.dateFormat
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -130,6 +124,8 @@ fun SettingRoute(viewModel: SettingViewModel) {
     val slEntitiy by viewModel.slEntitiy.collectAsStateWithLifecycle(initialValue = null)
     val ncEntitiy by viewModel.ncEntitiy.collectAsStateWithLifecycle(initialValue = null)
 
+    val expected by viewModel.expected.collectAsStateWithLifecycle(initialValue = null)
+
 
     //导入数据更新
     val speedFlow by viewModel.speedFlow.collectAsStateWithLifecycle()
@@ -144,6 +140,7 @@ fun SettingRoute(viewModel: SettingViewModel) {
     val sportsLogEntitiesDis = viewModel.sportsLogEntitiesDis.collectAsLazyPagingItems()
 
     val sportsLogEntities = viewModel.sportsLogEntities.collectAsLazyPagingItems()
+
 
     val navigation: () -> Unit = {
         scope.launch {
@@ -182,12 +179,10 @@ fun SettingRoute(viewModel: SettingViewModel) {
                     PageType.SETTINGS -> SettingLits(
                         slEntitiy,
                         ncEntitiy,
-                        application,
-                        progress,
                         viewModel::dispatch,
                         erroeEntities,
-                        uiFlags,
-                        currentpwd
+                        currentpwd,
+                        expected,
                     )
 
                     PageType.DEBUGMODE -> debug(
@@ -225,19 +220,17 @@ fun SettingRoute(viewModel: SettingViewModel) {
 fun SettingLits(
     s1: Setting?,
     c1: NewCalibration?,
-    application: Application?,
-    progress: Int,
     uiEvent: (SettingIntent) -> Unit,
     erroeEntities: LazyPagingItems<ErrorRecord>,
-    uiFlags: UiFlags,
-    currentpwd: String
+    currentpwd: String,
+    ex1: Expected?,
 ) {
     var setting = s1 ?: Setting()
 
-    println("setting的====$setting")
-
 
     var newCalibration = c1 ?: NewCalibration()
+
+    val expected = ex1 ?: Expected()
 
     val context = LocalContext.current
 
@@ -2546,26 +2539,52 @@ fun SettingLits(
                     modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
                         containerColor = Color(rgb(0, 105, 52))
                     ), onClick = {
-                        setting.higeCleanVolume = 5.0
-                        setting.higeRehearsalVolume = 1.0
-                        setting.higeFilling = 3.0
-                        setting.lowCleanVolume = 5.0
-                        setting.lowFilling = 3.0
-                        setting.rinseCleanVolume = 5.0
-                        setting.rinseFilling = 3.0
-                        setting.coagulantCleanVolume = 5.0
-                        setting.coagulantFilling = 3.0
-                        uiEvent(SettingIntent.UpdateSet(setting))
 
-                        higeCleanVolume_ex = "5.0"
-                        higeRehearsalVolume_ex = "1.0"
-                        higeFilling_ex = "3.0"
-                        lowCleanVolume_ex = "5.0"
-                        lowFilling_ex = "3.0"
-                        rinseCleanVolume_ex = "5.0"
-                        rinseFilling_ex = "3.0"
-                        coagulantCleanVolume_ex = "5.0"
-                        coagulantFilling_ex = "3.0"
+                        if (expected.higeCleanDefault == 0.0) {
+                            setting.higeCleanVolume = 5.0
+                            setting.higeRehearsalVolume = 1.0
+                            setting.higeFilling = 3.0
+                            setting.lowCleanVolume = 5.0
+                            setting.lowFilling = 3.0
+                            setting.rinseCleanVolume = 5.0
+                            setting.rinseFilling = 3.0
+                            setting.coagulantCleanVolume = 5.0
+                            setting.coagulantFilling = 3.0
+                            uiEvent(SettingIntent.UpdateSet(setting))
+
+                            higeCleanVolume_ex = "5.0"
+                            higeRehearsalVolume_ex = "1.0"
+                            higeFilling_ex = "3.0"
+                            lowCleanVolume_ex = "5.0"
+                            lowFilling_ex = "3.0"
+                            rinseCleanVolume_ex = "5.0"
+                            rinseFilling_ex = "3.0"
+                            coagulantCleanVolume_ex = "5.0"
+                            coagulantFilling_ex = "3.0"
+                        } else {
+                            setting.higeCleanVolume = expected.higeCleanDefault
+                            setting.higeRehearsalVolume = expected.higeRehearsalDefault
+                            setting.higeFilling = expected.higeFillingDefault
+                            setting.lowCleanVolume = expected.lowCleanDefault
+                            setting.lowFilling = expected.lowFillingDefault
+                            setting.rinseCleanVolume = expected.rinseCleanDefault
+                            setting.rinseFilling = expected.rinseFillingDefault
+                            setting.coagulantCleanVolume = expected.coagulantCleanDefault
+                            setting.coagulantFilling = expected.coagulantFillingDefault
+                            uiEvent(SettingIntent.UpdateSet(setting))
+
+                            higeCleanVolume_ex = expected.higeCleanDefault.toString()
+                            higeRehearsalVolume_ex = expected.higeRehearsalDefault.toString()
+                            higeFilling_ex = expected.higeFillingDefault.toString()
+                            lowCleanVolume_ex = expected.lowCleanDefault.toString()
+                            lowFilling_ex = expected.lowFillingDefault.toString()
+                            rinseCleanVolume_ex = expected.rinseCleanDefault.toString()
+                            rinseFilling_ex = expected.rinseFillingDefault.toString()
+                            coagulantCleanVolume_ex = expected.coagulantCleanDefault.toString()
+                            coagulantFilling_ex = expected.coagulantFillingDefault.toString()
+                        }
+
+
                         expectedResetDialog.value = false
                     }) {
                     Text(text = "确认")
@@ -3071,11 +3090,13 @@ fun SettingLits(
                         modifier = Modifier.width(120.dp), colors = ButtonDefaults.buttonColors(
                             containerColor = Color(rgb(0, 105, 52))
                         ), onClick = {
+                            useHighTime = "0.0"
+                            useLowTime = "0.0"
+                            useRinseTime = "0.0"
                             setting.highTime = 0.0
                             setting.lowLife = 0.0
                             setting.rinseTime = 0.0
                             uiEvent(SettingIntent.UpdateSet(setting))
-                            accessoriesDialog.value = false
                         }) {
                         Text(text = "全部重置")
                     }
