@@ -106,6 +106,29 @@
             </a-list-item>
           </a-list>
         </a-card>
+        <a-card :title="t('debug.test.title')">
+          <a-list>
+            <a-list-item>
+              <a-list-item-meta :title="t('debug.test.aging')"></a-list-item-meta>
+              <template #actions>
+                <a-space>
+                  <a-button
+                    type="primary"
+                    @click="agingTest({ hatch: true, led: true, light: true, camera: true })"
+                  >
+                    {{ t('debug.test.aging.start') }}
+                  </a-button>
+                  <a-button
+                    type="primary"
+                    @click="agingTest({ hatch: false, led: false, light: false, camera: false })"
+                  >
+                    {{ t('debug.test.aging.stop') }}
+                  </a-button>
+                </a-space>
+              </template>
+            </a-list-item>
+          </a-list>
+        </a-card>
       </a-space>
     </div>
   </div>
@@ -123,6 +146,7 @@ import {
   camera,
   screen
 } from '@renderer/api/machine'
+import { agingTest } from '@renderer/api/test'
 import { Message } from '@arco-design/web-vue'
 
 const { t } = useI18n()

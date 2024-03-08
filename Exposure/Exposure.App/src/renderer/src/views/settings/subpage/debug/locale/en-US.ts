@@ -27,5 +27,9 @@ export default {
   'debug.machine.camera.close': 'Close',
   'debug.machine.screen': 'Screen',
   'debug.machine.screen.open': 'Open',
-  'debug.machine.screen.close': 'Close'
+  'debug.machine.screen.close': 'Close',
+  'debug.test.title': 'Test',
+  'debug.test.aging': 'Aging Test',
+  'debug.test.aging.start': 'Start',
+  'debug.test.aging.stop': 'Stop'
 }

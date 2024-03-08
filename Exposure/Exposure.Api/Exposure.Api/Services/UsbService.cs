@@ -8,7 +8,7 @@ public class UsbService : IUsbService
     private readonly ManagementEventWatcher _insertWatcher;
     private readonly ILogger<UsbService> _logger;
     private readonly ManagementEventWatcher _removeWatcher;
-    
+
     #region 构造函数
 
     public UsbService(ILogger<UsbService> logger)
@@ -28,7 +28,7 @@ public class UsbService : IUsbService
     #endregion
 
     #region 外设插入
-    
+
     public void DeviceInsertedEvent(object sender, EventArrivedEventArgs e)
     {
         // 获取到当前插入的什么
@@ -38,7 +38,7 @@ public class UsbService : IUsbService
     #endregion
 
     #region 外设移除
-    
+
     public void DeviceRemovedEvent(object sender, EventArrivedEventArgs e)
     {
         _logger.LogInformation("外设移除");
@@ -47,7 +47,7 @@ public class UsbService : IUsbService
     #endregion
 
     #region 初始化
-    
+
     public Task InitializeAsync()
     {
         _insertWatcher.EventArrived += DeviceInsertedEvent;
@@ -59,7 +59,7 @@ public class UsbService : IUsbService
     #endregion
 
     #region 获取所有的USB设备
-    
+
     public DriveInfo[] GetUsbDrives()
     {
         var allDrives = DriveInfo.GetDrives();
@@ -72,7 +72,7 @@ public class UsbService : IUsbService
     #endregion
 
     #region 获取默认的USB设备
-    
+
     public DriveInfo? GetDefaultUsbDrive()
     {
         var usbDrives = GetUsbDrives();
@@ -83,7 +83,7 @@ public class UsbService : IUsbService
     #endregion
 
     #region 是否有USB设备
-    
+
     public bool IsUsbAttached()
     {
         var usbDrives = GetUsbDrives();

@@ -13,7 +13,7 @@ public class UserController : ControllerBase
 {
     private readonly IOperLogService _operLog;
     private readonly IUserService _user;
-    
+
     #region 构造函数
 
     /// <inheritdoc />

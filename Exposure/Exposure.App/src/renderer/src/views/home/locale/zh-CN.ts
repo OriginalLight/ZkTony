@@ -25,6 +25,7 @@ export default {
   'home.camera.options.out': '出仓',
   'home.camera.options.in': '进仓',
   'home.camera.options.preview': '预览',
+  'home.camera.options.preview.failed': '预览失败',
   'home.camera.options.shoot': '拍摄',
   'home.camera.options.shooting': '拍摄中...',
   'home.camera.options.cancel': '取消',

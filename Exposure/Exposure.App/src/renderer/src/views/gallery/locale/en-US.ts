@@ -17,5 +17,7 @@ export default {
   'gallery.bar.detail': 'Detail',
   'gallery.content.picture.light': 'Light Picture',
   'gallery.content.picture.dark': 'Dark Picture',
-  'gallery.content.picture.combine': 'Combine Picture'
+  'gallery.content.picture.combine': 'Combine Picture',
+  'gallery.content.picture.selectAll': 'Select All',
+  'gallery.content.picture.cancelSelectAll': 'Cancel Select All'
 }

@@ -27,5 +27,9 @@ export default {
   'debug.machine.camera.close': '关闭',
   'debug.machine.screen': '屏幕',
   'debug.machine.screen.open': '打开',
-  'debug.machine.screen.close': '关闭'
+  'debug.machine.screen.close': '关闭',
+  'debug.test.title': '测试',
+  'debug.test.aging': '老化测试',
+  'debug.test.aging.start': '开始',
+  'debug.test.aging.stop': '停止'
 }

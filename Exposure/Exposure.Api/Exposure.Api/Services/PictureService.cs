@@ -3,6 +3,7 @@ using Exposure.Api.Contracts.Services;
 using Exposure.Api.Contracts.SqlSugar;
 using Exposure.Api.Models;
 using Exposure.Api.Models.Dto;
+using Exposure.Api.Utils;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using SixLabors.ImageSharp;
@@ -15,9 +16,9 @@ namespace Exposure.Api.Services;
 
 public class PictureService : BaseService<Picture>, IPictureService
 {
-    private readonly IUserService _user;
     private readonly IDbContext _context;
-    
+    private readonly IUserService _user;
+
     #region 构造函数
 
     public PictureService(IDbContext dbContext, IUserService user) : base(dbContext)
@@ -29,7 +30,7 @@ public class PictureService : BaseService<Picture>, IPictureService
     #endregion
 
     #region 分页查询
-    
+
     public async Task<List<Picture>> GetByPage(PictureQueryDto dto, RefAsync<int> total)
     {
         var logged = _user.GetLogged();
@@ -50,7 +51,7 @@ public class PictureService : BaseService<Picture>, IPictureService
     #endregion
 
     #region 添加并返回实体
-    
+
     public Task<Picture> AddReturnModel(Picture picture)
     {
         var id = _context.db.Insertable(picture).ExecuteReturnIdentity();
@@ -60,7 +61,7 @@ public class PictureService : BaseService<Picture>, IPictureService
     #endregion
 
     #region 根据id查询
-    
+
     public async Task<List<Picture>> GetByIds(object[] ids)
     {
         return await _context.db.Queryable<Picture>().Where(p => ids.Contains(p.Id)).ToListAsync();
@@ -69,7 +70,7 @@ public class PictureService : BaseService<Picture>, IPictureService
     #endregion
 
     #region 合并图片
-    
+
     public async Task<Picture> Combine(List<Picture> list)
     {
         var bitmap1 = new Bitmap(list[0].Path);
@@ -79,39 +80,36 @@ public class PictureService : BaseService<Picture>, IPictureService
         var mat = new Mat(list[0].Height, list[1].Width, MatType.CV_8UC3, new Scalar(0));
         Cv2.Add(mat1, mat2, mat);
 
-        // 保存图片
-        var myPictures = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-        var savePath = Path.Combine(myPictures, "Exposure");
-        if (!Directory.Exists(savePath)) Directory.CreateDirectory(savePath);
         var date = DateTime.Now.ToString("yyyyMMddHHmmss");
-        var filePath = Path.Combine(savePath, $"{date}.png");
-        mat.SaveImage(filePath);
 
-        // 保存缩略图
-        var thumbnail = mat.Clone();
-        Cv2.Resize(mat, thumbnail, new Size(500, 500));
-        var thumbnailPath = Path.Combine(myPictures, "Thumbnail");
-        if (!Directory.Exists(thumbnailPath)) Directory.CreateDirectory(thumbnailPath);
-        var thumbnailFilePath = Path.Combine(thumbnailPath, $"{date}.jpg");
-        thumbnail.SaveImage(thumbnailFilePath);
+        // 保存图片
+        var exposure = FileUtils.GetFileName(FileUtils.Exposure, $"{date}.png");
+        mat.SaveImage(exposure);
 
         var width = mat.Width;
         var height = mat.Height;
+
+        // 保存缩略图
+        Cv2.Resize(mat, mat, new Size(500, 500));
+        var thumbnail = FileUtils.GetFileName(FileUtils.Thumbnail, $"{date}.jpg");
+        mat.SaveImage(thumbnail);
+
         // 释放资源
+        bitmap1.Dispose();
+        bitmap2.Dispose();
         mat1.Dispose();
         mat2.Dispose();
         mat.Dispose();
-        thumbnail.Dispose();
 
         return await AddReturnModel(new Picture
         {
             UserId = _user.GetLogged()?.Id ?? 0,
             Name = date,
-            Path = filePath,
+            Path = exposure,
             Width = width,
             Height = height,
             Type = 2,
-            Thumbnail = thumbnailFilePath,
+            Thumbnail = thumbnail,
             ExposureTime = 0,
             ExposureGain = 0,
             BlackLevel = 0,
@@ -125,7 +123,7 @@ public class PictureService : BaseService<Picture>, IPictureService
     #endregion
 
     #region 删除
-    
+
     public async Task<Picture> Adjust(Picture pic, PictureAdjustDto dto)
     {
         // 使用imageSharp处理图片
@@ -134,25 +132,22 @@ public class PictureService : BaseService<Picture>, IPictureService
         image.Mutate(x => x.Brightness(dto.Brightness / 100.0f));
         // 增强对比度
         image.Mutate(x => x.Contrast(dto.Contrast / 100.0f));
-
+        // 反色
         if (dto.Invert) image.Mutate(x => x.Invert());
-        // 保存图片
-        var myPictures = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-        var savePath = Path.Combine(myPictures, "Exposure");
-        if (!Directory.Exists(savePath)) Directory.CreateDirectory(savePath);
+
         var date = DateTime.Now.ToString("yyyyMMddHHmmss");
-        var filePath = Path.Combine(savePath, $"{date}.png");
-        await image.SaveAsPngAsync(filePath);
+
+        // 保存图片
+        var exposure = FileUtils.GetFileName(FileUtils.Exposure, $"{date}.png");
+        await image.SaveAsPngAsync(exposure);
 
         var width = image.Width;
         var height = image.Height;
 
         // 保存缩略图
         image.Mutate(x => x.Resize(500, 500));
-        var thumbnailPath = Path.Combine(myPictures, "Thumbnail");
-        if (!Directory.Exists(thumbnailPath)) Directory.CreateDirectory(thumbnailPath);
-        var thumbnailFilePath = Path.Combine(thumbnailPath, $"{date}.jpg");
-        await image.SaveAsJpegAsync(thumbnailFilePath);
+        var thumbnail = FileUtils.GetFileName(FileUtils.Thumbnail, $"{date}.jpg");
+        await image.SaveAsJpegAsync(thumbnail);
 
         // 释放资源
         image.Dispose();
@@ -161,11 +156,11 @@ public class PictureService : BaseService<Picture>, IPictureService
         {
             UserId = _user.GetLogged()?.Id ?? 0,
             Name = date,
-            Path = filePath,
+            Path = exposure,
             Width = width,
             Height = height,
             Type = pic.Type,
-            Thumbnail = thumbnailFilePath,
+            Thumbnail = thumbnail,
             ExposureTime = pic.ExposureTime,
             ExposureGain = pic.ExposureGain,
             BlackLevel = pic.BlackLevel,
@@ -179,7 +174,7 @@ public class PictureService : BaseService<Picture>, IPictureService
     #endregion
 
     #region 更新
-    
+
     public async Task<bool> Update(PictureUpdateDto model)
     {
         var pic = await _context.db.Queryable<Picture>().InSingleAsync(model.Id);
@@ -191,5 +186,4 @@ public class PictureService : BaseService<Picture>, IPictureService
     }
 
     #endregion
-    
 }

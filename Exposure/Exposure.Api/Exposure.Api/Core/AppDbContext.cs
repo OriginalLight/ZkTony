@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Exposure.Api.Contracts.SqlSugar;
+using Exposure.Api.Utils;
 using SqlSugar;
 
 namespace Exposure.Api.Core;
@@ -17,12 +18,12 @@ public class AppDbContext : IDbContext
     {
         _logger = logger;
         _config = config;
-        var location = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) ?? throw new InvalidOperationException("无法获取程序集位置");
+
         var dataBase = _config.GetSection("DataBase").Value ?? throw new InvalidOperationException("无法获取数据库名称");
         //打印日志
         _db = new SqlSugarClient(new ConnectionConfig
         {
-            ConnectionString = $"Data Source={Path.Combine(location, dataBase)}",
+            ConnectionString = $"Data Source={Path.Combine(FileUtils.AppLocation, dataBase)}",
             DbType = DbType.Sqlite, //数据库类型
             IsAutoCloseConnection = true, //自动释放数据务，如果存在事务，在事务结束后释放
             LanguageType = LanguageType.Chinese,

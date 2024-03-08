@@ -9,8 +9,8 @@ namespace Exposure.Api.Controllers;
 [Route("[controller]")]
 public class MetricController : ControllerBase
 {
-    private readonly ISerialPortService _serialPort;
     private readonly ICameraService _camera;
+    private readonly ISerialPortService _serialPort;
     private readonly IUsbService _usb;
 
     #region 构造函数
@@ -27,17 +27,13 @@ public class MetricController : ControllerBase
 
     #region 状态
 
-    /// <summary>
-    ///     状态
-    /// </summary>
-    /// <returns></returns>
     [HttpGet]
     public IActionResult Status()
     {
         var temperature = _camera.GetTemperature();
         var flag = _serialPort.GetFlag("led");
         var hatch = _serialPort.GetFlag("hatch");
-        
+
         var dto = new StatusOutDto
         {
             Usb = _usb.IsUsbAttached(),
@@ -45,7 +41,7 @@ public class MetricController : ControllerBase
             Temperature = temperature
         };
 
-        if (temperature > -18)
+        if (temperature > -13)
         {
             if (flag >= 3) return Ok(dto);
             _serialPort.WritePort("Com1", DefaultProtocol.LedYellow().ToBytes());
@@ -57,7 +53,7 @@ public class MetricController : ControllerBase
             _serialPort.WritePort("Com1", DefaultProtocol.LedGreen().ToBytes());
             _serialPort.SetFlag("led", 2);
         }
-        
+
         return Ok(dto);
     }
 

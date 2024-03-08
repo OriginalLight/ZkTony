@@ -4,13 +4,15 @@
       <a-divider direction="vertical" />
     </template>
     <a-tooltip :content="$t('navigation.status.temperature')">
-      <h3 style="white-space: nowrap">{{ status.temperature }}</h3>
+      <h3 style="white-space: nowrap">
+        {{ appStore.temperature <= -100 ? '#' : `${appStore.temperature} °C` }}
+      </h3>
     </a-tooltip>
     <a-tooltip :content="$t('navigation.status.usb')">
-      <usb size="24" :fill="status.usb" />
+      <usb size="24" :fill="appStore.usb ? '#1890ff' : '#808080'" />
     </a-tooltip>
     <a-tooltip :content="$t('navigation.status.hatch')">
-      <open-door size="24" :fill="status.hatch" />
+      <open-door size="24" :fill="appStore.hatch ? '#1890ff' : '#808080'" />
     </a-tooltip>
     <a-tooltip :content="$t('navigation.status.time')">
       <div style="font-size: 10px">{{ now }}</div>
@@ -50,15 +52,6 @@ const userStore = useUserStore()
 const appStore = useAppStore()
 // 注销弹窗
 const visible = ref(false)
-// 状态栏的一些图标颜色和文字
-const status = ref({
-  // usb图标颜色
-  usb: '#808080',
-  // 舱门图标颜色
-  hatch: '#808080',
-  // 温度
-  temperature: '0°C'
-})
 // 时间
 const now = useDateFormat(useNow(), 'HH:mm:ss YYYY/MM/DD')
 // 确认注销
@@ -77,9 +70,6 @@ const timer = setInterval(async () => {
   try {
     const res = await metric()
     const data = res.data
-    status.value.usb = data.usb ? '#1890ff' : '#808080'
-    status.value.temperature = data.temperature <= -100 ? '/' : `${data.temperature} °C`
-    status.value.hatch = data.hatch ? '#1890ff' : '#808080'
     appStore.toggleUsb(data.usb)
     appStore.toggleHatch(data.hatch)
     appStore.toggleTemperature(data.temperature)

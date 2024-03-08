@@ -9,26 +9,28 @@ namespace Exposure.Api.Controllers;
 [Route("[controller]")]
 public class MachineController : ControllerBase
 {
+    private readonly ILogger<MachineController> _logger;
     private readonly ISerialPortService _serialPort;
-    
-    public MachineController(ISerialPortService serialPort)
+
+    public MachineController(ILogger<MachineController> logger, ISerialPortService serialPort)
     {
+        _logger = logger;
         _serialPort = serialPort;
     }
-    
+
     #region 串口状态
-    
+
     [HttpGet]
     [Route("SerialPort")]
     public IActionResult SerialPortStatus()
     {
         return Ok(_serialPort.GetPorts());
     }
-    
+
     #endregion
-    
+
     #region 串口发送
-    
+
     [HttpPost]
     [Route("SerialPort")]
     public IActionResult SerialPort([FromBody] SerialPortDto dto)
@@ -36,17 +38,11 @@ public class MachineController : ControllerBase
         try
         {
             var ports = _serialPort.GetPorts();
-            if (!ports.Contains(dto.Port))
-            {
-                return Problem("串口未初始化，或者串口不存在。");
-            }
+            if (!ports.Contains(dto.Port)) return Problem("串口未初始化，或者串口不存在。");
             // 将字符串hex转换为byte数组
             var hex = dto.Hex.Replace(" ", "");
             var bytes = new byte[hex.Length / 2];
-            for (var i = 0; i < hex.Length; i += 2)
-            {
-                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
-            }
+            for (var i = 0; i < hex.Length; i += 2) bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
             _serialPort.WritePort(dto.Port, bytes);
             return Ok("OK");
         }
@@ -59,7 +55,7 @@ public class MachineController : ControllerBase
     #endregion
 
     #region 三色灯
-    
+
     [HttpGet]
     [Route("Led")]
     public IActionResult Led([FromQuery] int code)
@@ -96,7 +92,7 @@ public class MachineController : ControllerBase
     }
 
     #endregion
-    
+
     #region 舱门
 
     [HttpGet]
@@ -110,8 +106,17 @@ public class MachineController : ControllerBase
                 _serialPort.WritePort("Com1", DefaultProtocol.LedYellowFastFlash().ToBytes());
                 _serialPort.SetFlag("led", 2);
             }
+
+            _serialPort.SetFlag("hatch", 0);
             _serialPort.WritePort("Com2", DefaultProtocol.OpenHatch().ToBytes());
-            await Task.Delay(5000);
+            var num = 0;
+            while (_serialPort.GetFlag("hatch") == 0 && num < 50)
+            {
+                num++;
+                await Task.Delay(100);
+            }
+
+            if (num >= 50) return Problem("打开舱门超时");
             _serialPort.WritePort("Com1", DefaultProtocol.LedAllClose().ToBytes());
             _serialPort.SetFlag("led", 0);
             _serialPort.SetFlag("hatch", 1);
@@ -123,12 +128,22 @@ public class MachineController : ControllerBase
                 _serialPort.WritePort("Com1", DefaultProtocol.LedYellowFastFlash().ToBytes());
                 _serialPort.SetFlag("led", 2);
             }
+
+            _serialPort.SetFlag("hatch", 1);
             _serialPort.WritePort("Com2", DefaultProtocol.CloseHatch().ToBytes());
-            await Task.Delay(5000);
+            var num = 0;
+            while (_serialPort.GetFlag("hatch") == 1 && num < 50)
+            {
+                num++;
+                await Task.Delay(100);
+            }
+
+            if (num >= 50) return Problem("关闭舱门超时");
             _serialPort.WritePort("Com1", DefaultProtocol.LedAllClose().ToBytes());
             _serialPort.SetFlag("led", 0);
             _serialPort.SetFlag("hatch", 0);
         }
+
         return Ok();
     }
 

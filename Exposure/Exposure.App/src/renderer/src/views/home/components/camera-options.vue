@@ -122,7 +122,7 @@
             :placeholder="t('home.camera.options.frames')"
             mode="button"
             :min="1"
-            :max="100"
+            :max="maxFrams"
             :step="1"
             :input-attrs="{ style: { textAlign: 'center' } }"
             model-event="input"
@@ -143,7 +143,7 @@
             <icon-expand />
           </template>
           {{
-            hatchStatus === 0 ? t('home.camera.options.out') : t('home.camera.options.in')
+            appStore.hatch ? t('home.camera.options.in') : t('home.camera.options.out')
           }}</a-button
         >
         <a-button
@@ -191,16 +191,18 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Message } from '@arco-design/web-vue'
 import { init, preview, pixel, manual, auto, cancel, result } from '@renderer/api/camera'
 import { hatch } from '@renderer/api/machine'
+import { useAppStore } from '@renderer/store'
 import useHomeState from '@renderer/states/home'
 
 const { options, isInit } = useHomeState()
 
-const hatchStatus = ref(0)
+// 获取应用信息
+const appStore = useAppStore()
 
 const emit = defineEmits(['shoot', 'preview'])
 
@@ -222,6 +224,28 @@ const loading = ref({
   preview: false
 })
 
+//根据曝光时间计算最大帧数不能超过曝光时间除以5秒
+const maxFrams = computed(() => {
+  const max = Math.floor((options.value.time.minute * 60 + options.value.time.second) / 5)
+  if (max < 1) {
+    return 1
+  }
+
+  return max
+})
+
+watch(
+  () => maxFrams.value,
+  (value) => {
+    if (options.value.frame > value) {
+      options.value.frame = value
+    }
+  },
+  {
+    immediate: true
+  }
+)
+
 const handleQualityChange = async (value: unknown) => {
   try {
     await pixel({ index: Number(value) })
@@ -233,8 +257,12 @@ const handleQualityChange = async (value: unknown) => {
 const handleHatch = async () => {
   loading.value.hatch = true
   try {
-    await hatch({ code: hatchStatus.value === 0 ? 1 : 0 })
-    hatchStatus.value = hatchStatus.value === 0 ? 1 : 0
+    const before = appStore.hatch
+    await hatch({ code: appStore.hatch ? 0 : 1 })
+    appStore.toggleHatch(!before)
+    if (before) {
+      await handlePreview()
+    }
   } catch (error) {
     Message.error((error as Error).message)
   } finally {
@@ -276,7 +304,11 @@ const handlePreview = async () => {
     // 延时500ms
     await delay(500)
     const res = await result()
-    emit('preview', res.data[0])
+    if (res.data.length > 0) {
+      emit('preview', res.data[0])
+    } else {
+      Message.error(t('home.camera.options.preview.failed'))
+    }
   } catch (error) {
     Message.error((error as Error).message)
   } finally {

@@ -8,7 +8,7 @@ public interface ICameraService
     ///     初始化 0: 成功 1: 无设备 2: 打开失败
     /// </summary>
     /// <returns></returns>
-    void Initialize();
+    void Init();
 
     /// <summary>
     ///  停止
@@ -32,7 +32,7 @@ public interface ICameraService
     ///     预览
     /// </summary>
     /// <returns></returns>
-    void PreviewAsync();
+    Task PreviewAsync();
 
     /// <summary>
     ///     自动拍照
@@ -62,4 +62,19 @@ public interface ICameraService
     /// <returns></returns>
     Task<List<Picture>> GetCacheAsync();
     
+    /// <summary>
+    ///     老化测试
+    /// </summary>
+    /// <returns></returns>
+    void AgingTest();
+
+    /// <summary>
+    ///     数据采集
+    /// </summary>
+    /// <param name="start"></param>
+    /// <param name="interval"></param>
+    /// <param name="number"></param>
+    /// <returns></returns>
+    Task Collect(int start, int interval, int number);
+
 }

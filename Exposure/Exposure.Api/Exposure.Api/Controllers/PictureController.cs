@@ -30,11 +30,6 @@ public class PictureController : ControllerBase
 
     #region 分页查询
 
-    /// <summary>
-    ///     分页查询
-    /// </summary>
-    /// <param name="dto"></param>
-    /// <returns></returns>
     [HttpPost]
     [Route("Page")]
     public async Task<IActionResult> Page([FromBody] PictureQueryDto dto)
@@ -53,11 +48,6 @@ public class PictureController : ControllerBase
 
     #region 添加
 
-    /// <summary>
-    ///     添加
-    /// </summary>
-    /// <param name="dto"></param>
-    /// <returns></returns>
     [HttpPut]
     public async Task<IActionResult> Update([FromBody] PictureUpdateDto dto)
     {
@@ -72,11 +62,6 @@ public class PictureController : ControllerBase
 
     #region 删除
 
-    /// <summary>
-    ///     删除
-    /// </summary>
-    /// <param name="ids"></param>
-    /// <returns></returns>
     [HttpDelete]
     public async Task<IActionResult> Delete([FromBody] object[] ids)
     {
@@ -91,11 +76,6 @@ public class PictureController : ControllerBase
 
     #region 合成
 
-    /// <summary>
-    ///     合成
-    /// </summary>
-    /// <param name="ids"></param>
-    /// <returns></returns>
     [HttpPost]
     [Route("Combine")]
     public async Task<IActionResult> Combine([FromBody] object[] ids)
@@ -119,11 +99,6 @@ public class PictureController : ControllerBase
 
     #region 导出
 
-    /// <summary>
-    ///     导出
-    /// </summary>
-    /// <param name="dto"></param>
-    /// <returns></returns>
     [HttpPost]
     [Route("Export")]
     public async Task<IActionResult> Export([FromBody] PictureExportDto dto)
@@ -169,11 +144,6 @@ public class PictureController : ControllerBase
 
     #region 调整
 
-    /// <summary>
-    ///     调整
-    /// </summary>
-    /// <param name="dto"></param>
-    /// <returns></returns>
     [HttpPost]
     [Route("Adjust")]
     public async Task<IActionResult> Adjust([FromBody] PictureAdjustDto dto)

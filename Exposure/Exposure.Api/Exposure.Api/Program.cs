@@ -49,6 +49,7 @@ builder.Services.AddSingleton<ICameraService, CameraService>();
 builder.Services.AddSingleton<IErrorLogService, ErrorLogService>();
 builder.Services.AddSingleton<IOperLogService, OperLogService>();
 builder.Services.AddSingleton<IPictureService, PictureService>();
+builder.Services.AddSingleton<ITestService, TestService>();
 
 var app = builder.Build();
 

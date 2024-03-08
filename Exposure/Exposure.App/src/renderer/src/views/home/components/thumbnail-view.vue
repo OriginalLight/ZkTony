@@ -242,14 +242,18 @@ onMounted(() => {
       position: absolute;
       top: 0;
       left: 0;
-      color: rgb(var(--arcoblue-6));
+      font-size: 10px;
+      padding: 2px;
+      color: rgba(255, 255, 255, 1);
+      background-color: rgb(var(--arcoblue-6));
     }
 
     .selected {
       position: absolute;
       top: 0;
       right: 0;
-      color: rgb(var(--arcoblue-6));
+      color: rgba(255, 255, 255, 1);
+      background-color: rgb(var(--arcoblue-6));
     }
 
     .img {
@@ -263,7 +267,7 @@ onMounted(() => {
       position: absolute;
       bottom: 0;
       width: 100%;
-      background-color: rgba(0, 0, 0, 1);
+      background-color: rgb(var(--arcoblue-6));
       color: rgba(255, 255, 255, 1);
       font-size: 10px;
       text-align: center;

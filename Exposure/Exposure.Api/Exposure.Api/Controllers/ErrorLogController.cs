@@ -30,11 +30,6 @@ public class ErrorLogController : ControllerBase
 
     #region 分页查询
 
-    /// <summary>
-    ///     分页查询
-    /// </summary>
-    /// <param name="dto"></param>
-    /// <returns></returns>
     [HttpPost]
     [Route("Page")]
     public async Task<IActionResult> Page([FromBody] ErrorLogQueryDto dto)
@@ -53,11 +48,6 @@ public class ErrorLogController : ControllerBase
 
     #region 删除
 
-    /// <summary>
-    ///     删除
-    /// </summary>
-    /// <param name="ids"></param>
-    /// <returns></returns>
     [HttpDelete]
     public async Task<IActionResult> Delete([FromBody] object[] ids)
     {
@@ -71,10 +61,6 @@ public class ErrorLogController : ControllerBase
 
     #region 导出
 
-    /// <summary>
-    ///     导出
-    /// </summary>
-    /// <returns></returns>
     [HttpPost]
     [Route("Export")]
     public async Task<IActionResult> Export([FromBody] object[] ids)

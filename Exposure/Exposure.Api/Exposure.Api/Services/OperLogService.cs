@@ -8,9 +8,9 @@ namespace Exposure.Api.Services;
 
 public class OperLogService : BaseService<OperLog>, IOperLogService
 {
-    private readonly IUserService _user;
     private readonly IDbContext _context;
-    
+    private readonly IUserService _user;
+
     #region 构造函数
 
     public OperLogService(IDbContext dbContext, IUserService userService) : base(dbContext)

@@ -25,6 +25,7 @@ export default {
   'home.camera.options.out': 'Out',
   'home.camera.options.in': 'In',
   'home.camera.options.preview': 'Preview',
+  'home.camera.options.preview.failed': 'Preview Failed',
   'home.camera.options.shoot': 'Shoot',
   'home.camera.options.shooting': 'Shooting...',
   'home.camera.options.cancel': 'Cancel',

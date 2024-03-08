@@ -23,7 +23,7 @@
                 v-model="imageOptions.brightness"
                 class="slider"
                 :style="{ width: '300px' }"
-                :max="200"
+                :max="300"
                 show-tooltip="drag"
                 :lazy="false"
               />
@@ -45,7 +45,7 @@
                 v-model="imageOptions.contrast"
                 class="slider"
                 :style="{ width: '300px' }"
-                :max="200"
+                :max="300"
                 show-tooltip="drag"
                 :lazy="false"
               />

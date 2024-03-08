@@ -171,11 +171,11 @@
               </a-radio-group>
 
               <div v-if="radioOpts.opt2 === 0" class="slider-box">
-                <Slider v-model="options.brightness" class="slider" :max="200" :lazy="false" />
+                <Slider v-model="options.brightness" class="slider" :max="300" :lazy="false" />
               </div>
 
               <div v-if="radioOpts.opt2 === 1" class="slider-box">
-                <Slider v-model="options.contrast" class="slider" :max="200" :lazy="false" />
+                <Slider v-model="options.contrast" class="slider" :max="300" :lazy="false" />
               </div>
 
               <div v-if="radioOpts.opt2 === 2" class="icon-box">
@@ -288,6 +288,15 @@ const handleSave = async () => {
       invert: options.value.invert
     })
     subpage.value.item = res.data
+    if (res.data.type === 0) {
+      subpage.value.list.light = subpage.value.list.light.concat(res.data)
+    }
+    if (res.data.type === 1) {
+      subpage.value.list.dark = subpage.value.list.dark.concat(res.data)
+    }
+    if (res.data.type === 2) {
+      subpage.value.list.combine = subpage.value.list.combine.concat(res.data)
+    }
     resetOptions()
   } catch (error) {
     Message.error((error as Error).message)
@@ -461,16 +470,15 @@ onMounted(() => {
     position: absolute;
     top: 0;
     right: 0;
-    color: rgb(var(--arcoblue-6));
-    font-size: 20px;
-    padding: 2px;
+    color: rgba(255, 255, 255, 1);
+    background-color: rgb(var(--arcoblue-6));
   }
 
   .img-name {
     position: absolute;
     bottom: 0;
     width: 100%;
-    background-color: rgba(0, 0, 0, 1);
+    background-color: rgb(var(--arcoblue-6));
     color: rgba(255, 255, 255, 1);
     font-size: 10px;
     text-align: center;

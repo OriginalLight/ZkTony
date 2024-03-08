@@ -8,9 +8,8 @@ namespace Exposure.Api.Services;
 
 public class ErrorLogService : BaseService<ErrorLog>, IErrorLogService
 {
-
     private readonly IDbContext _context;
-    
+
 
     #region 构造函数
 
@@ -22,7 +21,7 @@ public class ErrorLogService : BaseService<ErrorLog>, IErrorLogService
     #endregion
 
     #region 创建崩溃日志
-    
+
     public void AddErrorLog(Exception ex)
     {
         var errLog = new ErrorLog
@@ -39,7 +38,7 @@ public class ErrorLogService : BaseService<ErrorLog>, IErrorLogService
     #endregion
 
     #region 分页查询
-    
+
     public async Task<List<ErrorLog>> GetByPage(ErrorLogQueryDto dto, RefAsync<int> total)
     {
         return await _context.db.Queryable<ErrorLog>()
@@ -52,7 +51,7 @@ public class ErrorLogService : BaseService<ErrorLog>, IErrorLogService
     #endregion
 
     #region 根据id查询
-    
+
     public async Task<List<ErrorLog>> GetByIds(object[] ids)
     {
         return await _context.db.Queryable<ErrorLog>().Where(p => ids.Contains(p.Id)).ToListAsync();

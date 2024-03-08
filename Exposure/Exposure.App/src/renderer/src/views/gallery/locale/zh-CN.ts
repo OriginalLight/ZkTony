@@ -17,5 +17,7 @@ export default {
   'gallery.bar.detail': '详情',
   'gallery.content.picture.light': '白光图',
   'gallery.content.picture.dark': '曝光图',
-  'gallery.content.picture.combine': '合成图'
+  'gallery.content.picture.combine': '合成图',
+  'gallery.content.picture.selectAll': '全选',
+  'gallery.content.picture.cancelSelectAll': '取消全选'
 }

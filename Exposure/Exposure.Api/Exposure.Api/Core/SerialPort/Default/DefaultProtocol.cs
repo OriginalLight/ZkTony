@@ -321,6 +321,17 @@ public class DefaultProtocol
             Data = [0x03, 0x00]
         };
     }
+    
+    //光耦
+    public static Protocol QueryOptocoupler()
+    {
+        return new Protocol
+        {
+            Address = 0x01,
+            Function = 0x04,
+            Data = [0x00]
+        };
+    }
 
     #endregion
 }

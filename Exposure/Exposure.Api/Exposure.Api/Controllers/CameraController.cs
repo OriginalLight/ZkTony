@@ -26,10 +26,6 @@ public class CameraController : ControllerBase
 
     #region 初始化
 
-    /// <summary>
-    ///     初始化
-    /// </summary>
-    /// <returns></returns>
     [HttpGet]
     [Route("Init")]
     public IActionResult Init()
@@ -37,7 +33,7 @@ public class CameraController : ControllerBase
         // 初始化
         try
         {
-            _camera.Initialize();
+            _camera.Init();
         }
         catch (Exception e)
         {
@@ -52,18 +48,14 @@ public class CameraController : ControllerBase
 
     #region 预览
 
-    /// <summary>
-    ///     预览
-    /// </summary>
-    /// <returns></returns>
     [HttpGet]
     [Route("Preview")]
-    public IActionResult Preview()
+    public async Task<IActionResult> Preview()
     {
         // 预览
         try
         {
-            _camera.PreviewAsync();
+            await _camera.PreviewAsync();
             _operLog.AddOperLog("预览", "预览成功");
             return Ok();
         }
@@ -78,11 +70,6 @@ public class CameraController : ControllerBase
 
     #region 设置分辨率
 
-    /// <summary>
-    ///     设置分辨率
-    /// </summary>
-    /// <param name="index"></param>
-    /// <returns></returns>
     [HttpGet]
     [Route("Pixel")]
     public IActionResult Pixel([FromQuery] int index)
@@ -90,7 +77,7 @@ public class CameraController : ControllerBase
         // 设置像素
         try
         {
-            _camera.SetPixel(uint.Parse(index.ToString()));
+            _camera.SetPixel((uint)index);
         }
         catch (Exception e)
         {
@@ -105,10 +92,6 @@ public class CameraController : ControllerBase
 
     #region 自动拍照
 
-    /// <summary>
-    ///     自动拍照
-    /// </summary>
-    /// <returns></returns>
     [HttpGet]
     [Route("Auto")]
     public async Task<IActionResult> Auto()
@@ -132,12 +115,6 @@ public class CameraController : ControllerBase
 
     #region 手动拍照
 
-    /// <summary>
-    ///     手动拍照
-    /// </summary>
-    /// <param name="exposure"></param>
-    /// <param name="frame"></param>
-    /// <returns></returns>
     [HttpGet]
     [Route("Manual")]
     public async Task<IActionResult> Manual([FromQuery] int exposure, [FromQuery] int frame)
@@ -162,10 +139,6 @@ public class CameraController : ControllerBase
 
     #region 取消拍照
 
-    /// <summary>
-    ///     取消拍照
-    /// </summary>
-    /// <returns></returns>
     [HttpGet]
     [Route("Cancel")]
     public IActionResult Cancel()
@@ -189,10 +162,6 @@ public class CameraController : ControllerBase
 
     #region 获取缓存图片
 
-    /// <summary>
-    ///     获取缓存图片
-    /// </summary>
-    /// <returns></returns>
     [HttpGet]
     [Route("Result")]
     public async Task<IActionResult> Result()
@@ -202,6 +171,27 @@ public class CameraController : ControllerBase
         {
             var cache = await _camera.GetCacheAsync();
             return Ok(cache);
+        }
+        catch (Exception e)
+        {
+            _errorLog.AddErrorLog(e);
+            return Problem($"{e.Message}");
+        }
+    }
+
+    #endregion
+
+    #region 照片采集
+
+    [HttpGet]
+    [Route("Collect")]
+    public async Task<IActionResult> Collect([FromQuery] int start, [FromQuery] int interval, [FromQuery] int number)
+    {
+        // 获取温度
+        try
+        {
+            await _camera.Collect(start, interval, number);
+            return Ok();
         }
         catch (Exception e)
         {

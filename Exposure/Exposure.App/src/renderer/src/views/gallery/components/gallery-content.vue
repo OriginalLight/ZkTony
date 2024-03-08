@@ -10,7 +10,16 @@
   >
     <template #item="{ item }">
       <a-list-item action-layout="vertical">
-        <a-tag size="large">{{ item.date }}</a-tag>
+        <a-space>
+          <a-tag size="large">{{ item.date }}</a-tag>
+          <a-button @click="handleSelectedAll(item)">
+            {{
+              showSelectedAll(item)
+                ? t('gallery.content.picture.cancelSelectAll')
+                : t('gallery.content.picture.selectAll')
+            }}
+          </a-button>
+        </a-space>
         <a-divider v-if="item.light.length > 0" orientation="right">{{
           t('gallery.content.picture.light')
         }}</a-divider>
@@ -121,6 +130,11 @@ const list = computed<PictureGallery[]>(() => {
 const showSelected = (item: Picture) => {
   return selected.value.some((selected) => selected.id === item.id)
 }
+// 是否显示全部选中
+const showSelectedAll = (list: PictureGallery) => {
+  const item = list.light.concat(list.dark).concat(list.combine)
+  return item.every((item) => selected.value.find((selected) => selected.id === item.id))
+}
 // 选择
 const handleSelected = (list: PictureGallery, item: Picture) => {
   if (selected.value.find((selected) => selected.id === item.id)) {
@@ -131,6 +145,18 @@ const handleSelected = (list: PictureGallery, item: Picture) => {
   subpage.value = {
     list,
     item
+  }
+}
+// 全选或者取消全选
+const handleSelectedAll = (list: PictureGallery) => {
+  const item = list.light.concat(list.dark).concat(list.combine)
+  // item 全在选中列表中 则取消全选
+  if (item.every((item) => selected.value.find((selected) => selected.id === item.id))) {
+    selected.value = selected.value.filter(
+      (selected) => !item.find((item) => item.id === selected.id)
+    )
+  } else {
+    selected.value = selected.value.concat(item)
   }
 }
 // 分页
@@ -202,14 +228,15 @@ onMounted(async () => {
     position: absolute;
     top: 0;
     right: 0;
-    color: rgb(var(--arcoblue-6));
+    color: rgba(255, 255, 255, 1);
+    background-color: rgb(var(--arcoblue-6));
   }
 
   .img-name {
     position: absolute;
     bottom: 0;
     width: 100%;
-    background-color: rgba(0, 0, 0, 1);
+    background-color: rgb(var(--arcoblue-6));
     color: rgba(255, 255, 255, 1);
     font-size: 10px;
     text-align: center;
