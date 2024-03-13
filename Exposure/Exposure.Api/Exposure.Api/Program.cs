@@ -1,6 +1,7 @@
 using Exposure.Api.Contracts.Services;
 using Exposure.Api.Contracts.SqlSugar;
 using Exposure.Api.Core;
+using Exposure.Api.Core.Exception;
 using Exposure.Api.Services;
 using Microsoft.OpenApi.Models;
 using Serilog;
@@ -66,6 +67,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.UseMiddleware<ExceptionHandlerMiddleware>();
+app.UseExceptionMiddleware();
 
 app.Run();

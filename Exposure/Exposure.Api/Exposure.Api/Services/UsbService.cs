@@ -3,36 +3,17 @@ using Exposure.Api.Contracts.Services;
 
 namespace Exposure.Api.Services;
 
-public class UsbService : IUsbService
+public class UsbService(ILogger<UsbService> logger) : IUsbService
 {
-    private readonly ManagementEventWatcher _insertWatcher;
-    private readonly ILogger<UsbService> _logger;
-    private readonly ManagementEventWatcher _removeWatcher;
-
-    #region 构造函数
-
-    public UsbService(ILogger<UsbService> logger)
-    {
-        _logger = logger;
-        // Add insert event watcher.
-        _insertWatcher = new ManagementEventWatcher();
-        _insertWatcher.Query = new WqlEventQuery("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 2");
-        _insertWatcher.Start();
-
-        // Add remove event watcher.
-        _removeWatcher = new ManagementEventWatcher();
-        _removeWatcher.Query = new WqlEventQuery("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 3");
-        _removeWatcher.Start();
-    }
-
-    #endregion
+    private readonly ManagementEventWatcher _insertWatcher = new();
+    private readonly ManagementEventWatcher _removeWatcher = new();
 
     #region 外设插入
 
     public void DeviceInsertedEvent(object sender, EventArrivedEventArgs e)
     {
         // 获取到当前插入的什么
-        _logger.LogInformation("外设插入");
+        logger.LogInformation("外设插入");
     }
 
     #endregion
@@ -41,7 +22,7 @@ public class UsbService : IUsbService
 
     public void DeviceRemovedEvent(object sender, EventArrivedEventArgs e)
     {
-        _logger.LogInformation("外设移除");
+        logger.LogInformation("外设移除");
     }
 
     #endregion
@@ -50,6 +31,14 @@ public class UsbService : IUsbService
 
     public Task InitializeAsync()
     {
+        // Add insert event watcher.
+        _insertWatcher.Query = new WqlEventQuery("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 2");
+        _insertWatcher.Start();
+
+        // Add remove event watcher.
+        _removeWatcher.Query = new WqlEventQuery("SELECT * FROM Win32_DeviceChangeEvent WHERE EventType = 3");
+        _removeWatcher.Start();
+
         _insertWatcher.EventArrived += DeviceInsertedEvent;
         _removeWatcher.EventArrived += DeviceRemovedEvent;
 

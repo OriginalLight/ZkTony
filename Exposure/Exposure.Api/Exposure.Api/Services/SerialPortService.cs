@@ -4,35 +4,19 @@ using Exposure.Api.Core.SerialPort.Default;
 
 namespace Exposure.Api.Services;
 
-public class SerialPortService : ISerialPortService
+public class SerialPortService(ILogger<SerialPortService> logger, IConfiguration config, IErrorLogService errorLog)
+    : ISerialPortService
 {
-    private readonly IConfiguration _config;
-    private readonly IErrorLogService _errorLog;
     private readonly Dictionary<string, int> _flags = new();
-    private readonly ILogger<SerialPortService> _logger;
     private readonly Dictionary<string, SerialPort> _serialPorts = new();
-
-    #region 构造函数
-
-    public SerialPortService(ILogger<SerialPortService> logger, IConfiguration config, IErrorLogService errorLog)
-    {
-        _config = config;
-        _logger = logger;
-        _errorLog = errorLog;
-    }
-
-    #endregion
 
     #region 初始化
 
     public void Init()
     {
-        // 读取配置文件
-        var com1 = _config["SerialPort:Com1"];
-        var com2 = _config["SerialPort:Com2"];
         // 打开串口
-        if (com1 != null) OpenPort(com1, 115200, "Com1");
-        if (com2 != null) OpenPort(com2, 115200, "Com2");
+        OpenPort("Com1");
+        OpenPort("Com2");
         // 设置串口接收事件
         if (!_serialPorts.TryGetValue("Com2", out var serialPort)) return;
         serialPort.DataReceived += (sender, _) =>
@@ -40,7 +24,7 @@ public class SerialPortService : ISerialPortService
             var sp = (SerialPort)sender;
             var bytes = new byte[sp.BytesToRead];
             sp.Read(bytes, 0, bytes.Length);
-            _logger.LogInformation("Com2 接收到数据: " + BitConverter.ToString(bytes));
+            logger.LogInformation("Com2 接收到数据: " + BitConverter.ToString(bytes));
             switch (bytes[2])
             {
                 case 0x03:
@@ -54,7 +38,7 @@ public class SerialPortService : ISerialPortService
                     }
                     catch (Exception e)
                     {
-                        _logger.LogError(e.Message);
+                        logger.LogError(e.Message);
                     }
                 }
                     break;
@@ -97,58 +81,6 @@ public class SerialPortService : ISerialPortService
 
     #endregion
 
-    #region 获取串口
-
-    public SerialPort? GetSerialPort(string alias)
-    {
-        return !_serialPorts.TryGetValue(alias, out var serialPort) ? null : serialPort;
-    }
-
-    #endregion
-
-    #region 打开串口
-
-    public bool OpenPort(string portName, int baudRate, string alias)
-    {
-        if (_serialPorts.ContainsKey(portName)) return false;
-        SerialPort serialPort = new(portName, baudRate);
-        try
-        {
-            serialPort.Open();
-            _serialPorts.Add(alias, serialPort);
-            _logger.LogInformation("成功打开串口: " + portName + " 波特率: " + baudRate);
-            return true;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError("打开串口失败：" + portName, e);
-            _errorLog.AddErrorLog(e);
-        }
-
-        return false;
-    }
-
-    #endregion
-
-    #region 关闭串口
-
-    public void ClosePort(string alias)
-    {
-        try
-        {
-            _serialPorts[alias].Close();
-            _serialPorts.Remove(alias);
-            _logger.LogInformation("成功关闭串口: " + alias);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError("关闭串口失败：" + alias, e);
-            _errorLog.AddErrorLog(e);
-        }
-    }
-
-    #endregion
-
     #region 写入串口
 
     public void WritePort(string alias, byte[] bytes)
@@ -156,33 +88,43 @@ public class SerialPortService : ISerialPortService
         try
         {
             _serialPorts[alias].Write(bytes, 0, bytes.Length);
-            _logger.LogInformation("向串口 " + alias + " 写入数据: " + BitConverter.ToString(bytes));
+            logger.LogInformation("向串口 " + alias + " 写入数据: " + BitConverter.ToString(bytes));
         }
         catch (Exception e)
         {
-            _logger.LogError("写入数据失败" + alias, e);
-            _errorLog.AddErrorLog(e);
+            logger.LogError("写入数据失败" + alias, e);
+            errorLog.AddErrorLog(e);
         }
     }
 
     #endregion
 
-    #region 读取串口
+    #region 打开串口
 
-    public string? ReadPort(string alias)
+    private void OpenPort(string alias)
     {
-        if (!_serialPorts.TryGetValue(alias, out var value)) return null;
+        var portName = config.GetSection("SerialPort:" + alias + ":PortName").Value;
+        if (portName == null) return;
+        var baudRate = int.Parse(config.GetSection("SerialPort:" + alias + ":BaudRate").Value ?? "115200");
+        var parity = (Parity)Enum.Parse(typeof(Parity),
+            config.GetSection("SerialPort:" + alias + ":Parity").Value ?? "None");
+        var dataBits = int.Parse(config.GetSection("SerialPort:" + alias + ":DataBits").Value ?? "8");
+        var stopBits = (StopBits)Enum.Parse(typeof(StopBits),
+            config.GetSection("SerialPort:" + alias + ":StopBits").Value ?? "One");
+
+        if (_serialPorts.ContainsKey(portName)) return;
+        SerialPort serialPort = new(portName, baudRate, parity, dataBits, stopBits);
         try
         {
-            return value.ReadLine();
+            serialPort.Open();
+            _serialPorts.Add(alias, serialPort);
+            logger.LogInformation("成功打开串口: " + portName + " 波特率: " + baudRate);
         }
         catch (Exception e)
         {
-            _logger.LogError("读取串口失败：" + alias, e);
-            _errorLog.AddErrorLog(e);
+            logger.LogError("打开串口失败：" + portName, e);
+            errorLog.AddErrorLog(e);
         }
-
-        return null;
     }
 
     #endregion

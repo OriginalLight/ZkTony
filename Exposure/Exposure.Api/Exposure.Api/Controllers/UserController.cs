@@ -9,155 +9,118 @@ namespace Exposure.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class UserController : ControllerBase
+public class UserController(ILogger<UserController> logger, IUserService user, IOperLogService operLog) : ControllerBase
 {
-    private readonly IOperLogService _operLog;
-    private readonly IUserService _user;
-
-    #region 构造函数
-
-    /// <inheritdoc />
-    public UserController(IUserService user, IOperLogService operLog)
-    {
-        _user = user;
-        _operLog = operLog;
-    }
-
-    #endregion
-
     #region 登录
-
-    /// <summary>
-    ///     登录
-    /// </summary>
-    /// <param name="dto"></param>
-    /// <returns></returns>
+    
     [HttpPost]
     [Route("Login")]
     public async Task<IActionResult> Login([FromBody] LoginDto dto)
     {
         // 登录
-        switch (await _user.LogIn(dto.UserName, dto.Password))
+        switch (await user.LogIn(dto.UserName, dto.Password))
         {
             case 0:
             {
                 // 记录登录日志
-                _operLog.AddOperLog("登录", $"登录系统: {dto.UserName}");
-                return new JsonResult(_user.GetLogged());
+                operLog.AddOperLog("登录", $"登录系统: {dto.UserName}");
+                logger.LogInformation("登录成功");
+                return Ok(user.GetLogged());
             }
-            case 1: return Problem("用户不存在");
-            case 2: return Problem("密码错误");
-            case 3: return Problem("用户被禁用");
-            case 4: return Problem("用户已过期");
-            default: return Problem("未知错误");
+            case 1: throw new Exception("用户不存在");
+            case 2: throw new Exception("密码错误");
+            case 3: throw new Exception("用户被禁用");
+            case 4: throw new Exception("用户已过期");
+            default: throw new Exception("未知错误");
         }
     }
 
     #endregion
 
     #region 登出
-
-    /// <summary>
-    ///     登出
-    /// </summary>
-    /// <returns></returns>
+    
     [HttpGet]
     [Route("Logout")]
     public IActionResult Logout()
     {
         // 记录登出日志
-        _operLog.AddOperLog("注销", $"登出系统: {_user.GetLogged()?.Name}");
-        _user.LogOut();
+        operLog.AddOperLog("注销", $"登出系统: {user.GetLogged()?.Name}");
+        user.LogOut();
         return Ok();
     }
 
     #endregion
 
     #region 分页查询
-
-    /// <summary>
-    ///     分页查询所有用户
-    /// </summary>
-    /// <returns></returns>
+    
     [HttpPost]
     [Route("Page")]
     public async Task<IActionResult> Page([FromBody] UserQueryDto dto)
     {
         // 查询
         var total = new RefAsync<int>();
-        var list = await _user.GetByPage(dto, total);
-        return new JsonResult(new PageOutDto<List<User>>
+        var list = await user.GetByPage(dto, total);
+        var res = new PageOutDto<List<User>>
         {
             Total = total.Value,
             List = list
-        });
+        };
+        logger.LogInformation("分页查询成功");
+        return Ok(res);
     }
 
     #endregion
 
     #region 根据ID查询
-
-    /// <summary>
-    ///     根据ID查询
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
+    
     [HttpGet]
     public async Task<IActionResult> GetByIds([FromQuery] int id)
     {
         // 查询
-        var user = await _user.GetByPrimary(id);
-        return Ok(user);
+        var user1 = await user.GetByPrimary(id);
+        logger.LogInformation("查询成功");
+        return Ok(user1);
     }
 
     #endregion
 
     #region 添加用户
-
-    /// <summary>
-    ///     添加用户
-    /// </summary>
-    /// <param name="dto"></param>
-    /// <returns></returns>
+    
     [HttpPost]
     public async Task<IActionResult> Add([FromBody] UserAddDto dto)
     {
         // 添加
-        var user = dto.Adapt<User>();
-        user.Sha = BCrypt.Net.BCrypt.HashPassword(dto.Password);
-        user.CreateTime = DateTime.Now;
-        user.UpdateTime = DateTime.Now;
-        user.LastLoginTime = DateTime.Now;
+        var user1 = dto.Adapt<User>();
+        user1.Sha = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+        user1.CreateTime = DateTime.Now;
+        user1.UpdateTime = DateTime.Now;
+        user1.LastLoginTime = DateTime.Now;
         // 验证用户名是否重复
-        if (await _user.GetByName(dto.Name) != null) return Problem("用户名重复");
-        if (!await _user.Add(user)) return Problem("添加失败");
+        if (await user.GetByName(dto.Name) != null) return Problem("用户名重复");
+        if (!await user.Add(user1)) return Problem("添加失败");
         // 记录添加日志
-        _operLog.AddOperLog("添加", $"添加用户: {dto.Name}");
+        operLog.AddOperLog("添加", $"添加用户: {dto.Name}");
+        logger.LogInformation("添加成功");
         return Ok("添加成功");
     }
 
     #endregion
 
     #region 更新用户
-
-    /// <summary>
-    ///     更新用户
-    /// </summary>
-    /// <param name="dto"></param>
-    /// <returns></returns>
+    
     [HttpPut]
     public async Task<IActionResult> Update([FromBody] UserUpdateDto dto)
     {
         // 更新
-        var old = await _user.GetByPrimary(dto.Id);
-        if (old == null) return Problem("更新失败");
+        var old = await user.GetByPrimary(dto.Id);
+        if (old == null) throw new Exception("更新失败");
         switch (dto.OldPassword.Length)
         {
             // 如果密码不为空，则更新密码
             case > 0 when dto.NewPassword.Length > 0:
             {
                 if (!BCrypt.Net.BCrypt.Verify(dto.OldPassword, old.Sha))
-                    return Problem("旧密码错误");
+                    throw new Exception("旧密码错误");
                 old.Sha = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
                 break;
             }
@@ -173,28 +136,25 @@ public class UserController : ControllerBase
         old.Role = dto.Role;
         old.Enabled = dto.Enabled;
         old.UpdateTime = DateTime.Now;
-        if (!await _user.Update(old)) return Problem("更新失败");
+        if (!await user.Update(old)) throw new Exception("更新失败");
         // 记录更新日志
-        _operLog.AddOperLog("更新", $"更新用户: {dto.Name}");
+        operLog.AddOperLog("更新", $"更新用户: {dto.Name}");
+        logger.LogInformation("更新成功");
         return Ok("更新成功");
     }
 
     #endregion
 
     #region 删除用户
-
-    /// <summary>
-    ///     删除用户
-    /// </summary>
-    /// <param name="ids"></param>
-    /// <returns></returns>
+    
     [HttpDelete]
     public async Task<IActionResult> Delete([FromBody] object[] ids)
     {
         // 删除
-        if (!await _user.DeleteRange(ids)) return Problem("删除失败");
+        if (!await user.DeleteRange(ids)) return Problem("删除失败");
         // 记录删除日志
-        _operLog.AddOperLog("删除", $"删除用户: {string.Join(',', ids)}");
+        operLog.AddOperLog("删除", $"删除用户: {string.Join(',', ids)}");
+        logger.LogInformation("删除成功");
         return Ok("删除成功");
     }
 

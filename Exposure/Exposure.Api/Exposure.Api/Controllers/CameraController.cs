@@ -5,24 +5,13 @@ namespace Exposure.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class CameraController : ControllerBase
+public class CameraController(
+    ILogger<CameraController> logger,
+    ICameraService camera,
+    IOperLogService operLog
+    ) : ControllerBase
 {
-    private readonly ICameraService _camera;
-    private readonly IErrorLogService _errorLog;
-    private readonly IOperLogService _operLog;
     private CancellationTokenSource? _cts;
-
-    #region 构造函数
-
-    /// <inheritdoc />
-    public CameraController(ICameraService camera, IErrorLogService errorLog, IOperLogService operLog)
-    {
-        _camera = camera;
-        _errorLog = errorLog;
-        _operLog = operLog;
-    }
-
-    #endregion
 
     #region 初始化
 
@@ -31,16 +20,8 @@ public class CameraController : ControllerBase
     public IActionResult Init()
     {
         // 初始化
-        try
-        {
-            _camera.Init();
-        }
-        catch (Exception e)
-        {
-            _errorLog.AddErrorLog(e);
-            return Problem($"{e.Message}");
-        }
-
+        camera.Init();
+        logger.LogInformation("初始化成功");
         return Ok("初始化成功");
     }
 
@@ -53,17 +34,10 @@ public class CameraController : ControllerBase
     public async Task<IActionResult> Preview()
     {
         // 预览
-        try
-        {
-            await _camera.PreviewAsync();
-            _operLog.AddOperLog("预览", "预览成功");
-            return Ok();
-        }
-        catch (Exception e)
-        {
-            _errorLog.AddErrorLog(e);
-            return Problem($"{e.Message}");
-        }
+        await camera.PreviewAsync();
+        operLog.AddOperLog("预览", "预览成功");
+        logger.LogInformation("预览成功");
+        return Ok("预览成功");
     }
 
     #endregion
@@ -75,16 +49,8 @@ public class CameraController : ControllerBase
     public IActionResult Pixel([FromQuery] int index)
     {
         // 设置像素
-        try
-        {
-            _camera.SetPixel((uint)index);
-        }
-        catch (Exception e)
-        {
-            _errorLog.AddErrorLog(e);
-            return Problem($"{e.Message}");
-        }
-
+        camera.SetPixel((uint)index);
+        logger.LogInformation($"设置像素成功: {index}");
         return Ok("设置画质成功");
     }
 
@@ -97,18 +63,11 @@ public class CameraController : ControllerBase
     public async Task<IActionResult> Auto()
     {
         // 自动拍照
-        try
-        {
-            _cts = new CancellationTokenSource();
-            var res = await _camera.TakeAutoPhotoAsync(_cts.Token);
-            _operLog.AddOperLog("自动拍照", "自动拍照成功");
-            return Ok(new Dictionary<string, long> { { "exposure", res } });
-        }
-        catch (Exception e)
-        {
-            _errorLog.AddErrorLog(e);
-            return Problem($"{e.Message}");
-        }
+        _cts = new CancellationTokenSource();
+        var res = await camera.TakeAutoPhotoAsync(_cts.Token);
+        operLog.AddOperLog("自动拍照", "自动拍照成功");
+        logger.LogInformation("自动拍照成功");
+        return Ok(new Dictionary<string, long> { { "exposure", res } });
     }
 
     #endregion
@@ -120,18 +79,10 @@ public class CameraController : ControllerBase
     public async Task<IActionResult> Manual([FromQuery] int exposure, [FromQuery] int frame)
     {
         // 手动拍照
-        try
-        {
-            _cts = new CancellationTokenSource();
-            await _camera.TakeManualPhotoAsync(exposure, frame, _cts.Token);
-            _operLog.AddOperLog("手动拍照", "手动拍照成功");
-        }
-        catch (Exception e)
-        {
-            _errorLog.AddErrorLog(e);
-            return Problem($"{e.Message}");
-        }
-
+        _cts = new CancellationTokenSource();
+        await camera.TakeManualPhotoAsync(exposure, frame, _cts.Token);
+        operLog.AddOperLog("手动拍照", "手动拍照成功");
+        logger.LogInformation("手动拍照成功");
         return Ok("手动拍照成功");
     }
 
@@ -144,17 +95,9 @@ public class CameraController : ControllerBase
     public IActionResult Cancel()
     {
         // 取消拍照
-        try
-        {
-            _camera.CancelTask();
-            _operLog.AddOperLog("取消拍照", "取消拍照成功");
-        }
-        catch (Exception e)
-        {
-            _errorLog.AddErrorLog(e);
-            return Problem($"{e.Message}");
-        }
-
+        camera.CancelTask();
+        operLog.AddOperLog("取消拍照", "取消拍照成功");
+        logger.LogInformation("取消拍照成功");
         return Ok("取消拍照成功");
     }
 
@@ -167,16 +110,9 @@ public class CameraController : ControllerBase
     public async Task<IActionResult> Result()
     {
         // 获取温度
-        try
-        {
-            var cache = await _camera.GetCacheAsync();
-            return Ok(cache);
-        }
-        catch (Exception e)
-        {
-            _errorLog.AddErrorLog(e);
-            return Problem($"{e.Message}");
-        }
+        var cache = await camera.GetCacheAsync();
+        logger.LogInformation("获取缓存图片成功");
+        return Ok(cache);
     }
 
     #endregion
@@ -188,16 +124,9 @@ public class CameraController : ControllerBase
     public async Task<IActionResult> Collect([FromQuery] int start, [FromQuery] int interval, [FromQuery] int number)
     {
         // 获取温度
-        try
-        {
-            await _camera.Collect(start, interval, number);
-            return Ok();
-        }
-        catch (Exception e)
-        {
-            _errorLog.AddErrorLog(e);
-            return Problem($"{e.Message}");
-        }
+        await camera.Collect(start, interval, number);
+        logger.LogInformation("照片采集成功");
+        return Ok("照片采集成功");
     }
 
     #endregion

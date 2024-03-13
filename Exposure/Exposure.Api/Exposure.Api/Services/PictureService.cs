@@ -14,26 +14,15 @@ using Size = OpenCvSharp.Size;
 
 namespace Exposure.Api.Services;
 
-public class PictureService : BaseService<Picture>, IPictureService
+public class PictureService(IDbContext dbContext, IUserService user) : BaseService<Picture>(dbContext), IPictureService
 {
-    private readonly IDbContext _context;
-    private readonly IUserService _user;
-
-    #region 构造函数
-
-    public PictureService(IDbContext dbContext, IUserService user) : base(dbContext)
-    {
-        _context = dbContext;
-        _user = user;
-    }
-
-    #endregion
+    private readonly IDbContext _context = dbContext;
 
     #region 分页查询
 
     public async Task<List<Picture>> GetByPage(PictureQueryDto dto, RefAsync<int> total)
     {
-        var logged = _user.GetLogged();
+        var logged = user.GetLogged();
         if (logged == null) return new List<Picture>();
         var lower = await _context.db.Queryable<User>().Where(u => u.Role > logged.Role).ToListAsync();
         var users = lower.Append(logged).ToList();
@@ -103,7 +92,7 @@ public class PictureService : BaseService<Picture>, IPictureService
 
         return await AddReturnModel(new Picture
         {
-            UserId = _user.GetLogged()?.Id ?? 0,
+            UserId = user.GetLogged()?.Id ?? 0,
             Name = date,
             Path = exposure,
             Width = width,
@@ -154,7 +143,7 @@ public class PictureService : BaseService<Picture>, IPictureService
 
         return await AddReturnModel(new Picture
         {
-            UserId = _user.GetLogged()?.Id ?? 0,
+            UserId = user.GetLogged()?.Id ?? 0,
             Name = date,
             Path = exposure,
             Width = width,

@@ -6,20 +6,11 @@ using SqlSugar;
 
 namespace Exposure.Api.Services;
 
-public class OperLogService : BaseService<OperLog>, IOperLogService
+public class OperLogService(IDbContext dbContext, IUserService userService)
+    : BaseService<OperLog>(dbContext), IOperLogService
 {
-    private readonly IDbContext _context;
-    private readonly IUserService _user;
+    private readonly IDbContext _context = dbContext;
 
-    #region 构造函数
-
-    public OperLogService(IDbContext dbContext, IUserService userService) : base(dbContext)
-    {
-        _context = dbContext;
-        _user = userService;
-    }
-
-    #endregion
 
     #region 添加操作日志
 
@@ -30,7 +21,7 @@ public class OperLogService : BaseService<OperLog>, IOperLogService
     /// <param name="desc"></param>
     public void AddOperLog(string type, string desc)
     {
-        var logged = _user.GetLogged();
+        var logged = userService.GetLogged();
         if (logged != null)
         {
             var operLog = new OperLog

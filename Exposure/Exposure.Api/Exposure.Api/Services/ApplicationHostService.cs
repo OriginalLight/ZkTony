@@ -4,36 +4,16 @@ using Exposure.Api.Models;
 
 namespace Exposure.Api.Services;
 
-public class ApplicationHostService : IHostedService
+public class ApplicationHostService(
+    IDbContext dbContext,
+    IUsbService usbService,
+    IUserService userService,
+    ICameraService cameraService,
+    IAutoCleanService autoCleanService,
+    ISerialPortService serialPortService
+) : IHostedService
 {
-    private readonly IAutoCleanService _autoCleanService;
-    private readonly ICameraService _cameraService;
-    private readonly IDbContext _dbContext;
-    private readonly ISerialPortService _serialPortService;
-    private readonly IUsbService _usbService;
-    private readonly IUserService _userService;
     private bool _isInitialized;
-
-    #region 构造函数
-
-    public ApplicationHostService(
-        IDbContext dbContext,
-        IUserService userService,
-        IUsbService usbService,
-        ICameraService cameraService,
-        IAutoCleanService autoCleanService,
-        ISerialPortService serialPortService
-    )
-    {
-        _dbContext = dbContext;
-        _usbService = usbService;
-        _userService = userService;
-        _cameraService = cameraService;
-        _autoCleanService = autoCleanService;
-        _serialPortService = serialPortService;
-    }
-
-    #endregion
 
     #region 初始化
 
@@ -41,11 +21,11 @@ public class ApplicationHostService : IHostedService
     {
         if (!_isInitialized)
         {
-            _dbContext.CreateTable(false, 50, typeof(User), typeof(Picture), typeof(OperLog), typeof(ErrorLog));
-            _serialPortService.Init();
-            await _userService.InitializeAsync();
-            await _autoCleanService.CleanPreviewAsync();
-            await _usbService.InitializeAsync();
+            dbContext.CreateTable(false, 50, typeof(User), typeof(Picture), typeof(OperLog), typeof(ErrorLog));
+            serialPortService.Init();
+            await userService.InitializeAsync();
+            await autoCleanService.CleanPreviewAsync();
+            await usbService.InitializeAsync();
         }
 
         _isInitialized = true;
@@ -57,7 +37,7 @@ public class ApplicationHostService : IHostedService
 
     public async Task StopAsync(CancellationToken cancellationToken)
     {
-        _cameraService.Stop();
+        cameraService.Stop();
         await Task.CompletedTask;
     }
 

@@ -6,19 +6,10 @@ using SqlSugar;
 
 namespace Exposure.Api.Services;
 
-public class ErrorLogService : BaseService<ErrorLog>, IErrorLogService
+public class ErrorLogService(IDbContext dbContext) : BaseService<ErrorLog>(dbContext), IErrorLogService
 {
-    private readonly IDbContext _context;
+    private readonly IDbContext _context = dbContext;
 
-
-    #region 构造函数
-
-    public ErrorLogService(IDbContext dbContext) : base(dbContext)
-    {
-        _context = dbContext;
-    }
-
-    #endregion
 
     #region 创建崩溃日志
 

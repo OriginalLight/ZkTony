@@ -6,21 +6,12 @@ using SqlSugar;
 
 namespace Exposure.Api.Services;
 
-public class UserService : BaseService<User>, IUserService
+public class UserService(IDbContext dbContext) : BaseService<User>(dbContext), IUserService
 {
-    private readonly IDbContext _context;
+    private readonly IDbContext _context = dbContext;
 
     // 登录状态
-    private User? _logged;
-
-    #region 构造函数
-
-    public UserService(IDbContext dbContext) : base(dbContext)
-    {
-        _context = dbContext;
-    }
-
-    #endregion
+    private User? _user;
 
     #region 初始化
 
@@ -51,7 +42,7 @@ public class UserService : BaseService<User>, IUserService
     public User? GetLogged()
     {
         // 返回登录状态
-        var user = _logged;
+        var user = _user;
         if (user != null) user.Sha = "";
         return user;
     }
@@ -73,7 +64,7 @@ public class UserService : BaseService<User>, IUserService
         // 检查是否被禁用
         if (!user.Enabled) return 3;
         // 存储登录状态
-        _logged = user;
+        _user = user;
         // 更新登录时间
         user.LastLoginTime = DateTime.Now;
         await _context.db.Updateable(user).ExecuteCommandAsync();
@@ -88,7 +79,7 @@ public class UserService : BaseService<User>, IUserService
     public void LogOut()
     {
         // 清除登录状态
-        _logged = null;
+        _user = null;
     }
 
     #endregion
@@ -109,7 +100,7 @@ public class UserService : BaseService<User>, IUserService
                 LastLoginTime = p.LastLoginTime
             })
             .WhereIF(!string.IsNullOrEmpty(dto.Name), p => p.Name.Contains(dto.Name!))
-            .WhereIF(_logged != null, p => p.Role > _logged!.Role)
+            .WhereIF(_user != null, p => p.Role > _user!.Role)
             .OrderBy(p => p.CreateTime, OrderByType.Desc)
             .ToPageListAsync(dto.Page, dto.Size, total);
     }

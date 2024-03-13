@@ -8,22 +8,8 @@ namespace Exposure.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class OperLogController : ControllerBase
+public class OperLogController(ILogger<OperLogController> logger, IUsbService usb, IOperLogService operLog) : ControllerBase
 {
-    private readonly IOperLogService _operLog;
-    private readonly IUsbService _usb;
-
-    #region 构造函数
-
-    /// <inheritdoc />
-    public OperLogController(IUsbService usb, IOperLogService operLog)
-    {
-        _usb = usb;
-        _operLog = operLog;
-    }
-
-    #endregion
-
     #region 分页查询
 
     [HttpPost]
@@ -32,12 +18,14 @@ public class OperLogController : ControllerBase
     {
         // 查询
         var total = new RefAsync<int>();
-        var list = await _operLog.GetByPage(dto, total);
-        return new JsonResult(new PageOutDto<List<OperLogOutDto>>
+        var list = await operLog.GetByPage(dto, total);
+        var res = new PageOutDto<List<OperLogOutDto>>
         {
             Total = total.Value,
             List = list
-        });
+        };
+        logger.LogInformation("分页查询成功");
+        return Ok(res);
     }
 
     #endregion
@@ -47,9 +35,10 @@ public class OperLogController : ControllerBase
     [HttpDelete]
     public async Task<IActionResult> Delete([FromBody] object[] ids)
     {
-        if (!await _operLog.DeleteRange(ids)) return Problem("删除失败");
+        if (!await operLog.DeleteRange(ids)) return Problem("删除失败");
         // 插入日志
-        _operLog.AddOperLog("删除", "删除操作日志：ids = " + string.Join(",", ids));
+        operLog.AddOperLog("删除", "删除操作日志：ids = " + string.Join(",", ids));
+        logger.LogInformation("删除成功");
         return Ok("删除成功");
     }
 
@@ -62,11 +51,11 @@ public class OperLogController : ControllerBase
     public async Task<IActionResult> Export([FromBody] object[] ids)
     {
         // 获取U盘
-        var usb = _usb.GetDefaultUsbDrive();
-        if (usb == null) return Problem("未找到可用的U盘");
+        var usb1 = usb.GetDefaultUsbDrive();
+        if (usb1 == null) throw new Exception("未找到可用的U盘");
         // 获取日志
-        var list = await _operLog.GetByIds(ids);
-        if (list.Count == 0) return Problem("未找到相关日志");
+        var list = await operLog.GetByIds(ids);
+        if (list.Count == 0) throw new Exception("未找到相关日志");
 
         // 使用MiniExcel导出
         var data = list.Select(p => new
@@ -78,9 +67,10 @@ public class OperLogController : ControllerBase
             操作时间 = p.Time
         }).ToList();
         // 保存到U盘
-        await MiniExcel.SaveAsAsync(Path.Combine(usb.Name, "操作日志.xlsx"), data, overwriteFile: true);
+        await MiniExcel.SaveAsAsync(Path.Combine(usb1.Name, "操作日志.xlsx"), data, overwriteFile: true);
         // 记录日志
-        _operLog.AddOperLog("导出", "导出操作日志：ids = " + string.Join(",", ids));
+        operLog.AddOperLog("导出", "导出操作日志：ids = " + string.Join(",", ids));
+        logger.LogInformation("导出成功");
         // 返回结果
         return Ok("导出成功");
     }

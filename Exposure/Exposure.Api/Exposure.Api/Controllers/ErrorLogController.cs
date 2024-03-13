@@ -10,24 +10,13 @@ namespace Exposure.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class ErrorLogController : ControllerBase
+public class ErrorLogController(
+    ILogger<ErrorLogController> logger,
+    IUsbService usb, 
+    IErrorLogService errorLog, 
+    IOperLogService operLog
+    ) : ControllerBase
 {
-    private readonly IErrorLogService _errorLog;
-    private readonly IOperLogService _operLog;
-    private readonly IUsbService _usb;
-
-    #region 构造函数
-
-    /// <inheritdoc />
-    public ErrorLogController(IUsbService usb, IErrorLogService errorLog, IOperLogService operLog)
-    {
-        _usb = usb;
-        _errorLog = errorLog;
-        _operLog = operLog;
-    }
-
-    #endregion
-
     #region 分页查询
 
     [HttpPost]
@@ -36,12 +25,14 @@ public class ErrorLogController : ControllerBase
     {
         // 查询
         var total = new RefAsync<int>();
-        var list = await _errorLog.GetByPage(dto, total);
-        return new JsonResult(new PageOutDto<List<ErrorLog>>
+        var list = await errorLog.GetByPage(dto, total);
+        var res = new PageOutDto<List<ErrorLog>>
         {
             Total = total.Value,
             List = list
-        });
+        };
+        logger.LogInformation("分页查询成功");
+        return Ok(res);
     }
 
     #endregion
@@ -51,9 +42,10 @@ public class ErrorLogController : ControllerBase
     [HttpDelete]
     public async Task<IActionResult> Delete([FromBody] object[] ids)
     {
-        if (!await _errorLog.DeleteRange(ids)) return Problem("删除失败");
+        if (!await errorLog.DeleteRange(ids)) return Problem("删除失败");
         // 插入日志
-        _operLog.AddOperLog("删除", $"删除崩溃日志：ids = {string.Join(",", ids)}");
+        operLog.AddOperLog("删除", $"删除崩溃日志：ids = {string.Join(",", ids)}");
+        logger.LogInformation("删除成功");
         return Ok("删除成功");
     }
 
@@ -66,16 +58,17 @@ public class ErrorLogController : ControllerBase
     public async Task<IActionResult> Export([FromBody] object[] ids)
     {
         // 获取U盘
-        var usb = _usb.GetDefaultUsbDrive();
-        if (usb == null) return Problem("未找到可用的U盘");
+        var usb1 = usb.GetDefaultUsbDrive();
+        if (usb1 == null) throw new Exception("未找到可用的U盘");
         // 获取日志
-        var list = await _errorLog.GetByIds(ids);
-        if (list.Count == 0) return Problem("未找到相关日志");
+        var list = await errorLog.GetByIds(ids);
+        if (list.Count == 0) throw new Exception("未找到相关日志");
         // 保存到U盘
-        await System.IO.File.WriteAllTextAsync(Path.Combine(usb.Name, "错误日志.json"), JsonConvert.SerializeObject(list),
+        await System.IO.File.WriteAllTextAsync(Path.Combine(usb1.Name, "错误日志.json"), JsonConvert.SerializeObject(list),
             Encoding.UTF8);
         // 插入日志
-        _operLog.AddOperLog("导出", "导出崩溃日志：ids = " + string.Join(",", ids));
+        operLog.AddOperLog("导出", "导出崩溃日志：ids = " + string.Join(",", ids));
+        logger.LogInformation("导出成功");
         // 返回结果
         return Ok("导出成功");
     }

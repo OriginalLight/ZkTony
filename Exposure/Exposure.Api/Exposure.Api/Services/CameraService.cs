@@ -7,30 +7,20 @@ using OpenCvSharp;
 
 namespace Exposure.Api.Services;
 
-public class CameraService : ICameraService
+public class CameraService(
+    IConfiguration config,
+    ISerialPortService serialPort,
+    IPictureService picture,
+    IUserService user)
+    : ICameraService
 {
-    private const uint ExpoTime = 1500;
-    private readonly IPictureService _picture;
-
     private readonly List<Picture> _pictureList = [];
-    private readonly ISerialPortService _serialPort;
-    private readonly IUserService _user;
+    private uint _expoTime = 1500;
     private string _flag = "preview";
     private Mat? _mat;
     private Nncam? _nncam;
     private int _seq;
     private int _target;
-
-    #region 构造函数
-
-    public CameraService(ISerialPortService serialPort, IPictureService picture, IUserService user)
-    {
-        _serialPort = serialPort;
-        _picture = picture;
-        _user = user;
-    }
-
-    #endregion
 
     #region 初始化
 
@@ -40,6 +30,14 @@ public class CameraService : ICameraService
 
         try
         {
+            // 从config中加载参数
+            _expoTime = uint.Parse(config.GetSection("Camera:ExpoTime").Value ?? "1500");
+            var temperature = short.Parse(config.GetSection("Camera:Temperature").Value ?? "-150");
+            var optionTrigger = int.Parse(config.GetSection("Camera:OptionTrigger").Value ?? "1");
+            var autoExpo = bool.Parse(config.GetSection("Camera:AutoExpo").Value ?? "false");
+            var chrome = bool.Parse(config.GetSection("Camera:Chrome").Value ?? "true");
+            var gain = ushort.Parse(config.GetSection("Camera:Gain").Value ?? "3000");
+
             var arr = Nncam.EnumV2();
             if (arr.Length == 0) throw new Exception("未找到设备");
 
@@ -48,12 +46,11 @@ public class CameraService : ICameraService
             if (_nncam == null) throw new Exception("打开设备失败");
 
             // 设置参数
-            if (!_nncam.put_Temperature(-150)) throw new Exception("设置温度失败");
-            if (!_nncam.put_Option(Nncam.eOPTION.OPTION_TRIGGER, 1)) throw new Exception("设置模式失败");
-            if (!_nncam.put_AutoExpoEnable(false)) throw new Exception("参数自动曝光设置失败");
-            if (!_nncam.put_Chrome(true)) throw new Exception("设置单色失败");
-            if (!_nncam.put_Option(Nncam.eOPTION.OPTION_BITDEPTH, 1)) throw new Exception("设置位深失败");
-            if (!_nncam.put_ExpoAGain(3000)) throw new Exception("设置增益失败");
+            if (!_nncam.put_Temperature(temperature)) throw new Exception("设置温度失败");
+            if (!_nncam.put_Option(Nncam.eOPTION.OPTION_TRIGGER, optionTrigger)) throw new Exception("设置模式失败");
+            if (!_nncam.put_AutoExpoEnable(autoExpo)) throw new Exception("参数自动曝光设置失败");
+            if (!_nncam.put_Chrome(chrome)) throw new Exception("设置单色失败");
+            if (!_nncam.put_ExpoAGain(gain)) throw new Exception("设置增益失败");
 
             // 设置回调
             if (!SetCallBack()) throw new Exception("设置回调失败");
@@ -62,8 +59,8 @@ public class CameraService : ICameraService
         {
             _nncam?.Close();
             _nncam = null;
-            _serialPort.WritePort("Com1", DefaultProtocol.LedRed().ToBytes());
-            _serialPort.SetFlag("led", 5);
+            serialPort.WritePort("Com1", DefaultProtocol.LedRed().ToBytes());
+            serialPort.SetFlag("led", 5);
             throw;
         }
     }
@@ -96,18 +93,18 @@ public class CameraService : ICameraService
         try
         {
             //打开灯光
-            _serialPort.WritePort("Com2", DefaultProtocol.OpenLight().ToBytes());
+            serialPort.WritePort("Com2", DefaultProtocol.OpenLight().ToBytes());
             // 延时100ms
             await Task.Delay(100);
 
             // 设置曝光时间
-            if (!_nncam.put_ExpoTime(ExpoTime)) throw new Exception("设置曝光时间失败");
+            if (!_nncam.put_ExpoTime(_expoTime)) throw new Exception("设置曝光时间失败");
             // 触发拍摄
             if (!_nncam.Trigger(1)) throw new Exception("预览失败");
         }
         catch (Exception)
         {
-            _serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
+            serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
             throw;
         }
     }
@@ -123,23 +120,7 @@ public class CameraService : ICameraService
 
         _mat = null;
         _flag = "sampling";
-        uint targetExpo = 1000000;
-
-        // 设置曝光时间
-        if (!_nncam.put_ExpoTime(1000000)) throw new Exception("设置采样曝光时间失败");
-        // 计算曝光时间
-        if (!_nncam.Trigger(1)) throw new Exception("计算曝光时间失败");
-
-        // 延时1300ms
-        await Task.Delay(1300, ctsToken);
-
-        if (_mat == null) throw new Exception("获取采样图失败");
-        var gray = new Mat();
-        // 转换成灰度图
-        Cv2.CvtColor(_mat, gray, ColorConversionCodes.BGR2GRAY);
-        var expo = CalculateExpo(gray, (int)targetExpo, 0.5);
-        if (expo > 1000000L * 60L * 60L) throw new Exception("曝光时间过长");
-        targetExpo = Math.Max((uint)expo, 10000);
+        var targetExpo = await CalculateExpo(0.1, ctsToken);
 
         _mat = null;
         _pictureList.Clear();
@@ -150,19 +131,19 @@ public class CameraService : ICameraService
         try
         {
             //打开灯光
-            _serialPort.WritePort("Com2", DefaultProtocol.OpenLight().ToBytes());
+            serialPort.WritePort("Com2", DefaultProtocol.OpenLight().ToBytes());
             // 延时100ms
             await Task.Delay(100, ctsToken);
 
             // 设置曝光时间
-            if (!_nncam.put_ExpoTime(ExpoTime)) throw new Exception("设置白光曝光时间失败");
+            if (!_nncam.put_ExpoTime(_expoTime)) throw new Exception("设置白光曝光时间失败");
             // 触发拍摄
             if (!_nncam.Trigger(1)) throw new Exception("拍摄白光图失败");
         }
         catch (Exception)
         {
             // 关闭灯光
-            _serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
+            serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
             throw;
         }
 
@@ -170,7 +151,7 @@ public class CameraService : ICameraService
         await Task.Delay(500, ctsToken);
 
         // 设置曝光时
-        if (!_nncam.put_ExpoTime(targetExpo)) throw new Exception("设置曝光图曝光时间失败");
+        if (!_nncam.put_ExpoTime((uint)targetExpo)) throw new Exception("设置曝光图曝光时间失败");
 
         if (!_nncam.Trigger(1)) throw new Exception("拍摄曝光图失败");
 
@@ -195,18 +176,18 @@ public class CameraService : ICameraService
         try
         {
             //打开灯光
-            _serialPort.WritePort("Com2", DefaultProtocol.OpenLight().ToBytes());
+            serialPort.WritePort("Com2", DefaultProtocol.OpenLight().ToBytes());
             // 延时100ms
             await Task.Delay(100, ctsToken);
 
             // 设置曝光时间
-            if (!_nncam.put_ExpoTime(ExpoTime)) throw new Exception("设置白光曝光时间失败");
+            if (!_nncam.put_ExpoTime(_expoTime)) throw new Exception("设置白光曝光时间失败");
             // 触发拍摄
             if (!_nncam.Trigger(1)) throw new Exception("拍摄白光图失败");
         }
         catch (Exception)
         {
-            _serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
+            serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
             throw;
         }
 
@@ -258,7 +239,7 @@ public class CameraService : ICameraService
 
         _flag = "aging";
         // 设置曝光时间
-        if (!_nncam.put_ExpoTime(ExpoTime)) throw new Exception("设置白光曝光时间失败");
+        if (!_nncam.put_ExpoTime(_expoTime)) throw new Exception("设置白光曝光时间失败");
         // 触发拍摄
         if (!_nncam.Trigger(100)) throw new Exception("拍摄白光图失败");
     }
@@ -349,7 +330,7 @@ public class CameraService : ICameraService
     }
 
     #endregion
-    
+
     #region 获取图片
 
     private async void OnEventImage()
@@ -361,7 +342,7 @@ public class CameraService : ICameraService
         if (!_nncam.PullImageV3(buffer, 0, 24, 0, out var info)) return;
         // buffer => mat
         var mat = new Mat(height, width, MatType.CV_8UC3, buffer);
-        
+
         // 序列
         _seq++;
         try
@@ -372,7 +353,7 @@ public class CameraService : ICameraService
                 {
                     _pictureList.Add(await SaveAsync(mat, info, (int)expo, -1));
                     // 关闭灯光
-                    _serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
+                    serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
                 }
                     break;
                 case "auto":
@@ -385,7 +366,7 @@ public class CameraService : ICameraService
                             // 保存图片
                             _pictureList.Add(await SaveAsync(mat, info, (int)expo));
                             // 关闭灯光
-                            _serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
+                            serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
                             _mat = mat.Clone();
                         }
                             break;
@@ -398,7 +379,7 @@ public class CameraService : ICameraService
                             try
                             {
                                 if (_mat != null) Cv2.Add(mat, _mat, combine);
-                                _pictureList.Add(await SaveAsync(combine, info, (int)(expo + ExpoTime), 2));
+                                _pictureList.Add(await SaveAsync(combine, info, (int)(expo + _expoTime), 2));
                             }
                             finally
                             {
@@ -418,7 +399,7 @@ public class CameraService : ICameraService
                             // 保存图片
                             _pictureList.Add(await SaveAsync(mat, info, (int)expo));
                             // 关闭灯光
-                            _serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
+                            serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
                             break;
                         case 2:
                             _mat = mat.Clone();
@@ -481,27 +462,30 @@ public class CameraService : ICameraService
     )
     {
         #region 通用处理
-        
-        // 去除杂色
-        mat.SetTo(new Scalar(0, 0, 0), mat.InRange(new Scalar(0, 0, 0), new Scalar(3, 3, 3)));
-        // 中值滤波
-        Cv2.MedianBlur(mat, mat, 5);
+
         // 校准图片
         var dst = Calibrate(mat);
         // 转换灰度图
         var gray = new Mat();
         Cv2.CvtColor(dst, gray, ColorConversionCodes.BGR2GRAY);
+        // 去除杂色
+        mat.SetTo(0, mat.InRange(0, 3));
+        // 中值滤波
+        //Cv2.MedianBlur(gray, gray, 5);
+        // 开运算
+        Cv2.MorphologyEx(gray, gray, MorphTypes.Open, Cv2.GetStructuringElement(MorphShapes.Rect, new Size(3, 3)));
         // 直方图归一化
-        Cv2.Normalize(gray, gray, 0, 255, NormTypes.MinMax, MatType.CV_8UC1);
-        
+        gray.MinMaxLoc(out _, out double max);
+        if (max > 10 && type == 1) Cv2.Normalize(gray, gray, 0, 255, NormTypes.MinMax, MatType.CV_8UC1);
+
         #endregion
-        
+
         // 保存原图
         var date = DateTime.Now.ToString("yyMMddHHmmssfff");
 
         // 保存图片
         var filePath = FileUtils.GetFileName(type == -1 ? FileUtils.Preview : FileUtils.Exposure, $"{date}.png");
-        
+
         gray.SaveImage(filePath);
         // 保存缩略图
         var thumb = new Mat();
@@ -514,9 +498,9 @@ public class CameraService : ICameraService
         thumb.Dispose();
         dst.Dispose();
 
-        var picture = new Picture
+        var picture1 = new Picture
         {
-            UserId = _user.GetLogged()?.Id ?? 0,
+            UserId = user.GetLogged()?.Id ?? 0,
             Name = type == -1 ? "Preview" : date,
             Path = filePath,
             Width = (int)info.width,
@@ -532,24 +516,7 @@ public class CameraService : ICameraService
             DeleteTime = DateTime.Now
         };
 
-        return type == -1 ? picture : await _picture.AddReturnModel(picture);
-    }
-
-    #endregion
-
-    #region 计算曝光时间
-
-    private static long CalculateExpo(Mat mat, nint expo, double snr)
-    {
-        // 计算信噪比
-        Cv2.MeanStdDev(mat, out var mean, out var stddev);
-        var snr1 = mean.Val0 / stddev.Val0;
-        //计算曝光时间比例
-        var ratio = Math.Pow(snr / snr1, 2);
-        //计算目标曝光时间
-        if (ratio != 0 && expo != 0) return (long)(expo / ratio);
-
-        return 10000;
+        return type == -1 ? picture1 : await picture.AddReturnModel(picture1);
     }
 
     #endregion
@@ -625,6 +592,84 @@ public class CameraService : ICameraService
         dst.Dispose();
 
         return res;
+    }
+
+    #endregion
+
+    #region 计算曝光时间
+
+    private async Task<long> CalculateExpo(double time, CancellationToken ctsToken)
+    {
+        if (_nncam == null) throw new Exception("计算曝光时间失败");
+        // 设置曝光时间
+        if (!_nncam.put_ExpoTime((uint)(time * 1000000))) throw new Exception("设置采样曝光时间失败");
+        // 计算曝光时间
+        if (!_nncam.Trigger(1)) throw new Exception("计算曝光时间失败");
+        // 延时1300ms
+        await Task.Delay((int)(time * 1000 + 1000), ctsToken);
+        if (_mat == null) throw new Exception("获取采样图失败");
+
+        var snr = CalculateSnr(_mat, time);
+        _mat = null;
+
+        if (Math.Abs(time - 0.1) < 0.1)
+            return snr switch
+            {
+                < -20 => 1000000,
+                < -15 => 2500000,
+                <= -10 => 5000000,
+                > -10 => await CalculateExpo(1, ctsToken),
+                _ => 1000000
+            };
+
+        if (Math.Abs(time - 1) < 0.1)
+            return snr switch
+            {
+                < -7 => 8000000,
+                < -5 => 10000000,
+                < -2 => 15000000,
+                <= 0 => 20000000,
+                > 0 => await CalculateExpo(5, ctsToken),
+                _ => 1000000
+            };
+
+        if (Math.Abs(time - 5) < 0.1) return 600000000;
+
+        return 1000000;
+    }
+
+    #endregion
+
+    #region SNR
+
+    private static double CalculateSnr(Mat image, double time)
+    {
+        var gray = new Mat();
+        try
+        {
+            // 转换成灰度图
+            Cv2.CvtColor(image, gray, ColorConversionCodes.BGR2GRAY);
+
+            // 计算信噪比
+            Cv2.MeanStdDev(gray, out var mean, out var stddev);
+
+            // Calculate the signal power (square of the mean)
+            var signalPower = Math.Pow(mean.Val0, 2);
+
+            // Calculate the noise power (square of the standard deviation)
+            var noisePower = Math.Pow(stddev.Val0, 2);
+
+            // Adjust the noise power based on the exposure time
+            var adjustedNoisePower = noisePower / time;
+
+            // Calculate and return the adjusted SNR value
+            return 10 * Math.Log10(signalPower / adjustedNoisePower);
+        }
+        finally
+        {
+            // 释放资源
+            gray.Dispose();
+        }
     }
 
     #endregion

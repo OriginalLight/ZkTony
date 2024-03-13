@@ -7,36 +7,21 @@ namespace Exposure.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class MetricController : ControllerBase
+public class MetricController(ISerialPortService serialPort, IUsbService usb, ICameraService camera)
+    : ControllerBase
 {
-    private readonly ICameraService _camera;
-    private readonly ISerialPortService _serialPort;
-    private readonly IUsbService _usb;
-
-    #region 构造函数
-
-    /// <inheritdoc />
-    public MetricController(ISerialPortService serialPort, IUsbService usb, ICameraService camera)
-    {
-        _usb = usb;
-        _camera = camera;
-        _serialPort = serialPort;
-    }
-
-    #endregion
-
     #region 状态
 
     [HttpGet]
     public IActionResult Status()
     {
-        var temperature = _camera.GetTemperature();
-        var flag = _serialPort.GetFlag("led");
-        var hatch = _serialPort.GetFlag("hatch");
+        var temperature = camera.GetTemperature();
+        var flag = serialPort.GetFlag("led");
+        var hatch = serialPort.GetFlag("hatch");
 
         var dto = new StatusOutDto
         {
-            Usb = _usb.IsUsbAttached(),
+            Usb = usb.IsUsbAttached(),
             Hatch = hatch == 1,
             Temperature = temperature
         };
@@ -44,14 +29,14 @@ public class MetricController : ControllerBase
         if (temperature > -13)
         {
             if (flag >= 3) return Ok(dto);
-            _serialPort.WritePort("Com1", DefaultProtocol.LedYellow().ToBytes());
-            _serialPort.SetFlag("led", 3);
+            serialPort.WritePort("Com1", DefaultProtocol.LedYellow().ToBytes());
+            serialPort.SetFlag("led", 3);
         }
         else
         {
             if (flag >= 2) return Ok(dto);
-            _serialPort.WritePort("Com1", DefaultProtocol.LedGreen().ToBytes());
-            _serialPort.SetFlag("led", 2);
+            serialPort.WritePort("Com1", DefaultProtocol.LedGreen().ToBytes());
+            serialPort.SetFlag("led", 2);
         }
 
         return Ok(dto);
