@@ -3,10 +3,10 @@ using Exposure.Api.Utils;
 
 namespace Exposure.Api.Services;
 
-public class AutoCleanService(
-    ILogger<AutoCleanService> logger,
+public class StorageService(
+    ILogger<StorageService> logger,
     IErrorLogService errorLog
-) : IAutoCleanService
+) : IStorageService
 {
     #region 清理预览图
 
@@ -30,5 +30,17 @@ public class AutoCleanService(
         });
     }
 
+    #endregion
+    
+    #region 存储空间检测
+    
+    public double AvailableStorage()
+    {
+        var drives = DriveInfo.GetDrives();
+        var total = drives.Sum(drive => drive.TotalSize);
+        var available = drives.Sum(drive => drive.AvailableFreeSpace);
+        return available * 1.0 / total;
+    }
+    
     #endregion
 }

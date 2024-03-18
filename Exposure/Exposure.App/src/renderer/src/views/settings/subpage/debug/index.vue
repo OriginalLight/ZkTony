@@ -4,11 +4,6 @@
       <a-space size="large" direction="vertical">
         <a-card :title="t('debug.serialport.title')">
           <a-space direction="vertical" :style="{ width: '100%' }">
-            <a-space v-if="serialStatus.length > 0">
-              <a-tag v-for="code in serialStatus" :key="code" size="large" color="arcoblue">
-                {{ ports.find((port) => port.code === code)?.label }}
-              </a-tag>
-            </a-space>
             <a-input-group :style="{ width: '100%' }">
               <a-select v-model="serialOptions.port" :style="{ width: '15%' }">
                 <a-option v-for="port in ports" :key="port.code" :value="port.code">
@@ -114,13 +109,43 @@
                 <a-space>
                   <a-button
                     type="primary"
-                    @click="agingTest({ hatch: true, led: true, light: true, camera: true })"
+                    @click="(agingOptions.camera = !agingOptions.camera), agingTest(agingOptions)"
+                  >
+                    {{ t('debug.test.aging.camera') }}
+                  </a-button>
+                  <a-button
+                    type="primary"
+                    @click="(agingOptions.hatch = !agingOptions.hatch), agingTest(agingOptions)"
+                  >
+                    {{ t('debug.test.aging.hatch') }}
+                  </a-button>
+                  <a-button
+                    type="primary"
+                    @click="(agingOptions.led = !agingOptions.led), agingTest(agingOptions)"
+                  >
+                    {{ t('debug.test.aging.led') }}
+                  </a-button>
+                  <a-button
+                    type="primary"
+                    @click="(agingOptions.light = !agingOptions.light), agingTest(agingOptions)"
+                  >
+                    {{ t('debug.test.aging.light') }}
+                  </a-button>
+                  <a-button
+                    type="primary"
+                    @click="
+                      (agingOptions = { hatch: true, led: true, light: true, camera: true }),
+                        agingTest(agingOptions)
+                    "
                   >
                     {{ t('debug.test.aging.start') }}
                   </a-button>
                   <a-button
                     type="primary"
-                    @click="agingTest({ hatch: false, led: false, light: false, camera: false })"
+                    @click="
+                      (agingOptions = { hatch: false, led: false, light: false, camera: false }),
+                        agingTest(agingOptions)
+                    "
                   >
                     {{ t('debug.test.aging.stop') }}
                   </a-button>
@@ -135,17 +160,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import {
-  led,
-  serialPort,
-  serialPortStatus,
-  hatch,
-  light,
-  camera,
-  screen
-} from '@renderer/api/machine'
+import { led, serialPort, hatch, light, camera, screen } from '@renderer/api/machine'
 import { agingTest } from '@renderer/api/test'
 import { Message } from '@arco-design/web-vue'
 
@@ -156,7 +173,12 @@ const ports = [
   { code: 'Com2', label: t('debug.serialport.com2') }
 ]
 
-const serialStatus = ref<string[]>([])
+const agingOptions = ref({
+  hatch: false,
+  led: false,
+  light: false,
+  camera: false
+})
 
 const serialOptions = ref({
   port: 'Com1',
@@ -217,15 +239,6 @@ const handleExcute = async () => {
     Message.error((error as Error).message)
   }
 }
-
-onMounted(async () => {
-  try {
-    const res = await serialPortStatus()
-    serialStatus.value = res.data
-  } catch (error) {
-    console.log(error)
-  }
-})
 </script>
 
 <style lang="less" scoped>

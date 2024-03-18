@@ -17,12 +17,12 @@ public class CameraController(
 
     [HttpGet]
     [Route("Init")]
-    public IActionResult Init()
+    public async Task<IActionResult> Init()
     {
         // 初始化
-        camera.Init();
+        await camera.InitAsync();
         logger.LogInformation("初始化成功");
-        return Ok("初始化成功");
+        return Ok();
     }
 
     #endregion
@@ -37,7 +37,7 @@ public class CameraController(
         await camera.PreviewAsync();
         operLog.AddOperLog("预览", "预览成功");
         logger.LogInformation("预览成功");
-        return Ok("预览成功");
+        return Ok();
     }
 
     #endregion
@@ -46,12 +46,12 @@ public class CameraController(
 
     [HttpGet]
     [Route("Pixel")]
-    public IActionResult Pixel([FromQuery] int index)
+    public async Task<IActionResult> Pixel([FromQuery] int index)
     {
         // 设置像素
-        camera.SetPixel((uint)index);
+        await camera.SetPixel((uint)index);
         logger.LogInformation($"设置像素成功: {index}");
-        return Ok("设置画质成功");
+        return Ok();
     }
 
     #endregion
@@ -67,7 +67,7 @@ public class CameraController(
         var res = await camera.TakeAutoPhotoAsync(_cts.Token);
         operLog.AddOperLog("自动拍照", "自动拍照成功");
         logger.LogInformation("自动拍照成功");
-        return Ok(new Dictionary<string, long> { { "exposure", res } });
+        return Ok(res);
     }
 
     #endregion
@@ -83,7 +83,7 @@ public class CameraController(
         await camera.TakeManualPhotoAsync(exposure, frame, _cts.Token);
         operLog.AddOperLog("手动拍照", "手动拍照成功");
         logger.LogInformation("手动拍照成功");
-        return Ok("手动拍照成功");
+        return Ok();
     }
 
     #endregion
@@ -92,13 +92,13 @@ public class CameraController(
 
     [HttpGet]
     [Route("Cancel")]
-    public IActionResult Cancel()
+    public async Task<IActionResult> Cancel()
     {
         // 取消拍照
-        camera.CancelTask();
+        await camera.CancelTask();
         operLog.AddOperLog("取消拍照", "取消拍照成功");
         logger.LogInformation("取消拍照成功");
-        return Ok("取消拍照成功");
+        return Ok();
     }
 
     #endregion
@@ -126,7 +126,7 @@ public class CameraController(
         // 获取温度
         await camera.Collect(start, interval, number);
         logger.LogInformation("照片采集成功");
-        return Ok("照片采集成功");
+        return Ok();
     }
 
     #endregion

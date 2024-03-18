@@ -92,6 +92,7 @@
           field="name"
           :rules="[{ required: true, message: $t('user.managemet.add.form.name.errMsg') }]"
           :validate-trigger="['change', 'blur']"
+          :max-length="32"
           hide-label
         >
           <a-input
@@ -112,6 +113,7 @@
           <a-input-password
             v-model="addForm.password"
             :placeholder="$t('user.managemet.add.form.password.placeholder')"
+            :max-length="32"
             allow-clear
           >
             <template #prefix>
@@ -178,7 +180,7 @@ const addForm = reactive({
 })
 
 // 分页
-const pagination = reactive({ current: 1, pageSize: 15, total: 0 })
+const pagination = reactive({ current: 1, pageSize: 20, total: 0, showTotal: true })
 
 // 表格列
 const columns: TableColumnData[] = [

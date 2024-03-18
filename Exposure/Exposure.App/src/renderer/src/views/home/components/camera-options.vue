@@ -63,15 +63,21 @@
             style="width: 100%"
             @change="handleQualityChange"
           >
-            <a-radio value="0" style="width: 100%; text-align: center">{{
-              t('home.camera.options.3000.pixel')
-            }}</a-radio>
-            <a-radio value="1" style="width: 100%; text-align: center">{{
-              t('home.camera.options.1500.pixel')
-            }}</a-radio>
-            <a-radio value="2" style="width: 100%; text-align: center">{{
-              t('home.camera.options.1000.pixel')
-            }}</a-radio>
+            <a-tooltip :content="t('home.camera.options.3000.title')">
+              <a-radio value="0" style="width: 100%; text-align: center">{{
+                t('home.camera.options.3000.pixel')
+              }}</a-radio>
+            </a-tooltip>
+            <a-tooltip :content="t('home.camera.options.1500.title')">
+              <a-radio value="1" style="width: 100%; text-align: center">{{
+                t('home.camera.options.1500.pixel')
+              }}</a-radio>
+            </a-tooltip>
+            <a-tooltip :content="t('home.camera.options.1000.title')">
+              <a-radio value="2" style="width: 100%; text-align: center">{{
+                t('home.camera.options.1000.pixel')
+              }}</a-radio>
+            </a-tooltip>
           </a-radio-group>
         </div>
       </a-card>
@@ -191,15 +197,15 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Message } from '@arco-design/web-vue'
-import { init, preview, pixel, manual, auto, cancel, result } from '@renderer/api/camera'
+import { preview, pixel, manual, auto, cancel, result } from '@renderer/api/camera'
 import { hatch } from '@renderer/api/machine'
 import { useAppStore } from '@renderer/store'
 import useHomeState from '@renderer/states/home'
 
-const { options, isInit } = useHomeState()
+const { options } = useHomeState()
 
 // 获取应用信息
 const appStore = useAppStore()
@@ -278,8 +284,8 @@ const handleShoot = async () => {
     if (options.value.mode === 'auto') {
       progress.value.time = 10000
       const res = await auto()
-      progress.value.time = res.data.exposure / 1000 + 1500
-      const ms = res.data.exposure / 1000
+      progress.value.time = res.data / 1000 + 1500
+      const ms = res.data / 1000
       options.value.time.minute = Math.floor(ms / 1000 / 60)
       options.value.time.second = Math.floor((ms / 1000) % 60)
       options.value.time.millisecond = Math.floor(ms % 1000)
@@ -355,18 +361,6 @@ const handleFinish = async () => {
 const delay = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
-
-// 初始化
-onMounted(async () => {
-  try {
-    if (!isInit.value) {
-      await init()
-      isInit.value = true
-    }
-  } catch (error) {
-    console.log(error)
-  }
-})
 </script>
 
 <style scoped lang="less">

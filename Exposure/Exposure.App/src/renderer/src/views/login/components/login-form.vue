@@ -16,7 +16,11 @@
         :validate-trigger="['change', 'blur']"
         hide-label
       >
-        <a-input v-model="userInfo.username" :placeholder="$t('login.form.userName.placeholder')">
+        <a-input
+          v-model="userInfo.username"
+          :placeholder="$t('login.form.userName.placeholder')"
+          :max-length="32"
+        >
           <template #prefix>
             <icon-user />
           </template>
@@ -31,6 +35,7 @@
         <a-input-password
           v-model="userInfo.password"
           :placeholder="$t('login.form.password.placeholder')"
+          :max-length="32"
           allow-clear
         >
           <template #prefix>

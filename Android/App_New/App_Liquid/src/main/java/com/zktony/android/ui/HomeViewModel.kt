@@ -140,6 +140,7 @@ class HomeViewModel @Inject constructor(
             val orificePlates = selected.orificePlates
 
             orificePlates.forEach { op ->
+                delay(10)
                 _orificePlate.value = op
                 previousAlgorithm(op)
 

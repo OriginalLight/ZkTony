@@ -30,6 +30,10 @@ export default {
   'debug.machine.screen.close': 'Close',
   'debug.test.title': 'Test',
   'debug.test.aging': 'Aging Test',
-  'debug.test.aging.start': 'Start',
-  'debug.test.aging.stop': 'Stop'
+  'debug.test.aging.start': 'Start All',
+  'debug.test.aging.stop': 'Stop All',
+  'debug.test.aging.camera': 'Camera',
+  'debug.test.aging.hatch': 'Hatch',
+  'debug.test.aging.light': 'Light',
+  'debug.test.aging.led': 'LED'
 }

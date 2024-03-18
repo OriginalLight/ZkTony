@@ -13,8 +13,9 @@ const options = ref({
 
 const paginationProps = reactive<PaginationProps>({
   current: 1,
-  defaultPageSize: 100,
-  total: 0
+  defaultPageSize: 200,
+  total: 0,
+  showTotal: true
 })
 
 const subpage = ref<{

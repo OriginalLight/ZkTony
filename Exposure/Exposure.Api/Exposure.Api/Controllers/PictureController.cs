@@ -3,6 +3,7 @@ using System.Drawing.Imaging;
 using Exposure.Api.Contracts.Services;
 using Exposure.Api.Models;
 using Exposure.Api.Models.Dto;
+using Exposure.Api.Utils;
 using Microsoft.AspNetCore.Mvc;
 using SqlSugar;
 
@@ -104,7 +105,19 @@ public class PictureController(ILogger<PictureController> logger, IPictureServic
                 "tiff" => ImageFormat.Tiff,
                 _ => ImageFormat.Tiff
             };
-            bitmap.Save(Path.Combine(path, $"{pic.Name}.{dto.Format}"), imageFormat);
+
+            // 保存图片
+            var filename = $"{pic.Name}.{dto.Format}";
+            var fullPath = Path.Combine(path, filename);
+            var counter = 1;
+            while (FileUtils.Exists(fullPath))
+            {
+                filename = $"{pic.Name}_{counter}.{dto.Format}";
+                fullPath = Path.Combine(path, filename);
+                counter++;
+            }
+            bitmap.Save(fullPath, imageFormat);
+
             // 释放资源
             bitmap.Dispose();
         }
@@ -124,9 +137,7 @@ public class PictureController(ILogger<PictureController> logger, IPictureServic
     public async Task<IActionResult> Adjust([FromBody] PictureAdjustDto dto)
     {
         // 获取日志
-        var pic = await picture.GetByPrimary(dto.Id);
-        if (pic == null) throw new Exception("未找到相关图片");
-        var res = await picture.Adjust(pic, dto);
+        var res = await picture.Adjust(dto);
         operLog.AddOperLog("调整", "调整图片：id = " + dto.Id);
         return Ok(res);
     }

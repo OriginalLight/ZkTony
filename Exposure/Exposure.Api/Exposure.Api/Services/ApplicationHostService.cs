@@ -9,7 +9,7 @@ public class ApplicationHostService(
     IUsbService usbService,
     IUserService userService,
     ICameraService cameraService,
-    IAutoCleanService autoCleanService,
+    IStorageService storageService,
     ISerialPortService serialPortService
 ) : IHostedService
 {
@@ -21,10 +21,10 @@ public class ApplicationHostService(
     {
         if (!_isInitialized)
         {
-            dbContext.CreateTable(false, 50, typeof(User), typeof(Picture), typeof(OperLog), typeof(ErrorLog));
-            serialPortService.Init();
+            dbContext.CreateTable(false, 50, typeof(User), typeof(Picture), typeof(OperLog), typeof(ErrorLog), typeof(Option));
+            await serialPortService.InitAsync();
             await userService.InitializeAsync();
-            await autoCleanService.CleanPreviewAsync();
+            await storageService.CleanPreviewAsync();
             await usbService.InitializeAsync();
         }
 

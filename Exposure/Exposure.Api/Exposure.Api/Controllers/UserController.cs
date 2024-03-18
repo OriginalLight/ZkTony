@@ -126,6 +126,7 @@ public class UserController(ILogger<UserController> logger, IUserService user, I
             }
             // 如果旧密码为空，新密码不为空，则直接更新密码
             case 0 when dto.NewPassword.Length > 0:
+                // 新旧密码相同
                 old.Sha = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
                 break;
         }

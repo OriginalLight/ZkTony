@@ -8,7 +8,7 @@ public interface ISerialPortService
     ///   初始化
     /// </summary>
     /// <returns></returns>
-    void Init();
+    Task InitAsync();
     /// <summary>
     ///  获取标志
     /// </summary>

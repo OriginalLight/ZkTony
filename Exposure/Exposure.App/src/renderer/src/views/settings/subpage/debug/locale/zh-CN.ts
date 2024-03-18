@@ -30,6 +30,10 @@ export default {
   'debug.machine.screen.close': '关闭',
   'debug.test.title': '测试',
   'debug.test.aging': '老化测试',
-  'debug.test.aging.start': '开始',
-  'debug.test.aging.stop': '停止'
+  'debug.test.aging.start': '全部开始',
+  'debug.test.aging.stop': '全部停止',
+  'debug.test.aging.camera': '相机',
+  'debug.test.aging.hatch': '舱门',
+  'debug.test.aging.light': '灯光',
+  'debug.test.aging.led': '三色灯'
 }

@@ -82,7 +82,7 @@ const searchDate = ref<Date | undefined>(undefined)
 const selectedKeys = ref([])
 
 // 分页
-const pagination = reactive({ current: 1, pageSize: 15, total: 0 })
+const pagination = reactive({ current: 1, pageSize: 50, total: 0, showTotal: true })
 
 // 表格列
 const columns: TableColumnData[] = [

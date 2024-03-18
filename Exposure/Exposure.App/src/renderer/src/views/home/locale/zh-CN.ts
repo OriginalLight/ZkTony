@@ -1,4 +1,5 @@
 export default {
+  'home.storage.error': '存储空间不足',
   'home.image.preview.brightness': '亮度',
   'home.image.preview.contrast': '对比度',
   'home.image.preview.undo': '撤销',
@@ -16,6 +17,9 @@ export default {
   'home.camera.options.3000.pixel': '高清画质',
   'home.camera.options.1500.pixel': '标清画质',
   'home.camera.options.1000.pixel': '普清画质',
+  'home.camera.options.3000.title': '2992 x 3000',
+  'home.camera.options.1500.title': '1488 x 1500',
+  'home.camera.options.1000.title': '992 x 998',
   'home.camera.options.exposure': '曝光时间 分:秒:毫秒',
   'home.camera.options.minute': '分钟',
   'home.camera.options.second': '秒',
@@ -34,5 +38,6 @@ export default {
   'home.thumbnail.view.export.success': '导出成功',
   'home.thumbnail.view.picture.light': '白光图',
   'home.thumbnail.view.picture.dark': '曝光图',
-  'home.thumbnail.view.picture.combine': '合成图'
+  'home.thumbnail.view.picture.combine': '合成图',
+  'home.thumbnail.view.preview': '预览中'
 }

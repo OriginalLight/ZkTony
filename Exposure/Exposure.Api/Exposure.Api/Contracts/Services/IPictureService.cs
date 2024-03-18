@@ -38,10 +38,9 @@ public interface IPictureService : IBaseService<Picture>
     /// <summary>
     ///     调整图片
     /// </summary>
-    /// <param name="pic"></param>
     /// <param name="dto"></param>
     /// <returns></returns>
-    Task<Picture> Adjust(Picture pic, PictureAdjustDto dto);
+    Task<Picture> Adjust(PictureAdjustDto dto);
 
     /// <summary>
     ///   更新

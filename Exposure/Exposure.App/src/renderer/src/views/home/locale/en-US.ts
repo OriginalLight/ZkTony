@@ -1,4 +1,5 @@
 export default {
+  'home.storage.error': 'Storage Space Insufficient',
   'home.image.preview.brightness': 'Brightness',
   'home.image.preview.contrast': 'Contrast',
   'home.image.preview.undo': 'Undo',
@@ -16,6 +17,9 @@ export default {
   'home.camera.options.3000.pixel': 'High Pixel',
   'home.camera.options.1500.pixel': 'Standard Pixel',
   'home.camera.options.1000.pixel': 'Normal Pixel',
+  'home.camera.options.3000.title': '2992 x 3000',
+  'home.camera.options.1500.title': '1488 x 1500',
+  'home.camera.options.1000.title': '992 x 998',
   'home.camera.options.exposure': 'Exposure Time Min:Sec:MilliSec',
   'home.camera.options.minute': 'Minute',
   'home.camera.options.second': 'Second',
@@ -32,7 +36,8 @@ export default {
   'home.thumbnail.view.combine': 'Combine',
   'home.thumbnail.view.export': 'Export',
   'home.thumbnail.view.export.success': 'Export Success',
-  'home.thumbnail.view.picture.light': 'Light Picture',
-  'home.thumbnail.view.picture.dark': 'Dark Picture',
-  'home.thumbnail.view.picture.combine': 'Combine Picture'
+  'home.thumbnail.view.picture.light': 'Light',
+  'home.thumbnail.view.picture.dark': 'Dark',
+  'home.thumbnail.view.picture.combine': 'Combine',
+  'home.thumbnail.view.preview': 'Preview'
 }

@@ -84,7 +84,7 @@
               type="primary"
               size="medium"
               :disabled="options.brightness === 100 && options.contrast === 100 && !options.invert"
-              :loading="loading"
+              :loading="loading.save"
               @click="handleSave"
             >
               <template #icon>
@@ -97,7 +97,12 @@
       <a-divider direction="vertical" style="height: 100%" :margin="8" />
       <div class="col-2">
         <a-space direction="vertical" style="width: 100%">
-          <a-input v-model="subpage.item.name" allow-clear @change="handleUpdate()">
+          <a-input
+            v-model="subpage.item.name"
+            allow-clear
+            :max-length="32"
+            @change="handleUpdate()"
+          >
             <template #prepend> {{ t('gallery.detail.name') }} </template>
           </a-input>
           <a-input :model-value="subpage.item.width + ' x ' + subpage.item.height" readonly>
@@ -185,6 +190,20 @@
           </div>
         </a-space>
         <canvas id="canvas"></canvas>
+        <a-tooltip placement="top" :content="t('gallery.detail.refresh')">
+          <a-button
+            v-if="options.brightness != 100 || options.contrast != 100 || options.invert"
+            class="canvas_refresh"
+            type="primary"
+            size="medium"
+            :loading="loading.chart"
+            @click="handleRefreshHistogram"
+          >
+            <template #icon>
+              <Refresh />
+            </template>
+          </a-button>
+        </a-tooltip>
       </div>
     </div>
   </div>
@@ -229,7 +248,10 @@ const radioOpts = ref({
   opt2: 0
 })
 
-const loading = ref(false)
+const loading = ref({
+  save: false,
+  chart: false
+})
 
 const resetOptions = () => {
   options.value = {
@@ -255,7 +277,7 @@ const handle3dChart = async () => {
 
 const handelSelected = async (img: Picture) => {
   subpage.value.item = img
-  handleHistogram()
+  handleHistogram(img.thumbnail)
   if (img.userId === user.value?.id) {
     return
   }
@@ -280,12 +302,13 @@ const handleUpdate = async () => {
 
 const handleSave = async () => {
   try {
-    loading.value = true
+    loading.value.save = true
     const res = await adjustPicture({
       id: subpage.value.item.id,
       brightness: options.value.brightness,
       contrast: options.value.contrast,
-      invert: options.value.invert
+      invert: options.value.invert,
+      code: 0
     })
     subpage.value.item = res.data
     if (res.data.type === 0) {
@@ -301,11 +324,11 @@ const handleSave = async () => {
   } catch (error) {
     Message.error((error as Error).message)
   } finally {
-    loading.value = false
+    loading.value.save = false
   }
 }
 
-const handleHistogram = () => {
+const handleHistogram = (src: string) => {
   const canvas = document.getElementById('canvas') as HTMLCanvasElement
   const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
   const img = new Image()
@@ -353,7 +376,25 @@ const handleHistogram = () => {
     }
   }
 
-  img.src = subpage.value.item.thumbnail
+  img.src = src
+}
+
+const handleRefreshHistogram = async () => {
+  try {
+    loading.value.chart = true
+    const res = await adjustPicture({
+      id: subpage.value.item.id,
+      brightness: options.value.brightness,
+      contrast: options.value.contrast,
+      invert: options.value.invert,
+      code: 1
+    })
+    handleHistogram(res.data.thumbnail)
+  } catch (error) {
+    console.error(error)
+  } finally {
+    loading.value.chart = false
+  }
 }
 
 const handleTouch = () => {
@@ -435,7 +476,7 @@ const handleTouch = () => {
 
 onMounted(() => {
   handelSelected(subpage.value.item)
-  handleHistogram()
+  handleHistogram(subpage.value.item.thumbnail)
   handleTouch()
 })
 </script>
@@ -521,12 +562,21 @@ onMounted(() => {
   .col-2 {
     flex: 1;
     display: flex;
+    position: relative;
     flex-direction: column;
     justify-content: space-between;
 
     #canvas {
+      position: absolute;
+      bottom: 0;
       width: 100%;
       height: 35%;
+    }
+
+    .canvas_refresh {
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
     }
   }
 

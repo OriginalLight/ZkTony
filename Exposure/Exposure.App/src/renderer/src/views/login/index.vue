@@ -6,14 +6,29 @@
     <div class="content">
       <LoginForm />
     </div>
-    <div class="qrcode">
-      <img alt="qrcode" src="../../assets/qrcode.png" style="height: 96px" />
-    </div>
+    <a-space class="qrcode">
+      <a-space direction="vertical" :size="4">
+        <img alt="qrcode" src="../../assets/qrcode.png" style="height: 96px" />
+        <div style="font-size: 12px; width: 96px; text-align: center">
+          {{ t('login.qrcode.0') }}
+        </div>
+      </a-space>
+
+      <a-space direction="vertical" :size="4">
+        <img alt="qrcode" src="../../assets/qrcode1.png" style="height: 96px" />
+        <div style="font-size: 12px; width: 96px; text-align: center">
+          {{ t('login.qrcode.1') }}
+        </div>
+      </a-space>
+    </a-space>
   </div>
 </template>
 
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n'
 import LoginForm from './components/login-form.vue'
+
+const { t } = useI18n()
 </script>
 
 <style lang="less" scoped>

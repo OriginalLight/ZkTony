@@ -8,7 +8,7 @@ using OpenCvSharp;
 namespace Exposure.Api.Services;
 
 public class CameraService(
-    IConfiguration config,
+    IOptionService option,
     ISerialPortService serialPort,
     IPictureService picture,
     IUserService user)
@@ -24,19 +24,16 @@ public class CameraService(
 
     #region 初始化
 
-    public void Init()
+    public async Task InitAsync()
     {
         if (_nncam != null) return;
 
         try
         {
             // 从config中加载参数
-            _expoTime = uint.Parse(config.GetSection("Camera:ExpoTime").Value ?? "1500");
-            var temperature = short.Parse(config.GetSection("Camera:Temperature").Value ?? "-150");
-            var optionTrigger = int.Parse(config.GetSection("Camera:OptionTrigger").Value ?? "1");
-            var autoExpo = bool.Parse(config.GetSection("Camera:AutoExpo").Value ?? "false");
-            var chrome = bool.Parse(config.GetSection("Camera:Chrome").Value ?? "true");
-            var gain = ushort.Parse(config.GetSection("Camera:Gain").Value ?? "3000");
+            _expoTime = uint.Parse(await option.GetOptionValueAsync("ExpoTime") ?? "1500");
+            var temperature = short.Parse(await option.GetOptionValueAsync("Temperature") ?? "-150");
+            var gain = ushort.Parse(await option.GetOptionValueAsync("Gain") ?? "3000");
 
             var arr = Nncam.EnumV2();
             if (arr.Length == 0) throw new Exception("未找到设备");
@@ -47,9 +44,9 @@ public class CameraService(
 
             // 设置参数
             if (!_nncam.put_Temperature(temperature)) throw new Exception("设置温度失败");
-            if (!_nncam.put_Option(Nncam.eOPTION.OPTION_TRIGGER, optionTrigger)) throw new Exception("设置模式失败");
-            if (!_nncam.put_AutoExpoEnable(autoExpo)) throw new Exception("参数自动曝光设置失败");
-            if (!_nncam.put_Chrome(chrome)) throw new Exception("设置单色失败");
+            if (!_nncam.put_Option(Nncam.eOPTION.OPTION_TRIGGER, 1)) throw new Exception("设置模式失败");
+            if (!_nncam.put_AutoExpoEnable(false)) throw new Exception("参数自动曝光设置失败");
+            if (!_nncam.put_Chrome(true)) throw new Exception("设置单色失败");
             if (!_nncam.put_ExpoAGain(gain)) throw new Exception("设置增益失败");
 
             // 设置回调
@@ -81,7 +78,7 @@ public class CameraService(
 
     public async Task PreviewAsync()
     {
-        Init();
+        await InitAsync();
         if (_nncam == null) throw new Exception("预览失败");
         // 清空队列
         _pictureList.Clear();
@@ -115,7 +112,7 @@ public class CameraService(
 
     public async Task<long> TakeAutoPhotoAsync(CancellationToken ctsToken)
     {
-        Init();
+        await InitAsync();
         if (_nncam == null) throw new Exception("自动拍照失败");
 
         _mat = null;
@@ -164,7 +161,7 @@ public class CameraService(
 
     public async Task TakeManualPhotoAsync(int exposure, int frame, CancellationToken ctsToken)
     {
-        Init();
+        await InitAsync();
         if (_nncam == null) throw new Exception("手动拍照失败");
 
         _mat = null;
@@ -204,9 +201,9 @@ public class CameraService(
 
     #region 取消拍照
 
-    public void CancelTask()
+    public async Task CancelTask()
     {
-        Init();
+        await InitAsync();
         if (_nncam == null) throw new Exception("取消失败");
         if (!_nncam.Trigger(0)) throw new Exception("取消失败");
     }
@@ -234,14 +231,10 @@ public class CameraService(
 
     public void AgingTest()
     {
-        Init();
-        if (_nncam == null) throw new Exception("手动拍照失败");
-
-        _flag = "aging";
-        // 设置曝光时间
-        if (!_nncam.put_ExpoTime(_expoTime)) throw new Exception("设置白光曝光时间失败");
-        // 触发拍摄
-        if (!_nncam.Trigger(100)) throw new Exception("拍摄白光图失败");
+        Task.Run(async () =>
+        {
+            await TakeManualPhotoAsync(5000000, 10, new CancellationToken());
+        });
     }
 
     #endregion
@@ -250,7 +243,7 @@ public class CameraService(
 
     public async Task Collect(int start, int interval, int number)
     {
-        Init();
+        await InitAsync();
         if (_nncam == null) throw new Exception("数据采集失败");
 
         _flag = "collect";
@@ -270,9 +263,9 @@ public class CameraService(
 
     #region 设置画质
 
-    public void SetPixel(uint index)
+    public async Task SetPixel(uint index)
     {
-        Init();
+        await InitAsync();
         if (_nncam == null) return;
         if (_nncam.get_eSize(out var size))
         {
@@ -501,7 +494,7 @@ public class CameraService(
         var picture1 = new Picture
         {
             UserId = user.GetLogged()?.Id ?? 0,
-            Name = type == -1 ? "Preview" : date,
+            Name = type == -1 ? "预览图" : date,
             Path = filePath,
             Width = (int)info.width,
             Height = (int)info.height,

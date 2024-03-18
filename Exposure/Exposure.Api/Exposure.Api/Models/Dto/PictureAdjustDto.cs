@@ -7,4 +7,6 @@ public class PictureAdjustDto
     public int Contrast { get; set; }
     
     public bool Invert { get; set; }
+    
+    public int Code { get; set; }
 }

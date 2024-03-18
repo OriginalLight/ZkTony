@@ -49,6 +49,7 @@ export interface PictureAdjustParam {
   brightness: number
   contrast: number
   invert: boolean
+  code: number
 }
 
 export interface PictureUpdateParam {

@@ -7,14 +7,14 @@ namespace Exposure.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class MachineController(ILogger<MachineController> logger, ISerialPortService serialPort)
+public class MachineController(ILogger<MachineController> logger, ISerialPortService serialPort, IStorageService storage)
     : ControllerBase
 {
     #region 串口状态
 
     [HttpGet]
     [Route("SerialPort")]
-    public IActionResult SerialPortStatus()
+    public IActionResult GetPorts()
     {
         return Ok(serialPort.GetPorts());
     }
@@ -191,6 +191,29 @@ public class MachineController(ILogger<MachineController> logger, ISerialPortSer
         serialPort.WritePort("Com2", protocol.ToBytes());
         serialPort.SetFlag("screen", code);
         return Ok();
+    }
+
+    #endregion
+    
+    #region 设备版本
+    
+    [HttpGet]
+    [Route("Version")]
+    public ActionResult Version()
+    {
+        return Ok(GetType().Assembly.GetName().Version?.ToString() ?? "None");
+    }
+    
+    #endregion
+
+    #region 存储
+
+    [HttpGet]
+    [Route("Storage")]
+    public ActionResult Storage()
+    {
+        var st = storage.AvailableStorage();
+        return Ok(st);
     }
 
     #endregion

@@ -13,6 +13,8 @@ function createWindow(): void {
     minWidth: 800,
     minHeight: 600,
     show: false,
+    //frame: false,
+    //fullscreen: true,
     autoHideMenuBar: true,
     icon: path.join(__dirname, '../../resources/icon.ico'),
     ...(process.platform === 'linux' ? { icon } : {}),

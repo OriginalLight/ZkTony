@@ -5,6 +5,7 @@ export default {
   'gallery.detail.3dchart': '3D图',
   'gallery.detail.undo': '撤销',
   'gallery.detail.redo': '重置',
+  'gallery.detail.refresh': '刷新',
   'gallery.detail.save': '保存',
   'gallery.detail.name': '图片名称',
   'gallery.detail.size': '图片大小',

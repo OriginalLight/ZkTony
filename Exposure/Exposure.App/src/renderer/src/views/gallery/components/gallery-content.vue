@@ -12,6 +12,9 @@
       <a-list-item action-layout="vertical">
         <a-space>
           <a-tag size="large">{{ item.date }}</a-tag>
+          <a-tag size="large">{{
+            item.light.length + item.dark.length + item.combine.length
+          }}</a-tag>
           <a-button @click="handleSelectedAll(item)">
             {{
               showSelectedAll(item)
@@ -21,7 +24,7 @@
           </a-button>
         </a-space>
         <a-divider v-if="item.light.length > 0" orientation="right">{{
-          t('gallery.content.picture.light')
+          t('gallery.content.picture.light') + ' - ' + item.light.length
         }}</a-divider>
         <a-space wrap>
           <div
@@ -37,7 +40,7 @@
           </div>
         </a-space>
         <a-divider v-if="item.dark.length > 0" orientation="right">{{
-          t('gallery.content.picture.dark')
+          t('gallery.content.picture.dark') + ' - ' + item.dark.length
         }}</a-divider>
         <a-space wrap>
           <div
@@ -53,7 +56,7 @@
           </div>
         </a-space>
         <a-divider v-if="item.combine.length > 0" orientation="right">{{
-          t('gallery.content.picture.combine')
+          t('gallery.content.picture.combine') + ' - ' + item.combine.length
         }}</a-divider>
         <a-space wrap>
           <div

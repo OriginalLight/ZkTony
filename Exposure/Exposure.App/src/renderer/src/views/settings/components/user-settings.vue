@@ -60,6 +60,7 @@
           <a-input-password
             v-model="form.oldPassword"
             :placeholder="$t('settings.user.mofify.password.old.placeholder')"
+            :max-length="32"
             allow-clear
           >
             <template #prefix>
@@ -79,6 +80,7 @@
           <a-input-password
             v-model="form.newPassword"
             :placeholder="$t('settings.user.mofify.password.new.placeholder')"
+            :max-length="32"
             allow-clear
           >
             <template #prefix>
@@ -98,6 +100,7 @@
           <a-input-password
             v-model="form.confirmPassword"
             :placeholder="$t('settings.user.mofify.password.confirm.placeholder')"
+            :max-length="32"
             allow-clear
           >
             <template #prefix>

@@ -1,12 +1,16 @@
+import localFQC from '../subpage/fqc/locale/zh-CN'
 import localDebug from '../subpage/debug/locale/zh-CN'
 import localErrLog from '../subpage/err-log/locale/zh-CN'
 import localOperLog from '../subpage/oper-log/locale/zh-CN'
+import localOption from '../subpage/option/locale/zh-CN'
 import localUserManage from '../subpage/user-manage/locale/zh-CN'
 
 export default {
+  ...localFQC,
   ...localDebug,
   ...localErrLog,
   ...localOperLog,
+  ...localOption,
   ...localUserManage,
   'settings.system.title': '系统设置',
   'settings.system.theme.title': '系统主题',
@@ -15,6 +19,7 @@ export default {
   'settings.system.language.title': '系统语言',
   'settings.system.errlog.title': '错误日志',
   'settings.system.version.title': '版本信息',
+  'settings.system.machine.title': '设备编号',
   'settings.user.title': '用户设置',
   'settings.user.mofify.password': '修改密码',
   'settings.user.mofify.password.new': '新密码',
@@ -29,5 +34,9 @@ export default {
   'settings.user.operlog.title': '操作日志',
   'settings.user.manage.title': '用户管理',
   'settings.factory.title': '工厂设置',
-  'settings.factory.debug': '调试'
+  'settings.factory.option': '参数',
+  'settings.factory.debug': '调试',
+  'settings.factory.fqc': 'FQC',
+  'settings.factory.update': '更新',
+  'settings.factory.update.check': '检查更新'
 }

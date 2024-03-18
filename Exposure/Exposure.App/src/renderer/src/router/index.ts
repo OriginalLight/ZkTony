@@ -58,6 +58,11 @@ const router = createRouter({
       component: () => import('@renderer/views/settings/subpage/debug/index.vue')
     },
     {
+      path: '/fqc',
+      name: 'fqc',
+      component: () => import('@renderer/views/settings/subpage/fqc/index.vue')
+    },
+    {
       path: '/errlog',
       name: 'errlog',
       component: () => import('@renderer/views/settings/subpage/err-log/index.vue')
@@ -66,6 +71,11 @@ const router = createRouter({
       path: '/operlog',
       name: 'operlog',
       component: () => import('@renderer/views/settings/subpage/oper-log/index.vue')
+    },
+    {
+      path: '/option',
+      name: 'option',
+      component: () => import('@renderer/views/settings/subpage/option/index.vue')
     },
     {
       path: '/user-manage',

@@ -9,7 +9,12 @@ export interface SerialPortParam {
   hex: string
 }
 
-export function serialPortStatus() {
+export interface MachineInfo {
+  id: string
+  version: string
+}
+
+export function getPorts() {
   return axios.get<string[]>('/Machine/SerialPort')
 }
 
@@ -35,4 +40,12 @@ export function camera(data: CodeParam) {
 
 export function screen(data: CodeParam) {
   return axios.get('/Machine/Screen', { params: data })
+}
+
+export function varsion() {
+  return axios.get<string>('/Machine/Version')
+}
+
+export function storage() {
+  return axios.get<number>('/Machine/Storage')
 }

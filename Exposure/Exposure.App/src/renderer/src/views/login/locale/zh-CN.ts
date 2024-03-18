@@ -16,5 +16,7 @@ export default {
   'login.banner.slogan2': '内置了常见问题的解决方案',
   'login.banner.subSlogan2': '国际化，路由配置，状态管理应有尽有',
   'login.banner.slogan3': '接入可视化增强工具AUX',
-  'login.banner.subSlogan3': '实现灵活的区块式开发'
+  'login.banner.subSlogan3': '实现灵活的区块式开发',
+  'login.qrcode.0': '扫码关注公众号',
+  'login.qrcode.1': '扫码关注视频号'
 }

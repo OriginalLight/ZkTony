@@ -4,7 +4,7 @@ using Exposure.Api.Core.SerialPort.Default;
 
 namespace Exposure.Api.Services;
 
-public class SerialPortService(ILogger<SerialPortService> logger, IConfiguration config, IErrorLogService errorLog)
+public class SerialPortService(ILogger<SerialPortService> logger, IOptionService option, IErrorLogService errorLog)
     : ISerialPortService
 {
     private readonly Dictionary<string, int> _flags = new();
@@ -12,11 +12,11 @@ public class SerialPortService(ILogger<SerialPortService> logger, IConfiguration
 
     #region 初始化
 
-    public void Init()
+    public async Task InitAsync()
     {
         // 打开串口
-        OpenPort("Com1");
-        OpenPort("Com2");
+        await OpenPort("Com1");
+        await OpenPort("Com2");
         // 设置串口接收事件
         if (!_serialPorts.TryGetValue("Com2", out var serialPort)) return;
         serialPort.DataReceived += (sender, _) =>
@@ -76,7 +76,7 @@ public class SerialPortService(ILogger<SerialPortService> logger, IConfiguration
 
     public string[] GetPorts()
     {
-        return _serialPorts.Keys.ToArray();
+        return SerialPort.GetPortNames();
     }
 
     #endregion
@@ -101,24 +101,18 @@ public class SerialPortService(ILogger<SerialPortService> logger, IConfiguration
 
     #region 打开串口
 
-    private void OpenPort(string alias)
+    private async Task OpenPort(string alias)
     {
-        var portName = config.GetSection("SerialPort:" + alias + ":PortName").Value;
+        var portName = await option.GetOptionValueAsync(alias);
         if (portName == null) return;
-        var baudRate = int.Parse(config.GetSection("SerialPort:" + alias + ":BaudRate").Value ?? "115200");
-        var parity = (Parity)Enum.Parse(typeof(Parity),
-            config.GetSection("SerialPort:" + alias + ":Parity").Value ?? "None");
-        var dataBits = int.Parse(config.GetSection("SerialPort:" + alias + ":DataBits").Value ?? "8");
-        var stopBits = (StopBits)Enum.Parse(typeof(StopBits),
-            config.GetSection("SerialPort:" + alias + ":StopBits").Value ?? "One");
 
         if (_serialPorts.ContainsKey(portName)) return;
-        SerialPort serialPort = new(portName, baudRate, parity, dataBits, stopBits);
+        SerialPort serialPort = new(portName, 115200, Parity.None, 8, StopBits.One);
         try
         {
             serialPort.Open();
             _serialPorts.Add(alias, serialPort);
-            logger.LogInformation("成功打开串口: " + portName + " 波特率: " + baudRate);
+            logger.LogInformation("成功打开串口: " + portName);
         }
         catch (Exception e)
         {

@@ -17,15 +17,13 @@ public class TestService(ICameraService cameraService, ISerialPortService serial
         _agingDto = dto;
         if (dto.IsAnyTrue())
         {
-            _agingTask = Task.Run(AgingTask);
+            _agingTask ??= Task.Run(AgingTask);
         }
         else
         {
             if (_agingTask is { IsCanceled: false }) _agingTask.Dispose();
             _agingTask?.Dispose();
-            serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
-            serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
-            serialPort.WritePort("Com1", DefaultProtocol.LedAllClose().ToBytes());
+            _agingTask = null;
         }
     }
 
@@ -93,7 +91,10 @@ public class TestService(ICameraService cameraService, ISerialPortService serial
                         break;
                 }
 
-            if (_agingDto.Camera) cameraService.AgingTest();
+            if (_agingDto.Camera)
+            {
+                cameraService.AgingTest();
+            }
             await Task.Delay(10000);
         }
     }

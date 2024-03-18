@@ -127,7 +127,8 @@ const handleSave = async () => {
       id: props.image.id,
       brightness: imageOptions.value.brightness,
       contrast: imageOptions.value.contrast,
-      invert: false
+      invert: false,
+      code: 0
     })
     emit('adjust', res.data)
   } catch (error) {

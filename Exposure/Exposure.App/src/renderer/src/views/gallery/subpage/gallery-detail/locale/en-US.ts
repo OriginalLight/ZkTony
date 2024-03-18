@@ -5,6 +5,7 @@ export default {
   'gallery.detail.3dchart': '3D Chart',
   'gallery.detail.undo': 'Undo',
   'gallery.detail.redo': 'Redo',
+  'gallery.detail.refresh': 'Refresh',
   'gallery.detail.save': 'Save',
   'gallery.detail.name': 'Name',
   'gallery.detail.size': 'Size',

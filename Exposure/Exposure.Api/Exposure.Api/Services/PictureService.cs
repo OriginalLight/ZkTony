@@ -113,8 +113,10 @@ public class PictureService(IDbContext dbContext, IUserService user) : BaseServi
 
     #region 删除
 
-    public async Task<Picture> Adjust(Picture pic, PictureAdjustDto dto)
+    public async Task<Picture> Adjust(PictureAdjustDto dto)
     {
+        var pic = await GetByPrimary(dto.Id);
+        if (pic == null) throw new Exception("未找到相关图片");
         // 使用imageSharp处理图片
         var image = await Image.LoadAsync(pic.Path);
         // 增强亮度
@@ -127,37 +129,64 @@ public class PictureService(IDbContext dbContext, IUserService user) : BaseServi
         var date = DateTime.Now.ToString("yyyyMMddHHmmss");
 
         // 保存图片
-        var exposure = FileUtils.GetFileName(FileUtils.Exposure, $"{date}.png");
-        await image.SaveAsPngAsync(exposure);
-
-        var width = image.Width;
-        var height = image.Height;
-
-        // 保存缩略图
-        image.Mutate(x => x.Resize(500, 500));
-        var thumbnail = FileUtils.GetFileName(FileUtils.Thumbnail, $"{date}.jpg");
-        await image.SaveAsJpegAsync(thumbnail);
-
-        // 释放资源
-        image.Dispose();
-
-        return await AddReturnModel(new Picture
+        if (dto.Code == 0)
         {
-            UserId = user.GetLogged()?.Id ?? 0,
-            Name = date,
-            Path = exposure,
-            Width = width,
-            Height = height,
-            Type = pic.Type,
-            Thumbnail = thumbnail,
-            ExposureTime = pic.ExposureTime,
-            ExposureGain = pic.ExposureGain,
-            BlackLevel = pic.BlackLevel,
-            IsDelete = false,
-            CreateTime = DateTime.Now,
-            UpdateTime = DateTime.Now,
-            DeleteTime = DateTime.Now
-        });
+            var exposure = FileUtils.GetFileName(FileUtils.Exposure, $"{date}.png");
+            await image.SaveAsPngAsync(exposure);
+            
+            var width = image.Width;
+            var height = image.Height;
+
+            // 保存缩略图
+            image.Mutate(x => x.Resize(500, 500));
+            var thumbnail = FileUtils.GetFileName(FileUtils.Thumbnail, $"{date}.jpg");
+            await image.SaveAsJpegAsync(thumbnail);
+
+            // 释放资源
+            image.Dispose();
+
+            return await AddReturnModel(new Picture
+            {
+                UserId = user.GetLogged()?.Id ?? 0,
+                Name = date,
+                Path = exposure,
+                Width = width,
+                Height = height,
+                Type = pic.Type,
+                Thumbnail = thumbnail,
+                ExposureTime = pic.ExposureTime,
+                ExposureGain = pic.ExposureGain,
+                BlackLevel = pic.BlackLevel,
+                IsDelete = false,
+                CreateTime = DateTime.Now,
+                UpdateTime = DateTime.Now,
+                DeleteTime = DateTime.Now
+            });
+        }
+        else
+        {
+            image.Mutate(x => x.Resize(500, 500));
+            var thumbnail = FileUtils.GetFileName(FileUtils.Thumbnail, $"{date}.jpg");
+            await image.SaveAsJpegAsync(thumbnail);
+
+            // 释放资源
+            image.Dispose();
+
+            return new Picture
+            {
+                UserId = user.GetLogged()?.Id ?? 0,
+                Name = date,
+                Type = pic.Type,
+                Thumbnail = thumbnail,
+                ExposureTime = pic.ExposureTime,
+                ExposureGain = pic.ExposureGain,
+                BlackLevel = pic.BlackLevel,
+                IsDelete = false,
+                CreateTime = DateTime.Now,
+                UpdateTime = DateTime.Now,
+                DeleteTime = DateTime.Now
+            };
+        }
     }
 
     #endregion

@@ -39,11 +39,16 @@
       </a-space>
     </div>
     <div class="grid-item">
-      <a-tag style="width: 100px" color="arcoblue" size="small" bordered>
-        <div style="width: 100%; text-align: center">
-          {{ t('home.thumbnail.view.picture.light') + ' ' + light.length }}
-        </div>
-      </a-tag>
+      <a-space>
+        <a-tag style="width: 100px" color="arcoblue" size="small">
+          <div style="width: 100%; text-align: center">
+            {{ t('home.thumbnail.view.picture.light') }}
+          </div>
+        </a-tag>
+        <a-tag style="width: 40px" color="arcoblue" size="small">
+          <div style="width: 100%; text-align: center">{{ light.length }}</div>
+        </a-tag>
+      </a-space>
       <a-space id="scroll-light" :size="5" class="scroll-wrapper">
         <div
           v-for="(item, index) in light"
@@ -51,7 +56,9 @@
           class="scroll-item"
           @click="handleSelected(item)"
         >
-          <div v-if="showPreview(item)" class="img-preview">Preview</div>
+          <div v-if="showPreview(item)" class="img-preview">
+            {{ t('home.thumbnail.view.preview') }}
+          </div>
           <icon-check v-if="showSelected(item)" class="selected" />
           <img v-lazy="item.thumbnail" class="img" alt="dessert" />
           <div class="img-index">{{ index + 1 }}</div>
@@ -60,11 +67,16 @@
       </a-space>
     </div>
     <div class="grid-item">
-      <a-tag style="width: 100px" color="arcoblue" size="small" bordered>
-        <div style="width: 100%; text-align: center">
-          {{ t('home.thumbnail.view.picture.dark') + ' ' + dark.length }}
-        </div>
-      </a-tag>
+      <a-space>
+        <a-tag style="width: 100px" color="arcoblue" size="small">
+          <div style="width: 100%; text-align: center">
+            {{ t('home.thumbnail.view.picture.dark') }}
+          </div>
+        </a-tag>
+        <a-tag style="width: 40px" color="arcoblue" size="small">
+          <div style="width: 100%; text-align: center">{{ dark.length }}</div>
+        </a-tag>
+      </a-space>
       <a-space id="scroll-dark" :size="5" class="scroll-wrapper">
         <div
           v-for="(item, index) in dark"
@@ -72,7 +84,9 @@
           class="scroll-item"
           @click="handleSelected(item)"
         >
-          <div v-if="showPreview(item)" class="img-preview">Preview</div>
+          <div v-if="showPreview(item)" class="img-preview">
+            {{ t('home.thumbnail.view.preview') }}
+          </div>
           <icon-check v-if="showSelected(item)" class="selected" />
           <img v-lazy="item.thumbnail" class="img" alt="dessert" />
           <div class="img-index">{{ index + 1 }}</div>
@@ -81,11 +95,16 @@
       </a-space>
     </div>
     <div class="grid-item">
-      <a-tag style="width: 100px" color="arcoblue" size="small" bordered>
-        <div style="width: 100%; text-align: center">
-          {{ t('home.thumbnail.view.picture.combine') + ' ' + combine.length }}
-        </div>
-      </a-tag>
+      <a-space>
+        <a-tag style="width: 100px" color="arcoblue" size="small">
+          <div style="width: 100%; text-align: center">
+            {{ t('home.thumbnail.view.picture.combine') }}
+          </div>
+        </a-tag>
+        <a-tag style="width: 40px" color="arcoblue" size="small">
+          <div style="width: 100%; text-align: center">{{ combine.length }}</div>
+        </a-tag>
+      </a-space>
       <a-space id="scroll-combine" :size="5" class="scroll-wrapper">
         <div
           v-for="(item, index) in combine"
@@ -93,7 +112,9 @@
           class="scroll-item"
           @click="handleSelected(item)"
         >
-          <div v-if="showPreview(item)" class="img-preview">Preview</div>
+          <div v-if="showPreview(item)" class="img-preview">
+            {{ t('home.thumbnail.view.preview') }}
+          </div>
           <icon-check v-if="showSelected(item)" class="selected" />
           <img v-lazy="item.thumbnail" class="img" alt="dessert" />
           <div class="img-index">{{ index + 1 }}</div>
@@ -290,8 +311,8 @@ onMounted(() => {
 
     .img-index {
       position: absolute;
-      bottom: 11px;
-      width: 30%;
+      bottom: 10px;
+      width: 25%;
       background-color: rgb(var(--arcoblue-6));
       color: rgba(255, 255, 255, 1);
       font-size: 8px;
