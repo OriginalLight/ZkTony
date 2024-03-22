@@ -101,59 +101,6 @@
             </a-list-item>
           </a-list>
         </a-card>
-        <a-card :title="t('debug.test.title')">
-          <a-list>
-            <a-list-item>
-              <a-list-item-meta :title="t('debug.test.aging')"></a-list-item-meta>
-              <template #actions>
-                <a-space>
-                  <a-button
-                    type="primary"
-                    @click="(agingOptions.camera = !agingOptions.camera), agingTest(agingOptions)"
-                  >
-                    {{ t('debug.test.aging.camera') }}
-                  </a-button>
-                  <a-button
-                    type="primary"
-                    @click="(agingOptions.hatch = !agingOptions.hatch), agingTest(agingOptions)"
-                  >
-                    {{ t('debug.test.aging.hatch') }}
-                  </a-button>
-                  <a-button
-                    type="primary"
-                    @click="(agingOptions.led = !agingOptions.led), agingTest(agingOptions)"
-                  >
-                    {{ t('debug.test.aging.led') }}
-                  </a-button>
-                  <a-button
-                    type="primary"
-                    @click="(agingOptions.light = !agingOptions.light), agingTest(agingOptions)"
-                  >
-                    {{ t('debug.test.aging.light') }}
-                  </a-button>
-                  <a-button
-                    type="primary"
-                    @click="
-                      (agingOptions = { hatch: true, led: true, light: true, camera: true }),
-                        agingTest(agingOptions)
-                    "
-                  >
-                    {{ t('debug.test.aging.start') }}
-                  </a-button>
-                  <a-button
-                    type="primary"
-                    @click="
-                      (agingOptions = { hatch: false, led: false, light: false, camera: false }),
-                        agingTest(agingOptions)
-                    "
-                  >
-                    {{ t('debug.test.aging.stop') }}
-                  </a-button>
-                </a-space>
-              </template>
-            </a-list-item>
-          </a-list>
-        </a-card>
       </a-space>
     </div>
   </div>
@@ -163,7 +110,6 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { led, serialPort, hatch, light, camera, screen } from '@renderer/api/machine'
-import { agingTest } from '@renderer/api/test'
 import { Message } from '@arco-design/web-vue'
 
 const { t } = useI18n()
@@ -172,13 +118,6 @@ const ports = [
   { code: 'Com1', label: t('debug.serialport.com1') },
   { code: 'Com2', label: t('debug.serialport.com2') }
 ]
-
-const agingOptions = ref({
-  hatch: false,
-  led: false,
-  light: false,
-  camera: false
-})
 
 const serialOptions = ref({
   port: 'Com1',

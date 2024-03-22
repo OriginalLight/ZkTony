@@ -77,7 +77,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onActivated } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import dayjs from 'dayjs'
@@ -201,7 +201,7 @@ defineExpose({
   fetchData
 })
 // 初始化
-onMounted(async () => {
+onActivated(async () => {
   fetchData()
 })
 </script>

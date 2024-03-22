@@ -66,7 +66,7 @@ public interface ICameraService
     ///     老化测试
     /// </summary>
     /// <returns></returns>
-    void AgingTest();
+    Task AgingTest();
 
     /// <summary>
     ///     数据采集

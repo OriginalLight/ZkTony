@@ -4,11 +4,13 @@ import localErrLog from '../subpage/err-log/locale/en-US'
 import localOperLog from '../subpage/oper-log/locale/en-US'
 import localOption from '../subpage/option/locale/en-US'
 import localUserManage from '../subpage/user-manage/locale/en-US'
+import loaclAging from '../subpage/aging/locale/en-US'
 
 export default {
   ...localFQC,
   ...localDebug,
   ...localErrLog,
+  ...loaclAging,
   ...localOperLog,
   ...localOption,
   ...localUserManage,
@@ -20,6 +22,9 @@ export default {
   'settings.system.errlog.title': 'Error Log',
   'settings.system.version.title': 'Version Info',
   'settings.system.machine.title': 'Machine ID',
+  'settings.system.update': 'Check Update',
+  'settings.system.update.check': 'Check Update',
+  'settings.system.update.no': 'No new version',
   'settings.user.title': 'User Settings',
   'settings.user.mofify.password': 'Modify Password',
   'settings.user.mofify.password.new': 'New Password',
@@ -32,12 +37,12 @@ export default {
   'settings.user.mofify.password.confirm.errMsg': 'The two passwords entered are inconsistent',
   'settings.user.mofify.password.confirm.placeholder': 'Please enter the new password again',
   'settings.user.modify.password.success': 'Password modified successfully',
+  'settings.user.modify.password.fail': 'Failed to modify password',
   'settings.user.operlog.title': 'Operation Log',
   'settings.user.manage.title': 'User Management',
   'settings.factory.title': 'Factory Settings',
   'settings.factory.option': 'Option',
   'settings.factory.debug': 'Debug',
   'settings.factory.fqc': 'FQC',
-  'settings.factory.update': 'Update',
-  'settings.factory.update.check': 'Check Update'
+  'settings.factory.aging': 'Aging'
 }

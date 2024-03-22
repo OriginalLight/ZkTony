@@ -142,7 +142,7 @@
           size="large"
           style="width: 120px"
           :loading="loading.hatch"
-          :disabled="loading.hatch"
+          :disabled="disabled.hatch"
           @click="handleHatch"
         >
           <template #icon>
@@ -157,7 +157,7 @@
           size="large"
           style="width: 120px"
           :loading="loading.preview"
-          :disabled="loading.preview"
+          :disabled="disabled.preview"
           @click="handlePreview"
         >
           <template #icon>
@@ -165,7 +165,13 @@
           </template>
           {{ t('home.camera.options.preview') }}
         </a-button>
-        <a-button type="primary" size="large" style="width: 120px" @click="handleShoot">
+        <a-button
+          type="primary"
+          size="large"
+          style="width: 120px"
+          :disabled="disabled.shot"
+          @click="handleShoot"
+        >
           <template #icon>
             <icon-camera />
           </template>
@@ -230,6 +236,13 @@ const loading = ref({
   preview: false
 })
 
+// 关闭
+const disabled = ref({
+  hatch: false,
+  preview: false,
+  shot: false
+})
+
 //根据曝光时间计算最大帧数不能超过曝光时间除以5秒
 const maxFrams = computed(() => {
   const max = Math.floor((options.value.time.minute * 60 + options.value.time.second) / 5)
@@ -262,17 +275,21 @@ const handleQualityChange = async (value: unknown) => {
 
 const handleHatch = async () => {
   loading.value.hatch = true
+  disabled.value = { hatch: true, preview: true, shot: true }
   try {
     const before = appStore.hatch
     await hatch({ code: appStore.hatch ? 0 : 1 })
     appStore.toggleHatch(!before)
     if (before) {
+      disabled.value.preview = false
+      disabled.value.shot = false
       await handlePreview()
     }
   } catch (error) {
     Message.error((error as Error).message)
   } finally {
     loading.value.hatch = false
+    disabled.value.hatch = false
   }
 }
 
@@ -306,6 +323,7 @@ const handleShoot = async () => {
 const handlePreview = async () => {
   try {
     loading.value.preview = true
+    disabled.value = { hatch: true, preview: true, shot: true }
     await preview()
     // 延时500ms
     await delay(500)
@@ -319,6 +337,7 @@ const handlePreview = async () => {
     Message.error((error as Error).message)
   } finally {
     loading.value.preview = false
+    disabled.value = { hatch: false, preview: false, shot: false }
   }
 }
 

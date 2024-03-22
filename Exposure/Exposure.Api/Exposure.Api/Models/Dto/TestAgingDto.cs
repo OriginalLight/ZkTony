@@ -7,6 +7,10 @@ public class TestAgingDto
     public bool Light { get; set; }
     public bool Camera { get; set; }
     
+    public int Cycle { get; set; }
+    
+    public int Interval { get; set; }
+    
     public bool IsAnyTrue()
     {
         return Hatch || Led || Light || Camera;

@@ -8,7 +8,7 @@
           </template>
         </a-list-item-meta>
         <template #actions>
-          <a-button @click="visible = true">
+          <a-button style="width: 120px" @click="visible = true">
             <template #icon>
               <icon-edit />
             </template>
@@ -23,7 +23,7 @@
           </template>
         </a-list-item-meta>
         <template #actions>
-          <a-button style="width: 60px" @click="handleOperlog">
+          <a-button style="width: 120px" @click="handleOperlog">
             <template #icon>
               <icon-launch />
             </template>
@@ -37,7 +37,7 @@
           </template>
         </a-list-item-meta>
         <template #actions>
-          <a-button style="width: 60px" @click="handleManage">
+          <a-button style="width: 120px" @click="handleManage">
             <template #icon>
               <icon-launch />
             </template>
@@ -176,12 +176,15 @@ const validateConfirmPassword = (value, cb) => {
 const handleModifyPassword = async () => {
   try {
     if (form.newPassword === '' || form.confirmPassword === '' || form.oldPassword === '') {
+      Message.error(t('settings.user.modify.password.fail'))
       return
     }
     if (form.oldPassword === form.newPassword) {
+      Message.error(t('settings.user.modify.password.fail'))
       return
     }
     if (form.newPassword !== form.confirmPassword) {
+      Message.error(t('settings.user.modify.password.fail'))
       return
     }
     await updateUser({
@@ -193,6 +196,7 @@ const handleModifyPassword = async () => {
       enabled: userStore.enabled
     })
     visible.value = false
+    form.oldPassword = ''
     form.newPassword = ''
     form.confirmPassword = ''
     Message.success(t('settings.user.modify.password.success'))

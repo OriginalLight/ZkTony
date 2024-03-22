@@ -63,6 +63,11 @@ const router = createRouter({
       component: () => import('@renderer/views/settings/subpage/fqc/index.vue')
     },
     {
+      path: '/aging',
+      name: 'aging',
+      component: () => import('@renderer/views/settings/subpage/aging/index.vue')
+    },
+    {
       path: '/errlog',
       name: 'errlog',
       component: () => import('@renderer/views/settings/subpage/err-log/index.vue')

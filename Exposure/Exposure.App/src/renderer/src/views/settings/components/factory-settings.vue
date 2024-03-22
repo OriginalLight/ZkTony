@@ -8,7 +8,7 @@
           </template>
         </a-list-item-meta>
         <template #actions>
-          <a-button style="width: 60px" @click="handleOption">
+          <a-button style="width: 120px" @click="router.push('/option')">
             <template #icon>
               <icon-launch />
             </template>
@@ -22,7 +22,7 @@
           </template>
         </a-list-item-meta>
         <template #actions>
-          <a-button style="width: 60px" @click="handleDebug">
+          <a-button style="width: 120px" @click="router.push('/debug')">
             <template #icon>
               <icon-launch />
             </template>
@@ -36,7 +36,7 @@
           </template>
         </a-list-item-meta>
         <template #actions>
-          <a-button style="width: 60px" @click="handleFQC">
+          <a-button style="width: 120px" @click="router.push('/fqc')">
             <template #icon>
               <icon-launch />
             </template>
@@ -44,17 +44,16 @@
         </template>
       </a-list-item>
       <a-list-item>
-        <a-list-item-meta :title="$t('settings.factory.update')">
+        <a-list-item-meta :title="$t('settings.factory.aging')">
           <template #avatar>
-            <UpdateRotation size="20" />
+            <Tea size="20" />
           </template>
         </a-list-item-meta>
         <template #actions>
-          <a-button @click="handleUpdate">
+          <a-button style="width: 120px" @click="router.push('/aging')">
             <template #icon>
-              <icon-download />
+              <icon-launch />
             </template>
-            {{ t('settings.factory.update.check') }}
           </a-button>
         </template>
       </a-list-item>
@@ -66,29 +65,9 @@
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@renderer/store'
-import { Message } from '@arco-design/web-vue'
-import { Bug, UpdateRotation, FactoryBuilding, Inbox } from '@icon-park/vue-next'
+import { Bug, FactoryBuilding, Inbox, Tea } from '@icon-park/vue-next'
 
 const { t } = useI18n()
 const router = useRouter()
 const userStore = useUserStore()
-
-// 跳转到调试界面
-const handleDebug = () => {
-  router.push('/debug')
-}
-
-// 跳转到FQC界面
-const handleFQC = () => {
-  router.push('/fqc')
-}
-
-// 跳转到参数设置界面
-const handleOption = () => {
-  router.push('/option')
-}
-
-const handleUpdate = () => {
-  Message.info('暂无更新')
-}
 </script>

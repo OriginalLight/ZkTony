@@ -1,6 +1,6 @@
 export default {
-  'option.machine': 'Device',
-  'option.machine.id.title': 'Device ID',
+  'option.machine': 'Machine',
+  'option.machine.id.title': 'Machine ID',
   'option.serialport': 'Serial Port',
   'option.serialport.led': 'LED Serial Port',
   'option.serialport.computer': 'Lower Computer Serial Port',

@@ -205,6 +205,8 @@ public class CameraService(
     {
         await InitAsync();
         if (_nncam == null) throw new Exception("取消失败");
+        // 关闭灯光
+        serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
         if (!_nncam.Trigger(0)) throw new Exception("取消失败");
     }
 
@@ -229,12 +231,17 @@ public class CameraService(
 
     #region 老化测试
 
-    public void AgingTest()
+    public async Task AgingTest()
     {
-        Task.Run(async () =>
-        {
-            await TakeManualPhotoAsync(5000000, 10, new CancellationToken());
-        });
+        
+        await InitAsync();
+        if (_nncam == null) throw new Exception("手动拍照失败");
+        // 设置flag
+        _flag = "aging";
+        // 设置曝光时间
+        if (!_nncam.put_ExpoTime(5000000)) throw new Exception("设置曝光时间失败");
+        // 触发拍摄
+        if (!_nncam.Trigger(1)) throw new Exception("预览失败");
     }
 
     #endregion

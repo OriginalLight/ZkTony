@@ -46,21 +46,11 @@
           </template>
         </a-list-item-meta>
         <template #actions>
-          <a-button style="width: 60px" @click="handleErrlog">
+          <a-button style="width: 120px" @click="handleErrlog">
             <template #icon>
               <icon-launch />
             </template>
           </a-button>
-        </template>
-      </a-list-item>
-      <a-list-item>
-        <a-list-item-meta :title="$t('settings.system.machine.title')">
-          <template #avatar>
-            <icon-code size="20" />
-          </template>
-        </a-list-item-meta>
-        <template #actions>
-          <a-tag> {{ machine.id }} </a-tag>
         </template>
       </a-list-item>
       <a-list-item>
@@ -74,6 +64,31 @@
             <a-tag> {{ config.version }} </a-tag>
             <a-tag> {{ machine.version }} </a-tag>
           </a-space>
+        </template>
+      </a-list-item>
+      <a-list-item v-if="userStore.role < 2">
+        <a-list-item-meta :title="$t('settings.system.update')">
+          <template #avatar>
+            <UpdateRotation size="20" />
+          </template>
+        </a-list-item-meta>
+        <template #actions>
+          <a-button style="width: 120px" @click="handleUpdate">
+            <template #icon>
+              <icon-download />
+            </template>
+            {{ t('settings.system.update.check') }}
+          </a-button>
+        </template>
+      </a-list-item>
+      <a-list-item>
+        <a-list-item-meta :title="$t('settings.system.machine.title')">
+          <template #avatar>
+            <icon-code size="20" />
+          </template>
+        </a-list-item-meta>
+        <template #actions>
+          <a-tag> {{ machine.id }} </a-tag>
         </template>
       </a-list-item>
     </a-list>
@@ -90,8 +105,12 @@ import useTheme from '@renderer/hooks/themes'
 import { varsion } from '@renderer/api/machine'
 import { getOption } from '@renderer/api/option'
 import config from '../../../../../../package.json'
+import { Message } from '@arco-design/web-vue'
+import { UpdateRotation } from '@icon-park/vue-next'
+import { useUserStore } from '@renderer/store'
 
 const { t } = useI18n()
+const userStore = useUserStore()
 const locales = [...LOCALE_OPTIONS]
 const { changeLocale, currentLocale } = useLocale()
 const { changeTheme, currentTheme } = useTheme()
@@ -104,6 +123,10 @@ const machine = ref({
 // 查看错误日志
 const handleErrlog = () => {
   router.push('/errlog')
+}
+
+const handleUpdate = () => {
+  Message.info(t('settings.system.update.no'))
 }
 
 // 软件版本

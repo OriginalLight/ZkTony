@@ -1,6 +1,6 @@
 export default {
   'option.machine': '设备',
-  'option.machine.id.title': '设备编号',
+  'option.machine.id.title': '设备序列号',
   'option.serialport': '串口',
   'option.serialport.led': 'LED串口',
   'option.serialport.computer': '下位机串口',
