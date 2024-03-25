@@ -142,7 +142,7 @@ fun experimentList(
 
 
     /**
-     * 删除的弹窗
+     * 删除的弹窗x
      */
     val deleteDialog = remember { mutableStateOf(false) }
 

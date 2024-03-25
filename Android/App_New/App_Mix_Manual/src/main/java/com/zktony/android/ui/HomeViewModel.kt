@@ -327,6 +327,7 @@ class HomeViewModel @Inject constructor(
                     delay(1000L)
                 }
                 if (num >= waitTime) {
+                    _uiFlags.value = UiFlags.objects(13)
                     _waitTimeRinseNum.value += 1
                     val slEnetity = slDao.getById(1L).firstOrNull()
                     if (slEnetity != null) {
@@ -368,6 +369,9 @@ class HomeViewModel @Inject constructor(
                     _waitTimeRinseJob.value?.cancel()
                     _waitTimeRinseJob.value = null
                     waitTimeRinse()
+                    _uiFlags.value = UiFlags.none()
+
+
                 }
             }
 

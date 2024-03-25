@@ -333,28 +333,28 @@ fun operate(
     /**
      * 纯水进度
      */
-    val waterSweepState = remember {
+    var waterSweepState by remember {
         mutableStateOf(0f)
     }
 
     /**
      * 促凝剂进度
      */
-    val coagulantSweepState = remember {
+    var coagulantSweepState by remember {
         mutableStateOf(0f)
     }
 
     /**
      * 低浓度进度
      */
-    val lowCoagulantSweepState = remember {
+    var lowCoagulantSweepState by remember {
         mutableStateOf(0f)
     }
 
     /**
      * 高浓度进度
      */
-    val highCoagulantSweepState = remember {
+    var highCoagulantSweepState by remember {
         mutableStateOf(0f)
     }
 
@@ -422,23 +422,30 @@ fun operate(
             Row(
                 modifier = Modifier
                     .clickable(onClick = {
-                        waterDialog.value = true
+                        if (uiFlags is UiFlags.None) {
+                            waterDialog.value = true
+                        }
                     })
             ) {
                 //纯水进度条
-                WaterVerticalProgressBar(waterSweepState.value, watermother.toString())
+                WaterVerticalProgressBar(
+                    if (uiFlags is UiFlags.Objects && uiFlags.objects == 4 || uiFlags is UiFlags.Objects && uiFlags.objects == 0) watermother / waterSweepState else 0f,
+                    watermother.toString()
+                )
             }
 
             Row(
                 modifier = Modifier
                     .padding(start = 22.82.dp)
                     .clickable(onClick = {
-                        coagulantDialog.value = true
+                        if (uiFlags is UiFlags.None) {
+                            coagulantDialog.value = true
+                        }
                     })
             ) {
                 //促凝剂进度条
                 CoagulantProgressBarVertical(
-                    coagulantSweepState.value,
+                    if (uiFlags is UiFlags.Objects && uiFlags.objects == 4 || uiFlags is UiFlags.Objects && uiFlags.objects == 0) coagulantmother / coagulantSweepState else 0f,
                     coagulantmother.toString(),
                     concentration_ex
                 )
@@ -448,12 +455,14 @@ fun operate(
                 modifier = Modifier
                     .padding(start = 22.82.dp)
                     .clickable(onClick = {
-                        lowDialog.value = true
+                        if (uiFlags is UiFlags.None) {
+                            lowDialog.value = true
+                        }
                     })
             ) {
                 //低浓度进度条
                 LowCoagulantProgressBarVertical(
-                    lowCoagulantSweepState.value,
+                    if (uiFlags is UiFlags.Objects && uiFlags.objects == 4 || uiFlags is UiFlags.Objects && uiFlags.objects == 0) lowmother / lowCoagulantSweepState else 0f,
                     lowmother.toString(),
                     lowCoagulant_ex
                 )
@@ -463,12 +472,14 @@ fun operate(
                 modifier = Modifier
                     .padding(start = 22.82.dp)
                     .clickable(onClick = {
-                        highDialog.value = true
+                        if (uiFlags is UiFlags.None) {
+                            highDialog.value = true
+                        }
                     })
             ) {
                 //高浓度进度条
                 HighCoagulantProgressBarVertical(
-                    highCoagulantSweepState.value,
+                    if (uiFlags is UiFlags.Objects && uiFlags.objects == 4 || uiFlags is UiFlags.Objects && uiFlags.objects == 0) higemother / highCoagulantSweepState else 0f,
                     higemother.toString(),
                     highCoagulant_ex
                 )
@@ -494,7 +505,9 @@ fun operate(
             Column(
                 modifier = Modifier
                     .clickable(onClick = {
-                        programListDialog.value = true
+                        if (uiFlags is UiFlags.None) {
+                            programListDialog.value = true
+                        }
                     })
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -516,12 +529,6 @@ fun operate(
                         imageVector = Icons.Default.ArrowDropDown,
                         contentDescription = null
                     )
-
-//                    Image(
-//                        painter = painterResource(id = R.drawable), contentDescription = null,
-//                        modifier = Modifier
-//                            .padding(start = 20.dp)
-//                    )
 
                 }
 
@@ -579,7 +586,7 @@ fun operate(
                             .clickable {
                                 if (job == null) {
                                     if (uiFlags is UiFlags.None) {
-                                        if (program != null) {
+                                        if (program.id != 0L) {
                                             if (expectedMakeNum.value > 1) {
                                                 expectedMakeNum.value -= 1
                                                 expectedMakeNum_ex =
@@ -674,7 +681,7 @@ fun operate(
                             .clickable {
                                 if (job == null) {
                                     if (uiFlags is UiFlags.None) {
-                                        if (program != null) {
+                                        if (program.id != 0L) {
                                             var temp = expectedMakeNum_ex.toIntOrNull() ?: 0
                                             temp += 1
                                             if (temp > 99) {
@@ -739,7 +746,9 @@ fun operate(
             Row(
                 modifier = Modifier
                     .clickable(onClick = {
-                        wasteDialog.value = true
+                        if (uiFlags is UiFlags.None) {
+                            wasteDialog.value = true
+                        }
                     })
             ) {
                 //废液进度条
@@ -805,7 +814,14 @@ fun operate(
                                             }
 
                                         }
-
+                                    } else {
+                                        Toast
+                                            .makeText(
+                                                context,
+                                                "正在运行中,请稍后再操作！",
+                                                Toast.LENGTH_SHORT
+                                            )
+                                            .show()
                                     }
                                 } else {
                                     stopGlueDialog.value = true
@@ -834,6 +850,14 @@ fun operate(
                                     } else {
                                         pipelineDialog.value = true
                                     }
+                                } else {
+                                    Toast
+                                        .makeText(
+                                            context,
+                                            "正在运行中,请稍后再操作！",
+                                            Toast.LENGTH_SHORT
+                                        )
+                                        .show()
                                 }
 
                             }
@@ -860,6 +884,14 @@ fun operate(
                                     } else {
                                         cleanDialog.value = true
                                     }
+                                } else {
+                                    Toast
+                                        .makeText(
+                                            context,
+                                            "正在运行中,请稍后再操作！",
+                                            Toast.LENGTH_SHORT
+                                        )
+                                        .show()
                                 }
 
                             }
@@ -874,6 +906,14 @@ fun operate(
                             .clickable {
                                 if (uiFlags is UiFlags.None) {
                                     uiEvent(HomeIntent.Reset)
+                                } else {
+                                    Toast
+                                        .makeText(
+                                            context,
+                                            "正在运行中,请稍后再操作！",
+                                            Toast.LENGTH_SHORT
+                                        )
+                                        .show()
                                 }
                             }
                     )
@@ -1081,7 +1121,6 @@ fun operate(
                     ), onClick = {
                         expectedMakeNum.value = 0
                         expectedMakeNum_ex = "0"
-
                         uiEvent(HomeIntent.MotherVolZero)
                         experimentRecord.status = EPStatus.ABORT
                         experimentRecord.detail = "手动停止制胶"
@@ -1152,17 +1191,25 @@ fun operate(
                     fontSize = 16.sp,
                     text = "请更换制胶架，继续制胶!"
                 )
-
             }, confirmButton = {
                 Button(
                     enabled = hint,
                     modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
                         containerColor = Color(rgb(0, 105, 52))
                     ), onClick = {
-                        experimentRecord.number = complate
-                        uiEvent(HomeIntent.Update(experimentRecord))
-                        continueGlueDialog.value = false
-                        uiEvent(HomeIntent.Start(complate))
+                        if (uiFlags is UiFlags.Objects && uiFlags.objects == 13) {
+                            Toast.makeText(
+                                context,
+                                "正在冲洗,请稍后再操作!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            experimentRecord.number = complate
+                            uiEvent(HomeIntent.Update(experimentRecord))
+                            continueGlueDialog.value = false
+                            uiEvent(HomeIntent.Start(complate))
+                        }
+
                     }) {
                     Text(text = "继续")
                 }
@@ -1171,15 +1218,23 @@ fun operate(
                     modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
                         containerColor = Color(rgb(0, 105, 52))
                     ), onClick = {
-                        expectedMakeNum.value = 0
-                        expectedMakeNum_ex = "0"
-                        experimentRecord.number = complate
-                        experimentRecord.status = EPStatus.ABORT
-                        experimentRecord.detail = "手动停止制胶"
-                        uiEvent(HomeIntent.Update(experimentRecord))
-                        uiEvent(HomeIntent.MotherVolZero)
-                        uiEvent(HomeIntent.MoveCom(complate))
-                        continueGlueDialog.value = false
+                        if (uiFlags is UiFlags.Objects && uiFlags.objects == 13) {
+                            Toast.makeText(
+                                context,
+                                "正在冲洗,请稍后再操作!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            expectedMakeNum.value = 0
+                            expectedMakeNum_ex = "0"
+                            experimentRecord.number = complate
+                            experimentRecord.status = EPStatus.ABORT
+                            experimentRecord.detail = "手动停止制胶"
+                            uiEvent(HomeIntent.Update(experimentRecord))
+                            uiEvent(HomeIntent.MotherVolZero)
+                            uiEvent(HomeIntent.MoveCom(complate))
+                            continueGlueDialog.value = false
+                        }
                     }) {
                     Text(text = "停止")
                 }
@@ -1206,6 +1261,11 @@ fun operate(
                         containerColor = Color(rgb(0, 105, 52))
                     ), onClick = {
                         if (calculate >= expectedMakeNum.value) {
+                            waterSweepState = watermother
+                            coagulantSweepState = coagulantmother
+                            lowCoagulantSweepState = lowmother
+                            highCoagulantSweepState = higemother
+
                             startMake = "停止制胶"
                             uiEvent(HomeIntent.Start(0))
                             uiEvent(
@@ -1415,6 +1475,7 @@ fun operate(
                             modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(rgb(0, 105, 52))
                             ), onClick = {
+                                concentration_ex = concentration.value.toString()
                                 coagulantDialog.value = false
                             }) {
                             Text(text = "确认")

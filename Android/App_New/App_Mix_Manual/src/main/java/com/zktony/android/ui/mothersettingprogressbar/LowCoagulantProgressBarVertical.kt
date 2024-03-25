@@ -31,7 +31,7 @@ fun LowCoagulantProgressBarVertical(
     volume: String,
     concentration: String,
     modifier: Modifier = Modifier,
-    color: Color = Color.Green,
+    color: Color = Color(android.graphics.Color.rgb(136, 196, 254)),
     backgroundColor: Color = Color(245, 245, 245),
     size: Size = Size(width = 102.48f, height = 150.85f),
     strokeSize: Float = 0.1f,

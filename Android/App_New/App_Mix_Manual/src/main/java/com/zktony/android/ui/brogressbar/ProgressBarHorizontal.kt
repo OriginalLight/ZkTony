@@ -16,32 +16,27 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 /**
  * 横向进度条
  */
 @Composable
-fun HorizontalProgressBar() {
-    var progress by remember {
-        mutableStateOf(0.1f)
-    }
+fun HorizontalProgressBar(progress: Float) {
 
     val animatedProgress by animateFloatAsState(
         targetValue = progress,
-        animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
+        animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec, label = ""
     )
 
     Column {
         LinearProgressIndicator(
             modifier = Modifier
-                .width(50.dp)
-                .height(100.dp),
+                .width(400.dp)
+                .height(10.dp),
+            color = Color(android.graphics.Color.rgb(136, 196, 254)),
             progress = animatedProgress
         )
-        Spacer(modifier = Modifier.requiredHeight(30.dp))
-        OutlinedButton(onClick = { if (progress < 1f) progress += 0.1f }) {
-            Text(text = "增加进度")
-        }
     }
 }

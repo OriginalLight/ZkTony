@@ -17,12 +17,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -38,11 +41,13 @@ import androidx.compose.ui.unit.sp
 import androidx.paging.compose.LazyPagingItems
 import com.zktony.android.R
 import com.zktony.android.data.entities.SportsLog
+import com.zktony.android.ui.brogressbar.HorizontalProgressBar
 import com.zktony.android.ui.components.TableTextBody
 import com.zktony.android.ui.components.TableTextHead
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.utils.extra.dateFormat
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.io.File
@@ -68,6 +73,23 @@ fun sportsLogMode(
     var selectedIndex by remember { mutableStateOf(0) }
     //	定义列宽
     val cellWidthList = arrayListOf(70, 115, 300)
+
+    /**
+     * 导出弹窗
+     */
+    val exportDialog = remember { mutableStateOf(false) }
+
+    /**
+     * 导出进度
+     */
+    var exportSweepState by remember {
+        mutableFloatStateOf(0f)
+    }
+
+    var exportSweepStateCount by remember {
+        mutableIntStateOf(0)
+    }
+
 
 
     Column(
@@ -168,18 +190,29 @@ fun sportsLogMode(
                                 val entity = sportsLogEntitiesDis[selectedIndex]
                                 if (entity != null) {
                                     try {
-                                        val filePath = "$path/zktony/${entity.logName}.txt"
-
+                                        exportDialog.value = true
+                                        val filePath =
+                                            "$path/zktony/${entity.logName}.txt"
                                         FileWriter(filePath, true).use { writer ->
                                             writer.write(entity.createTime.dateFormat("yyyy-MM-dd") + "\n")
+                                            delay(500)
+                                            exportSweepStateCount = entitiesList.size
                                             entitiesList.forEach {
                                                 if (entity.logName == it.logName) {
                                                     writer.append("使用模块：${it.startModel}\n")
                                                     writer.append("运行数据：${it.detail}\n")
                                                 }
+                                                delay(500)
+                                                exportSweepState += 1f
                                             }
-                                            writer.close()
                                         }
+                                        exportSweepState = 0f
+                                        exportDialog.value = false
+                                        Toast.makeText(
+                                            context,
+                                            "导出完成",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     } catch (e: Exception) {
                                         Toast.makeText(
                                             context,
@@ -206,6 +239,23 @@ fun sportsLogMode(
         }
 
 
+    }
+
+
+
+    if (exportDialog.value) {
+        AlertDialog(
+            onDismissRequest = {},
+            title = {
+                Text(text = "导出进度", fontSize = 18.sp)
+            },
+            text = {
+                HorizontalProgressBar(exportSweepState / exportSweepStateCount)
+            }, confirmButton = {
+
+            }, dismissButton = {
+
+            })
     }
 
 
