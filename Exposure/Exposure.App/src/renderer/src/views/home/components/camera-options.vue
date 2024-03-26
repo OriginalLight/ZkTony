@@ -299,7 +299,7 @@ const handleShoot = async () => {
   progress.value.message = t('home.camera.options.shooting')
   try {
     if (options.value.mode === 'auto') {
-      progress.value.time = 10000
+      progress.value.time = 12000
       const res = await auto()
       progress.value.time = res.data / 1000 + 1500
       const ms = res.data / 1000

@@ -11,5 +11,8 @@ export default {
   'option.set': 'Set',
   'option.set.success': 'Set successfully',
   'option.set.restart': 'Set successfully, please restart the device',
-  'option.set.fail': 'Set failed'
+  'option.set.fail': 'Set failed',
+  'option.lower': 'Lower Computer',
+  'option.lower.hatch.step': 'Open Door Steps',
+  'option.lower.hatch.offset': 'Open Door Offset'
 }

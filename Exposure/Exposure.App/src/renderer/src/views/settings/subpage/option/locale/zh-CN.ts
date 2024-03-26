@@ -11,5 +11,8 @@ export default {
   'option.set': '设置',
   'option.set.success': '设置成功',
   'option.set.restart': '设置成功, 请重启设备',
-  'option.set.fail': '设置失败'
+  'option.set.fail': '设置失败',
+  'option.lower': '下位机',
+  'option.lower.hatch.step': '开门步数',
+  'option.lower.hatch.offset': '开门偏移'
 }

@@ -1,4 +1,4 @@
-# com.zktony
+# exposure.app
 
 An Electron application with Vue and TypeScript
 

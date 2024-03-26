@@ -118,6 +118,7 @@ public class CameraService(
         _mat = null;
         _flag = "sampling";
         var targetExpo = await CalculateExpo(0.1, ctsToken);
+        if (targetExpo == 0) throw new Exception("计算曝光时间失败");
 
         _mat = null;
         _pictureList.Clear();
@@ -608,16 +609,13 @@ public class CameraService(
         // 延时1300ms
         await Task.Delay((int)(time * 1000 + 1000), ctsToken);
         if (_mat == null) throw new Exception("获取采样图失败");
-
         var snr = CalculateSnr(_mat, time);
         _mat = null;
 
         if (Math.Abs(time - 0.1) < 0.1)
             return snr switch
             {
-                < -20 => 1000000,
-                < -15 => 2500000,
-                <= -10 => 5000000,
+                <= -10 => GetScale(-50, -10, 1000000, 3000000, snr),
                 > -10 => await CalculateExpo(1, ctsToken),
                 _ => 1000000
             };
@@ -625,17 +623,29 @@ public class CameraService(
         if (Math.Abs(time - 1) < 0.1)
             return snr switch
             {
-                < -7 => 8000000,
-                < -5 => 10000000,
-                < -2 => 15000000,
-                <= 0 => 20000000,
-                > 0 => await CalculateExpo(5, ctsToken),
-                _ => 1000000
+                <= -15 => GetScale(-50, -15, 2000000, 3000000, snr),
+                <= 0 => GetScale(-15, 0, 3000000, 10000000, snr),
+                <= 1 => GetScale(0, 1, 10000000, 14000000, snr),
+                <= 1.5 => GetScale(1, 1.5, 14000000, 20000000, snr),
+                <= 2 => GetScale(1.5, 2, 20000000, 30000000, snr),
+                > 2 => await CalculateExpo(5, ctsToken),
+                _ => 2000000
             };
 
-        if (Math.Abs(time - 5) < 0.1) return 600000000;
+        if (Math.Abs(time - 5) < 0.1) 
+            return snr switch
+            {
+                <= 5 => GetScale(2, 5, 30000000, 40000000, snr),
+                <= 6 => GetScale(5, 6, 40000000, 80000000, snr),
+                <= 7 => GetScale(6, 7, 80000000, 140000000, snr),
+                <= 7.5 => GetScale(7, 7.5, 140000000, 240000000, snr),
+                <= 8 => GetScale(7.5, 8, 240000000, 300000000, snr),
+                <= 10 => GetScale(8, 10, 300000000, 600000000, snr),
+                > 10 => 600000000,
+                _ => 30000000
+            };
 
-        return 1000000;
+        return 0;
     }
 
     #endregion
@@ -670,6 +680,15 @@ public class CameraService(
             // 释放资源
             gray.Dispose();
         }
+    }
+
+    #endregion
+
+    #region 比例缩放
+    
+    private static long GetScale(double min, double max, double minTarget, double maxTarget, double value)
+    {
+        return (long)((maxTarget - minTarget) * (value - min) / (max - min) + minTarget);
     }
 
     #endregion

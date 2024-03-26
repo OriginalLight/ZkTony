@@ -1,6 +1,7 @@
 ﻿using Exposure.Api.Contracts.Services;
 using Exposure.Api.Contracts.SqlSugar;
 using Exposure.Api.Models;
+using Exposure.Api.Utils;
 
 namespace Exposure.Api.Services;
 
@@ -21,6 +22,7 @@ public class ApplicationHostService(
     {
         if (!_isInitialized)
         {
+            WindowUtils.Hide();
             dbContext.CreateTable(false, 50, typeof(User), typeof(Picture), typeof(OperLog), typeof(ErrorLog), typeof(Option));
             await serialPortService.InitAsync();
             await userService.InitializeAsync();

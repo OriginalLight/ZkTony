@@ -105,6 +105,45 @@
             </a-list-item>
           </a-list>
         </a-card>
+        <a-card :title="t('option.lower')">
+          <a-list>
+            <a-list-item>
+              <a-list-item-meta :title="t('option.lower.hatch.step')"></a-list-item-meta>
+              <template #actions>
+                <a-input-group>
+                  <a-input-number
+                    v-model="option.hatchStep"
+                    style="width: 350px"
+                    :min="0"
+                    mode="button"
+                    :step="12800"
+                  >
+                    <template #suffix>Pulse</template>
+                  </a-input-number>
+                  <a-button type="primary" @click="handleHatchStep">{{ t('option.set') }}</a-button>
+                </a-input-group>
+              </template>
+            </a-list-item>
+            <a-list-item>
+              <a-list-item-meta :title="t('option.lower.hatch.offset')"></a-list-item-meta>
+              <template #actions>
+                <a-input-group>
+                  <a-input-number
+                    v-model="option.hatchOffset"
+                    style="width: 350px"
+                    mode="button"
+                    :step="12800"
+                  >
+                    <template #suffix>Pulse</template>
+                  </a-input-number>
+                  <a-button type="primary" @click="handleHatchOffset">{{
+                    t('option.set')
+                  }}</a-button>
+                </a-input-group>
+              </template>
+            </a-list-item>
+          </a-list>
+        </a-card>
       </a-space>
     </div>
   </div>
@@ -126,7 +165,9 @@ const option = ref({
   ports: ['COM1', 'COM2', 'COM3', 'COM4'],
   expoTime: 1500,
   gain: 3000,
-  temperature: -15
+  temperature: -15,
+  hatchStep: 0,
+  hatchOffset: 0
 })
 
 const handleMachineId = async () => {
@@ -201,6 +242,30 @@ const handleTemperature = async () => {
   }
 }
 
+const handleHatchStep = async () => {
+  try {
+    await setOption({
+      key: 'HatchStep',
+      value: String(option.value.hatchStep)
+    })
+    Message.success(t('option.set.success'))
+  } catch (error) {
+    Message.error(t('option.set.fail'))
+  }
+}
+
+const handleHatchOffset = async () => {
+  try {
+    await setOption({
+      key: 'HatchOffset',
+      value: String(option.value.hatchOffset)
+    })
+    Message.success(t('option.set.success'))
+  } catch (error) {
+    Message.error(t('option.set.fail'))
+  }
+}
+
 onMounted(async () => {
   try {
     const res = await getOption({ key: 'MachineId' })
@@ -222,6 +287,14 @@ onMounted(async () => {
     const res6 = await getOption({ key: 'Temperature' })
     if (res6.data != 'None') {
       option.value.temperature = Number(res6.data) / 10
+    }
+    const res7 = await getOption({ key: 'HatchStep' })
+    if (res7.data != 'None') {
+      option.value.hatchStep = Number(res7.data)
+    }
+    const res8 = await getOption({ key: 'HatchOffset' })
+    if (res8.data != 'None') {
+      option.value.hatchOffset = Number(res8.data)
     }
   } catch (error) {
     console.error(error)

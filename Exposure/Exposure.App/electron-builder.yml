@@ -1,4 +1,4 @@
-appId: com.zktony
+appId: Exposure.App
 productName: 化学发光
 directories:
   buildResources: build
@@ -13,14 +13,14 @@ asarUnpack:
   - resources/**
 win:
   icon: resources/icon.ico
-  executableName: Exposure
+  executableName: Exposure.App
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
   allowElevation: true
-  perMachine: true
+  perMachine: false
   createStartMenuShortcut: true
   installerIcon: resources/icon.ico
   uninstallerIcon: resources/icon.ico

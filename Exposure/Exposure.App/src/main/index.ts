@@ -13,8 +13,8 @@ function createWindow(): void {
     minWidth: 800,
     minHeight: 600,
     show: false,
-    frame: false,
-    fullscreen: true,
+    //frame: false,
+    //fullscreen: true,
     autoHideMenuBar: true,
     icon: path.join(__dirname, '../../resources/icon.ico'),
     ...(process.platform === 'linux' ? { icon } : {}),
@@ -60,7 +60,7 @@ if (app.isPackaged) {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   // Set app user model id for windows
-  electronApp.setAppUserModelId('com.zktony')
+  electronApp.setAppUserModelId('Exposure.App')
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.

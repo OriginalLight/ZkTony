@@ -21,27 +21,35 @@ public class SerialPortService(ILogger<SerialPortService> logger, IOptionService
         if (!_serialPorts.TryGetValue("Com2", out var serialPort)) return;
         serialPort.DataReceived += (sender, _) =>
         {
-            var sp = (SerialPort)sender;
-            var bytes = new byte[sp.BytesToRead];
-            sp.Read(bytes, 0, bytes.Length);
-            logger.LogInformation("Com2 接收到数据: " + BitConverter.ToString(bytes));
-            switch (bytes[2])
+            try
             {
-                case 0x03:
-                    WritePort("Com2", DefaultProtocol.QueryOptocoupler().ToBytes());
-                    break;
-                case 0x04:
+                var sp = (SerialPort)sender;
+                var bytes = new byte[sp.BytesToRead];
+                sp.Read(bytes, 0, bytes.Length);
+                logger.LogInformation("Com2 接收到数据: " + BitConverter.ToString(bytes));
+                switch (bytes[2])
                 {
-                    try
+                    case 0x03:
+                        WritePort("Com2", DefaultProtocol.QueryOptocoupler().ToBytes());
+                        break;
+                    case 0x04:
                     {
-                        SetFlag("hatch", bytes[6] == 0x00 ? 1 : 0);
+                        try
+                        {
+                            SetFlag("hatch", bytes[6] == 0x00 ? 1 : 0);
+                        }
+                        catch (Exception e)
+                        {
+                            logger.LogError(e.Message);
+                        }
                     }
-                    catch (Exception e)
-                    {
-                        logger.LogError(e.Message);
-                    }
+                        break;
                 }
-                    break;
+            }
+            catch (Exception e)
+            {
+                errorLog.AddErrorLog(e);
+                logger.LogError(e.Message);
             }
         };
 

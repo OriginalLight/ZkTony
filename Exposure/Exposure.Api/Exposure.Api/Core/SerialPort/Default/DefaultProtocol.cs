@@ -332,6 +332,34 @@ public class DefaultProtocol
             Data = [0x00]
         };
     }
+    
+    public static Protocol HatchStep(int step)
+    {
+        // step 转换成4个字节小端序
+        var data = BitConverter.GetBytes(step);
+        if (BitConverter.IsLittleEndian == false)
+            Array.Reverse(data);
+        return new Protocol
+        {
+            Address = 0x01,
+            Function = 0x07,
+            Data = [0x01, data[0], data[1], data[2], data[3]]
+        };
+    }
+    
+    public static Protocol HatchOffset(int offset)
+    {
+        // offset 转换成4个字节小端序
+        var data = BitConverter.GetBytes(offset);
+        if (BitConverter.IsLittleEndian == false)
+            Array.Reverse(data);
+        return new Protocol
+        {
+            Address = 0x01,
+            Function = 0x07,
+            Data = [0x00, data[0], data[1], data[2], data[3]]
+        };
+    }
 
     #endregion
 }
