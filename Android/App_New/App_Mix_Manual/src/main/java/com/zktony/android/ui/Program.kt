@@ -1,16 +1,15 @@
 package com.zktony.android.ui
 
 import android.content.Context
-import android.os.Build
-import android.os.Environment
+import android.graphics.Color.rgb
 import android.os.storage.StorageManager
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +17,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
@@ -29,10 +29,12 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -43,9 +45,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -53,11 +58,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.zktony.android.R
 import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.components.HomeAppBar
-import com.zktony.android.ui.components.ProgramAppBar
-import com.zktony.android.ui.components.TableText
+import com.zktony.android.ui.components.TableTextBody
+import com.zktony.android.ui.components.TableTextHead
 import com.zktony.android.ui.utils.AnimatedContent
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
@@ -69,10 +75,8 @@ import com.zktony.android.utils.extra.dateFormat
 import com.zktony.android.utils.extra.format
 import kotlinx.coroutines.launch
 import java.io.File
-import java.io.PrintWriter
+import java.io.IOException
 import java.lang.reflect.Method
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -106,18 +110,25 @@ fun ProgramRoute(viewModel: ProgramViewModel) {
         }
     }
 
-    Column {
-        HomeAppBar(page) { navigation() }
-//        ProgramAppBar(entities.toList(), selected, page, viewModel::dispatch) { navigation() }
-        AnimatedContent(targetState = page) {
-            when (page) {
-                PageType.PROGRAM -> ProgramList(
-                    entities,
-                    entities.toList(),
-                    viewModel::dispatch
-                )
+    Box {
+        Image(
+            modifier = Modifier.fillMaxSize(),
+            painter = painterResource(R.mipmap.bkimg),
+            contentDescription = "background_image",
+            contentScale = ContentScale.FillBounds
+        )
+        Column {
+            HomeAppBar(page, false) { navigation() }
+            AnimatedContent(targetState = page) {
+                when (page) {
+                    PageType.PROGRAM -> ProgramList(
+                        entities,
+                        entities.toList(),
+                        viewModel::dispatch
+                    )
 
-                else -> {}
+                    else -> {}
+                }
             }
         }
     }
@@ -162,6 +173,7 @@ fun ProgramList(
 
     var selectedIndex by remember { mutableStateOf(0) }
 
+    var selectedId by remember { mutableStateOf(0L) }
 
     /**
      * 制胶名称
@@ -171,14 +183,14 @@ fun ProgramList(
     /**
      * 开始浓度
      */
-    val startRange = rememberDataSaverState(key = "startRange", default = 0f)
-    var startRange_ex by remember { mutableStateOf(startRange.value.format(3)) }
+    val startRange = rememberDataSaverState(key = "startRange", default = 0)
+    var startRange_ex by remember { mutableStateOf(startRange.value.toString()) }
 
     /**
      * 结束浓度
      */
-    var endRange = rememberDataSaverState(key = "endRange", default = 0f)
-    var endRange_ex by remember { mutableStateOf(endRange.value.format(3)) }
+    var endRange = rememberDataSaverState(key = "endRange", default = 0)
+    var endRange_ex by remember { mutableStateOf(endRange.value.toString()) }
 
 
     /**
@@ -192,8 +204,8 @@ fun ProgramList(
     /**
      * 促凝剂体积
      */
-    var coagulant = rememberDataSaverState(key = "coagulant", default = 0f)
-    var coagulant_ex by remember { mutableStateOf(coagulant.value.format(3)) }
+    var coagulant = rememberDataSaverState(key = "coagulant", default = 0)
+    var coagulant_ex by remember { mutableStateOf(coagulant.value.toString()) }
 
     /**
      * 胶液体积
@@ -206,175 +218,236 @@ fun ProgramList(
      */
     var founder by remember { mutableStateOf("") }
 
+    /**
+     * home选中的制胶程序id
+     */
+    var programId = rememberDataSaverState(key = "programid", default = 1L)
+
 
     //	定义列宽
-    val cellWidthList = arrayListOf(70, 100, 130, 90, 100, 120)
+    val cellWidthList = arrayListOf(70, 100, 120, 70, 90, 120)
     //	使用lazyColumn来解决大数据量时渲染的性能问题
-    LazyColumn(
+    Column(
         modifier = Modifier
-            .height(800.dp)
-            .padding(top = 20.dp)
+            .padding(start = 13.75.dp)
+            .clip(RoundedCornerShape(topEnd = 10.dp, bottomEnd = 10.dp, bottomStart = 10.dp))
+            .background(Color.White)
+            .height(904.9.dp)
+            .width(572.5.dp)
     ) {
-        //	粘性标题
-        stickyHeader {
-            Row(Modifier.background(Color.Gray)) {
-                TableText(text = "序号", width = cellWidthList[0])
-                TableText(text = "名称", width = cellWidthList[1])
-                TableText(text = "浓度", width = cellWidthList[2])
-                TableText(text = "厚度", width = cellWidthList[3])
-                TableText(text = "创建人", width = cellWidthList[4])
-                TableText(text = "日期", width = cellWidthList[5])
+        LazyColumn(
+            modifier = Modifier
+                .height(800.dp)
+                .fillMaxWidth()
+                .padding(top = 20.dp, start = 2.dp)
+        ) {
+            stickyHeader {
+                Row(Modifier.background(Color(rgb(0, 105, 52)))) {
+                    TableTextHead(text = "序号", width = cellWidthList[0])
+                    TableTextHead(text = "名        称", width = cellWidthList[1])
+                    TableTextHead(text = "浓             度", width = cellWidthList[2])
+                    TableTextHead(text = "厚度", width = cellWidthList[3])
+                    TableTextHead(text = "创建人", width = cellWidthList[4])
+                    TableTextHead(text = "日期", width = cellWidthList[5])
+                }
             }
+
+            itemsIndexed(entities) { index, item ->
+                val selected = item == entities[selectedIndex]
+                Row(
+                    modifier = Modifier
+                        .background(if (index % 2 == 0) Color(rgb(239, 239, 239)) else Color.White)
+                        .clickable(onClick = {
+                            selectedIndex = index
+                            selectedId = item.id
+                        })
+                ) {
+                    TableTextBody(text = (index + 1).toString(), width = cellWidthList[0], selected)
+                    TableTextBody(text = item.displayText, width = cellWidthList[1], selected)
+                    TableTextBody(
+                        text = "" + item.startRange + "%~" + item.endRange + "%",
+                        width = cellWidthList[2], selected
+                    )
+                    TableTextBody(text = item.thickness, width = cellWidthList[3], selected)
+                    TableTextBody(text = item.founder, width = cellWidthList[4], selected)
+                    TableTextBody(
+                        text = "" + item.createTime.dateFormat("yyyy-MM-dd"),
+                        width = cellWidthList[5], selected
+                    )
+                }
+            }
+
         }
-        itemsIndexed(entities) { index, item ->
-            val selected = item == entities[selectedIndex]
+
+        Box(
+            modifier = Modifier
+                .padding(top = 10.dp)
+                .fillMaxWidth()
+                .height(200.dp)
+                .background(Color(239, 239, 239))
+        ) {
             Row(
                 modifier = Modifier
-                    .background(if (selected) Color.Gray else Color.White)
-                    .clickable(onClick = {
-                        selectedIndex = index
-
-                    })
+                    .padding(top = 30.dp)
             ) {
-                TableText(text = "" + item.id, width = cellWidthList[0])
-                TableText(text = item.displayText, width = cellWidthList[1])
-                TableText(
-                    text = "" + item.startRange + "%~" + item.endRange + "%",
-                    width = cellWidthList[2]
-                )
-                TableText(text = item.thickness + "mm", width = cellWidthList[3])
-                TableText(text = item.founder, width = cellWidthList[4])
-                TableText(
-                    text = "" + item.createTime.dateFormat("yyyy-MM-dd"),
-                    width = cellWidthList[5]
-                )
-            }
-        }
-
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 850.dp)
-    ) {
-        Row {
-            Button(
-                modifier = Modifier
-                    .padding(start = 10.dp)
-                    .width(100.dp)
-                    .height(50.dp),
-                shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
-                onClick = {
-                    displayText = ""
-                    startRange_ex = "0.0"
-                    endRange_ex = "0.0"
-                    coagulant_ex = "0.0"
-                    volume_ex = "0.0"
-                    founder = ""
-                    showingDialog.value = true
-                    open.value = false
-                }
-            ) {
-                Text(text = "新    建", fontSize = 18.sp)
-            }
-
-            Button(
-                modifier = Modifier
-                    .padding(start = 20.dp)
-                    .width(100.dp)
-                    .height(50.dp),
-                shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
-                onClick = {
-                    if (entitiesList.size > 0) {
-                        val entity = entities[selectedIndex]
-                        if (entity != null) {
-                            displayText = entity.displayText
-                            startRange_ex = entity.startRange.toString()
-                            endRange_ex = entity.endRange.toString()
-                            coagulant_ex = entity.coagulant.toString()
-                            volume_ex = entity.volume.toString()
-                            thickness.value = entity.thickness
-                            founder = entity.founder
-                            showingDialog.value = true
-                            open.value = true
-                        }
+                Button(
+                    modifier = Modifier
+                        .padding(start = 25.dp)
+                        .width(90.dp)
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                    onClick = {
+                        displayText = ""
+                        startRange_ex = "0"
+                        endRange_ex = "0"
+                        coagulant_ex = "0"
+                        volume_ex = "0.0"
+                        founder = ""
+                        showingDialog.value = true
+                        open.value = false
                     }
-
+                ) {
+                    Text(text = "新 建", fontSize = 18.sp)
                 }
-            ) {
-                Text(text = "编    辑", fontSize = 18.sp)
-            }
 
-            Button(modifier = Modifier
-                .padding(start = 20.dp)
-                .width(100.dp)
-                .height(50.dp),
-                shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
-                onClick = {
-                    deleteDialog.value = true
-                }
-            ) {
-                Text(text = "删    除", fontSize = 18.sp)
-            }
-
-            Button(
-                modifier = Modifier
-                    .padding(start = 20.dp)
-                    .width(100.dp)
-                    .height(50.dp),
-                shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
-                onClick = {
-                    importDialog.value = true
-                }
-            ) {
-                Text(text = "导    入", fontSize = 18.sp)
-            }
-
-            Button(
-                modifier = Modifier
-                    .padding(start = 20.dp)
-                    .width(100.dp)
-                    .height(50.dp),
-                shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
-                onClick = {
-
-                    var path = getStoragePath(context, true)
-                    if (!"".equals(path)) {
-                        if (entitiesList.size > 0) {
+                Button(
+                    modifier = Modifier
+                        .padding(start = 15.dp)
+                        .width(90.dp)
+                        .height(50.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ),
+                    shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
+                    onClick = {
+                        if (entitiesList.isNotEmpty()) {
                             val entity = entities[selectedIndex]
                             if (entity != null) {
-                                File(path + "/zktony/test.txt").writeText(
-                                    "制胶程序:" + entity.displayText
-                                            + ",开始浓度:" + entity.startRange.toString()
-                                            + ",结束浓度:" + entity.endRange.toString()
-                                            + ",常用厚度:" + entity.thickness
-                                            + ",促凝剂体积:" + entity.coagulant.toString()
-                                            + ",胶液体积:" + entity.volume.toString()
-                                            + ",创建人:" + entity.founder
-                                            + ",日期：" + entity.createTime.dateFormat("yyyy-MM-dd")
-                                )
-                                Toast.makeText(
-                                    context,
-                                    "导出成功！",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                if (programId.value == entity.id) {
+                                    Toast.makeText(
+                                        context,
+                                        "已在制胶操作选中,不能编辑！",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    displayText = entity.displayText
+                                    startRange_ex = entity.startRange.toString()
+                                    endRange_ex = entity.endRange.toString()
+                                    coagulant_ex = entity.coagulant.toString()
+                                    volume_ex = entity.volume.toString()
+                                    thickness.value = entity.thickness
+                                    founder = entity.founder
+                                    showingDialog.value = true
+                                    open.value = true
+                                }
+
                             }
                         }
+
                     }
-
-
+                ) {
+                    Text(text = "编 辑", fontSize = 18.sp)
                 }
-            ) {
-                Text(text = "导    出", fontSize = 18.sp)
+
+                Button(modifier = Modifier
+                    .padding(start = 15.dp)
+                    .width(90.dp)
+                    .height(50.dp),
+                    enabled = selectedIndex !in 0..2,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ),
+                    shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
+                    onClick = {
+                        deleteDialog.value = true
+                    }
+                ) {
+                    Text(text = "删 除", fontSize = 18.sp)
+                }
+
+                Button(
+                    modifier = Modifier
+                        .padding(start = 15.dp)
+                        .width(90.dp)
+                        .height(50.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ),
+                    shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
+                    onClick = {
+                        importDialog.value = true
+                    }
+                ) {
+                    Text(text = "导 入", fontSize = 18.sp)
+                }
+
+                Button(
+                    modifier = Modifier
+                        .padding(start = 15.dp)
+                        .width(90.dp)
+                        .height(50.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ),
+                    shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
+                    onClick = {
+                        var path = getStoragePath(context, true)
+                        if ("" != path) {
+                            if (entitiesList.isNotEmpty()) {
+                                val entity = entities[selectedIndex]
+                                if (entity != null) {
+                                    try {
+
+
+                                        File(path + "/zktony/" + entity.displayText + ".txt").writeText(
+                                            "制胶程序:" + entity.displayText
+                                                    + ",开始浓度:" + entity.startRange.toString()
+                                                    + ",结束浓度:" + entity.endRange.toString()
+                                                    + ",常用厚度:" + entity.thickness
+                                                    + ",促凝剂体积:" + entity.coagulant.toString()
+                                                    + ",胶液体积:" + entity.volume.toString()
+                                                    + ",创建人:" + entity.founder
+                                                    + ",日期：" + entity.createTime.dateFormat("yyyy-MM-dd")
+                                        )
+                                        Toast.makeText(
+                                            context,
+                                            "导出成功！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } catch (e: IOException) {
+                                        Toast.makeText(
+                                            context,
+                                            "导出异常===${e.printStackTrace()}",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+
+                                }
+                            }
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "U盘不存在！",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+
+                    }
+                ) {
+                    Text(text = "导 出", fontSize = 18.sp)
+                }
             }
         }
+
+
     }
 
     //新建和打开弹窗
     if (showingDialog.value) {
         AlertDialog(
-            onDismissRequest = { showingDialog.value = false },
+            onDismissRequest = {
+            },
             text = {
 
                 LazyColumn(
@@ -388,8 +461,23 @@ fun ProgramList(
                     item {
                         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                             OutlinedTextField(value = displayText,
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(rgb(0, 105, 52)),
+                                    focusedLabelColor = Color(rgb(0, 105, 52)),
+                                    cursorColor = Color(rgb(0, 105, 52))
+                                ),
                                 label = { Text(text = "制胶名称") },
-                                onValueChange = { displayText = it })
+                                onValueChange = {
+                                    if (it.length > 7) {
+                                        Toast.makeText(
+                                            context,
+                                            "名称长度不能过长!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        displayText = it
+                                    }
+                                })
 
                         }
                     }
@@ -408,6 +496,11 @@ fun ProgramList(
                                 value = startRange_ex,
                                 label = { Text(text = "%") },
                                 onValueChange = { startRange_ex = it },
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(rgb(0, 105, 52)),
+                                    focusedLabelColor = Color(rgb(0, 105, 52)),
+                                    cursorColor = Color(rgb(0, 105, 52))
+                                ),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
                                     imeAction = ImeAction.Done,
@@ -424,6 +517,11 @@ fun ProgramList(
                             )
                             OutlinedTextField(
                                 modifier = Modifier.width(100.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(rgb(0, 105, 52)),
+                                    focusedLabelColor = Color(rgb(0, 105, 52)),
+                                    cursorColor = Color(rgb(0, 105, 52))
+                                ),
                                 value = endRange_ex,
                                 label = { Text(text = "%") },
                                 onValueChange = { endRange_ex = it },
@@ -441,7 +539,9 @@ fun ProgramList(
                     }
 
                     item {
-                        Row {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             Text(
                                 fontSize = 16.sp,
                                 text = "厚度："
@@ -449,12 +549,21 @@ fun ProgramList(
                             tags.forEach {
                                 Row {
                                     RadioButton(
+                                        colors = RadioButtonDefaults.colors(
+                                            Color(
+                                                android.graphics.Color.rgb(
+                                                    0,
+                                                    105,
+                                                    52
+                                                )
+                                            )
+                                        ),
                                         selected = it == thickness.value,
                                         onClick = {
                                             thickness.value = it
                                         }
                                     )
-                                    Text(text = it)
+                                    Text(modifier = Modifier.padding(top = 15.dp), text = it)
                                 }
 
                                 Spacer(modifier = Modifier.width(20.dp))
@@ -467,6 +576,11 @@ fun ProgramList(
                             OutlinedTextField(value = volume_ex,
                                 label = { Text(text = "胶液体积/mL") },
                                 onValueChange = { volume_ex = it },
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(rgb(0, 105, 52)),
+                                    focusedLabelColor = Color(rgb(0, 105, 52)),
+                                    cursorColor = Color(rgb(0, 105, 52))
+                                ),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
                                     imeAction = ImeAction.Done,
@@ -485,6 +599,11 @@ fun ProgramList(
                             OutlinedTextField(value = coagulant_ex,
                                 label = { Text(text = "促凝剂体积/μL") },
                                 onValueChange = { coagulant_ex = it },
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(rgb(0, 105, 52)),
+                                    focusedLabelColor = Color(rgb(0, 105, 52)),
+                                    cursorColor = Color(rgb(0, 105, 52))
+                                ),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
                                     imeAction = ImeAction.Done,
@@ -502,6 +621,11 @@ fun ProgramList(
                         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                             OutlinedTextField(value = founder,
                                 label = { Text(text = "创建人") },
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(rgb(0, 105, 52)),
+                                    focusedLabelColor = Color(rgb(0, 105, 52)),
+                                    cursorColor = Color(rgb(0, 105, 52))
+                                ),
                                 onValueChange = { founder = it })
 
                         }
@@ -512,109 +636,194 @@ fun ProgramList(
 
 
             }, confirmButton = {
-                TextButton(onClick = {
+                Button(
+                    modifier = Modifier.width(100.dp),
+                    enabled = !(open.value && selectedId in 1..3),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ),
+                    onClick = {
+                        try {
+                            if (open.value) {
+                                //打开
+                                val entity = entities[selectedIndex]
 
-                    if (open.value) {
-                        //打开
-                        val entity = entities[selectedIndex]
+                                var speChat =
+                                    "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？\\s]"
 
-                        var speChat =
-                            "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]"
+                                var nameRepeat = false
 
-                        var nameRepeat = false
+                                entitiesList.forEach {
+                                    if (displayText == it.displayText) {
+                                        if (entity != null) {
+                                            if (entity.displayText != displayText) {
+                                                nameRepeat = true
+                                            }
+                                        }
+                                    }
+                                }
 
-                        entitiesList.forEach {
-                            if (displayText == it.displayText) {
-                                if (entity != null) {
-                                    if (entity.displayText != displayText) {
+                                if (nameRepeat) {
+                                    Toast.makeText(
+                                        context,
+                                        "文件名不能重复！",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    if (Pattern.compile(speChat).matcher(displayText).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "文件名不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        if (startRange_ex.toInt() > endRange_ex.toInt()) {
+                                            Toast.makeText(
+                                                context,
+                                                "浓度范围不能由大到小",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else if (startRange_ex.toInt() < 3 || startRange_ex.toInt() > 30) {
+                                            Toast.makeText(
+                                                context,
+                                                "低浓度不能小于3或大于30",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else if (endRange_ex.toInt() < 3 || endRange_ex.toInt() > 30) {
+                                            Toast.makeText(
+                                                context,
+                                                "高浓度不能小于3或大于30",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else if (coagulant_ex.toInt() <= 0 || coagulant_ex.toInt() > 800) {
+                                            Toast.makeText(
+                                                context,
+                                                "促凝剂体积不能小于1或大于800",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else if (volume_ex.toDouble() <= 0 || volume_ex.toDouble() > 20) {
+                                            Toast.makeText(
+                                                context,
+                                                "胶液体积不能小于1或大于20",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else {
+                                            if (entity != null) {
+                                                entity.displayText = displayText
+                                                entity.startRange = startRange_ex.toInt()
+                                                entity.endRange = endRange_ex.toInt()
+                                                entity.thickness = thickness.value
+                                                entity.coagulant = coagulant_ex.toInt()
+                                                entity.volume = volume_ex.toDouble()
+                                                entity.founder = founder
+                                                dispatch(ProgramIntent.Update(entity))
+                                                showingDialog.value = false
+                                            }
+                                        }
+
+                                    }
+                                }
+
+
+                            } else {
+                                //新建
+                                var speChat =
+                                    "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？\\s]"
+
+                                var nameRepeat = false
+
+                                entitiesList.forEach {
+                                    if (displayText == it.displayText) {
                                         nameRepeat = true
                                     }
                                 }
-                            }
-                        }
 
-                        if (nameRepeat) {
-                            Toast.makeText(
-                                context,
-                                "文件名不能重复！",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        } else {
-                            if (Pattern.compile(speChat).matcher(displayText).find()) {
-                                Toast.makeText(
-                                    context,
-                                    "文件名不能包含特殊字符！",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                if (nameRepeat) {
+                                    Toast.makeText(
+                                        context,
+                                        "文件名不能重复！",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    if (Pattern.compile(speChat).matcher(displayText).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "文件名不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
 
-                            } else {
+                                    } else {
+                                        if (startRange_ex.toInt() > endRange_ex.toInt()) {
+                                            Toast.makeText(
+                                                context,
+                                                "浓度范围不能由大到小",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else if (startRange_ex.toInt() < 3 || startRange_ex.toInt() > 30) {
+                                            Toast.makeText(
+                                                context,
+                                                "低浓度不能小于3或大于30",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else if (endRange_ex.toInt() < 3 || endRange_ex.toInt() > 30) {
+                                            Toast.makeText(
+                                                context,
+                                                "高浓度不能小于3或大于30",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else if (coagulant_ex.toInt() <= 0 || coagulant_ex.toInt() > 800) {
+                                            Toast.makeText(
+                                                context,
+                                                "促凝剂体积不能小于1或大于800",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else if (volume_ex.toDouble() <= 0 || volume_ex.toDouble() > 20) {
+                                            Toast.makeText(
+                                                context,
+                                                "胶液体积不能小于1或大于20",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else {
+                                            dispatch(
+                                                ProgramIntent.Insert(
+                                                    displayText,
+                                                    startRange_ex.toInt(),
+                                                    endRange_ex.toInt(),
+                                                    thickness.value,
+                                                    coagulant_ex.toInt(),
+                                                    volume_ex.toDouble(),
+                                                    founder
+                                                )
+                                            )
+                                            showingDialog.value = false
+                                        }
 
-                                if (entity != null) {
-                                    entity.displayText = displayText
-                                    entity.startRange = startRange_ex.toDouble()
-                                    entity.endRange = endRange_ex.toDouble()
-                                    entity.thickness = thickness.value
-                                    entity.coagulant = coagulant_ex.toDouble()
-                                    entity.volume = volume_ex.toDouble()
-                                    entity.founder = founder
-                                    dispatch(ProgramIntent.Update(entity))
-                                    showingDialog.value = false
+                                    }
+
                                 }
                             }
-                        }
-
-
-                    } else {
-                        //新建
-                        var speChat =
-                            "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]"
-
-                        var nameRepeat = false
-
-                        entitiesList.forEach {
-                            if (displayText == it.displayText) {
-                                nameRepeat = true
-                            }
-                        }
-
-                        if (nameRepeat) {
+                        } catch (e: Exception) {
                             Toast.makeText(
                                 context,
-                                "文件名不能重复！",
+                                "数据异常！",
                                 Toast.LENGTH_SHORT
                             ).show()
-                        } else {
-                            if (Pattern.compile(speChat).matcher(displayText).find()) {
-                                Toast.makeText(
-                                    context,
-                                    "文件名不能包含特殊字符！",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-
-                            } else {
-                                dispatch(
-                                    ProgramIntent.Insert(
-                                        displayText,
-                                        startRange_ex.toDouble(),
-                                        endRange_ex.toDouble(),
-                                        thickness.value,
-                                        coagulant_ex.toDouble(),
-                                        volume_ex.toDouble(),
-                                        founder
-                                    )
-                                )
-                                showingDialog.value = false
-                            }
-
+                        } finally {
+                            thickness.value = "1.0"
                         }
-                    }
 
 
-                }) {
+                    }) {
                     Text(text = "确认")
                 }
             }, dismissButton = {
-                TextButton(onClick = { showingDialog.value = false }) {
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = {
+                        thickness.value = "1.0"
+                        showingDialog.value = false
+                    }) {
                     Text(text = "取消")
                 }
             })
@@ -631,19 +840,46 @@ fun ProgramList(
             text = {
 
             }, confirmButton = {
-                TextButton(onClick = {
-                    if (entitiesList.size > 0) {
-                        val entity = entities[selectedIndex]
-                        if (entity != null) {
-                            dispatch(ProgramIntent.Delete(entity.id))
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = {
+                        Log.d(
+                            "Test",
+                            "删除选中的selectedIndex===$selectedIndex"
+                        )
+                        if (entitiesList.size > 0) {
+                            val entity = entities[selectedIndex]
+                            Log.d(
+                                "Test",
+                                "删除选中的entity===$entity==="
+                            )
+                            if (entity != null) {
+                                if (programId.value == entity.id) {
+                                    Toast.makeText(
+                                        context,
+                                        "已在制胶操作选中,不能删除！",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    if (selectedIndex > 0) {
+                                        selectedIndex -= 1
+                                    }
+                                    dispatch(ProgramIntent.Delete(entity.id))
+                                    deleteDialog.value = false
+                                }
+
+                            }
+
                         }
-                        deleteDialog.value = false
-                    }
-                }) {
+                    }) {
                     Text(text = "确认")
                 }
             }, dismissButton = {
-                TextButton(onClick = { deleteDialog.value = false }) {
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = { deleteDialog.value = false }) {
                     Text(text = "取消")
                 }
             })
@@ -655,99 +891,153 @@ fun ProgramList(
         AlertDialog(
             onDismissRequest = { importDialog.value = false },
             text = {
-                Text(text = "导入格式为(制胶名称:test,开始浓度:20,结束浓度:40....)以此类推,一行是一个制胶程序！")
+                Column {
+                    Text(text = "导入zktony文件夹下的program.txt文件")
+                    Text(text = "导入格式为:")
+                    Text(text = "(制胶程序名称:test,开始浓度:4,结束浓度:20,厚度:1.5,促凝剂体积:75,胶液体积:9.5,创建人:)")
+                    Text(text = "以此类推,一行是一个制胶程序！")
+                }
             }, confirmButton = {
-                TextButton(onClick = {
+                Button(
+                    modifier = Modifier.width(120.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = {
 
-                    //获取usb地址
-                    var path = getStoragePath(context, true)
-                    println("path========" + path)
-                    if (!"".equals(path)) {
+                        //获取usb地址
+                        var path = getStoragePath(context, true)
+                        if (!"".equals(path)) {
 
-                        //获取文件列表
-//                        var fileList = File(path + "/zktony")
-//                        var files = fileList.listFiles()
-//                        files.forEach { file ->
-//                            run {
-//                                println("files========" + file.name)
-//                            }
-//                        }
-                        try {
-                            var textList = ArrayList<String>()
+                            try {
+                                var speChat =
+                                    "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？\\s]"
 
-                            //读取文件内容
-                            val content = File(path + "/zktony/test.txt").readText()
-                            println("content========" + content)
-                            var contents = content.split(",")
-                            contents.forEach {
-                                val entityy = it.split(":").get(1)
-                                textList.add(entityy)
-                            }
-                            println("textList====" + textList)
+                                var nameRepeat = false
 
-                            //新建
-                            var speChat =
-                                "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]"
+                                File("$path/zktony/program.txt").bufferedReader()
+                                    .useLines { lines ->
+                                        for (line in lines) {
+                                            if (line.isNotEmpty()) {
+                                                var textList = ArrayList<String>()
+                                                var contents = line.split(",")
+                                                contents.forEach {
+                                                    val byte = it.split(":").get(1)
+                                                    textList.add(byte)
+                                                }
 
-                            var nameRepeat = false
+                                                entitiesList.forEach {
+                                                    if (textList.get(0) == it.displayText) {
+                                                        nameRepeat = true
+                                                    }
+                                                }
 
-                            entitiesList.forEach {
-                                if (textList.get(0) == it.displayText) {
-                                    nameRepeat = true
-                                }
-                            }
+                                                if (nameRepeat) {
+                                                    Toast.makeText(
+                                                        context,
+                                                        "文件名不能重复！",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                } else {
+                                                    if (Pattern.compile(speChat)
+                                                            .matcher(textList.get(0)).find()
+                                                    ) {
+                                                        Toast.makeText(
+                                                            context,
+                                                            "文件名不能包含特殊字符！",
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
 
-                            if (nameRepeat) {
+                                                    } else {
+
+                                                        if (textList.get(1)
+                                                                .toInt() > textList.get(2)
+                                                                .toInt()
+                                                        ) {
+                                                            Toast.makeText(
+                                                                context,
+                                                                "浓度范围不能由大到小",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                        } else if (textList.get(1)
+                                                                .toInt() < 3 || textList.get(1)
+                                                                .toInt() > 30
+                                                        ) {
+                                                            Toast.makeText(
+                                                                context,
+                                                                "低浓度不能小于3或大于30",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                        } else if (textList.get(2)
+                                                                .toInt() < 3 || textList.get(2)
+                                                                .toInt() > 30
+                                                        ) {
+                                                            Toast.makeText(
+                                                                context,
+                                                                "高浓度不能小于3或大于30",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                        } else if (textList.get(4)
+                                                                .toInt() <= 0 || textList.get(4)
+                                                                .toInt() > 800
+                                                        ) {
+                                                            Toast.makeText(
+                                                                context,
+                                                                "促凝剂体积不能小于1或大于800",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                        } else if (textList.get(5)
+                                                                .toDouble() <= 0 || textList.get(
+                                                                5
+                                                            ).toDouble() > 20
+                                                        ) {
+                                                            Toast.makeText(
+                                                                context,
+                                                                "胶液体积不能小于1或大于20",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                        } else {
+                                                            dispatch(
+                                                                ProgramIntent.Insert(
+                                                                    textList.get(0),
+                                                                    textList.get(1).toInt(),
+                                                                    textList.get(2).toInt(),
+                                                                    textList.get(3),
+                                                                    textList.get(4).toInt(),
+                                                                    textList.get(5).toDouble(),
+                                                                    textList.get(6)
+                                                                )
+                                                            )
+                                                            showingDialog.value = false
+                                                        }
+                                                    }
+
+                                                }
+
+                                            }
+                                        }
+
+                                    }
+
+                                importDialog.value = false
+                            } catch (e: Exception) {
                                 Toast.makeText(
                                     context,
-                                    "文件名不能重复！",
+                                    "数据有误===${e.printStackTrace()}",
                                     Toast.LENGTH_SHORT
                                 ).show()
-                            } else {
-                                if (Pattern.compile(speChat).matcher(textList.get(0)).find()) {
-                                    Toast.makeText(
-                                        context,
-                                        "文件名不能包含特殊字符！",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-
-                                } else {
-                                    dispatch(
-                                        ProgramIntent.Insert(
-                                            textList.get(0),
-                                            textList.get(1).toDouble(),
-                                            textList.get(2).toDouble(),
-                                            textList.get(3),
-                                            textList.get(4).toDouble(),
-                                            textList.get(5).toDouble(),
-                                            textList.get(6)
-                                        )
-                                    )
-                                    showingDialog.value = false
-                                }
-
                             }
 
 
-
-                            importDialog.value = false
-                        } catch (exception: Exception) {
-                            Toast.makeText(
-                                context,
-                                "数据有误！",
-                                Toast.LENGTH_SHORT
-                            ).show()
                         }
 
 
-                    }
-
-
-                }) {
+                    }) {
                     Text(text = "开始导入")
                 }
             }, dismissButton = {
-                TextButton(onClick = { importDialog.value = false }) {
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = { importDialog.value = false }) {
                     Text(text = "取消")
                 }
             })
@@ -781,161 +1071,25 @@ private fun getStoragePath(context: Context, isUsb: Boolean): String? {
             if (isUsb == usb) { //usb
                 assert(file != null)
                 path = file.getAbsolutePath()
-                println("usb的path=====" + path)
+                Log.d(
+                    "Progarm",
+                    "usb的path=====$path"
+                )
             } else if (!isUsb == sd) { //sd
                 assert(file != null)
                 path = file.getAbsolutePath()
-                println("sd的path=====" + path)
             }
         }
     } catch (e: Exception) {
+        Log.d(
+            "Progarm",
+            "获取usb地址异常=====" + e.printStackTrace()
+        )
         e.printStackTrace()
     }
+    Log.d(
+        "Progarm",
+        "usb的path===未获取到==$path"
+    )
     return path
 }
-
-
-@Composable
-fun ProgramDetail(
-    entities: List<Program>,
-    selected: Long,
-    dispatch: (ProgramIntent) -> Unit
-) {
-}
-//) {
-//    val scope = rememberCoroutineScope()
-//    val program = entities.find { it.id == selected } ?: Program()
-//    val maxAbscissa by rememberDataSaverState(key = Constants.ZT_0001, initialValue = 0.0)
-//    val maxOrdinate by rememberDataSaverState(key = Constants.ZT_0002, initialValue = 0.0)
-//    var colloid by remember { mutableStateOf(program.dosage.colloid.format(1)) }
-//    var coagulant by remember { mutableStateOf(program.dosage.coagulant.format(1)) }
-//    var preColloid by remember { mutableStateOf(program.dosage.preColloid.format(1)) }
-//    var preCoagulant by remember { mutableStateOf(program.dosage.preCoagulant.format(1)) }
-//    var glueSpeed by remember { mutableStateOf(program.speed.glue.format(1)) }
-//    var preSpeed by remember { mutableStateOf(program.speed.pre.format(1)) }
-//
-//    LazyColumn(
-//        modifier = Modifier
-//            .padding(16.dp)
-//            .imePadding(),
-//        verticalArrangement = Arrangement.spacedBy(16.dp),
-//        contentPadding = PaddingValues(16.dp),
-//    ) {
-//        item {
-//            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-//                CircleTextField(
-//                    modifier = Modifier.weight(1f),
-//                    title = "制胶/促凝剂 μL",
-//                    value = coagulant,
-//                    onValueChange = {
-//                        scope.launch {
-//                            coagulant = it
-//                            val dosage =
-//                                program.dosage.copy(coagulant = it.toDoubleOrNull() ?: 0.0)
-//                            dispatch(ProgramIntent.Update(program.copy(dosage = dosage)))
-//                        }
-//                    }
-//                )
-//                CircleTextField(
-//                    modifier = Modifier.weight(1f),
-//                    title = "制胶/胶体 μL",
-//                    value = colloid,
-//                    onValueChange = {
-//                        scope.launch {
-//                            colloid = it
-//                            val dosage =
-//                                program.dosage.copy(colloid = it.toDoubleOrNull() ?: 0.0)
-//                            dispatch(ProgramIntent.Update(program.copy(dosage = dosage)))
-//                        }
-//                    }
-//                )
-//            }
-//        }
-//        item {
-//            CircleTextField(
-//                title = "制胶/速度",
-//                value = glueSpeed,
-//                onValueChange = {
-//                    scope.launch {
-//                        glueSpeed = it
-//                        val speed =
-//                            program.speed.copy(glue = it.toDoubleOrNull() ?: 0.0)
-//                        dispatch(ProgramIntent.Update(program.copy(speed = speed)))
-//                    }
-//                }
-//            )
-//        }
-//        item {
-//            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-//                CircleTextField(
-//                    modifier = Modifier.weight(1f),
-//                    title = "预排/促凝剂 μL",
-//                    value = preCoagulant,
-//                    onValueChange = {
-//                        scope.launch {
-//                            preCoagulant = it
-//                            val dosage =
-//                                program.dosage.copy(preCoagulant = it.toDoubleOrNull() ?: 0.0)
-//                            dispatch(ProgramIntent.Update(program.copy(dosage = dosage)))
-//                        }
-//                    }
-//                )
-//                CircleTextField(
-//                    modifier = Modifier.weight(1f),
-//                    title = "预排/胶体 μL",
-//                    value = preColloid,
-//                    onValueChange = {
-//                        scope.launch {
-//                            preColloid = it
-//                            val dosage =
-//                                program.dosage.copy(preColloid = it.toDoubleOrNull() ?: 0.0)
-//                            dispatch(ProgramIntent.Update(program.copy(dosage = dosage)))
-//                        }
-//                    }
-//                )
-//            }
-//        }
-//        item {
-//            CircleTextField(
-//                title = "预排/速度",
-//                value = preSpeed,
-//                onValueChange = {
-//                    scope.launch {
-//                        preSpeed = it
-//                        val speed =
-//                            program.speed.copy(pre = it.toDoubleOrNull() ?: 0.0)
-//                        dispatch(ProgramIntent.Update(program.copy(speed = speed)))
-//                    }
-//                }
-//            )
-//        }
-//        item {
-//            CoordinateInput(
-//                modifier = Modifier.fillMaxWidth(),
-//                title = "位置",
-//                point = program.point,
-//                limit = Point(maxAbscissa, maxOrdinate),
-//                onCoordinateChange = {
-//                    scope.launch {
-//                        dispatch(ProgramIntent.Update(program.copy(point = it)))
-//                    }
-//                }
-//            ) {
-//                scope.launch {
-//                    start {
-//                        timeOut = 1000L * 60L
-//                        with(index = 1, pdv = 0.0)
-//                    }
-//                    start {
-//                        timeOut = 1000L * 60L
-//                        with(index = 0, pdv = program.point.x)
-//                    }
-//                    start {
-//                        timeOut = 1000L * 60L
-//                        with(index = 1, pdv = program.point.y)
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}

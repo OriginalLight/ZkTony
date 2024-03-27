@@ -19,10 +19,18 @@ abstract class ExperimentRecordDao : BaseDao<ExperimentRecord> {
     )
     abstract fun getAll(): Flow<List<ExperimentRecord>>
 
+
     @Query(
         """
         SELECT * FROM ExperimentRecord
-        ORDER BY createTime ASC
+        """
+    )
+    abstract fun getList(): List<ExperimentRecord>
+
+    @Query(
+        """
+        SELECT * FROM ExperimentRecord
+        ORDER BY id DESC
         """
     )
     abstract fun getByPage(): PagingSource<Int, ExperimentRecord>
@@ -42,4 +50,11 @@ abstract class ExperimentRecordDao : BaseDao<ExperimentRecord> {
         """
     )
     abstract suspend fun deleteById(id: Long)
+
+    @Query(
+        """
+        DELETE FROM ExperimentRecord
+        """
+    )
+    abstract suspend fun deleteByAll()
 }

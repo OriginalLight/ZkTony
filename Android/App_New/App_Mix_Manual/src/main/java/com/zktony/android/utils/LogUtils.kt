@@ -1,6 +1,8 @@
 package com.zktony.android.utils
 
 import android.util.Log
+import com.zktony.android.BuildConfig
+
 //import com.zktony.android.BuildConfig
 
 /**
@@ -15,7 +17,7 @@ object LogUtils {
     const val W = 3
     const val E = 4
 
-//    val show = BuildConfig.DEBUG
+    val show = BuildConfig.DEBUG
 
     fun logV(tag: String = TAG, message: String) =
         log(V, tag, message)

@@ -67,10 +67,10 @@ sealed class ProgramIntent {
     data class Selected(val id: Long) : ProgramIntent()
     data class Insert(
         val name: String,
-        val startRange: Double,
-        val endRange: Double,
+        val startRange: Int,
+        val endRange: Int,
         val thickness: String,
-        val coagulant: Double,
+        val coagulant: Int,
         val volume: Double,
         val founder: String
     ) : ProgramIntent()

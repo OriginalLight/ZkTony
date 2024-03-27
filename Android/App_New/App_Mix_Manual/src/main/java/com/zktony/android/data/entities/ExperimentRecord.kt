@@ -26,12 +26,12 @@ data class ExperimentRecord(
     /**
      * 开始浓度
      */
-    var startRange: Double = 0.0,
+    var startRange: Int = 0,
 
     /**
      * 结束浓度
      */
-    var endRange: Double = 0.0,
+    var endRange: Int = 0,
 
     /**
      * 常用厚度
@@ -42,7 +42,7 @@ data class ExperimentRecord(
     /**
      * 促凝剂体积
      */
-    var coagulant: Double = 0.0,
+    var coagulant: Int = 0,
 
     /**
      * 胶液体积

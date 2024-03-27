@@ -22,7 +22,7 @@ abstract class ProgramDao : BaseDao<Program> {
     @Query(
         """
         SELECT * FROM program
-        ORDER BY createTime ASC
+        ORDER BY id ASC
         """
     )
     abstract fun getByPage(): PagingSource<Int, Program>
@@ -42,4 +42,13 @@ abstract class ProgramDao : BaseDao<Program> {
         """
     )
     abstract suspend fun deleteById(id: Long)
+
+
+    @Query(
+        """
+        DELETE FROM program
+        WHERE id != 1 AND id != 2 AND id != 3
+        """
+    )
+    abstract suspend fun deleteByAll()
 }

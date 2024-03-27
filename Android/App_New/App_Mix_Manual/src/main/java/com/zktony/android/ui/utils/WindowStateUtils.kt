@@ -9,6 +9,7 @@ object PageType {
     const val EXPERIMENTRECORDS=11
     const val SETTINGS = 5
     const val DEBUGMODE = 12
+    const val SPORTSLOG = 13
 
 
 

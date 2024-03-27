@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 class ServiceObserver @Inject constructor(
     private val s1: CalibrationService,
-    private val s2: MotorService
+    private val s2: MotorService,
 ) : LifecycleEventObserver {
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {

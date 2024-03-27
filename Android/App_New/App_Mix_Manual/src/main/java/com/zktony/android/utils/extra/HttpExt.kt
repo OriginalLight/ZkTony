@@ -3,6 +3,7 @@ package com.zktony.android.utils.extra
 import androidx.annotation.Keep
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.zktony.android.BuildConfig
 //import com.zktony.android.BuildConfig
 import com.zktony.android.utils.Constants
 import okhttp3.*
@@ -32,7 +33,7 @@ fun httpCall(
                     val resp = response.body.string()
                     val type = object : TypeToken<List<Application>>() {}.type
                     val list = Gson().fromJson<List<Application>>(resp, type)
-//                    callback(list.find { app -> app.applicationId == BuildConfig.APPLICATION_ID })
+                    callback(list.find { app -> app.applicationId == BuildConfig.APPLICATION_ID })
                 } catch (ex: Exception) {
                     ex.printStackTrace()
                     exception(ex)

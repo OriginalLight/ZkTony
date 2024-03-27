@@ -1,5 +1,6 @@
 package com.zktony.android.utils.internal
 
+import android.util.Log
 import com.zktony.android.data.entities.Motor
 import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.SerialPortUtils
@@ -24,19 +25,19 @@ class StartBuilder {
         ads: Triple<Long, Long, Long>? = null
     ) {
         val step = SerialPortUtils.pulse(index, pdv)
-        println("index===$index====step===$step")
+        Log.d("", "index===$index====step===$step")
         if (step != 0L) {
             val ba1 = ByteArray(5)
             val ba2 = ByteArray(12)
             ba1.writeInt8(index, 0).writeInt32LE(step, 1)
             if (ads == null) {
                 val motor = AppStateUtils.hpm[index] ?: Motor(displayText = "None")
-                ba2.writeInt32LE(motor.acceleration * 20, 0)
-                    .writeInt32LE(motor.deceleration * 20, 4)
-                    .writeInt32LE(motor.speed * 20, 8)
+                ba2.writeInt32LE(motor.acceleration, 0)
+                    .writeInt32LE(motor.deceleration, 4)
+                    .writeInt32LE(motor.speed, 8)
             } else {
-                ba2.writeInt32LE(ads.first * 20, 0).writeInt32LE(ads.second * 20, 4)
-                    .writeInt32LE(ads.third * 20, 8)
+                ba2.writeInt32LE(ads.first, 0).writeInt32LE(ads.second, 4)
+                    .writeInt32LE(ads.third, 8)
             }
             byteList.addAll(ba1.toList())
             byteList.addAll(ba2.toList())

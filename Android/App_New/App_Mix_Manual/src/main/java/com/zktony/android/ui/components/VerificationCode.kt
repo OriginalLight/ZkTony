@@ -102,7 +102,7 @@ fun VerificationCodeField(
             onValueChange = {
                 content = it
                 if (it.length == digits) {
-                    if (it == deviceAdminPwd.value || it == "234567" || it == "345678") {
+                    if (it == deviceAdminPwd.value || it == "922042" || it == "240229") {
                         // Invoke the input callback when the verification code is entered
                         inputCallback(it)
                         keyboardController?.hide()

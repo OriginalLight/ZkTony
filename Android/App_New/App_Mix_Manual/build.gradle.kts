@@ -12,8 +12,8 @@ android {
         applicationId = "com.zktony.android"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -53,6 +53,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     composeOptions {
@@ -81,7 +82,7 @@ android {
     applicationVariants.all {
         outputs.all {
             (this as? com.android.build.gradle.internal.api.ApkVariantOutputImpl)?.outputFileName =
-                "zktony-mix-${versionName}-${name}.apk"
+                "zktony-manual-${versionName}-${name}.apk"
         }
     }
 
@@ -92,6 +93,7 @@ android {
 }
 
 dependencies {
+    implementation("org.jetbrains:annotations:15.0")
     val composeBom = platform(libs.androidx.compose.bom)
 
     ksp(libs.androidx.room.compiler)

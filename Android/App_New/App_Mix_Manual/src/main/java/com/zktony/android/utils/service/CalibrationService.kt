@@ -1,12 +1,28 @@
 package com.zktony.android.utils.service
 
+import android.util.Log
 import com.zktony.android.data.dao.CalibrationDao
+import com.zktony.android.data.dao.ExpectedDao
+import com.zktony.android.data.dao.ExperimentRecordDao
+import com.zktony.android.data.dao.NewCalibrationDao
+import com.zktony.android.data.dao.SettingDao
+import com.zktony.android.data.dao.SportsLogDao
 import com.zktony.android.data.datastore.DataSaverDataStore
+import com.zktony.android.data.entities.Expected
+import com.zktony.android.data.entities.NewCalibration
+import com.zktony.android.data.entities.Setting
+import com.zktony.android.ui.EPStatus
 import com.zktony.android.utils.AlgorithmUtils.calculateCalibrationFactor
 import com.zktony.android.utils.AlgorithmUtils.calculateCalibrationFactorNew
 import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.AppStateUtils.hpc
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
 import javax.inject.Inject
 
 /**
@@ -14,49 +30,142 @@ import javax.inject.Inject
  * @date 2023/9/1 10:29
  */
 class CalibrationService @Inject constructor(
-    private val dataStore: DataSaverDataStore
+    private val dataStore: DataSaverDataStore,
+    private val ncDao: NewCalibrationDao,
+    private val slDao: SettingDao,
+    private val sportsLogDao: SportsLogDao,
+    private val expectedDao: ExpectedDao,
+    private val erDao: ExperimentRecordDao,
 ) : AbstractService() {
     override fun create() {
+        job = scope.launch {
 
-        val higeLiquidVolume1 = dataStore.readData("higeLiquidVolume1", 0.0)
-        val higeLiquidVolume2 = dataStore.readData("higeLiquidVolume2", 0.0)
-        val higeLiquidVolume3 = dataStore.readData("higeLiquidVolume3", 0.0)
+            val calendar = Calendar.getInstance() // 创建一个 Calendar 对象表示当前时间
 
-        val lowLiquidVolume1 = dataStore.readData("lowLiquidVolume1", 0.0)
-        val lowLiquidVolume2 = dataStore.readData("lowLiquidVolume2", 0.0)
-        val lowLiquidVolume3 = dataStore.readData("lowLiquidVolume3", 0.0)
+            calendar.add(Calendar.DAY_OF_MONTH, -3) // 将日期向前调整三天
 
-        val rinseLiquidVolume1 = dataStore.readData("rinseLiquidVolume1", 0.0)
-        val rinseLiquidVolume2 = dataStore.readData("rinseLiquidVolume2", 0.0)
-        val rinseLiquidVolume3 = dataStore.readData("rinseLiquidVolume3", 0.0)
+            val year = calendar[Calendar.YEAR] // 年份
+            val month = calendar[Calendar.MONTH] + 1 // 月份（注意需要加上1）
+            val dayOfMonth = calendar[Calendar.DAY_OF_MONTH] // 日期
 
-        val coagulantLiquidVolume1 = dataStore.readData("coagulantLiquidVolume1", 0.0)
-        val coagulantLiquidVolume2 = dataStore.readData("coagulantLiquidVolume2", 0.0)
-        val coagulantLiquidVolume3 = dataStore.readData("coagulantLiquidVolume3", 0.0)
+            val date = "$year-$month-$dayOfMonth"
 
-        val coagulantpulse = dataStore.readData("coagulantpulse", 67500)
+            val format = SimpleDateFormat("yyyy-MM-dd")
+            val date1 = format.parse(date)
 
-        val higeAvg = (higeLiquidVolume1 + higeLiquidVolume2 + higeLiquidVolume3) / 3
-        val lowAvg = (lowLiquidVolume1 + lowLiquidVolume2 + lowLiquidVolume3) / 3
-        val rinseAvg = (rinseLiquidVolume1 + rinseLiquidVolume2 + rinseLiquidVolume3) / 3
-        var coagulantAvg =
-            (coagulantLiquidVolume1 + coagulantLiquidVolume1 + coagulantLiquidVolume1) / 3
+            sportsLogDao.deleteByDate(date1)
+            val erAll = erDao.getList()
 
-        if (coagulantAvg == 0.0) coagulantAvg = 1.0
-        if (higeAvg == 0.0) coagulantAvg = 5.0
-        if (lowAvg == 0.0) coagulantAvg = 5.0
-        if (rinseAvg == 0.0) coagulantAvg = 5.0
+            Log.d(
+                "experimentRecord",
+                "=========experimentRecord========${erAll.size}"
+            )
+            if (erAll.isNotEmpty()) {
+                erAll.forEach {
+                    Log.d(
+                        "experimentRecord",
+                        "=========experimentRecord========$it"
+                    )
+                    if (it.status == EPStatus.RUNNING) {
+                        it.status = EPStatus.ABORT
+                        erDao.update(it)
+                    }
+                }
+            }
 
-        hpc[0] = calculateCalibrationFactorNew(64000, 10.toDouble())
+            val coagulantpulse = dataStore.readData("coagulantpulse", 550000)
 
-        hpc[1] = calculateCalibrationFactorNew(coagulantpulse, coagulantAvg * 1000)
+            var newCalibrations = ncDao.getById(1L)
+            newCalibrations.collect { newCalibration ->
+                Log.d(
+                    "CalibrationService",
+                    "newCalibration=========$newCalibration"
+                )
 
-        hpc[2] = calculateCalibrationFactorNew(64000, higeAvg * 1000)
+                if (newCalibration != null) {
+                    Log.d(
+                        "CalibrationService",
+                        "newCalibration.higeAvg=========" + newCalibration.higeAvg
+                    )
 
-        hpc[3] = calculateCalibrationFactorNew(64000, lowAvg * 1000)
+                    Log.d(
+                        "CalibrationService",
+                        "newCalibration.lowAvg=========" + newCalibration.lowAvg
+                    )
 
-        hpc[4] = calculateCalibrationFactorNew(64000, rinseAvg * 1000)
+                    Log.d(
+                        "CalibrationService",
+                        "newCalibration.rinseAvg=========" + newCalibration.rinseAvg
+                    )
+
+                    Log.d(
+                        "CalibrationService",
+                        "newCalibration.coagulantAvg=========" + newCalibration.coagulantAvg
+                    )
+                    hpc[0] = calculateCalibrationFactorNew(64000, 120.0)
+                    if (newCalibration.coagulantAvg == 0.0) {
+                        hpc[1] = calculateCalibrationFactorNew(coagulantpulse, 1.0 * 1000)
+                    } else {
+                        hpc[1] = calculateCalibrationFactorNew(
+                            coagulantpulse,
+                            newCalibration.coagulantAvg * 1000
+                        )
+                    }
+                    if (newCalibration.higeAvg == 0.0) {
+                        hpc[2] = calculateCalibrationFactorNew(51200 * 50, 5.0 * 1000)
+                    } else {
+                        hpc[2] =
+                            calculateCalibrationFactorNew(51200 * 50, newCalibration.higeAvg * 1000)
+                    }
+                    if (newCalibration.lowAvg == 0.0) {
+                        hpc[3] = calculateCalibrationFactorNew(51200 * 50, 5.0 * 1000)
+                    } else {
+                        hpc[3] =
+                            calculateCalibrationFactorNew(51200 * 50, newCalibration.lowAvg * 1000)
+
+                    }
+                    if (newCalibration.rinseAvg == 0.0) {
+                        hpc[4] = calculateCalibrationFactorNew(3200 * 50, 5.0 * 1000)
+                    } else {
+                        hpc[4] =
+                            calculateCalibrationFactorNew(3200 * 50, newCalibration.rinseAvg * 1000)
+
+                    }
 
 
+                } else {
+                    Log.d(
+                        "CalibrationService",
+                        "=========插入默认校准数据========"
+                    )
+                    ncDao.insert(
+                        NewCalibration(
+                            1, 1.6, 1.6, 1.6,
+                            1.6, 1.6, 1.6, 1.6,
+                            1.6, 1.0, 1.0, 1.0,
+                            1.0, 1.6, 1.6, 1.6, 1.6
+                        )
+                    )
+                    Log.d(
+                        "CalibrationService",
+                        "=========插入默认校准数据完成....插入默认设置数据开始========"
+                    )
+                    slDao.insert(
+                        Setting(
+                            1, 0.0, 0.0, 0.0, 500.0, 500.0, 500.0, 0.0, 0.0, 5.0, 1.0, 3.0,
+                            5.0, 3.0, 5.0, 3.0, 5.0, 3.0
+                        )
+                    )
+
+                    expectedDao.insert(Expected())
+
+                    Log.d(
+                        "CalibrationService",
+                        "=========插入默认设置数据完成========"
+                    )
+                }
+            }
+
+        }
     }
 }
