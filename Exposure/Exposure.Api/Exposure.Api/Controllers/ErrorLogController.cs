@@ -12,10 +12,10 @@ namespace Exposure.Api.Controllers;
 [Route("[controller]")]
 public class ErrorLogController(
     ILogger<ErrorLogController> logger,
-    IUsbService usb, 
-    IErrorLogService errorLog, 
+    IUsbService usb,
+    IErrorLogService errorLog,
     IOperLogService operLog
-    ) : ControllerBase
+) : ControllerBase
 {
     #region 分页查询
 

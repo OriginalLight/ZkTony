@@ -37,7 +37,7 @@ public class CameraService(
 
             var arr = Nncam.EnumV2();
             if (arr.Length == 0) throw new Exception("未找到设备");
-
+ 
             // 打开设备
             _nncam = Nncam.Open(arr[0].id);
             if (_nncam == null) throw new Exception("打开设备失败");
@@ -56,8 +56,6 @@ public class CameraService(
         {
             _nncam?.Close();
             _nncam = null;
-            serialPort.WritePort("Com1", DefaultProtocol.LedRed().ToBytes());
-            serialPort.SetFlag("led", 5);
             throw;
         }
     }
@@ -610,40 +608,68 @@ public class CameraService(
         await Task.Delay((int)(time * 1000 + 1000), ctsToken);
         if (_mat == null) throw new Exception("获取采样图失败");
         var snr = CalculateSnr(_mat, time);
+        var percentage = CalculatePercentage(_mat, 10, 255);
         _mat = null;
 
         if (Math.Abs(time - 0.1) < 0.1)
-            return snr switch
+        {
+            return percentage switch
             {
-                <= -10 => GetScale(-50, -10, 1000000, 3000000, snr),
-                > -10 => await CalculateExpo(1, ctsToken),
-                _ => 1000000
+                <= 0.05 => snr switch
+                {
+                    <= -10 => GetScale(-50, -10, 1000000, 3000000, snr),
+                    > -10 => await CalculateExpo(1, ctsToken),
+                    _ => 1000000
+                },
+                <= 0.1 => GetScale(0.05, 0.1, 5000000, 10000000, percentage),
+                <= 0.5 => GetScale(0.1, 0.5, 2000000, 5000000, percentage),
+                _ => GetScale(0.5, 1, 100000, 2000000, percentage)
             };
+        }
+
+
 
         if (Math.Abs(time - 1) < 0.1)
-            return snr switch
+        {
+            return percentage switch
             {
-                <= -15 => GetScale(-50, -15, 2000000, 3000000, snr),
-                <= 0 => GetScale(-15, 0, 3000000, 10000000, snr),
-                <= 1 => GetScale(0, 1, 10000000, 14000000, snr),
-                <= 1.5 => GetScale(1, 1.5, 14000000, 20000000, snr),
-                <= 2 => GetScale(1.5, 2, 20000000, 30000000, snr),
-                > 2 => await CalculateExpo(5, ctsToken),
-                _ => 2000000
+                <= 0.05 => snr switch
+                {
+                    <= -15 => GetScale(-50, -15, 2000000, 3000000, snr),
+                    <= 0 => GetScale(-15, 0, 3000000, 10000000, snr),
+                    <= 1 => GetScale(0, 1, 10000000, 14000000, snr),
+                    <= 1.5 => GetScale(1, 1.5, 14000000, 20000000, snr),
+                    <= 2 => GetScale(1.5, 2, 20000000, 30000000, snr),
+                    > 2 => await CalculateExpo(5, ctsToken),
+                    _ => 2000000
+                },
+                <= 0.1 => GetScale(0.05, 0.1, 5000000, 10000000, percentage),
+                <= 0.5 => GetScale(0.1, 0.5, 2000000, 5000000, percentage),
+                _ => GetScale(0.5, 1, 100000, 2000000, percentage)
             };
+        }
 
-        if (Math.Abs(time - 5) < 0.1) 
-            return snr switch
+        if (Math.Abs(time - 5) < 0.1)
+        {
+            return percentage switch
             {
-                <= 5 => GetScale(2, 5, 30000000, 40000000, snr),
-                <= 6 => GetScale(5, 6, 40000000, 80000000, snr),
-                <= 7 => GetScale(6, 7, 80000000, 140000000, snr),
-                <= 7.5 => GetScale(7, 7.5, 140000000, 240000000, snr),
-                <= 8 => GetScale(7.5, 8, 240000000, 300000000, snr),
-                <= 10 => GetScale(8, 10, 300000000, 600000000, snr),
-                > 10 => 600000000,
-                _ => 30000000
+                <= 0.05 => snr switch
+                {
+                    <= -20 => GetScale(-50, -20, 3000000, 5000000, snr),
+                    <= 0 => GetScale(-20, 0, 5000000, 10000000, snr),
+                    <= 1 => GetScale(0, 1, 10000000, 20000000, snr),
+                    <= 2 => GetScale(1, 2, 20000000, 30000000, snr),
+                    <= 3 => GetScale(2, 3, 30000000, 40000000, snr),
+                    <= 4 => GetScale(3, 4, 40000000, 50000000, snr),
+                    <= 5 => GetScale(4, 5, 50000000, 60000000, snr),
+                    > 5 => 60000000,
+                    _ => 3000000
+                },
+                <= 0.1 => GetScale(0.05, 0.1, 15000000, 30000000, percentage),
+                <= 0.5 => GetScale(0.1, 0.5, 6000000, 15000000, percentage),
+                _ => GetScale(0.5, 1, 300000, 6000000, percentage)
             };
+        }
 
         return 0;
     }
@@ -689,6 +715,34 @@ public class CameraService(
     private static long GetScale(double min, double max, double minTarget, double maxTarget, double value)
     {
         return (long)((maxTarget - minTarget) * (value - min) / (max - min) + minTarget);
+    }
+
+    #endregion
+
+    #region 计算mat中的某个灰度区间的占比
+
+    private static double CalculatePercentage(Mat mat, int min, int max)
+    {
+        var gray = new Mat();
+        var mask = new Mat();
+        try
+        {
+            // 转换成灰度图
+            Cv2.CvtColor(mat, gray, ColorConversionCodes.BGR2GRAY);
+            
+            var totalPixels = mat.Rows * mat.Cols;
+
+            // 创建一个掩码，其中在指定范围内的像素为白色，其他像素为黑色
+            Cv2.Threshold(gray, mask, min, max, ThresholdTypes.Binary);
+
+            var aboveThresholdPixels = Cv2.CountNonZero(mask);
+            return (double)aboveThresholdPixels / totalPixels;
+        }
+        finally
+        {
+            gray.Dispose();
+            mask.Dispose();
+        }
     }
 
     #endregion

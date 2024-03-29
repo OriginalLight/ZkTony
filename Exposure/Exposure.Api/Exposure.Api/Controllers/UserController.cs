@@ -12,7 +12,7 @@ namespace Exposure.Api.Controllers;
 public class UserController(ILogger<UserController> logger, IUserService user, IOperLogService operLog) : ControllerBase
 {
     #region 登录
-    
+
     [HttpPost]
     [Route("Login")]
     public async Task<IActionResult> Login([FromBody] LoginDto dto)
@@ -38,7 +38,7 @@ public class UserController(ILogger<UserController> logger, IUserService user, I
     #endregion
 
     #region 登出
-    
+
     [HttpGet]
     [Route("Logout")]
     public IActionResult Logout()
@@ -52,7 +52,7 @@ public class UserController(ILogger<UserController> logger, IUserService user, I
     #endregion
 
     #region 分页查询
-    
+
     [HttpPost]
     [Route("Page")]
     public async Task<IActionResult> Page([FromBody] UserQueryDto dto)
@@ -72,7 +72,7 @@ public class UserController(ILogger<UserController> logger, IUserService user, I
     #endregion
 
     #region 根据ID查询
-    
+
     [HttpGet]
     public async Task<IActionResult> GetByIds([FromQuery] int id)
     {
@@ -85,7 +85,7 @@ public class UserController(ILogger<UserController> logger, IUserService user, I
     #endregion
 
     #region 添加用户
-    
+
     [HttpPost]
     public async Task<IActionResult> Add([FromBody] UserAddDto dto)
     {
@@ -107,7 +107,7 @@ public class UserController(ILogger<UserController> logger, IUserService user, I
     #endregion
 
     #region 更新用户
-    
+
     [HttpPut]
     public async Task<IActionResult> Update([FromBody] UserUpdateDto dto)
     {
@@ -147,7 +147,7 @@ public class UserController(ILogger<UserController> logger, IUserService user, I
     #endregion
 
     #region 删除用户
-    
+
     [HttpDelete]
     public async Task<IActionResult> Delete([FromBody] object[] ids)
     {

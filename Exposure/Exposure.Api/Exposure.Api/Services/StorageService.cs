@@ -17,6 +17,10 @@ public class StorageService(
             //删除文件夹里面的所有文件
             try
             {
+                if (!Directory.Exists(FileUtils.Preview))
+                {
+                    return;
+                }
                 foreach (var file in Directory.GetFiles(FileUtils.Preview))
                 {
                     logger.LogInformation($"删除文件：{file}");
@@ -26,6 +30,7 @@ public class StorageService(
             catch (Exception e)
             {
                 errorLog.AddErrorLog(e);
+                logger.LogError(e, "清理预览图失败");
             }
         });
     }

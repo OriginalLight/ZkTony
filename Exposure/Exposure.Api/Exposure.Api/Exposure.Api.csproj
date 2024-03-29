@@ -15,8 +15,14 @@
 
     <ItemGroup>
         <None Include="..\.editorconfig" Link=".editorconfig" />
-        <None Update="Start.bat">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <None Update="Assets\Ringtones\Start.wav">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Assets\Voices\Error.wav">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Assets\Ringtones\Save.wav">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
     </ItemGroup>
 
@@ -24,6 +30,7 @@
         <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
         <PackageReference Include="Mapster" Version="7.4.0" />
         <PackageReference Include="MiniExcel" Version="1.31.3" />
+        <PackageReference Include="NAudio" Version="2.2.1" />
         <PackageReference Include="OpenCvSharp4.Extensions" Version="4.9.0.20240103" />
         <PackageReference Include="OpenCvSharp4.Windows" Version="4.9.0.20240103" />
         <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
@@ -35,7 +42,13 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="External\Libraries\*">
+        <None Update="Assets\**">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="External\**">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
     </ItemGroup>

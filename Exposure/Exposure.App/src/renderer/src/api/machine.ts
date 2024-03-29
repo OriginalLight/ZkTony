@@ -61,3 +61,8 @@ export function varsion() {
 export function storage() {
   return axios.get<number>('/Machine/Storage')
 }
+
+// 自检
+export function selfCheck() {
+  return axios.get('/Machine/SelfCheck')
+}

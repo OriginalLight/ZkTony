@@ -35,5 +35,22 @@ export default {
   'debug.test.aging.camera': 'Camera',
   'debug.test.aging.hatch': 'Hatch',
   'debug.test.aging.light': 'Light',
-  'debug.test.aging.led': 'LED'
+  'debug.test.aging.led': 'LED',
+  'debug.sound.title': 'Sound',
+  'debug.sound.ring': 'Ring',
+  'debug.sound.voice': 'Voice',
+  'debug.sound.ring1': 'Self-test successful',
+  'debug.sound.ring2': 'Error occurred',
+  'debug.sound.ring3': 'Start shooting',
+  'debug.sound.ring4': 'Cancel shooting',
+  'debug.sound.ring5': 'Save successful',
+  'debug.sound.ring6': 'Export successful',
+  'debug.sound.ring7': 'Ring mode',
+  'debug.sound.voice1': 'Self-test successful',
+  'debug.sound.voice2': 'Error occurred',
+  'debug.sound.voice3': 'Start shooting',
+  'debug.sound.voice4': 'Cancel shooting',
+  'debug.sound.voice5': 'Save successful',
+  'debug.sound.voice6': 'Export successful',
+  'debug.sound.voice7': 'Voice mode'
 }

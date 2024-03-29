@@ -8,8 +8,9 @@ namespace Exposure.Api.Controllers;
 public class CameraController(
     ILogger<CameraController> logger,
     ICameraService camera,
-    IOperLogService operLog
-    ) : ControllerBase
+    IOperLogService operLog,
+    IAudioService audio
+) : ControllerBase
 {
     private CancellationTokenSource? _cts;
 
@@ -64,6 +65,7 @@ public class CameraController(
     {
         // 自动拍照
         _cts = new CancellationTokenSource();
+        audio.PlayWithSwitch("Shot");
         var res = await camera.TakeAutoPhotoAsync(_cts.Token);
         operLog.AddOperLog("自动拍照", "自动拍照成功");
         logger.LogInformation("自动拍照成功");
@@ -80,6 +82,7 @@ public class CameraController(
     {
         // 手动拍照
         _cts = new CancellationTokenSource();
+        audio.PlayWithSwitch("Shot");
         await camera.TakeManualPhotoAsync(exposure, frame, _cts.Token);
         operLog.AddOperLog("手动拍照", "手动拍照成功");
         logger.LogInformation("手动拍照成功");
@@ -96,6 +99,7 @@ public class CameraController(
     {
         // 取消拍照
         await camera.CancelTask();
+        audio.PlayWithSwitch("CancelShot");
         operLog.AddOperLog("取消拍照", "取消拍照成功");
         logger.LogInformation("取消拍照成功");
         return Ok();

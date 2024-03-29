@@ -37,4 +37,34 @@ public class OptionService(IDbContext dbContext) : BaseService<Option>(dbContext
     }
 
     #endregion
+    
+    #region 获取Key对应的值
+
+    public string GetOptionValue(string key)
+    {
+        return _context.db.Queryable<Option>().Where(p => p.Key == key).Select(p => p.Value).First();
+    }
+
+    #endregion
+
+    #region 设置Key对应的值
+    
+    public bool SetOptionValue(string key, string value)
+    {
+        var option = _context.db.Queryable<Option>().First(p => p.Key == key);
+        if (option != null)
+        {
+            option.Value = value;
+            return _context.db.Updateable(option).ExecuteCommand() > 0;
+        }
+
+        option = new Option
+        {
+            Key = key,
+            Value = value
+        };
+        return _context.db.Insertable(option).ExecuteCommand() > 0;
+    }
+    
+    #endregion
 }

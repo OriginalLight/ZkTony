@@ -2,13 +2,20 @@
 using Exposure.Api.Core.SerialPort.Default;
 using Exposure.Api.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
+using OpenCvSharp;
 
 namespace Exposure.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class MachineController(ILogger<MachineController> logger, ISerialPortService serialPort, IStorageService storage)
-    : ControllerBase
+public class MachineController(
+    ILogger<MachineController> logger,
+    ISerialPortService serialPort,
+    IStorageService storage,
+    ICameraService camera,
+    IErrorLogService errorLog,
+    IAudioService audio
+) : ControllerBase
 {
     #region 串口状态
 
@@ -194,16 +201,16 @@ public class MachineController(ILogger<MachineController> logger, ISerialPortSer
     }
 
     #endregion
-    
+
     #region 设备版本
-    
+
     [HttpGet]
     [Route("Version")]
     public ActionResult Version()
     {
         return Ok(GetType().Assembly.GetName().Version?.ToString() ?? "None");
     }
-    
+
     #endregion
 
     #region 存储
@@ -214,6 +221,96 @@ public class MachineController(ILogger<MachineController> logger, ISerialPortSer
     {
         var st = storage.AvailableStorage();
         return Ok(st);
+    }
+
+    #endregion
+
+    #region 自检
+
+    [HttpGet]
+    [Route("SelfCheck")]
+    public async Task<IActionResult> SelfCheck()
+    {
+        // 舱门自检
+        try
+        {
+            serialPort.SetFlag("hatch", 1);
+            serialPort.WritePort("Com2", DefaultProtocol.CloseHatch().ToBytes());
+            var num = 0;
+            while (serialPort.GetFlag("hatch") == 1 && num < 50)
+            {
+                num++;
+                await Task.Delay(100);
+            }
+
+            if (num >= 50) throw new Exception("舱门自检失败: 超时");
+        }
+        catch (Exception e)
+        {
+            errorLog.AddErrorLog(e);
+            logger.LogError(e, "舱门自检失败");
+            serialPort.WritePort("Com1", DefaultProtocol.LedRed().ToBytes());
+            serialPort.SetFlag("led", 5);
+            audio.PlayWithSwitch("Error");
+            return Problem(e.Message);
+        }
+
+        // 相机自检
+        try
+        {
+            await camera.InitAsync();
+        }
+        catch (Exception e)
+        {
+            errorLog.AddErrorLog(e);
+            logger.LogError(e, "相机自检失败");
+            serialPort.WritePort("Com1", DefaultProtocol.LedRed().ToBytes());
+            serialPort.SetFlag("led", 5);
+            audio.PlayWithSwitch("Error");
+            return Problem("相机自检失败：" + e.Message);
+        }
+
+        // 灯光自检
+        try
+        {
+            await camera.PreviewAsync();
+            await Task.Delay(1000);
+            var res = await camera.GetCacheAsync();
+            if (res.Count == 0) return Problem("灯光自检失败");
+            var img = res[0];
+            var mat = new Mat(img.Path);
+            var gray = new Mat();
+            var mask = new Mat();
+            try
+            {
+                // 转换成灰度图
+                Cv2.CvtColor(mat, gray, ColorConversionCodes.BGR2GRAY);
+                var totalPixels = mat.Rows * mat.Cols;
+                // 创建一个掩码，其中在指定范围内的像素为白色，其他像素为黑色
+                Cv2.Threshold(gray, mask, 10, 255, ThresholdTypes.Binary);
+                var aboveThresholdPixels = Cv2.CountNonZero(mask);
+                var p = (double)aboveThresholdPixels / totalPixels;
+                if (p < 0.1) throw new Exception("灯光自检失败");
+            }
+            finally
+            {
+                mat.Dispose();
+                gray.Dispose();
+                mask.Dispose();
+            }
+        }
+        catch (Exception e)
+        {
+            errorLog.AddErrorLog(e);
+            logger.LogError(e, "灯光自检失败");
+            serialPort.WritePort("Com1", DefaultProtocol.LedRed().ToBytes());
+            serialPort.SetFlag("led", 5);
+            audio.PlayWithSwitch("Error");
+            return Problem("闪光灯自检失败：" + e.Message);
+        }
+
+        audio.PlayWithSwitch("Start");
+        return Ok();
     }
 
     #endregion

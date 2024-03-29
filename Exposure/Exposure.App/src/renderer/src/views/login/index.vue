@@ -27,8 +27,29 @@
 <script lang="ts" setup>
 import { useI18n } from 'vue-i18n'
 import LoginForm from './components/login-form.vue'
+import { onMounted } from 'vue'
+import { storage, selfCheck } from '@renderer/api/machine'
+import { Message } from '@arco-design/web-vue'
+import useHomeState from '@renderer/states/home'
 
 const { t } = useI18n()
+const { isInit } = useHomeState()
+
+// 初始化
+onMounted(async () => {
+  try {
+    if (!isInit.value) {
+      await selfCheck()
+      const res = await storage()
+      if (res.data < 0.1) {
+        Message.error(t('home.storage.error'))
+      }
+      isInit.value = true
+    }
+  } catch (error) {
+    Message.error((error as Error).message)
+  }
+})
 </script>
 
 <style lang="less" scoped>

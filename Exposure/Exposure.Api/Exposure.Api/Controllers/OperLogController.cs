@@ -8,7 +8,8 @@ namespace Exposure.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class OperLogController(ILogger<OperLogController> logger, IUsbService usb, IOperLogService operLog) : ControllerBase
+public class OperLogController(ILogger<OperLogController> logger, IUsbService usb, IOperLogService operLog)
+    : ControllerBase
 {
     #region 分页查询
 

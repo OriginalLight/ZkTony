@@ -93,8 +93,42 @@
                   <a-button type="primary" @click="screen({ code: 1 })">
                     {{ t('debug.machine.screen.open') }}
                   </a-button>
-                  <a-button type="primary" @click="screen({ code: 0 })">
+                  <a-button type="primary" @click="handleCloseScreen">
                     {{ t('debug.machine.screen.close') }}
+                  </a-button>
+                </a-space>
+              </template>
+            </a-list-item>
+          </a-list>
+        </a-card>
+        <a-card :title="t('debug.sound.title')">
+          <a-list>
+            <a-list-item>
+              <a-list-item-meta :title="t('debug.sound.ring')"></a-list-item-meta>
+              <template #actions>
+                <a-space>
+                  <a-button
+                    v-for="ring in rings"
+                    :key="ring.key"
+                    type="primary"
+                    @click="play({ key: ring.key })"
+                  >
+                    {{ ring.label }}
+                  </a-button>
+                </a-space>
+              </template>
+            </a-list-item>
+            <a-list-item>
+              <a-list-item-meta :title="t('debug.sound.voice')"></a-list-item-meta>
+              <template #actions>
+                <a-space>
+                  <a-button
+                    v-for="ring in voices"
+                    :key="ring.key"
+                    type="primary"
+                    @click="play({ key: ring.key })"
+                  >
+                    {{ ring.label }}
                   </a-button>
                 </a-space>
               </template>
@@ -111,12 +145,33 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { led, serialPort, hatch, light, camera, screen } from '@renderer/api/machine'
 import { Message } from '@arco-design/web-vue'
+import { play } from '@renderer/api/audio'
 
 const { t } = useI18n()
 
 const ports = [
   { code: 'Com1', label: t('debug.serialport.com1') },
   { code: 'Com2', label: t('debug.serialport.com2') }
+]
+
+const rings = [
+  { key: 'Assets\\Ringtones\\Start.wav', label: t('debug.sound.ring1') },
+  { key: 'Assets\\Ringtones\\Error.wav', label: t('debug.sound.ring2') },
+  { key: 'Assets\\Ringtones\\Shot.wav', label: t('debug.sound.ring3') },
+  { key: 'Assets\\Ringtones\\CancelShot.wav', label: t('debug.sound.ring4') },
+  { key: 'Assets\\Ringtones\\Save.wav', label: t('debug.sound.ring5') },
+  { key: 'Assets\\Ringtones\\Export.wav', label: t('debug.sound.ring6') },
+  { key: 'Assets\\Ringtones\\Ringtone.wav', label: t('debug.sound.ring7') }
+]
+
+const voices = [
+  { key: 'Assets\\Voices\\Start.wav', label: t('debug.sound.voice1') },
+  { key: 'Assets\\Voices\\Error.wav', label: t('debug.sound.voice2') },
+  { key: 'Assets\\Voices\\Shot.wav', label: t('debug.sound.voice3') },
+  { key: 'Assets\\Voices\\CancelShot.wav', label: t('debug.sound.voice4') },
+  { key: 'Assets\\Voices\\Save.wav', label: t('debug.sound.voice5') },
+  { key: 'Assets\\Voices\\Export.wav', label: t('debug.sound.voice6') },
+  { key: 'Assets\\Voices\\Voice.wav', label: t('debug.sound.voice7') }
 ]
 
 const serialOptions = ref({
@@ -174,6 +229,18 @@ const handleExcute = async () => {
       return
     }
     await serialPort(serialOptions.value)
+  } catch (error) {
+    Message.error((error as Error).message)
+  }
+}
+
+const handleCloseScreen = async () => {
+  try {
+    await screen({ code: 0 })
+    // 5s 后自动关闭
+    setTimeout(() => {
+      screen({ code: 1 })
+    }, 5000)
   } catch (error) {
     Message.error((error as Error).message)
   }

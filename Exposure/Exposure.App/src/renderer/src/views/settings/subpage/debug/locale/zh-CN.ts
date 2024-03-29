@@ -35,5 +35,22 @@ export default {
   'debug.test.aging.camera': '相机',
   'debug.test.aging.hatch': '舱门',
   'debug.test.aging.light': '灯光',
-  'debug.test.aging.led': '三色灯'
+  'debug.test.aging.led': '三色灯',
+  'debug.sound.title': '提示音',
+  'debug.sound.ring': '铃声',
+  'debug.sound.voice': '语音',
+  'debug.sound.ring1': '自检成功',
+  'debug.sound.ring2': '发生错误',
+  'debug.sound.ring3': '开始拍摄',
+  'debug.sound.ring4': '取消拍摄',
+  'debug.sound.ring5': '保存成功',
+  'debug.sound.ring6': '导出成功',
+  'debug.sound.ring7': '铃声模式',
+  'debug.sound.voice1': '自检成功',
+  'debug.sound.voice2': '发生错误',
+  'debug.sound.voice3': '开始拍摄',
+  'debug.sound.voice4': '取消拍摄',
+  'debug.sound.voice5': '保存成功',
+  'debug.sound.voice6': '导出成功',
+  'debug.sound.voice7': '语音模式'
 }

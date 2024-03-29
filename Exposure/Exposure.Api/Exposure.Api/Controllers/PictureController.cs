@@ -11,7 +11,12 @@ namespace Exposure.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class PictureController(ILogger<PictureController> logger, IPictureService picture, IOperLogService operLog, IUsbService usb)
+public class PictureController(
+    ILogger<PictureController> logger,
+    IPictureService picture,
+    IOperLogService operLog,
+    IUsbService usb,
+    IAudioService audio)
     : ControllerBase
 {
     #region 分页查询
@@ -116,6 +121,7 @@ public class PictureController(ILogger<PictureController> logger, IPictureServic
                 fullPath = Path.Combine(path, filename);
                 counter++;
             }
+
             bitmap.Save(fullPath, imageFormat);
 
             // 释放资源
@@ -124,6 +130,7 @@ public class PictureController(ILogger<PictureController> logger, IPictureServic
 
         // 记录日志
         operLog.AddOperLog("导出", "导出图片：ids = " + string.Join(",", dto.Ids));
+        audio.PlayWithSwitch("Export");
         // 返回结果
         return Ok("导出成功");
     }
@@ -138,6 +145,7 @@ public class PictureController(ILogger<PictureController> logger, IPictureServic
     {
         // 获取日志
         var res = await picture.Adjust(dto);
+        audio.PlayWithSwitch("Save");
         operLog.AddOperLog("调整", "调整图片：id = " + dto.Id);
         return Ok(res);
     }

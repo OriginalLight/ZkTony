@@ -1,5 +1,6 @@
 using Exposure.Api.Contracts.Services;
 using Exposure.Api.Contracts.SqlSugar;
+using Exposure.Api.Controllers;
 using Exposure.Api.Core;
 using Exposure.Api.Core.Exception;
 using Exposure.Api.Services;
@@ -52,6 +53,7 @@ builder.Services.AddSingleton<IOptionService, OptionService>();
 builder.Services.AddSingleton<IOperLogService, OperLogService>();
 builder.Services.AddSingleton<IPictureService, PictureService>();
 builder.Services.AddSingleton<ITestService, TestService>();
+builder.Services.AddSingleton<IAudioService, AudioService>();
 
 var app = builder.Build();
 

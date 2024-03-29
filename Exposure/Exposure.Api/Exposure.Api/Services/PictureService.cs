@@ -23,7 +23,7 @@ public class PictureService(IDbContext dbContext, IUserService user) : BaseServi
     public async Task<List<Picture>> GetByPage(PictureQueryDto dto, RefAsync<int> total)
     {
         var logged = user.GetLogged();
-        if (logged == null) return new List<Picture>();
+        if (logged == null) return [];
         var lower = await _context.db.Queryable<User>().Where(u => u.Role > logged.Role).ToListAsync();
         var users = lower.Append(logged).ToList();
         var ids = users.Select(u => u.Id).ToList();
