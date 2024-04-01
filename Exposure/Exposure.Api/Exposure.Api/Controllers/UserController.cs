@@ -3,13 +3,17 @@ using Exposure.Api.Models;
 using Exposure.Api.Models.Dto;
 using Mapster;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using SqlSugar;
 
 namespace Exposure.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class UserController(ILogger<UserController> logger, IUserService user, IOperLogService operLog) : ControllerBase
+public class UserController(
+    IUserService user, 
+    IOperLogService operLog,
+    IStringLocalizer<SharedResources> localizer) : ControllerBase
 {
     #region 登录
 
@@ -23,15 +27,14 @@ public class UserController(ILogger<UserController> logger, IUserService user, I
             case 0:
             {
                 // 记录登录日志
-                operLog.AddOperLog("登录", $"登录系统: {dto.UserName}");
-                logger.LogInformation("登录成功");
+                operLog.AddOperLog(localizer.GetString("LogIn").Value, $"{dto.UserName}");
                 return Ok(user.GetLogged());
             }
-            case 1: throw new Exception("用户不存在");
-            case 2: throw new Exception("密码错误");
-            case 3: throw new Exception("用户被禁用");
-            case 4: throw new Exception("用户已过期");
-            default: throw new Exception("未知错误");
+            case 1: throw new Exception(localizer.GetString("NoUser").Value);
+            case 2: throw new Exception(localizer.GetString("ErrorPassword").Value);
+            case 3: throw new Exception(localizer.GetString("DisabledUser").Value);
+            case 4: throw new Exception(localizer.GetString("ExpiredUser").Value);
+            default: throw new Exception(localizer.GetString("ErrorUnknown").Value);
         }
     }
 
@@ -44,7 +47,7 @@ public class UserController(ILogger<UserController> logger, IUserService user, I
     public IActionResult Logout()
     {
         // 记录登出日志
-        operLog.AddOperLog("注销", $"登出系统: {user.GetLogged()?.Name}");
+        operLog.AddOperLog(localizer.GetString("LogOut").Value, $"{user.GetLogged()?.Name}");
         user.LogOut();
         return Ok();
     }
@@ -65,7 +68,6 @@ public class UserController(ILogger<UserController> logger, IUserService user, I
             Total = total.Value,
             List = list
         };
-        logger.LogInformation("分页查询成功");
         return Ok(res);
     }
 
@@ -78,7 +80,6 @@ public class UserController(ILogger<UserController> logger, IUserService user, I
     {
         // 查询
         var user1 = await user.GetByPrimary(id);
-        logger.LogInformation("查询成功");
         return Ok(user1);
     }
 
@@ -96,12 +97,11 @@ public class UserController(ILogger<UserController> logger, IUserService user, I
         user1.UpdateTime = DateTime.Now;
         user1.LastLoginTime = DateTime.Now;
         // 验证用户名是否重复
-        if (await user.GetByName(dto.Name) != null) return Problem("用户名重复");
-        if (!await user.Add(user1)) return Problem("添加失败");
+        if (await user.GetByName(dto.Name) != null) return Problem(localizer.GetString("DuplicateUserName").Value);
+        if (!await user.Add(user1)) return Problem(localizer.GetString("Add").Value + localizer.GetString("Failure").Value);
         // 记录添加日志
-        operLog.AddOperLog("添加", $"添加用户: {dto.Name}");
-        logger.LogInformation("添加成功");
-        return Ok("添加成功");
+        operLog.AddOperLog(localizer.GetString("Add").Value, $"{localizer.GetString("User").Value}: {dto.Name}");
+        return Ok();
     }
 
     #endregion
@@ -113,14 +113,14 @@ public class UserController(ILogger<UserController> logger, IUserService user, I
     {
         // 更新
         var old = await user.GetByPrimary(dto.Id);
-        if (old == null) throw new Exception("更新失败");
+        if (old == null) throw new Exception(localizer.GetString("NotFound").Value);
         switch (dto.OldPassword.Length)
         {
             // 如果密码不为空，则更新密码
             case > 0 when dto.NewPassword.Length > 0:
             {
                 if (!BCrypt.Net.BCrypt.Verify(dto.OldPassword, old.Sha))
-                    throw new Exception("旧密码错误");
+                    throw new Exception(localizer.GetString("ErrorPassword").Value);
                 old.Sha = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
                 break;
             }
@@ -137,11 +137,10 @@ public class UserController(ILogger<UserController> logger, IUserService user, I
         old.Role = dto.Role;
         old.Enabled = dto.Enabled;
         old.UpdateTime = DateTime.Now;
-        if (!await user.Update(old)) throw new Exception("更新失败");
+        if (!await user.Update(old)) throw new Exception(localizer.GetString("Update").Value + localizer.GetString("Failure").Value);
         // 记录更新日志
-        operLog.AddOperLog("更新", $"更新用户: {dto.Name}");
-        logger.LogInformation("更新成功");
-        return Ok("更新成功");
+        operLog.AddOperLog(localizer.GetString("Update").Value, $"{localizer.GetString("User").Value}: {dto.Name}");
+        return Ok();
     }
 
     #endregion
@@ -152,11 +151,10 @@ public class UserController(ILogger<UserController> logger, IUserService user, I
     public async Task<IActionResult> Delete([FromBody] object[] ids)
     {
         // 删除
-        if (!await user.DeleteRange(ids)) return Problem("删除失败");
+        if (!await user.DeleteRange(ids)) return Problem(localizer.GetString("Delete").Value + localizer.GetString("Failure").Value);
         // 记录删除日志
-        operLog.AddOperLog("删除", $"删除用户: {string.Join(',', ids)}");
-        logger.LogInformation("删除成功");
-        return Ok("删除成功");
+        operLog.AddOperLog(localizer.GetString("Delete").Value, $"{localizer.GetString("User").Value}: {string.Join(',', ids)}");
+        return Ok();
     }
 
     #endregion

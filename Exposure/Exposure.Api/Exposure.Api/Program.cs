@@ -1,11 +1,12 @@
 using Exposure.Api.Contracts.Services;
 using Exposure.Api.Contracts.SqlSugar;
-using Exposure.Api.Controllers;
 using Exposure.Api.Core;
 using Exposure.Api.Core.Exception;
 using Exposure.Api.Services;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +39,9 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Localizations
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
 // Add DbContext
 builder.Services.AddTransient<IDbContext, AppDbContext>();
 
@@ -65,6 +69,18 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseRequestLocalization(options =>
+{
+    var supportedCultures = new List<CultureInfo>
+    {
+        new ("en"),
+        new ("zh")
+    };
+    options.DefaultRequestCulture = new RequestCulture("zh");
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
+});
 
 app.UseAuthorization();
 

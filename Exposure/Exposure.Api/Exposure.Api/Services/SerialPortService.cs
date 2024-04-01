@@ -26,7 +26,7 @@ public class SerialPortService(ILogger<SerialPortService> logger, IOptionService
                 var sp = (SerialPort)sender;
                 var bytes = new byte[sp.BytesToRead];
                 sp.Read(bytes, 0, bytes.Length);
-                logger.LogInformation("Com2 接收到数据: " + BitConverter.ToString(bytes));
+                logger.LogInformation("Com2 Rx: " + BitConverter.ToString(bytes));
                 switch (bytes[2])
                 {
                     case 0x03:
@@ -96,11 +96,11 @@ public class SerialPortService(ILogger<SerialPortService> logger, IOptionService
         try
         {
             _serialPorts[alias].Write(bytes, 0, bytes.Length);
-            logger.LogInformation("向串口 " + alias + " 写入数据: " + BitConverter.ToString(bytes));
+            logger.LogInformation(alias + " Tx: " + BitConverter.ToString(bytes));
         }
         catch (Exception e)
         {
-            logger.LogError("写入数据失败" + alias, e);
+            logger.LogError("Tx Failure" + alias, e);
             errorLog.AddErrorLog(e);
         }
     }
@@ -120,11 +120,11 @@ public class SerialPortService(ILogger<SerialPortService> logger, IOptionService
         {
             serialPort.Open();
             _serialPorts.Add(alias, serialPort);
-            logger.LogInformation("成功打开串口: " + portName);
+            logger.LogInformation("Open Success: " + portName);
         }
         catch (Exception e)
         {
-            logger.LogError("打开串口失败：" + portName, e);
+            logger.LogError("Open Failure：" + portName, e);
             errorLog.AddErrorLog(e);
         }
     }

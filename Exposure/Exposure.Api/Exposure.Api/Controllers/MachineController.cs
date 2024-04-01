@@ -2,6 +2,7 @@
 using Exposure.Api.Core.SerialPort.Default;
 using Exposure.Api.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using OpenCvSharp;
 
 namespace Exposure.Api.Controllers;
@@ -14,8 +15,8 @@ public class MachineController(
     IStorageService storage,
     ICameraService camera,
     IErrorLogService errorLog,
-    IAudioService audio
-) : ControllerBase
+    IAudioService audio,
+    IStringLocalizer<SharedResources> localizer) : ControllerBase
 {
     #region 串口状态
 
@@ -35,14 +36,14 @@ public class MachineController(
     public IActionResult SerialPort([FromBody] SerialPortDto dto)
     {
         var ports = serialPort.GetPorts();
-        if (!ports.Contains(dto.Port)) return Problem("串口未初始化，或者串口不存在。");
+        if (!ports.Contains(dto.Port)) return Problem(localizer.GetString("PortNotExist").Value);
         // 将字符串hex转换为byte数组
         var hex = dto.Hex.Replace(" ", "");
         var bytes = new byte[hex.Length / 2];
         for (var i = 0; i < hex.Length; i += 2) bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
         serialPort.WritePort(dto.Port, bytes);
-        logger.LogInformation($"发送串口数据：{dto.Port} {BitConverter.ToString(bytes)}");
-        return Ok("OK");
+        logger.LogInformation($"Tx：{dto.Port} {BitConverter.ToString(bytes)}");
+        return Ok();
     }
 
     #endregion
@@ -81,8 +82,8 @@ public class MachineController(
             _ => DefaultProtocol.LedAllClose()
         };
         serialPort.WritePort("Com1", protocol.ToBytes());
-        logger.LogInformation($"发送串口数据：Com1 {BitConverter.ToString(protocol.ToBytes())}");
-        return Ok("OK");
+        logger.LogInformation($"Tx：Com1 {BitConverter.ToString(protocol.ToBytes())}");
+        return Ok();
     }
 
     #endregion
@@ -110,11 +111,11 @@ public class MachineController(
                 await Task.Delay(100);
             }
 
-            if (num >= 50) return Problem("打开舱门超时");
+            if (num >= 50) return Problem(localizer.GetString("OpenHatch").Value + localizer.GetString("Failure").Value);
             serialPort.WritePort("Com1", DefaultProtocol.LedAllClose().ToBytes());
             serialPort.SetFlag("led", 0);
             serialPort.SetFlag("hatch", 1);
-            logger.LogInformation("打开舱门");
+            logger.LogInformation(localizer.GetString("OpenHatch").Value);
         }
         else
         {
@@ -133,11 +134,11 @@ public class MachineController(
                 await Task.Delay(100);
             }
 
-            if (num >= 50) return Problem("关闭舱门超时");
+            if (num >= 50) return Problem(localizer.GetString("CloseHatch").Value + localizer.GetString("Failure").Value);
             serialPort.WritePort("Com1", DefaultProtocol.LedAllClose().ToBytes());
             serialPort.SetFlag("led", 0);
             serialPort.SetFlag("hatch", 0);
-            logger.LogInformation("关闭舱门");
+            logger.LogInformation(localizer.GetString("CloseHatch").Value + localizer.GetString("Failure").Value);
         }
 
         return Ok();
@@ -243,12 +244,12 @@ public class MachineController(
                 await Task.Delay(100);
             }
 
-            if (num >= 50) throw new Exception("舱门自检失败: 超时");
+            if (num >= 50) throw new Exception(localizer.GetString("Error0012").Value);
         }
         catch (Exception e)
         {
             errorLog.AddErrorLog(e);
-            logger.LogError(e, "舱门自检失败");
+            logger.LogError(e, localizer.GetString("Error0012").Value);
             serialPort.WritePort("Com1", DefaultProtocol.LedRed().ToBytes());
             serialPort.SetFlag("led", 5);
             audio.PlayWithSwitch("Error");
@@ -263,11 +264,11 @@ public class MachineController(
         catch (Exception e)
         {
             errorLog.AddErrorLog(e);
-            logger.LogError(e, "相机自检失败");
+            logger.LogError(e, localizer.GetString("Error0013").Value);
             serialPort.WritePort("Com1", DefaultProtocol.LedRed().ToBytes());
             serialPort.SetFlag("led", 5);
             audio.PlayWithSwitch("Error");
-            return Problem("相机自检失败：" + e.Message);
+            return Problem(localizer.GetString("Error0012").Value + "-" + e.Message);
         }
 
         // 灯光自检
@@ -276,7 +277,7 @@ public class MachineController(
             await camera.PreviewAsync();
             await Task.Delay(1000);
             var res = await camera.GetCacheAsync();
-            if (res.Count == 0) return Problem("灯光自检失败");
+            if (res.Count == 0) return Problem(localizer.GetString("Error0014").Value);
             var img = res[0];
             var mat = new Mat(img.Path);
             var gray = new Mat();
@@ -290,7 +291,7 @@ public class MachineController(
                 Cv2.Threshold(gray, mask, 10, 255, ThresholdTypes.Binary);
                 var aboveThresholdPixels = Cv2.CountNonZero(mask);
                 var p = (double)aboveThresholdPixels / totalPixels;
-                if (p < 0.1) throw new Exception("灯光自检失败");
+                if (p < 0.1) throw new Exception(localizer.GetString("Error0014").Value);
             }
             finally
             {
@@ -302,11 +303,11 @@ public class MachineController(
         catch (Exception e)
         {
             errorLog.AddErrorLog(e);
-            logger.LogError(e, "灯光自检失败");
+            logger.LogError(e, localizer.GetString("Error0014").Value);
             serialPort.WritePort("Com1", DefaultProtocol.LedRed().ToBytes());
             serialPort.SetFlag("led", 5);
             audio.PlayWithSwitch("Error");
-            return Problem("闪光灯自检失败：" + e.Message);
+            return Problem(localizer.GetString("Error0014").Value + "-" + e.Message);
         }
 
         audio.PlayWithSwitch("Start");

@@ -15,7 +15,7 @@ public class AudioController(IAudioService audioService, ILogger<AudioController
     {
         // 播放
         audioService.Play(key);
-        logger.LogInformation("播放成功:" + key);
+        logger.LogInformation("Play:" + key);
         return Ok();
     }
 

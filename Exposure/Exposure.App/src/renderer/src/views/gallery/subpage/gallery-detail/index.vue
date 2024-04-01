@@ -533,7 +533,7 @@ onMounted(() => {
   flex-direction: row;
 
   .col-1 {
-    width: 70%;
+    width: 60%;
     display: flex;
     position: relative;
     overflow: hidden;

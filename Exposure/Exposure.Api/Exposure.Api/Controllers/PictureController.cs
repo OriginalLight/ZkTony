@@ -5,6 +5,7 @@ using Exposure.Api.Models;
 using Exposure.Api.Models.Dto;
 using Exposure.Api.Utils;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using SqlSugar;
 
 namespace Exposure.Api.Controllers;
@@ -12,11 +13,11 @@ namespace Exposure.Api.Controllers;
 [ApiController]
 [Route("[controller]")]
 public class PictureController(
-    ILogger<PictureController> logger,
     IPictureService picture,
     IOperLogService operLog,
     IUsbService usb,
-    IAudioService audio)
+    IAudioService audio,
+    IStringLocalizer<SharedResources> localizer)
     : ControllerBase
 {
     #region 分页查询
@@ -33,22 +34,21 @@ public class PictureController(
             Total = total.Value,
             List = list
         };
-        logger.LogInformation("分页查询成功");
         return Ok(res);
     }
 
     #endregion
 
-    #region 添加
+    #region 更新
 
     [HttpPut]
     public async Task<IActionResult> Update([FromBody] PictureUpdateDto dto)
     {
         // 更新
-        if (!await picture.Update(dto)) throw new Exception("更新失败");
+        if (!await picture.Update(dto)) throw new Exception(localizer.GetString("Update").Value + localizer.GetString("Failure").Value);
         // 插入日志
-        operLog.AddOperLog("更新", $"更新照片: {dto.Id}");
-        return Ok("更新成功");
+        operLog.AddOperLog(localizer.GetString("Update").Value, $"{localizer.GetString("Picture").Value}: {dto.Id}");
+        return Ok();
     }
 
     #endregion
@@ -59,11 +59,10 @@ public class PictureController(
     public async Task<IActionResult> Delete([FromBody] object[] ids)
     {
         // 删除
-        if (!await picture.DeleteRange(ids)) throw new Exception("删除失败");
+        if (!await picture.DeleteRange(ids)) throw new Exception(localizer.GetString("Delete").Value + localizer.GetString("Failure").Value);
         // 插入日志
-        operLog.AddOperLog("删除", $"删除照片: {string.Join(',', ids)}");
-        logger.LogInformation("删除成功");
-        return Ok("删除成功");
+        operLog.AddOperLog(localizer.GetString("Delete").Value, $"{localizer.GetString("Picture").Value}: {string.Join(',', ids)}");
+        return Ok();
     }
 
     #endregion
@@ -75,11 +74,10 @@ public class PictureController(
     public async Task<IActionResult> Combine([FromBody] object[] ids)
     {
         var list = await picture.GetByIds(ids);
-        if (list.Count is 0 or not 2) throw new Exception("未找到相关图片");
-        if (list[0].Width != list[1].Width || list[0].Height != list[1].Height) return Problem("图片尺寸不一致");
-        var res = await picture.Combine(list);
-        operLog.AddOperLog("合并", $"合并照片: {string.Join(',', ids)}");
-        logger.LogInformation("合并成功");
+        if (list.Count is 0 or not 2) throw new Exception(localizer.GetString("NotFound").Value);
+        if (list[0].Width != list[1].Width || list[0].Height != list[1].Height) return Problem(localizer.GetString("SizeInconsistency").Value);
+        var res = await picture.Combine(list[0], list[1]);
+        operLog.AddOperLog(localizer.GetString("Combine").Value, $"{localizer.GetString("Picture").Value}: {string.Join(',', ids)}");
         return Ok(res);
     }
 
@@ -93,10 +91,10 @@ public class PictureController(
     {
         // 获取U盘
         var usb1 = usb.GetDefaultUsbDrive();
-        if (usb1 == null) throw new Exception("未找到可用的U盘");
+        if (usb1 == null) throw new Exception(localizer.GetString("NoUsb").Value);
         // 获取日志
         var list = await picture.GetByIds(dto.Ids);
-        if (list.Count == 0) throw new Exception("未找到相关图片");
+        if (list.Count == 0) throw new Exception(localizer.GetString("NotFound").Value);
         // 复制图片到U盘
         var path = Path.Combine(usb1.Name, DateTime.Now.ToString("yyyyMMddHHmmss"));
         Directory.CreateDirectory(path);
@@ -129,10 +127,10 @@ public class PictureController(
         }
 
         // 记录日志
-        operLog.AddOperLog("导出", "导出图片：ids = " + string.Join(",", dto.Ids));
+        operLog.AddOperLog(localizer.GetString("Export").Value, $"{localizer.GetString("Picture").Value}：ids = " + string.Join(",", dto.Ids));
         audio.PlayWithSwitch("Export");
         // 返回结果
-        return Ok("导出成功");
+        return Ok();
     }
 
     #endregion
@@ -146,7 +144,7 @@ public class PictureController(
         // 获取日志
         var res = await picture.Adjust(dto);
         audio.PlayWithSwitch("Save");
-        operLog.AddOperLog("调整", "调整图片：id = " + dto.Id);
+        operLog.AddOperLog(localizer.GetString("Adjust").Value, $"{localizer.GetString("Picture").Value}：id = " + dto.Id);
         return Ok(res);
     }
 

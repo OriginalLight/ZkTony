@@ -169,7 +169,7 @@
           type="primary"
           size="large"
           style="width: 120px"
-          :disabled="disabled.shot"
+          :disabled="disabled.shot || exposureTime === 0"
           @click="handleShoot"
         >
           <template #icon>
@@ -307,9 +307,9 @@ const handleShoot = async () => {
       options.value.time.second = Math.floor((ms / 1000) % 60)
       options.value.time.millisecond = Math.floor(ms % 1000)
     } else {
-      progress.value.time = getExposureTime() / 1000 + 1500
+      progress.value.time = exposureTime.value / 1000 + 1500
       await manual({
-        exposure: getExposureTime(),
+        exposure: exposureTime.value,
         frame: options.value.frame
       })
     }
@@ -341,15 +341,13 @@ const handlePreview = async () => {
   }
 }
 
-// 获取曝光时间
-const getExposureTime = () => {
+const exposureTime = computed(() => {
   return (
-    ((options.value.time.minute ? options.value.time.minute : 0) * 60 * 1000 +
-      (options.value.time.second ? options.value.time.second : 0) * 1000 +
-      (options.value.time.millisecond ? options.value.time.millisecond : 0)) *
-    1000
+    (options.value.time.minute ? options.value.time.minute : 0) * 60 * 1000 +
+    (options.value.time.second ? options.value.time.second : 0) * 1000 +
+    (options.value.time.millisecond ? options.value.time.millisecond : 0)
   )
-}
+})
 
 // 取消
 const handleCancel = async () => {

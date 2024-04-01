@@ -20,7 +20,7 @@ public class OptionController(
     {
         // 读取
         var res = await option.GetOptionValueAsync(key) ?? "None";
-        logger.LogInformation("读取配置：" + key + " = " + res);
+        logger.LogInformation("Get Optiom：" + key + " = " + res);
         return Ok(res);
     }
 
@@ -34,7 +34,7 @@ public class OptionController(
     {
         // 设置
         var res = await option.SetOptionValueAsync(dto.Key, dto.Value);
-        logger.LogInformation("设置配置：" + dto.Key + " = " + dto.Value);
+        logger.LogInformation("Set Option：" + dto.Key + " = " + dto.Value);
         if (res) SetOptionValueHook(dto.Key, dto.Value);
         return Ok(res);
     }

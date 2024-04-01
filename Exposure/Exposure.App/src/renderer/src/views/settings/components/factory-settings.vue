@@ -8,7 +8,7 @@
           </template>
         </a-list-item-meta>
         <template #actions>
-          <a-button style="width: 120px" @click="router.push('/option')">
+          <a-button style="width: 150px" @click="router.push('/option')">
             <template #icon>
               <icon-launch />
             </template>
@@ -22,7 +22,7 @@
           </template>
         </a-list-item-meta>
         <template #actions>
-          <a-button style="width: 120px" @click="router.push('/debug')">
+          <a-button style="width: 150px" @click="router.push('/debug')">
             <template #icon>
               <icon-launch />
             </template>
@@ -36,7 +36,7 @@
           </template>
         </a-list-item-meta>
         <template #actions>
-          <a-button style="width: 120px" @click="router.push('/fqc')">
+          <a-button style="width: 150px" @click="router.push('/fqc')">
             <template #icon>
               <icon-launch />
             </template>
@@ -50,7 +50,7 @@
           </template>
         </a-list-item-meta>
         <template #actions>
-          <a-button style="width: 120px" @click="router.push('/aging')">
+          <a-button style="width: 150px" @click="router.push('/aging')">
             <template #icon>
               <icon-launch />
             </template>

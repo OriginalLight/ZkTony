@@ -31,9 +31,10 @@ public interface IPictureService : IBaseService<Picture>
     /// <summary>
     ///     合成
     /// </summary>
-    /// <param name="list"></param>
+    /// <param name="pic1"></param>
+    /// <param name="pic2"></param>
     /// <returns></returns>
-    Task<Picture> Combine(List<Picture> list);
+    Task<Picture> Combine(Picture pic1, Picture pic2);
 
     /// <summary>
     ///     调整图片

@@ -23,14 +23,14 @@ public class StorageService(
                 }
                 foreach (var file in Directory.GetFiles(FileUtils.Preview))
                 {
-                    logger.LogInformation($"删除文件：{file}");
+                    logger.LogInformation($"Delete File：{file}");
                     File.Delete(file);
                 }
             }
             catch (Exception e)
             {
                 errorLog.AddErrorLog(e);
-                logger.LogError(e, "清理预览图失败");
+                logger.LogError(e, "Clean Preview Error");
             }
         });
     }

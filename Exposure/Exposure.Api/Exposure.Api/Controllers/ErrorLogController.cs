@@ -3,6 +3,7 @@ using Exposure.Api.Contracts.Services;
 using Exposure.Api.Models;
 using Exposure.Api.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Newtonsoft.Json;
 using SqlSugar;
 
@@ -11,11 +12,10 @@ namespace Exposure.Api.Controllers;
 [ApiController]
 [Route("[controller]")]
 public class ErrorLogController(
-    ILogger<ErrorLogController> logger,
     IUsbService usb,
     IErrorLogService errorLog,
-    IOperLogService operLog
-) : ControllerBase
+    IOperLogService operLog,
+    IStringLocalizer<SharedResources> localizer) : ControllerBase
 {
     #region 分页查询
 
@@ -31,7 +31,6 @@ public class ErrorLogController(
             Total = total.Value,
             List = list
         };
-        logger.LogInformation("分页查询成功");
         return Ok(res);
     }
 
@@ -42,11 +41,10 @@ public class ErrorLogController(
     [HttpDelete]
     public async Task<IActionResult> Delete([FromBody] object[] ids)
     {
-        if (!await errorLog.DeleteRange(ids)) return Problem("删除失败");
+        if (!await errorLog.DeleteRange(ids)) return Problem(localizer.GetString("Delete").Value + localizer.GetString("Failure").Value);
         // 插入日志
-        operLog.AddOperLog("删除", $"删除崩溃日志：ids = {string.Join(",", ids)}");
-        logger.LogInformation("删除成功");
-        return Ok("删除成功");
+        operLog.AddOperLog(localizer.GetString("Delete").Value, $"{localizer.GetString("ErrorLog").Value}：ids = {string.Join(",", ids)}");
+        return Ok();
     }
 
     #endregion
@@ -59,18 +57,17 @@ public class ErrorLogController(
     {
         // 获取U盘
         var usb1 = usb.GetDefaultUsbDrive();
-        if (usb1 == null) throw new Exception("未找到可用的U盘");
+        if (usb1 == null) throw new Exception(localizer.GetString("NoUsb").Value);
         // 获取日志
         var list = await errorLog.GetByIds(ids);
-        if (list.Count == 0) throw new Exception("未找到相关日志");
+        if (list.Count == 0) throw new Exception(localizer.GetString("NotFound").Value);
         // 保存到U盘
-        await System.IO.File.WriteAllTextAsync(Path.Combine(usb1.Name, "错误日志.json"), JsonConvert.SerializeObject(list),
+        await System.IO.File.WriteAllTextAsync(Path.Combine(usb1.Name, $"{localizer.GetString("ErrorLog").Value}.json"), JsonConvert.SerializeObject(list),
             Encoding.UTF8);
         // 插入日志
-        operLog.AddOperLog("导出", "导出崩溃日志：ids = " + string.Join(",", ids));
-        logger.LogInformation("导出成功");
+        operLog.AddOperLog(localizer.GetString("Export").Value, $"{localizer.GetString("ErrorLog").Value}：ids = " + string.Join(",", ids));
         // 返回结果
-        return Ok("导出成功");
+        return Ok();
     }
 
     #endregion

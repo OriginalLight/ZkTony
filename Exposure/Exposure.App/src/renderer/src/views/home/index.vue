@@ -1,9 +1,9 @@
 <template>
   <a-row class="container">
-    <a-col :span="14" class="image-preview">
+    <a-col :span="13" class="image-preview">
       <ImagePreview :image="preview" @adjust="handleAdjust" />
     </a-col>
-    <a-col :span="10" class="operation">
+    <a-col :span="11" class="operation">
       <CameraOptions @shoot="handleShoot" @preview="handlePreview" />
       <ThumbnailView
         :preview="preview"

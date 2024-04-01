@@ -9,7 +9,7 @@
         </a-list-item-meta>
         <template #actions>
           <a-select
-            style="width: 120px"
+            style="width: 150px"
             :default-value="currentTheme === 'dark' ? 'dark' : 'light'"
             @change="changeTheme"
           >
@@ -26,7 +26,7 @@
         </a-list-item-meta>
         <template #actions>
           <a-select
-            style="width: 120px"
+            style="width: 150px"
             :default-value="locales.find((item) => item.value === currentLocale)?.value"
             @change="changeLocale"
           >
@@ -46,9 +46,10 @@
           </template>
         </a-list-item-meta>
         <template #actions>
-          <a-select v-model="machine.sound" style="width: 120px" @change="changeSound">
-            <a-option v-for="mode in machine.soundModes" :key="mode" :value="mode" :label="mode">
-            </a-option>
+          <a-select v-model="machine.sound" style="width: 150px" @change="changeSound">
+            <a-option>{{ t('settings.system.sound.0') }}</a-option>
+            <a-option>{{ t('settings.system.sound.1') }}</a-option>
+            <a-option>{{ t('settings.system.sound.2') }} </a-option>
           </a-select>
         </template>
       </a-list-item>
@@ -59,7 +60,7 @@
           </template>
         </a-list-item-meta>
         <template #actions>
-          <a-button style="width: 120px" @click="handleErrlog">
+          <a-button style="width: 150px" @click="handleErrlog">
             <template #icon>
               <icon-launch />
             </template>
@@ -86,7 +87,7 @@
           </template>
         </a-list-item-meta>
         <template #actions>
-          <a-button style="width: 120px" @click="handleUpdate">
+          <a-button style="width: 150px" @click="handleUpdate">
             <template #icon>
               <icon-download />
             </template>
@@ -131,12 +132,7 @@ const router = useRouter()
 const machine = ref({
   id: 'None',
   version: 'None',
-  sound: t('settings.system.sound.0'),
-  soundModes: [
-    t('settings.system.sound.0'),
-    t('settings.system.sound.1'),
-    t('settings.system.sound.2')
-  ]
+  sound: t('settings.system.sound.0')
 })
 
 // 查看错误日志
@@ -148,9 +144,9 @@ const handleUpdate = () => {
   Message.info(t('settings.system.update.no'))
 }
 
-const changeSound = async (value) => {
+const changeSound = async (va) => {
   try {
-    switch (value) {
+    switch (va) {
       case t('settings.system.sound.0'):
         await setOption({ key: 'Sound', value: '0' })
         break
@@ -163,7 +159,7 @@ const changeSound = async (value) => {
       default:
         break
     }
-    machine.value.sound = value
+    machine.value.sound = va
   } catch (error) {
     console.error(error)
   }

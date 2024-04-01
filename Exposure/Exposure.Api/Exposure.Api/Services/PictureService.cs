@@ -4,6 +4,7 @@ using Exposure.Api.Contracts.SqlSugar;
 using Exposure.Api.Models;
 using Exposure.Api.Models.Dto;
 using Exposure.Api.Utils;
+using Microsoft.Extensions.Localization;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using SixLabors.ImageSharp;
@@ -14,7 +15,11 @@ using Size = OpenCvSharp.Size;
 
 namespace Exposure.Api.Services;
 
-public class PictureService(IDbContext dbContext, IUserService user) : BaseService<Picture>(dbContext), IPictureService
+public class PictureService(
+    IDbContext dbContext, 
+    IUserService user, 
+    IStringLocalizer<SharedResources> localizer
+    ) : BaseService<Picture>(dbContext), IPictureService
 {
     private readonly IDbContext _context = dbContext;
 
@@ -60,13 +65,20 @@ public class PictureService(IDbContext dbContext, IUserService user) : BaseServi
 
     #region 合并图片
 
-    public async Task<Picture> Combine(List<Picture> list)
+    public async Task<Picture> Combine(Picture pic1, Picture pic2)
     {
-        var bitmap1 = new Bitmap(list[0].Path);
-        var bitmap2 = new Bitmap(list[1].Path);
-        var mat1 = bitmap1.ToMat();
-        var mat2 = bitmap2.ToMat();
-        var mat = new Mat(list[0].Height, list[1].Width, MatType.CV_8UC3, new Scalar(0));
+        var mat1 = new Mat(pic1.Path, ImreadModes.Grayscale);
+        var mat2 = new Mat(pic2.Path, ImreadModes.Grayscale);
+        if (pic1.Type == 1)
+        {
+            Cv2.BitwiseNot(mat1, mat1);
+        }
+
+        if (pic2.Type == 1)
+        {
+            Cv2.BitwiseNot(mat2, mat2);
+        }
+        var mat = new Mat();
         Cv2.Add(mat1, mat2, mat);
 
         var date = DateTime.Now.ToString("yyyyMMddHHmmss");
@@ -84,8 +96,6 @@ public class PictureService(IDbContext dbContext, IUserService user) : BaseServi
         mat.SaveImage(thumbnail);
 
         // 释放资源
-        bitmap1.Dispose();
-        bitmap2.Dispose();
         mat1.Dispose();
         mat2.Dispose();
         mat.Dispose();
@@ -116,7 +126,7 @@ public class PictureService(IDbContext dbContext, IUserService user) : BaseServi
     public async Task<Picture> Adjust(PictureAdjustDto dto)
     {
         var pic = await GetByPrimary(dto.Id);
-        if (pic == null) throw new Exception("未找到相关图片");
+        if (pic == null) throw new Exception(localizer.GetString("NotFound").Value);
         // 使用imageSharp处理图片
         var image = await Image.LoadAsync(pic.Path);
         // 增强亮度

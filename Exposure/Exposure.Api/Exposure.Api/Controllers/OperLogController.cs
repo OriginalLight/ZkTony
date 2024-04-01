@@ -1,6 +1,7 @@
 ﻿using Exposure.Api.Contracts.Services;
 using Exposure.Api.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using MiniExcelLibs;
 using SqlSugar;
 
@@ -8,7 +9,10 @@ namespace Exposure.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class OperLogController(ILogger<OperLogController> logger, IUsbService usb, IOperLogService operLog)
+public class OperLogController(
+    IUsbService usb, 
+    IOperLogService operLog,
+    IStringLocalizer<SharedResources> localizer)
     : ControllerBase
 {
     #region 分页查询
@@ -25,7 +29,6 @@ public class OperLogController(ILogger<OperLogController> logger, IUsbService us
             Total = total.Value,
             List = list
         };
-        logger.LogInformation("分页查询成功");
         return Ok(res);
     }
 
@@ -36,11 +39,10 @@ public class OperLogController(ILogger<OperLogController> logger, IUsbService us
     [HttpDelete]
     public async Task<IActionResult> Delete([FromBody] object[] ids)
     {
-        if (!await operLog.DeleteRange(ids)) return Problem("删除失败");
+        if (!await operLog.DeleteRange(ids)) return Problem(localizer.GetString("Delete").Value + localizer.GetString("Failure").Value);
         // 插入日志
-        operLog.AddOperLog("删除", "删除操作日志：ids = " + string.Join(",", ids));
-        logger.LogInformation("删除成功");
-        return Ok("删除成功");
+        operLog.AddOperLog(localizer.GetString("Delete").Value, $"{localizer.GetString("OperLog").Value}：ids = {string.Join(",", ids)}");
+        return Ok();
     }
 
     #endregion
@@ -53,27 +55,44 @@ public class OperLogController(ILogger<OperLogController> logger, IUsbService us
     {
         // 获取U盘
         var usb1 = usb.GetDefaultUsbDrive();
-        if (usb1 == null) throw new Exception("未找到可用的U盘");
+        if (usb1 == null) throw new Exception(localizer.GetString("NoUsb").Value);
         // 获取日志
         var list = await operLog.GetByIds(ids);
-        if (list.Count == 0) throw new Exception("未找到相关日志");
+        if (list.Count == 0) throw new Exception(localizer.GetString("NotFound").Value);
 
-        // 使用MiniExcel导出
-        var data = list.Select(p => new
+        // 判断使用中文还是英文
+        var lang = HttpContext.Request.Headers["Accept-Language"].ToString().ToLower();
+        if (lang.Contains("zh"))
         {
-            编号 = p.Id,
-            用户名 = p.User?.Name,
-            操作类型 = p.Type,
-            操作描述 = p.Description,
-            操作时间 = p.Time
-        }).ToList();
-        // 保存到U盘
-        await MiniExcel.SaveAsAsync(Path.Combine(usb1.Name, "操作日志.xlsx"), data, overwriteFile: true);
+            // 使用MiniExcel导出
+            var data = list.Select(p => new
+            {
+                编号 = p.Id,
+                用户名 = p.User?.Name,
+                操作类型 = p.Type,
+                操作描述 = p.Description,
+                操作时间 = p.Time
+            }).ToList();
+            // 保存到U盘
+            await MiniExcel.SaveAsAsync(Path.Combine(usb1.Name, $"{localizer.GetString("OperLog").Value}.xlsx"), data, overwriteFile: true);
+        } else {
+            // 使用MiniExcel导出
+            var data = list.Select(p => new
+            {
+                Id = p.Id,
+                UserName = p.User?.Name,
+                Type = p.Type,
+                Description = p.Description,
+                Time = p.Time
+            }).ToList();
+            // 保存到U盘
+            await MiniExcel.SaveAsAsync(Path.Combine(usb1.Name, $"{localizer.GetString("OperLog").Value}.xlsx"), data, overwriteFile: true);
+        }
+        
         // 记录日志
-        operLog.AddOperLog("导出", "导出操作日志：ids = " + string.Join(",", ids));
-        logger.LogInformation("导出成功");
+        operLog.AddOperLog(localizer.GetString("Export").Value, $"{localizer.GetString("OperLog").Value}：ids = " + string.Join(",", ids));
         // 返回结果
-        return Ok("导出成功");
+        return Ok();
     }
 
     #endregion

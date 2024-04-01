@@ -3,6 +3,7 @@ using Exposure.Api.Contracts.Services;
 using Exposure.Api.Core.SerialPort.Default;
 using Exposure.Api.Models;
 using Exposure.Api.Utils;
+using Microsoft.Extensions.Localization;
 using OpenCvSharp;
 
 namespace Exposure.Api.Services;
@@ -11,8 +12,8 @@ public class CameraService(
     IOptionService option,
     ISerialPortService serialPort,
     IPictureService picture,
-    IUserService user)
-    : ICameraService
+    IUserService user,
+    IStringLocalizer<SharedResources> localizer) : ICameraService
 {
     private readonly List<Picture> _pictureList = [];
     private uint _expoTime = 1500;
@@ -36,21 +37,21 @@ public class CameraService(
             var gain = ushort.Parse(await option.GetOptionValueAsync("Gain") ?? "3000");
 
             var arr = Nncam.EnumV2();
-            if (arr.Length == 0) throw new Exception("未找到设备");
+            if (arr.Length == 0) throw new Exception(localizer.GetString("Error0001").Value);
  
             // 打开设备
             _nncam = Nncam.Open(arr[0].id);
-            if (_nncam == null) throw new Exception("打开设备失败");
+            if (_nncam == null) throw new Exception(localizer.GetString("Error0002").Value);
 
             // 设置参数
-            if (!_nncam.put_Temperature(temperature)) throw new Exception("设置温度失败");
-            if (!_nncam.put_Option(Nncam.eOPTION.OPTION_TRIGGER, 1)) throw new Exception("设置模式失败");
-            if (!_nncam.put_AutoExpoEnable(false)) throw new Exception("参数自动曝光设置失败");
-            if (!_nncam.put_Chrome(true)) throw new Exception("设置单色失败");
-            if (!_nncam.put_ExpoAGain(gain)) throw new Exception("设置增益失败");
+            if (!_nncam.put_Temperature(temperature)) throw new Exception(localizer.GetString("Error0003").Value);
+            if (!_nncam.put_Option(Nncam.eOPTION.OPTION_TRIGGER, 1)) throw new Exception(localizer.GetString("Error0004").Value);
+            if (!_nncam.put_AutoExpoEnable(false)) throw new Exception(localizer.GetString("Error0005").Value);
+            if (!_nncam.put_Chrome(true)) throw new Exception(localizer.GetString("Error0006").Value);
+            if (!_nncam.put_ExpoAGain(gain)) throw new Exception(localizer.GetString("Error0007").Value);
 
             // 设置回调
-            if (!SetCallBack()) throw new Exception("设置回调失败");
+            if (!SetCallBack()) throw new Exception(localizer.GetString("Error0008").Value);
         }
         catch (Exception)
         {
@@ -77,7 +78,7 @@ public class CameraService(
     public async Task PreviewAsync()
     {
         await InitAsync();
-        if (_nncam == null) throw new Exception("预览失败");
+        if (_nncam == null) throw new Exception($"{localizer.GetString("Preview")}-{localizer.GetString("Failure").Value}");
         // 清空队列
         _pictureList.Clear();
         // 设置flag
@@ -93,9 +94,9 @@ public class CameraService(
             await Task.Delay(100);
 
             // 设置曝光时间
-            if (!_nncam.put_ExpoTime(_expoTime)) throw new Exception("设置曝光时间失败");
+            if (!_nncam.put_ExpoTime(_expoTime)) throw new Exception(localizer.GetString("Error0009").Value);
             // 触发拍摄
-            if (!_nncam.Trigger(1)) throw new Exception("预览失败");
+            if (!_nncam.Trigger(1)) throw new Exception($"{localizer.GetString("Preview")}-{localizer.GetString("Failure").Value}");
         }
         catch (Exception)
         {
@@ -111,12 +112,16 @@ public class CameraService(
     public async Task<long> TakeAutoPhotoAsync(CancellationToken ctsToken)
     {
         await InitAsync();
-        if (_nncam == null) throw new Exception("自动拍照失败");
+        if (_nncam == null) throw new Exception(localizer.GetString("Error0011").Value);
 
         _mat = null;
         _flag = "sampling";
         var targetExpo = await CalculateExpo(0.1, ctsToken);
-        if (targetExpo == 0) throw new Exception("计算曝光时间失败");
+        // 验证曝光时间
+        if (targetExpo == 0)
+        {
+            targetExpo = 1000;
+        }
 
         _mat = null;
         _pictureList.Clear();
@@ -132,9 +137,9 @@ public class CameraService(
             await Task.Delay(100, ctsToken);
 
             // 设置曝光时间
-            if (!_nncam.put_ExpoTime(_expoTime)) throw new Exception("设置白光曝光时间失败");
+            if (!_nncam.put_ExpoTime(_expoTime)) throw new Exception(localizer.GetString("Error0009").Value);
             // 触发拍摄
-            if (!_nncam.Trigger(1)) throw new Exception("拍摄白光图失败");
+            if (!_nncam.Trigger(1)) throw new Exception(localizer.GetString("Error0010").Value);
         }
         catch (Exception)
         {
@@ -147,9 +152,9 @@ public class CameraService(
         await Task.Delay(500, ctsToken);
 
         // 设置曝光时
-        if (!_nncam.put_ExpoTime((uint)targetExpo)) throw new Exception("设置曝光图曝光时间失败");
+        if (!_nncam.put_ExpoTime((uint)targetExpo)) throw new Exception(localizer.GetString("Error0009").Value);
 
-        if (!_nncam.Trigger(1)) throw new Exception("拍摄曝光图失败");
+        if (!_nncam.Trigger(1)) throw new Exception(localizer.GetString("Error0010").Value);
 
         return targetExpo;
     }
@@ -161,7 +166,7 @@ public class CameraService(
     public async Task TakeManualPhotoAsync(int exposure, int frame, CancellationToken ctsToken)
     {
         await InitAsync();
-        if (_nncam == null) throw new Exception("手动拍照失败");
+        if (_nncam == null) throw new Exception(localizer.GetString("Error0011").Value);
 
         _mat = null;
         _pictureList.Clear();
@@ -177,9 +182,9 @@ public class CameraService(
             await Task.Delay(100, ctsToken);
 
             // 设置曝光时间
-            if (!_nncam.put_ExpoTime(_expoTime)) throw new Exception("设置白光曝光时间失败");
+            if (!_nncam.put_ExpoTime(_expoTime)) throw new Exception(localizer.GetString("Error0009").Value);
             // 触发拍摄
-            if (!_nncam.Trigger(1)) throw new Exception("拍摄白光图失败");
+            if (!_nncam.Trigger(1)) throw new Exception(localizer.GetString("Error0010").Value);
         }
         catch (Exception)
         {
@@ -191,9 +196,9 @@ public class CameraService(
         await Task.Delay(500, ctsToken);
 
         // 设置曝光时
-        if (!_nncam.put_ExpoTime((uint)(exposure / frame))) throw new Exception("设置多帧曝光时间失败");
+        if (!_nncam.put_ExpoTime((uint)(exposure / frame))) throw new Exception(localizer.GetString("Error0009").Value);
         // 触发拍摄
-        if (!_nncam.Trigger((ushort)frame)) throw new Exception("拍摄曝光图失败");
+        if (!_nncam.Trigger((ushort)frame)) throw new Exception(localizer.GetString("Error0010").Value);
     }
 
     #endregion
@@ -203,10 +208,10 @@ public class CameraService(
     public async Task CancelTask()
     {
         await InitAsync();
-        if (_nncam == null) throw new Exception("取消失败");
+        if (_nncam == null) throw new Exception(localizer.GetString("Error0011").Value);
         // 关闭灯光
         serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
-        if (!_nncam.Trigger(0)) throw new Exception("取消失败");
+        if (!_nncam.Trigger(0)) throw new Exception(localizer.GetString("Error0010").Value);
     }
 
     #endregion
@@ -234,13 +239,13 @@ public class CameraService(
     {
         
         await InitAsync();
-        if (_nncam == null) throw new Exception("手动拍照失败");
+        if (_nncam == null) throw new Exception(localizer.GetString("Error0011").Value);
         // 设置flag
         _flag = "aging";
         // 设置曝光时间
-        if (!_nncam.put_ExpoTime(5000000)) throw new Exception("设置曝光时间失败");
+        if (!_nncam.put_ExpoTime(5000000)) throw new Exception(localizer.GetString("Error0009").Value);
         // 触发拍摄
-        if (!_nncam.Trigger(1)) throw new Exception("预览失败");
+        if (!_nncam.Trigger(1)) throw new Exception(localizer.GetString("Error0010").Value);
     }
 
     #endregion
@@ -250,16 +255,16 @@ public class CameraService(
     public async Task Collect(int start, int interval, int number)
     {
         await InitAsync();
-        if (_nncam == null) throw new Exception("数据采集失败");
+        if (_nncam == null) throw new Exception(localizer.GetString("Error0011").Value);
 
         _flag = "collect";
         _seq = 0;
 
         for (var i = 0; i < number; i++)
         {
-            if (!_nncam.put_ExpoTime((uint)((start + interval * i) * 1000))) throw new Exception("设置曝光时间失败");
+            if (!_nncam.put_ExpoTime((uint)((start + interval * i) * 1000))) throw new Exception(localizer.GetString("Error0009").Value);
             // 触发拍摄
-            if (!_nncam.Trigger(1)) throw new Exception("拍摄图片失败");
+            if (!_nncam.Trigger(1)) throw new Exception(localizer.GetString("Error0010").Value);
 
             await Task.Delay(start + interval * i + 100);
         }
@@ -288,7 +293,7 @@ public class CameraService(
         if (SetCallBack()) return;
         _nncam?.Close();
         _nncam = null;
-        throw new Exception("设置回调失败");
+        throw new Exception(localizer.GetString("Error0008").Value);
     }
 
     #endregion
@@ -377,7 +382,12 @@ public class CameraService(
                             var combine = new Mat(height, width, MatType.CV_8UC3, new Scalar(0));
                             try
                             {
-                                if (_mat != null) Cv2.Add(mat, _mat, combine);
+                                if (_mat != null)
+                                {
+                                    // _mat 黑白反色处理
+                                    Cv2.BitwiseNot(_mat, _mat);
+                                    Cv2.Add(mat, _mat, combine);
+                                }
                                 _pictureList.Add(await SaveAsync(combine, info, (int)(expo + _expoTime), 2));
                             }
                             finally
@@ -500,7 +510,7 @@ public class CameraService(
         var picture1 = new Picture
         {
             UserId = user.GetLogged()?.Id ?? 0,
-            Name = type == -1 ? "预览图" : date,
+            Name = type == -1 ? localizer.GetString("Preview").Value : date,
             Path = filePath,
             Width = (int)info.width,
             Height = (int)info.height,
@@ -599,14 +609,14 @@ public class CameraService(
 
     private async Task<long> CalculateExpo(double time, CancellationToken ctsToken)
     {
-        if (_nncam == null) throw new Exception("计算曝光时间失败");
+        if (_nncam == null) throw new Exception(localizer.GetString("Error0011").Value);
         // 设置曝光时间
-        if (!_nncam.put_ExpoTime((uint)(time * 1000000))) throw new Exception("设置采样曝光时间失败");
+        if (!_nncam.put_ExpoTime((uint)(time * 1000000))) throw new Exception(localizer.GetString("Error0009").Value);
         // 计算曝光时间
-        if (!_nncam.Trigger(1)) throw new Exception("计算曝光时间失败");
+        if (!_nncam.Trigger(1)) throw new Exception(localizer.GetString("Error0010").Value);
         // 延时1300ms
         await Task.Delay((int)(time * 1000 + 1000), ctsToken);
-        if (_mat == null) throw new Exception("获取采样图失败");
+        if (_mat == null) throw new Exception(localizer.GetString("Error0011").Value);
         var snr = CalculateSnr(_mat, time);
         var percentage = CalculatePercentage(_mat, 10, 255);
         _mat = null;

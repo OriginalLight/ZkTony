@@ -1,5 +1,6 @@
 ﻿using Exposure.Api.Contracts.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace Exposure.Api.Controllers;
 
@@ -9,8 +10,8 @@ public class CameraController(
     ILogger<CameraController> logger,
     ICameraService camera,
     IOperLogService operLog,
-    IAudioService audio
-) : ControllerBase
+    IAudioService audio,
+    IStringLocalizer<SharedResources> localizer) : ControllerBase
 {
     private CancellationTokenSource? _cts;
 
@@ -22,7 +23,7 @@ public class CameraController(
     {
         // 初始化
         await camera.InitAsync();
-        logger.LogInformation("初始化成功");
+        logger.LogInformation(localizer.GetString("Init").Value);
         return Ok();
     }
 
@@ -36,8 +37,8 @@ public class CameraController(
     {
         // 预览
         await camera.PreviewAsync();
-        operLog.AddOperLog("预览", "预览成功");
-        logger.LogInformation("预览成功");
+        operLog.AddOperLog(localizer.GetString("Preview").Value, localizer.GetString("Success").Value);
+        logger.LogInformation(localizer.GetString("Preview").Value);
         return Ok();
     }
 
@@ -51,7 +52,7 @@ public class CameraController(
     {
         // 设置像素
         await camera.SetPixel((uint)index);
-        logger.LogInformation($"设置像素成功: {index}");
+        logger.LogInformation($"{localizer.GetString("SetPixel").Value}: {index}");
         return Ok();
     }
 
@@ -67,8 +68,8 @@ public class CameraController(
         _cts = new CancellationTokenSource();
         audio.PlayWithSwitch("Shot");
         var res = await camera.TakeAutoPhotoAsync(_cts.Token);
-        operLog.AddOperLog("自动拍照", "自动拍照成功");
-        logger.LogInformation("自动拍照成功");
+        operLog.AddOperLog(localizer.GetString("AutoShot").Value, localizer.GetString("Success").Value);
+        logger.LogInformation(localizer.GetString("AutoShot").Value);
         return Ok(res);
     }
 
@@ -84,8 +85,8 @@ public class CameraController(
         _cts = new CancellationTokenSource();
         audio.PlayWithSwitch("Shot");
         await camera.TakeManualPhotoAsync(exposure, frame, _cts.Token);
-        operLog.AddOperLog("手动拍照", "手动拍照成功");
-        logger.LogInformation("手动拍照成功");
+        operLog.AddOperLog(localizer.GetString("ManualShot").Value, localizer.GetString("Success").Value);
+        logger.LogInformation(localizer.GetString("ManualShot").Value);
         return Ok();
     }
 
@@ -100,8 +101,8 @@ public class CameraController(
         // 取消拍照
         await camera.CancelTask();
         audio.PlayWithSwitch("CancelShot");
-        operLog.AddOperLog("取消拍照", "取消拍照成功");
-        logger.LogInformation("取消拍照成功");
+        operLog.AddOperLog(localizer.GetString("CancelShot").Value, localizer.GetString("Success").Value);
+        logger.LogInformation(localizer.GetString("CancelShot").Value);
         return Ok();
     }
 
@@ -115,7 +116,6 @@ public class CameraController(
     {
         // 获取温度
         var cache = await camera.GetCacheAsync();
-        logger.LogInformation("获取缓存图片成功");
         return Ok(cache);
     }
 
@@ -129,7 +129,6 @@ public class CameraController(
     {
         // 获取温度
         await camera.Collect(start, interval, number);
-        logger.LogInformation("照片采集成功");
         return Ok();
     }
 

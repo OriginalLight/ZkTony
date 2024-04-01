@@ -13,6 +13,11 @@ axios.interceptors.request.use(
     // this example using the JWT token
     // Authorization is a custom headers key
     // please modify it according to the actual situation
+
+    // add headers
+    const language = localStorage.getItem('locale') || 'zh-CN'
+    config.headers['Content-Type'] = 'application/json'
+    config.headers['Accept-Language'] = language === 'zh-CN' ? 'zh' : 'en'
     return config
   },
   (error) => {
@@ -28,6 +33,6 @@ axios.interceptors.response.use(
     return response
   },
   (error) => {
-    return Promise.reject(new Error(error?.response?.data?.detail || 'Request Error'))
+    return Promise.reject(new Error(error?.response?.data?.detail || '0x0000 Request Error'))
   }
 )
