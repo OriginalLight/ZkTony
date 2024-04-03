@@ -1,5 +1,5 @@
 <template>
-  <a-card>
+  <a-card style="width: 100%">
     <a-space direction="vertical" size="medium" fill>
       <a-radio-group v-model="switchIndex" type="button" size="large" style="width: 100%">
         <a-tooltip :content="t('home.camera.options.model')">
@@ -140,7 +140,8 @@
         <a-button
           type="primary"
           size="large"
-          style="width: 120px"
+          style="width: 140px"
+          shape="round"
           :loading="loading.hatch"
           :disabled="disabled.hatch"
           @click="handleHatch"
@@ -155,7 +156,8 @@
         <a-button
           type="primary"
           size="large"
-          style="width: 120px"
+          style="width: 140px"
+          shape="round"
           :loading="loading.preview"
           :disabled="disabled.preview"
           @click="handlePreview"
@@ -168,7 +170,8 @@
         <a-button
           type="primary"
           size="large"
-          style="width: 120px"
+          style="width: 140px"
+          shape="round"
           :disabled="disabled.shot || exposureTime === 0"
           @click="handleShoot"
         >
@@ -343,9 +346,10 @@ const handlePreview = async () => {
 
 const exposureTime = computed(() => {
   return (
-    (options.value.time.minute ? options.value.time.minute : 0) * 60 * 1000 +
-    (options.value.time.second ? options.value.time.second : 0) * 1000 +
-    (options.value.time.millisecond ? options.value.time.millisecond : 0)
+    ((options.value.time.minute ? options.value.time.minute : 0) * 60 * 1000 +
+      (options.value.time.second ? options.value.time.second : 0) * 1000 +
+      (options.value.time.millisecond ? options.value.time.millisecond : 0)) *
+    1000
   )
 })
 

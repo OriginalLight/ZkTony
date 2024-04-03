@@ -8,5 +8,22 @@ export default {
   'fqc.machine.hatch.close': '关闭',
   'fqc.machine.light': '灯光',
   'fqc.machine.light.open': '打开',
-  'fqc.machine.light.close': '关闭'
+  'fqc.machine.light.close': '关闭',
+  'fqc.sound.title': '提示音 FQC',
+  'fqc.sound.ring': '铃声',
+  'fqc.sound.voice': '语音',
+  'fqc.sound.ring1': '自检成功',
+  'fqc.sound.ring2': '发生错误',
+  'fqc.sound.ring3': '开始拍摄',
+  'fqc.sound.ring4': '取消拍摄',
+  'fqc.sound.ring5': '保存成功',
+  'fqc.sound.ring6': '导出成功',
+  'fqc.sound.ring7': '铃声模式',
+  'fqc.sound.voice1': '自检成功',
+  'fqc.sound.voice2': '发生错误',
+  'fqc.sound.voice3': '开始拍摄',
+  'fqc.sound.voice4': '取消拍摄',
+  'fqc.sound.voice5': '保存成功',
+  'fqc.sound.voice6': '导出成功',
+  'fqc.sound.voice7': '语音模式'
 }

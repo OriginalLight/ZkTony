@@ -2,7 +2,7 @@
   <div class="content">
     <a-result class="result" status="404" :subtitle="'Not Found'"> </a-result>
     <div class="operation-row">
-      <a-button key="back" type="primary" @click="back"> Back </a-button>
+      <a-button key="back" shape="round" type="primary" @click="back"> Back </a-button>
     </div>
   </div>
 </template>

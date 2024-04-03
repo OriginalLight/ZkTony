@@ -1,13 +1,14 @@
 <template>
-  <a-image
-    :src="props.image.path"
-    fit="fill"
-    width="100%"
-    height="100%"
-    :style="{
-      filter: `brightness(${imageOptions.brightness}%) contrast(${imageOptions.contrast}%)`
-    }"
-  />
+  <div class="img-preview-box">
+    <img
+      id="img-preview"
+      v-lazy="props.image.path"
+      :style="{
+        filter: `brightness(${imageOptions.brightness}%) contrast(${imageOptions.contrast}%)`,
+        transform: `scale(${imageOptions.scale})`
+      }"
+    />
+  </div>
   <div class="image-edit">
     <a-space size="medium">
       <a-tooltip placement="top" :content="t('home.image.preview.brightness')">
@@ -58,7 +59,12 @@
         <a-button
           type="primary"
           size="medium"
-          @click="(imageOptions.brightness = 100), (imageOptions.contrast = 100)"
+          :disabled="
+            imageOptions.brightness == 100 &&
+            imageOptions.contrast == 100 &&
+            imageOptions.scale == 1.2
+          "
+          @click="handleRedo"
         >
           <template #icon>
             <Refresh />
@@ -92,7 +98,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Brightness, Contrast, Refresh, Save } from '@icon-park/vue-next'
 import { Picture, adjustPicture } from '@renderer/api/picture'
@@ -116,8 +122,19 @@ const loading = ref(false)
 // 参数
 const imageOptions = ref({
   brightness: 100,
-  contrast: 100
+  contrast: 100,
+  scale: 1.2
 })
+
+// 恢复
+const handleRedo = () => {
+  imageOptions.value.brightness = 100
+  imageOptions.value.contrast = 100
+  imageOptions.value.scale = 1.2
+  const img = document.getElementById('img-preview') as HTMLImageElement
+  img.style.left = '0px'
+  img.style.top = '0px'
+}
 
 // 保存
 const handleSave = async () => {
@@ -145,6 +162,53 @@ watch(
     imageOptions.value.contrast = 100
   }
 )
+
+const handleTouch = () => {
+  // 双指缩放
+  const div = document.querySelector('.img-preview-box') as HTMLDivElement
+  let startX, startY
+  let distanceStart, distanceEnd
+
+  div.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+      startX = Math.abs(e.touches[0].pageX - e.touches[1].pageX)
+      startY = Math.abs(e.touches[0].pageY - e.touches[1].pageY)
+      distanceStart = Math.sqrt(startX * startX + startY * startY) // 计算两个触点之间的距离
+    }
+  })
+
+  div.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2) {
+      const endX = Math.abs(e.touches[0].pageX - e.touches[1].pageX)
+      const endY = Math.abs(e.touches[0].pageY - e.touches[1].pageY)
+      if (Math.abs(startX - endX) < 10 && Math.abs(startY - endY) < 10) {
+        return
+      }
+      distanceEnd = Math.sqrt(endX * endX + endY * endY) // 计算两个触点之间的距离
+      const scale = distanceEnd / distanceStart // 计算缩放比例
+      // 根据缩放比例来缩放图片或其他内容
+      imageOptions.value.scale = scale
+    }
+  })
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  div.addEventListener('touchend', (_e) => {
+    startX = startY = distanceStart = distanceEnd = 0
+  })
+
+  // 鼠标滚轮缩放
+  div.addEventListener('wheel', (e) => {
+    if (e.deltaY < 0) {
+      imageOptions.value.scale += 0.1
+    } else {
+      imageOptions.value.scale -= 0.1
+    }
+  })
+}
+
+onMounted(() => {
+  handleTouch()
+})
 </script>
 
 <style src="@vueform/slider/themes/default.css"></style>
@@ -164,9 +228,23 @@ watch(
   padding: 12px;
 }
 
+.img-preview-box {
+  display: flex;
+  position: relative;
+  width: 100%;
+  height: 100%;
+
+  img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+}
+
 .slider {
-  --slider-connect-bg: rgb(var(--arcoblue-6));
-  --slider-tooltip-bg: rgb(var(--arcoblue-6));
-  --slider-handle-ring-color: rgb(var(--arcoblue-6));
+  --slider-connect-bg: rgb(var(--primary-6));
+  --slider-tooltip-bg: rgb(var(--primary-6));
+  --slider-handle-ring-color: rgb(var(--primary-6));
 }
 </style>

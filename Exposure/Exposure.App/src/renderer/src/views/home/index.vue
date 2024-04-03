@@ -1,9 +1,9 @@
 <template>
   <a-row class="container">
-    <a-col :span="13" class="image-preview">
+    <a-col :span="14" class="image-preview">
       <ImagePreview :image="preview" @adjust="handleAdjust" />
     </a-col>
-    <a-col :span="11" class="operation">
+    <a-col :span="10" class="operation">
       <CameraOptions @shoot="handleShoot" @preview="handlePreview" />
       <ThumbnailView
         :preview="preview"
@@ -65,23 +65,25 @@ const handleAdjust = (image: Picture) => {
 </script>
 
 <style lang="less" scoped>
-.image-preview {
-  position: relative;
-  display: flex;
-  flex-direction: column;
+.container {
+  height: calc(100vh - 66px);
   padding: 4px;
-  height: calc(100vh - 66px);
   overflow: hidden;
-}
 
-.operation {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  height: calc(100vh - 66px);
-  padding-top: 4px;
-  padding-right: 4px;
-  padding-bottom: 4px;
+  .image-preview {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 74px);
+    overflow: hidden;
+  }
+
+  .operation {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: calc(100vh - 74px);
+    padding-left: 4px;
+  }
 }
 </style>
-./state/home-state ../../states/index

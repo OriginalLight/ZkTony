@@ -15,7 +15,7 @@
           <a-tag size="large">{{
             item.light.length + item.dark.length + item.combine.length
           }}</a-tag>
-          <a-button @click="handleSelectedAll(item)">
+          <a-button shape="round" @click="handleSelectedAll(item)">
             {{
               showSelectedAll(item)
                 ? t('gallery.content.picture.cancelSelectAll')
@@ -84,6 +84,7 @@ import dayjs from 'dayjs'
 import { useWindowSize } from '@vueuse/core'
 import { Picture, PictureGallery, getByPage } from '@renderer/api/picture'
 import useGalleryState from '@renderer/states/gallery'
+import { Message } from '@arco-design/web-vue'
 
 const { t } = useI18n()
 
@@ -191,7 +192,7 @@ const fetchData = async () => {
     data.value = res.data.list
     paginationProps.total = res.data.total
   } catch (error) {
-    console.log(error)
+    Message.error((error as Error).message)
   } finally {
     loading.value = false
   }
@@ -232,14 +233,14 @@ onActivated(async () => {
     top: 0;
     right: 0;
     color: rgba(255, 255, 255, 1);
-    background-color: rgb(var(--arcoblue-6));
+    background-color: rgb(var(--primary-6));
   }
 
   .img-name {
     position: absolute;
     bottom: 0;
     width: 100%;
-    background-color: rgb(var(--arcoblue-6));
+    background-color: rgb(var(--primary-6));
     color: rgba(255, 255, 255, 1);
     font-size: 10px;
     text-align: center;

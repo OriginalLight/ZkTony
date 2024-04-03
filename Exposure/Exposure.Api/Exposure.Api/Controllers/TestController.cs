@@ -1,16 +1,15 @@
 ﻿using Exposure.Api.Contracts.Services;
 using Exposure.Api.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
 
 namespace Exposure.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
 public class TestController(
-    ILogger<TestController> logger, 
+    ILogger<TestController> logger,
     ITestService service
-    ) : ControllerBase
+) : ControllerBase
 {
     #region 老化测试
 

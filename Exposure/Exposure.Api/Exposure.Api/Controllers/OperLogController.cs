@@ -10,7 +10,7 @@ namespace Exposure.Api.Controllers;
 [ApiController]
 [Route("[controller]")]
 public class OperLogController(
-    IUsbService usb, 
+    IUsbService usb,
     IOperLogService operLog,
     IStringLocalizer<SharedResources> localizer)
     : ControllerBase
@@ -39,9 +39,11 @@ public class OperLogController(
     [HttpDelete]
     public async Task<IActionResult> Delete([FromBody] object[] ids)
     {
-        if (!await operLog.DeleteRange(ids)) return Problem(localizer.GetString("Delete").Value + localizer.GetString("Failure").Value);
+        if (!await operLog.DeleteRange(ids))
+            return Problem(localizer.GetString("Delete").Value + localizer.GetString("Failure").Value);
         // 插入日志
-        operLog.AddOperLog(localizer.GetString("Delete").Value, $"{localizer.GetString("OperLog").Value}：ids = {string.Join(",", ids)}");
+        operLog.AddOperLog(localizer.GetString("Delete").Value,
+            $"{localizer.GetString("OperLog").Value}：ids = {string.Join(",", ids)}");
         return Ok();
     }
 
@@ -74,23 +76,28 @@ public class OperLogController(
                 操作时间 = p.Time
             }).ToList();
             // 保存到U盘
-            await MiniExcel.SaveAsAsync(Path.Combine(usb1.Name, $"{localizer.GetString("OperLog").Value}.xlsx"), data, overwriteFile: true);
-        } else {
+            await MiniExcel.SaveAsAsync(Path.Combine(usb1.Name, $"{localizer.GetString("OperLog").Value}.xlsx"), data,
+                overwriteFile: true);
+        }
+        else
+        {
             // 使用MiniExcel导出
             var data = list.Select(p => new
             {
-                Id = p.Id,
+                p.Id,
                 UserName = p.User?.Name,
-                Type = p.Type,
-                Description = p.Description,
-                Time = p.Time
+                p.Type,
+                p.Description,
+                p.Time
             }).ToList();
             // 保存到U盘
-            await MiniExcel.SaveAsAsync(Path.Combine(usb1.Name, $"{localizer.GetString("OperLog").Value}.xlsx"), data, overwriteFile: true);
+            await MiniExcel.SaveAsAsync(Path.Combine(usb1.Name, $"{localizer.GetString("OperLog").Value}.xlsx"), data,
+                overwriteFile: true);
         }
-        
+
         // 记录日志
-        operLog.AddOperLog(localizer.GetString("Export").Value, $"{localizer.GetString("OperLog").Value}：ids = " + string.Join(",", ids));
+        operLog.AddOperLog(localizer.GetString("Export").Value,
+            $"{localizer.GetString("OperLog").Value}：ids = " + string.Join(",", ids));
         // 返回结果
         return Ok();
     }

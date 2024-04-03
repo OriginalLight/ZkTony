@@ -17,10 +17,7 @@ public class StorageService(
             //删除文件夹里面的所有文件
             try
             {
-                if (!Directory.Exists(FileUtils.Preview))
-                {
-                    return;
-                }
+                if (!Directory.Exists(FileUtils.Preview)) return;
                 foreach (var file in Directory.GetFiles(FileUtils.Preview))
                 {
                     logger.LogInformation($"Delete File：{file}");
@@ -36,9 +33,9 @@ public class StorageService(
     }
 
     #endregion
-    
+
     #region 存储空间检测
-    
+
     public double AvailableStorage()
     {
         var drives = DriveInfo.GetDrives();
@@ -46,6 +43,6 @@ public class StorageService(
         var available = drives.Sum(drive => drive.AvailableFreeSpace);
         return available * 1.0 / total;
     }
-    
+
     #endregion
 }

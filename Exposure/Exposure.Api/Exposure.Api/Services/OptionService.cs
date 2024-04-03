@@ -7,8 +7,8 @@ namespace Exposure.Api.Services;
 public class OptionService(IDbContext dbContext) : BaseService<Option>(dbContext), IOptionService
 {
     private readonly IDbContext _context = dbContext;
-    
-    #region 获取Key对应的值 
+
+    #region 获取Key对应的值
 
     public async Task<string?> GetOptionValueAsync(string key)
     {
@@ -37,7 +37,7 @@ public class OptionService(IDbContext dbContext) : BaseService<Option>(dbContext
     }
 
     #endregion
-    
+
     #region 获取Key对应的值
 
     public string GetOptionValue(string key)
@@ -48,7 +48,7 @@ public class OptionService(IDbContext dbContext) : BaseService<Option>(dbContext
     #endregion
 
     #region 设置Key对应的值
-    
+
     public bool SetOptionValue(string key, string value)
     {
         var option = _context.db.Queryable<Option>().First(p => p.Key == key);
@@ -65,6 +65,6 @@ public class OptionService(IDbContext dbContext) : BaseService<Option>(dbContext
         };
         return _context.db.Insertable(option).ExecuteCommand() > 0;
     }
-    
+
     #endregion
 }

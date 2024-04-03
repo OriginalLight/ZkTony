@@ -56,11 +56,12 @@
               <a-list-item-meta :title="t('aging.switch')"></a-list-item-meta>
               <template #actions>
                 <a-space>
-                  <a-button type="primary" @click="agingTest(agingOptions)">
+                  <a-button type="primary" shape="round" @click="agingTest(agingOptions)">
                     {{ t('aging.start') }}
                   </a-button>
                   <a-button
                     type="primary"
+                    shape="round"
                     @click="
                       agingTest({
                         hatch: false,

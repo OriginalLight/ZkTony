@@ -17,7 +17,7 @@
     <a-tooltip :content="$t('navigation.status.time')">
       <div style="font-size: 10px">{{ now }}</div>
     </a-tooltip>
-    <a-button class="logout" @click="visible = true">
+    <a-button class="logout" shape="round" @click="visible = true">
       <template #icon>
         <icon-user />
       </template>

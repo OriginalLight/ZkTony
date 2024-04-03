@@ -38,14 +38,15 @@ public class CameraService(
 
             var arr = Nncam.EnumV2();
             if (arr.Length == 0) throw new Exception(localizer.GetString("Error0001").Value);
- 
+
             // 打开设备
             _nncam = Nncam.Open(arr[0].id);
             if (_nncam == null) throw new Exception(localizer.GetString("Error0002").Value);
 
             // 设置参数
             if (!_nncam.put_Temperature(temperature)) throw new Exception(localizer.GetString("Error0003").Value);
-            if (!_nncam.put_Option(Nncam.eOPTION.OPTION_TRIGGER, 1)) throw new Exception(localizer.GetString("Error0004").Value);
+            if (!_nncam.put_Option(Nncam.eOPTION.OPTION_TRIGGER, 1))
+                throw new Exception(localizer.GetString("Error0004").Value);
             if (!_nncam.put_AutoExpoEnable(false)) throw new Exception(localizer.GetString("Error0005").Value);
             if (!_nncam.put_Chrome(true)) throw new Exception(localizer.GetString("Error0006").Value);
             if (!_nncam.put_ExpoAGain(gain)) throw new Exception(localizer.GetString("Error0007").Value);
@@ -78,7 +79,8 @@ public class CameraService(
     public async Task PreviewAsync()
     {
         await InitAsync();
-        if (_nncam == null) throw new Exception($"{localizer.GetString("Preview")}-{localizer.GetString("Failure").Value}");
+        if (_nncam == null)
+            throw new Exception($"{localizer.GetString("Preview")}{localizer.GetString("Failure").Value}");
         // 清空队列
         _pictureList.Clear();
         // 设置flag
@@ -96,7 +98,8 @@ public class CameraService(
             // 设置曝光时间
             if (!_nncam.put_ExpoTime(_expoTime)) throw new Exception(localizer.GetString("Error0009").Value);
             // 触发拍摄
-            if (!_nncam.Trigger(1)) throw new Exception($"{localizer.GetString("Preview")}-{localizer.GetString("Failure").Value}");
+            if (!_nncam.Trigger(1))
+                throw new Exception($"{localizer.GetString("Preview")}{localizer.GetString("Failure").Value}");
         }
         catch (Exception)
         {
@@ -118,10 +121,7 @@ public class CameraService(
         _flag = "sampling";
         var targetExpo = await CalculateExpo(0.1, ctsToken);
         // 验证曝光时间
-        if (targetExpo == 0)
-        {
-            targetExpo = 1000;
-        }
+        if (targetExpo == 0) targetExpo = 1000;
 
         _mat = null;
         _pictureList.Clear();
@@ -227,7 +227,7 @@ public class CameraService(
             await Task.Delay(100);
             count--;
         }
-
+        
         return _pictureList;
     }
 
@@ -237,7 +237,6 @@ public class CameraService(
 
     public async Task AgingTest()
     {
-        
         await InitAsync();
         if (_nncam == null) throw new Exception(localizer.GetString("Error0011").Value);
         // 设置flag
@@ -262,7 +261,8 @@ public class CameraService(
 
         for (var i = 0; i < number; i++)
         {
-            if (!_nncam.put_ExpoTime((uint)((start + interval * i) * 1000))) throw new Exception(localizer.GetString("Error0009").Value);
+            if (!_nncam.put_ExpoTime((uint)((start + interval * i) * 1000)))
+                throw new Exception(localizer.GetString("Error0009").Value);
             // 触发拍摄
             if (!_nncam.Trigger(1)) throw new Exception(localizer.GetString("Error0010").Value);
 
@@ -379,21 +379,16 @@ public class CameraService(
                         {
                             // 保存图片
                             _pictureList.Add(await SaveAsync(mat, info, (int)expo, 1));
-                            var combine = new Mat(height, width, MatType.CV_8UC3, new Scalar(0));
-                            try
+                            if (_mat != null)
                             {
-                                if (_mat != null)
-                                {
-                                    // _mat 黑白反色处理
-                                    Cv2.BitwiseNot(_mat, _mat);
-                                    Cv2.Add(mat, _mat, combine);
-                                }
-                                _pictureList.Add(await SaveAsync(combine, info, (int)(expo + _expoTime), 2));
-                            }
-                            finally
-                            {
+                                // _mat 黑白反色处理
+                                Cv2.BitwiseNot(mat, mat);
+                                // 正片叠底将mat叠在-mat上面
+                                var multiply = OpenCvUtils.Multiply(_mat, mat);
+                                // 保存图片
+                                _pictureList.Add(await SaveAsync(multiply, info, (int)(expo + _expoTime), 2));
                                 // 释放资源
-                                combine.Dispose();
+                                multiply.Dispose();
                             }
                         }
                             break;
@@ -414,23 +409,6 @@ public class CameraService(
                             _mat = mat.Clone();
                             // 保存图片
                             _pictureList.Add(await SaveAsync(mat, info, (int)expo, 1));
-                            break;
-                        default:
-                        {
-                            var combine = new Mat(height, width, MatType.CV_8UC3, new Scalar(0));
-                            try
-                            {
-                                if (_mat != null) Cv2.Add(mat, _mat, combine);
-                                _mat = combine.Clone();
-                                // 保存图片
-                                _pictureList.Add(await SaveAsync(combine, info, (int)expo * (_seq - 1), 1));
-                            }
-                            finally
-                            {
-                                // 释放资源
-                                combine.Dispose();
-                            }
-                        }
                             break;
                     }
                 }
@@ -473,12 +451,12 @@ public class CameraService(
         #region 通用处理
 
         // 校准图片
-        var dst = Calibrate(mat);
+        var dst = OpenCvUtils.Calibrate(mat);
         // 转换灰度图
         var gray = new Mat();
         Cv2.CvtColor(dst, gray, ColorConversionCodes.BGR2GRAY);
         // 去除杂色
-        mat.SetTo(0, mat.InRange(0, 3));
+        gray.SetTo(0, gray.InRange(0, 3));
         // 中值滤波
         //Cv2.MedianBlur(gray, gray, 5);
         // 开运算
@@ -530,81 +508,6 @@ public class CameraService(
 
     #endregion
 
-    #region 相机标定
-
-    private static Mat Calibrate(Mat src)
-    {
-        InputArray cameraMatrix;
-        InputArray distCoeffs;
-
-        switch (src)
-        {
-            // 3000 分辨率
-            case { Width: 2992, Height: 3000 }:
-                cameraMatrix = InputArray.Create(new[,]
-                {
-                    { 25084.866788553183, 0.0, 1490.4840423876637 }, { 0.0, 24953.07878266964, 1036.6913576658844 },
-                    { 0.0, 0.0, 1.0 }
-                });
-                distCoeffs = InputArray.Create([
-                    -6.714961926680041, 36.45951919419504, 0.11381577335005356, 0.012718469865032982,
-                    -0.09751213606627142
-                ]);
-                break;
-            // 1500 分辨率
-            case { Width: 1488, Height: 1500 }:
-                cameraMatrix = InputArray.Create(new[,]
-                {
-                    { 13043.982070571883, 0.0, 740.7185361307056 }, { 0.0, 12987.689563610029, 541.4143327555635 },
-                    { 0.0, 0.0, 1.0 }
-                });
-                distCoeffs = InputArray.Create([
-                    -7.19141774541563, 28.710192805407473, 0.10897004294135913, 0.013334599463637546,
-                    0.29155982674105035
-                ]);
-                break;
-            // 1000 分辨率
-            case { Width: 992, Height: 998 }:
-                cameraMatrix = InputArray.Create(new[,]
-                {
-                    { 10066.90980810934, 0.0, 356.1090956224924 }, { 0.0, 10104.216767255499, 472.4125568043425 },
-                    { 0.0, 0.0, 1.0 }
-                });
-                distCoeffs = InputArray.Create([
-                    -9.08285993829159, -112.07125081784204, 0.022485367380474335, 0.1431247144709765, -0.489913386337676
-                ]);
-                break;
-            default:
-                cameraMatrix = InputArray.Create(new[,]
-                {
-                    { 25084.866788553183, 0.0, 1490.4840423876637 }, { 0.0, 24953.07878266964, 1036.6913576658844 },
-                    { 0.0, 0.0, 1.0 }
-                });
-                distCoeffs = InputArray.Create([
-                    -6.714961926680041, 36.45951919419504, 0.11381577335005356, 0.012718469865032982,
-                    -0.09751213606627142
-                ]);
-                break;
-        }
-
-        //根据相机内参和畸变参数矫正图片
-        var dst = new Mat();
-
-        var newCameraMatrix =
-            Cv2.GetOptimalNewCameraMatrix(cameraMatrix, distCoeffs, src.Size(), 0, src.Size(), out var roi);
-        // cameraMatrix 数组转换成 Mat 类型
-        Cv2.Undistort(src, dst, cameraMatrix, distCoeffs, newCameraMatrix);
-        // 裁剪图片并返回原始尺寸
-        var res = new Mat();
-        Cv2.Resize(dst[roi], res, src.Size());
-        // 释放资源
-        dst.Dispose();
-
-        return res;
-    }
-
-    #endregion
-
     #region 计算曝光时间
 
     private async Task<long> CalculateExpo(double time, CancellationToken ctsToken)
@@ -616,13 +519,16 @@ public class CameraService(
         if (!_nncam.Trigger(1)) throw new Exception(localizer.GetString("Error0010").Value);
         // 延时1300ms
         await Task.Delay((int)(time * 1000 + 1000), ctsToken);
+        // 获取图片
         if (_mat == null) throw new Exception(localizer.GetString("Error0011").Value);
-        var snr = CalculateSnr(_mat, time);
-        var percentage = CalculatePercentage(_mat, 10, 255);
+        // 计算信噪比
+        var snr = OpenCvUtils.CalculateSnr(_mat, time);
+        // 计算白色区域占比
+        var percentage = OpenCvUtils.CalculatePercentage(_mat, 10, 255);
+        // 清空_mat
         _mat = null;
 
         if (Math.Abs(time - 0.1) < 0.1)
-        {
             return percentage switch
             {
                 <= 0.05 => snr switch
@@ -635,12 +541,9 @@ public class CameraService(
                 <= 0.5 => GetScale(0.1, 0.5, 2000000, 5000000, percentage),
                 _ => GetScale(0.5, 1, 100000, 2000000, percentage)
             };
-        }
-
 
 
         if (Math.Abs(time - 1) < 0.1)
-        {
             return percentage switch
             {
                 <= 0.05 => snr switch
@@ -657,10 +560,8 @@ public class CameraService(
                 <= 0.5 => GetScale(0.1, 0.5, 2000000, 5000000, percentage),
                 _ => GetScale(0.5, 1, 100000, 2000000, percentage)
             };
-        }
 
         if (Math.Abs(time - 5) < 0.1)
-        {
             return percentage switch
             {
                 <= 0.05 => snr switch
@@ -679,81 +580,20 @@ public class CameraService(
                 <= 0.5 => GetScale(0.1, 0.5, 6000000, 15000000, percentage),
                 _ => GetScale(0.5, 1, 300000, 6000000, percentage)
             };
-        }
 
         return 0;
     }
 
     #endregion
-
-    #region SNR
-
-    private static double CalculateSnr(Mat image, double time)
-    {
-        var gray = new Mat();
-        try
-        {
-            // 转换成灰度图
-            Cv2.CvtColor(image, gray, ColorConversionCodes.BGR2GRAY);
-
-            // 计算信噪比
-            Cv2.MeanStdDev(gray, out var mean, out var stddev);
-
-            // Calculate the signal power (square of the mean)
-            var signalPower = Math.Pow(mean.Val0, 2);
-
-            // Calculate the noise power (square of the standard deviation)
-            var noisePower = Math.Pow(stddev.Val0, 2);
-
-            // Adjust the noise power based on the exposure time
-            var adjustedNoisePower = noisePower / time;
-
-            // Calculate and return the adjusted SNR value
-            return 10 * Math.Log10(signalPower / adjustedNoisePower);
-        }
-        finally
-        {
-            // 释放资源
-            gray.Dispose();
-        }
-    }
-
-    #endregion
+    
 
     #region 比例缩放
-    
+
     private static long GetScale(double min, double max, double minTarget, double maxTarget, double value)
     {
         return (long)((maxTarget - minTarget) * (value - min) / (max - min) + minTarget);
     }
-
+    
     #endregion
-
-    #region 计算mat中的某个灰度区间的占比
-
-    private static double CalculatePercentage(Mat mat, int min, int max)
-    {
-        var gray = new Mat();
-        var mask = new Mat();
-        try
-        {
-            // 转换成灰度图
-            Cv2.CvtColor(mat, gray, ColorConversionCodes.BGR2GRAY);
-            
-            var totalPixels = mat.Rows * mat.Cols;
-
-            // 创建一个掩码，其中在指定范围内的像素为白色，其他像素为黑色
-            Cv2.Threshold(gray, mask, min, max, ThresholdTypes.Binary);
-
-            var aboveThresholdPixels = Cv2.CountNonZero(mask);
-            return (double)aboveThresholdPixels / totalPixels;
-        }
-        finally
-        {
-            gray.Dispose();
-            mask.Dispose();
-        }
-    }
-
-    #endregion
+    
 }

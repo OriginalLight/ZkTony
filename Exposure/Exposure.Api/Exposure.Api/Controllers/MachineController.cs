@@ -111,7 +111,8 @@ public class MachineController(
                 await Task.Delay(100);
             }
 
-            if (num >= 50) return Problem(localizer.GetString("OpenHatch").Value + localizer.GetString("Failure").Value);
+            if (num >= 50)
+                return Problem(localizer.GetString("OpenHatch").Value + localizer.GetString("Failure").Value);
             serialPort.WritePort("Com1", DefaultProtocol.LedAllClose().ToBytes());
             serialPort.SetFlag("led", 0);
             serialPort.SetFlag("hatch", 1);
@@ -134,11 +135,12 @@ public class MachineController(
                 await Task.Delay(100);
             }
 
-            if (num >= 50) return Problem(localizer.GetString("CloseHatch").Value + localizer.GetString("Failure").Value);
+            if (num >= 50)
+                return Problem(localizer.GetString("CloseHatch").Value + localizer.GetString("Failure").Value);
             serialPort.WritePort("Com1", DefaultProtocol.LedAllClose().ToBytes());
             serialPort.SetFlag("led", 0);
             serialPort.SetFlag("hatch", 0);
-            logger.LogInformation(localizer.GetString("CloseHatch").Value + localizer.GetString("Failure").Value);
+            logger.LogInformation(localizer.GetString("CloseHatch").Value);
         }
 
         return Ok();

@@ -44,7 +44,7 @@
         </a-input-password>
       </a-form-item>
       <a-space :size="16" direction="vertical">
-        <a-button type="primary" html-type="submit" long :loading="loading">
+        <a-button type="primary" shape="round" html-type="submit" long :loading="loading">
           {{ $t('login.form.login') }}
         </a-button>
       </a-space>

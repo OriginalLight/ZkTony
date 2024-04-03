@@ -1,12 +1,10 @@
-﻿using System.Media;
-using Exposure.Api.Contracts.Services;
+﻿using Exposure.Api.Contracts.Services;
 using NAudio.Wave;
 
 namespace Exposure.Api.Services;
 
 public class AudioService(IOptionService option) : IAudioService
 {
-
     #region 播放
 
     public void Play(string key)
@@ -61,7 +59,6 @@ public class AudioService(IOptionService option) : IAudioService
 
     public void Stop()
     {
-        
     }
 
     #endregion

@@ -7,7 +7,7 @@ import store from './store'
 import i18n from './locale'
 import VueLazyLoad from 'vue3-lazyload'
 import { Message } from '@arco-design/web-vue'
-import '@arco-design/web-vue/dist/arco.css'
+import '@arco-themes/vue-zktony/index.less'
 import '@renderer/api/interceptor'
 import '@icon-park/vue-next/styles/index.css'
 

@@ -45,7 +45,8 @@ public class PictureController(
     public async Task<IActionResult> Update([FromBody] PictureUpdateDto dto)
     {
         // 更新
-        if (!await picture.Update(dto)) throw new Exception(localizer.GetString("Update").Value + localizer.GetString("Failure").Value);
+        if (!await picture.Update(dto))
+            throw new Exception(localizer.GetString("Update").Value + localizer.GetString("Failure").Value);
         // 插入日志
         operLog.AddOperLog(localizer.GetString("Update").Value, $"{localizer.GetString("Picture").Value}: {dto.Id}");
         return Ok();
@@ -59,9 +60,11 @@ public class PictureController(
     public async Task<IActionResult> Delete([FromBody] object[] ids)
     {
         // 删除
-        if (!await picture.DeleteRange(ids)) throw new Exception(localizer.GetString("Delete").Value + localizer.GetString("Failure").Value);
+        if (!await picture.DeleteRange(ids))
+            throw new Exception(localizer.GetString("Delete").Value + localizer.GetString("Failure").Value);
         // 插入日志
-        operLog.AddOperLog(localizer.GetString("Delete").Value, $"{localizer.GetString("Picture").Value}: {string.Join(',', ids)}");
+        operLog.AddOperLog(localizer.GetString("Delete").Value,
+            $"{localizer.GetString("Picture").Value}: {string.Join(',', ids)}");
         return Ok();
     }
 
@@ -75,9 +78,11 @@ public class PictureController(
     {
         var list = await picture.GetByIds(ids);
         if (list.Count is 0 or not 2) throw new Exception(localizer.GetString("NotFound").Value);
-        if (list[0].Width != list[1].Width || list[0].Height != list[1].Height) return Problem(localizer.GetString("SizeInconsistency").Value);
+        if (list[0].Width != list[1].Width || list[0].Height != list[1].Height)
+            return Problem(localizer.GetString("SizeInconsistency").Value);
         var res = await picture.Combine(list[0], list[1]);
-        operLog.AddOperLog(localizer.GetString("Combine").Value, $"{localizer.GetString("Picture").Value}: {string.Join(',', ids)}");
+        operLog.AddOperLog(localizer.GetString("Combine").Value,
+            $"{localizer.GetString("Picture").Value}: {string.Join(',', ids)}");
         return Ok(res);
     }
 
@@ -127,7 +132,8 @@ public class PictureController(
         }
 
         // 记录日志
-        operLog.AddOperLog(localizer.GetString("Export").Value, $"{localizer.GetString("Picture").Value}：ids = " + string.Join(",", dto.Ids));
+        operLog.AddOperLog(localizer.GetString("Export").Value,
+            $"{localizer.GetString("Picture").Value}：ids = " + string.Join(",", dto.Ids));
         audio.PlayWithSwitch("Export");
         // 返回结果
         return Ok();
@@ -143,8 +149,12 @@ public class PictureController(
     {
         // 获取日志
         var res = await picture.Adjust(dto);
-        audio.PlayWithSwitch("Save");
-        operLog.AddOperLog(localizer.GetString("Adjust").Value, $"{localizer.GetString("Picture").Value}：id = " + dto.Id);
+        if (dto.Code == 0)
+        {
+            audio.PlayWithSwitch("Save");
+        }
+        operLog.AddOperLog(localizer.GetString("Adjust").Value,
+            $"{localizer.GetString("Picture").Value}：id = " + dto.Id);
         return Ok(res);
     }
 

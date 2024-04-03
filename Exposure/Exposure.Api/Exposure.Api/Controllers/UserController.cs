@@ -11,7 +11,7 @@ namespace Exposure.Api.Controllers;
 [ApiController]
 [Route("[controller]")]
 public class UserController(
-    IUserService user, 
+    IUserService user,
     IOperLogService operLog,
     IStringLocalizer<SharedResources> localizer) : ControllerBase
 {
@@ -98,7 +98,8 @@ public class UserController(
         user1.LastLoginTime = DateTime.Now;
         // 验证用户名是否重复
         if (await user.GetByName(dto.Name) != null) return Problem(localizer.GetString("DuplicateUserName").Value);
-        if (!await user.Add(user1)) return Problem(localizer.GetString("Add").Value + localizer.GetString("Failure").Value);
+        if (!await user.Add(user1))
+            return Problem(localizer.GetString("Add").Value + localizer.GetString("Failure").Value);
         // 记录添加日志
         operLog.AddOperLog(localizer.GetString("Add").Value, $"{localizer.GetString("User").Value}: {dto.Name}");
         return Ok();
@@ -137,7 +138,8 @@ public class UserController(
         old.Role = dto.Role;
         old.Enabled = dto.Enabled;
         old.UpdateTime = DateTime.Now;
-        if (!await user.Update(old)) throw new Exception(localizer.GetString("Update").Value + localizer.GetString("Failure").Value);
+        if (!await user.Update(old))
+            throw new Exception(localizer.GetString("Update").Value + localizer.GetString("Failure").Value);
         // 记录更新日志
         operLog.AddOperLog(localizer.GetString("Update").Value, $"{localizer.GetString("User").Value}: {dto.Name}");
         return Ok();
@@ -151,9 +153,11 @@ public class UserController(
     public async Task<IActionResult> Delete([FromBody] object[] ids)
     {
         // 删除
-        if (!await user.DeleteRange(ids)) return Problem(localizer.GetString("Delete").Value + localizer.GetString("Failure").Value);
+        if (!await user.DeleteRange(ids))
+            return Problem(localizer.GetString("Delete").Value + localizer.GetString("Failure").Value);
         // 记录删除日志
-        operLog.AddOperLog(localizer.GetString("Delete").Value, $"{localizer.GetString("User").Value}: {string.Join(',', ids)}");
+        operLog.AddOperLog(localizer.GetString("Delete").Value,
+            $"{localizer.GetString("User").Value}: {string.Join(',', ids)}");
         return Ok();
     }
 

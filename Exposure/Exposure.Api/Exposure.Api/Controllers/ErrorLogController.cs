@@ -41,9 +41,11 @@ public class ErrorLogController(
     [HttpDelete]
     public async Task<IActionResult> Delete([FromBody] object[] ids)
     {
-        if (!await errorLog.DeleteRange(ids)) return Problem(localizer.GetString("Delete").Value + localizer.GetString("Failure").Value);
+        if (!await errorLog.DeleteRange(ids))
+            return Problem(localizer.GetString("Delete").Value + localizer.GetString("Failure").Value);
         // 插入日志
-        operLog.AddOperLog(localizer.GetString("Delete").Value, $"{localizer.GetString("ErrorLog").Value}：ids = {string.Join(",", ids)}");
+        operLog.AddOperLog(localizer.GetString("Delete").Value,
+            $"{localizer.GetString("ErrorLog").Value}：ids = {string.Join(",", ids)}");
         return Ok();
     }
 
@@ -62,10 +64,12 @@ public class ErrorLogController(
         var list = await errorLog.GetByIds(ids);
         if (list.Count == 0) throw new Exception(localizer.GetString("NotFound").Value);
         // 保存到U盘
-        await System.IO.File.WriteAllTextAsync(Path.Combine(usb1.Name, $"{localizer.GetString("ErrorLog").Value}.json"), JsonConvert.SerializeObject(list),
+        await System.IO.File.WriteAllTextAsync(Path.Combine(usb1.Name, $"{localizer.GetString("ErrorLog").Value}.json"),
+            JsonConvert.SerializeObject(list),
             Encoding.UTF8);
         // 插入日志
-        operLog.AddOperLog(localizer.GetString("Export").Value, $"{localizer.GetString("ErrorLog").Value}：ids = " + string.Join(",", ids));
+        operLog.AddOperLog(localizer.GetString("Export").Value,
+            $"{localizer.GetString("ErrorLog").Value}：ids = " + string.Join(",", ids));
         // 返回结果
         return Ok();
     }

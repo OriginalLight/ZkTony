@@ -100,7 +100,7 @@ public class SerialPortService(ILogger<SerialPortService> logger, IOptionService
         }
         catch (Exception e)
         {
-            logger.LogError("Tx Failure" + alias, e);
+            logger.LogError("Tx Failure " + alias, e);
             errorLog.AddErrorLog(e);
         }
     }

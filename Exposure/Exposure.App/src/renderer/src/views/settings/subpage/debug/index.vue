@@ -36,6 +36,7 @@
                     v-for="option in button.options"
                     :key="option.code"
                     type="primary"
+                    shape="round"
                     @click="led(option)"
                   >
                     {{ option.label }}
@@ -51,10 +52,10 @@
               <a-list-item-meta :title="t('debug.machine.hatch')"></a-list-item-meta>
               <template #actions>
                 <a-space>
-                  <a-button type="primary" @click="hatch({ code: 1 })">
+                  <a-button type="primary" shape="round" @click="hatch({ code: 1 })">
                     {{ t('debug.machine.hatch.open') }}
                   </a-button>
-                  <a-button type="primary" @click="hatch({ code: 0 })">
+                  <a-button type="primary" shape="round" @click="hatch({ code: 0 })">
                     {{ t('debug.machine.hatch.close') }}
                   </a-button>
                 </a-space>
@@ -64,10 +65,10 @@
               <a-list-item-meta :title="t('debug.machine.light')"></a-list-item-meta>
               <template #actions>
                 <a-space>
-                  <a-button type="primary" @click="light({ code: 1 })">
+                  <a-button type="primary" shape="round" @click="light({ code: 1 })">
                     {{ t('debug.machine.light.open') }}
                   </a-button>
-                  <a-button type="primary" @click="light({ code: 0 })">
+                  <a-button type="primary" shape="round" @click="light({ code: 0 })">
                     {{ t('debug.machine.light.close') }}
                   </a-button>
                 </a-space>
@@ -77,10 +78,10 @@
               <a-list-item-meta :title="t('debug.machine.camera')"></a-list-item-meta>
               <template #actions>
                 <a-space>
-                  <a-button type="primary" @click="camera({ code: 1 })">
+                  <a-button type="primary" shape="round" @click="camera({ code: 1 })">
                     {{ t('debug.machine.camera.open') }}
                   </a-button>
-                  <a-button type="primary" @click="camera({ code: 0 })">
+                  <a-button type="primary" shape="round" @click="camera({ code: 0 })">
                     {{ t('debug.machine.camera.close') }}
                   </a-button>
                 </a-space>
@@ -90,10 +91,10 @@
               <a-list-item-meta :title="t('debug.machine.screen')"></a-list-item-meta>
               <template #actions>
                 <a-space>
-                  <a-button type="primary" @click="screen({ code: 1 })">
+                  <a-button type="primary" shape="round" @click="screen({ code: 1 })">
                     {{ t('debug.machine.screen.open') }}
                   </a-button>
-                  <a-button type="primary" @click="handleCloseScreen">
+                  <a-button type="primary" shape="round" @click="handleCloseScreen">
                     {{ t('debug.machine.screen.close') }}
                   </a-button>
                 </a-space>
@@ -111,6 +112,7 @@
                     v-for="ring in rings"
                     :key="ring.key"
                     type="primary"
+                    shape="round"
                     @click="play({ key: ring.key })"
                   >
                     {{ ring.label }}
@@ -126,6 +128,7 @@
                     v-for="ring in voices"
                     :key="ring.key"
                     type="primary"
+                    shape="round"
                     @click="play({ key: ring.key })"
                   >
                     {{ ring.label }}

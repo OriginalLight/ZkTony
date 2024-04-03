@@ -8,7 +8,7 @@
           </template>
         </a-list-item-meta>
         <template #actions>
-          <a-button style="width: 150px" @click="visible = true">
+          <a-button shape="round" style="width: 120px" @click="visible = true">
             <template #icon>
               <icon-edit />
             </template>
@@ -23,7 +23,7 @@
           </template>
         </a-list-item-meta>
         <template #actions>
-          <a-button style="width: 150px" @click="handleOperlog">
+          <a-button shape="round" style="width: 120px" @click="handleOperlog">
             <template #icon>
               <icon-launch />
             </template>
@@ -37,7 +37,7 @@
           </template>
         </a-list-item-meta>
         <template #actions>
-          <a-button style="width: 150px" @click="handleManage">
+          <a-button shape="round" style="width: 120px" @click="handleManage">
             <template #icon>
               <icon-launch />
             </template>

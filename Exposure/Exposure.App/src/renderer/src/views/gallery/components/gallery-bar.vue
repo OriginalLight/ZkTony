@@ -8,7 +8,7 @@
         style="width: 150px"
         allow-clear
       />
-      <a-button type="primary" @click="handleSearch">
+      <a-button type="primary" shape="round" @click="handleSearch">
         <template #icon>
           <icon-search />
         </template>
@@ -16,7 +16,7 @@
       >
     </a-space>
     <a-space size="large">
-      <a-button type="primary" :disabled="diableDetail" @click="handleDetail">
+      <a-button type="primary" shape="round" :disabled="diableDetail" @click="handleDetail">
         <template #icon>
           <icon-edit />
         </template>
@@ -24,6 +24,7 @@
       </a-button>
       <a-button
         type="primary"
+        shape="round"
         :disabled="diableCombine"
         :loading="loading.combine"
         @click="handleCombine"
@@ -34,7 +35,7 @@
         <template #default>{{ t('gallery.bar.combine') }}</template>
       </a-button>
       <a-popover position="br" trigger="click">
-        <a-button type="primary" :disabled="disableExport" :loading="loading.export">
+        <a-button type="primary" shape="round" :disabled="disableExport" :loading="loading.export">
           <template #icon>
             <icon-export />
           </template>
@@ -42,14 +43,15 @@
         </a-button>
         <template #content>
           <a-space size="large">
-            <a-button @click="handleExport('png')">PNG</a-button>
-            <a-button @click="handleExport('tiff')">TIFF</a-button>
-            <a-button @click="handleExport('jpg')">JPG</a-button>
+            <a-button shape="round" @click="handleExport('png')">PNG</a-button>
+            <a-button shape="round" @click="handleExport('tiff')">TIFF</a-button>
+            <a-button shape="round" @click="handleExport('jpg')">JPG</a-button>
           </a-space>
         </template>
       </a-popover>
       <a-button
         type="primary"
+        shape="round"
         status="danger"
         :loading="loading.delete"
         :disabled="disableDelete"

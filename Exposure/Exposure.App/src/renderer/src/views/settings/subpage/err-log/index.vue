@@ -3,7 +3,7 @@
     <div class="bar">
       <a-space size="large">
         <a-date-picker v-model="searchDate" style="width: 200px" />
-        <a-button type="primary" @click="handleSearch">
+        <a-button type="primary" shape="round" @click="handleSearch">
           <template #icon>
             <icon-search />
           </template>
@@ -13,6 +13,7 @@
       <a-space size="large">
         <a-button
           type="primary"
+          shape="round"
           status="danger"
           :disabled="isNoSelectedKeys"
           @click="visible = true"
@@ -22,7 +23,7 @@
           </template>
           <template #default>{{ t('errlog.bar.delete') }}</template>
         </a-button>
-        <a-button type="primary" :disabled="isNoSelectedKeys" @click="handleExport">
+        <a-button shape="round" type="primary" :disabled="isNoSelectedKeys" @click="handleExport">
           <template #icon>
             <icon-export />
           </template>

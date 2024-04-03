@@ -9,7 +9,7 @@
         </a-list-item-meta>
         <template #actions>
           <a-select
-            style="width: 150px"
+            style="width: 120px"
             :default-value="currentTheme === 'dark' ? 'dark' : 'light'"
             @change="changeTheme"
           >
@@ -26,7 +26,7 @@
         </a-list-item-meta>
         <template #actions>
           <a-select
-            style="width: 150px"
+            style="width: 120px"
             :default-value="locales.find((item) => item.value === currentLocale)?.value"
             @change="changeLocale"
           >
@@ -46,10 +46,10 @@
           </template>
         </a-list-item-meta>
         <template #actions>
-          <a-select v-model="machine.sound" style="width: 150px" @change="changeSound">
-            <a-option>{{ t('settings.system.sound.0') }}</a-option>
-            <a-option>{{ t('settings.system.sound.1') }}</a-option>
-            <a-option>{{ t('settings.system.sound.2') }} </a-option>
+          <a-select :default-value="machine.sound" style="width: 120px" @change="changeSound">
+            <a-option value="0">{{ t('settings.system.sound.0') }}</a-option>
+            <a-option value="1">{{ t('settings.system.sound.1') }}</a-option>
+            <a-option value="2">{{ t('settings.system.sound.2') }} </a-option>
           </a-select>
         </template>
       </a-list-item>
@@ -60,7 +60,7 @@
           </template>
         </a-list-item-meta>
         <template #actions>
-          <a-button style="width: 150px" @click="handleErrlog">
+          <a-button shape="round" style="width: 120px" @click="handleErrlog">
             <template #icon>
               <icon-launch />
             </template>
@@ -87,7 +87,7 @@
           </template>
         </a-list-item-meta>
         <template #actions>
-          <a-button style="width: 150px" @click="handleUpdate">
+          <a-button shape="round" style="width: 120px" @click="handleUpdate">
             <template #icon>
               <icon-download />
             </template>
@@ -132,7 +132,7 @@ const router = useRouter()
 const machine = ref({
   id: 'None',
   version: 'None',
-  sound: t('settings.system.sound.0')
+  sound: localStorage.getItem('sound') || '0'
 })
 
 // 查看错误日志
@@ -146,19 +146,8 @@ const handleUpdate = () => {
 
 const changeSound = async (va) => {
   try {
-    switch (va) {
-      case t('settings.system.sound.0'):
-        await setOption({ key: 'Sound', value: '0' })
-        break
-      case t('settings.system.sound.1'):
-        await setOption({ key: 'Sound', value: '1' })
-        break
-      case t('settings.system.sound.2'):
-        await setOption({ key: 'Sound', value: '2' })
-        break
-      default:
-        break
-    }
+    await setOption({ key: 'Sound', value: va })
+    localStorage.setItem('sound', va)
     machine.value.sound = va
   } catch (error) {
     console.error(error)

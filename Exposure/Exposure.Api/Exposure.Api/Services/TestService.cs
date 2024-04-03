@@ -101,7 +101,6 @@ public class TestService(ICameraService cameraService, ISerialPortService serial
                 }
 
             if (_agingDto.Camera)
-            {
                 try
                 {
                     await SaveAgingLogAsync("开始摄像头老化测试");
@@ -113,17 +112,18 @@ public class TestService(ICameraService cameraService, ISerialPortService serial
                 {
                     await SaveAgingLogAsync("摄像头老化测试异常: " + e.Message);
                 }
-            }
+
             await SaveAgingLogAsync($"等待{_agingDto.Interval}秒后进行下一次老化测试");
             await Task.Delay(_agingDto.Interval * 1000);
             await SaveAgingLogAsync($"---------------------------第{cycle}次老化测试结束");
         }
+
         _agingTask = null;
     }
 
     #endregion
-    
-    
+
+
     #region 存储老化测试日志
 
     private async Task SaveAgingLogAsync(string msg)
@@ -144,6 +144,6 @@ public class TestService(ICameraService cameraService, ISerialPortService serial
             await sw.WriteLineAsync(date + " " + msg);
         }
     }
-    
+
     #endregion
 }

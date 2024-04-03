@@ -6,6 +6,7 @@
           type="primary"
           style="width: 100px"
           size="large"
+          shape="round"
           :disabled="diableCombine"
           :loading="loading.combine"
           @click="handleCombine"
@@ -20,6 +21,7 @@
             type="primary"
             style="width: 100px"
             size="large"
+            shape="round"
             :disabled="disableExport"
             :loading="loading.export"
           >
@@ -30,9 +32,9 @@
           >
           <template #content>
             <a-space size="large">
-              <a-button @click="handleExport('png')">PNG</a-button>
-              <a-button @click="handleExport('tiff')">TIFF</a-button>
-              <a-button @click="handleExport('jpg')">JPG</a-button>
+              <a-button shape="round" @click="handleExport('png')">PNG</a-button>
+              <a-button shape="round" @click="handleExport('tiff')">TIFF</a-button>
+              <a-button shape="round" @click="handleExport('jpg')">JPG</a-button>
             </a-space>
           </template>
         </a-popover>
@@ -291,7 +293,7 @@ onMounted(() => {
       font-size: 10px;
       padding: 2px;
       color: rgba(255, 255, 255, 1);
-      background-color: rgb(var(--arcoblue-6));
+      background-color: rgb(var(--primary-6));
     }
 
     .selected {
@@ -299,7 +301,7 @@ onMounted(() => {
       top: 0;
       right: 0;
       color: rgba(255, 255, 255, 1);
-      background-color: rgb(var(--arcoblue-6));
+      background-color: rgb(var(--primary-6));
     }
 
     .img {
@@ -313,7 +315,7 @@ onMounted(() => {
       position: absolute;
       bottom: 10px;
       width: 25%;
-      background-color: rgb(var(--arcoblue-6));
+      background-color: rgb(var(--primary-6));
       color: rgba(255, 255, 255, 1);
       font-size: 8px;
       text-align: center;
@@ -324,7 +326,7 @@ onMounted(() => {
       position: absolute;
       bottom: 0;
       width: 100%;
-      background-color: rgb(var(--arcoblue-6));
+      background-color: rgb(var(--primary-6));
       color: rgba(255, 255, 255, 1);
       font-size: 10px;
       text-align: center;

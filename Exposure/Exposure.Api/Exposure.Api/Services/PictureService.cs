@@ -1,12 +1,10 @@
-﻿using System.Drawing;
-using Exposure.Api.Contracts.Services;
+﻿using Exposure.Api.Contracts.Services;
 using Exposure.Api.Contracts.SqlSugar;
 using Exposure.Api.Models;
 using Exposure.Api.Models.Dto;
 using Exposure.Api.Utils;
 using Microsoft.Extensions.Localization;
 using OpenCvSharp;
-using OpenCvSharp.Extensions;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using SqlSugar;
@@ -16,10 +14,10 @@ using Size = OpenCvSharp.Size;
 namespace Exposure.Api.Services;
 
 public class PictureService(
-    IDbContext dbContext, 
-    IUserService user, 
+    IDbContext dbContext,
+    IUserService user,
     IStringLocalizer<SharedResources> localizer
-    ) : BaseService<Picture>(dbContext), IPictureService
+) : BaseService<Picture>(dbContext), IPictureService
 {
     private readonly IDbContext _context = dbContext;
 
@@ -69,17 +67,18 @@ public class PictureService(
     {
         var mat1 = new Mat(pic1.Path, ImreadModes.Grayscale);
         var mat2 = new Mat(pic2.Path, ImreadModes.Grayscale);
+        var mat = new Mat();
         if (pic1.Type == 1)
         {
             Cv2.BitwiseNot(mat1, mat1);
+            mat = OpenCvUtils.Multiply(mat2, mat1);
         }
 
         if (pic2.Type == 1)
         {
             Cv2.BitwiseNot(mat2, mat2);
+            mat = OpenCvUtils.Multiply(mat1, mat2);
         }
-        var mat = new Mat();
-        Cv2.Add(mat1, mat2, mat);
 
         var date = DateTime.Now.ToString("yyyyMMddHHmmss");
 
@@ -143,7 +142,7 @@ public class PictureService(
         {
             var exposure = FileUtils.GetFileName(FileUtils.Exposure, $"{date}.png");
             await image.SaveAsPngAsync(exposure);
-            
+
             var width = image.Width;
             var height = image.Height;
 

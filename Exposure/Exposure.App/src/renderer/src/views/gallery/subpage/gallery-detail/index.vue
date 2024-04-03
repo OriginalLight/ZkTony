@@ -240,7 +240,7 @@ const options = ref({
   grayScale: 0,
   rotate: 0,
   invert: false,
-  scale: 1
+  scale: 1.2
 })
 
 const radioOpts = ref({
@@ -260,7 +260,7 @@ const resetOptions = () => {
     invert: false,
     grayScale: 0,
     rotate: 0,
-    scale: 1
+    scale: 1.2
   }
   const img = document.getElementById('img-preview') as HTMLImageElement
   img.style.left = '0px'
@@ -501,7 +501,7 @@ onMounted(() => {
   display: flex;
   position: relative;
 
-  .img {
+  img {
     width: 100px;
     height: 100px;
     object-fit: contain;
@@ -512,14 +512,14 @@ onMounted(() => {
     top: 0;
     right: 0;
     color: rgba(255, 255, 255, 1);
-    background-color: rgb(var(--arcoblue-6));
+    background-color: rgb(var(--primary-6));
   }
 
   .img-name {
     position: absolute;
     bottom: 0;
     width: 100%;
-    background-color: rgb(var(--arcoblue-6));
+    background-color: rgb(var(--primary-6));
     color: rgba(255, 255, 255, 1);
     font-size: 10px;
     text-align: center;
@@ -533,7 +533,7 @@ onMounted(() => {
   flex-direction: row;
 
   .col-1 {
-    width: 60%;
+    width: 65%;
     display: flex;
     position: relative;
     overflow: hidden;
@@ -548,7 +548,7 @@ onMounted(() => {
         position: absolute;
         width: 100%;
         height: 100%;
-        object-fit: fill;
+        object-fit: contain;
       }
     }
 
@@ -587,7 +587,7 @@ onMounted(() => {
   }
 
   .icon-btn:hover {
-    color: rgb(var(--arcoblue-6));
+    color: rgb(var(--primary-6));
   }
 
   .icon-btn:active {
@@ -599,9 +599,9 @@ onMounted(() => {
     padding-top: 36px;
 
     .slider {
-      --slider-connect-bg: rgb(var(--arcoblue-6));
-      --slider-tooltip-bg: rgb(var(--arcoblue-6));
-      --slider-handle-ring-color: rgb(var(--arcoblue-6));
+      --slider-connect-bg: rgb(var(--primary-6));
+      --slider-tooltip-bg: rgb(var(--primary-6));
+      --slider-handle-ring-color: rgb(var(--primary-6));
     }
   }
 
