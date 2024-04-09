@@ -1,7 +1,7 @@
 ﻿using Exposure.Api.Contracts.Services;
 using Exposure.Api.Models;
 using Exposure.SqlSugar.Contracts;
-using Exposure.Utils;
+using Exposure.Utilities;
 
 namespace Exposure.Api.Services;
 

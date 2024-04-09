@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Exposure.Utils", "Exposure.Utils\Exposure.Utils.csproj", "{154C78CB-F49E-4AF3-BE5D-2573C1F7304B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Exposure.Utilities", "Exposure.Utilities\Exposure.Utilities.csproj", "{154C78CB-F49E-4AF3-BE5D-2573C1F7304B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Exposure.SqlSugar", "Exposure.SqlSugar\Exposure.SqlSugar.csproj", "{6F72A82A-D6A5-489A-B701-0F333E10F33F}"
 EndProject

@@ -22,11 +22,11 @@ public class Picture
     ///     图片路径
     /// </summary>
     public string Path { get; set; } = string.Empty;
-    
+
     /// <summary>
     ///     缩略图
     /// </summary>
-    public string Thumbnail { get; set; }  = string.Empty;
+    public string Thumbnail { get; set; } = string.Empty;
 
     /// <summary>
     ///     宽度

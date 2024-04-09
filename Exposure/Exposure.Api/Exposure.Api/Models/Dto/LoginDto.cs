@@ -1,6 +1,6 @@
 ﻿namespace Exposure.Api.Models.Dto;
 
-public class  
+public class
     LoginDto
 {
     public string UserName { get; set; } = string.Empty;

@@ -11,7 +11,7 @@ public interface ICameraService
     Task InitAsync();
 
     /// <summary>
-    ///  停止
+    ///     停止
     /// </summary>
     void Stop();
 
@@ -61,7 +61,7 @@ public interface ICameraService
     /// </summary>
     /// <returns></returns>
     Task<List<Picture>> GetCacheAsync();
-    
+
     /// <summary>
     ///     老化测试
     /// </summary>
@@ -76,5 +76,4 @@ public interface ICameraService
     /// <param name="number"></param>
     /// <returns></returns>
     Task Collect(int start, int interval, int number);
-
 }

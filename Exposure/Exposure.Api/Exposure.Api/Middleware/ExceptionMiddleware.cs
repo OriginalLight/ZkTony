@@ -17,17 +17,18 @@ public class ExceptionMiddleware(
         // Utf8 编码
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
     };
+
     public async Task Invoke(HttpContext context)
     {
         try
         {
             await next(context);
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             context.Response.ContentType = "application/problem+json";
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            
+
             logger.LogError(ex, ex.Message);
             errorLog.AddErrorLog(ex);
             var problemDetails = new ProblemDetails

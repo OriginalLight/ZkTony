@@ -2,7 +2,7 @@
 using Exposure.Api.Contracts.Services;
 using Exposure.Api.Models;
 using Exposure.Protocal.Default;
-using Exposure.Utils;
+using Exposure.Utilities;
 using Microsoft.Extensions.Localization;
 using OpenCvSharp;
 
@@ -232,7 +232,7 @@ public class CameraService(
             await Task.Delay(100);
             count--;
         }
-        
+
         return _pictureList;
     }
 
@@ -494,11 +494,11 @@ public class CameraService(
         var gray = new Mat();
         // 缩略图
         var thumb = new Mat();
-        
+
         try
         {
             #region 通用处理
-            
+
             Cv2.CvtColor(dst, gray, ColorConversionCodes.BGR2GRAY);
             // 去除杂色
             gray.SetTo(0, gray.InRange(0, 3));
@@ -508,10 +508,7 @@ public class CameraService(
             Cv2.MorphologyEx(gray, gray, MorphTypes.Open, Cv2.GetStructuringElement(MorphShapes.Rect, new Size(3, 3)));
             // 直方图归一化
             gray.MinMaxLoc(out _, out double max);
-            if (max > 10 && type == 1)
-            {
-                Cv2.Normalize(gray, gray, 0, 255, NormTypes.MinMax, MatType.CV_8UC1);
-            }
+            if (max > 10 && type == 1) Cv2.Normalize(gray, gray, 0, 255, NormTypes.MinMax, MatType.CV_8UC1);
 
             #endregion
 
@@ -524,7 +521,7 @@ public class CameraService(
             Cv2.Resize(gray, thumb, new Size(500, 500));
             var tPath = FileUtils.GetFileName(FileUtils.Thumbnail, $"{name}.jpg");
             thumb.SaveImage(tPath);
-            
+
             var pic = new Picture
             {
                 UserId = user.GetLogged()?.Id ?? 0,
@@ -633,7 +630,7 @@ public class CameraService(
     }
 
     #endregion
-    
+
 
     #region 比例缩放
 
@@ -641,7 +638,6 @@ public class CameraService(
     {
         return (long)((maxTarget - minTarget) * (value - min) / (max - min) + minTarget);
     }
-    
+
     #endregion
-    
 }

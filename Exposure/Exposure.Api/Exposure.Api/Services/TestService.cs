@@ -1,7 +1,7 @@
 ﻿using Exposure.Api.Contracts.Services;
 using Exposure.Api.Models.Dto;
 using Exposure.Protocal.Default;
-using Exposure.Utils;
+using Exposure.Utilities;
 
 namespace Exposure.Api.Services;
 

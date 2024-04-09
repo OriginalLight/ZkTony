@@ -3,7 +3,7 @@ using System.Drawing.Imaging;
 using Exposure.Api.Contracts.Services;
 using Exposure.Api.Models;
 using Exposure.Api.Models.Dto;
-using Exposure.Utils;
+using Exposure.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SqlSugar;
@@ -149,10 +149,7 @@ public class PictureController(
     {
         // 获取日志
         var res = await picture.Adjust(dto);
-        if (dto.Code == 0)
-        {
-            audio.PlayWithSwitch("Save");
-        }
+        if (dto.Code == 0) audio.PlayWithSwitch("Save");
         operLog.AddOperLog(localizer.GetString("Adjust").Value,
             $"{localizer.GetString("Picture").Value}：id = " + dto.Id);
         return Ok(res);

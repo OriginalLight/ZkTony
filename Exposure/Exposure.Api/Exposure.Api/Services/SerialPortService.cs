@@ -23,7 +23,7 @@ public class SerialPortService(ILogger<SerialPortService> logger, IOptionService
         {
             try
             {
-                var sp = (System.IO.Ports.SerialPort)sender;
+                var sp = (SerialPort)sender;
                 var bytes = new byte[sp.BytesToRead];
                 sp.Read(bytes, 0, bytes.Length);
                 logger.LogInformation("Com2 Rx: " + BitConverter.ToString(bytes));

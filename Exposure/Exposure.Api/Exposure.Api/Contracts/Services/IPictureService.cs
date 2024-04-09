@@ -44,7 +44,7 @@ public interface IPictureService : IBaseService<Picture>
     Task<Picture> Adjust(PictureAdjustDto dto);
 
     /// <summary>
-    ///   更新
+    ///     更新
     /// </summary>
     /// <param name="model"></param>
     /// <returns></returns>

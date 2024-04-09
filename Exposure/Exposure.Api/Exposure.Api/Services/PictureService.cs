@@ -2,7 +2,7 @@
 using Exposure.Api.Models;
 using Exposure.Api.Models.Dto;
 using Exposure.SqlSugar.Contracts;
-using Exposure.Utils;
+using Exposure.Utilities;
 using Microsoft.Extensions.Localization;
 using OpenCvSharp;
 using SixLabors.ImageSharp;

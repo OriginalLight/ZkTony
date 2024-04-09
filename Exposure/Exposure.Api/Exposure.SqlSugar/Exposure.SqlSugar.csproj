@@ -7,12 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="SqlSugarCore" Version="5.1.4.151" />
-      <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+        <PackageReference Include="SqlSugarCore" Version="5.1.4.151"/>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Exposure.Utils\Exposure.Utils.csproj" />
+        <ProjectReference Include="..\Exposure.Utilities\Exposure.Utilities.csproj"/>
     </ItemGroup>
 
 </Project>

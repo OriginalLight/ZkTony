@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using Exposure.SqlSugar.Contracts;
-using Exposure.Utils;
+using Exposure.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SqlSugar;
@@ -12,9 +12,8 @@ namespace Exposure.SqlSugar;
 /// </summary>
 public class AppDbContext : IDbContext
 {
-    private readonly ILogger<AppDbContext> _logger;
     private readonly IConfiguration _config;
-    private readonly SqlSugarClient _db;
+    private readonly ILogger<AppDbContext> _logger;
 
     public AppDbContext(IConfiguration config, ILogger<AppDbContext> logger)
     {
@@ -23,7 +22,7 @@ public class AppDbContext : IDbContext
 
         var dataBase = _config.GetSection("DataBase").Value ?? throw new InvalidOperationException("无法获取数据库名称");
         //打印日志
-        _db = new SqlSugarClient(new ConnectionConfig
+        db = new SqlSugarClient(new ConnectionConfig
         {
             ConnectionString = $"Data Source={Path.Combine(FileUtils.AppLocation, dataBase)}",
             DbType = DbType.Sqlite, //数据库类型
@@ -31,21 +30,18 @@ public class AppDbContext : IDbContext
             LanguageType = LanguageType.Chinese,
             InitKeyType = InitKeyType.Attribute //从实体特性中读取主键自增列信息
         });
-        
+
         // Dev环境打印sql
         if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
-        {
-            _db.Aop.OnLogExecuting = (sql, paramster) =>
+            db.Aop.OnLogExecuting = (sql, paramster) =>
             {
                 _logger.LogInformation(sql + "\r\n" +
                                        $"{db.Utilities.SerializeObject(paramster.ToDictionary(it => it.ParameterName, it => it.Value))} \r\n");
             };
-        }
-        
     }
 
 
-    public SqlSugarClient db => _db;
+    public SqlSugarClient db { get; }
 
     /// <summary>
     ///     创建数据表

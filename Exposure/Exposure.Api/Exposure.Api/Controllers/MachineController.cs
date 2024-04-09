@@ -2,7 +2,7 @@
 using Exposure.Api.Contracts.Services;
 using Exposure.Api.Models.Dto;
 using Exposure.Protocal.Default;
-using Exposure.Utils;
+using Exposure.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using OpenCvSharp;
@@ -249,10 +249,7 @@ public class MachineController(
             while (serialPort.GetFlag("hatch") == 1 && num < 50)
             {
                 num++;
-                if (num == 35)
-                {
-                    serialPort.WritePort("Com2", DefaultProtocol.QueryOptocoupler().ToBytes());
-                }
+                if (num == 35) serialPort.WritePort("Com2", DefaultProtocol.QueryOptocoupler().ToBytes());
                 await Task.Delay(100);
             }
 
@@ -327,7 +324,7 @@ public class MachineController(
     }
 
     #endregion
-    
+
     [HttpGet]
     [Route("Update")]
     public IActionResult Update()
@@ -339,14 +336,10 @@ public class MachineController(
         var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         var dir = new DirectoryInfo(path);
         if (dir.Exists)
-        {
             // 整个文件夹复制，包括所有文件和子文件夹
             FileUtils.DirectoryCopy(path, Path.Combine(documents, "Exposure"), true);
-        }
         else
-        {
             throw new Exception(localizer.GetString("NotFound"));
-        }
         var bat = Path.Combine(Path.Combine(documents, "Exposure"), "Update.bat");
         if (!System.IO.File.Exists(bat)) throw new Exception(localizer.GetString("NotFound"));
         var process = new Process

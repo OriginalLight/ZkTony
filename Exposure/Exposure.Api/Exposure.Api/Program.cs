@@ -1,13 +1,11 @@
 using Exposure.Api.Contracts.Services;
-using Exposure.Api.Services;
-using Microsoft.AspNetCore.Localization;
-using Microsoft.OpenApi.Models;
-using Serilog;
-using System.Globalization;
 using Exposure.Api.Middleware;
+using Exposure.Api.Services;
 using Exposure.SqlSugar;
 using Exposure.SqlSugar.Contracts;
-using Exposure.Utils;
+using Exposure.Utilities;
+using Microsoft.OpenApi.Models;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -71,22 +69,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseRequestLocalization(options =>
-{
-    var supportedCultures = new List<CultureInfo>
-    {
-        new ("en"),
-        new ("zh")
-    };
-    options.DefaultRequestCulture = new RequestCulture("zh");
-    options.SupportedCultures = supportedCultures;
-    options.SupportedUICultures = supportedCultures;
-});
-
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.UseExceptionMiddleware();
+
+app.UseLocalizationMiddleware();
 
 app.Run();

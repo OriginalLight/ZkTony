@@ -10,7 +10,6 @@ public class Crc
         {
             crc ^= t;
             for (var j = 0; j < 8; j++)
-            {
                 if ((crc & 0x0001) != 0)
                 {
                     crc >>= 1;
@@ -20,9 +19,8 @@ public class Crc
                 {
                     crc >>= 1;
                 }
-            }
         }
 
-        return [(byte) (crc & 0xFF), (byte) (crc >> 8)];
+        return [(byte)(crc & 0xFF), (byte)(crc >> 8)];
     }
 }

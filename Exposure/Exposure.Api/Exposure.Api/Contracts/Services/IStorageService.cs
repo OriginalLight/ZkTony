@@ -9,7 +9,7 @@ public interface IStorageService
     Task CleanPreviewAsync();
 
     /// <summary>
-    ///   存储空间检测
+    ///     存储空间检测
     /// </summary>
     /// <returns></returns>
     double AvailableStorage();

@@ -7,6 +7,7 @@ public class User
 {
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
     public int Id { get; set; }
+
     public string Name { get; set; } = string.Empty;
     public string Sha { get; set; } = string.Empty;
     public int Role { get; set; }
