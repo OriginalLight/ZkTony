@@ -107,14 +107,14 @@ const handleSubmit = async ({
   }
 
   &-title {
-    color: var(--color-text-1);
+    color: white;
     font-weight: 500;
     font-size: 24px;
     line-height: 32px;
   }
 
   &-sub-title {
-    color: var(--color-text-3);
+    color: white;
     font-size: 16px;
     line-height: 24px;
   }

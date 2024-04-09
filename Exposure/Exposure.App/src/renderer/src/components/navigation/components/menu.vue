@@ -1,8 +1,14 @@
 <template>
-  <a-menu mode="horizontal" :default-selected-keys="['/home']" @menu-item-click="handleMenuClick">
+  <a-menu
+    class="menu"
+    mode="horizontal"
+    :default-selected-keys="['/home']"
+    @menu-item-click="handleMenuClick"
+  >
     <a-menu-item
       v-for="item in routes"
       :key="item.path"
+      class="menu-item"
       style="margin-right: 30px; font-size: 20px"
       :route="item"
     >
@@ -27,3 +33,14 @@ const handleMenuClick = (e: string) => {
   })
 }
 </script>
+
+<style lang="less" scoped>
+.menu {
+  background-color: transparent;
+
+  .menu-item {
+    background-color: transparent;
+    color: var(--color-bg-2);
+  }
+}
+</style>

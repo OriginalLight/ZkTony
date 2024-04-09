@@ -1,12 +1,13 @@
 using Exposure.Api.Contracts.Services;
-using Exposure.Api.Contracts.SqlSugar;
-using Exposure.Api.Core;
-using Exposure.Api.Core.Exception;
 using Exposure.Api.Services;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Globalization;
+using Exposure.Api.Middleware;
+using Exposure.SqlSugar;
+using Exposure.SqlSugar.Contracts;
+using Exposure.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +17,7 @@ builder.Host.UseSerilog((_, config) => config.ReadFrom.Configuration(builder.Con
 // Add services to the container.
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
-    options.JsonSerializerOptions.Converters.Add(new DateTimeJsonConverter());
+    options.JsonSerializerOptions.Converters.Add(new JsonUtils.JsonOptions());
 });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

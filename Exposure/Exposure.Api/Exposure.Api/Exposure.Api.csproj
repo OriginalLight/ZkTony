@@ -15,15 +15,6 @@
 
     <ItemGroup>
         <None Include="..\.editorconfig" Link=".editorconfig" />
-        <None Update="Assets\Ringtones\Start.wav">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Assets\Voices\Error.wav">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Assets\Ringtones\Save.wav">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
     </ItemGroup>
 
     <ItemGroup>
@@ -31,11 +22,8 @@
         <PackageReference Include="Mapster" Version="7.4.0" />
         <PackageReference Include="MiniExcel" Version="1.31.3" />
         <PackageReference Include="NAudio" Version="2.2.1" />
-        <PackageReference Include="OpenCvSharp4.Extensions" Version="4.9.0.20240103" />
-        <PackageReference Include="OpenCvSharp4.Windows" Version="4.9.0.20240103" />
         <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
         <PackageReference Include="SixLabors.ImageSharp" Version="3.1.3" />
-        <PackageReference Include="SqlSugarCore" Version="5.1.4.149" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
         <PackageReference Include="System.IO.Ports" Version="8.0.0" />
         <PackageReference Include="System.Management" Version="8.0.0" />
@@ -46,11 +34,12 @@
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
     </ItemGroup>
-
+    
     <ItemGroup>
-        <None Update="External\**">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
+        <ProjectReference Include="..\Exposure.External\Exposure.External.csproj" />
+        <ProjectReference Include="..\Exposure.Protocal\Exposure.Protocal.csproj" />
+        <ProjectReference Include="..\Exposure.Utils\Exposure.Utils.csproj" />
+        <ProjectReference Include="..\Exposure.SqlSugar\Exposure.SqlSugar.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Exposure.Api.Contracts.Services;
-using Exposure.Api.Contracts.SqlSugar;
+using Exposure.SqlSugar.Contracts;
 using SqlSugar;
 
 namespace Exposure.Api.Services;

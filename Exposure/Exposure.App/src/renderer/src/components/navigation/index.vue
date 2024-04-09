@@ -3,7 +3,7 @@
     <SystemMenu />
     <SystemStatus />
   </div>
-  <a-divider :margin="0" />
+  <a-divider v-if="show" :margin="0" />
 </template>
 <script lang="ts" setup>
 import { ref, watch } from 'vue'

@@ -67,14 +67,14 @@ const handleAdjust = (image: Picture) => {
 <style lang="less" scoped>
 .container {
   height: calc(100vh - 66px);
-  padding: 4px;
+  padding: 8px;
   overflow: hidden;
 
   .image-preview {
     position: relative;
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 74px);
+    height: calc(100vh - 66px - 16px);
     overflow: hidden;
   }
 
@@ -82,8 +82,8 @@ const handleAdjust = (image: Picture) => {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    height: calc(100vh - 74px);
-    padding-left: 4px;
+    height: calc(100vh - 66px - 16px);
+    padding-left: 8px;
   }
 }
 </style>

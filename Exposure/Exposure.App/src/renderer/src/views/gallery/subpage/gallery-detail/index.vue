@@ -4,7 +4,6 @@
       <a-tag
         v-if="subpage.list.light.length > 0"
         style="width: 100px; display: flex; justify-content: center"
-        color="arcoblue"
         >{{ t('gallery.detail.picture.light') }}</a-tag
       >
       <div
@@ -20,7 +19,6 @@
       <a-tag
         v-if="subpage.list.dark.length > 0"
         style="width: 100px; display: flex; justify-content: center"
-        color="arcoblue"
         >{{ t('gallery.detail.picture.dark') }}</a-tag
       >
       <div
@@ -36,7 +34,6 @@
       <a-tag
         v-if="subpage.list.combine.length > 0"
         style="width: 100px; display: flex; justify-content: center"
-        color="arcoblue"
         >{{ t('gallery.detail.picture.combine') }}</a-tag
       >
       <div
@@ -366,7 +363,6 @@ const handleHistogram = (src: string) => {
 
     canvas.width = 256 * 2
     canvas.height = (Math.max(...grayList) + 100 - (Math.max(...grayList) % 100)) / 20
-    ctx.strokeStyle = '#000000'
     ctx.lineWidth = 1
     for (let i = 0; i < grayList.length; i++) {
       ctx.beginPath()
@@ -374,6 +370,24 @@ const handleHistogram = (src: string) => {
       ctx.lineTo(i * 2, grayList[i] / 20)
       ctx.stroke()
     }
+
+    //canvas 上下颠倒
+    const imageData2 = ctx.getImageData(0, 0, canvas.width, canvas.height)
+    const data = imageData2.data
+    const data2 = new Uint8ClampedArray(data.length)
+    for (let i = 0; i < canvas.height; i++) {
+      for (let j = 0; j < canvas.width; j++) {
+        data2[i * canvas.width * 4 + j * 4] =
+          data[(canvas.height - i - 1) * canvas.width * 4 + j * 4]
+        data2[i * canvas.width * 4 + j * 4 + 1] =
+          data[(canvas.height - i - 1) * canvas.width * 4 + j * 4 + 1]
+        data2[i * canvas.width * 4 + j * 4 + 2] =
+          data[(canvas.height - i - 1) * canvas.width * 4 + j * 4 + 2]
+        data2[i * canvas.width * 4 + j * 4 + 3] =
+          data[(canvas.height - i - 1) * canvas.width * 4 + j * 4 + 3]
+      }
+    }
+    ctx.putImageData(new ImageData(data2, canvas.width, canvas.height), 0, 0)
   }
 
   img.src = src
@@ -485,8 +499,11 @@ onMounted(() => {
 .box {
   display: flex;
   flex-direction: row;
-  padding: 16px;
+  padding: 8px;
+  margin: 8px;
+  border-radius: 4px;
   height: calc(100vh - 66px - 32px);
+  background: var(--color-bg-2);
 }
 
 .preview {

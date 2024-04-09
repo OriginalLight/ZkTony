@@ -9,10 +9,10 @@
       </h3>
     </a-tooltip>
     <a-tooltip :content="$t('navigation.status.usb')">
-      <usb size="24" :fill="appStore.usb ? '#1890ff' : '#808080'" />
+      <usb size="24" :class="{ active: appStore.usb }" />
     </a-tooltip>
     <a-tooltip :content="$t('navigation.status.hatch')">
-      <open-door size="24" :fill="appStore.hatch ? '#1890ff' : '#808080'" />
+      <open-door size="24" :class="{ active: appStore.hatch }" />
     </a-tooltip>
     <a-tooltip :content="$t('navigation.status.time')">
       <div style="font-size: 10px">{{ now }}</div>
@@ -92,7 +92,7 @@ onBeforeUnmount(() => {
 .space {
   vertical-align: middle;
   padding: 0 30px;
-  color: var(--color-text-2);
+  color: var(--color-bg-2);
 }
 .logout {
   max-width: 200px;
@@ -105,5 +105,8 @@ onBeforeUnmount(() => {
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+}
+.active {
+  color: rgb(var(--primary-6));
 }
 </style>

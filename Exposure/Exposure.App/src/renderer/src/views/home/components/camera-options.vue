@@ -1,5 +1,5 @@
 <template>
-  <a-card style="width: 100%">
+  <a-card class="card">
     <a-space direction="vertical" size="medium" fill>
       <a-radio-group v-model="switchIndex" type="button" size="large" style="width: 100%">
         <a-tooltip :content="t('home.camera.options.model')">
@@ -193,7 +193,8 @@
     @ok="handleCancel"
   >
     <template #title> {{ t('home.camera.options.shooting') }} </template>
-    <a-space direction="vertical" size="large">
+    <a-space size="large">
+      <a-spin dot />
       <a-countdown
         :value="Date.now() + progress.time"
         :now="Date.now()"
@@ -299,17 +300,19 @@ const handleHatch = async () => {
 // 拍摄
 const handleShoot = async () => {
   progress.value.visible = true
-  progress.value.message = t('home.camera.options.shooting')
   try {
     if (options.value.mode === 'auto') {
+      progress.value.message = t('home.camera.options.calculating')
       progress.value.time = 12000
       const res = await auto()
+      progress.value.message = t('home.camera.options.shooting')
       progress.value.time = res.data / 1000 + 1500
       const ms = res.data / 1000
       options.value.time.minute = Math.floor(ms / 1000 / 60)
       options.value.time.second = Math.floor((ms / 1000) % 60)
       options.value.time.millisecond = Math.floor(ms % 1000)
     } else {
+      progress.value.message = t('home.camera.options.shooting')
       progress.value.time = exposureTime.value / 1000 + 1500
       await manual({
         exposure: exposureTime.value,
@@ -385,12 +388,18 @@ const delay = (ms: number) => {
 </script>
 
 <style scoped lang="less">
+.card {
+  display: flex;
+  flex-direction: column;
+}
+
 .image-edit {
   position: absolute;
   top: 8px;
   right: 8px;
   padding: 12px;
 }
+
 .image-info {
   position: absolute;
   top: 8px;

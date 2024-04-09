@@ -1,7 +1,7 @@
 ﻿using Exposure.Api.Contracts.Services;
-using Exposure.Api.Core.SerialPort.Default;
 using Exposure.Api.Models.Dto;
-using Exposure.Api.Utils;
+using Exposure.Protocal.Default;
+using Exposure.Utils;
 
 namespace Exposure.Api.Services;
 

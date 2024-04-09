@@ -1,7 +1,7 @@
 <template>
-  <a-layout class="layout">
-    <a-layout-header class="layout-header"> <Navigation /> </a-layout-header>
-    <a-layout-content class="layout-content">
+  <div class="layout">
+    <div class="layout-header"><Navigation /></div>
+    <div class="layout-content">
       <a-config-provider :locale="locale">
         <router-view v-slot="{ Component, route }">
           <keep-alive v-if="route.meta.keepAlive">
@@ -10,8 +10,8 @@
           <component :is="Component" v-else />
         </router-view>
       </a-config-provider>
-    </a-layout-content>
-  </a-layout>
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -43,13 +43,13 @@ onMounted(() => {
 <style lang="less" scoped>
 .layout {
   height: 100vh;
-  background-color: var(--color-bg-2);
-  .layout-header {
-    height: 66px;
-  }
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(to bottom right, #049a83, #1a6eb6);
+
   .layout-content {
     overflow: hidden;
-    height: calc(100vh - 66px);
+    flex: 1;
   }
 }
 </style>

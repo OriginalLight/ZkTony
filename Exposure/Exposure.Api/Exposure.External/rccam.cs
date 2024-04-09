@@ -1,14 +1,14 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Exposure.Api.External;
+namespace Exposure.External;
 
 internal class Rccam
 {
     public delegate bool FrameProcCbFunc(IntPtr pFrameInShort, ushort iFrameID, int iFrameWidth, int iFrameHeight,
         IntPtr pParam);
 
-    private const string dll = @"External\Libraries\Vision.dll";
+    private const string dll = @"Libraries\Vision.dll";
 
     [DllImport(dll, CallingConvention = CallingConvention.Cdecl)]
     public static extern void Init();

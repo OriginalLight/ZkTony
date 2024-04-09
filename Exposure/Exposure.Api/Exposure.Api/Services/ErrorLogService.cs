@@ -1,5 +1,5 @@
 ﻿using Exposure.Api.Contracts.Services;
-using Exposure.Api.Contracts.SqlSugar;
+using Exposure.SqlSugar.Contracts;
 using Exposure.Api.Models;
 using Exposure.Api.Models.Dto;
 using SqlSugar;
@@ -13,7 +13,7 @@ public class ErrorLogService(IDbContext dbContext) : BaseService<ErrorLog>(dbCon
 
     #region 创建崩溃日志
 
-    public void AddErrorLog(Exception ex)
+    public void AddErrorLog(System.Exception ex)
     {
         var errLog = new ErrorLog
         {

@@ -1,7 +1,7 @@
 <template>
   <a-card :title="t('settings.system.title')">
     <a-list>
-      <a-list-item>
+      <a-list-item v-if="false">
         <a-list-item-meta :title="$t('settings.system.theme.title')">
           <template #avatar>
             <icon-sun size="20" />
@@ -53,7 +53,7 @@
           </a-select>
         </template>
       </a-list-item>
-      <a-list-item>
+      <a-list-item class="nav" @click="handleErrlog">
         <a-list-item-meta :title="$t('settings.system.errlog.title')">
           <template #avatar>
             <icon-file size="20" />
@@ -65,19 +65,6 @@
               <icon-launch />
             </template>
           </a-button>
-        </template>
-      </a-list-item>
-      <a-list-item>
-        <a-list-item-meta :title="$t('settings.system.version.title')">
-          <template #avatar>
-            <icon-question-circle size="20" />
-          </template>
-        </a-list-item-meta>
-        <template #actions>
-          <a-space>
-            <a-tag> {{ config.version }} </a-tag>
-            <a-tag> {{ machine.version }} </a-tag>
-          </a-space>
         </template>
       </a-list-item>
       <a-list-item v-if="userStore.role < 2">
@@ -116,9 +103,8 @@ import { useRouter } from 'vue-router'
 import { LOCALE_OPTIONS } from '@renderer/locale'
 import useLocale from '@renderer/hooks/locale'
 import useTheme from '@renderer/hooks/themes'
-import { varsion } from '@renderer/api/machine'
+import { update } from '@renderer/api/machine'
 import { getOption, setOption } from '@renderer/api/option'
-import config from '../../../../../../package.json'
 import { Message } from '@arco-design/web-vue'
 import { UpdateRotation } from '@icon-park/vue-next'
 import { useUserStore } from '@renderer/store'
@@ -131,7 +117,6 @@ const { changeTheme, currentTheme } = useTheme()
 const router = useRouter()
 const machine = ref({
   id: 'None',
-  version: 'None',
   sound: localStorage.getItem('sound') || '0'
 })
 
@@ -140,8 +125,12 @@ const handleErrlog = () => {
   router.push('/errlog')
 }
 
-const handleUpdate = () => {
-  Message.info(t('settings.system.update.no'))
+const handleUpdate = async () => {
+  try {
+    await update()
+  } catch (error) {
+    Message.error((error as Error).message)
+  }
 }
 
 const changeSound = async (va) => {
@@ -157,8 +146,6 @@ const changeSound = async (va) => {
 // 软件版本
 onMounted(async () => {
   try {
-    const res = await varsion()
-    machine.value.version = res.data
     const res1 = await getOption({ key: 'MachineId' })
     machine.value.id = res1.data
     const res2 = await getOption({ key: 'Sound' })
@@ -168,3 +155,11 @@ onMounted(async () => {
   }
 })
 </script>
+
+<style lang="less" scoped>
+.nav {
+  &:hover {
+    background: var(--color-neutral-1);
+  }
+}
+</style>

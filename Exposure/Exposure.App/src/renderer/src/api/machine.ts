@@ -66,3 +66,8 @@ export function storage() {
 export function selfCheck() {
   return axios.get('/Machine/SelfCheck')
 }
+
+// 升级
+export function update() {
+  return axios.get('/Machine/Update')
+}

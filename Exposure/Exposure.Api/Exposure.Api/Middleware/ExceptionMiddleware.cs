@@ -3,7 +3,7 @@ using System.Text.Json;
 using Exposure.Api.Contracts.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Exposure.Api.Core.Exception;
+namespace Exposure.Api.Middleware;
 
 public class ExceptionMiddleware(
     RequestDelegate next,

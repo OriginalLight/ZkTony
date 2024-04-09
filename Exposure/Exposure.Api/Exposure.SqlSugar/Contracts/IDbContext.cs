@@ -1,6 +1,6 @@
 ﻿using SqlSugar;
 
-namespace Exposure.Api.Contracts.SqlSugar;
+namespace Exposure.SqlSugar.Contracts;
 
 public interface IDbContext
 {

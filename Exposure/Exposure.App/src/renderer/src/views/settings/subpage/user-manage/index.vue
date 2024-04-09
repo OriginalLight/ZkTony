@@ -357,18 +357,23 @@ onMounted(() => {
 .container {
   display: flex;
   flex-direction: column;
-  padding: 16px;
   height: calc(100vh - 66px - 32px);
-  background-color: var(--color-bg-2);
+  padding: 8px;
+  margin: 8px;
+  border-radius: 4px;
+  background: var(--color-bg-2);
+  overflow: hidden;
 
   .bar {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    padding: 8px;
   }
 
   .table {
     flex: 1;
-    margin-top: 16px;
+    margin-top: 8px;
   }
 }
 </style>

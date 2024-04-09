@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Exposure.Api.Utils;
+namespace Exposure.Utils;
 
 public static class WindowUtils
 {

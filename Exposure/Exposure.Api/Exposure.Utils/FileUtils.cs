@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 
-namespace Exposure.Api.Utils;
+namespace Exposure.Utils;
 
-public class FileUtils
+public static class FileUtils
 {
     #region 静态文件夹
 
@@ -118,5 +118,28 @@ public class FileUtils
     }
 
     #endregion
-    
+
+    #region 复制文件夹
+
+    public static void DirectoryCopy(string sourceDir, string targetDir, bool overwrite)
+    {
+        // 创建目标目录
+        Directory.CreateDirectory(targetDir);
+
+        // 复制所有文件
+        foreach (var file in Directory.GetFiles(sourceDir))
+        {
+            var targetFile = Path.Combine(targetDir, Path.GetFileName(file));
+            File.Copy(file, targetFile, overwrite);
+        }
+
+        // 递归复制所有子目录
+        foreach (var directory in Directory.GetDirectories(sourceDir))
+        {
+            var targetDirectory = Path.Combine(targetDir, Path.GetFileName(directory));
+            DirectoryCopy(directory, targetDirectory, overwrite);
+        }
+    }
+
+    #endregion
 }

@@ -1,6 +1,6 @@
 ﻿using Exposure.Api.Contracts.Services;
-using Exposure.Api.Core.SerialPort.Default;
 using Exposure.Api.Models;
+using Exposure.Protocal.Default;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Exposure.Api.Controllers;

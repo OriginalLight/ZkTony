@@ -1,9 +1,11 @@
 ﻿using System.Reflection;
-using Exposure.Api.Contracts.SqlSugar;
-using Exposure.Api.Utils;
+using Exposure.SqlSugar.Contracts;
+using Exposure.Utils;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using SqlSugar;
 
-namespace Exposure.Api.Core;
+namespace Exposure.SqlSugar;
 
 /// <summary>
 ///     数据库上下文

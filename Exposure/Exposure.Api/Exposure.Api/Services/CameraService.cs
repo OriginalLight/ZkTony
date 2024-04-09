@@ -1,8 +1,8 @@
 ﻿using System.Runtime.InteropServices;
 using Exposure.Api.Contracts.Services;
-using Exposure.Api.Core.SerialPort.Default;
 using Exposure.Api.Models;
-using Exposure.Api.Utils;
+using Exposure.Protocal.Default;
+using Exposure.Utils;
 using Microsoft.Extensions.Localization;
 using OpenCvSharp;
 
@@ -44,11 +44,16 @@ public class CameraService(
             if (_nncam == null) throw new Exception(localizer.GetString("Error0002").Value);
 
             // 设置参数
+            // 设置温度
             if (!_nncam.put_Temperature(temperature)) throw new Exception(localizer.GetString("Error0003").Value);
+            // 设置触发模式
             if (!_nncam.put_Option(Nncam.eOPTION.OPTION_TRIGGER, 1))
                 throw new Exception(localizer.GetString("Error0004").Value);
+            // 设置自动曝光
             if (!_nncam.put_AutoExpoEnable(false)) throw new Exception(localizer.GetString("Error0005").Value);
+            // 设置彩色
             if (!_nncam.put_Chrome(true)) throw new Exception(localizer.GetString("Error0006").Value);
+            // 设置增益
             if (!_nncam.put_ExpoAGain(gain)) throw new Exception(localizer.GetString("Error0007").Value);
 
             // 设置回调
@@ -362,16 +367,21 @@ public class CameraService(
                     break;
                 case "auto":
                 {
+                    /*
+                     * 1. 保存白光图
+                     * 2. 保存曝光图和合成图
+                     */
                     switch (_seq)
                     {
                         // 暂存白光图
                         case 1:
                         {
+                            // 暂存白光图
+                            _mat = mat.Clone();
                             // 保存图片
                             _pictureList.Add(await SaveAsync(mat, info, (int)expo));
                             // 关闭灯光
                             serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
-                            _mat = mat.Clone();
                         }
                             break;
                         // 生成合成图
@@ -397,6 +407,11 @@ public class CameraService(
                     break;
                 case "manual":
                 {
+                    /*
+                     * 1. 保存白光图
+                     * 2. 保存黑光图
+                     * 其他. 多帧合成
+                     */
                     switch (_seq)
                     {
                         case 1:
@@ -409,6 +424,23 @@ public class CameraService(
                             _mat = mat.Clone();
                             // 保存图片
                             _pictureList.Add(await SaveAsync(mat, info, (int)expo, 1));
+                            break;
+                        default:
+                        {
+                            var combine = new Mat(height, width, MatType.CV_8UC3, new Scalar(0));
+                            try
+                            {
+                                if (_mat != null) Cv2.Add(mat, _mat, combine);
+                                _mat = combine.Clone();
+                                // 保存图片
+                                _pictureList.Add(await SaveAsync(combine, info, (int)expo * (_seq - 1), 1));
+                            }
+                            finally
+                            {
+                                // 释放资源
+                                combine.Dispose();
+                            }
+                        }
                             break;
                     }
                 }
@@ -423,8 +455,16 @@ public class CameraService(
                     // 保存图片
                     var filePath = FileUtils.GetFileName(FileUtils.Collect, $"{date}.png");
                     var gray = new Mat();
-                    Cv2.CvtColor(mat, gray, ColorConversionCodes.BGR2GRAY);
-                    gray.SaveImage(filePath);
+                    try
+                    {
+                        Cv2.CvtColor(mat, gray, ColorConversionCodes.BGR2GRAY);
+                        gray.SaveImage(filePath);
+                    }
+                    finally
+                    {
+                        // 释放资源
+                        gray.Dispose();
+                    }
                 }
                     break;
             }
@@ -448,62 +488,70 @@ public class CameraService(
         int type = 0
     )
     {
-        #region 通用处理
-
         // 校准图片
         var dst = OpenCvUtils.Calibrate(mat);
-        // 转换灰度图
+        // 灰度图
         var gray = new Mat();
-        Cv2.CvtColor(dst, gray, ColorConversionCodes.BGR2GRAY);
-        // 去除杂色
-        gray.SetTo(0, gray.InRange(0, 3));
-        // 中值滤波
-        //Cv2.MedianBlur(gray, gray, 5);
-        // 开运算
-        Cv2.MorphologyEx(gray, gray, MorphTypes.Open, Cv2.GetStructuringElement(MorphShapes.Rect, new Size(3, 3)));
-        // 直方图归一化
-        gray.MinMaxLoc(out _, out double max);
-        if (max > 10 && type == 1) Cv2.Normalize(gray, gray, 0, 255, NormTypes.MinMax, MatType.CV_8UC1);
-
-        #endregion
-
-        // 保存原图
-        var date = DateTime.Now.ToString("yyMMddHHmmssfff");
-
-        // 保存图片
-        var filePath = FileUtils.GetFileName(type == -1 ? FileUtils.Preview : FileUtils.Exposure, $"{date}.png");
-
-        gray.SaveImage(filePath);
-        // 保存缩略图
+        // 缩略图
         var thumb = new Mat();
-        Cv2.Resize(gray, thumb, new Size(500, 500));
-        var thumbnail = FileUtils.GetFileName(FileUtils.Thumbnail, $"{date}.jpg");
-        thumb.SaveImage(thumbnail);
-
-        // 释放资源
-        gray.Dispose();
-        thumb.Dispose();
-        dst.Dispose();
-
-        var picture1 = new Picture
+        
+        try
         {
-            UserId = user.GetLogged()?.Id ?? 0,
-            Name = type == -1 ? localizer.GetString("Preview").Value : date,
-            Path = filePath,
-            Width = (int)info.width,
-            Height = (int)info.height,
-            Type = type,
-            Thumbnail = thumbnail,
-            ExposureTime = exposureTime,
-            ExposureGain = info.expogain,
-            BlackLevel = info.blacklevel,
-            IsDelete = false,
-            CreateTime = DateTime.Now,
-            UpdateTime = DateTime.Now,
-            DeleteTime = DateTime.Now
-        };
+            #region 通用处理
+            
+            Cv2.CvtColor(dst, gray, ColorConversionCodes.BGR2GRAY);
+            // 去除杂色
+            gray.SetTo(0, gray.InRange(0, 3));
+            // 中值滤波
+            //Cv2.MedianBlur(gray, gray, 5);
+            // 开运算
+            Cv2.MorphologyEx(gray, gray, MorphTypes.Open, Cv2.GetStructuringElement(MorphShapes.Rect, new Size(3, 3)));
+            // 直方图归一化
+            gray.MinMaxLoc(out _, out double max);
+            if (max > 10 && type == 1)
+            {
+                Cv2.Normalize(gray, gray, 0, 255, NormTypes.MinMax, MatType.CV_8UC1);
+            }
 
-        return type == -1 ? picture1 : await picture.AddReturnModel(picture1);
+            #endregion
+
+            // 保存原图
+            var name = DateTime.Now.ToString("yyMMddHHmmssfff");
+            // 保存图片
+            var path = FileUtils.GetFileName(type == -1 ? FileUtils.Preview : FileUtils.Exposure, $"{name}.png");
+            gray.SaveImage(path);
+            // 保存缩略图
+            Cv2.Resize(gray, thumb, new Size(500, 500));
+            var tPath = FileUtils.GetFileName(FileUtils.Thumbnail, $"{name}.jpg");
+            thumb.SaveImage(tPath);
+            
+            var pic = new Picture
+            {
+                UserId = user.GetLogged()?.Id ?? 0,
+                Name = type == -1 ? localizer.GetString("Preview").Value : name,
+                Path = path,
+                Width = (int)info.width,
+                Height = (int)info.height,
+                Type = type,
+                Thumbnail = tPath,
+                ExposureTime = exposureTime,
+                ExposureGain = info.expogain,
+                BlackLevel = info.blacklevel,
+                IsDelete = false,
+                CreateTime = DateTime.Now,
+                UpdateTime = DateTime.Now,
+                DeleteTime = DateTime.Now
+            };
+
+            return type == -1 ? pic : await picture.AddReturnModel(pic);
+        }
+        finally
+        {
+            // 释放资源
+            gray.Dispose();
+            thumb.Dispose();
+            dst.Dispose();
+        }
     }
 
     #endregion

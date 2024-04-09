@@ -1,4 +1,4 @@
-﻿namespace Exposure.Api.Core.SerialPort;
+﻿namespace Exposure.Protocal;
 
 public class Protocol
 {

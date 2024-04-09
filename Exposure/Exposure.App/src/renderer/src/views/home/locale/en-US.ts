@@ -32,6 +32,7 @@ export default {
   'home.camera.options.preview.failed': 'Preview Failed',
   'home.camera.options.shoot': 'Shoot',
   'home.camera.options.shooting': 'Shooting...',
+  'home.camera.options.calculating': 'Calculating...',
   'home.camera.options.cancel': 'Cancel',
   'home.thumbnail.view.combine': 'Combine',
   'home.thumbnail.view.export': 'Export',

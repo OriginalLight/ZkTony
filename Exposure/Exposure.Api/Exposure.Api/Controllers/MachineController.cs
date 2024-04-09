@@ -1,6 +1,8 @@
-﻿using Exposure.Api.Contracts.Services;
-using Exposure.Api.Core.SerialPort.Default;
+﻿using System.Diagnostics;
+using Exposure.Api.Contracts.Services;
 using Exposure.Api.Models.Dto;
+using Exposure.Protocal.Default;
+using Exposure.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using OpenCvSharp;
@@ -16,6 +18,7 @@ public class MachineController(
     ICameraService camera,
     IErrorLogService errorLog,
     IAudioService audio,
+    IUsbService usb,
     IStringLocalizer<SharedResources> localizer) : ControllerBase
 {
     #region 串口状态
@@ -211,7 +214,10 @@ public class MachineController(
     [Route("Version")]
     public ActionResult Version()
     {
-        return Ok(GetType().Assembly.GetName().Version?.ToString() ?? "None");
+        var version = GetType().Assembly.GetName().Version;
+        // 只使用主版本号和次版本号和修订号
+        var ver = version?.ToString().Split('.').Take(3).Aggregate((a, b) => a + "." + b);
+        return Ok(ver ?? "1.0.0");
     }
 
     #endregion
@@ -243,6 +249,10 @@ public class MachineController(
             while (serialPort.GetFlag("hatch") == 1 && num < 50)
             {
                 num++;
+                if (num == 35)
+                {
+                    serialPort.WritePort("Com2", DefaultProtocol.QueryOptocoupler().ToBytes());
+                }
                 await Task.Delay(100);
             }
 
@@ -317,4 +327,39 @@ public class MachineController(
     }
 
     #endregion
+    
+    [HttpGet]
+    [Route("Update")]
+    public IActionResult Update()
+    {
+        var usb1 = usb.GetDefaultUsbDrive();
+        if (usb1 == null) throw new Exception(localizer.GetString("NoUsb").Value);
+        var path = Path.Combine(usb1.Name, "Exposure");
+        // 复制文件到Documents
+        var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        var dir = new DirectoryInfo(path);
+        if (dir.Exists)
+        {
+            // 整个文件夹复制，包括所有文件和子文件夹
+            FileUtils.DirectoryCopy(path, Path.Combine(documents, "Exposure"), true);
+        }
+        else
+        {
+            throw new Exception(localizer.GetString("NotFound"));
+        }
+        var bat = Path.Combine(Path.Combine(documents, "Exposure"), "Update.bat");
+        if (!System.IO.File.Exists(bat)) throw new Exception(localizer.GetString("NotFound"));
+        var process = new Process
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = bat,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                CreateNoWindow = true
+            }
+        };
+        process.Start();
+        return Ok();
+    }
 }

@@ -129,8 +129,12 @@ img.src = subpage.value.item?.thumbnail || ''
 .box {
   display: flex;
   position: relative;
-  height: 100%;
-  width: 100%;
+  height: calc(100vh - 66px - 32px);
+  padding: 8px;
+  margin: 8px;
+  border-radius: 4px;
+  background: var(--color-bg-2);
+  overflow: hidden;
 
   .chart {
     height: 100%;

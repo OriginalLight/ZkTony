@@ -1,4 +1,4 @@
-﻿namespace Exposure.Api.Core.Exception;
+﻿namespace Exposure.Api.Middleware;
 
 public static class ExceptionMiddlewareExtension
 {

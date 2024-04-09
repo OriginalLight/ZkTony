@@ -3,7 +3,7 @@ using System.Drawing.Imaging;
 using Exposure.Api.Contracts.Services;
 using Exposure.Api.Models;
 using Exposure.Api.Models.Dto;
-using Exposure.Api.Utils;
+using Exposure.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SqlSugar;
@@ -101,7 +101,7 @@ public class PictureController(
         var list = await picture.GetByIds(dto.Ids);
         if (list.Count == 0) throw new Exception(localizer.GetString("NotFound").Value);
         // 复制图片到U盘
-        var path = Path.Combine(usb1.Name, DateTime.Now.ToString("yyyyMMddHHmmss"));
+        var path = Path.Combine(usb1.Name, localizer.GetString("Picture").Value);
         Directory.CreateDirectory(path);
         foreach (var pic in list)
         {

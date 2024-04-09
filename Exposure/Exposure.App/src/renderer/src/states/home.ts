@@ -6,7 +6,7 @@ const preview = ref<Picture>({
   id: 0,
   userId: 0,
   name: 'None',
-  path: 'None',
+  path: '',
   width: 1000,
   height: 1000,
   type: 0,

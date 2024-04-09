@@ -1,6 +1,6 @@
 ﻿using System.IO.Ports;
 using Exposure.Api.Contracts.Services;
-using Exposure.Api.Core.SerialPort.Default;
+using Exposure.Protocal.Default;
 
 namespace Exposure.Api.Services;
 
@@ -23,7 +23,7 @@ public class SerialPortService(ILogger<SerialPortService> logger, IOptionService
         {
             try
             {
-                var sp = (SerialPort)sender;
+                var sp = (System.IO.Ports.SerialPort)sender;
                 var bytes = new byte[sp.BytesToRead];
                 sp.Read(bytes, 0, bytes.Length);
                 logger.LogInformation("Com2 Rx: " + BitConverter.ToString(bytes));

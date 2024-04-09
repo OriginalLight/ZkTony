@@ -91,8 +91,8 @@
   </div>
   <div class="image-info">
     <a-space size="medium">
-      <a-tag color="arcoblue">{{ props.image.name }}</a-tag>
-      <a-tag color="arcoblue">{{ props.image.width + ' x ' + props.image.height }}</a-tag>
+      <a-tag>{{ props.image.name }}</a-tag>
+      <a-tag>{{ props.image.width + ' x ' + props.image.height }}</a-tag>
     </a-space>
   </div>
 </template>
@@ -231,8 +231,10 @@ onMounted(() => {
 .img-preview-box {
   display: flex;
   position: relative;
-  width: 100%;
   height: 100%;
+  border: 1px solid var(--color-neutral-3);
+  border-radius: var(--border-radius-small);
+  background-color: var(--color-bg-2);
 
   img {
     position: absolute;
@@ -240,6 +242,11 @@ onMounted(() => {
     height: 100%;
     object-fit: contain;
   }
+}
+
+img[src=''],
+img:not([src]) {
+  opacity: 0;
 }
 
 .slider {

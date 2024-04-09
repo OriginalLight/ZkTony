@@ -1,8 +1,8 @@
 ﻿using OpenCvSharp;
 
-namespace Exposure.Api.Utils;
+namespace Exposure.Utils;
 
-public class OpenCvUtils
+public static class OpenCvUtils
 {
     #region 相机标定
 
@@ -64,17 +64,22 @@ public class OpenCvUtils
         //根据相机内参和畸变参数矫正图片
         var dst = new Mat();
 
-        var newCameraMatrix =
-            Cv2.GetOptimalNewCameraMatrix(cameraMatrix, distCoeffs, src.Size(), 0, src.Size(), out var roi);
-        // cameraMatrix 数组转换成 Mat 类型
-        Cv2.Undistort(src, dst, cameraMatrix, distCoeffs, newCameraMatrix);
-        // 裁剪图片并返回原始尺寸
-        var res = new Mat();
-        Cv2.Resize(dst[roi], res, src.Size());
-        // 释放资源
-        dst.Dispose();
-
-        return res;
+        try
+        {
+            var newCameraMatrix =
+                Cv2.GetOptimalNewCameraMatrix(cameraMatrix, distCoeffs, src.Size(), 0, src.Size(), out var roi);
+            // cameraMatrix 数组转换成 Mat 类型
+            Cv2.Undistort(src, dst, cameraMatrix, distCoeffs, newCameraMatrix);
+            // 裁剪图片并返回原始尺寸
+            var res = new Mat();
+            Cv2.Resize(dst[roi], res, src.Size());
+            return res;
+        }
+        finally
+        {
+            // 释放资源
+            dst.Dispose();
+        }
     }
 
     #endregion

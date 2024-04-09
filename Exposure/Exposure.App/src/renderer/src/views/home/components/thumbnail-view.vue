@@ -42,12 +42,12 @@
     </div>
     <div class="grid-item">
       <a-space>
-        <a-tag style="width: 100px" color="arcoblue" size="small">
+        <a-tag style="width: 100px" size="small">
           <div style="width: 100%; text-align: center">
             {{ t('home.thumbnail.view.picture.light') }}
           </div>
         </a-tag>
-        <a-tag style="width: 40px" color="arcoblue" size="small">
+        <a-tag style="width: 40px" size="small">
           <div style="width: 100%; text-align: center">{{ light.length }}</div>
         </a-tag>
       </a-space>
@@ -70,12 +70,12 @@
     </div>
     <div class="grid-item">
       <a-space>
-        <a-tag style="width: 100px" color="arcoblue" size="small">
+        <a-tag style="width: 100px" size="small">
           <div style="width: 100%; text-align: center">
             {{ t('home.thumbnail.view.picture.dark') }}
           </div>
         </a-tag>
-        <a-tag style="width: 40px" color="arcoblue" size="small">
+        <a-tag style="width: 40px" size="small">
           <div style="width: 100%; text-align: center">{{ dark.length }}</div>
         </a-tag>
       </a-space>
@@ -98,12 +98,12 @@
     </div>
     <div class="grid-item">
       <a-space>
-        <a-tag style="width: 100px" color="arcoblue" size="small">
+        <a-tag style="width: 100px" size="small">
           <div style="width: 100%; text-align: center">
             {{ t('home.thumbnail.view.picture.combine') }}
           </div>
         </a-tag>
-        <a-tag style="width: 40px" color="arcoblue" size="small">
+        <a-tag style="width: 40px" size="small">
           <div style="width: 100%; text-align: center">{{ combine.length }}</div>
         </a-tag>
       </a-space>
@@ -266,7 +266,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  margin-top: 4px;
+  margin-top: 8px;
 }
 
 .grid-item {
@@ -305,8 +305,8 @@ onMounted(() => {
     }
 
     .img {
-      height: 100px;
-      min-height: 100px;
+      height: 90px;
+      min-height: 90px;
       width: auto;
       object-fit: contain;
     }

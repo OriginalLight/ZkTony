@@ -21,7 +21,7 @@ using System.Threading;
 /*
     Version: 55.24686.20240225
 
-    For Microsoft dotNET Framework & dotNet Core
+    For Microsoft dotNET Framework & dotNet SqlSugar
 
     We use P/Invoke to call into the nncam.dll API, the c# class Nncam is a thin wrapper class to the native api of nncam.dll.
     So the manual en.html(English) and hans.html(Simplified Chinese) are also applicable for programming with nncam.cs.
@@ -29,7 +29,7 @@ using System.Threading;
        (1) en.html, English
        (2) hans.html, Simplified Chinese
 */
-internal class Nncam : IDisposable
+public class Nncam : IDisposable
 {
     [Flags]
     public enum eFLAG : ulong
@@ -3579,7 +3579,7 @@ internal class Nncam : IDisposable
     private const string dll = "libnncam.so";
     private const UnmanagedType ut = UnmanagedType.LPStr;
 #else
-    private const string dll = @"External\Libraries\nncam.dll";
+    private const string dll = @"Libraries\nncam.dll";
     private const UnmanagedType ut = UnmanagedType.LPWStr;
 #endif
 

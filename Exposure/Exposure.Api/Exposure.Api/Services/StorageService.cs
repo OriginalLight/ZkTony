@@ -1,5 +1,5 @@
 ﻿using Exposure.Api.Contracts.Services;
-using Exposure.Api.Utils;
+using Exposure.Utils;
 
 namespace Exposure.Api.Services;
 

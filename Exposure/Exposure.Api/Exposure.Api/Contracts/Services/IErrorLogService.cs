@@ -10,7 +10,7 @@ public interface IErrorLogService : IBaseService<ErrorLog>
     ///     创建崩溃日志
     /// </summary>
     /// <param name="ex"></param>
-    void AddErrorLog(Exception ex);
+    void AddErrorLog(System.Exception ex);
 
     /// <summary>
     ///     分页获取崩溃日志

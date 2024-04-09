@@ -93,7 +93,7 @@ const router = useRouter()
 const { height } = useWindowSize()
 // 最大高度
 const maxHeight = computed(() => {
-  return height.value - 208
+  return height.value - 200
 })
 // 分页参数
 const { selected, options, paginationProps, subpage } = useGalleryState()
@@ -211,11 +211,17 @@ onActivated(async () => {
 .list {
   flex: 1;
   border-radius: 2px;
-  margin-top: 16px;
+  margin-top: 8px;
   overflow: hidden;
+  background: var(--color-bg-2);
 }
 .box::-webkit-scrollbar {
   display: none;
+}
+
+:deep(.arco-list-pagination) {
+  float: right;
+  margin-top: 12px;
 }
 
 .img-box {

@@ -16,7 +16,7 @@
           </a-button>
         </template>
       </a-list-item>
-      <a-list-item v-if="userStore.role < 2">
+      <a-list-item v-if="userStore.role < 2" class="nav" @click="handleOperlog">
         <a-list-item-meta :title="$t('settings.user.operlog.title')">
           <template #avatar>
             <icon-file size="20" />
@@ -30,7 +30,7 @@
           </a-button>
         </template>
       </a-list-item>
-      <a-list-item v-if="userStore.role < 2">
+      <a-list-item v-if="userStore.role < 2" class="nav" @click="handleManage">
         <a-list-item-meta :title="$t('settings.user.manage.title')">
           <template #avatar>
             <icon-nav size="20" />
@@ -214,3 +214,11 @@ const handleManage = () => {
   router.push('/user-manage')
 }
 </script>
+
+<style lang="less" scoped>
+.nav {
+  &:hover {
+    background: var(--color-neutral-1);
+  }
+}
+</style>

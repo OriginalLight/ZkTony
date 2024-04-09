@@ -2,7 +2,6 @@ import { app, shell, BrowserWindow } from 'electron'
 import path, { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 
 function createWindow(): void {
@@ -13,8 +12,8 @@ function createWindow(): void {
     minWidth: 800,
     minHeight: 600,
     show: false,
-    //frame: false,
-    //fullscreen: true,
+    frame: app.isPackaged ? false : true,
+    fullscreen: app.isPackaged ? true : false,
     autoHideMenuBar: true,
     icon: path.join(__dirname, '../../resources/icon.ico'),
     ...(process.platform === 'linux' ? { icon } : {}),

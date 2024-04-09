@@ -1,4 +1,4 @@
-﻿namespace Exposure.Api.Core.SerialPort.Default;
+﻿namespace Exposure.Protocal.Default;
 
 public class DefaultProtocol
 {

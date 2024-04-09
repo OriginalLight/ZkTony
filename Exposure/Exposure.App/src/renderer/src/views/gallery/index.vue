@@ -33,9 +33,12 @@ const handleSearch = () => {
 <style lang="less" scoped>
 .container {
   display: flex;
-  position: relative;
   flex-direction: column;
-  padding: 16px;
+  padding: 8px;
+  margin: 8px;
   height: calc(100vh - 66px - 32px);
+  border-radius: 4px;
+  background: var(--color-bg-2);
+  overflow: hidden;
 }
 </style>

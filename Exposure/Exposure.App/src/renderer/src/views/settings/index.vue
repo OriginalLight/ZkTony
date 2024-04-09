@@ -19,8 +19,12 @@ import FactortSettings from './components/factory-settings.vue'
 <style lang="less" scoped>
 .container {
   display: flex;
-  padding: 16px;
   height: calc(100vh - 66px - 32px);
+  padding: 8px;
+  margin: 8px;
+  border-radius: 4px;
+  background: var(--color-bg-2);
+  overflow: hidden;
 
   .card {
     display: flex;

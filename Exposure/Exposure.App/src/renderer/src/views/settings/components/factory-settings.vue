@@ -2,6 +2,19 @@
   <a-card v-if="userStore.role === 0" :title="t('settings.factory.title')">
     <a-list>
       <a-list-item>
+        <a-list-item-meta :title="$t('settings.system.version.title')">
+          <template #avatar>
+            <icon-question-circle size="20" />
+          </template>
+        </a-list-item-meta>
+        <template #actions>
+          <a-space>
+            <a-tag> {{ config.version }} </a-tag>
+            <a-tag> {{ version }} </a-tag>
+          </a-space>
+        </template>
+      </a-list-item>
+      <a-list-item class="nav" @click="router.push('/option')">
         <a-list-item-meta :title="$t('settings.factory.option')">
           <template #avatar>
             <Inbox size="20" />
@@ -15,7 +28,7 @@
           </a-button>
         </template>
       </a-list-item>
-      <a-list-item>
+      <a-list-item class="nav" @click="router.push('/debug')">
         <a-list-item-meta :title="$t('settings.factory.debug')">
           <template #avatar>
             <Bug size="20" />
@@ -29,7 +42,7 @@
           </a-button>
         </template>
       </a-list-item>
-      <a-list-item>
+      <a-list-item class="nav" @click="router.push('/fqc')">
         <a-list-item-meta :title="$t('settings.factory.fqc')">
           <template #avatar>
             <FactoryBuilding size="20" />
@@ -43,7 +56,7 @@
           </a-button>
         </template>
       </a-list-item>
-      <a-list-item>
+      <a-list-item class="nav" @click="router.push('/aging')">
         <a-list-item-meta :title="$t('settings.factory.aging')">
           <template #avatar>
             <Tea size="20" />
@@ -62,12 +75,30 @@
 </template>
 
 <script lang="ts" setup>
+import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@renderer/store'
 import { Bug, FactoryBuilding, Inbox, Tea } from '@icon-park/vue-next'
+import config from '../../../../../../package.json'
+import { varsion } from '@renderer/api/machine'
 
 const { t } = useI18n()
 const router = useRouter()
 const userStore = useUserStore()
+
+const version = ref('1.0.0')
+
+onMounted(async () => {
+  const res = await varsion()
+  version.value = res.data
+})
 </script>
+
+<style lang="less" scoped>
+.nav {
+  &:hover {
+    background: var(--color-neutral-1);
+  }
+}
+</style>

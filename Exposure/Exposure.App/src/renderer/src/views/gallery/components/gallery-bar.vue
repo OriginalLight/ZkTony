@@ -1,5 +1,5 @@
 <template>
-  <div style="display: flex; justify-content: space-between">
+  <div class="bar">
     <a-space size="large">
       <a-range-picker v-model="options.date" style="width: 280px" />
       <a-input
@@ -179,5 +179,11 @@ const handleDelete = async () => {
 }
 </script>
 
-<style scoped lang="less"></style>
-@renderer/states/gallery
+<style scoped lang="less">
+.bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+}
+</style>
