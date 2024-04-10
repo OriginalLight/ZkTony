@@ -249,7 +249,9 @@ const disabled = ref({
 
 //根据曝光时间计算最大帧数不能超过曝光时间除以5秒
 const maxFrams = computed(() => {
-  const max = Math.floor((options.value.time.minute * 60 + options.value.time.second) / 5)
+  const min = options.value.time.minute ? options.value.time.minute : 0
+  const sec = options.value.time.second ? options.value.time.second : 0
+  const max = Math.floor((min * 60 + sec) / 5)
   if (max < 1) {
     return 1
   }
