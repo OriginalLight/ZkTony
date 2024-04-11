@@ -25,7 +25,7 @@
         <template #actions>
           <a-button shape="round" style="width: 120px" @click="handleOperlog">
             <template #icon>
-              <icon-launch />
+              <icon-right />
             </template>
           </a-button>
         </template>
@@ -39,7 +39,7 @@
         <template #actions>
           <a-button shape="round" style="width: 120px" @click="handleManage">
             <template #icon>
-              <icon-launch />
+              <icon-right />
             </template>
           </a-button>
         </template>

@@ -1,7 +1,7 @@
 export default {
-  'user.managemet.search': '搜索',
+  'user.managemet.search': '搜\u2002索',
   'user.managemet.search.placeholder': '请输入用户名',
-  'user.managemet.add': '添加',
+  'user.managemet.add': '添\u2002加',
   'user.managemet.add.title': '添加用户',
   'user.managemet.add.form.name.errMsg': '用户名不能为空',
   'user.managemet.add.form.name.placeholder': '请输入用户名',
@@ -9,7 +9,7 @@ export default {
   'user.managemet.add.form.password.placeholder': '请输入密码',
   'user.managemet.add.form.role.lable': '角色',
   'user.managemet.add.form.enabled.lable': '状态',
-  'user.managemet.delete': '删除',
+  'user.managemet.delete': '删\u2002除',
   'user.managemet.delete.title': '删除用户',
   'user.managemet.delete.content': '确认删除选中的用户吗？',
   'user.managemet.reset': '重置密码',

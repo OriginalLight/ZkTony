@@ -232,13 +232,15 @@ onActivated(async () => {
     width: 100px;
     height: 100px;
     object-fit: contain;
+    border-radius: 4px;
   }
 
   .selected {
     position: absolute;
     top: 0;
     right: 0;
-    color: rgba(255, 255, 255, 1);
+    color: var(--color-bg-2);
+    border-radius: 2px;
     background-color: rgb(var(--primary-6));
   }
 
@@ -246,11 +248,12 @@ onActivated(async () => {
     position: absolute;
     bottom: 0;
     width: 100%;
-    background-color: rgb(var(--primary-6));
-    color: rgba(255, 255, 255, 1);
+    border-radius: 4px;
+    color: var(--color-bg-2);
     font-size: 10px;
     text-align: center;
     overflow: hidden;
+    background-color: rgb(var(--primary-6));
   }
 }
 </style>

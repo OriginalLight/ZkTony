@@ -6,5 +6,6 @@ export default {
   'navigation.status.logout.title': '退出登录',
   'navigation.status.logout.content': '确定退出登录吗？',
   'navigation.status.logout.success': '退出登录成功',
-  'navigation.status.logout.failed': '退出登录失败'
+  'navigation.status.logout.failed': '退出登录失败',
+  'navigation.status.logout.shutdown': '关机'
 }

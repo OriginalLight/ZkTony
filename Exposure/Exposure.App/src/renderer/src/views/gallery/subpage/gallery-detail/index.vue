@@ -262,6 +262,8 @@ const resetOptions = () => {
   const img = document.getElementById('img-preview') as HTMLImageElement
   img.style.left = '0px'
   img.style.top = '0px'
+
+  handleHistogram(subpage.value.item.thumbnail)
 }
 
 const showSelected = (img: Picture) => {
@@ -337,8 +339,6 @@ const handleHistogram = (src: string) => {
     const originalImageData = ctx.getImageData(0, 0, img.width, img.height)
     const grayList = new Array(256)
 
-    const imageData = ctx.createImageData(originalImageData)
-
     for (let i = 0; i < grayList.length; i++) {
       grayList[i] = 0
     }
@@ -351,43 +351,54 @@ const handleHistogram = (src: string) => {
           originalImageData.data[i + 2]) /
           3
       )
-      imageData.data[i + 0] = gray // Red
-      imageData.data[i + 1] = gray // Green
-      imageData.data[i + 2] = gray // Blue
-      imageData.data[i + 3] = originalImageData.data[i + 3] // Alpha
 
       grayList[gray] += 1 // 统计灰度值数量
     }
 
-    ctx.putImageData(imageData, 0, 0)
+    canvas.width = 256 * 2 + 10
+    canvas.height = 360 + 10
+    // 缩放比例
 
-    canvas.width = 256 * 2
-    canvas.height = (Math.max(...grayList) + 100 - (Math.max(...grayList) % 100)) / 20
+    const scale = 20
+    const scaleHeight = 360 / (Math.max(...grayList) / scale)
     ctx.lineWidth = 1
-    for (let i = 0; i < grayList.length; i++) {
+    // 绘制Y坐标轴
+    ctx.beginPath()
+    ctx.moveTo(0, 0)
+    ctx.lineTo(0, canvas.height)
+    ctx.stroke()
+    // 绘制X坐标轴
+    ctx.beginPath()
+    ctx.moveTo(0, canvas.height)
+    ctx.lineTo(canvas.width, canvas.height)
+    ctx.stroke()
+
+    // 绘制x轴刻度
+    for (let i = 0; i < 6; i++) {
       ctx.beginPath()
-      ctx.moveTo(i * 2, canvas.height)
-      ctx.lineTo(i * 2, grayList[i] / 20)
+      ctx.moveTo(i * 100 + 10, canvas.height)
+      ctx.lineTo(i * 100 + 10, canvas.height - 5)
       ctx.stroke()
     }
 
-    //canvas 上下颠倒
-    const imageData2 = ctx.getImageData(0, 0, canvas.width, canvas.height)
-    const data = imageData2.data
-    const data2 = new Uint8ClampedArray(data.length)
-    for (let i = 0; i < canvas.height; i++) {
-      for (let j = 0; j < canvas.width; j++) {
-        data2[i * canvas.width * 4 + j * 4] =
-          data[(canvas.height - i - 1) * canvas.width * 4 + j * 4]
-        data2[i * canvas.width * 4 + j * 4 + 1] =
-          data[(canvas.height - i - 1) * canvas.width * 4 + j * 4 + 1]
-        data2[i * canvas.width * 4 + j * 4 + 2] =
-          data[(canvas.height - i - 1) * canvas.width * 4 + j * 4 + 2]
-        data2[i * canvas.width * 4 + j * 4 + 3] =
-          data[(canvas.height - i - 1) * canvas.width * 4 + j * 4 + 3]
-      }
+    // 绘制y轴刻度
+    for (let i = 0; i < 6; i++) {
+      ctx.beginPath()
+      ctx.moveTo(0, i * 74 - 10)
+      ctx.lineTo(5, i * 74 - 10)
+      ctx.stroke()
     }
-    ctx.putImageData(new ImageData(data2, canvas.width, canvas.height), 0, 0)
+
+    // 左上角坐标轴开始绘制
+    for (let i = 0; i < grayList.length; i++) {
+      ctx.beginPath()
+      ctx.moveTo(
+        i * 2 + 10,
+        canvas.height - (grayList[i] * scaleHeight > 360 ? 360 : grayList[i] * scaleHeight) - 10
+      )
+      ctx.lineTo(i * 2 + 10, canvas.height - 10)
+      ctx.stroke()
+    }
   }
 
   img.src = src
@@ -518,17 +529,19 @@ onMounted(() => {
   display: flex;
   position: relative;
 
-  img {
+  .img {
     width: 100px;
     height: 100px;
     object-fit: contain;
+    border-radius: 4px;
   }
 
   .selected {
     position: absolute;
     top: 0;
     right: 0;
-    color: rgba(255, 255, 255, 1);
+    color: var(--color-bg-2);
+    border-radius: 2px;
     background-color: rgb(var(--primary-6));
   }
 
@@ -536,11 +549,12 @@ onMounted(() => {
     position: absolute;
     bottom: 0;
     width: 100%;
-    background-color: rgb(var(--primary-6));
-    color: rgba(255, 255, 255, 1);
+    border-radius: 4px;
+    color: var(--color-bg-2);
     font-size: 10px;
     text-align: center;
     overflow: hidden;
+    background-color: rgb(var(--primary-6));
   }
 }
 
@@ -554,6 +568,7 @@ onMounted(() => {
     display: flex;
     position: relative;
     overflow: hidden;
+    border-radius: 4px;
 
     .img-preview-box {
       display: flex;
@@ -587,7 +602,6 @@ onMounted(() => {
       position: absolute;
       bottom: 0;
       width: 100%;
-      height: 35%;
     }
 
     .canvas_refresh {

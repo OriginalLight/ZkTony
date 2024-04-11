@@ -40,5 +40,7 @@ export default {
   'home.thumbnail.view.picture.light': 'Light',
   'home.thumbnail.view.picture.dark': 'Dark',
   'home.thumbnail.view.picture.combine': 'Combine',
-  'home.thumbnail.view.preview': 'Preview'
+  'home.thumbnail.view.preview': 'Preview',
+  'home.camera.options.temperature.error':
+    'The current camera temperature has not reached the set temperature. Clicking shoot will affect the image quality!'
 }

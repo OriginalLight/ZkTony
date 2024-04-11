@@ -71,3 +71,8 @@ export function selfCheck() {
 export function update() {
   return axios.get('/Machine/Update')
 }
+
+//关机
+export function shutdown() {
+  return axios.get('/Machine/Shutdown')
+}

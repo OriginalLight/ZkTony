@@ -23,7 +23,7 @@
         <template #actions>
           <a-button shape="round" style="width: 120px" @click="router.push('/option')">
             <template #icon>
-              <icon-launch />
+              <icon-right />
             </template>
           </a-button>
         </template>
@@ -37,7 +37,7 @@
         <template #actions>
           <a-button shape="round" style="width: 120px" @click="router.push('/debug')">
             <template #icon>
-              <icon-launch />
+              <icon-right />
             </template>
           </a-button>
         </template>
@@ -51,7 +51,7 @@
         <template #actions>
           <a-button shape="round" style="width: 120px" @click="router.push('/fqc')">
             <template #icon>
-              <icon-launch />
+              <icon-right />
             </template>
           </a-button>
         </template>
@@ -65,7 +65,7 @@
         <template #actions>
           <a-button shape="round" style="width: 120px" @click="router.push('/aging')">
             <template #icon>
-              <icon-launch />
+              <icon-right />
             </template>
           </a-button>
         </template>

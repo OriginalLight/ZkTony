@@ -62,7 +62,7 @@
         <template #actions>
           <a-button shape="round" style="width: 120px" @click="handleErrlog">
             <template #icon>
-              <icon-launch />
+              <icon-right />
             </template>
           </a-button>
         </template>

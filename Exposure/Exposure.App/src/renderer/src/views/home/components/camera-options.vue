@@ -214,6 +214,7 @@ import { preview, pixel, manual, auto, cancel, result } from '@renderer/api/came
 import { hatch } from '@renderer/api/machine'
 import { useAppStore } from '@renderer/store'
 import useHomeState from '@renderer/states/home'
+import { getOption } from '@renderer/api/option'
 
 const { options } = useHomeState()
 
@@ -301,6 +302,12 @@ const handleHatch = async () => {
 
 // 拍摄
 const handleShoot = async () => {
+  const res6 = await getOption({ key: 'Temperature' })
+  const targetTemperature = res6.data === 'None' ? -15 : Number(res6.data) / 10
+  const currentTemperature = appStore.temperature
+  if (currentTemperature - targetTemperature >= 3) {
+    Message.error(t('home.camera.options.temperature.error'))
+  }
   progress.value.visible = true
   try {
     if (options.value.mode === 'auto') {

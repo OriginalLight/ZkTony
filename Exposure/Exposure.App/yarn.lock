@@ -41,10 +41,10 @@
     resize-observer-polyfill "^1.5.1"
     scroll-into-view-if-needed "^2.2.28"
 
-"@arco-themes/vue-zktony@^0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@arco-themes/vue-zktony/-/vue-zktony-0.0.7.tgz#6a736da70f51cce8add655abc7b185fd1b390be6"
-  integrity sha512-jTnriru0RDKsBi7iAdhRLsaNqGfbvmU3Gyp4e4x0Fj6udggQwSqq93FF8sWbnmSoOR9XBeoQHhZjHfvqajlmQA==
+"@arco-themes/vue-zktony@^0.0.8":
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/@arco-themes/vue-zktony/-/vue-zktony-0.0.8.tgz#1277808f49c03148330abf405b00d9e49ae4cb56"
+  integrity sha512-DyQbCpGvKnlpqJiqHAbpPHjByEhYCWjmHvelExaFnbnd1XQQhtAgPQb0DJH29ZGOh81ZA2UzR+jqX548iBodHw==
 
 "@babel/code-frame@^7.22.13", "@babel/code-frame@^7.23.5":
   version "7.23.5"

@@ -292,7 +292,8 @@ onMounted(() => {
       left: 0;
       font-size: 10px;
       padding: 2px;
-      color: rgba(255, 255, 255, 1);
+      color: var(--color-bg-2);
+      border-radius: 2px;
       background-color: rgb(var(--primary-6));
     }
 
@@ -300,7 +301,8 @@ onMounted(() => {
       position: absolute;
       top: 0;
       right: 0;
-      color: rgba(255, 255, 255, 1);
+      color: var(--color-bg-2);
+      border-radius: 2px;
       background-color: rgb(var(--primary-6));
     }
 
@@ -309,28 +311,31 @@ onMounted(() => {
       min-height: 90px;
       width: auto;
       object-fit: contain;
+      border-radius: 4px;
     }
 
     .img-index {
       position: absolute;
       bottom: 10px;
       width: 25%;
-      background-color: rgb(var(--primary-6));
-      color: rgba(255, 255, 255, 1);
+      color: var(--color-bg-2);
       font-size: 8px;
       text-align: center;
       overflow: hidden;
+      border-radius: 2px;
+      background-color: rgb(var(--primary-6));
     }
 
     .img-name {
       position: absolute;
       bottom: 0;
       width: 100%;
-      background-color: rgb(var(--primary-6));
-      color: rgba(255, 255, 255, 1);
+      color: var(--color-bg-2);
       font-size: 10px;
       text-align: center;
       overflow: hidden;
+      border-radius: 4px;
+      background-color: rgb(var(--primary-6));
     }
   }
 }

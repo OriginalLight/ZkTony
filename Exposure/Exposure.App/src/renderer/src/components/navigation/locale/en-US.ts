@@ -6,5 +6,6 @@ export default {
   'navigation.status.logout.title': 'Log out',
   'navigation.status.logout.content': 'Are you sure you want to log out?',
   'navigation.status.logout.success': 'Log out successfully',
-  'navigation.status.logout.failed': 'Log out failed'
+  'navigation.status.logout.failed': 'Log out failed',
+  'navigation.status.logout.shutdown': 'Shut down'
 }
