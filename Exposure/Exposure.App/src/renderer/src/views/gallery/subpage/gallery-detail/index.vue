@@ -116,75 +116,50 @@
             <template #prepend> {{ t('gallery.detail.time') }} </template>
           </a-input>
           <a-divider margin="0" />
-          <a-radio-group v-model="radioOpts.opt1" type="button" style="width: 100%">
-            <a-radio :value="0" style="width: 100%; text-align: center">
-              <a-space>
-                <icon-eye />
-                <div>{{ t('gallery.detail.preview.adjust') }}</div>
-              </a-space>
-            </a-radio>
-            <a-radio :value="1" style="width: 100%; text-align: center">
-              <a-space>
-                <icon-edit />
-                <div>{{ t('gallery.detail.picture.adjust') }}</div>
-              </a-space>
-            </a-radio>
-          </a-radio-group>
+          <a-space direction="vertical" size="medium" style="width: 100%">
+            <a-button-group style="width: 100%">
+              <a-button style="width: 100%" @click="options.rotate -= 90">
+                <template #icon>
+                  <icon-rotate-left />
+                </template>
+                {{ t('gallery.detail.rotate.right') }}
+              </a-button>
+              <a-button style="width: 100%" @click="options.rotate += 90">
+                <template #icon>
+                  <icon-rotate-right />
+                </template>
+                {{ t('gallery.detail.rotate.right') }}
+              </a-button>
+            </a-button-group>
+            <div class="op">
+              <a-tag>{{ t('gallery.detail.invert') }}</a-tag>
+              <a-switch v-model="options.invert" style="margin-left: 16px" />
+            </div>
 
-          <div v-if="radioOpts.opt1 === 0">
-            <a-row style="text-align: center; padding-top: 16px">
-              <a-col :span="8">
-                <a-tooltip :content="t('gallery.detail.rotate.left')">
-                  <div @click="options.rotate -= 90">
-                    <icon-rotate-left class="icon-btn" :size="32" />
-                  </div>
-                </a-tooltip>
-              </a-col>
-              <a-col :span="8">
-                <a-tooltip :content="t('gallery.detail.rotate.right')">
-                  <div @click="options.rotate += 90">
-                    <icon-rotate-right class="icon-btn" :size="32" />
-                  </div>
-                </a-tooltip>
-              </a-col>
-            </a-row>
-          </div>
-          <div v-if="radioOpts.opt1 === 1">
-            <a-space direction="vertical" style="width: 100%">
-              <a-radio-group v-model="radioOpts.opt2" type="button" style="width: 100%">
-                <a-radio :value="0" style="width: 100%; text-align: center">
-                  <a-space>
-                    <Brightness />
-                    <div>{{ t('gallery.detail.brightness') }}</div>
-                  </a-space>
-                </a-radio>
-                <a-radio :value="1" style="width: 100%; text-align: center">
-                  <a-space>
-                    <Contrast />
-                    <div>{{ t('gallery.detail.contrast') }}</div>
-                  </a-space>
-                </a-radio>
-                <a-radio :value="2" style="width: 100%; text-align: center">
-                  <a-space>
-                    <Transform />
-                    <div>{{ t('gallery.detail.invert') }}</div>
-                  </a-space>
-                </a-radio>
-              </a-radio-group>
+            <div class="op">
+              <a-tag>{{ t('gallery.detail.brightness') }}</a-tag>
+              <Slider
+                v-model="options.brightness"
+                class="slider"
+                :max="300"
+                :lazy="false"
+                show-tooltip="drag"
+              />
+              <a-tag>{{ options.brightness }}</a-tag>
+            </div>
 
-              <div v-if="radioOpts.opt2 === 0" class="slider-box">
-                <Slider v-model="options.brightness" class="slider" :max="300" :lazy="false" />
-              </div>
-
-              <div v-if="radioOpts.opt2 === 1" class="slider-box">
-                <Slider v-model="options.contrast" class="slider" :max="300" :lazy="false" />
-              </div>
-
-              <div v-if="radioOpts.opt2 === 2" class="icon-box">
-                <a-switch v-model="options.invert" />
-              </div>
-            </a-space>
-          </div>
+            <div class="op">
+              <a-tag>{{ t('gallery.detail.contrast') }}</a-tag>
+              <Slider
+                v-model="options.contrast"
+                class="slider"
+                :max="300"
+                :lazy="false"
+                show-tooltip="drag"
+              />
+              <a-tag>{{ options.contrast }}</a-tag>
+            </div>
+          </a-space>
         </a-space>
         <canvas id="canvas"></canvas>
         <a-tooltip placement="top" :content="t('gallery.detail.refresh')">
@@ -210,16 +185,10 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import {
-  CoordinateSystem,
-  Refresh,
-  Save,
-  Brightness,
-  Contrast,
-  Transform
-} from '@icon-park/vue-next'
+import { CoordinateSystem, Refresh, Save } from '@icon-park/vue-next'
 import { Message } from '@arco-design/web-vue'
 import useGalleryState from '@renderer/states/gallery'
+import { useWindowSize } from '@vueuse/core'
 import { User, getUserById } from '@renderer/api/user'
 import { Picture, updatePicture, adjustPicture } from '@renderer/api/picture'
 import Slider from '@vueform/slider'
@@ -228,6 +197,8 @@ const { subpage } = useGalleryState()
 
 const { t } = useI18n()
 const router = useRouter()
+// 窗口高度
+const { height } = useWindowSize()
 
 const user = ref<User>()
 
@@ -238,11 +209,6 @@ const options = ref({
   rotate: 0,
   invert: false,
   scale: 1.2
-})
-
-const radioOpts = ref({
-  opt1: 0,
-  opt2: 0
 })
 
 const loading = ref({
@@ -355,12 +321,14 @@ const handleHistogram = (src: string) => {
       grayList[gray] += 1 // 统计灰度值数量
     }
 
+    const hei = height.value * 0.4
+
     canvas.width = 256 * 2 + 10
-    canvas.height = 360 + 10
+    canvas.height = hei + 10
     // 缩放比例
 
     const scale = 20
-    const scaleHeight = 360 / (Math.max(...grayList) / scale)
+    const scaleHeight = hei / (Math.max(...grayList) / scale)
     ctx.lineWidth = 1
     // 绘制Y坐标轴
     ctx.beginPath()
@@ -384,8 +352,8 @@ const handleHistogram = (src: string) => {
     // 绘制y轴刻度
     for (let i = 0; i < 6; i++) {
       ctx.beginPath()
-      ctx.moveTo(0, i * 74 - 10)
-      ctx.lineTo(5, i * 74 - 10)
+      ctx.moveTo(0, (i * (hei + 10)) / 5 - 10)
+      ctx.lineTo(5, (i * (hei + 10)) / 5 - 10)
       ctx.stroke()
     }
 
@@ -625,15 +593,19 @@ onMounted(() => {
     transform: scale(0.9);
   }
 
-  .slider-box {
-    padding: 8px;
-    padding-top: 36px;
+  .op {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
 
-    .slider {
-      --slider-connect-bg: rgb(var(--primary-6));
-      --slider-tooltip-bg: rgb(var(--primary-6));
-      --slider-handle-ring-color: rgb(var(--primary-6));
-    }
+  .slider {
+    width: 70%;
+    padding-left: 16px;
+    padding-right: 16px;
+    --slider-connect-bg: rgb(var(--primary-6));
+    --slider-tooltip-bg: rgb(var(--primary-6));
+    --slider-handle-ring-color: rgb(var(--primary-6));
   }
 
   .icon-box {

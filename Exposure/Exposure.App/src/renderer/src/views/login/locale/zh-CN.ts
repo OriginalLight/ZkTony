@@ -1,5 +1,5 @@
 export default {
-  'login.form.title': '全自动化学发光成像仪',
+  'login.form.title': '一体式化学发光成像仪',
   'login.form.subtitle': '登录',
   'login.form.userName.errMsg': '用户名不能为空',
   'login.form.password.errMsg': '密码不能为空',

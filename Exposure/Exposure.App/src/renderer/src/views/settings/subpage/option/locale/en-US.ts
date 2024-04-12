@@ -8,6 +8,8 @@ export default {
   'option.camera.expoTime': 'Exposure Time',
   'option.camera.gain': 'Gain',
   'option.camera.temperature': 'Temperature',
+  'option.camera.rotate': 'Image Rotation',
+  'option.camera.roi': 'Image Cropping',
   'option.set': 'Set',
   'option.set.success': 'Set successfully',
   'option.set.restart': 'Set successfully, please restart the device',

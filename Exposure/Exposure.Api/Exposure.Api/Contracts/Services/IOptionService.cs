@@ -33,4 +33,10 @@ public interface IOptionService : IBaseService<Option>
     /// <param name="value"></param>
     /// <returns></returns>
     bool SetOptionValue(string key, string value);
+
+    /// <summary>
+    ///     获取所有
+    /// </summary>
+    /// <returns></returns>
+    Task<IDictionary<string, string>> GetAllAsync();
 }

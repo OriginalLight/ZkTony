@@ -5,6 +5,7 @@ using Exposure.Api.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Newtonsoft.Json;
+using Serilog;
 using SqlSugar;
 
 namespace Exposure.Api.Controllers;
@@ -31,6 +32,7 @@ public class ErrorLogController(
             Total = total.Value,
             List = list
         };
+        Log.Information("分页查询崩溃日志");
         return Ok(res);
     }
 
@@ -46,6 +48,7 @@ public class ErrorLogController(
         // 插入日志
         operLog.AddOperLog(localizer.GetString("Delete").Value,
             $"{localizer.GetString("ErrorLog").Value}：ids = {string.Join(",", ids)}");
+        Log.Information("删除崩溃日志");
         return Ok();
     }
 
@@ -70,6 +73,7 @@ public class ErrorLogController(
         // 插入日志
         operLog.AddOperLog(localizer.GetString("Export").Value,
             $"{localizer.GetString("ErrorLog").Value}：ids = " + string.Join(",", ids));
+        Log.Information("导出崩溃日志");
         // 返回结果
         return Ok();
     }

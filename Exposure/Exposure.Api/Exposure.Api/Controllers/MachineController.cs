@@ -6,13 +6,13 @@ using Exposure.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using OpenCvSharp;
+using Serilog;
 
 namespace Exposure.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
 public class MachineController(
-    ILogger<MachineController> logger,
     ISerialPortService serialPort,
     IStorageService storage,
     ICameraService camera,
@@ -21,6 +21,9 @@ public class MachineController(
     IUsbService usb,
     IStringLocalizer<SharedResources> localizer) : ControllerBase
 {
+    /**
+     * led 0 全关， 1 绿色， 2 黄色， 3 黄慢闪， 4 黄快闪， 5 红色
+     */
     #region 串口状态
 
     [HttpGet]
@@ -45,7 +48,7 @@ public class MachineController(
         var bytes = new byte[hex.Length / 2];
         for (var i = 0; i < hex.Length; i += 2) bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
         serialPort.WritePort(dto.Port, bytes);
-        logger.LogInformation($"Tx：{dto.Port} {BitConverter.ToString(bytes)}");
+        Log.Information($"Tx：{dto.Port} {BitConverter.ToString(bytes)}");
         return Ok();
     }
 
@@ -85,7 +88,7 @@ public class MachineController(
             _ => DefaultProtocol.LedAllClose()
         };
         serialPort.WritePort("Com1", protocol.ToBytes());
-        logger.LogInformation($"Tx：Com1 {BitConverter.ToString(protocol.ToBytes())}");
+        Log.Information($"Tx：Com1 {BitConverter.ToString(protocol.ToBytes())}");
         return Ok();
     }
 
@@ -97,14 +100,14 @@ public class MachineController(
     [Route("Hatch")]
     public async Task<ActionResult> Hatch([FromQuery] int code)
     {
+        if (serialPort.GetFlag("led") <= 4)
+        {
+            serialPort.WritePort("Com1", DefaultProtocol.LedYellowFastFlash().ToBytes());
+            serialPort.SetFlag("led", 4);
+        }
+        
         if (code == 1)
         {
-            if (serialPort.GetFlag("led") < 2)
-            {
-                serialPort.WritePort("Com1", DefaultProtocol.LedYellowFastFlash().ToBytes());
-                serialPort.SetFlag("led", 2);
-            }
-
             serialPort.SetFlag("hatch", 0);
             serialPort.WritePort("Com2", DefaultProtocol.OpenHatch().ToBytes());
             var num = 0;
@@ -116,19 +119,12 @@ public class MachineController(
 
             if (num >= 50)
                 return Problem(localizer.GetString("OpenHatch").Value + localizer.GetString("Failure").Value);
-            serialPort.WritePort("Com1", DefaultProtocol.LedAllClose().ToBytes());
-            serialPort.SetFlag("led", 0);
+            
             serialPort.SetFlag("hatch", 1);
-            logger.LogInformation(localizer.GetString("OpenHatch").Value);
+            Log.Information(localizer.GetString("OpenHatch").Value);
         }
         else
         {
-            if (serialPort.GetFlag("led") < 2)
-            {
-                serialPort.WritePort("Com1", DefaultProtocol.LedYellowFastFlash().ToBytes());
-                serialPort.SetFlag("led", 2);
-            }
-
             serialPort.SetFlag("hatch", 1);
             serialPort.WritePort("Com2", DefaultProtocol.CloseHatch().ToBytes());
             var num = 0;
@@ -140,11 +136,12 @@ public class MachineController(
 
             if (num >= 50)
                 return Problem(localizer.GetString("CloseHatch").Value + localizer.GetString("Failure").Value);
-            serialPort.WritePort("Com1", DefaultProtocol.LedAllClose().ToBytes());
-            serialPort.SetFlag("led", 0);
             serialPort.SetFlag("hatch", 0);
-            logger.LogInformation(localizer.GetString("CloseHatch").Value);
+            Log.Information(localizer.GetString("CloseHatch").Value);
         }
+        
+        serialPort.WritePort("Com1", DefaultProtocol.LedAllClose().ToBytes());
+        serialPort.SetFlag("led", 0);
 
         return Ok();
     }
@@ -258,7 +255,7 @@ public class MachineController(
         catch (Exception e)
         {
             errorLog.AddErrorLog(e);
-            logger.LogError(e, localizer.GetString("Error0012").Value);
+            Log.Error(e, localizer.GetString("Error0012").Value);
             serialPort.WritePort("Com1", DefaultProtocol.LedRed().ToBytes());
             serialPort.SetFlag("led", 5);
             audio.PlayWithSwitch("Error");
@@ -273,7 +270,7 @@ public class MachineController(
         catch (Exception e)
         {
             errorLog.AddErrorLog(e);
-            logger.LogError(e, localizer.GetString("Error0013").Value);
+            Log.Error(e, localizer.GetString("Error0013").Value);
             serialPort.WritePort("Com1", DefaultProtocol.LedRed().ToBytes());
             serialPort.SetFlag("led", 5);
             audio.PlayWithSwitch("Error");
@@ -312,7 +309,7 @@ public class MachineController(
         catch (Exception e)
         {
             errorLog.AddErrorLog(e);
-            logger.LogError(e, localizer.GetString("Error0014").Value);
+            Log.Error(e, localizer.GetString("Error0014").Value);
             serialPort.WritePort("Com1", DefaultProtocol.LedRed().ToBytes());
             serialPort.SetFlag("led", 5);
             audio.PlayWithSwitch("Error");

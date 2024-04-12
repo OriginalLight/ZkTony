@@ -172,4 +172,55 @@ public static class OpenCvUtils
     }
 
     #endregion
+
+    #region 截取部分
+
+    public static Mat CuteRoi(Mat src, string roi)
+    {
+        try
+        {
+            var arr = roi.Split(',');
+            var left = double.Parse(arr[0]);
+            var right = double.Parse(arr[1]);
+            var top = double.Parse(arr[2]);
+            var bottom = double.Parse(arr[3]);
+            var width = src.Width;
+            var height = src.Height;
+            var x = (int)(width * left);
+            var y = (int)(height * top);
+            var w = (int)(width * (right - left));
+            var h = (int)(height * (bottom - top));
+            var rect = new Rect(x, y, w, h);
+            return src[rect].Resize(new Size(width, height));
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return src;
+        }
+    }
+
+    #endregion
+
+    #region 中心旋转
+
+    public static Mat Rotate(Mat src, double angle)
+    {
+        try
+        {
+            // ReSharper disable PossibleLossOfFraction
+            var center = new Point2f(src.Width / 2, src.Height / 2);
+            var rot = Cv2.GetRotationMatrix2D(center, angle, 1.0);
+            var dst = new Mat();
+            Cv2.WarpAffine(src, dst, rot, src.Size());
+            return dst;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return src;
+        }
+    }
+
+    #endregion
 }

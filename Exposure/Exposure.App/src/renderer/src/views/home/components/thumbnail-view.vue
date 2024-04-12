@@ -267,6 +267,7 @@ onMounted(() => {
   flex-direction: column;
   height: 100%;
   margin-top: 8px;
+  border-radius: 4px;
 }
 
 .grid-item {

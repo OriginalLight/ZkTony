@@ -27,6 +27,13 @@ public interface IPictureService : IBaseService<Picture>
     /// <param name="ids"></param>
     /// <returns></returns>
     Task<List<Picture>> GetByIds(object[] ids);
+    
+    /// <summary>
+    ///     删除多条数据
+    /// </summary>
+    /// <param name="keys"></param>
+    /// <returns></returns>
+    Task<bool> DeleteByIds(object[] keys);
 
     /// <summary>
     ///     合成

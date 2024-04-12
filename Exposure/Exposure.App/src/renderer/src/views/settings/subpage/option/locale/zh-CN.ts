@@ -8,6 +8,8 @@ export default {
   'option.camera.expoTime': '曝光时间',
   'option.camera.gain': '增益',
   'option.camera.temperature': '温度',
+  'option.camera.rotate': '图片旋转',
+  'option.camera.roi': '图片裁切',
   'option.set': '设置',
   'option.set.success': '设置成功',
   'option.set.restart': '设置成功, 请重启设备',

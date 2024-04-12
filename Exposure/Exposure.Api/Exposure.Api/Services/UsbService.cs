@@ -1,9 +1,10 @@
 ﻿using System.Management;
 using Exposure.Api.Contracts.Services;
+using Serilog;
 
 namespace Exposure.Api.Services;
 
-public class UsbService(ILogger<UsbService> logger) : IUsbService
+public class UsbService : IUsbService
 {
     private readonly ManagementEventWatcher _insertWatcher = new();
     private readonly ManagementEventWatcher _removeWatcher = new();
@@ -13,7 +14,7 @@ public class UsbService(ILogger<UsbService> logger) : IUsbService
     public void DeviceInsertedEvent(object sender, EventArrivedEventArgs e)
     {
         // 获取到当前插入的什么
-        logger.LogInformation("外设插入");
+        Log.Information("外设插入");
     }
 
     #endregion
@@ -22,7 +23,7 @@ public class UsbService(ILogger<UsbService> logger) : IUsbService
 
     public void DeviceRemovedEvent(object sender, EventArrivedEventArgs e)
     {
-        logger.LogInformation("外设移除");
+        Log.Information("外设移除");
     }
 
     #endregion

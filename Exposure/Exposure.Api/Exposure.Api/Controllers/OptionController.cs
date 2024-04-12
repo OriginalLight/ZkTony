@@ -2,13 +2,13 @@
 using Exposure.Api.Models;
 using Exposure.Protocal.Default;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace Exposure.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
 public class OptionController(
-    ILogger<OptionController> logger,
     IOptionService option,
     ISerialPortService serialPort,
     IAudioService audio) : ControllerBase
@@ -20,10 +20,23 @@ public class OptionController(
     {
         // 读取
         var res = await option.GetOptionValueAsync(key) ?? "None";
-        logger.LogInformation("Get Optiom：" + key + " = " + res);
+        Log.Information("获取参数：" + key + " = " + res);
         return Ok(res);
     }
 
+    #endregion
+    
+    #region 读取所有
+    
+    [HttpGet("All")]
+    public async Task<ActionResult> GetAll()
+    {
+        // 读取
+        var res = await option.GetAllAsync();
+        Log.Information("获取所有参数");
+        return Ok(res);
+    }
+    
     #endregion
 
 
@@ -34,7 +47,7 @@ public class OptionController(
     {
         // 设置
         var res = await option.SetOptionValueAsync(dto.Key, dto.Value);
-        logger.LogInformation("Set Option：" + dto.Key + " = " + dto.Value);
+        Log.Information("设置参数：" + dto.Key + " = " + dto.Value);
         if (res) SetOptionValueHook(dto.Key, dto.Value);
         return Ok(res);
     }

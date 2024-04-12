@@ -103,6 +103,33 @@
                 </a-input-group>
               </template>
             </a-list-item>
+            <a-list-item>
+              <a-list-item-meta :title="t('option.camera.rotate')"></a-list-item-meta>
+              <template #actions>
+                <a-input-group>
+                  <a-input-number
+                    v-model="option.rotate"
+                    style="width: 350px"
+                    :min="-360"
+                    :max="360"
+                    mode="button"
+                    :step="1"
+                  >
+                    <template #suffix>°</template>
+                  </a-input-number>
+                  <a-button type="primary" @click="handleRotate">{{ t('option.set') }}</a-button>
+                </a-input-group>
+              </template>
+            </a-list-item>
+            <a-list-item>
+              <a-list-item-meta :title="t('option.camera.roi')"></a-list-item-meta>
+              <template #actions>
+                <a-input-group>
+                  <a-input v-model="option.roi" style="width: 350px" />
+                  <a-button type="primary" @click="handleRoi">{{ t('option.set') }}</a-button>
+                </a-input-group>
+              </template>
+            </a-list-item>
           </a-list>
         </a-card>
         <a-card :title="t('option.lower')">
@@ -152,7 +179,7 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { setOption, getOption } from '@renderer/api/option'
+import { setOption, getAllOptions } from '@renderer/api/option'
 import { getPorts } from '@renderer/api/machine'
 import { Message } from '@arco-design/web-vue'
 
@@ -160,12 +187,14 @@ const { t } = useI18n()
 
 const option = ref({
   machineId: '',
-  com1: 'COM4',
-  com2: 'COM3',
+  com1: 'None',
+  com2: 'None',
   ports: ['COM1', 'COM2', 'COM3', 'COM4'],
   expoTime: 1500,
   gain: 3000,
   temperature: -15,
+  rotate: 0,
+  roi: '',
   hatchStep: 0,
   hatchOffset: 0
 })
@@ -242,6 +271,30 @@ const handleTemperature = async () => {
   }
 }
 
+const handleRotate = async () => {
+  try {
+    await setOption({
+      key: 'Rotate',
+      value: String(option.value.rotate)
+    })
+    Message.success(t('option.set.success'))
+  } catch (error) {
+    Message.error(t('option.set.fail'))
+  }
+}
+
+const handleRoi = async () => {
+  try {
+    await setOption({
+      key: 'Roi',
+      value: option.value.roi
+    })
+    Message.success(t('option.set.success'))
+  } catch (error) {
+    Message.error(t('option.set.fail'))
+  }
+}
+
 const handleHatchStep = async () => {
   try {
     await setOption({
@@ -268,34 +321,20 @@ const handleHatchOffset = async () => {
 
 onMounted(async () => {
   try {
-    const res = await getOption({ key: 'MachineId' })
-    option.value.machineId = res.data
-    const res1 = await getOption({ key: 'Com1' })
-    option.value.com1 = res1.data
-    const res2 = await getOption({ key: 'Com2' })
-    option.value.com2 = res2.data
-    const res3 = await getPorts()
-    option.value.ports = res3.data
-    const res4 = await getOption({ key: 'ExpoTime' })
-    if (res4.data != 'None') {
-      option.value.expoTime = Number(res4.data)
-    }
-    const res5 = await getOption({ key: 'Gain' })
-    if (res5.data != 'None') {
-      option.value.gain = Number(res5.data)
-    }
-    const res6 = await getOption({ key: 'Temperature' })
-    if (res6.data != 'None') {
-      option.value.temperature = Number(res6.data) / 10
-    }
-    const res7 = await getOption({ key: 'HatchStep' })
-    if (res7.data != 'None') {
-      option.value.hatchStep = Number(res7.data)
-    }
-    const res8 = await getOption({ key: 'HatchOffset' })
-    if (res8.data != 'None') {
-      option.value.hatchOffset = Number(res8.data)
-    }
+    const all = await getAllOptions()
+    const ops = all.data
+    if (ops.MachineId) option.value.machineId = ops.MachineId
+    if (ops.Com1) option.value.com1 = ops.Com1
+    if (ops.Com2) option.value.com2 = ops.Com2
+    if (ops.ExpoTime) option.value.expoTime = Number(ops.ExpoTime)
+    if (ops.Gain) option.value.gain = Number(ops.Gain)
+    if (ops.Temperature) option.value.temperature = Number(ops.Temperature) / 10
+    if (ops.HatchStep) option.value.hatchStep = Number(ops.HatchStep)
+    if (ops.HatchOffset) option.value.hatchOffset = Number(ops.HatchOffset)
+    if (ops.Rotate) option.value.rotate = Number(ops.Rotate)
+    if (ops.Roi) option.value.roi = ops.Roi
+    const res = await getPorts()
+    option.value.ports = res.data
   } catch (error) {
     console.error(error)
   }

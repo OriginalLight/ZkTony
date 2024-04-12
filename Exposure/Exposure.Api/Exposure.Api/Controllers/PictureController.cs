@@ -6,6 +6,7 @@ using Exposure.Api.Models.Dto;
 using Exposure.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Serilog;
 using SqlSugar;
 
 namespace Exposure.Api.Controllers;
@@ -34,6 +35,7 @@ public class PictureController(
             Total = total.Value,
             List = list
         };
+        Log.Information("分页查询图片信息");
         return Ok(res);
     }
 
@@ -49,6 +51,7 @@ public class PictureController(
             throw new Exception(localizer.GetString("Update").Value + localizer.GetString("Failure").Value);
         // 插入日志
         operLog.AddOperLog(localizer.GetString("Update").Value, $"{localizer.GetString("Picture").Value}: {dto.Id}");
+        Log.Information("更新图片信息");
         return Ok();
     }
 
@@ -60,11 +63,12 @@ public class PictureController(
     public async Task<IActionResult> Delete([FromBody] object[] ids)
     {
         // 删除
-        if (!await picture.DeleteRange(ids))
+        if (!await picture.DeleteByIds(ids))
             throw new Exception(localizer.GetString("Delete").Value + localizer.GetString("Failure").Value);
         // 插入日志
         operLog.AddOperLog(localizer.GetString("Delete").Value,
             $"{localizer.GetString("Picture").Value}: {string.Join(',', ids)}");
+        Log.Information("删除图片信息");
         return Ok();
     }
 
@@ -83,6 +87,7 @@ public class PictureController(
         var res = await picture.Combine(list[0], list[1]);
         operLog.AddOperLog(localizer.GetString("Combine").Value,
             $"{localizer.GetString("Picture").Value}: {string.Join(',', ids)}");
+        Log.Information("合成图片");
         return Ok(res);
     }
 
@@ -136,6 +141,7 @@ public class PictureController(
             $"{localizer.GetString("Picture").Value}：ids = " + string.Join(",", dto.Ids));
         audio.PlayWithSwitch("Export");
         // 返回结果
+        Log.Information("导出图片");
         return Ok();
     }
 
@@ -152,6 +158,7 @@ public class PictureController(
         if (dto.Code == 0) audio.PlayWithSwitch("Save");
         operLog.AddOperLog(localizer.GetString("Adjust").Value,
             $"{localizer.GetString("Picture").Value}：id = " + dto.Id);
+        Log.Information("调整图片");
         return Ok(res);
     }
 

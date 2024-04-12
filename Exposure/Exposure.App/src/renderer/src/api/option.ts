@@ -20,3 +20,8 @@ export function getOption(data: OptionGetParam) {
 export function setOption(data: OptionSetParam) {
   return axios.post('/Option', data)
 }
+
+// 获取所有选项
+export function getAllOptions() {
+  return axios.get<Record<string, string>>('/Option/All')
+}

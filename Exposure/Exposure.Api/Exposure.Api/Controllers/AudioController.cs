@@ -1,11 +1,12 @@
 ﻿using Exposure.Api.Contracts.Services;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace Exposure.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class AudioController(IAudioService audioService, ILogger<AudioController> logger) : ControllerBase
+public class AudioController(IAudioService audioService) : ControllerBase
 {
     #region 播放
 
@@ -15,7 +16,7 @@ public class AudioController(IAudioService audioService, ILogger<AudioController
     {
         // 播放
         audioService.Play(key);
-        logger.LogInformation("Play:" + key);
+        Log.Information("播放:" + key);
         return Ok();
     }
 

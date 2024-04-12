@@ -60,6 +60,21 @@ public class PictureService(
     }
 
     #endregion
+    
+    #region 删除多条数据
+    
+    public async Task<bool> DeleteByIds(object[] keys)
+    {
+        var list = await _context.db.Queryable<Picture>().Where(p => keys.Contains(p.Id)).ToListAsync();
+        foreach (var item in list.OfType<Picture>())
+        {
+            FileUtils.DeleteFile(item.Path);
+            FileUtils.DeleteFile(item.Thumbnail);
+        }
+        return await _context.db.Deleteable<Picture>().In(keys).ExecuteCommandHasChangeAsync();
+    }
+    
+    #endregion
 
     #region 合并图片
 

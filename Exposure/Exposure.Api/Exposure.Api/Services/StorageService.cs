@@ -1,10 +1,10 @@
 ﻿using Exposure.Api.Contracts.Services;
 using Exposure.Utilities;
+using Serilog;
 
 namespace Exposure.Api.Services;
 
 public class StorageService(
-    ILogger<StorageService> logger,
     IErrorLogService errorLog
 ) : IStorageService
 {
@@ -20,14 +20,14 @@ public class StorageService(
                 if (!Directory.Exists(FileUtils.Preview)) return;
                 foreach (var file in Directory.GetFiles(FileUtils.Preview))
                 {
-                    logger.LogInformation($"Delete File：{file}");
+                    Log.Information($"删除文件：{file}");
                     File.Delete(file);
                 }
             }
             catch (Exception e)
             {
                 errorLog.AddErrorLog(e);
-                logger.LogError(e, "Clean Preview Error");
+                Log.Error(e, "清空预览图失败");
             }
         });
     }
@@ -41,6 +41,7 @@ public class StorageService(
         var drives = DriveInfo.GetDrives();
         var total = drives.Sum(drive => drive.TotalSize);
         var available = drives.Sum(drive => drive.AvailableFreeSpace);
+        Log.Information($"Available Storage：{available} / {total}");
         return available * 1.0 / total;
     }
 

@@ -37,9 +37,9 @@ export default {
   'home.thumbnail.view.combine': '合\u2002并',
   'home.thumbnail.view.export': '导\u2002出',
   'home.thumbnail.view.export.success': '导出成功',
-  'home.thumbnail.view.picture.light': '白光图',
-  'home.thumbnail.view.picture.dark': '曝光图',
-  'home.thumbnail.view.picture.combine': '合成图',
+  'home.thumbnail.view.picture.light': '白\u2002光\u2002图',
+  'home.thumbnail.view.picture.dark': '曝\u2002光\u2002图',
+  'home.thumbnail.view.picture.combine': '合\u2002成\u2002图',
   'home.thumbnail.view.preview': '预览中',
   'home.camera.options.temperature.error': '当前相机温度未达到设置温度，点击拍摄会影响图片质量！'
 }

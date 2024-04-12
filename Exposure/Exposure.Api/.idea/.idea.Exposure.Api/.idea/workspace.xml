@@ -16,43 +16,36 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="78ea7552-3107-4483-86a7-883cf6a7e7bd" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/dataSources.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/encodings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/indexLayout.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/config/applicationhost.config" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vs/Exposure.Api/DesignTimeBuild/.dtbcache.v2" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vs/Exposure.Api/FileContentIndex/76ba30ff-3103-4e06-b7a8-dacbaba67de3.vsidx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vs/Exposure.Api/FileContentIndex/7703594e-5325-4428-8165-317333497952.vsidx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vs/Exposure.Api/FileContentIndex/bb1e6809-c33c-4238-914b-1791baf52703.vsidx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vs/Exposure.Api/FileContentIndex/ed116ad4-3d73-46d9-89ed-28aecf2c32b4.vsidx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vs/Exposure.Api/FileContentIndex/f3a8b5af-db8b-41aa-8f14-ab6fa9dbea4c.vsidx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vs/Exposure.Api/config/applicationhost.config" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vs/Exposure.Api/v17/.futdcache.v2" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vs/Exposure.Api/v17/.suo" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vs/ProjectEvaluation/exposure.api.metadata.v7.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vs/ProjectEvaluation/exposure.api.projects.v7.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Contracts/Services/ICameraService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Contracts/Services/ICameraService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Contracts/Services/IOptionService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Contracts/Services/IOptionService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Contracts/Services/IPictureService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Contracts/Services/IPictureService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/AudioController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/AudioController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/CameraController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/CameraController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/ErrorLogController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/ErrorLogController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/MachineController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/MachineController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/MetricController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/MetricController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/OptionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/OptionController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/PictureController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/PictureController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/TestController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/TestController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/CameraService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/CameraService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/OptionService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/OptionService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/PictureService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/PictureService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/StorageService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/StorageService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/UsbService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/UsbService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.SqlSugar/AppDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.SqlSugar/AppDbContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.SqlSugar/Exposure.SqlSugar.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.SqlSugar/Exposure.SqlSugar.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Utilities/OpenCvUtils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Utilities/OpenCvUtils.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Exposure.App/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/api/machine.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/api/machine.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/components/navigation/locale/en-US.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/components/navigation/locale/en-US.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/components/navigation/locale/zh-CN.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/components/navigation/locale/zh-CN.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/locale/zh-CN.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/locale/zh-CN.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/gallery/components/gallery-content.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/gallery/components/gallery-content.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/gallery/locale/zh-CN.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/gallery/locale/zh-CN.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/api/interceptor.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/api/interceptor.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/gallery/subpage/gallery-detail/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/gallery/subpage/gallery-detail/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/gallery/subpage/gallery-detail/locale/zh-CN.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/gallery/subpage/gallery-detail/locale/zh-CN.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/home/components/camera-options.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/home/components/camera-options.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/home/components/image-preview.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/home/components/image-preview.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/home/components/thumbnail-view.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/home/components/thumbnail-view.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/home/locale/en-US.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/home/locale/en-US.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/home/locale/zh-CN.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/home/locale/zh-CN.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/login/locale/zh-CN.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/login/locale/zh-CN.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/components/factory-settings.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/components/factory-settings.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/components/system-settings.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/components/system-settings.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/components/user-settings.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/components/user-settings.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/err-log/locale/zh-CN.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/err-log/locale/zh-CN.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/oper-log/locale/zh-CN.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/oper-log/locale/zh-CN.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/user-manage/locale/zh-CN.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/user-manage/locale/zh-CN.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Exposure.App/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -75,36 +68,8 @@
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/5535e31a712343a63f5d7d796cd874e563e5ac14/src/libraries/System.Diagnostics.Process/src/System/Diagnostics/ProcessStartInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/5535e31a712343a63f5d7d796cd874e563e5ac14/src/libraries/System.Management/src/System/Management/ManagementException.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/5535e31a712343a63f5d7d796cd874e563e5ac14/src/libraries/System.Net.WebSockets/src/System/Net/WebSockets/WebSocket.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/61111f2ba0364b66868c1385a840aefb46a00/21/524973c2/0200002Fpdb13High.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/61111f2ba0364b66868c1385a840aefb46a00/21/524973c2/0200002Fpdb13Low.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/87b68031d348402681f63c070fa16ca53aa00/35/cb08b32c/02000015pdb23High.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/87b68031d348402681f63c070fa16ca53aa00/35/cb08b32c/02000015pdb23Low.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/f45552f8ca9a4ef086d5b1dca03087163a600/2a/26c65edc/02000009pdb46Low.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/06195d02d60c42989da9717c9e3d33981de8a0/14/669f5517/ControllerBase.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/06195d02d60c42989da9717c9e3d33981de8a0/d6/bd2b79a9/JsonResult.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/2158f4f04358416a9be3e74eb2b544461de8a0/3c/9a45ae99/ObjectResult.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/2158f4f04358416a9be3e74eb2b544461de8a0/ea/01d07214/ControllerBase.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5abecb93434c4299acd01d522fdf8da2c9a910/06/ea7e8384/Environment.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5abecb93434c4299acd01d522fdf8da2c9a910/09/cd1ba8ed/Int32.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5abecb93434c4299acd01d522fdf8da2c9a910/1c/8835dc27/Task`1.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5abecb93434c4299acd01d522fdf8da2c9a910/45/ea6ef735/AssemblyName.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5abecb93434c4299acd01d522fdf8da2c9a910/51/58e52484/CancellationTokenSource.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5abecb93434c4299acd01d522fdf8da2c9a910/a2/c6464578/IDisposable.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/67cdd60ce4bf4b8987dc435b0604cda9d908/d8/feb6a323/DriveType.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7c05a9f56cce41eba9451cc4a5a099cc138a0/02/dd364ed8/IHostedService.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/a4e4bd33b15c45a09e0aa1b0d939755429fa00/e3/c6eea67e/ISugarQueryable`1.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/ccbc86d5ad0b43008ecf651f5d223466e7400/c9/29e5b04b/NormTypes.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/ccbc86d5ad0b43008ecf651f5d223466e7400/fb/b0c14d0c/Cv2.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/27633a066f89dc9a0c637aaa4ab422ea3485c058fefc65fe8cbaa534bca92/System.Drawing.Common.notsupported.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2b6ecba4c89716fd33f426f37ad95e92ae35e1a3736377fd7b84936246372/System.Windows.Extensions.notsupported.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2be4a033dbc1f36847877f67c1c1ffdca1ce6ac79daaf7064523f1a6956b4ed/GrayscaleExtensions.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2f765288d3779137c1ffedeb3bf65cbec2a4b8946b3db9b47ca786dac3e79bb1/DisposableObject.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/90df3a12bb97bad7fba2b5ab0f42a3f2aea16e68aaa7ee9877fcdefefe54ac/NativeMethods.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/bda1a8aceb88de87254065a2ded795c3953da7c42a269ae5bbb443973798b75/Version.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d34fd5bb1bae90f26dc59ca29671df440ba176795417f1d2a69e92f968a9/Image.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d882146b4f265f10bcbec2663fce248db9ffec5fa1aeaf76e32a11ba5eafcd6/MethodBaseInvoker.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/ec9cbb41e7c431e6de747cc3eb514627fd64fb0a57fae8952b4a2d5573/System.IO.Ports.notsupported.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/ecfda295482784bd65d11791a8344e16826436a9fce93ab4bd1891f59f3c/AssemblyName.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/891a5c25823c4eeda76705f52719aef02ad600/6b/20a50cb7/AdoProvider.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8e7d133a4bc14e71834005a023e0390222600/a5/46f7e32e/LoggerConfiguration.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
@@ -341,6 +306,8 @@
       <workItem from="1712541818019" duration="20788000" />
       <workItem from="1712711464109" duration="15192000" />
       <workItem from="1712738794840" duration="2452000" />
+      <workItem from="1712798600174" duration="25443000" />
+      <workItem from="1712905748308" duration="5293000" />
     </task>
     <servers />
   </component>

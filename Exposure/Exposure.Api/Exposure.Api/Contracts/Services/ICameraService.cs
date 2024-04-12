@@ -48,7 +48,7 @@ public interface ICameraService
     /// <param name="frame"></param>
     /// <param name="ctsToken"></param>
     /// <returns></returns>
-    Task TakeManualPhotoAsync(int exposure, int frame, CancellationToken ctsToken);
+    Task TakeManualPhotoAsync(uint exposure, int frame, CancellationToken ctsToken);
 
     /// <summary>
     ///     取消拍照

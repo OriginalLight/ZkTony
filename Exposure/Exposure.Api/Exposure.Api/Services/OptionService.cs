@@ -40,7 +40,7 @@ public class OptionService(IDbContext dbContext) : BaseService<Option>(dbContext
 
     #region 获取Key对应的值
 
-    public string GetOptionValue(string key)
+    public string? GetOptionValue(string key)
     {
         return _context.db.Queryable<Option>().Where(p => p.Key == key).Select(p => p.Value).First();
     }
@@ -66,5 +66,15 @@ public class OptionService(IDbContext dbContext) : BaseService<Option>(dbContext
         return _context.db.Insertable(option).ExecuteCommand() > 0;
     }
 
+    #endregion
+    
+    #region 获取所有
+    
+    public async Task<IDictionary<string, string>> GetAllAsync()
+    {
+        var ops = await _context.db.Queryable<Option>().ToListAsync();
+        return ops.ToDictionary(p => p.Key, p => p.Value);
+    }
+    
     #endregion
 }

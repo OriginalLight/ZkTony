@@ -1,13 +1,13 @@
 ﻿using Exposure.Api.Contracts.Services;
 using Exposure.Api.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace Exposure.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
 public class TestController(
-    ILogger<TestController> logger,
     ITestService service
 ) : ControllerBase
 {
@@ -18,7 +18,7 @@ public class TestController(
     public IActionResult AgingTest([FromBody] TestAgingDto dto)
     {
         service.AgingTest(dto);
-        logger.LogInformation("老化测试成功");
+        Log.Information("老化测试成功");
         return Ok();
     }
 

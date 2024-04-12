@@ -77,7 +77,8 @@
           size="medium"
           :disabled="
             (imageOptions.brightness === 100 && imageOptions.contrast === 100) ||
-            props.image.name === 'Preview'
+            props.image.name === 'Preview' ||
+            props.image.path === ''
           "
           :loading="loading"
           @click="handleSave"
@@ -91,8 +92,8 @@
   </div>
   <div class="image-info">
     <a-space size="medium">
-      <a-tag>{{ props.image.name }}</a-tag>
-      <a-tag>{{ props.image.width + ' x ' + props.image.height }}</a-tag>
+      <a-tag color="#006934">{{ props.image.name }}</a-tag>
+      <a-tag color="#006934">{{ props.image.width + ' x ' + props.image.height }}</a-tag>
     </a-space>
   </div>
 </template>
@@ -232,15 +233,16 @@ onMounted(() => {
   display: flex;
   position: relative;
   height: 100%;
-  border: 1px solid var(--color-neutral-3);
-  border-radius: var(--border-radius-small);
+  border-radius: 4px;
   background-color: var(--color-bg-2);
+  overflow: hidden;
 
   img {
     position: absolute;
     width: 100%;
     height: 100%;
     object-fit: contain;
+    border-radius: 4px;
   }
 }
 

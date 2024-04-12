@@ -2,7 +2,7 @@
 using Exposure.SqlSugar.Contracts;
 using Exposure.Utilities;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using SqlSugar;
 
 namespace Exposure.SqlSugar;
@@ -13,11 +13,9 @@ namespace Exposure.SqlSugar;
 public class AppDbContext : IDbContext
 {
     private readonly IConfiguration _config;
-    private readonly ILogger<AppDbContext> _logger;
 
-    public AppDbContext(IConfiguration config, ILogger<AppDbContext> logger)
+    public AppDbContext(IConfiguration config)
     {
-        _logger = logger;
         _config = config;
 
         var dataBase = _config.GetSection("DataBase").Value ?? throw new InvalidOperationException("无法获取数据库名称");
@@ -35,7 +33,7 @@ public class AppDbContext : IDbContext
         if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
             db.Aop.OnLogExecuting = (sql, paramster) =>
             {
-                _logger.LogInformation(sql + "\r\n" +
+                Log.Information(sql + "\r\n" +
                                        $"{db.Utilities.SerializeObject(paramster.ToDictionary(it => it.ParameterName, it => it.Value))} \r\n");
             };
     }

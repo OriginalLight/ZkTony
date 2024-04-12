@@ -33,6 +33,9 @@ axios.interceptors.response.use(
     return response
   },
   (error) => {
-    return Promise.reject(new Error(error?.response?.data?.detail || '0x0000 Request Error'))
+    const language = localStorage.getItem('locale') || 'zh-CN'
+    const message =
+      language === 'zh-CN' ? '后台服务错误，请重启！' : 'Backend service error, please restart!'
+    return Promise.reject(new Error(error?.response?.data?.detail || '0x0000 ' + message))
   }
 )

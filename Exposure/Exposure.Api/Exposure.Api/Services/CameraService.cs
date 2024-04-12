@@ -5,6 +5,7 @@ using Exposure.Protocal.Default;
 using Exposure.Utilities;
 using Microsoft.Extensions.Localization;
 using OpenCvSharp;
+using Serilog;
 
 namespace Exposure.Api.Services;
 
@@ -153,8 +154,8 @@ public class CameraService(
             throw;
         }
 
-        // 延时500ms
-        await Task.Delay(500, ctsToken);
+        // 延时1000ms
+        await Task.Delay(1000, ctsToken);
 
         // 设置曝光时
         if (!_nncam.put_ExpoTime((uint)targetExpo)) throw new Exception(localizer.GetString("Error0009").Value);
@@ -168,7 +169,7 @@ public class CameraService(
 
     #region 手动拍照
 
-    public async Task TakeManualPhotoAsync(int exposure, int frame, CancellationToken ctsToken)
+    public async Task TakeManualPhotoAsync(uint exposure, int frame, CancellationToken ctsToken)
     {
         await InitAsync();
         if (_nncam == null) throw new Exception(localizer.GetString("Error0011").Value);
@@ -197,8 +198,8 @@ public class CameraService(
             throw;
         }
 
-        // 延时500ms
-        await Task.Delay(500, ctsToken);
+        // 延时1000ms
+        await Task.Delay(1000, ctsToken);
 
         // 设置曝光时
         if (!_nncam.put_ExpoTime((uint)(exposure / frame))) throw new Exception(localizer.GetString("Error0009").Value);
@@ -326,10 +327,12 @@ public class CameraService(
                 case Nncam.eEVENT.EVENT_ERROR:
                     _nncam?.Close();
                     _nncam = null;
+                    Log.Error("相机错误");
                     break;
                 case Nncam.eEVENT.EVENT_DISCONNECTED:
                     _nncam?.Close();
                     _nncam = null;
+                    Log.Error("相机断开");
                     break;
                 case Nncam.eEVENT.EVENT_IMAGE:
                     OnEventImage();
@@ -488,8 +491,13 @@ public class CameraService(
         int type = 0
     )
     {
+        var start = DateTime.Now;
+        var roi = await option.GetOptionValueAsync("Roi") ?? "0,1,0,1";
+        var rot = await option.GetOptionValueAsync("Rotate") ?? "0";
         // 校准图片
-        var dst = OpenCvUtils.Calibrate(mat);
+        var caliMat = OpenCvUtils.Calibrate(mat);
+        var rotateMat = OpenCvUtils.Rotate(caliMat, double.Parse(rot));
+        var dst = OpenCvUtils.CuteRoi(rotateMat, roi);
         // 灰度图
         var gray = new Mat();
         // 缩略图
@@ -545,9 +553,13 @@ public class CameraService(
         finally
         {
             // 释放资源
+            caliMat.Dispose();
+            rotateMat.Dispose();
             gray.Dispose();
             thumb.Dispose();
             dst.Dispose();
+            var end = DateTime.Now;
+            Log.Information($"保存图片耗时：{(end - start).TotalMilliseconds}ms");
         }
     }
 

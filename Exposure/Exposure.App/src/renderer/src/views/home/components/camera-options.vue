@@ -64,19 +64,28 @@
             @change="handleQualityChange"
           >
             <a-tooltip :content="t('home.camera.options.3000.title')">
-              <a-radio value="0" style="width: 100%; text-align: center">{{
-                t('home.camera.options.3000.pixel')
-              }}</a-radio>
+              <a-radio
+                value="0"
+                :disabled="disabled.quality"
+                style="width: 100%; text-align: center"
+                >{{ t('home.camera.options.3000.pixel') }}</a-radio
+              >
             </a-tooltip>
             <a-tooltip :content="t('home.camera.options.1500.title')">
-              <a-radio value="1" style="width: 100%; text-align: center">{{
-                t('home.camera.options.1500.pixel')
-              }}</a-radio>
+              <a-radio
+                value="1"
+                :disabled="disabled.quality"
+                style="width: 100%; text-align: center"
+                >{{ t('home.camera.options.1500.pixel') }}</a-radio
+              >
             </a-tooltip>
             <a-tooltip :content="t('home.camera.options.1000.title')">
-              <a-radio value="2" style="width: 100%; text-align: center">{{
-                t('home.camera.options.1000.pixel')
-              }}</a-radio>
+              <a-radio
+                value="2"
+                :disabled="disabled.quality"
+                style="width: 100%; text-align: center"
+                >{{ t('home.camera.options.1000.pixel') }}</a-radio
+              >
             </a-tooltip>
           </a-radio-group>
         </div>
@@ -192,7 +201,7 @@
     :mask-closable="false"
     @ok="handleCancel"
   >
-    <template #title> {{ t('home.camera.options.shooting') }} </template>
+    <template #title> {{ progress.message }} </template>
     <a-space size="large">
       <a-spin dot />
       <a-countdown
@@ -245,7 +254,8 @@ const loading = ref({
 const disabled = ref({
   hatch: false,
   preview: false,
-  shot: false
+  shot: false,
+  quality: false
 })
 
 //根据曝光时间计算最大帧数不能超过曝光时间除以5秒
@@ -274,17 +284,26 @@ watch(
 
 const handleQualityChange = async (value: unknown) => {
   try {
+    disabled.value.shot = true
+    disabled.value.preview = true
+    disabled.value.quality = true
     await pixel({ index: Number(value) })
+    // 延时2s
+    await delay(2500)
   } catch (error) {
     Message.error((error as Error).message)
+  } finally {
+    disabled.value.shot = false
+    disabled.value.preview = false
+    disabled.value.quality = false
   }
 }
 
 const handleHatch = async () => {
   loading.value.hatch = true
-  disabled.value = { hatch: true, preview: true, shot: true }
+  disabled.value = { hatch: true, preview: true, shot: true, quality: false }
+  const before = appStore.hatch
   try {
-    const before = appStore.hatch
     await hatch({ code: appStore.hatch ? 0 : 1 })
     appStore.toggleHatch(!before)
     if (before) {
@@ -294,6 +313,10 @@ const handleHatch = async () => {
     }
   } catch (error) {
     Message.error((error as Error).message)
+    if (!before) {
+      disabled.value.preview = false
+      disabled.value.shot = false
+    }
   } finally {
     loading.value.hatch = false
     disabled.value.hatch = false
@@ -302,27 +325,27 @@ const handleHatch = async () => {
 
 // 拍摄
 const handleShoot = async () => {
-  const res6 = await getOption({ key: 'Temperature' })
-  const targetTemperature = res6.data === 'None' ? -15 : Number(res6.data) / 10
-  const currentTemperature = appStore.temperature
-  if (currentTemperature - targetTemperature >= 3) {
-    Message.error(t('home.camera.options.temperature.error'))
-  }
-  progress.value.visible = true
   try {
+    const res6 = await getOption({ key: 'Temperature' })
+    const targetTemperature = res6.data === 'None' ? -15 : Number(res6.data) / 10
+    const currentTemperature = appStore.temperature
+    if (currentTemperature - targetTemperature >= 3) {
+      Message.warning(t('home.camera.options.temperature.error'))
+    }
+    progress.value.visible = true
     if (options.value.mode === 'auto') {
       progress.value.message = t('home.camera.options.calculating')
-      progress.value.time = 12000
+      progress.value.time = 15000
       const res = await auto()
       progress.value.message = t('home.camera.options.shooting')
-      progress.value.time = res.data / 1000 + 1500
+      progress.value.time = res.data / 1000 + 2000
       const ms = res.data / 1000
       options.value.time.minute = Math.floor(ms / 1000 / 60)
       options.value.time.second = Math.floor((ms / 1000) % 60)
       options.value.time.millisecond = Math.floor(ms % 1000)
     } else {
       progress.value.message = t('home.camera.options.shooting')
-      progress.value.time = exposureTime.value / 1000 + 1500
+      progress.value.time = exposureTime.value / 1000 + 2000
       await manual({
         exposure: exposureTime.value,
         frame: options.value.frame
@@ -338,7 +361,7 @@ const handleShoot = async () => {
 const handlePreview = async () => {
   try {
     loading.value.preview = true
-    disabled.value = { hatch: true, preview: true, shot: true }
+    disabled.value = { hatch: true, preview: true, shot: true, quality: true }
     await preview()
     // 延时500ms
     await delay(500)
@@ -352,7 +375,7 @@ const handlePreview = async () => {
     Message.error((error as Error).message)
   } finally {
     loading.value.preview = false
-    disabled.value = { hatch: false, preview: false, shot: false }
+    disabled.value = { hatch: false, preview: false, shot: false, quality: false }
   }
 }
 
@@ -400,6 +423,8 @@ const delay = (ms: number) => {
 .card {
   display: flex;
   flex-direction: column;
+  border-radius: 4px;
+  font-weight: bold;
 }
 
 .image-edit {
