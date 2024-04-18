@@ -14,7 +14,8 @@ export default {
   'user.managemet.delete.content': 'Are you sure to delete the selected user?',
   'user.managemet.reset': 'Reset',
   'user.managemet.reset.title': 'Reset Password',
-  'user.managemet.reset.content': 'Are you sure to reset the password of the selected user?',
+  'user.managemet.reset.content':
+    'Are you sure to reset the password of the selected user to the current user name?',
   'user.managemet.reset.success': 'Reset Success',
   'user.managemet.table.id': 'ID',
   'user.managemet.table.name': 'Name',

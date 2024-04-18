@@ -1,17 +1,17 @@
 <template>
-  <div class="layout">
-    <div class="layout-header"><Navigation /></div>
-    <div class="layout-content">
-      <a-config-provider :locale="locale">
+  <a-config-provider :locale="locale">
+    <div class="layout">
+      <div class="layout-header"><Navigation /></div>
+      <div class="layout-content">
         <router-view v-slot="{ Component, route }">
           <keep-alive v-if="route.meta.keepAlive">
             <component :is="Component" />
           </keep-alive>
           <component :is="Component" v-else />
         </router-view>
-      </a-config-provider>
+      </div>
     </div>
-  </div>
+  </a-config-provider>
 </template>
 
 <script lang="ts" setup>

@@ -1,51 +1,78 @@
 <template>
   <div class="box">
     <a-space direction="vertical" class="preview">
-      <a-tag
+      <a-button
         v-if="subpage.list.light.length > 0"
-        style="width: 100px; display: flex; justify-content: center"
-        >{{ t('gallery.detail.picture.light') }}</a-tag
+        size="small"
+        style="width: 108px"
+        @click="expand.light = !expand.light"
       >
-      <div
-        v-for="img in subpage.list.light"
-        :key="img.id"
-        class="img-box"
-        @click="handelSelected(img)"
+        <template #icon>
+          <icon-list v-if="expand.light" />
+          <icon-more v-else />
+        </template>
+        {{ t('gallery.detail.picture.light') }}</a-button
       >
-        <img v-lazy="img.thumbnail" class="img" />
-        <icon-check v-if="showSelected(img)" class="selected" />
-        <div class="img-name">{{ img.name }}</div>
-      </div>
-      <a-tag
+      <a-space v-if="expand.light && subpage.list.light.length > 0" direction="vertical">
+        <div
+          v-for="img in subpage.list.light"
+          :key="img.id"
+          class="img-box"
+          @click="handelSelected(img)"
+        >
+          <img v-lazy="img.thumbnail" class="img" />
+          <icon-check v-if="showSelected(img)" class="selected" />
+          <div class="img-name">{{ img.name }}</div>
+        </div>
+      </a-space>
+      <a-button
         v-if="subpage.list.dark.length > 0"
-        style="width: 100px; display: flex; justify-content: center"
-        >{{ t('gallery.detail.picture.dark') }}</a-tag
+        size="small"
+        style="width: 108px"
+        @click="expand.dark = !expand.dark"
       >
-      <div
-        v-for="img in subpage.list.dark"
-        :key="img.id"
-        class="img-box"
-        @click="handelSelected(img)"
+        <template #icon>
+          <icon-list v-if="expand.dark" />
+          <icon-more v-else />
+        </template>
+        {{ t('gallery.detail.picture.dark') }}</a-button
       >
-        <img v-lazy="img.thumbnail" class="img" />
-        <icon-check v-if="showSelected(img)" class="selected" />
-        <div class="img-name">{{ img.name }}</div>
-      </div>
-      <a-tag
+      <a-space v-if="expand.dark && subpage.list.dark.length > 0" direction="vertical">
+        <div
+          v-for="img in subpage.list.dark"
+          :key="img.id"
+          class="img-box"
+          @click="handelSelected(img)"
+        >
+          <img v-lazy="img.thumbnail" class="img" />
+          <icon-check v-if="showSelected(img)" class="selected" />
+          <div class="img-name">{{ img.name }}</div>
+        </div>
+      </a-space>
+      <a-button
         v-if="subpage.list.combine.length > 0"
-        style="width: 100px; display: flex; justify-content: center"
-        >{{ t('gallery.detail.picture.combine') }}</a-tag
+        size="small"
+        style="width: 108px"
+        @click="expand.combine = !expand.combine"
       >
-      <div
-        v-for="img in subpage.list.combine"
-        :key="img.id"
-        class="img-box"
-        @click="handelSelected(img)"
+        <template #icon>
+          <icon-list v-if="expand.combine" />
+          <icon-more v-else />
+        </template>
+        {{ t('gallery.detail.picture.combine') }}</a-button
       >
-        <img v-lazy="img.thumbnail" class="img" />
-        <icon-check v-if="showSelected(img)" class="selected" />
-        <div class="img-name">{{ img.name }}</div>
-      </div>
+      <a-space v-if="expand.combine && subpage.list.combine.length > 0" direction="vertical">
+        <div
+          v-for="img in subpage.list.combine"
+          :key="img.id"
+          class="img-box"
+          @click="handelSelected(img)"
+        >
+          <img v-lazy="img.thumbnail" class="img" />
+          <icon-check v-if="showSelected(img)" class="selected" />
+          <div class="img-name">{{ img.name }}</div>
+        </div>
+      </a-space>
     </a-space>
     <a-divider direction="vertical" style="height: 100%" :margin="8" />
     <div class="col">
@@ -133,7 +160,11 @@
             </a-button-group>
             <div class="op">
               <a-tag>{{ t('gallery.detail.invert') }}</a-tag>
-              <a-switch v-model="options.invert" style="margin-left: 16px" />
+              <a-switch
+                v-model="options.invert"
+                style="margin-left: 16px"
+                @change="handleRefreshHistogram"
+              />
             </div>
 
             <div class="op">
@@ -144,6 +175,7 @@
                 :max="300"
                 :lazy="false"
                 show-tooltip="drag"
+                @change="handleRefreshHistogram"
               />
               <a-tag>{{ options.brightness }}</a-tag>
             </div>
@@ -156,26 +188,13 @@
                 :max="300"
                 :lazy="false"
                 show-tooltip="drag"
+                @change="handleRefreshHistogram"
               />
               <a-tag>{{ options.contrast }}</a-tag>
             </div>
           </a-space>
         </a-space>
         <canvas id="canvas"></canvas>
-        <a-tooltip placement="top" :content="t('gallery.detail.refresh')">
-          <a-button
-            v-if="options.brightness != 100 || options.contrast != 100 || options.invert"
-            class="canvas_refresh"
-            type="primary"
-            size="medium"
-            :loading="loading.chart"
-            @click="handleRefreshHistogram"
-          >
-            <template #icon>
-              <Refresh />
-            </template>
-          </a-button>
-        </a-tooltip>
       </div>
     </div>
   </div>
@@ -212,8 +231,13 @@ const options = ref({
 })
 
 const loading = ref({
-  save: false,
-  chart: false
+  save: false
+})
+
+const expand = ref({
+  light: true,
+  dark: true,
+  combine: true
 })
 
 const resetOptions = () => {
@@ -374,7 +398,6 @@ const handleHistogram = (src: string) => {
 
 const handleRefreshHistogram = async () => {
   try {
-    loading.value.chart = true
     const res = await adjustPicture({
       id: subpage.value.item.id,
       brightness: options.value.brightness,
@@ -385,8 +408,6 @@ const handleRefreshHistogram = async () => {
     handleHistogram(res.data.thumbnail)
   } catch (error) {
     console.error(error)
-  } finally {
-    loading.value.chart = false
   }
 }
 
@@ -488,11 +509,13 @@ onMounted(() => {
 .preview {
   overflow-x: hidden;
   overflow-y: scroll;
+  align-items: center;
 }
 
 .preview::-webkit-scrollbar {
   display: none;
 }
+
 .img-box {
   display: flex;
   position: relative;
@@ -570,12 +593,6 @@ onMounted(() => {
       position: absolute;
       bottom: 0;
       width: 100%;
-    }
-
-    .canvas_refresh {
-      position: absolute;
-      right: 8px;
-      bottom: 8px;
     }
   }
 

@@ -1,5 +1,6 @@
 ﻿using Exposure.Api.Contracts.Services;
 using NAudio.Wave;
+using Serilog;
 
 namespace Exposure.Api.Services;
 
@@ -49,7 +50,7 @@ public class AudioService(IOptionService option) : IAudioService
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            Log.Error(e.Message);
         }
     }
 

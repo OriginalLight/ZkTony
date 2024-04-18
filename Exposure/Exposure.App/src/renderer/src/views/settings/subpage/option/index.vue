@@ -9,7 +9,9 @@
               <template #actions>
                 <a-input-group>
                   <a-input v-model="option.machineId" style="width: 350px" />
-                  <a-button type="primary" @click="handleMachineId">{{ t('option.set') }}</a-button>
+                  <a-button type="primary" @click="handleOption('MachineId', option.machineId)">{{
+                    t('option.set')
+                  }}</a-button>
                 </a-input-group>
               </template>
             </a-list-item>
@@ -26,7 +28,9 @@
                       {{ port }}
                     </a-option>
                   </a-select>
-                  <a-button type="primary" @click="handleCom1">{{ t('option.set') }}</a-button>
+                  <a-button type="primary" @click="handleOption('Com1', option.com1, false)">{{
+                    t('option.set')
+                  }}</a-button>
                 </a-input-group>
               </template>
             </a-list-item>
@@ -39,7 +43,9 @@
                       {{ port }}
                     </a-option>
                   </a-select>
-                  <a-button type="primary" @click="handleCom2">{{ t('option.set') }}</a-button>
+                  <a-button type="primary" @click="handleOption('Com2', option.com2, false)">{{
+                    t('option.set')
+                  }}</a-button>
                 </a-input-group>
               </template>
             </a-list-item>
@@ -61,7 +67,11 @@
                   >
                     <template #suffix>NS</template>
                   </a-input-number>
-                  <a-button type="primary" @click="handleExpoTime">{{ t('option.set') }}</a-button>
+                  <a-button
+                    type="primary"
+                    @click="handleOption('ExpoTime', String(option.expoTime), false)"
+                    >{{ t('option.set') }}</a-button
+                  >
                 </a-input-group>
               </template>
             </a-list-item>
@@ -79,7 +89,11 @@
                   >
                     <template #suffix>%</template>
                   </a-input-number>
-                  <a-button type="primary" @click="handleGain">{{ t('option.set') }}</a-button>
+                  <a-button
+                    type="primary"
+                    @click="handleOption('Gain', String(option.gain), false)"
+                    >{{ t('option.set') }}</a-button
+                  >
                 </a-input-group>
               </template>
             </a-list-item>
@@ -97,9 +111,11 @@
                   >
                     <template #suffix>°C</template>
                   </a-input-number>
-                  <a-button type="primary" @click="handleTemperature">{{
-                    t('option.set')
-                  }}</a-button>
+                  <a-button
+                    type="primary"
+                    @click="handleOption('Temperature', String(option.temperature * 10), false)"
+                    >{{ t('option.set') }}</a-button
+                  >
                 </a-input-group>
               </template>
             </a-list-item>
@@ -117,7 +133,9 @@
                   >
                     <template #suffix>°</template>
                   </a-input-number>
-                  <a-button type="primary" @click="handleRotate">{{ t('option.set') }}</a-button>
+                  <a-button type="primary" @click="handleOption('Rotate', String(option.rotate))">{{
+                    t('option.set')
+                  }}</a-button>
                 </a-input-group>
               </template>
             </a-list-item>
@@ -126,7 +144,9 @@
               <template #actions>
                 <a-input-group>
                   <a-input v-model="option.roi" style="width: 350px" />
-                  <a-button type="primary" @click="handleRoi">{{ t('option.set') }}</a-button>
+                  <a-button type="primary" @click="handleOption('Roi', String(option.roi))">{{
+                    t('option.set')
+                  }}</a-button>
                 </a-input-group>
               </template>
             </a-list-item>
@@ -147,7 +167,11 @@
                   >
                     <template #suffix>Pulse</template>
                   </a-input-number>
-                  <a-button type="primary" @click="handleHatchStep">{{ t('option.set') }}</a-button>
+                  <a-button
+                    type="primary"
+                    @click="handleOption('HatchStep', String(option.hatchStep))"
+                    >{{ t('option.set') }}</a-button
+                  >
                 </a-input-group>
               </template>
             </a-list-item>
@@ -163,9 +187,11 @@
                   >
                     <template #suffix>Pulse</template>
                   </a-input-number>
-                  <a-button type="primary" @click="handleHatchOffset">{{
-                    t('option.set')
-                  }}</a-button>
+                  <a-button
+                    type="primary"
+                    @click="handleOption('HatchOffset', String(option.hatchOffset))"
+                    >{{ t('option.set') }}</a-button
+                  >
                 </a-input-group>
               </template>
             </a-list-item>
@@ -199,121 +225,17 @@ const option = ref({
   hatchOffset: 0
 })
 
-const handleMachineId = async () => {
+const handleOption = async (key: string, value: string, flag: boolean = true) => {
   try {
     await setOption({
-      key: 'MachineId',
-      value: option.value.machineId
+      key: key,
+      value: value
     })
-    Message.success(t('option.set.success'))
-  } catch (error) {
-    Message.error(t('option.set.fail'))
-  }
-}
-
-const handleCom1 = async () => {
-  try {
-    await setOption({
-      key: 'Com1',
-      value: option.value.com1
-    })
-    Message.success(t('option.set.restart'))
-  } catch (error) {
-    Message.error(t('option.set.fail'))
-  }
-}
-
-const handleCom2 = async () => {
-  try {
-    await setOption({
-      key: 'Com2',
-      value: option.value.com2
-    })
-    Message.success(t('option.set.restart'))
-  } catch (error) {
-    Message.error(t('option.set.fail'))
-  }
-}
-
-const handleExpoTime = async () => {
-  try {
-    await setOption({
-      key: 'ExpoTime',
-      value: String(option.value.expoTime)
-    })
-    Message.success(t('option.set.restart'))
-  } catch (error) {
-    Message.error(t('option.set.fail'))
-  }
-}
-
-const handleGain = async () => {
-  try {
-    await setOption({
-      key: 'Gain',
-      value: String(option.value.gain)
-    })
-    Message.success(t('option.set.restart'))
-  } catch (error) {
-    Message.error(t('option.set.fail'))
-  }
-}
-
-const handleTemperature = async () => {
-  try {
-    await setOption({
-      key: 'Temperature',
-      value: String(option.value.temperature * 10)
-    })
-    Message.success(t('option.set.restart'))
-  } catch (error) {
-    Message.error(t('option.set.fail'))
-  }
-}
-
-const handleRotate = async () => {
-  try {
-    await setOption({
-      key: 'Rotate',
-      value: String(option.value.rotate)
-    })
-    Message.success(t('option.set.success'))
-  } catch (error) {
-    Message.error(t('option.set.fail'))
-  }
-}
-
-const handleRoi = async () => {
-  try {
-    await setOption({
-      key: 'Roi',
-      value: option.value.roi
-    })
-    Message.success(t('option.set.success'))
-  } catch (error) {
-    Message.error(t('option.set.fail'))
-  }
-}
-
-const handleHatchStep = async () => {
-  try {
-    await setOption({
-      key: 'HatchStep',
-      value: String(option.value.hatchStep)
-    })
-    Message.success(t('option.set.success'))
-  } catch (error) {
-    Message.error(t('option.set.fail'))
-  }
-}
-
-const handleHatchOffset = async () => {
-  try {
-    await setOption({
-      key: 'HatchOffset',
-      value: String(option.value.hatchOffset)
-    })
-    Message.success(t('option.set.success'))
+    if (flag) {
+      Message.success(t('option.set.success'))
+    } else {
+      Message.success(t('option.set.restart'))
+    }
   } catch (error) {
     Message.error(t('option.set.fail'))
   }

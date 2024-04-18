@@ -64,6 +64,7 @@ public class CameraService(
         {
             _nncam?.Close();
             _nncam = null;
+            Log.Error("相机初始化错误！");
             throw;
         }
     }
@@ -109,6 +110,7 @@ public class CameraService(
         }
         catch (Exception)
         {
+            Log.Error("预览失败！");
             serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
             throw;
         }
@@ -128,6 +130,7 @@ public class CameraService(
         var targetExpo = await CalculateExpo(0.1, ctsToken);
         // 验证曝光时间
         if (targetExpo == 0) targetExpo = 1000;
+        Log.Information("计算曝光时间：" + targetExpo);
 
         _mat = null;
         _pictureList.Clear();
@@ -308,9 +311,9 @@ public class CameraService(
 
     public double GetTemperature()
     {
-        if (_nncam == null || !_nncam.get_Temperature(out var nTemp)) return -100.0;
+        if (_nncam == null || !_nncam.get_Temperature(out var nTemp)) return -1000.0;
 
-        return nTemp / 10.0;
+        return nTemp;
     }
 
     #endregion
@@ -580,8 +583,10 @@ public class CameraService(
         if (_mat == null) throw new Exception(localizer.GetString("Error0011").Value);
         // 计算信噪比
         var snr = OpenCvUtils.CalculateSnr(_mat, time);
+        Log.Information("SNR：" + snr);
         // 计算白色区域占比
         var percentage = OpenCvUtils.CalculatePercentage(_mat, 10, 255);
+        Log.Information("白色区域占比：" + percentage);
         // 清空_mat
         _mat = null;
 

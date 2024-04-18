@@ -5,7 +5,7 @@
     </template>
     <a-tooltip :content="$t('navigation.status.temperature')">
       <h3 style="white-space: nowrap">
-        {{ appStore.temperature <= -100 ? '#' : `${appStore.temperature} °C` }}
+        {{ appStore.temperature <= -1000 ? '#' : `${appStore.temperature / 10.0} °C` }}
       </h3>
     </a-tooltip>
     <a-tooltip :content="$t('navigation.status.usb')">

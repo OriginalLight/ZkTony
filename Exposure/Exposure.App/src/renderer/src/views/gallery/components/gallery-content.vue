@@ -12,15 +12,8 @@
       <a-list-item action-layout="vertical">
         <a-space>
           <a-tag size="large">{{ item.date }}</a-tag>
-          <a-tag size="large">{{
-            item.light.length + item.dark.length + item.combine.length
-          }}</a-tag>
-          <a-button shape="round" @click="handleSelectedAll(item)">
-            {{
-              showSelectedAll(item)
-                ? t('gallery.content.picture.cancelSelectAll')
-                : t('gallery.content.picture.selectAll')
-            }}
+          <a-button shape="round" style="width: 100px" @click="handleSelectedAll(item)">
+            {{ selectedNumber(item) }}
           </a-button>
         </a-space>
         <a-divider v-if="item.light.length > 0" orientation="right">{{
@@ -134,11 +127,6 @@ const list = computed<PictureGallery[]>(() => {
 const showSelected = (item: Picture) => {
   return selected.value.some((selected) => selected.id === item.id)
 }
-// 是否显示全部选中
-const showSelectedAll = (list: PictureGallery) => {
-  const item = list.light.concat(list.dark).concat(list.combine)
-  return item.every((item) => selected.value.find((selected) => selected.id === item.id))
-}
 // 选择
 const handleSelected = (list: PictureGallery, item: Picture) => {
   if (selected.value.find((selected) => selected.id === item.id)) {
@@ -162,6 +150,13 @@ const handleSelectedAll = (list: PictureGallery) => {
   } else {
     selected.value = selected.value.concat(item)
   }
+}
+
+const selectedNumber = (gallery: PictureGallery) => {
+  // list中被选中的
+  const item = gallery.light.concat(gallery.dark).concat(gallery.combine)
+  const num = item.filter((item) => selected.value.find((selected) => selected.id === item.id))
+  return num.length + ' / ' + item.length
 }
 // 分页
 const handlePageChange = (page: number) => {

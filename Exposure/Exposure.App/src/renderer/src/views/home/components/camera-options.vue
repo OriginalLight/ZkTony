@@ -309,6 +309,8 @@ const handleHatch = async () => {
     if (before) {
       disabled.value.preview = false
       disabled.value.shot = false
+      // 延时500ms
+      await delay(500)
       await handlePreview()
     }
   } catch (error) {
@@ -327,10 +329,14 @@ const handleHatch = async () => {
 const handleShoot = async () => {
   try {
     const res6 = await getOption({ key: 'Temperature' })
-    const targetTemperature = res6.data === 'None' ? -15 : Number(res6.data) / 10
+    const targetTemperature = res6.data === 'None' ? -150 : Number(res6.data)
     const currentTemperature = appStore.temperature
-    if (currentTemperature - targetTemperature >= 3) {
+    if (currentTemperature >= -50) {
       Message.warning(t('home.camera.options.temperature.error'))
+      return
+    }
+    if (currentTemperature - targetTemperature >= 30) {
+      Message.warning(t('home.camera.options.temperature.warn'))
     }
     progress.value.visible = true
     if (options.value.mode === 'auto') {

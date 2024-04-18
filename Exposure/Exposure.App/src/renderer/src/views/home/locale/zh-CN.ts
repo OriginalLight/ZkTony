@@ -41,5 +41,6 @@ export default {
   'home.thumbnail.view.picture.dark': '曝\u2002光\u2002图',
   'home.thumbnail.view.picture.combine': '合\u2002成\u2002图',
   'home.thumbnail.view.preview': '预览中',
-  'home.camera.options.temperature.error': '当前相机温度未达到设置温度，点击拍摄会影响图片质量！'
+  'home.camera.options.temperature.warn': '当前相机温度未达到设置温度，点击拍摄会影响图片质量！',
+  'home.camera.options.temperature.error': '当前相机超过最高限制温度，无法拍摄！'
 }

@@ -1,4 +1,5 @@
 ﻿using OpenCvSharp;
+using Serilog;
 
 namespace Exposure.Utilities;
 
@@ -62,23 +63,23 @@ public static class OpenCvUtils
         }
 
         //根据相机内参和畸变参数矫正图片
-        var dst = new Mat();
+        var mask = new Mat();
 
         try
         {
             var newCameraMatrix =
                 Cv2.GetOptimalNewCameraMatrix(cameraMatrix, distCoeffs, src.Size(), 0, src.Size(), out var roi);
             // cameraMatrix 数组转换成 Mat 类型
-            Cv2.Undistort(src, dst, cameraMatrix, distCoeffs, newCameraMatrix);
+            Cv2.Undistort(src, mask, cameraMatrix, distCoeffs, newCameraMatrix);
             // 裁剪图片并返回原始尺寸
             var res = new Mat();
-            Cv2.Resize(dst[roi], res, src.Size());
+            Cv2.Resize(mask[roi], res, src.Size());
             return res;
         }
         finally
         {
             // 释放资源
-            dst.Dispose();
+            mask.Dispose();
         }
     }
 
@@ -195,7 +196,7 @@ public static class OpenCvUtils
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            Log.Error("截取部分失败：" + e.Message);
             return src;
         }
     }
@@ -217,7 +218,7 @@ public static class OpenCvUtils
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            Log.Error("中心旋转失败：" + e.Message);
             return src;
         }
     }

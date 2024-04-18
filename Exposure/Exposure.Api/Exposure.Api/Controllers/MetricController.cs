@@ -2,6 +2,7 @@
 using Exposure.Api.Models.Dto;
 using Exposure.Protocal.Default;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace Exposure.Api.Controllers;
 
@@ -26,9 +27,11 @@ public class MetricController(ISerialPortService serialPort, IUsbService usb, IC
             Temperature = temperature
         };
 
-        var target = double.Parse(option.GetOptionValue("Temperature") ?? "-15");
+        var target = double.Parse(option.GetOptionValue("Temperature") ?? "-150");
+        
+        Log.Information("当前温度：" + temperature + "，目标温度：" + target + "，灯光：" + flag + "，舱门：" + hatch);
 
-        if (temperature > target + 3)
+        if (temperature > target + 30)
         {
             if (flag > 2) return Ok(dto);
             serialPort.WritePort("Com1", DefaultProtocol.LedYellow().ToBytes());
@@ -37,7 +40,7 @@ public class MetricController(ISerialPortService serialPort, IUsbService usb, IC
         }
         else
         {
-            if (flag > 1) return Ok(dto);
+            if (flag > 2) return Ok(dto);
             serialPort.WritePort("Com1", DefaultProtocol.LedGreen().ToBytes());
             serialPort.SetFlag("led", 1);
         }

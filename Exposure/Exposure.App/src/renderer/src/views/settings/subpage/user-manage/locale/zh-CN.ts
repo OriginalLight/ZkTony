@@ -14,7 +14,7 @@ export default {
   'user.managemet.delete.content': '确认删除选中的用户吗？',
   'user.managemet.reset': '重置密码',
   'user.managemet.reset.title': '重置密码',
-  'user.managemet.reset.content': '确认重置选中用户的密码吗？',
+  'user.managemet.reset.content': '确认重置选中用户的密码为当前用户名吗？',
   'user.managemet.reset.success': '重置成功',
   'user.managemet.table.id': '序号',
   'user.managemet.table.name': '用户名',

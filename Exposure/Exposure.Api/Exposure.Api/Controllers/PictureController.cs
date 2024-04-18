@@ -155,9 +155,12 @@ public class PictureController(
     {
         // 获取日志
         var res = await picture.Adjust(dto);
-        if (dto.Code == 0) audio.PlayWithSwitch("Save");
-        operLog.AddOperLog(localizer.GetString("Adjust").Value,
-            $"{localizer.GetString("Picture").Value}：id = " + dto.Id);
+        if (dto.Code == 0)
+        {
+            audio.PlayWithSwitch("Save");
+            operLog.AddOperLog(localizer.GetString("Adjust").Value,
+                $"{localizer.GetString("Picture").Value}：id = " + dto.Id);
+        }
         Log.Information("调整图片");
         return Ok(res);
     }

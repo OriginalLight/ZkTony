@@ -2,6 +2,7 @@
 using Exposure.Api.Contracts.Services;
 using Exposure.Api.Models;
 using Exposure.Api.Models.Dto;
+using Exposure.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Newtonsoft.Json;
@@ -67,9 +68,25 @@ public class ErrorLogController(
         var list = await errorLog.GetByIds(ids);
         if (list.Count == 0) throw new Exception(localizer.GetString("NotFound").Value);
         // 保存到U盘
-        await System.IO.File.WriteAllTextAsync(Path.Combine(usb1.Name, $"{localizer.GetString("ErrorLog").Value}.json"),
+        var path = Path.Combine(usb1.Name, localizer.GetString("ErrorLog").Value);
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+        await System.IO.File.WriteAllTextAsync(Path.Combine(path, $"{localizer.GetString("ErrorLog").Value}.json"),
             JsonConvert.SerializeObject(list),
             Encoding.UTF8);
+        var logs = Path.Combine(FileUtils.AppLocation, "Logs");
+        if (Directory.Exists(logs))
+        {
+            // 复制日志
+            var files = Directory.GetFiles(logs);
+            foreach (var file in files)
+            {
+                var name = Path.GetFileName(file);
+                System.IO.File.Copy(file, Path.Combine(path, name), true);
+            }
+        }
         // 插入日志
         operLog.AddOperLog(localizer.GetString("Export").Value,
             $"{localizer.GetString("ErrorLog").Value}：ids = " + string.Join(",", ids));

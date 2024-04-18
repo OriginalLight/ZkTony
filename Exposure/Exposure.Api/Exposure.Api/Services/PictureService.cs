@@ -187,30 +187,28 @@ public class PictureService(
                 DeleteTime = DateTime.Now
             });
         }
-        else
+
+        image.Mutate(x => x.Resize(500, 500));
+        var path = FileUtils.GetFileName(FileUtils.Preview, $"{date}.jpg");
+        await image.SaveAsJpegAsync(path);
+
+        // 释放资源
+        image.Dispose();
+
+        return new Picture
         {
-            image.Mutate(x => x.Resize(500, 500));
-            var thumbnail = FileUtils.GetFileName(FileUtils.Thumbnail, $"{date}.jpg");
-            await image.SaveAsJpegAsync(thumbnail);
-
-            // 释放资源
-            image.Dispose();
-
-            return new Picture
-            {
-                UserId = user.GetLogged()?.Id ?? 0,
-                Name = date,
-                Type = pic.Type,
-                Thumbnail = thumbnail,
-                ExposureTime = pic.ExposureTime,
-                ExposureGain = pic.ExposureGain,
-                BlackLevel = pic.BlackLevel,
-                IsDelete = false,
-                CreateTime = DateTime.Now,
-                UpdateTime = DateTime.Now,
-                DeleteTime = DateTime.Now
-            };
-        }
+            UserId = user.GetLogged()?.Id ?? 0,
+            Name = date,
+            Type = pic.Type,
+            Thumbnail = path,
+            ExposureTime = pic.ExposureTime,
+            ExposureGain = pic.ExposureGain,
+            BlackLevel = pic.BlackLevel,
+            IsDelete = false,
+            CreateTime = DateTime.Now,
+            UpdateTime = DateTime.Now,
+            DeleteTime = DateTime.Now
+        };
     }
 
     #endregion
