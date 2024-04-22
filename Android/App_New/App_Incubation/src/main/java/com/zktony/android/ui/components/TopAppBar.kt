@@ -13,7 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Reply
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -42,7 +41,6 @@ import com.zktony.android.R
 import com.zktony.android.data.entities.Calibration
 import com.zktony.android.data.entities.History
 import com.zktony.android.data.entities.Program
-import com.zktony.android.data.entities.internal.IncubationStage
 import com.zktony.android.data.entities.internal.Point
 import com.zktony.android.data.entities.internal.defaults.StageDefaults
 import com.zktony.android.ui.CalibrationIntent
@@ -55,7 +53,6 @@ import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.extra.dateFormat
 import kotlinx.coroutines.launch
-import java.util.UUID
 
 /**
  * @author 刘贺贺

@@ -31,7 +31,6 @@ import androidx.compose.material.icons.automirrored.filled.TrendingDown
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.filled.ArrowCircleUp
-import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Cyclone
 import androidx.compose.material.icons.filled.Done
@@ -39,13 +38,10 @@ import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Numbers
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.TextFields
-import androidx.compose.material.icons.filled.TrendingDown
-import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.outlined.Analytics
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.Grade
-import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Navigation
 import androidx.compose.material.icons.outlined.Security
@@ -69,7 +65,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -548,7 +543,6 @@ fun MotorList(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun MotorDetail(
     entities: List<Motor>,

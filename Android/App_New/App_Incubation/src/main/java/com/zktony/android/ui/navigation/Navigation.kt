@@ -1,6 +1,5 @@
 package com.zktony.android.ui.navigation
 
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -12,9 +11,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.zktony.android.ui.*
+import com.zktony.android.ui.CalibrationRoute
+import com.zktony.android.ui.DebugRoute
+import com.zktony.android.ui.HistoryRoute
+import com.zktony.android.ui.HomeRoute
+import com.zktony.android.ui.HomeViewModel
+import com.zktony.android.ui.ProgramRoute
+import com.zktony.android.ui.SettingRoute
+import com.zktony.android.ui.Splash
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AppNavigation(
     navController: NavHostController,

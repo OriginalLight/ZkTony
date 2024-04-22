@@ -1,12 +1,15 @@
 package com.zktony.android.ui.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
@@ -27,7 +30,6 @@ import androidx.compose.ui.unit.sp
  * @author 刘贺贺
  * @date 2023/8/8 13:56
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun CircleTextField(
     modifier: Modifier = Modifier,
@@ -78,7 +80,6 @@ fun CircleTextField(
     )
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SquareTextField(
     modifier: Modifier = Modifier,
