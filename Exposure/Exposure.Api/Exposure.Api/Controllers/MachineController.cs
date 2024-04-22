@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Reflection;
 using Exposure.Api.Contracts.Services;
 using Exposure.Api.Models.Dto;
 using Exposure.Protocal.Default;
@@ -16,6 +17,7 @@ public class MachineController(
     ISerialPortService serialPort,
     IStorageService storage,
     ICameraService camera,
+    IOperLogService operLog,
     IErrorLogService errorLog,
     IAudioService audio,
     IUsbService usb,
@@ -139,7 +141,7 @@ public class MachineController(
             serialPort.SetFlag("hatch", 0);
             Log.Information(localizer.GetString("CloseHatch").Value);
         }
-        
+        operLog.AddOperLog(localizer.GetString("OpenHatch").Value, code == 0 ? localizer.GetString("CloseHatch").Value : localizer.GetString("OpenHatch").Value);
         serialPort.WritePort("Com1", DefaultProtocol.LedAllClose().ToBytes());
         serialPort.SetFlag("led", 0);
 
@@ -211,10 +213,9 @@ public class MachineController(
     [Route("Version")]
     public ActionResult Version()
     {
-        var version = GetType().Assembly.GetName().Version;
-        // 只使用主版本号和次版本号和修订号
-        var ver = version?.ToString().Split('.').Take(3).Aggregate((a, b) => a + "." + b);
-        return Ok(ver ?? "1.0.0");
+        var version = (Assembly.GetEntryAssembly() ?? throw new InvalidOperationException()).GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+            ?.InformationalVersion;
+        return Ok(version);
     }
 
     #endregion

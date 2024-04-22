@@ -7,6 +7,7 @@
     <projectFile profileName="Production">Exposure.Api/Exposure.Api.csproj</projectFile>
     <projectFile profileName="http">Exposure.Api/Exposure.Api.csproj</projectFile>
     <projectFile profileName="https">Exposure.Api/Exposure.Api.csproj</projectFile>
+    <projectFile pubXmlPath="Exposure.Api/Properties/PublishProfiles/FolderProfile.pubxml">Exposure.Api/Exposure.Api.csproj</projectFile>
     <projectFile profileName="IIS Express">Exposure.Utils/Exposure.Utils.csproj</projectFile>
     <projectFile profileName="http">Exposure.Utils/Exposure.Utils.csproj</projectFile>
     <projectFile profileName="https">Exposure.Utils/Exposure.Utils.csproj</projectFile>
@@ -17,22 +18,15 @@
   <component name="ChangeListManager">
     <list default="true" id="78ea7552-3107-4483-86a7-883cf6a7e7bd" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/ErrorLogController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/ErrorLogController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/MetricController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/MetricController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/PictureController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/PictureController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/MachineController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/MachineController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/UserController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/UserController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Exposure.Api/Exposure.Api.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Exposure.Api.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Exposure.Api.csproj.user" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Exposure.Api.csproj.user" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Exposure.Api/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/AudioService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/AudioService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Resources/SharedResources.en.resx" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Resources/SharedResources.en.resx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Resources/SharedResources.zh.resx" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Resources/SharedResources.zh.resx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/CameraService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/CameraService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/PictureService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/PictureService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.SqlSugar/Exposure.SqlSugar.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.SqlSugar/Exposure.SqlSugar.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Utilities/Exposure.Utilities.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Utilities/Exposure.Utilities.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Utilities/OpenCvUtils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Utilities/OpenCvUtils.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/components/navigation/components/status.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/components/navigation/components/status.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/gallery/subpage/gallery-detail/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/gallery/subpage/gallery-detail/index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/home/components/camera-options.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/home/components/camera-options.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/home/locale/en-US.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/home/locale/en-US.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/home/locale/zh-CN.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/home/locale/zh-CN.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/option/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/option/index.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -55,12 +49,10 @@
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/5535e31a712343a63f5d7d796cd874e563e5ac14/src/libraries/System.Diagnostics.Process/src/System/Diagnostics/ProcessStartInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/5535e31a712343a63f5d7d796cd874e563e5ac14/src/libraries/System.Management/src/System/Management/ManagementException.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/5535e31a712343a63f5d7d796cd874e563e5ac14/src/libraries/System.Net.WebSockets/src/System/Net/WebSockets/WebSocket.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/4d66c706110b4c618ff8a8532ab94c5d12798/d1/69a463b8/ApiVersion.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/891a5c25823c4eeda76705f52719aef02ad600/6b/20a50cb7/AdoProvider.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8e7d133a4bc14e71834005a023e0390222600/a5/46f7e32e/LoggerConfiguration.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Users/ThinkBook/Documents/GitHub/ZkTony/Exposure/Exposure.Api/Exposure.Api/Controllers/MetricController.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Users/ThinkBook/Documents/GitHub/ZkTony/Exposure/Exposure.Api/Exposure.Api/Services/ApplicationHostService.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Users/ThinkBook/Documents/GitHub/ZkTony/Exposure/Exposure.Api/Exposure.Api/Services/OptionService.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Users/ThinkBook/Documents/GitHub/ZkTony/Exposure/Exposure.Api/Exposure.Utilities/OpenCvUtils.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Exposure.Api/obj/Debug/net8.0/Exposure.Api.AssemblyInfo.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
@@ -118,6 +110,10 @@
   <component name="RunManager" selected=".NET Launch Settings Profile.Development">
     <configuration name="Publish Exposure.Api" type="DotNetFolderPublish" factoryName="Publish to folder">
       <riderPublish configuration="Release" delete_existing_files="true" platform="Any CPU" runtime="win-x64" target_folder="$PROJECT_DIR$/Exposure.Api/bin/Release/net8.0/win-x64/publish" target_framework="net8.0" uuid_high="3617825066592587548" uuid_low="-9007917930747795288" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Exposure.Api: FolderProfile" type="DotNetMsBuildPublish" factoryName="Publish to IIS">
+      <riderPublish configuration="Release" platform="Any CPU" publish_profile="FolderProfile.pubxml" pubxml_path="$PROJECT_DIR$/Exposure.Api/Properties/PublishProfiles/FolderProfile.pubxml" uuid_high="3617825066592587548" uuid_low="-9007917930747795288" />
       <method v="2" />
     </configuration>
     <configuration name="All in Exposure.Api" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" path="$PROJECT_DIR$/Exposure.Api/Exposure.Api.http">
@@ -210,6 +206,7 @@
       <item itemvalue="HTTP Request.All in Exposure.Api" />
       <item itemvalue="HTTP Request.Exposure.Api | #1" />
       <item itemvalue="Publish to folder.Publish Exposure.Api" />
+      <item itemvalue="Publish to IIS.Exposure.Api: FolderProfile" />
     </list>
     <recent_temporary>
       <list>
@@ -301,7 +298,7 @@
       <workItem from="1712905748308" duration="5293000" />
       <workItem from="1713142678453" duration="14474000" />
       <workItem from="1713401947741" duration="2965000" />
-      <workItem from="1713417317733" duration="4779000" />
+      <workItem from="1713417317733" duration="18153000" />
     </task>
     <servers />
   </component>

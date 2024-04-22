@@ -92,7 +92,10 @@
   </div>
   <div class="image-info">
     <a-space size="medium">
-      <a-tag color="#006934">{{ props.image.name }}</a-tag>
+      <a-tag v-if="props.image.name === 'Preview'" color="#006934">{{
+        t('home.camera.options.preview')
+      }}</a-tag>
+      <a-tag v-else color="#006934">{{ props.image.name }}</a-tag>
       <a-tag color="#006934">{{ props.image.width + ' x ' + props.image.height }}</a-tag>
     </a-space>
   </div>

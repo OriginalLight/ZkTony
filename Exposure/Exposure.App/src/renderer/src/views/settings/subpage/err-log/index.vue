@@ -48,7 +48,7 @@
       @page-change="onPageChange"
     >
       <template #index="{ rowIndex }">
-        {{ rowIndex + 1 }}
+        {{ pagination.pageSize * (pagination.current - 1) + rowIndex + 1 }}
       </template>
     </a-table>
   </div>

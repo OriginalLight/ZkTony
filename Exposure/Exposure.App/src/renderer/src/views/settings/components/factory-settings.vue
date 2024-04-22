@@ -9,7 +9,6 @@
         </a-list-item-meta>
         <template #actions>
           <a-space>
-            <a-tag> {{ config.version }} </a-tag>
             <a-tag> {{ version }} </a-tag>
           </a-space>
         </template>
@@ -80,7 +79,6 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@renderer/store'
 import { Bug, FactoryBuilding, Inbox, Tea } from '@icon-park/vue-next'
-import config from '../../../../../../package.json'
 import { varsion } from '@renderer/api/machine'
 
 const { t } = useI18n()

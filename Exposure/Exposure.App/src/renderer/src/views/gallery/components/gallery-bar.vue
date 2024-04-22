@@ -5,7 +5,7 @@
       <a-input
         v-model="options.name"
         :placeholder="t('gallery.bar.name.placeholder')"
-        style="width: 150px"
+        style="width: 180px"
         allow-clear
       />
       <a-button type="primary" shape="round" @click="handleSearch">

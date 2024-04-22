@@ -524,24 +524,24 @@ public class CameraService(
             #endregion
 
             // 保存原图
-            var name = DateTime.Now.ToString("yyMMddHHmmssfff");
+            var picName = DateTime.Now.ToString("yyMMddHHmmssfff");
             // 保存图片
-            var path = FileUtils.GetFileName(type == -1 ? FileUtils.Preview : FileUtils.Exposure, $"{name}.png");
-            gray.SaveImage(path);
+            var picPath = FileUtils.GetFileName(type == -1 ? FileUtils.Preview : FileUtils.Exposure, $"{picName}.png");
+            gray.SaveImage(picPath);
             // 保存缩略图
             Cv2.Resize(gray, thumb, new Size(500, 500));
-            var tPath = FileUtils.GetFileName(FileUtils.Thumbnail, $"{name}.jpg");
-            thumb.SaveImage(tPath);
+            var thumbPath = FileUtils.GetFileName(FileUtils.Thumbnail, $"{picName}.jpg");
+            thumb.SaveImage(thumbPath);
 
             var pic = new Picture
             {
                 UserId = user.GetLogged()?.Id ?? 0,
-                Name = type == -1 ? localizer.GetString("Preview").Value : name,
-                Path = path,
+                Name = type == -1 ? "Preview" : picName,
+                Path = picPath,
                 Width = (int)info.width,
                 Height = (int)info.height,
                 Type = type,
-                Thumbnail = tPath,
+                Thumbnail = thumbPath,
                 ExposureTime = exposureTime,
                 ExposureGain = info.expogain,
                 BlackLevel = info.blacklevel,

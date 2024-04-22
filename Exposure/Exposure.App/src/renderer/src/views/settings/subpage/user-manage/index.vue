@@ -51,7 +51,7 @@
       @page-change="onPageChange"
     >
       <template #index="{ rowIndex }">
-        {{ rowIndex + 1 }}
+        {{ pagination.pageSize * (pagination.current - 1) + rowIndex + 1 }}
       </template>
       <template #role="{ rowIndex }">
         <a-select
@@ -84,7 +84,13 @@
       {{ t('user.managemet.delete.content') }}
     </div>
   </a-modal>
-  <a-modal v-model:visible="visible.add" draggable @ok="handleAdd" @cancel="visible.add = false">
+  <a-modal
+    v-model:visible="visible.add"
+    draggable
+    unmount-on-close
+    :on-before-ok="handleAdd"
+    @cancel="visible.add = false"
+  >
     <template #title> {{ t('user.managemet.add.title') }} </template>
     <div>
       <a-form :model="addForm" auto-label-width>
@@ -283,8 +289,13 @@ const handleDelete = async () => {
 // 添加
 const handleAdd = async () => {
   try {
-    if (addForm.name === '' || addForm.password === '') {
-      return
+    if (addForm.name === '') {
+      Message.error(t('user.managemet.add.form.name.errMsg'))
+      return false
+    }
+    if (addForm.password === '') {
+      Message.error(t('user.managemet.add.form.password.errMsg'))
+      return false
     }
     await addUser({
       name: addForm.name,
@@ -298,8 +309,10 @@ const handleAdd = async () => {
     addForm.role = 2
     addForm.enabled = true
     fetchData()
+    return true
   } catch (error) {
     Message.error((error as Error).message)
+    return false
   }
 }
 

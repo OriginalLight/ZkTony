@@ -97,7 +97,7 @@
             </a-button>
           </a-tooltip>
           <a-tooltip placement="top" :content="t('gallery.detail.redo')">
-            <a-button type="primary" size="medium" @click="resetOptions">
+            <a-button type="primary" size="medium" :disabled="disabledRedo" @click="resetOptions">
               <template #icon>
                 <Refresh />
               </template>
@@ -149,7 +149,7 @@
                 <template #icon>
                   <icon-rotate-left />
                 </template>
-                {{ t('gallery.detail.rotate.right') }}
+                {{ t('gallery.detail.rotate.left') }}
               </a-button>
               <a-button style="width: 100%" @click="options.rotate += 90">
                 <template #icon>
@@ -201,7 +201,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { CoordinateSystem, Refresh, Save } from '@icon-park/vue-next'
@@ -227,7 +227,9 @@ const options = ref({
   grayScale: 0,
   rotate: 0,
   invert: false,
-  scale: 1.2
+  scale: 1.2,
+  offsetX: 0,
+  offsetY: 0
 })
 
 const loading = ref({
@@ -247,7 +249,9 @@ const resetOptions = () => {
     invert: false,
     grayScale: 0,
     rotate: 0,
-    scale: 1.2
+    scale: 1.2,
+    offsetX: 0,
+    offsetY: 0
   }
   const img = document.getElementById('img-preview') as HTMLImageElement
   img.style.left = '0px'
@@ -255,6 +259,18 @@ const resetOptions = () => {
 
   handleHistogram(subpage.value.item.thumbnail)
 }
+
+const disabledRedo = computed(() => {
+  return (
+    options.value.brightness === 100 &&
+    options.value.contrast === 100 &&
+    !options.value.invert &&
+    options.value.rotate === 0 &&
+    options.value.scale === 1.2 &&
+    options.value.offsetX === 0 &&
+    options.value.offsetY === 0
+  )
+})
 
 const showSelected = (img: Picture) => {
   return subpage.value.item.id === img.id
@@ -266,6 +282,7 @@ const handle3dChart = async () => {
 
 const handelSelected = async (img: Picture) => {
   subpage.value.item = img
+  resetOptions()
   handleHistogram(img.thumbnail)
   if (img.userId === user.value?.id) {
     return
@@ -354,11 +371,13 @@ const handleHistogram = (src: string) => {
     const scale = 20
     const scaleHeight = hei / (Math.max(...grayList) / scale)
     ctx.lineWidth = 1
+
     // 绘制Y坐标轴
     ctx.beginPath()
     ctx.moveTo(0, 0)
     ctx.lineTo(0, canvas.height)
     ctx.stroke()
+
     // 绘制X坐标轴
     ctx.beginPath()
     ctx.moveTo(0, canvas.height)
@@ -466,6 +485,8 @@ const handleTouch = () => {
     if (isDown) {
       img.style.left = e.clientX - disX + 'px'
       img.style.top = e.clientY - disY + 'px'
+      options.value.offsetX = e.clientX - disX
+      options.value.offsetY = e.clientY - disY
     }
   })
   img.addEventListener('mouseup', () => {
@@ -481,6 +502,8 @@ const handleTouch = () => {
     if (isDown) {
       img.style.left = e.touches[0].clientX - disX + 'px'
       img.style.top = e.touches[0].clientY - disY + 'px'
+      options.value.offsetX = e.touches[0].clientX - disX
+      options.value.offsetY = e.touches[0].clientY - disY
     }
   })
   img.addEventListener('touchend', () => {

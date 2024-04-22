@@ -4,7 +4,7 @@
       <a-space size="large">
         <a-button
           type="primary"
-          style="width: 100px"
+          style="width: 120px"
           size="large"
           shape="round"
           :disabled="diableCombine"
@@ -19,7 +19,7 @@
         <a-popover position="br" trigger="click">
           <a-button
             type="primary"
-            style="width: 100px"
+            style="width: 120px"
             size="large"
             shape="round"
             :disabled="disableExport"

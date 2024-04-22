@@ -221,9 +221,6 @@
     <data name="DisabledUser" xml:space="preserve">
     <value>User is disabled</value>
   </data>
-    <data name="ExpiredUser" xml:space="preserve">
-    <value>User expired</value>
-  </data>
     <data name="ErrorUnknown" xml:space="preserve">
     <value>Unknown Error</value>
   </data>

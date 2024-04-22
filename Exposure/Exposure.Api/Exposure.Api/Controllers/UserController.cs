@@ -33,7 +33,6 @@ public class UserController(
             case 1: throw new Exception(localizer.GetString("NoUser").Value);
             case 2: throw new Exception(localizer.GetString("ErrorPassword").Value);
             case 3: throw new Exception(localizer.GetString("DisabledUser").Value);
-            case 4: throw new Exception(localizer.GetString("ExpiredUser").Value);
             default: throw new Exception(localizer.GetString("ErrorUnknown").Value);
         }
     }

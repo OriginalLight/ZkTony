@@ -47,7 +47,13 @@
     </a-list>
   </a-card>
 
-  <a-modal v-model:visible="visible" draggable @ok="handleModifyPassword" @cancel="visible = false">
+  <a-modal
+    v-model:visible="visible"
+    draggable
+    unmount-on-close
+    :on-before-ok="handleModifyPassword"
+    @cancel="visible = false"
+  >
     <template #title> {{ t('settings.user.mofify.password') }} </template>
     <div>
       <a-form :model="form">
@@ -176,16 +182,16 @@ const validateConfirmPassword = (value, cb) => {
 const handleModifyPassword = async () => {
   try {
     if (form.newPassword === '' || form.confirmPassword === '' || form.oldPassword === '') {
-      Message.error(t('settings.user.modify.password.fail'))
-      return
+      Message.error(t('settings.user.mofify.password.empty.errMsg'))
+      return false
     }
     if (form.oldPassword === form.newPassword) {
-      Message.error(t('settings.user.modify.password.fail'))
-      return
+      Message.error(t('settings.user.mofify.password.new.errMsg'))
+      return false
     }
     if (form.newPassword !== form.confirmPassword) {
-      Message.error(t('settings.user.modify.password.fail'))
-      return
+      Message.error(t('settings.user.mofify.password.confirm.errMsg'))
+      return false
     }
     await updateUser({
       id: userStore.id,
@@ -200,8 +206,10 @@ const handleModifyPassword = async () => {
     form.newPassword = ''
     form.confirmPassword = ''
     Message.success(t('settings.user.modify.password.success'))
+    return true
   } catch (error) {
     Message.error((error as Error).message)
+    return false
   }
 }
 

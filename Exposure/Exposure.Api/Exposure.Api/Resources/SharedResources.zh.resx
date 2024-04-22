@@ -221,9 +221,6 @@
     <data name="DisabledUser" xml:space="preserve">
     <value>用户被禁用</value>
   </data>
-    <data name="ExpiredUser" xml:space="preserve">
-    <value>用户已过期</value>
-  </data>
     <data name="ErrorUnknown" xml:space="preserve">
     <value>未知错误</value>
   </data>
