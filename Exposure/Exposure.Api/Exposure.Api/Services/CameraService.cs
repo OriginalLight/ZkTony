@@ -648,7 +648,6 @@ public class CameraService(
 
     #endregion
 
-
     #region 比例缩放
 
     private static long GetScale(double min, double max, double minTarget, double maxTarget, double value)

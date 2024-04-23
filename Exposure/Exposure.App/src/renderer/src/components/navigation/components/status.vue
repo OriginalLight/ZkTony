@@ -3,18 +3,18 @@
     <template #split>
       <a-divider direction="vertical" />
     </template>
-    <a-tooltip :content="$t('navigation.status.temperature')">
+    <a-tooltip :content="t('navigation.status.temperature')">
       <h3 style="white-space: nowrap">
         {{ appStore.temperature <= -1000 ? '#' : `${appStore.temperature / 10.0} °C` }}
       </h3>
     </a-tooltip>
-    <a-tooltip :content="$t('navigation.status.usb')">
+    <a-tooltip :content="t('navigation.status.usb')">
       <usb size="24" :class="{ active: appStore.usb }" />
     </a-tooltip>
-    <a-tooltip :content="$t('navigation.status.hatch')">
+    <a-tooltip :content="t('navigation.status.hatch')">
       <open-door size="24" :class="{ active: appStore.hatch }" />
     </a-tooltip>
-    <a-tooltip :content="$t('navigation.status.time')">
+    <a-tooltip :content="t('navigation.status.time')">
       <div style="font-size: 10px">{{ now }}</div>
     </a-tooltip>
     <a-button class="logout" shape="round" @click="visible = true">

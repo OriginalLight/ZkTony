@@ -2,7 +2,7 @@
   <a-card :title="t('settings.system.title')">
     <a-list>
       <a-list-item v-if="false">
-        <a-list-item-meta :title="$t('settings.system.theme.title')">
+        <a-list-item-meta :title="t('settings.system.theme.title')">
           <template #avatar>
             <icon-sun size="20" />
           </template>
@@ -13,13 +13,13 @@
             :default-value="currentTheme === 'dark' ? 'dark' : 'light'"
             @change="changeTheme"
           >
-            <a-option value="light" :label="$t('settings.system.theme.light')"></a-option>
-            <a-option value="dark" :label="$t('settings.system.theme.dark')"></a-option>
+            <a-option value="light" :label="t('settings.system.theme.light')"></a-option>
+            <a-option value="dark" :label="t('settings.system.theme.dark')"></a-option>
           </a-select>
         </template>
       </a-list-item>
       <a-list-item>
-        <a-list-item-meta :title="$t('settings.system.language.title')">
+        <a-list-item-meta :title="t('settings.system.language.title')">
           <template #avatar>
             <icon-language size="20" />
           </template>
@@ -40,7 +40,7 @@
         </template>
       </a-list-item>
       <a-list-item>
-        <a-list-item-meta :title="$t('settings.system.sound.title')">
+        <a-list-item-meta :title="t('settings.system.sound.title')">
           <template #avatar>
             <icon-music size="20" />
           </template>
@@ -54,7 +54,7 @@
         </template>
       </a-list-item>
       <a-list-item class="nav" @click="handleErrlog">
-        <a-list-item-meta :title="$t('settings.system.errlog.title')">
+        <a-list-item-meta :title="t('settings.system.errlog.title')">
           <template #avatar>
             <icon-file size="20" />
           </template>
@@ -68,7 +68,7 @@
         </template>
       </a-list-item>
       <a-list-item v-if="userStore.role < 2">
-        <a-list-item-meta :title="$t('settings.system.update')">
+        <a-list-item-meta :title="t('settings.system.update')">
           <template #avatar>
             <UpdateRotation size="20" />
           </template>
@@ -83,7 +83,7 @@
         </template>
       </a-list-item>
       <a-list-item>
-        <a-list-item-meta :title="$t('settings.system.machine.title')">
+        <a-list-item-meta :title="t('settings.system.machine.title')">
           <template #avatar>
             <icon-code size="20" />
           </template>

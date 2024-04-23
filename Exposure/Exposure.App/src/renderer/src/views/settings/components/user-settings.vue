@@ -17,7 +17,7 @@
         </template>
       </a-list-item>
       <a-list-item v-if="userStore.role < 2" class="nav" @click="handleOperlog">
-        <a-list-item-meta :title="$t('settings.user.operlog.title')">
+        <a-list-item-meta :title="t('settings.user.operlog.title')">
           <template #avatar>
             <icon-file size="20" />
           </template>
@@ -31,7 +31,7 @@
         </template>
       </a-list-item>
       <a-list-item v-if="userStore.role < 2" class="nav" @click="handleManage">
-        <a-list-item-meta :title="$t('settings.user.manage.title')">
+        <a-list-item-meta :title="t('settings.user.manage.title')">
           <template #avatar>
             <icon-nav size="20" />
           </template>
@@ -59,13 +59,13 @@
       <a-form :model="form">
         <a-form-item
           field="oldPassword"
-          :rules="[{ required: true, message: $t('settings.user.mofify.password.empty.errMsg') }]"
+          :rules="[{ required: true, message: t('settings.user.mofify.password.empty.errMsg') }]"
           :validate-trigger="['change', 'blur']"
           hide-label
         >
           <a-input-password
             v-model="form.oldPassword"
-            :placeholder="$t('settings.user.mofify.password.old.placeholder')"
+            :placeholder="t('settings.user.mofify.password.old.placeholder')"
             :max-length="32"
             allow-clear
           >
@@ -77,7 +77,7 @@
         <a-form-item
           field="newPassword"
           :rules="[
-            { required: true, message: $t('settings.user.mofify.password.empty.errMsg') },
+            { required: true, message: t('settings.user.mofify.password.empty.errMsg') },
             { validator: validateNewPassword }
           ]"
           :validate-trigger="['change', 'blur']"
@@ -85,7 +85,7 @@
         >
           <a-input-password
             v-model="form.newPassword"
-            :placeholder="$t('settings.user.mofify.password.new.placeholder')"
+            :placeholder="t('settings.user.mofify.password.new.placeholder')"
             :max-length="32"
             allow-clear
           >
@@ -97,7 +97,7 @@
         <a-form-item
           field="confirmPassword"
           :rules="[
-            { required: true, message: $t('settings.user.mofify.password.empty.errMsg') },
+            { required: true, message: t('settings.user.mofify.password.empty.errMsg') },
             { validator: validateConfirmPassword }
           ]"
           :validate-trigger="['change', 'blur']"
@@ -105,7 +105,7 @@
         >
           <a-input-password
             v-model="form.confirmPassword"
-            :placeholder="$t('settings.user.mofify.password.confirm.placeholder')"
+            :placeholder="t('settings.user.mofify.password.confirm.placeholder')"
             :max-length="32"
             allow-clear
           >

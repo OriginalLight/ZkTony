@@ -2,7 +2,7 @@
   <a-card v-if="userStore.role === 0" :title="t('settings.factory.title')">
     <a-list>
       <a-list-item>
-        <a-list-item-meta :title="$t('settings.system.version.title')">
+        <a-list-item-meta :title="t('settings.system.version.title')">
           <template #avatar>
             <icon-question-circle size="20" />
           </template>
@@ -14,7 +14,7 @@
         </template>
       </a-list-item>
       <a-list-item class="nav" @click="router.push('/option')">
-        <a-list-item-meta :title="$t('settings.factory.option')">
+        <a-list-item-meta :title="t('settings.factory.option')">
           <template #avatar>
             <Inbox size="20" />
           </template>
@@ -28,7 +28,7 @@
         </template>
       </a-list-item>
       <a-list-item class="nav" @click="router.push('/debug')">
-        <a-list-item-meta :title="$t('settings.factory.debug')">
+        <a-list-item-meta :title="t('settings.factory.debug')">
           <template #avatar>
             <Bug size="20" />
           </template>
@@ -42,7 +42,7 @@
         </template>
       </a-list-item>
       <a-list-item class="nav" @click="router.push('/fqc')">
-        <a-list-item-meta :title="$t('settings.factory.fqc')">
+        <a-list-item-meta :title="t('settings.factory.fqc')">
           <template #avatar>
             <FactoryBuilding size="20" />
           </template>
@@ -56,7 +56,7 @@
         </template>
       </a-list-item>
       <a-list-item class="nav" @click="router.push('/aging')">
-        <a-list-item-meta :title="$t('settings.factory.aging')">
+        <a-list-item-meta :title="t('settings.factory.aging')">
           <template #avatar>
             <Tea size="20" />
           </template>

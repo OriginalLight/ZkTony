@@ -96,14 +96,14 @@
       <a-form :model="addForm" auto-label-width>
         <a-form-item
           field="name"
-          :rules="[{ required: true, message: $t('user.managemet.add.form.name.errMsg') }]"
+          :rules="[{ required: true, message: t('user.managemet.add.form.name.errMsg') }]"
           :validate-trigger="['change', 'blur']"
           :max-length="32"
           hide-label
         >
           <a-input
             v-model="addForm.name"
-            :placeholder="$t('user.managemet.add.form.name.placeholder')"
+            :placeholder="t('user.managemet.add.form.name.placeholder')"
           >
             <template #prefix>
               <icon-user />
@@ -112,13 +112,13 @@
         </a-form-item>
         <a-form-item
           field="password"
-          :rules="[{ required: true, message: $t('user.managemet.add.form.password.errMsg') }]"
+          :rules="[{ required: true, message: t('user.managemet.add.form.password.errMsg') }]"
           :validate-trigger="['change', 'blur']"
           hide-label
         >
           <a-input-password
             v-model="addForm.password"
-            :placeholder="$t('user.managemet.add.form.password.placeholder')"
+            :placeholder="t('user.managemet.add.form.password.placeholder')"
             :max-length="32"
             allow-clear
           >

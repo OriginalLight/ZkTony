@@ -1,7 +1,7 @@
 <template>
   <div class="login-form-wrapper">
-    <div class="login-form-title">{{ $t('login.form.title') }}</div>
-    <div class="login-form-sub-title">{{ $t('login.form.subtitle') }}</div>
+    <div class="login-form-title">{{ t('login.form.title') }}</div>
+    <div class="login-form-sub-title">{{ t('login.form.subtitle') }}</div>
     <div class="login-form-error-msg">{{ errorMessage }}</div>
     <a-form
       ref="loginForm"
@@ -12,13 +12,13 @@
     >
       <a-form-item
         field="username"
-        :rules="[{ required: true, message: $t('login.form.userName.errMsg') }]"
+        :rules="[{ required: true, message: t('login.form.userName.errMsg') }]"
         :validate-trigger="['change', 'blur']"
         hide-label
       >
         <a-input
           v-model="userInfo.username"
-          :placeholder="$t('login.form.userName.placeholder')"
+          :placeholder="t('login.form.userName.placeholder')"
           :max-length="32"
         >
           <template #prefix>
@@ -28,13 +28,13 @@
       </a-form-item>
       <a-form-item
         field="password"
-        :rules="[{ required: true, message: $t('login.form.password.errMsg') }]"
+        :rules="[{ required: true, message: t('login.form.password.errMsg') }]"
         :validate-trigger="['change', 'blur']"
         hide-label
       >
         <a-input-password
           v-model="userInfo.password"
-          :placeholder="$t('login.form.password.placeholder')"
+          :placeholder="t('login.form.password.placeholder')"
           :max-length="32"
           allow-clear
         >
@@ -45,7 +45,7 @@
       </a-form-item>
       <a-space :size="16" direction="vertical">
         <a-button type="primary" shape="round" html-type="submit" long :loading="loading">
-          {{ $t('login.form.login') }}
+          {{ t('login.form.login') }}
         </a-button>
       </a-space>
     </a-form>

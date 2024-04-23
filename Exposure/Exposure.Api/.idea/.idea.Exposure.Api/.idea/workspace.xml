@@ -18,16 +18,7 @@
   <component name="ChangeListManager">
     <list default="true" id="78ea7552-3107-4483-86a7-883cf6a7e7bd" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/MachineController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/MachineController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/UserController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/UserController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Exposure.Api.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Exposure.Api.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Exposure.Api.csproj.user" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Exposure.Api.csproj.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Resources/SharedResources.en.resx" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Resources/SharedResources.en.resx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Resources/SharedResources.zh.resx" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Resources/SharedResources.zh.resx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/CameraService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/CameraService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/gallery/subpage/gallery-detail/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/gallery/subpage/gallery-detail/index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/option/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/option/index.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -298,7 +289,8 @@
       <workItem from="1712905748308" duration="5293000" />
       <workItem from="1713142678453" duration="14474000" />
       <workItem from="1713401947741" duration="2965000" />
-      <workItem from="1713417317733" duration="18153000" />
+      <workItem from="1713417317733" duration="19233000" />
+      <workItem from="1713769199700" duration="8190000" />
     </task>
     <servers />
   </component>
