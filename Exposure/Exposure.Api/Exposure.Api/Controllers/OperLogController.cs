@@ -41,9 +41,6 @@ public class OperLogController(
     {
         if (!await operLog.DeleteRange(ids))
             return Problem(localizer.GetString("Delete").Value + localizer.GetString("Failure").Value);
-        // 插入日志
-        operLog.AddOperLog(localizer.GetString("Delete").Value,
-            $"{localizer.GetString("OperLog").Value}：ids = {string.Join(",", ids)}");
         return Ok();
     }
 
@@ -61,38 +58,44 @@ public class OperLogController(
         // 获取日志
         var list = await operLog.GetByIds(ids);
         if (list.Count == 0) throw new Exception(localizer.GetString("NotFound").Value);
+        list.Reverse();
 
         // 判断使用中文还是英文
         var lang = HttpContext.Request.Headers["Accept-Language"].ToString().ToLower();
+        var excel = Path.Combine(usb1.Name, $"{localizer.GetString("OperLog").Value}.xlsx");
+        var i = 1;
+        while (System.IO.File.Exists(excel))
+        {
+            excel = Path.Combine(usb1.Name, $"{localizer.GetString("OperLog").Value}_{i}.xlsx");
+            i++;
+        }
         if (lang.Contains("zh"))
         {
             // 使用MiniExcel导出
-            var data = list.Select(p => new
+            var data = list.Select((p, index) => new
             {
-                编号 = p.Id,
+                序号 = index + 1,
                 用户名 = p.User?.Name,
                 操作类型 = p.Type,
                 操作描述 = p.Description,
                 操作时间 = p.Time
             }).ToList();
             // 保存到U盘
-            await MiniExcel.SaveAsAsync(Path.Combine(usb1.Name, $"{localizer.GetString("OperLog").Value}.xlsx"), data,
-                overwriteFile: true);
+            await MiniExcel.SaveAsAsync(excel, data, overwriteFile: true);
         }
         else
         {
             // 使用MiniExcel导出
-            var data = list.Select(p => new
+            var data = list.Select((p, index) => new
             {
-                p.Id,
+                Index = index + 1,
                 UserName = p.User?.Name,
                 p.Type,
                 p.Description,
                 p.Time
             }).ToList();
             // 保存到U盘
-            await MiniExcel.SaveAsAsync(Path.Combine(usb1.Name, $"{localizer.GetString("OperLog").Value}.xlsx"), data,
-                overwriteFile: true);
+            await MiniExcel.SaveAsAsync(excel, data, overwriteFile: true);
         }
 
         // 记录日志

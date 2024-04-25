@@ -221,7 +221,7 @@ const option = ref({
   temperature: -15,
   rotate: 0,
   roi: '0,0,0,0',
-  hatchStep: 0,
+  hatchStep: 268800,
   hatchOffset: 0
 })
 

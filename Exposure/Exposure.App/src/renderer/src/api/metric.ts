@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 // 状态
-export interface Status {
+export interface Metric {
   usb: boolean
   hatch: boolean
   temperature: number
@@ -9,5 +9,5 @@ export interface Status {
 
 // 获取状态
 export function metric() {
-  return axios.get<Status>('/Metric')
+  return axios.get<Metric>('/Metric')
 }

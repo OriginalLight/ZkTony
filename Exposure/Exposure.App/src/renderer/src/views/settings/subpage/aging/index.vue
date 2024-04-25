@@ -10,7 +10,7 @@
                 <a-input-number
                   v-model="agingOptions.cycle"
                   :min="1"
-                  :max="1000"
+                  :max="10000"
                   :step="1"
                   mode="button"
                 />

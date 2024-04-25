@@ -14,13 +14,13 @@ public class MetricController(ISerialPortService serialPort, IUsbService usb, IC
     #region 状态
 
     [HttpGet]
-    public IActionResult Status()
+    public IActionResult Metric()
     {
         var temperature = camera.GetTemperature();
         var flag = serialPort.GetFlag("led");
         var hatch = serialPort.GetFlag("hatch");
 
-        var dto = new StatusOutDto
+        var dto = new MetricOutDto
         {
             Usb = usb.IsUsbAttached(),
             Hatch = hatch == 1,

@@ -1,10 +1,11 @@
 ﻿using System.IO.Ports;
 using Exposure.Api.Contracts.Services;
 using Exposure.Protocal.Default;
+using Serilog;
 
 namespace Exposure.Api.Services;
 
-public class SerialPortService(ILogger<SerialPortService> logger, IOptionService option, IErrorLogService errorLog)
+public class SerialPortService(IOptionService option, IErrorLogService errorLog)
     : ISerialPortService
 {
     private readonly Dictionary<string, int> _flags = new();
@@ -26,7 +27,7 @@ public class SerialPortService(ILogger<SerialPortService> logger, IOptionService
                 var sp = (SerialPort)sender;
                 var bytes = new byte[sp.BytesToRead];
                 sp.Read(bytes, 0, bytes.Length);
-                logger.LogInformation("Com2 Rx: " + BitConverter.ToString(bytes));
+                Log.Information("Com2 Rx: " + BitConverter.ToString(bytes));
                 switch (bytes[2])
                 {
                     case 0x03:
@@ -40,7 +41,7 @@ public class SerialPortService(ILogger<SerialPortService> logger, IOptionService
                         }
                         catch (Exception e)
                         {
-                            logger.LogError(e.Message);
+                            Log.Error(e.Message);
                         }
                     }
                         break;
@@ -49,7 +50,7 @@ public class SerialPortService(ILogger<SerialPortService> logger, IOptionService
             catch (Exception e)
             {
                 errorLog.AddErrorLog(e);
-                logger.LogError(e.Message);
+                Log.Error(e.Message);
             }
         };
 
@@ -96,11 +97,11 @@ public class SerialPortService(ILogger<SerialPortService> logger, IOptionService
         try
         {
             _serialPorts[alias].Write(bytes, 0, bytes.Length);
-            logger.LogInformation(alias + " Tx: " + BitConverter.ToString(bytes));
+            Log.Information(alias + " Tx: " + BitConverter.ToString(bytes));
         }
         catch (Exception e)
         {
-            logger.LogError("Tx Failure " + alias, e);
+            Log.Error("Tx Failure " + alias, e);
             errorLog.AddErrorLog(e);
         }
     }
@@ -120,11 +121,11 @@ public class SerialPortService(ILogger<SerialPortService> logger, IOptionService
         {
             serialPort.Open();
             _serialPorts.Add(alias, serialPort);
-            logger.LogInformation("Open Success: " + portName);
+            Log.Information("Open Success: " + portName);
         }
         catch (Exception e)
         {
-            logger.LogError("Open Failure：" + portName, e);
+            Log.Error("Open Failure：" + portName, e);
             errorLog.AddErrorLog(e);
         }
     }

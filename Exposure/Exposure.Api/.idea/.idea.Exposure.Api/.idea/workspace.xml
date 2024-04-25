@@ -18,7 +18,18 @@
   <component name="ChangeListManager">
     <list default="true" id="78ea7552-3107-4483-86a7-883cf6a7e7bd" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/CameraService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/CameraService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/MachineController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/MachineController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/MetricController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/MetricController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/OperLogController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/OperLogController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Models/Dto/StatusOutDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Models/Dto/MetricOutDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/SerialPortService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/SerialPortService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/UserService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/UserService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/components/system-settings.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/components/system-settings.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/aging/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/aging/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/err-log/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/err-log/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/oper-log/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/oper-log/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/option/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/option/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/user-manage/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/user-manage/index.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,6 +54,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/4d66c706110b4c618ff8a8532ab94c5d12798/d1/69a463b8/ApiVersion.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/891a5c25823c4eeda76705f52719aef02ad600/6b/20a50cb7/AdoProvider.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8e7d133a4bc14e71834005a023e0390222600/a5/46f7e32e/LoggerConfiguration.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/1f75784e73e851b61dc0a47593745082d7ec10c118ac134b7eec36b91b2f46/MiniExcel.Async.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Exposure.Api/obj/Debug/net8.0/Exposure.Api.AssemblyInfo.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
@@ -290,7 +302,9 @@
       <workItem from="1713142678453" duration="14474000" />
       <workItem from="1713401947741" duration="2965000" />
       <workItem from="1713417317733" duration="19233000" />
-      <workItem from="1713769199700" duration="8190000" />
+      <workItem from="1713769199700" duration="30450000" />
+      <workItem from="1714006494782" duration="6523000" />
+      <workItem from="1714014603855" duration="7613000" />
     </task>
     <servers />
   </component>

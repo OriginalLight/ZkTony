@@ -3,7 +3,6 @@ using System.Reflection;
 using Exposure.Api.Contracts.Services;
 using Exposure.Api.Models.Dto;
 using Exposure.Protocal.Default;
-using Exposure.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using OpenCvSharp;
@@ -117,6 +116,10 @@ public class MachineController(
             {
                 num++;
                 await Task.Delay(100);
+                if (num >= 40 && num % 2 == 0)
+                {
+                    serialPort.WritePort("Com2", DefaultProtocol.QueryOptocoupler().ToBytes());
+                }
             }
 
             if (num >= 50)
@@ -247,8 +250,11 @@ public class MachineController(
             while (serialPort.GetFlag("hatch") == 1 && num < 50)
             {
                 num++;
-                if (num == 35) serialPort.WritePort("Com2", DefaultProtocol.QueryOptocoupler().ToBytes());
                 await Task.Delay(100);
+                if (num >= 40 && num % 2 == 0)
+                {
+                    serialPort.WritePort("Com2", DefaultProtocol.QueryOptocoupler().ToBytes());
+                }
             }
 
             if (num >= 50) throw new Exception(localizer.GetString("Error0012").Value);
@@ -332,27 +338,13 @@ public class MachineController(
         var usb1 = usb.GetDefaultUsbDrive();
         if (usb1 == null) throw new Exception(localizer.GetString("NoUsb").Value);
         var path = Path.Combine(usb1.Name, "Exposure");
-        // 复制文件到Documents
-        var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        var dir = new DirectoryInfo(path);
-        if (dir.Exists)
-            // 整个文件夹复制，包括所有文件和子文件夹
-            FileUtils.DirectoryCopy(path, Path.Combine(documents, "Exposure"), true);
-        else
-            throw new Exception(localizer.GetString("NotFound"));
-        var bat = Path.Combine(Path.Combine(documents, "Exposure"), "Update.bat");
+        if (!Directory.Exists(path)) throw new Exception(localizer.GetString("NotFound"));
+        var bat = Path.Combine(path, "Update.bat");
         if (!System.IO.File.Exists(bat)) throw new Exception(localizer.GetString("NotFound"));
-        var process = new Process
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = bat,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                CreateNoWindow = true
-            }
-        };
-        process.Start();
+        var batchProcess = new Process();
+        batchProcess.StartInfo.FileName = bat;
+        batchProcess.EnableRaisingEvents = true;
+        batchProcess.Start();
         return Ok();
     }
 
