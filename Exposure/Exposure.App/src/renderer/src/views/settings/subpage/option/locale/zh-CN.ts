@@ -16,5 +16,7 @@ export default {
   'option.set.fail': '设置失败',
   'option.lower': '下位机',
   'option.lower.hatch.step': '开门步数',
-  'option.lower.hatch.offset': '开门偏移'
+  'option.lower.hatch.offset': '关门偏移',
+  'option.lower.hatch.open': '开门',
+  'option.lower.hatch.close': '关门'
 }

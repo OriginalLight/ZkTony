@@ -65,7 +65,7 @@
                     mode="button"
                     :step="500"
                   >
-                    <template #suffix>NS</template>
+                    <template #suffix>μs</template>
                   </a-input-number>
                   <a-button
                     type="primary"
@@ -195,6 +195,19 @@
                 </a-input-group>
               </template>
             </a-list-item>
+            <a-list-item>
+              <a-list-item-meta :title="t('debug.machine.hatch')"></a-list-item-meta>
+              <template #actions>
+                <a-space>
+                  <a-button type="primary" @click="hatch({ code: 1 })">
+                    {{ t('option.lower.hatch.open') }}
+                  </a-button>
+                  <a-button type="primary" @click="hatch({ code: 0 })">
+                    {{ t('option.lower.hatch.close') }}
+                  </a-button>
+                </a-space>
+              </template>
+            </a-list-item>
           </a-list>
         </a-card>
       </a-space>
@@ -206,6 +219,7 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { setOption, getAllOptions } from '@renderer/api/option'
+import { hatch } from '@renderer/api/machine'
 import { getPorts } from '@renderer/api/machine'
 import { Message } from '@arco-design/web-vue'
 
@@ -221,7 +235,7 @@ const option = ref({
   temperature: -15,
   rotate: 0,
   roi: '0,0,0,0',
-  hatchStep: 268800,
+  hatchStep: 256000,
   hatchOffset: 0
 })
 

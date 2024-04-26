@@ -17,19 +17,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="78ea7552-3107-4483-86a7-883cf6a7e7bd" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Exposure.Setup/Exposure.Setup.vdproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/MachineController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/MachineController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/MetricController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/MetricController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/OperLogController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/OperLogController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Models/Dto/StatusOutDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Models/Dto/MetricOutDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api.sln" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api.sln" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Exposure.Api.csproj.user" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Exposure.Api.csproj.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Program.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/SerialPortService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/SerialPortService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/UserService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/UserService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/components/system-settings.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/components/system-settings.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/aging/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/aging/index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/err-log/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/err-log/index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/oper-log/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/oper-log/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/appsettings.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/option/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/option/index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/user-manage/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/user-manage/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/option/locale/en-US.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/option/locale/en-US.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/option/locale/zh-CN.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/option/locale/zh-CN.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -140,21 +137,6 @@
         <option name="Build" />
       </method>
     </configuration>
-    <configuration name="Exposure.Utils: IIS Express" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
-      <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/Exposure.Utilities/Exposure.Utilities.csproj" />
-      <option name="LAUNCH_PROFILE_TFM" value="net8.0" />
-      <option name="LAUNCH_PROFILE_NAME" value="IIS Express" />
-      <option name="USE_EXTERNAL_CONSOLE" value="0" />
-      <option name="USE_MONO" value="0" />
-      <option name="RUNTIME_ARGUMENTS" value="" />
-      <option name="GENERATE_APPLICATIONHOST_CONFIG" value="1" />
-      <option name="SHOW_IIS_EXPRESS_OUTPUT" value="0" />
-      <option name="SEND_DEBUG_REQUEST" value="1" />
-      <option name="ADDITIONAL_IIS_EXPRESS_ARGUMENTS" value="" />
-      <method v="2">
-        <option name="Build" />
-      </method>
-    </configuration>
     <configuration name="Exposure.Utils: http" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/Exposure.Utilities/Exposure.Utilities.csproj" />
       <option name="LAUNCH_PROFILE_TFM" value="net8.0" />
@@ -201,7 +183,6 @@
       </method>
     </configuration>
     <list>
-      <item itemvalue=".NET Launch Settings Profile.Exposure.Utils: IIS Express" />
       <item itemvalue=".NET Launch Settings Profile.Exposure.Utils: http" />
       <item itemvalue=".NET Launch Settings Profile.Exposure.Utils: https" />
       <item itemvalue=".NET Launch Settings Profile.Development" />
@@ -304,7 +285,7 @@
       <workItem from="1713417317733" duration="19233000" />
       <workItem from="1713769199700" duration="30450000" />
       <workItem from="1714006494782" duration="6523000" />
-      <workItem from="1714014603855" duration="7613000" />
+      <workItem from="1714014603855" duration="17657000" />
     </task>
     <servers />
   </component>

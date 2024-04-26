@@ -112,10 +112,23 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
 
     private async Task OpenPort(string alias)
     {
+        if (_serialPorts.ContainsKey(alias))
+        {
+            Log.Information("Already Open: " + alias);
+            return;
+        }
         var portName = await option.GetOptionValueAsync(alias);
-        if (portName == null) return;
-
-        if (_serialPorts.ContainsKey(portName)) return;
+        if (portName == null)
+        {
+            Log.Information("Not Found: " + alias);
+            return;
+        }
+        if (_serialPorts.Any(kv => kv.Value.PortName == portName))
+        {
+            Log.Information("Already Open: " + portName);
+            return;
+        }
+        
         SerialPort serialPort = new(portName, 115200, Parity.None, 8, StopBits.One);
         try
         {

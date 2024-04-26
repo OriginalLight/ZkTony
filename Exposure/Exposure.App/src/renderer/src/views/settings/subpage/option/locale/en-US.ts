@@ -16,5 +16,7 @@ export default {
   'option.set.fail': 'Set failed',
   'option.lower': 'Lower Computer',
   'option.lower.hatch.step': 'Open Door Steps',
-  'option.lower.hatch.offset': 'Open Door Offset'
+  'option.lower.hatch.offset': 'Close Door Offset',
+  'option.lower.hatch.open': 'Open Door',
+  'option.lower.hatch.close': 'Close Door'
 }
