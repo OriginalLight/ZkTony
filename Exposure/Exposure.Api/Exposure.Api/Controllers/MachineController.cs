@@ -49,7 +49,7 @@ public class MachineController(
         var bytes = new byte[hex.Length / 2];
         for (var i = 0; i < hex.Length; i += 2) bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
         serialPort.WritePort(dto.Port, bytes);
-        Log.Information($"Tx：{dto.Port} {BitConverter.ToString(bytes)}");
+        Log.Information($"发送：{dto.Port} {BitConverter.ToString(bytes)}");
         return Ok();
     }
 
@@ -89,7 +89,7 @@ public class MachineController(
             _ => DefaultProtocol.LedAllClose()
         };
         serialPort.WritePort("Com1", protocol.ToBytes());
-        Log.Information($"Tx：Com1 {BitConverter.ToString(protocol.ToBytes())}");
+        Log.Information($"发送：Com1 {BitConverter.ToString(protocol.ToBytes())}");
         return Ok();
     }
 
@@ -216,9 +216,17 @@ public class MachineController(
     [Route("Version")]
     public ActionResult Version()
     {
-        var version = (Assembly.GetEntryAssembly() ?? throw new InvalidOperationException()).GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+        var ver1 = (Assembly.GetEntryAssembly() ?? throw new InvalidOperationException()).GetCustomAttribute<AssemblyInformationalVersionAttribute>()
             ?.InformationalVersion;
-        return Ok(version);
+        var ver2 = serialPort.GetVer();
+        
+        var dict = new Dictionary<string, string?>
+        {
+            {"Ver1", ver1},
+            {"Ver2", ver2}
+        };
+        
+        return Ok(dict);
     }
 
     #endregion

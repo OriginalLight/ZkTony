@@ -2,13 +2,13 @@
 using System.Text.Json;
 using Exposure.Api.Contracts.Services;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace Exposure.Api.Middleware;
 
 public class ExceptionMiddleware(
     RequestDelegate next,
-    IErrorLogService errorLog,
-    ILogger<ExceptionMiddleware> logger)
+    IErrorLogService errorLog)
 {
     private readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
@@ -29,7 +29,7 @@ public class ExceptionMiddleware(
             context.Response.ContentType = "application/problem+json";
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
-            logger.LogError(ex, ex.Message);
+            Log.Error(ex, ex.Message);
             errorLog.AddErrorLog(ex);
             var problemDetails = new ProblemDetails
             {

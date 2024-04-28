@@ -21,6 +21,7 @@ public class UserService(IDbContext dbContext) : BaseService<User>(dbContext), I
         var su = await _context.db.Queryable<User>().Where(it => it.Role == 0).FirstAsync();
         if (su == null)
         {
+            // 创建工厂管理员
             await _context.db.Insertable(new User
             {
                 Name = "zkty",
@@ -31,6 +32,7 @@ public class UserService(IDbContext dbContext) : BaseService<User>(dbContext), I
                 UpdateTime = DateTime.Now,
                 LastLoginTime = DateTime.Now
             }).ExecuteReturnIdentityAsync();
+            // 创建管理员
             await _context.db.Insertable(new User
             {
                 Name = "admin",

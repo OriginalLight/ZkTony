@@ -34,4 +34,11 @@ public interface ISerialPortService
     /// <param name="alias"></param>
     /// <param name="bytes"></param>
     void WritePort(string alias, byte[] bytes);
+
+
+    /// <summary>
+    ///     获取版本号
+    /// </summary>
+    /// <returns></returns>
+    string GetVer();
 }

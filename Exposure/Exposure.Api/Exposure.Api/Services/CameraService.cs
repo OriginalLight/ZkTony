@@ -60,11 +60,11 @@ public class CameraService(
             // 设置回调
             if (!SetCallBack()) throw new Exception(localizer.GetString("Error0008").Value);
         }
-        catch (Exception)
+        catch (Exception e)
         {
             _nncam?.Close();
             _nncam = null;
-            Log.Error("相机初始化错误！");
+            Log.Error(e, "相机初始化错误！");
             throw;
         }
     }
@@ -108,9 +108,9 @@ public class CameraService(
             if (!_nncam.Trigger(1))
                 throw new Exception($"{localizer.GetString("Preview")}{localizer.GetString("Failure").Value}");
         }
-        catch (Exception)
+        catch (Exception e)
         {
-            Log.Error("预览失败！");
+            Log.Error(e, "预览失败！");
             serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
             throw;
         }
@@ -595,13 +595,13 @@ public class CameraService(
             {
                 <= 0.05 => snr switch
                 {
-                    <= -10 => GetScale(-50, -10, 1000000, 3000000, snr),
+                    <= -10 => GetScale(-50, -10, 1_000_000, 3_000_000, snr),
                     > -10 => await CalculateExpo(1, ctsToken),
-                    _ => 1000000
+                    _ => 1_000_000
                 },
-                <= 0.1 => GetScale(0.05, 0.1, 5000000, 10000000, percentage),
-                <= 0.5 => GetScale(0.1, 0.5, 2000000, 5000000, percentage),
-                _ => GetScale(0.5, 1, 100000, 2000000, percentage)
+                <= 0.1 => GetScale(0.05, 0.1, 5_000_000, 10_000_000, percentage),
+                <= 0.5 => GetScale(0.1, 0.5, 2_000_000, 5_000_000, percentage),
+                _ => GetScale(0.5, 1, 100_000, 2_000_000, percentage)
             };
 
 
@@ -610,17 +610,17 @@ public class CameraService(
             {
                 <= 0.05 => snr switch
                 {
-                    <= -15 => GetScale(-50, -15, 2000000, 3000000, snr),
-                    <= 0 => GetScale(-15, 0, 3000000, 10000000, snr),
-                    <= 1 => GetScale(0, 1, 10000000, 14000000, snr),
-                    <= 1.5 => GetScale(1, 1.5, 14000000, 20000000, snr),
-                    <= 2 => GetScale(1.5, 2, 20000000, 30000000, snr),
+                    <= -15 => GetScale(-50, -15, 2_000_000, 3_000_000, snr),
+                    <= 0 => GetScale(-15, 0, 3_000_000, 10_000_000, snr),
+                    <= 1 => GetScale(0, 1, 10_000_000, 14_000_000, snr),
+                    <= 1.5 => GetScale(1, 1.5, 14_000_000, 20_000_000, snr),
+                    <= 2 => GetScale(1.5, 2, 20_000_000, 30_000_000, snr),
                     > 2 => await CalculateExpo(5, ctsToken),
-                    _ => 2000000
+                    _ => 2_000_000
                 },
-                <= 0.1 => GetScale(0.05, 0.1, 5000000, 10000000, percentage),
-                <= 0.5 => GetScale(0.1, 0.5, 2000000, 5000000, percentage),
-                _ => GetScale(0.5, 1, 100000, 2000000, percentage)
+                <= 0.1 => GetScale(0.05, 0.1, 5_000_000, 10_000_000, percentage),
+                <= 0.5 => GetScale(0.1, 0.5, 2_000_000, 5_000_000, percentage),
+                _ => GetScale(0.5, 1, 100_000, 2_000_000, percentage)
             };
 
         if (Math.Abs(time - 5) < 0.1)
@@ -628,19 +628,19 @@ public class CameraService(
             {
                 <= 0.05 => snr switch
                 {
-                    <= -20 => GetScale(-50, -20, 3000000, 5000000, snr),
-                    <= 0 => GetScale(-20, 0, 5000000, 10000000, snr),
-                    <= 1 => GetScale(0, 1, 10000000, 20000000, snr),
-                    <= 2 => GetScale(1, 2, 20000000, 30000000, snr),
-                    <= 3 => GetScale(2, 3, 30000000, 40000000, snr),
-                    <= 4 => GetScale(3, 4, 40000000, 50000000, snr),
-                    <= 5 => GetScale(4, 5, 50000000, 60000000, snr),
-                    > 5 => 60000000,
-                    _ => 3000000
+                    <= 2 => GetScale(0, 2, 20_000_000, 30_000_000, snr),
+                    <= 5 => GetScale(2, 5, 30_000_000, 40_000_000, snr),
+                    <= 6 => GetScale(5, 6, 40_000_000, 80_000_000, snr),
+                    <= 7 => GetScale(6, 7, 80_000_000, 140_000_000, snr),
+                    <= 7.5 => GetScale(7, 7.5, 140_000_000, 240_000_000, snr),
+                    <= 8 => GetScale(7.5, 8, 240_000_000, 300_000_000, snr),
+                    <= 20 => GetScale(8, 20, 300_000_000, 600_000_000, snr),
+                    > 20 => 600_000_000,
+                    _ => 3_000_000
                 },
-                <= 0.1 => GetScale(0.05, 0.1, 15000000, 30000000, percentage),
-                <= 0.5 => GetScale(0.1, 0.5, 6000000, 15000000, percentage),
-                _ => GetScale(0.5, 1, 300000, 6000000, percentage)
+                <= 0.1 => GetScale(0.05, 0.1, 15_000_000, 30_000_000, percentage),
+                <= 0.5 => GetScale(0.1, 0.5, 6_000_000, 15_000_000, percentage),
+                _ => GetScale(0.5, 1, 300_000, 6_000_000, percentage)
             };
 
         return 0;

@@ -9,7 +9,8 @@
         </a-list-item-meta>
         <template #actions>
           <a-space>
-            <a-tag> {{ version }} </a-tag>
+            <a-tag v-if="version.ver2 != ''"> {{ version.ver2 }} </a-tag>
+            <a-tag v-if="version.ver1 != ''"> {{ version.ver1 }} </a-tag>
           </a-space>
         </template>
       </a-list-item>
@@ -85,11 +86,20 @@ const { t } = useI18n()
 const router = useRouter()
 const userStore = useUserStore()
 
-const version = ref('1.0.0')
+const version = ref({
+  ver1: '',
+  ver2: ''
+})
 
 onMounted(async () => {
   const res = await varsion()
-  version.value = res.data
+  const ver = res.data
+  if (ver.Ver1) {
+    version.value.ver1 = ver.Ver1
+  }
+  if (ver.Ver2) {
+    version.value.ver2 = ver.Ver2
+  }
 })
 </script>
 

@@ -17,16 +17,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="78ea7552-3107-4483-86a7-883cf6a7e7bd" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Exposure.Setup/Exposure.Setup.vdproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api.sln" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api.sln" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Exposure.Api.csproj.user" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Exposure.Api.csproj.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/SerialPortService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/SerialPortService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/appsettings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/option/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/option/index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/option/locale/en-US.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/option/locale/en-US.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/option/locale/zh-CN.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/option/locale/zh-CN.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.SqlSugar/Exposure.SqlSugar.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.SqlSugar/Exposure.SqlSugar.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -92,7 +84,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;IdeDpaAspPageId&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\ThinkBook\\AppData\\Local\\Programs\\Rider\\plugins\\javascript-impl\\jsLanguageServicesImpl\\external&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
@@ -286,6 +278,11 @@
       <workItem from="1713769199700" duration="30450000" />
       <workItem from="1714006494782" duration="6523000" />
       <workItem from="1714014603855" duration="17657000" />
+      <workItem from="1714121725824" duration="970000" />
+      <workItem from="1714265270669" duration="1035000" />
+      <workItem from="1714266317788" duration="123000" />
+      <workItem from="1714266454454" duration="61000" />
+      <workItem from="1714266528453" duration="200000" />
     </task>
     <servers />
   </component>

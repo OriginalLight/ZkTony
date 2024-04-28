@@ -1,4 +1,5 @@
 ﻿using System.IO.Ports;
+using System.Text;
 using Exposure.Api.Contracts.Services;
 using Exposure.Protocal.Default;
 using Serilog;
@@ -10,6 +11,7 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
 {
     private readonly Dictionary<string, int> _flags = new();
     private readonly Dictionary<string, SerialPort> _serialPorts = new();
+    private string _ver = "1.0.0";
 
     #region 初始化
 
@@ -27,7 +29,7 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
                 var sp = (SerialPort)sender;
                 var bytes = new byte[sp.BytesToRead];
                 sp.Read(bytes, 0, bytes.Length);
-                Log.Information("Com2 Rx: " + BitConverter.ToString(bytes));
+                Log.Information("Com2 收到: " + BitConverter.ToString(bytes));
                 switch (bytes[2])
                 {
                     case 0x03:
@@ -41,7 +43,23 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
                         }
                         catch (Exception e)
                         {
-                            Log.Error(e.Message);
+                            Log.Error(e, e.Message);
+                        }
+                    }
+                        break;
+                    case 0xFE:
+                    {
+                        try
+                        {
+                            var arr = bytes.Skip(5).Take(5).ToArray();
+                            // arr to string
+                            var str = Encoding.ASCII.GetString(arr);
+                            Log.Information("下位机版本：" + str);
+                            _ver = str;
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Error(e, e.Message);
                         }
                     }
                         break;
@@ -50,7 +68,7 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
             catch (Exception e)
             {
                 errorLog.AddErrorLog(e);
-                Log.Error(e.Message);
+                Log.Error(e, e.Message);
             }
         };
 
@@ -59,6 +77,10 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
 
         // 查询门的状态
         WritePort("Com2", DefaultProtocol.QueryOptocoupler().ToBytes());
+
+        await Task.Delay(100);
+        // 查询版本号
+        WritePort("Com2", DefaultProtocol.QueryVer().ToBytes());
     }
 
     #endregion
@@ -97,13 +119,22 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
         try
         {
             _serialPorts[alias].Write(bytes, 0, bytes.Length);
-            Log.Information(alias + " Tx: " + BitConverter.ToString(bytes));
+            Log.Information(alias + " 发送: " + BitConverter.ToString(bytes));
         }
         catch (Exception e)
         {
-            Log.Error("Tx Failure " + alias, e);
+            Log.Error(e, "发送失败" + alias);
             errorLog.AddErrorLog(e);
         }
+    }
+
+    #endregion
+
+    #region 获取版本号
+
+    public string GetVer()
+    {
+        return _ver;
     }
 
     #endregion
@@ -114,18 +145,18 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
     {
         if (_serialPorts.ContainsKey(alias))
         {
-            Log.Information("Already Open: " + alias);
+            Log.Information("已经打开串口: " + alias);
             return;
         }
         var portName = await option.GetOptionValueAsync(alias);
         if (portName == null)
         {
-            Log.Information("Not Found: " + alias);
+            Log.Information("找不到串口号: " + alias);
             return;
         }
         if (_serialPorts.Any(kv => kv.Value.PortName == portName))
         {
-            Log.Information("Already Open: " + portName);
+            Log.Information("已经打开串口: " + portName);
             return;
         }
         
@@ -134,11 +165,11 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
         {
             serialPort.Open();
             _serialPorts.Add(alias, serialPort);
-            Log.Information("Open Success: " + portName);
+            Log.Information("打开串口成功: " + portName);
         }
         catch (Exception e)
         {
-            Log.Error("Open Failure：" + portName, e);
+            Log.Error(e, "打开串口失败：" + portName);
             errorLog.AddErrorLog(e);
         }
     }
