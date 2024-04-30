@@ -1,4 +1,764 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.1.4" type="baseline" client="gradle" dependencies="false" name="AGP (8.1.4)" variant="all" version="8.1.4">
+<issues format="6" by="lint 8.3.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.3.2)" variant="all" version="8.3.2">
+
+    <issue
+        id="ScopedStorage"
+        message="WRITE_EXTERNAL_STORAGE is deprecated (and is not granted) when targeting Android 13+. If you need to write to shared storage, use the `MediaStore.createWriteRequest` intent."
+        errorLine1="    &lt;uses-permission android:name=&quot;android.permission.WRITE_EXTERNAL_STORAGE&quot;/>"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="9"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 28 (current min is 21): `SettingRoute`"
+        errorLine1="            composable(Route.SETTING) { SettingRoute(viewModel = hiltViewModel()) }"
+        errorLine2="                                        ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/navigation/Navigation.kt"
+            line="43"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="PrivateApi"
+        message="Accessing internal APIs via reflection is not supported and may not work on all devices or in the future"
+        errorLine1="        volumeInfoClazz = Class.forName(&quot;android.os.storage.VolumeInfo&quot;)"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/DebugMode.kt"
+            line="2095"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="PrivateApi"
+        message="Accessing internal APIs via reflection is not supported and may not work on all devices or in the future"
+        errorLine1="        diskInfoClaszz = Class.forName(&quot;android.os.storage.DiskInfo&quot;)"
+        errorLine2="                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/DebugMode.kt"
+            line="2096"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="PrivateApi"
+        message="Accessing internal APIs via reflection is not supported and may not work on all devices or in the future"
+        errorLine1="        volumeInfoClazz = Class.forName(&quot;android.os.storage.VolumeInfo&quot;)"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/ExperimentRecords.kt"
+            line="534"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="PrivateApi"
+        message="Accessing internal APIs via reflection is not supported and may not work on all devices or in the future"
+        errorLine1="        diskInfoClaszz = Class.forName(&quot;android.os.storage.DiskInfo&quot;)"
+        errorLine2="                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/ExperimentRecords.kt"
+            line="535"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="PrivateApi"
+        message="Accessing internal APIs via reflection is not supported and may not work on all devices or in the future"
+        errorLine1="        volumeInfoClazz = Class.forName(&quot;android.os.storage.VolumeInfo&quot;)"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/Program.kt"
+            line="1056"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="PrivateApi"
+        message="Accessing internal APIs via reflection is not supported and may not work on all devices or in the future"
+        errorLine1="        diskInfoClaszz = Class.forName(&quot;android.os.storage.DiskInfo&quot;)"
+        errorLine2="                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/Program.kt"
+            line="1057"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="PrivateApi"
+        message="Accessing internal APIs via reflection is not supported and may not work on all devices or in the future"
+        errorLine1="        volumeInfoClazz = Class.forName(&quot;android.os.storage.VolumeInfo&quot;)"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/Setting.kt"
+            line="3373"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="PrivateApi"
+        message="Accessing internal APIs via reflection is not supported and may not work on all devices or in the future"
+        errorLine1="        diskInfoClaszz = Class.forName(&quot;android.os.storage.DiskInfo&quot;)"
+        errorLine2="                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/Setting.kt"
+            line="3374"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="PrivateApi"
+        message="Accessing internal APIs via reflection is not supported and may not work on all devices or in the future"
+        errorLine1="        volumeInfoClazz = Class.forName(&quot;android.os.storage.VolumeInfo&quot;)"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/sportsLogMode.kt"
+            line="282"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="PrivateApi"
+        message="Accessing internal APIs via reflection is not supported and may not work on all devices or in the future"
+        errorLine1="        diskInfoClaszz = Class.forName(&quot;android.os.storage.DiskInfo&quot;)"
+        errorLine2="                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/sportsLogMode.kt"
+            line="283"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="SimpleDateFormat"
+        message="To get local formatting use `getDateInstance()`, `getDateTimeInstance()`, or `getTimeInstance()`, or use `new SimpleDateFormat(String template, Locale locale)` with for example `Locale.US` for ASCII dates."
+        errorLine1="            val format = SimpleDateFormat(&quot;yyyy-MM-dd&quot;)"
+        errorLine2="                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/utils/service/CalibrationService.kt"
+            line="53"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="ComposableNaming"
+        message="Composable functions that return Unit should start with an uppercase letter"
+        errorLine1="fun debugMode("
+        errorLine2="    ~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/DebugMode.kt"
+            line="126"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ComposableNaming"
+        message="Composable functions that return Unit should start with an uppercase letter"
+        errorLine1="fun experimentList("
+        errorLine2="    ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/ExperimentRecords.kt"
+            line="130"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ComposableNaming"
+        message="Composable functions that return Unit should start with an uppercase letter"
+        errorLine1="fun operate("
+        errorLine2="    ~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/Home.kt"
+            line="181"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ComposableNaming"
+        message="Composable functions that return Unit should start with an uppercase letter"
+        errorLine1="fun debug("
+        errorLine2="    ~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/Setting.kt"
+            line="3302"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ComposableNaming"
+        message="Composable functions that return Unit should start with an uppercase letter"
+        errorLine1="fun sportsLog("
+        errorLine2="    ~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/Setting.kt"
+            line="3337"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ComposableNaming"
+        message="Composable functions that return Unit should start with an uppercase letter"
+        errorLine1="fun line("
+        errorLine2="    ~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/utils/line.kt"
+            line="34"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ComposableNaming"
+        message="Composable functions that return Unit should start with an uppercase letter"
+        errorLine1="fun sportsLogMode("
+        errorLine2="    ~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/sportsLogMode.kt"
+            line="63"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ComposableNaming"
+        message="Composable functions that return Unit should start with an uppercase letter"
+        errorLine1="fun test() {"
+        errorLine2="    ~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/components/test.kt"
+            line="69"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ComposableNaming"
+        message="Composable functions that return Unit should start with an uppercase letter"
+        errorLine1="fun shengyin() {"
+        errorLine2="    ~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/components/test.kt"
+            line="137"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableLongStateOf` instead of `mutableStateOf`"
+        errorLine1="    var higeSpeed by remember { mutableStateOf(0L) }"
+        errorLine2="                                ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/DebugMode.kt"
+            line="168"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableLongStateOf` instead of `mutableStateOf`"
+        errorLine1="    var lowSpeed by remember { mutableStateOf(0L) }"
+        errorLine2="                               ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/DebugMode.kt"
+            line="171"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
+        errorLine1="    var xNum by remember { mutableStateOf(1) }"
+        errorLine2="                           ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/DebugMode.kt"
+            line="285"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
+        errorLine1="    var highNum by remember { mutableStateOf(0) }"
+        errorLine2="                              ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/DebugMode.kt"
+            line="291"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
+        errorLine1="    var lowNum by remember { mutableStateOf(0) }"
+        errorLine2="                             ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/DebugMode.kt"
+            line="298"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
+        errorLine1="    var rinseNum by remember { mutableStateOf(0) }"
+        errorLine2="                               ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/DebugMode.kt"
+            line="305"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
+        errorLine1="    var selectedIndex by remember { mutableStateOf(0) }"
+        errorLine2="                                    ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/ExperimentRecords.kt"
+            line="156"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
+        errorLine1="    var selectedIndex by remember { mutableStateOf(0) }"
+        errorLine2="                                    ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/Home.kt"
+            line="221"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableFloatStateOf` instead of `mutableStateOf`"
+        errorLine1="        mutableStateOf(0f)"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/Home.kt"
+            line="337"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableFloatStateOf` instead of `mutableStateOf`"
+        errorLine1="        mutableStateOf(0f)"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/Home.kt"
+            line="344"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableFloatStateOf` instead of `mutableStateOf`"
+        errorLine1="        mutableStateOf(0f)"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/Home.kt"
+            line="351"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableFloatStateOf` instead of `mutableStateOf`"
+        errorLine1="        mutableStateOf(0f)"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/Home.kt"
+            line="358"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
+        errorLine1="    var selectedIndex by remember { mutableStateOf(0) }"
+        errorLine2="                                    ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/Program.kt"
+            line="174"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableLongStateOf` instead of `mutableStateOf`"
+        errorLine1="    var selectedId by remember { mutableStateOf(0L) }"
+        errorLine2="                                 ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/Program.kt"
+            line="176"
+            column="34"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableFloatStateOf` instead of `mutableStateOf`"
+        errorLine1="        mutableStateOf(0f)"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/brogressbar/ProgressBarCircle.kt"
+            line="42"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
+        errorLine1="    var switchColum by remember { mutableStateOf(0) }"
+        errorLine2="                                  ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/Setting.kt"
+            line="239"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
+        errorLine1="    var selectedIndex by remember { mutableStateOf(0) }"
+        errorLine2="                                    ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/Setting.kt"
+            line="499"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
+        errorLine1="    var selectedIndex by remember { mutableStateOf(0) }"
+        errorLine2="                                    ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/sportsLogMode.kt"
+            line="73"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="FrequentlyChangedStateReadInComposition"
+        message="Frequently changing state should not be directly read in composable function"
+        errorLine1="    LaunchedEffect(stateRowX.firstVisibleItemScrollOffset) {"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/Home.kt"
+            line="367"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="FrequentlyChangedStateReadInComposition"
+        message="Frequently changing state should not be directly read in composable function"
+        errorLine1="    LaunchedEffect(stateRowY.firstVisibleItemScrollOffset) {"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/Home.kt"
+            line="374"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.mipmap.drop` appears to be unused">
+        <location
+            file="src/main/res/mipmap-hdpi/drop.png"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.raw.error` appears to be unused">
+        <location
+            file="src/main/res/raw/error.mp3"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.raw.finish` appears to be unused">
+        <location
+            file="src/main/res/raw/finish.mp3"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.mipmap.homebtn2` appears to be unused">
+        <location
+            file="src/main/res/mipmap-hdpi/homebtn2.png"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.mipmap.logo` appears to be unused">
+        <location
+            file="src/main/res/mipmap-mdpi/logo.png"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.mipmap.qrcode` appears to be unused">
+        <location
+            file="src/main/res/mipmap-hdpi/qrcode.png"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.mipmap.sph` appears to be unused">
+        <location
+            file="src/main/res/mipmap-hdpi/sph.png"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.raw.startend` appears to be unused">
+        <location
+            file="src/main/res/raw/startend.mp3"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.already_latest` appears to be unused"
+        errorLine1="    &lt;string name=&quot;already_latest&quot;>已是最新版&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="3"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.help` appears to be unused"
+        errorLine1="    &lt;string name=&quot;help&quot;>帮助&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="7"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.motor_config` appears to be unused"
+        errorLine1="    &lt;string name=&quot;motor_config&quot;>电机参数&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="8"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.navigation` appears to be unused"
+        errorLine1="    &lt;string name=&quot;navigation&quot;>导航栏&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="9"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.parameters` appears to be unused"
+        errorLine1="    &lt;string name=&quot;parameters&quot;>系统参数&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="10"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.qrcode` appears to be unused"
+        errorLine1="    &lt;string name=&quot;qrcode&quot;>微信扫码关注公众号&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="11"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.system_config` appears to be unused"
+        errorLine1="    &lt;string name=&quot;system_config&quot;>系统参数&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="12"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.calibration` appears to be unused"
+        errorLine1="    &lt;string name=&quot;calibration&quot;>校准管理&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="13"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.update` appears to be unused"
+        errorLine1="    &lt;string name=&quot;update&quot;>检测更新&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="18"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.update_available` appears to be unused"
+        errorLine1="    &lt;string name=&quot;update_available&quot;>有新版本&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="19"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.version` appears to be unused"
+        errorLine1="    &lt;string name=&quot;version&quot;>版本&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="20"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.network` appears to be unused"
+        errorLine1="    &lt;string name=&quot;network&quot;>网络设置&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="21"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.downloading` appears to be unused"
+        errorLine1="    &lt;string name=&quot;downloading&quot;>下载中&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="22"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.speed` appears to be unused"
+        errorLine1="    &lt;string name=&quot;speed&quot;>速度&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="23"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.acceleration` appears to be unused"
+        errorLine1="    &lt;string name=&quot;acceleration&quot;>加速度&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="24"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.deceleration` appears to be unused"
+        errorLine1="    &lt;string name=&quot;deceleration&quot;>减速度&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="25"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.notice_content` appears to be unused"
+        errorLine1="    &lt;string name=&quot;notice_content&quot;>1、请按照说明书进行操作\n2、请先填充促凝剂再填充胶液\n3、灌胶中请将针头贴紧胶板开口\n4、使用中请尽可能保持管路中液体处于流动状态\n5、灌装两块凝胶之间的时间间隔不宜过长\n6、灌胶完成后用清水冲洗管路避免凝胶堵塞管路&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="29"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.notice` appears to be unused"
+        errorLine1="    &lt;string name=&quot;notice&quot;>注意事项&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="30"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.glue_making` appears to be unused"
+        errorLine1="    &lt;string name=&quot;glue_making&quot;>制胶&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="31"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.pre_drain` appears to be unused"
+        errorLine1="    &lt;string name=&quot;pre_drain&quot;>预排&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="32"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.copyright` appears to be unused"
+        errorLine1="    &lt;string name=&quot;copyright&quot;>南京中科通仪科技有限公司 版权所有&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="34"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.remark` appears to be unused"
+        errorLine1="    &lt;string name=&quot;remark&quot;>备注&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="35"
+            column="13"/>
+    </issue>
 
 </issues>
