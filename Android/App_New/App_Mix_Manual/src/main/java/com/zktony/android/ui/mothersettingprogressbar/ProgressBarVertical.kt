@@ -33,7 +33,7 @@ fun VerticalProgressBar(
     progress: String,
     modifier: Modifier = Modifier,
     color: Color = Color(android.graphics.Color.rgb(136, 196, 254)),
-    backgroundColor: Color = Color(245, 245, 245),
+    backgroundColor: Color = Color(229, 229, 229),
     size: Size = Size(width = 401.9f, height = 227.7f),
     strokeSize: Float = 0.1f,
     strokeColor: Color = Color.Blue
@@ -79,7 +79,7 @@ fun VerticalProgressBar(
                 height = (waterProgress * size.height).dp.toPx()
             ),
             topLeft = Offset(0.dp.toPx(), ((1 - waterProgress) * size.height).dp.toPx()),
-            cornerRadius = CornerRadius(10f, 10f)
+            cornerRadius = CornerRadius(if (waterProgress < 1) 0f else 10f, 10f)
         )
         // background
         drawRoundRect(
@@ -88,7 +88,7 @@ fun VerticalProgressBar(
                 width = size.width.dp.toPx(),
                 height = ((1 - waterProgress) * size.height).dp.toPx()
             ),
-            cornerRadius = CornerRadius(10f, 10f)
+            cornerRadius = CornerRadius(10f, if (waterProgress < 1) 0f else 10f)
         )
 
         val textDescWidth = zhiDescLayoutResult.size.width

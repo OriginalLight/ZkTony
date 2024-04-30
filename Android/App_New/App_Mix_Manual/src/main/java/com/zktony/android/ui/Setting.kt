@@ -755,7 +755,7 @@ fun SettingLits(
                                 .height(280.dp)
                                 .clip(RoundedCornerShape(10.dp))
                                 .background(
-                                    color = Color(rgb(239, 239, 239)),
+                                    color = Color(rgb(229, 229, 229)),
                                 )
                         ) {
                             Text(
@@ -890,7 +890,7 @@ fun SettingLits(
                                 .padding(top = 20.3.dp)
                                 .clip(RoundedCornerShape(10.dp))
                                 .background(
-                                    color = Color(rgb(239, 239, 239)),
+                                    color = Color(rgb(229, 229, 229)),
                                 )
                         ) {
                             Text(
@@ -993,7 +993,7 @@ fun SettingLits(
                                 .padding(top = 20.3.dp)
                                 .clip(RoundedCornerShape(10.dp))
                                 .background(
-                                    color = Color(rgb(239, 239, 239)),
+                                    color = Color(rgb(229, 229, 229)),
                                 )
                         ) {
                             Text(
@@ -1095,7 +1095,7 @@ fun SettingLits(
                                 .padding(top = 20.3.dp)
                                 .clip(RoundedCornerShape(10.dp))
                                 .background(
-                                    color = Color(rgb(239, 239, 239)),
+                                    color = Color(rgb(229, 229, 229)),
                                 )
                         ) {
                             Text(
@@ -1262,7 +1262,7 @@ fun SettingLits(
                                 .height(290.dp)
                                 .clip(RoundedCornerShape(10.dp))
                                 .background(
-                                    color = Color(rgb(239, 239, 239)),
+                                    color = Color(rgb(229, 229, 229)),
                                 )
                         ) {
                             Row {
@@ -1437,7 +1437,7 @@ fun SettingLits(
                                 .padding(top = 20.3.dp)
                                 .clip(RoundedCornerShape(10.dp))
                                 .background(
-                                    color = Color(rgb(239, 239, 239)),
+                                    color = Color(rgb(229, 229, 229)),
                                 )
                         ) {
 
@@ -1611,7 +1611,7 @@ fun SettingLits(
                                 .padding(top = 20.3.dp)
                                 .clip(RoundedCornerShape(10.dp))
                                 .background(
-                                    color = Color(rgb(239, 239, 239)),
+                                    color = Color(rgb(229, 229, 229)),
                                 )
                         ) {
 
@@ -1785,7 +1785,7 @@ fun SettingLits(
                                 .padding(top = 20.3.dp)
                                 .clip(RoundedCornerShape(10.dp))
                                 .background(
-                                    color = Color(rgb(239, 239, 239)),
+                                    color = Color(rgb(229, 229, 229)),
                                 )
                         ) {
 
@@ -2087,7 +2087,7 @@ fun SettingLits(
                                 .background(
                                     if (index % 2 == 0) Color(
                                         rgb(
-                                            239, 239, 239
+                                            229, 229, 229
                                         )
                                     ) else Color.White
                                 )
@@ -2142,36 +2142,15 @@ fun SettingLits(
                             }
                         }
                     } else {
+                        Row(
+                            modifier = Modifier
+                                .padding(top = 20.dp)
+                                .fillMaxWidth()
+                        ) {
+                            line(Color(rgb(240, 240, 240)), 0f, 400f)
+                        }
+
                         if (factoryAdminPwd.value == currentpwd) {
-                            Row {
-                                Text(
-                                    modifier = Modifier.padding(top = 20.dp),
-                                    text = "导航栏",
-                                    fontSize = 30.sp
-                                )
-                                Switch(colors = SwitchDefaults.colors(
-                                    checkedTrackColor = Color(rgb(0, 105, 52)),
-                                ),
-                                    modifier = Modifier
-                                        .height(32.dp)
-                                        .padding(top = 40.dp, start = 220.dp),
-                                    checked = navigation,
-                                    onCheckedChange = {
-                                        scope.launch {
-                                            navigation = it
-                                            uiEvent(SettingIntent.Navigation(it))
-                                        }
-                                    })
-                            }
-
-                            Row(
-                                modifier = Modifier
-                                    .padding(top = 20.dp)
-                                    .fillMaxWidth()
-                            ) {
-                                line(Color(rgb(240, 240, 240)), 0f, 400f)
-                            }
-
                             Row(modifier = Modifier.clickable {
                                 uiEvent(SettingIntent.NavTo(PageType.DEBUGMODE))
                             }) {
@@ -2237,6 +2216,32 @@ fun SettingLits(
                             Image(
                                 modifier = Modifier
                                     .padding(top = 20.dp, start = 200.dp)
+                                    .size(40.dp),
+                                painter = painterResource(id = R.mipmap.rightarrow),
+                                contentDescription = null
+                            )
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .padding(top = 20.dp)
+                                .fillMaxWidth()
+                        ) {
+                            line(Color(rgb(240, 240, 240)), 0f, 400f)
+                        }
+
+                        Row(modifier = Modifier.clickable {
+                            uiEvent(SettingIntent.exit)
+                        }) {
+                            Text(
+                                modifier = Modifier.padding(top = 20.dp),
+                                text = "操作系统设置",
+                                fontSize = 30.sp
+                            )
+
+                            Image(
+                                modifier = Modifier
+                                    .padding(top = 20.dp, start = 140.dp)
                                     .size(40.dp),
                                 painter = painterResource(id = R.mipmap.rightarrow),
                                 contentDescription = null
@@ -2432,15 +2437,19 @@ fun SettingLits(
                         Button(modifier = Modifier
                             .padding(start = 141.dp, top = 60.dp)
                             .width(131.8.dp)
-                            .height(41.5.dp), colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(rgb(0, 105, 52))
-                        ), shape = RoundedCornerShape(20.dp, 20.dp, 20.dp, 20.dp), onClick = {
-                            uiEvent(SettingIntent.Login(""))
-                            switchColum = 0
+                            .height(41.5.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ),
+                            shape = RoundedCornerShape(20.dp, 20.dp, 20.dp, 20.dp),
+                            onClick = {
+                                uiEvent(SettingIntent.Login(""))
+                                switchColum = 0
 
-                        }) {
+                            }) {
                             Text(text = "登出", fontSize = 18.sp)
                         }
+
 
                     }
 

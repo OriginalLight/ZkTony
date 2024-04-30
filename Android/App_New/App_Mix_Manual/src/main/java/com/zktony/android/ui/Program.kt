@@ -256,7 +256,7 @@ fun ProgramList(
                 val selected = item == entities[selectedIndex]
                 Row(
                     modifier = Modifier
-                        .background(if (index % 2 == 0) Color(rgb(239, 239, 239)) else Color.White)
+                        .background(if (index % 2 == 0) Color(rgb(229, 229, 229)) else Color.White)
                         .clickable(onClick = {
                             selectedIndex = index
                             selectedId = item.id
@@ -284,7 +284,7 @@ fun ProgramList(
                 .padding(top = 10.dp)
                 .fillMaxWidth()
                 .height(200.dp)
-                .background(Color(239, 239, 239))
+                .background(Color(229, 229, 229))
         ) {
             Row(
                 modifier = Modifier
@@ -751,7 +751,6 @@ fun ProgramList(
                                             "文件名不能包含特殊字符！",
                                             Toast.LENGTH_SHORT
                                         ).show()
-
                                     } else {
                                         if (startRange_ex.toInt() > endRange_ex.toInt()) {
                                             Toast.makeText(
@@ -805,7 +804,7 @@ fun ProgramList(
                         } catch (e: Exception) {
                             Toast.makeText(
                                 context,
-                                "数据异常！",
+                                "浓度和促凝剂液量必须是整数!",
                                 Toast.LENGTH_SHORT
                             ).show()
                         } finally {
@@ -858,7 +857,7 @@ fun ProgramList(
                                 if (programId.value == entity.id) {
                                     Toast.makeText(
                                         context,
-                                        "已在制胶操作选中,不能删除！",
+                                        "已在制胶操作选中,无法删除！",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 } else {

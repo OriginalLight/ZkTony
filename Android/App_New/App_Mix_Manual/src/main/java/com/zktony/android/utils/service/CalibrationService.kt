@@ -129,7 +129,6 @@ class CalibrationService @Inject constructor(
                     } else {
                         hpc[4] =
                             calculateCalibrationFactorNew(3200 * 50, newCalibration.rinseAvg * 1000)
-
                     }
 
 

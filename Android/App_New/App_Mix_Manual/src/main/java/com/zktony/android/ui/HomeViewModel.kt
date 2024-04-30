@@ -804,6 +804,107 @@ class HomeViewModel @Inject constructor(
                     }
                     //柱塞泵复位===========================================
                     delay(100)
+
+                    //蠕动泵复位===========================================
+                    /**
+                     * 蠕动泵复位次数
+                     */
+                    val numberOfPumpResets = dataStore.readData("numberofpumpresets", 3)
+
+                    val rinseSpeed = dataStore.readData("rinseSpeed", 600L)
+
+
+                    for (i in 1..numberOfPumpResets) {
+                        if (i == numberOfPumpResets) {
+                            //转一整圈
+                            if (i % 2 == 0) {
+                                start {
+                                    timeOut = 1000L * 60L * 10
+                                    with(
+                                        index = 2,
+                                        ads = Triple(rinseSpeed * 13, rinseSpeed * 1193, rinseSpeed * 1193),
+                                        pdv = 51200L
+                                    )
+                                    with(
+                                        index = 3,
+                                        ads = Triple(rinseSpeed * 13, rinseSpeed * 1193, rinseSpeed * 1193),
+                                        pdv = 51200L
+                                    )
+                                    with(
+                                        index = 4,
+                                        ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
+                                        pdv = 3200L
+                                    )
+                                }
+                            }else{
+                                start {
+                                    timeOut = 1000L * 60L * 10
+                                    with(
+                                        index = 2,
+                                        ads = Triple(rinseSpeed * 13, rinseSpeed * 1193, rinseSpeed * 1193),
+                                        pdv = -51200L
+                                    )
+                                    with(
+                                        index = 3,
+                                        ads = Triple(rinseSpeed * 13, rinseSpeed * 1193, rinseSpeed * 1193),
+                                        pdv = -51200L
+                                    )
+                                    with(
+                                        index = 4,
+                                        ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
+                                        pdv = -3200L
+                                    )
+                                }
+                            }
+                        } else {
+                            if (i % 2 == 0) {
+                                //正转
+                                start {
+                                    timeOut = 1000L * 60L * 10
+                                    with(
+                                        index = 2,
+                                        ads = Triple(rinseSpeed * 13, rinseSpeed * 1193, rinseSpeed * 1193),
+                                        pdv = 25600L
+                                    )
+                                    with(
+                                        index = 3,
+                                        ads = Triple(rinseSpeed * 13, rinseSpeed * 1193, rinseSpeed * 1193),
+                                        pdv = 25600L
+                                    )
+                                    with(
+                                        index = 4,
+                                        ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
+                                        pdv = 1600L
+                                    )
+                                }
+                            } else {
+                                //反转
+                                start {
+                                    timeOut = 1000L * 60L * 10
+                                    with(
+                                        index = 2,
+                                        ads = Triple(rinseSpeed * 13, rinseSpeed * 1193, rinseSpeed * 1193),
+                                        pdv = -25600L
+                                    )
+                                    with(
+                                        index = 3,
+                                        ads = Triple(rinseSpeed * 13, rinseSpeed * 1193, rinseSpeed * 1193),
+                                        pdv = -25600L
+                                    )
+                                    with(
+                                        index = 4,
+                                        ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
+                                        pdv = -1600L
+                                    )
+                                }
+                            }
+                        }
+
+                    }
+
+
+                    //蠕动泵复位===========================================
+
                     lightGreed()
                 }
                 _uiFlags.value = UiFlags.none()
@@ -2233,7 +2334,7 @@ class HomeViewModel @Inject constructor(
             if (status == 0) {
                 _stautsNum.value = 1
                 _complate.value = 0
-                
+
                 coagulantStart.value =
                     (coagulantExpectedPulse.toLong() + coagulantPulseCount.toLong()) * _stautsNum.value
                 Log.d(
@@ -2278,7 +2379,7 @@ class HomeViewModel @Inject constructor(
                      * 已经运动的柱塞泵步数
                      */
                     coagulantStart.value =
-                            (coagulantExpectedPulse.toLong() + coagulantPulseCount.toLong()) * _stautsNum.value
+                        (coagulantExpectedPulse.toLong() + coagulantPulseCount.toLong()) * _stautsNum.value
 
                 }
 
@@ -2376,7 +2477,7 @@ class HomeViewModel @Inject constructor(
                             "===柱塞泵回到下拉到底==="
                         )
 
-                        
+
                         coagulantStart.value =
                             (coagulantExpectedPulse.toLong() + coagulantPulseCount.toLong()) * _stautsNum.value
 

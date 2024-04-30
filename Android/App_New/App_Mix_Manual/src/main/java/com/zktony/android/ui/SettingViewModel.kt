@@ -328,7 +328,17 @@ class SettingViewModel @Inject constructor(
                 stop(0, 1, 2, 3, 4)
             }
 
-
+            is SettingIntent.exit -> viewModelScope.launch {
+                val intent = Intent(Settings.ACTION_SETTINGS).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    // Set the extra preferences to show the button bar and custom text
+                    putExtra("extra_prefs_show_button_bar", true)
+                    putExtra("extra_prefs_set_next_text", ApplicationUtils.ctx.getString(R.string.finish))
+                    putExtra("extra_prefs_set_back_text", ApplicationUtils.ctx.getString(R.string.cancel))
+                }
+                // Launch the Wi-Fi settings screen
+                ApplicationUtils.ctx.startActivity(intent)
+            }
         }
     }
 
@@ -3367,4 +3377,5 @@ sealed class SettingIntent {
     data class XStart(val xNum: Int) : SettingIntent()
 
     data object XStop : SettingIntent()
+    data object exit : SettingIntent()
 }

@@ -780,7 +780,7 @@ fun operate(
                 .padding(top = 21.4.dp)
                 .fillMaxWidth()
                 .height(143.98.dp)
-                .background(Color(239, 239, 239))
+                .background(Color(229, 229, 229))
         ) {
 
             Column(
@@ -1592,24 +1592,36 @@ fun operate(
                             modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(rgb(0, 105, 52))
                             ), onClick = {
-                                if ((lowCoagulant_ex.toIntOrNull() ?: 0) <= program.startRange) {
-                                    if ((lowCoagulant_ex.toIntOrNull() ?: 0) > 0) {
-                                        lowCoagulant.value = lowCoagulant_ex.toIntOrNull() ?: 0
-                                        uiEvent(HomeIntent.HigeLowMotherVol)
-                                        lowDialog.value = false
+                                if ((lowCoagulant_ex.toIntOrNull() ?: 0) < 3) {
+                                    Toast.makeText(
+                                        context,
+                                        "母液低浓度不能小于3",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    if ((lowCoagulant_ex.toIntOrNull()
+                                            ?: 0) <= program.startRange
+                                    ) {
+                                        if ((lowCoagulant_ex.toIntOrNull() ?: 0) > 0) {
+                                            lowCoagulant.value = lowCoagulant_ex.toIntOrNull() ?: 0
+                                            uiEvent(HomeIntent.HigeLowMotherVol)
+                                            lowDialog.value = false
+                                        } else {
+                                            Toast.makeText(
+                                                context,
+                                                "母液低浓度必须是整数并且大于0!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
                                     } else {
                                         Toast.makeText(
                                             context,
-                                            "不能是负数!",
+                                            "母液低浓度不能比制胶程序低浓度高",
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     }
-                                } else {
-                                    Toast.makeText(
-                                        context,
-                                        "母液低浓度不能比制胶程序低浓度高",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+
+
                                 }
 
 
@@ -1734,7 +1746,7 @@ fun operate(
                                     } else {
                                         Toast.makeText(
                                             context,
-                                            "不能是负数!",
+                                            "母液高浓度必须是整数并且大于0!",
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     }

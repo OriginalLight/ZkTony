@@ -32,7 +32,7 @@ fun CoagulantProgressBarVertical(
     concentration: String,
     modifier: Modifier = Modifier,
     color: Color = Color(android.graphics.Color.rgb(136, 196, 254)),
-    backgroundColor: Color = Color(245, 245, 245),
+    backgroundColor: Color = Color(229, 229, 229),
     size: Size = Size(width = 102.48f, height = 150.85f),
     strokeSize: Float = 0.1f,
     strokeColor: Color = Color.Blue
@@ -71,7 +71,7 @@ fun CoagulantProgressBarVertical(
                 height = (waterProgress * size.height).dp.toPx()
             ),
             topLeft = Offset(0.dp.toPx(), ((1 - waterProgress) * size.height).dp.toPx()),
-            cornerRadius = CornerRadius(10f, 10f)
+            cornerRadius = CornerRadius(if (waterProgress < 1) 0f else 10f, 10f)
         )
         // background
         drawRoundRect(
@@ -80,7 +80,7 @@ fun CoagulantProgressBarVertical(
                 width = size.width.dp.toPx(),
                 height = ((1 - waterProgress) * size.height).dp.toPx()
             ),
-            cornerRadius = CornerRadius(10f, 10f)
+            cornerRadius = CornerRadius(10f, if (waterProgress < 1) 0f else 10f)
         )
 
         val textDescWidth = textDescLayoutResult.size.width
