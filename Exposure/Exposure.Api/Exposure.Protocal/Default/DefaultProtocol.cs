@@ -360,6 +360,15 @@ public class DefaultProtocol
             Data = [0x00, data[0], data[1], data[2], data[3]]
         };
     }
+    
+    public static Protocol QueryVer() 
+    {
+        return new Protocol
+        {
+            Address = 0x01,
+            Function = 0xFE
+        };
+    }
 
     #endregion
 }

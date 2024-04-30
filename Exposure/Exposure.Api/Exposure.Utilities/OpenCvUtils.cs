@@ -196,7 +196,7 @@ public static class OpenCvUtils
         }
         catch (Exception e)
         {
-            Log.Error("截取部分失败：" + e.Message);
+            Log.Error(e, "截取部分失败");
             return src;
         }
     }
@@ -218,7 +218,7 @@ public static class OpenCvUtils
         }
         catch (Exception e)
         {
-            Log.Error("中心旋转失败：" + e.Message);
+            Log.Error(e, "中心旋转失败");
             return src;
         }
     }

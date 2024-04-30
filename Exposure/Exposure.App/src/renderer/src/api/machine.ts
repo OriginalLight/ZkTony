@@ -54,7 +54,7 @@ export function screen(data: CodeParam) {
 
 // 机器信息
 export function varsion() {
-  return axios.get<string>('/Machine/Version')
+  return axios.get<Record<string, string>>('/Machine/Version')
 }
 
 // 存储信息

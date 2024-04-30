@@ -649,7 +649,7 @@ class HomeViewModel @Inject constructor(
         // 切阀回收残留液体
         writeWithValve(inAddr, inChannel)
         writeWithValve(outAddr, outChannel)
-        writeWithPulse(group + 1, -(pulse * 2 + ((rIn + rOut * 3) * 6400 * 2)).toLong())
+        writeWithPulse(group + 1, -(pulse * 3 + ((rIn + rOut * 3) * 6400 * 2)).toLong())
         // 清理管路避免污染
         if (stage.type == 1 || stage.type == 2) {
             val rx = dataStore.readData(Constants.ZT_0004, 0.0)
@@ -725,7 +725,7 @@ class HomeViewModel @Inject constructor(
                 val r1 = dataStore.readData(Constants.ZT_0002, 0.0)
                 val r2 = dataStore.readData(Constants.ZT_0003, 0.0)
                 val r3 = dataStore.readData(Constants.ZT_0004, 0.0)
-                val pulse = (AppStateUtils.hpc[1] ?: { x -> x * 100 }).invoke(20000.0)
+                val pulse = (AppStateUtils.hpc[1] ?: { x -> x * 100 }).invoke(10000.0)
 
                 try {
                     _shaker.value = 4
@@ -757,7 +757,7 @@ class HomeViewModel @Inject constructor(
                         // 切阀放到一抗容器
                         writeWithValve(0, index + 1)
                         writeWithValve(1, index + 1)
-                        writeWithPulse(1, -(pulse * 1.5 + (r1 * 6400 * 4)).toLong())
+                        writeWithPulse(1, -(pulse * 3 + (r1 * 6400 * 4)).toLong())
                         delay(500L)
                         // 切阀加液进孵育盒
                         writeWithValve(0, 10)
@@ -777,17 +777,17 @@ class HomeViewModel @Inject constructor(
                         // 切阀放到二抗容器
                         writeWithValve(0, index + 5)
                         writeWithValve(1, index + 1)
-                        writeWithPulse(1, -(pulse * 1.5 + (r1 * 6400 * 4)).toLong())
+                        writeWithPulse(1, -(pulse * 3 + (r1 * 6400 * 4)).toLong())
                         delay(500L)
                         // 切阀排空一抗容器
                         writeWithValve(0, index + 1)
                         writeWithValve(1, 5)
-                        writeWithPulse(1, (pulse * 1.5 + (r1 * 6400 * 4)).toLong())
+                        writeWithPulse(1, (pulse * 3 + (r1 * 6400 * 4)).toLong())
                         delay(500L)
                         // 切阀排空二抗容器
                         writeWithValve(0, index + 5)
                         writeWithValve(1, 5)
-                        writeWithPulse(1, (pulse * 1.5 + (r1 * 6400 * 4)).toLong())
+                        writeWithPulse(1, (pulse * 3 + (r1 * 6400 * 4)).toLong())
                         delay(500L)
                     }
                     // 洗涤封闭液管路

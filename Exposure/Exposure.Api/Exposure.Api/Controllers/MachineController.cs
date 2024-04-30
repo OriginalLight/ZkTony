@@ -3,7 +3,6 @@ using System.Reflection;
 using Exposure.Api.Contracts.Services;
 using Exposure.Api.Models.Dto;
 using Exposure.Protocal.Default;
-using Exposure.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using OpenCvSharp;
@@ -50,7 +49,7 @@ public class MachineController(
         var bytes = new byte[hex.Length / 2];
         for (var i = 0; i < hex.Length; i += 2) bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
         serialPort.WritePort(dto.Port, bytes);
-        Log.Information($"Tx：{dto.Port} {BitConverter.ToString(bytes)}");
+        Log.Information($"发送：{dto.Port} {BitConverter.ToString(bytes)}");
         return Ok();
     }
 
@@ -90,7 +89,7 @@ public class MachineController(
             _ => DefaultProtocol.LedAllClose()
         };
         serialPort.WritePort("Com1", protocol.ToBytes());
-        Log.Information($"Tx：Com1 {BitConverter.ToString(protocol.ToBytes())}");
+        Log.Information($"发送：Com1 {BitConverter.ToString(protocol.ToBytes())}");
         return Ok();
     }
 
@@ -117,6 +116,10 @@ public class MachineController(
             {
                 num++;
                 await Task.Delay(100);
+                if (num >= 40 && num % 2 == 0)
+                {
+                    serialPort.WritePort("Com2", DefaultProtocol.QueryOptocoupler().ToBytes());
+                }
             }
 
             if (num >= 50)
@@ -213,9 +216,17 @@ public class MachineController(
     [Route("Version")]
     public ActionResult Version()
     {
-        var version = (Assembly.GetEntryAssembly() ?? throw new InvalidOperationException()).GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+        var ver1 = (Assembly.GetEntryAssembly() ?? throw new InvalidOperationException()).GetCustomAttribute<AssemblyInformationalVersionAttribute>()
             ?.InformationalVersion;
-        return Ok(version);
+        var ver2 = serialPort.GetVer();
+        
+        var dict = new Dictionary<string, string?>
+        {
+            {"Ver1", ver1},
+            {"Ver2", ver2}
+        };
+        
+        return Ok(dict);
     }
 
     #endregion
@@ -247,8 +258,11 @@ public class MachineController(
             while (serialPort.GetFlag("hatch") == 1 && num < 50)
             {
                 num++;
-                if (num == 35) serialPort.WritePort("Com2", DefaultProtocol.QueryOptocoupler().ToBytes());
                 await Task.Delay(100);
+                if (num >= 40 && num % 2 == 0)
+                {
+                    serialPort.WritePort("Com2", DefaultProtocol.QueryOptocoupler().ToBytes());
+                }
             }
 
             if (num >= 50) throw new Exception(localizer.GetString("Error0012").Value);
@@ -332,27 +346,13 @@ public class MachineController(
         var usb1 = usb.GetDefaultUsbDrive();
         if (usb1 == null) throw new Exception(localizer.GetString("NoUsb").Value);
         var path = Path.Combine(usb1.Name, "Exposure");
-        // 复制文件到Documents
-        var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        var dir = new DirectoryInfo(path);
-        if (dir.Exists)
-            // 整个文件夹复制，包括所有文件和子文件夹
-            FileUtils.DirectoryCopy(path, Path.Combine(documents, "Exposure"), true);
-        else
-            throw new Exception(localizer.GetString("NotFound"));
-        var bat = Path.Combine(Path.Combine(documents, "Exposure"), "Update.bat");
+        if (!Directory.Exists(path)) throw new Exception(localizer.GetString("NotFound"));
+        var bat = Path.Combine(path, "Update.bat");
         if (!System.IO.File.Exists(bat)) throw new Exception(localizer.GetString("NotFound"));
-        var process = new Process
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = bat,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                CreateNoWindow = true
-            }
-        };
-        process.Start();
+        var batchProcess = new Process();
+        batchProcess.StartInfo.FileName = bat;
+        batchProcess.EnableRaisingEvents = true;
+        batchProcess.Start();
         return Ok();
     }
 

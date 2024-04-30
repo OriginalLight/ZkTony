@@ -18,7 +18,7 @@
   <component name="ChangeListManager">
     <list default="true" id="78ea7552-3107-4483-86a7-883cf6a7e7bd" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/CameraService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/CameraService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.SqlSugar/Exposure.SqlSugar.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.SqlSugar/Exposure.SqlSugar.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,6 +43,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/4d66c706110b4c618ff8a8532ab94c5d12798/d1/69a463b8/ApiVersion.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/891a5c25823c4eeda76705f52719aef02ad600/6b/20a50cb7/AdoProvider.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8e7d133a4bc14e71834005a023e0390222600/a5/46f7e32e/LoggerConfiguration.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/1f75784e73e851b61dc0a47593745082d7ec10c118ac134b7eec36b91b2f46/MiniExcel.Async.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Exposure.Api/obj/Debug/net8.0/Exposure.Api.AssemblyInfo.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
@@ -83,7 +84,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;IdeDpaAspPageId&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\ThinkBook\\AppData\\Local\\Programs\\Rider\\plugins\\javascript-impl\\jsLanguageServicesImpl\\external&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
@@ -117,21 +118,6 @@
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/Exposure.Api/Exposure.Api.csproj" />
       <option name="LAUNCH_PROFILE_TFM" value="net8.0" />
       <option name="LAUNCH_PROFILE_NAME" value="Development" />
-      <option name="USE_EXTERNAL_CONSOLE" value="0" />
-      <option name="USE_MONO" value="0" />
-      <option name="RUNTIME_ARGUMENTS" value="" />
-      <option name="GENERATE_APPLICATIONHOST_CONFIG" value="1" />
-      <option name="SHOW_IIS_EXPRESS_OUTPUT" value="0" />
-      <option name="SEND_DEBUG_REQUEST" value="1" />
-      <option name="ADDITIONAL_IIS_EXPRESS_ARGUMENTS" value="" />
-      <method v="2">
-        <option name="Build" />
-      </method>
-    </configuration>
-    <configuration name="Exposure.Utils: IIS Express" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
-      <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/Exposure.Utilities/Exposure.Utilities.csproj" />
-      <option name="LAUNCH_PROFILE_TFM" value="net8.0" />
-      <option name="LAUNCH_PROFILE_NAME" value="IIS Express" />
       <option name="USE_EXTERNAL_CONSOLE" value="0" />
       <option name="USE_MONO" value="0" />
       <option name="RUNTIME_ARGUMENTS" value="" />
@@ -189,7 +175,6 @@
       </method>
     </configuration>
     <list>
-      <item itemvalue=".NET Launch Settings Profile.Exposure.Utils: IIS Express" />
       <item itemvalue=".NET Launch Settings Profile.Exposure.Utils: http" />
       <item itemvalue=".NET Launch Settings Profile.Exposure.Utils: https" />
       <item itemvalue=".NET Launch Settings Profile.Development" />
@@ -290,7 +275,14 @@
       <workItem from="1713142678453" duration="14474000" />
       <workItem from="1713401947741" duration="2965000" />
       <workItem from="1713417317733" duration="19233000" />
-      <workItem from="1713769199700" duration="8190000" />
+      <workItem from="1713769199700" duration="30450000" />
+      <workItem from="1714006494782" duration="6523000" />
+      <workItem from="1714014603855" duration="17657000" />
+      <workItem from="1714121725824" duration="970000" />
+      <workItem from="1714265270669" duration="1035000" />
+      <workItem from="1714266317788" duration="123000" />
+      <workItem from="1714266454454" duration="61000" />
+      <workItem from="1714266528453" duration="200000" />
     </task>
     <servers />
   </component>

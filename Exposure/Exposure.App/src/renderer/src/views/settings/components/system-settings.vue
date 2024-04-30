@@ -74,7 +74,7 @@
           </template>
         </a-list-item-meta>
         <template #actions>
-          <a-button shape="round" style="width: 120px" @click="handleUpdate">
+          <a-button shape="round" :loading="loading" style="width: 120px" @click="handleUpdate">
             <template #icon>
               <icon-download />
             </template>
@@ -120,6 +120,8 @@ const machine = ref({
   sound: localStorage.getItem('sound') || '0'
 })
 
+const loading = ref(false)
+
 // 查看错误日志
 const handleErrlog = () => {
   router.push('/errlog')
@@ -127,9 +129,12 @@ const handleErrlog = () => {
 
 const handleUpdate = async () => {
   try {
+    loading.value = true
     await update()
+    loading.value = false
   } catch (error) {
     Message.error((error as Error).message)
+    loading.value = false
   }
 }
 

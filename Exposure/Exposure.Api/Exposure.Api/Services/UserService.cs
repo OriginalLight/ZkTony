@@ -21,7 +21,8 @@ public class UserService(IDbContext dbContext) : BaseService<User>(dbContext), I
         var su = await _context.db.Queryable<User>().Where(it => it.Role == 0).FirstAsync();
         if (su == null)
         {
-            su = new User
+            // 创建工厂管理员
+            await _context.db.Insertable(new User
             {
                 Name = "zkty",
                 Sha = BCrypt.Net.BCrypt.HashPassword("zkty"),
@@ -30,8 +31,18 @@ public class UserService(IDbContext dbContext) : BaseService<User>(dbContext), I
                 CreateTime = DateTime.Now,
                 UpdateTime = DateTime.Now,
                 LastLoginTime = DateTime.Now
-            };
-            await _context.db.Insertable(su).ExecuteReturnIdentityAsync();
+            }).ExecuteReturnIdentityAsync();
+            // 创建管理员
+            await _context.db.Insertable(new User
+            {
+                Name = "admin",
+                Sha = BCrypt.Net.BCrypt.HashPassword("admin"),
+                Role = 1,
+                Enabled = true,
+                CreateTime = DateTime.Now,
+                UpdateTime = DateTime.Now,
+                LastLoginTime = DateTime.Now
+            }).ExecuteReturnIdentityAsync();
         }
     }
 

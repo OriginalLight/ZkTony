@@ -10,13 +10,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Exposure.Utilities", "Exposure.Utilities\Exposure.Utilities.csproj", "{154C78CB-F49E-4AF3-BE5D-2573C1F7304B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Exposure.Utilities", "Exposure.Utilities\Exposure.Utilities.csproj", "{154C78CB-F49E-4AF3-BE5D-2573C1F7304B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Exposure.SqlSugar", "Exposure.SqlSugar\Exposure.SqlSugar.csproj", "{6F72A82A-D6A5-489A-B701-0F333E10F33F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Exposure.SqlSugar", "Exposure.SqlSugar\Exposure.SqlSugar.csproj", "{6F72A82A-D6A5-489A-B701-0F333E10F33F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Exposure.Protocal", "Exposure.Protocal\Exposure.Protocal.csproj", "{90C72FA3-F418-47A1-BC6E-A660A3CB2FF1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Exposure.Protocal", "Exposure.Protocal\Exposure.Protocal.csproj", "{90C72FA3-F418-47A1-BC6E-A660A3CB2FF1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Exposure.External", "Exposure.External\Exposure.External.csproj", "{B8738717-C64E-4F2D-83B5-9ECDE7F4A8DF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Exposure.External", "Exposure.External\Exposure.External.csproj", "{B8738717-C64E-4F2D-83B5-9ECDE7F4A8DF}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Exposure.Setup", "Exposure.Setup\Exposure.Setup.vdproj", "{1663B37A-2072-4274-9285-377F5E41CE33}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,6 +46,8 @@ Global
 		{B8738717-C64E-4F2D-83B5-9ECDE7F4A8DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8738717-C64E-4F2D-83B5-9ECDE7F4A8DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B8738717-C64E-4F2D-83B5-9ECDE7F4A8DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1663B37A-2072-4274-9285-377F5E41CE33}.Debug|Any CPU.ActiveCfg = Debug
+		{1663B37A-2072-4274-9285-377F5E41CE33}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

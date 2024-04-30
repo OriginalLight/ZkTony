@@ -1,6 +1,6 @@
 ﻿namespace Exposure.Api.Models.Dto;
 
-public class StatusOutDto
+public class MetricOutDto
 {
     public bool Usb { get; set; }
     public bool Hatch { get; set; }

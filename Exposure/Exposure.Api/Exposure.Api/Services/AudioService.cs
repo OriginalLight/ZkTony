@@ -50,7 +50,7 @@ public class AudioService(IOptionService option) : IAudioService
         }
         catch (Exception e)
         {
-            Log.Error(e.Message);
+            Log.Error(e, e.Message);
         }
     }
 

@@ -93,7 +93,6 @@ android {
 }
 
 dependencies {
-    implementation("org.jetbrains:annotations:15.0")
     val composeBom = platform(libs.androidx.compose.bom)
 
     ksp(libs.androidx.room.compiler)

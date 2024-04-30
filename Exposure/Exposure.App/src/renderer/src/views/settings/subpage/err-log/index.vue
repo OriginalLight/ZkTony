@@ -148,6 +148,7 @@ const fetchData = async () => {
 // 搜索
 const handleSearch = () => {
   selectedKeys.value = []
+  pagination.current = 1
   fetchData()
 }
 

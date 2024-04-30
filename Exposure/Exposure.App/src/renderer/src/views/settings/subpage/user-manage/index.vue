@@ -186,7 +186,7 @@ const addForm = reactive({
 })
 
 // 分页
-const pagination = reactive({ current: 1, pageSize: 20, total: 0, showTotal: true })
+const pagination = reactive({ current: 1, pageSize: 50, total: 0, showTotal: true })
 
 // 表格列
 const columns: TableColumnData[] = [
@@ -259,6 +259,7 @@ const fetchData = async () => {
 // 搜索
 const handleSearch = () => {
   selectedKeys.value = []
+  pagination.current = 1
   fetchData()
 }
 

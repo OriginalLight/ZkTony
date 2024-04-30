@@ -15,12 +15,14 @@ win:
   icon: resources/icon.ico
   executableName: Exposure.App
 nsis:
-  artifactName: ${name}-${version}-setup.${ext}
+  artifactName: Exposure.App-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
+  allowToChangeInstallationDirectory: true
   allowElevation: true
   perMachine: false
+  oneClick: false
   createStartMenuShortcut: true
   installerIcon: resources/icon.ico
   uninstallerIcon: resources/icon.ico
