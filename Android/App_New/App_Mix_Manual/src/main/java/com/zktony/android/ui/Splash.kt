@@ -98,7 +98,7 @@ fun Splash() {
                 modifier = Modifier.padding(start = 350.dp),
                 fontSize = 18.sp,
                 color = Color.White,
-                text = "V${BuildConfig.VERSION_NAME}"
+                text = "${BuildConfig.VERSION_NAME}"
             )
         }
 

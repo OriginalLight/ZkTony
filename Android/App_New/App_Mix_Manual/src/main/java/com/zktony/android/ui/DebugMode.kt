@@ -154,6 +154,13 @@ fun debugMode(
     val speed = rememberDataSaverState(key = "speed", default = 180)
     var speed_ex by remember { mutableStateOf(speed.value.toString()) }
 
+
+    /**
+     * 蠕动泵复位次数
+     */
+    val numberOfPumpResets = rememberDataSaverState(key = "numberofpumpresets", default = 3)
+    var numberOfPumpResets_ex by remember { mutableStateOf(numberOfPumpResets.value.toString()) }
+
     /**
      * 胶板位置
      */
@@ -270,7 +277,6 @@ fun debugMode(
      */
     val glueNum = rememberDataSaverState(key = "glueNum", default = 1)
     var glueNum_ex by remember { mutableStateOf(glueNum.value.toString()) }
-
 
 
     var selectIndex by remember { mutableStateOf("") }
@@ -473,6 +479,35 @@ fun debugMode(
                                 Text(text = "运    行", fontSize = 18.sp)
                             }
 
+                        }
+
+                        Row(
+                            modifier = Modifier.padding(top = 20.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            OutlinedTextField(
+                                modifier = Modifier.width(130.dp),
+                                value = numberOfPumpResets_ex,
+                                label = { Text(text = "蠕动泵复位次数") },
+                                onValueChange = {
+                                    val temp = it.toIntOrNull() ?: 0
+                                    if (temp <= 0) {
+                                        numberOfPumpResets.value = 0
+                                        numberOfPumpResets_ex = "0"
+                                    } else {
+                                        numberOfPumpResets_ex = it
+                                        numberOfPumpResets.value =
+                                            numberOfPumpResets_ex.toIntOrNull() ?: 0
+                                    }
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(onDone = {
+                                    keyboard?.hide()
+                                })
+                            )
                         }
 
                     }

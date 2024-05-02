@@ -148,7 +148,7 @@ fun sportsLogMode(
                         .background(
                             if (index % 2 == 0) Color(
                                 rgb(
-                                    239, 239, 239
+                                    229, 229, 229
                                 )
                             ) else Color.White
                         )

@@ -230,7 +230,7 @@ fun experimentList(
                 .padding(top = 10.dp)
                 .fillMaxWidth()
                 .height(200.dp)
-                .background(Color(239, 239, 239))
+                .background(Color(229, 229, 229))
         ) {
             Row(
                 modifier = Modifier
@@ -495,7 +495,7 @@ fun experimentList(
                                 } else {
                                     Toast.makeText(
                                         context,
-                                        "制胶程序还在运动中,不能删除！",
+                                        "制胶程序还在运动中,无法删除！",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }
