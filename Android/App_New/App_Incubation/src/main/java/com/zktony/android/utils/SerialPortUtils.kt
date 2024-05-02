@@ -1,5 +1,6 @@
 package com.zktony.android.utils
 
+import android.annotation.SuppressLint
 import com.zktony.android.utils.AppStateUtils.hps
 import com.zktony.android.utils.AppStateUtils.hpv
 import com.zktony.serialport.command.modbus.RtuProtocol
@@ -163,6 +164,7 @@ object SerialPortUtils {
     /**
      * 发送温度
      */
+    @SuppressLint("DefaultLocale")
     suspend fun writeWithTemperature(id: Int, value: Double) {
         SerialStoreUtils.get("tec")?.sendAsciiString("TC1:TCSW=0@$id\r")
         delay(15 * 1000L)
