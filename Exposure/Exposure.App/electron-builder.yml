@@ -1,5 +1,5 @@
 appId: Exposure.App
-productName: 化学发光
+productName: Exposure App
 directories:
   buildResources: build
 files:
@@ -23,7 +23,6 @@ nsis:
   allowElevation: true
   perMachine: false
   oneClick: false
-  createStartMenuShortcut: true
   installerIcon: resources/icon.ico
   uninstallerIcon: resources/icon.ico
   installerHeaderIcon: resources/icon.ico

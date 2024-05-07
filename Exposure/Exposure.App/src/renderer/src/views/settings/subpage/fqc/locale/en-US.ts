@@ -1,6 +1,6 @@
 export default {
   'fqc.led.title': 'Three-color LED FQC',
-  'fqc.led.cycle': 'Cycle',
+  'fqc.led.cycle': 'Cycle (Green-Red-Yellow-Yellow fast flash-Yellow slow flash)',
   'fqc.led.start': 'Start',
   'fqc.machine.title': 'Lower Computer FQC',
   'fqc.machine.hatch': 'Hatch',

@@ -163,6 +163,7 @@
                     style="width: 350px"
                     :min="0"
                     mode="button"
+                    :max="256000"
                     :step="12800"
                   >
                     <template #suffix>Pulse</template>
@@ -183,6 +184,8 @@
                     v-model="option.hatchOffset"
                     style="width: 350px"
                     mode="button"
+                    :min="-12800"
+                    :max="12800"
                     :step="12800"
                   >
                     <template #suffix>Pulse</template>
@@ -234,7 +237,7 @@ const option = ref({
   gain: 3000,
   temperature: -15,
   rotate: 0,
-  roi: '0,0,0,0',
+  roi: '0,1,0,1',
   hatchStep: 256000,
   hatchOffset: 0
 })

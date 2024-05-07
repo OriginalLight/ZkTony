@@ -177,17 +177,6 @@
                 {
                 }
             }
-            "{1525181F-901A-416C-8A58-119130FE478E}:_BF2E9FEA85684A9385325BE712DDF655"
-            {
-            "Name" = "8:#1921"
-            "AlwaysCreate" = "11:FALSE"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Property" = "8:StartMenuFolder"
-                "Folders"
-                {
-                }
-            }
         }
         "LaunchCondition"
         {
@@ -205,7 +194,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Exposure.Api"
         "ProductCode" = "8:{36958CB8-69BA-4BED-86E6-C2428839ECFC}"
-        "PackageCode" = "8:{6D441973-798B-477E-AA89-7E80DAB346CC}"
+        "PackageCode" = "8:{DB3118EA-95FB-48FF-B6E0-6417B266BA61}"
         "UpgradeCode" = "8:{6388160A-F81A-413A-8947-C494653873AF}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -246,20 +235,6 @@
                     "Transitive" = "11:FALSE"
                         "Keys"
                         {
-                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_4D0F28B37565469FA4878422C8079C52"
-                            {
-                            "Name" = "8:[Manufacturer]"
-                            "Condition" = "8:"
-                            "AlwaysCreate" = "11:FALSE"
-                            "DeleteAtUninstall" = "11:FALSE"
-                            "Transitive" = "11:FALSE"
-                                "Keys"
-                                {
-                                }
-                                "Values"
-                                {
-                                }
-                            }
                         }
                         "Values"
                         {
@@ -280,70 +255,6 @@
                     "Transitive" = "11:FALSE"
                         "Keys"
                         {
-                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_AA2AAF3BE6364E7584CAFEC109E0AA80"
-                            {
-                            "Name" = "8:Microsoft"
-                            "Condition" = "8:"
-                            "AlwaysCreate" = "11:FALSE"
-                            "DeleteAtUninstall" = "11:FALSE"
-                            "Transitive" = "11:FALSE"
-                                "Keys"
-                                {
-                                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_33B071CBA1754EBFB3384C8371FE465F"
-                                    {
-                                    "Name" = "8:Windows"
-                                    "Condition" = "8:"
-                                    "AlwaysCreate" = "11:FALSE"
-                                    "DeleteAtUninstall" = "11:FALSE"
-                                    "Transitive" = "11:FALSE"
-                                        "Keys"
-                                        {
-                                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_8B6147C3862F48868127D7976E7A80DA"
-                                            {
-                                            "Name" = "8:CurrentVersion"
-                                            "Condition" = "8:"
-                                            "AlwaysCreate" = "11:FALSE"
-                                            "DeleteAtUninstall" = "11:FALSE"
-                                            "Transitive" = "11:FALSE"
-                                                "Keys"
-                                                {
-                                                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_7F7103AD276E4C859DE589CA79D778EC"
-                                                    {
-                                                    "Name" = "8:Run"
-                                                    "Condition" = "8:"
-                                                    "AlwaysCreate" = "11:FALSE"
-                                                    "DeleteAtUninstall" = "11:FALSE"
-                                                    "Transitive" = "11:FALSE"
-                                                        "Keys"
-                                                        {
-                                                        }
-                                                        "Values"
-                                                        {
-                                                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_D5E2DF0348864A78AEF42DE2F349B1D8"
-                                                            {
-                                                            "Name" = "8:Exposure Api"
-                                                            "Condition" = "8:"
-                                                            "Transitive" = "11:FALSE"
-                                                            "ValueTypes" = "3:1"
-                                                            "Value" = "8:[LocalAppDataFolder]Programs\\[ProductName]\\Exposure.Api.exe"
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                                "Values"
-                                                {
-                                                }
-                                            }
-                                        }
-                                        "Values"
-                                        {
-                                        }
-                                    }
-                                }
-                                "Values"
-                                {
-                                }
-                            }
                         }
                         "Values"
                         {
@@ -399,20 +310,6 @@
             "Transitive" = "11:FALSE"
             "Target" = "8:_CB308D5BC9804C63B7B48093C64F6F25"
             "Folder" = "8:_A85B5EABB05844778F7A0256FFD6C994"
-            "WorkingFolder" = "8:_A9CEBE140EDD4B9A8F5457C1D5BEEA15"
-            "Icon" = "8:_153D57D0B9454460863BD220CBB6B3E5"
-            "Feature" = "8:"
-            }
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_D825F67E7A004C5C945C363416689197"
-            {
-            "Name" = "8:Exposure Api"
-            "Arguments" = "8:"
-            "Description" = "8:"
-            "ShowCmd" = "3:1"
-            "IconIndex" = "3:0"
-            "Transitive" = "11:FALSE"
-            "Target" = "8:_CB308D5BC9804C63B7B48093C64F6F25"
-            "Folder" = "8:_BF2E9FEA85684A9385325BE712DDF655"
             "WorkingFolder" = "8:_A9CEBE140EDD4B9A8F5457C1D5BEEA15"
             "Icon" = "8:_153D57D0B9454460863BD220CBB6B3E5"
             "Feature" = "8:"

@@ -63,15 +63,15 @@ public class Picture
     /// <summary>
     ///     创建时间
     /// </summary>
-    public DateTime CreateTime { get; set; }
+    public DateTime CreateTime { get; set; } = DateTime.Now;
 
     /// <summary>
     ///     更新时间
     /// </summary>
-    public DateTime UpdateTime { get; set; }
+    public DateTime UpdateTime { get; set; } = DateTime.Now;
 
     /// <summary>
     ///     删除时间
     /// </summary>
-    public DateTime DeleteTime { get; set; }
+    public DateTime DeleteTime { get; set; } = DateTime.Now;
 }

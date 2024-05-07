@@ -101,35 +101,20 @@ public class PictureService(
         var exposure = FileUtils.GetFileName(FileUtils.Exposure, $"{date}.png");
         mat.SaveImage(exposure);
 
-        var width = mat.Width;
-        var height = mat.Height;
-
         // 保存缩略图
         Cv2.Resize(mat, mat, new Size(500, 500));
         var thumbnail = FileUtils.GetFileName(FileUtils.Thumbnail, $"{date}.jpg");
         mat.SaveImage(thumbnail);
-
-        // 释放资源
-        mat1.Dispose();
-        mat2.Dispose();
-        mat.Dispose();
 
         return await AddReturnModel(new Picture
         {
             UserId = user.GetLogged()?.Id ?? 0,
             Name = date,
             Path = exposure,
-            Width = width,
-            Height = height,
+            Width = mat.Width,
+            Height = mat.Height,
             Type = 2,
             Thumbnail = thumbnail,
-            ExposureTime = 0,
-            ExposureGain = 0,
-            BlackLevel = 0,
-            IsDelete = false,
-            CreateTime = DateTime.Now,
-            UpdateTime = DateTime.Now,
-            DeleteTime = DateTime.Now
         });
     }
 
@@ -166,9 +151,6 @@ public class PictureService(
             var thumbnail = FileUtils.GetFileName(FileUtils.Thumbnail, $"{date}.jpg");
             await image.SaveAsJpegAsync(thumbnail);
 
-            // 释放资源
-            image.Dispose();
-
             return await AddReturnModel(new Picture
             {
                 UserId = user.GetLogged()?.Id ?? 0,
@@ -180,20 +162,13 @@ public class PictureService(
                 Thumbnail = thumbnail,
                 ExposureTime = pic.ExposureTime,
                 ExposureGain = pic.ExposureGain,
-                BlackLevel = pic.BlackLevel,
-                IsDelete = false,
-                CreateTime = DateTime.Now,
-                UpdateTime = DateTime.Now,
-                DeleteTime = DateTime.Now
+                BlackLevel = pic.BlackLevel
             });
         }
 
         image.Mutate(x => x.Resize(500, 500));
         var path = FileUtils.GetFileName(FileUtils.Preview, $"{date}.jpg");
         await image.SaveAsJpegAsync(path);
-
-        // 释放资源
-        image.Dispose();
 
         return new Picture
         {
@@ -203,11 +178,7 @@ public class PictureService(
             Thumbnail = path,
             ExposureTime = pic.ExposureTime,
             ExposureGain = pic.ExposureGain,
-            BlackLevel = pic.BlackLevel,
-            IsDelete = false,
-            CreateTime = DateTime.Now,
-            UpdateTime = DateTime.Now,
-            DeleteTime = DateTime.Now
+            BlackLevel = pic.BlackLevel
         };
     }
 

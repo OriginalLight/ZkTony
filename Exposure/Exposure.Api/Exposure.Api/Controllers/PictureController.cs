@@ -131,9 +131,7 @@ public class PictureController(
             }
 
             bitmap.Save(fullPath, imageFormat);
-
-            // 释放资源
-            bitmap.Dispose();
+            
         }
 
         // 记录日志

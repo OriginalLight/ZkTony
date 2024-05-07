@@ -1,6 +1,6 @@
 export default {
   'fqc.led.title': '三色灯FQC',
-  'fqc.led.cycle': '循环',
+  'fqc.led.cycle': '循环（绿-红-黄-黄快闪-黄慢闪）',
   'fqc.led.start': '开始',
   'fqc.machine.title': '下位机FQC',
   'fqc.machine.hatch': '舱门',

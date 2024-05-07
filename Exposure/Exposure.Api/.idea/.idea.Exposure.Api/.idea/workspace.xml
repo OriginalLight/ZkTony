@@ -17,8 +17,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="78ea7552-3107-4483-86a7-883cf6a7e7bd" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/gradle/libs.versions.toml" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/gradle/libs.versions.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/MachineController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/MachineController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/PictureController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/PictureController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Exposure.Api.csproj.user" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Exposure.Api.csproj.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Models/Picture.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Models/Picture.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/CameraService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/CameraService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/PictureService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/PictureService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Setup/Exposure.Setup.vdproj" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Setup/Exposure.Setup.vdproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Exposure.SqlSugar/Exposure.SqlSugar.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.SqlSugar/Exposure.SqlSugar.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Utilities/FileUtils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Utilities/FileUtils.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Utilities/OpenCvUtils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Utilities/OpenCvUtils.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/aging/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/aging/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/fqc/locale/en-US.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/fqc/locale/en-US.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/fqc/locale/zh-CN.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/fqc/locale/zh-CN.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/option/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/option/index.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,7 +98,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.smartKeys_rider&quot;,
     &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\ThinkBook\\AppData\\Local\\Programs\\Rider\\plugins\\javascript-impl\\jsLanguageServicesImpl\\external&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
@@ -100,10 +114,6 @@
   }
 }</component>
   <component name="RunManager" selected=".NET Launch Settings Profile.Development">
-    <configuration name="Publish Exposure.Api" type="DotNetFolderPublish" factoryName="Publish to folder">
-      <riderPublish configuration="Release" delete_existing_files="true" platform="Any CPU" runtime="win-x64" target_folder="$PROJECT_DIR$/Exposure.Api/bin/Release/net8.0/win-x64/publish" target_framework="net8.0" uuid_high="3617825066592587548" uuid_low="-9007917930747795288" />
-      <method v="2" />
-    </configuration>
     <configuration name="Exposure.Api: FolderProfile" type="DotNetMsBuildPublish" factoryName="Publish to IIS">
       <riderPublish configuration="Release" platform="Any CPU" publish_profile="FolderProfile.pubxml" pubxml_path="$PROJECT_DIR$/Exposure.Api/Properties/PublishProfiles/FolderProfile.pubxml" uuid_high="3617825066592587548" uuid_low="-9007917930747795288" />
       <method v="2" />
@@ -181,7 +191,6 @@
       <item itemvalue=".NET Launch Settings Profile.Production" />
       <item itemvalue="HTTP Request.All in Exposure.Api" />
       <item itemvalue="HTTP Request.Exposure.Api | #1" />
-      <item itemvalue="Publish to folder.Publish Exposure.Api" />
       <item itemvalue="Publish to IIS.Exposure.Api: FolderProfile" />
     </list>
     <recent_temporary>
@@ -283,6 +292,10 @@
       <workItem from="1714266317788" duration="123000" />
       <workItem from="1714266454454" duration="61000" />
       <workItem from="1714266528453" duration="200000" />
+      <workItem from="1714266738339" duration="19228000" />
+      <workItem from="1714354012593" duration="1356000" />
+      <workItem from="1714960905907" duration="11615000" />
+      <workItem from="1714985423875" duration="7132000" />
     </task>
     <servers />
   </component>

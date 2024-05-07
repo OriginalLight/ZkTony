@@ -21,7 +21,7 @@
               <template #actions>
                 <a-input-number
                   v-model="agingOptions.interval"
-                  :min="1"
+                  :min="5"
                   :max="1000"
                   :step="1"
                   mode="button"
@@ -56,7 +56,17 @@
               <a-list-item-meta :title="t('aging.switch')"></a-list-item-meta>
               <template #actions>
                 <a-space>
-                  <a-button type="primary" shape="round" @click="agingTest(agingOptions)">
+                  <a-button
+                    type="primary"
+                    shape="round"
+                    :disabled="
+                      !agingOptions.hatch &&
+                      !agingOptions.led &&
+                      !agingOptions.light &&
+                      !agingOptions.camera
+                    "
+                    @click="agingTest(agingOptions)"
+                  >
                     {{ t('aging.start') }}
                   </a-button>
                   <a-button
