@@ -54,6 +54,14 @@
         <a-card :title="t('option.camera')">
           <a-list>
             <a-list-item>
+              <a-list-item-meta :title="t('option.camera.correction')"></a-list-item-meta>
+              <template #actions>
+                <a-button type="primary" @click="handleImport">{{
+                  t('option.camera.correction.import')
+                }}</a-button>
+              </template>
+            </a-list-item>
+            <a-list-item>
               <a-list-item-meta :title="t('option.camera.expoTime')"></a-list-item-meta>
               <template #actions>
                 <a-input-group>
@@ -69,7 +77,7 @@
                   </a-input-number>
                   <a-button
                     type="primary"
-                    @click="handleOption('ExpoTime', String(option.expoTime), false)"
+                    @click="handleOption('ExpoTime', String(option.expoTime))"
                     >{{ t('option.set') }}</a-button
                   >
                 </a-input-group>
@@ -89,11 +97,9 @@
                   >
                     <template #suffix>%</template>
                   </a-input-number>
-                  <a-button
-                    type="primary"
-                    @click="handleOption('Gain', String(option.gain), false)"
-                    >{{ t('option.set') }}</a-button
-                  >
+                  <a-button type="primary" @click="handleOption('Gain', String(option.gain))">{{
+                    t('option.set')
+                  }}</a-button>
                 </a-input-group>
               </template>
             </a-list-item>
@@ -113,7 +119,7 @@
                   </a-input-number>
                   <a-button
                     type="primary"
-                    @click="handleOption('Temperature', String(option.temperature * 10), false)"
+                    @click="handleOption('Temperature', String(option.temperature * 10))"
                     >{{ t('option.set') }}</a-button
                   >
                 </a-input-group>
@@ -186,7 +192,7 @@
                     mode="button"
                     :min="-12800"
                     :max="12800"
-                    :step="12800"
+                    :step="200"
                   >
                     <template #suffix>Pulse</template>
                   </a-input-number>
@@ -224,6 +230,7 @@ import { useI18n } from 'vue-i18n'
 import { setOption, getAllOptions } from '@renderer/api/option'
 import { hatch } from '@renderer/api/machine'
 import { getPorts } from '@renderer/api/machine'
+import { importFile } from '@renderer/api/camera'
 import { Message } from '@arco-design/web-vue'
 
 const { t } = useI18n()
@@ -233,8 +240,8 @@ const option = ref({
   com1: 'None',
   com2: 'None',
   ports: ['COM1', 'COM2', 'COM3', 'COM4'],
-  expoTime: 1500,
-  gain: 3000,
+  expoTime: 30000,
+  gain: 500,
   temperature: -15,
   rotate: 0,
   roi: '0,1,0,1',
@@ -255,6 +262,15 @@ const handleOption = async (key: string, value: string, flag: boolean = true) =>
     }
   } catch (error) {
     Message.error(t('option.set.fail'))
+  }
+}
+
+const handleImport = async () => {
+  try {
+    await importFile()
+    Message.info(t('option.camera.correction.import.success'))
+  } catch (error) {
+    Message.error((error as Error).message)
   }
 }
 

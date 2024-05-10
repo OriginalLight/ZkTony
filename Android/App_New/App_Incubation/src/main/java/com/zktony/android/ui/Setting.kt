@@ -37,6 +37,7 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Numbers
 import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.Start
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.outlined.Analytics
@@ -870,7 +871,20 @@ fun ConfigList() {
             CircleTextField(
                 title = "摇床平面补偿",
                 value = string,
-                keyboardType = KeyboardType.Number
+                keyboardType = KeyboardType.Number,
+                trailingIcon = {
+                    ElevatedButton(modifier = Modifier.padding(horizontal = 16.dp), onClick = {
+                        scope.launch {
+                            writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
+                            delay(300L)
+                            writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
+                            delay(3500L)
+                            writeRegister(startAddr = 222, slaveAddr = 0, value = (value * 6400).toLong())
+                        }
+                    }) {
+                        Icon(imageVector = Icons.Default.Start, contentDescription = null)
+                    }
+                }
             ) {
                 scope.launch {
                     string = it
@@ -886,7 +900,20 @@ fun ConfigList() {
             CircleTextField(
                 title = "摇床低点补偿",
                 value = string,
-                keyboardType = KeyboardType.Number
+                keyboardType = KeyboardType.Number,
+                trailingIcon = {
+                    ElevatedButton(modifier = Modifier.padding(horizontal = 16.dp), onClick = {
+                        scope.launch {
+                            writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
+                            delay(300L)
+                            writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
+                            delay(3500L)
+                            writeRegister(startAddr = 222, slaveAddr = 0, value = (value * 6400).toLong())
+                        }
+                    }) {
+                        Icon(imageVector = Icons.Default.Start, contentDescription = null)
+                    }
+                }
             ) {
                 scope.launch {
                     string = it

@@ -11,7 +11,8 @@ namespace Exposure.Api.Controllers;
 public class OptionController(
     IOptionService option,
     ISerialPortService serialPort,
-    IAudioService audio) : ControllerBase
+    IAudioService audio,
+    ICameraService camera) : ControllerBase
 {
     #region 读取
 
@@ -47,8 +48,8 @@ public class OptionController(
     {
         // 设置
         var res = await option.SetOptionValueAsync(dto.Key, dto.Value);
-        Log.Information("设置参数：" + dto.Key + " = " + dto.Value);
         if (res) SetOptionValueHook(dto.Key, dto.Value);
+        Log.Information("设置参数：" + dto.Key + " = " + dto.Value);
         return Ok(res);
     }
 
@@ -76,7 +77,20 @@ public class OptionController(
                         audio.Play("Assets/Voices/Voice.wav");
                         break;
                 }
-
+                break;
+            case "Temperature":
+                if (camera.Camera != null)
+                {
+                    var temp = short.Parse(value);
+                    camera.Camera.put_Temperature(temp);
+                }
+                break;
+            case "Gain":
+                if (camera.Camera != null)
+                {
+                    var gain = ushort.Parse(value);
+                    camera.Camera.put_ExpoAGain(gain);
+                }
                 break;
         }
     }

@@ -270,11 +270,11 @@ public class MachineController(
         catch (Exception e)
         {
             errorLog.AddErrorLog(e);
-            Log.Error(e, localizer.GetString("Error0012").Value);
+            Log.Error(e, "舱门自检失败");
             serialPort.WritePort("Com1", DefaultProtocol.LedRed().ToBytes());
             serialPort.SetFlag("led", 5);
             audio.PlayWithSwitch("Error");
-            return Problem(e.Message);
+            return Problem(localizer.GetString("Error0012").Value);
         }
 
         // 相机自检
@@ -285,11 +285,11 @@ public class MachineController(
         catch (Exception e)
         {
             errorLog.AddErrorLog(e);
-            Log.Error(e, localizer.GetString("Error0013").Value);
+            Log.Error(e, "相机自检失败");
             serialPort.WritePort("Com1", DefaultProtocol.LedRed().ToBytes());
             serialPort.SetFlag("led", 5);
             audio.PlayWithSwitch("Error");
-            return Problem(localizer.GetString("Error0012").Value + "-" + e.Message);
+            return Problem(localizer.GetString("Error0013").Value);
         }
 
         // 灯光自检
@@ -298,7 +298,7 @@ public class MachineController(
             await camera.PreviewAsync();
             await Task.Delay(1000);
             var res = await camera.GetCacheAsync();
-            if (res.Count == 0) return Problem(localizer.GetString("Error0014").Value);
+            if (res.Count == 0) throw new Exception(localizer.GetString("Error0014").Value);
             var img = res[0];
             var mat = new Mat(img.Path);
             var gray = new Mat();
@@ -315,13 +315,13 @@ public class MachineController(
         catch (Exception e)
         {
             errorLog.AddErrorLog(e);
-            Log.Error(e, localizer.GetString("Error0014").Value);
+            Log.Error(e, "灯光自检失败");
             serialPort.WritePort("Com1", DefaultProtocol.LedRed().ToBytes());
             serialPort.SetFlag("led", 5);
             audio.PlayWithSwitch("Error");
-            return Problem(localizer.GetString("Error0014").Value + "-" + e.Message);
+            return Problem(localizer.GetString("Error0014").Value);
         }
-
+        
         audio.PlayWithSwitch("Start");
         return Ok();
     }

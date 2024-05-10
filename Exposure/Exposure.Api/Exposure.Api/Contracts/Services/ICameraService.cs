@@ -4,6 +4,12 @@ namespace Exposure.Api.Contracts.Services;
 
 public interface ICameraService
 {
+    
+    /// <summary>
+    ///     相机
+    /// </summary>
+    Nncam? Camera { get; }
+    
     /// <summary>
     ///     初始化 0: 成功 1: 无设备 2: 打开失败
     /// </summary>
@@ -76,4 +82,16 @@ public interface ICameraService
     /// <param name="number"></param>
     /// <returns></returns>
     Task Collect(int start, int interval, int number);
+
+    /// <summary>
+    ///     加载畸形矫正字典
+    /// </summary>
+    /// <returns></returns>
+    Task LoadCalibration();
+
+    /// <summary>
+    ///     加载矫正
+    /// </summary>
+    /// <returns></returns>
+    Task LoadCorrection();
 }

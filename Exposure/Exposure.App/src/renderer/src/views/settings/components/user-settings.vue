@@ -44,6 +44,19 @@
           </a-button>
         </template>
       </a-list-item>
+      <a-list-item>
+        <a-list-item-meta :title="t('settings.system.version.title')">
+          <template #avatar>
+            <icon-question-circle size="20" />
+          </template>
+        </a-list-item-meta>
+        <template #actions>
+          <a-space>
+            <a-tag v-if="version.ver2 != ''"> {{ version.ver2 }} </a-tag>
+            <a-tag v-if="version.ver1 != ''"> {{ version.ver1 }} </a-tag>
+          </a-space>
+        </template>
+      </a-list-item>
     </a-list>
   </a-card>
 
@@ -120,12 +133,13 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@renderer/store'
 import { Message } from '@arco-design/web-vue'
 import { updateUser } from '@renderer/api/user'
+import { varsion } from '@renderer/api/machine'
 
 const { t } = useI18n()
 const userStore = useUserStore()
@@ -138,6 +152,11 @@ const form = reactive({
   oldPassword: '',
   newPassword: '',
   confirmPassword: ''
+})
+
+const version = ref({
+  ver1: '',
+  ver2: ''
 })
 
 // 根据role值返回对应的角色名称
@@ -221,6 +240,17 @@ const handleOperlog = () => {
 const handleManage = () => {
   router.push('/user-manage')
 }
+
+onMounted(async () => {
+  const res = await varsion()
+  const ver = res.data
+  if (ver.Ver1) {
+    version.value.ver1 = ver.Ver1
+  }
+  if (ver.Ver2) {
+    version.value.ver2 = ver.Ver2
+  }
+})
 </script>
 
 <style lang="less" scoped>

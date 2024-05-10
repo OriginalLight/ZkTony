@@ -1,11 +1,10 @@
-﻿using System.Drawing;
-using System.Drawing.Imaging;
-using Exposure.Api.Contracts.Services;
+﻿using Exposure.Api.Contracts.Services;
 using Exposure.Api.Models;
 using Exposure.Api.Models.Dto;
 using Exposure.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using OpenCvSharp;
 using Serilog;
 using SqlSugar;
 
@@ -110,14 +109,7 @@ public class PictureController(
         Directory.CreateDirectory(path);
         foreach (var pic in list)
         {
-            var bitmap = new Bitmap(pic.Path);
-            var imageFormat = dto.Format switch
-            {
-                "jpg" => ImageFormat.Jpeg,
-                "png" => ImageFormat.Png,
-                "tiff" => ImageFormat.Tiff,
-                _ => ImageFormat.Tiff
-            };
+            var mat = new Mat(pic.Path, ImreadModes.AnyDepth);
 
             // 保存图片
             var filename = $"{pic.Name}.{dto.Format}";
@@ -130,8 +122,7 @@ public class PictureController(
                 counter++;
             }
 
-            bitmap.Save(fullPath, imageFormat);
-            
+            mat.SaveImage(fullPath);
         }
 
         // 记录日志

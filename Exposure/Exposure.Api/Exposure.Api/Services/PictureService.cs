@@ -80,8 +80,8 @@ public class PictureService(
 
     public async Task<Picture> Combine(Picture pic1, Picture pic2)
     {
-        var mat1 = new Mat(pic1.Path, ImreadModes.Grayscale);
-        var mat2 = new Mat(pic2.Path, ImreadModes.Grayscale);
+        var mat1 = new Mat(pic1.Path, ImreadModes.AnyDepth);
+        var mat2 = new Mat(pic2.Path, ImreadModes.AnyDepth);
         var mat = new Mat();
         if (pic1.Type == 1)
         {
@@ -98,19 +98,21 @@ public class PictureService(
         var date = DateTime.Now.ToString("yyyyMMddHHmmss");
 
         // 保存图片
-        var exposure = FileUtils.GetFileName(FileUtils.Exposure, $"{date}.png");
-        mat.SaveImage(exposure);
+        var path = FileUtils.GetFileName(FileUtils.Exposure, $"{date}.png");
+        mat.SaveImage(path);
 
         // 保存缩略图
-        Cv2.Resize(mat, mat, new Size(500, 500));
+        var thumb = new Mat();
+        Cv2.ConvertScaleAbs(mat, thumb, 255 / 65535.0);
+        Cv2.Resize(thumb, thumb, new Size(500, 500));
         var thumbnail = FileUtils.GetFileName(FileUtils.Thumbnail, $"{date}.jpg");
-        mat.SaveImage(thumbnail);
+        thumb.SaveImage(thumbnail);
 
         return await AddReturnModel(new Picture
         {
             UserId = user.GetLogged()?.Id ?? 0,
             Name = date,
-            Path = exposure,
+            Path = path,
             Width = mat.Width,
             Height = mat.Height,
             Type = 2,

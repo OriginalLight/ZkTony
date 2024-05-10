@@ -1,4 +1,5 @@
 ﻿using Exposure.Api.Contracts.Services;
+using Exposure.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Serilog;
@@ -11,6 +12,7 @@ public class CameraController(
     ICameraService camera,
     IOperLogService operLog,
     IAudioService audio,
+    IUsbService usb,
     IStringLocalizer<SharedResources> localizer) : ControllerBase
 {
     private CancellationTokenSource? _cts;
@@ -23,7 +25,6 @@ public class CameraController(
     {
         // 初始化
         await camera.InitAsync();
-        Log.Information("初始化相机");
         return Ok();
     }
 
@@ -38,7 +39,6 @@ public class CameraController(
         // 预览
         await camera.PreviewAsync();
         operLog.AddOperLog(localizer.GetString("Preview").Value, localizer.GetString("Success").Value);
-        Log.Information("预览");
         return Ok();
     }
 
@@ -52,7 +52,6 @@ public class CameraController(
     {
         // 设置像素
         await camera.SetPixel((uint)index);
-        Log.Information($"设置分辨率: {index}");
         return Ok();
     }
 
@@ -69,7 +68,6 @@ public class CameraController(
         audio.PlayWithSwitch("Shot");
         var res = await camera.TakeAutoPhotoAsync(_cts.Token);
         operLog.AddOperLog(localizer.GetString("AutoShot").Value, localizer.GetString("Success").Value);
-        Log.Information("自动拍照");
         return Ok(res);
     }
 
@@ -86,7 +84,6 @@ public class CameraController(
         audio.PlayWithSwitch("Shot");
         await camera.TakeManualPhotoAsync(exposure, frame, _cts.Token);
         operLog.AddOperLog(localizer.GetString("ManualShot").Value, localizer.GetString("Success").Value);
-        Log.Information("手动拍照");
         return Ok();
     }
 
@@ -102,7 +99,6 @@ public class CameraController(
         await camera.CancelTask();
         audio.PlayWithSwitch("CancelShot");
         operLog.AddOperLog(localizer.GetString("CancelShot").Value, localizer.GetString("Success").Value);
-        Log.Information("取消拍照");
         return Ok();
     }
 
@@ -116,7 +112,6 @@ public class CameraController(
     {
         // 获取温度
         var cache = await camera.GetCacheAsync();
-        Log.Information("获取缓存图片");
         return Ok(cache);
     }
 
@@ -131,6 +126,49 @@ public class CameraController(
         // 获取温度
         await camera.Collect(start, interval, number);
         Log.Information("照片采集");
+        return Ok();
+    }
+
+    #endregion
+
+    #region 导入校正文件
+
+    [HttpGet]
+    [Route("Import")]
+    public async Task<IActionResult> Import()
+    {
+        // 导入校正文件
+        // 获取U盘
+        var usb1 = usb.GetDefaultUsbDrive();
+        if (usb1 == null) throw new Exception(localizer.GetString("NoUsb").Value);
+        // 获取日志
+        var correction = Path.Combine(usb1.Name, "Correction");
+        if (!Directory.Exists(correction))
+        {
+            throw new Exception(localizer.GetString("NotFound").Value);
+        }
+        
+        var files = Directory.GetFiles(correction);
+        
+        var appCorrection = Path.Combine(FileUtils.AppLocation, @"Assets\Correction");
+        if (!Directory.Exists(appCorrection))
+        {
+            Directory.CreateDirectory(appCorrection);
+        }
+        
+        foreach (var file in files)
+        {
+            var dest = Path.Combine(appCorrection, Path.GetFileName(file));
+            if (System.IO.File.Exists(dest))
+            {
+                System.IO.File.Delete(dest);
+            }
+            System.IO.File.Copy(file, dest);
+        }
+        
+        await camera.LoadCalibration();
+        await camera.LoadCorrection();
+        
         return Ok();
     }
 

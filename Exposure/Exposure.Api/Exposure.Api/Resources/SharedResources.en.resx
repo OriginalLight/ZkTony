@@ -156,8 +156,8 @@
     <value>0x0003 Failed to set temperature</value>
   </data>
     <data name="Error0004" xml:space="preserve">
-    <value>0x0004 Failed to set mode</value>
-  </data>
+      <value>0x0004 Failed to set option</value>
+    </data>
     <data name="Error0005" xml:space="preserve">
     <value>0x0005 Failed to set automatic exposure</value>
   </data>
@@ -263,4 +263,10 @@
     <data name="SizeInconsistency" xml:space="preserve">
     <value>Size inconsistency</value>
   </data>
+    <data name="Error0015" xml:space="preserve">
+      <value>0x0015 Camera calibration, please try again later</value>
+    </data>
+    <data name="Error0016" xml:space="preserve">
+      <value>0x0016 Camera correction failed</value>
+    </data>
 </root>

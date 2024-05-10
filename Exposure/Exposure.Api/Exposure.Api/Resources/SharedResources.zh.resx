@@ -156,8 +156,8 @@
     <value>0x0003 设置温度失败</value>
   </data>
     <data name="Error0004" xml:space="preserve">
-    <value>0x0004 设置模式失败</value>
-  </data>
+      <value>0x0004 设置参数失败</value>
+    </data>
     <data name="Error0005" xml:space="preserve">
     <value>0x0005 自动曝光设置失败</value>
   </data>
@@ -255,12 +255,18 @@
     <value>0x0013 相机自检失败</value>
   </data>
     <data name="Error0014" xml:space="preserve">
-    <value>0x0013 闪光灯自检失败</value>
-  </data>
+      <value>0x0014 闪光灯自检失败</value>
+    </data>
     <data name="Combine" xml:space="preserve">
     <value>合成</value>
   </data>
     <data name="SizeInconsistency" xml:space="preserve">
     <value>尺寸不一致</value>
   </data>
+    <data name="Error0015" xml:space="preserve">
+      <value>0x0015 相机校正中，请稍后重试</value>
+    </data>
+    <data name="Error0016" xml:space="preserve">
+      <value>0x0016 相机校正失败</value>
+    </data>
 </root>

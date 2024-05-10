@@ -43,3 +43,8 @@ export function cancel() {
 export function result() {
   return axios.get<Picture[]>('/Camera/Result')
 }
+
+// 导入
+export function importFile() {
+  return axios.get('/Camera/Import')
+}

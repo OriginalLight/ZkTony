@@ -1,4 +1,5 @@
-﻿using OpenCvSharp;
+﻿using Newtonsoft.Json.Linq;
+using OpenCvSharp;
 using Serilog;
 
 namespace Exposure.Utilities;
@@ -7,7 +8,7 @@ public static class OpenCvUtils
 {
     #region 相机标定
 
-    public static Mat Calibrate(Mat src)
+    public static Mat Calibrate(Mat src, Dictionary<string, Object> dic)
     {
         InputArray cameraMatrix;
         InputArray distCoeffs;
@@ -16,46 +17,91 @@ public static class OpenCvUtils
         {
             // 3000 分辨率
             case { Width: 2992, Height: 3000 }:
-                cameraMatrix = InputArray.Create(new[,]
+                var m1 = dic["Matrix_3000"].ToString();
+                var c1 = dic["Coeffs_3000"].ToString();
+                if (m1 != null && c1 != null)
                 {
-                    { 32496.711712725566, 0.0, 1734.5242659467344 }, { 0.0, 32535.746862601714, 1529.9190608439628 },
-                    { 0.0, 0.0, 1.0 }
-                });
-                distCoeffs = InputArray.Create([
-                    -12.179942261102948, 296.5151127295539, 0.01769078563352507, -0.08133542425690382, 1.1848142136842608
-                ]);
+                    var m1d = JArray.Parse(m1).ToObject<double[,]>();
+                    var c1d = JArray.Parse(c1).ToObject<double[]>();
+                    if (m1d == null || c1d == null)
+                    {
+                        Log.Error("相机标定参数为空");
+                        return src;
+                    }
+                    cameraMatrix = InputArray.Create(m1d);
+                    distCoeffs = InputArray.Create(c1d);
+                }
+                else
+                {
+                    Log.Error("相机标定参数为空");
+                    return src;
+                }
+
                 break;
             // 1500 分辨率
             case { Width: 1488, Height: 1500 }:
-                cameraMatrix = InputArray.Create(new[,]
+                var m2 = dic["Matrix_1500"].ToString();
+                var c2 = dic["Coeffs_1500"].ToString();
+                if (m2 != null && c2 != null)
                 {
-                    { 25795.548909748555, 0.0, 686.6541437350486 }, { 0.0, 25800.379936849415, 824.144008293167 },
-                    { 0.0, 0.0, 1.0 }
-                });
-                distCoeffs = InputArray.Create([
-                    -32.05268777310819, 2521.411049776186, -0.03996092095458863, 0.06814315060093115, 4.013535803259616
-                ]);
+                    var m2d = JArray.Parse(m2).ToObject<double[,]>();
+                    var c2d = JArray.Parse(c2).ToObject<double[]>();
+                    if (m2d == null || c2d == null)
+                    {
+                        Log.Error("相机标定参数为空");
+                        return src;
+                    }
+                    cameraMatrix = InputArray.Create(m2d);
+                    distCoeffs = InputArray.Create(c2d);
+                }
+                else
+                {
+                    Log.Error("相机标定参数为空");
+                    return src;
+                }
                 break;
             // 1000 分辨率
             case { Width: 992, Height: 998 }:
-                cameraMatrix = InputArray.Create(new[,]
+                var m3 = dic["Matrix_1000"].ToString();
+                var c3 = dic["Coeffs_1000"].ToString();
+                if (m3 != null && c3 != null)
                 {
-                    { 19985.133007483306, 0.0, 528.9050071145448 }, { 0.0, 19992.591456530063, 485.4081596993531 },
-                    { 0.0, 0.0, 1.0 }
-                });
-                distCoeffs = InputArray.Create([
-                    -40.85361568317635, 1633.8466631639812, 0.07771399552774197, -0.06761371171905543, 1.3797482065075937
-                ]);
+                    var m3d = JArray.Parse(m3).ToObject<double[,]>();
+                    var c3d = JArray.Parse(c3).ToObject<double[]>();
+                    if (m3d == null || c3d == null)
+                    {
+                        Log.Error("相机标定参数为空");
+                        return src;
+                    }
+                    cameraMatrix = InputArray.Create(m3d);
+                    distCoeffs = InputArray.Create(c3d);
+                }
+                else
+                {
+                    Log.Error("相机标定参数为空");
+                    return src;
+                }
                 break;
             default:
-                cameraMatrix = InputArray.Create(new[,]
+                var m4 = dic["Matrix_3000"].ToString();
+                var c4 = dic["Coeffs_3000"].ToString();
+                if (m4 != null && c4 != null)
                 {
-                    { 32496.711712725566, 0.0, 1734.5242659467344 }, { 0.0, 32535.746862601714, 1529.9190608439628 },
-                    { 0.0, 0.0, 1.0 }
-                });
-                distCoeffs = InputArray.Create([
-                    -12.179942261102948, 296.5151127295539, 0.01769078563352507, -0.08133542425690382, 1.1848142136842608
-                ]);
+                    var m4d = JArray.Parse(m4).ToObject<double[,]>();
+                    var c4d = JArray.Parse(c4).ToObject<double[]>();
+                    if (m4d == null || c4d == null)
+                    {
+                        Log.Error("相机标定参数为空");
+                        return src;
+                    }
+                    cameraMatrix = InputArray.Create(m4d);
+                    distCoeffs = InputArray.Create(c4d);
+                }
+                else
+                {
+                    Log.Error("相机标定参数为空");
+                    return src;
+                }
                 break;
         }
 
@@ -68,6 +114,7 @@ public static class OpenCvUtils
         // 裁剪图片并返回原始尺寸
         var res = new Mat();
         Cv2.Resize(mask[roi], res, src.Size());
+        Log.Information("图片标定成功");
         return res;
     }
 
@@ -126,11 +173,11 @@ public static class OpenCvUtils
         // 转换成CV_64FC4
         var mat3 = new Mat();
         var mat4 = new Mat();
-        mat1.ConvertTo(mat3, MatType.CV_64FC4, 1.0 / 255);
-        mat2.ConvertTo(mat4, MatType.CV_64FC4, 1.0 / 255);
+        mat1.ConvertTo(mat3, MatType.CV_64FC4, 1.0 / 65535);
+        mat2.ConvertTo(mat4, MatType.CV_64FC4, 1.0 / 65535);
         var dst = new Mat();
         Cv2.Multiply(mat3, mat4, dst);
-        dst.ConvertTo(dst, baseType, 255);
+        dst.ConvertTo(dst, baseType, 65535);
         return dst;
     }
 

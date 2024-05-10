@@ -293,8 +293,11 @@ const handleQualityChange = async (value: unknown) => {
   } catch (error) {
     Message.error((error as Error).message)
   } finally {
-    disabled.value.shot = false
-    disabled.value.preview = false
+    // 如果舱门未打开，拍摄和预览按钮可用
+    if (!appStore.hatch) {
+      disabled.value.shot = false
+      disabled.value.preview = false
+    }
     disabled.value.quality = false
   }
 }
@@ -351,7 +354,7 @@ const handleShoot = async () => {
       options.value.time.millisecond = Math.floor(ms % 1000)
     } else {
       progress.value.message = t('home.camera.options.shooting')
-      progress.value.time = exposureTime.value / 1000 + 2000
+      progress.value.time = exposureTime.value / 1000 + 2500
       await manual({
         exposure: exposureTime.value,
         frame: options.value.frame

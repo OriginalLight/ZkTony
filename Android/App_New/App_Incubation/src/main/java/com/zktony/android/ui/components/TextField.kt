@@ -36,7 +36,9 @@ fun CircleTextField(
     title: String,
     value: String,
     keyboardType: KeyboardType = KeyboardType.Decimal,
+    trailingIcon:  @Composable (() -> Unit)? = null,
     onValueChange: (String) -> Unit = {}
+
 ) {
     val softKeyboard = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
@@ -77,6 +79,7 @@ fun CircleTextField(
             fontSize = 20.sp,
             fontFamily = FontFamily.Monospace,
         ),
+        trailingIcon = trailingIcon
     )
 }
 
