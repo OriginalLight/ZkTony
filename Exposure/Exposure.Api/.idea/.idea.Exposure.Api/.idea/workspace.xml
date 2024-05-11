@@ -17,35 +17,29 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="78ea7552-3107-4483-86a7-883cf6a7e7bd" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Exposure.Api/Assets/Correction/Calibration.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Exposure.Api/Assets/Correction/DFC_1000.dfc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Exposure.Api/Assets/Correction/DFC_1500.dfc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Exposure.Api/Assets/Correction/DFC_3000.dfc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Android/App_Incubation/App/src/main/java/com/zktony/android/ui/Setting.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_Incubation/App/src/main/java/com/zktony/android/ui/Setting.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Android/App_Incubation/App/src/main/java/com/zktony/android/ui/components/TextField.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_Incubation/App/src/main/java/com/zktony/android/ui/components/TextField.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/ui/Setting.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/ui/Setting.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/ui/components/TextField.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/ui/components/TextField.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Contracts/Services/ICameraService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Contracts/Services/ICameraService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api.sln.DotSettings.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Contracts/Services/IErrorLogService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Contracts/Services/IErrorLogService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Contracts/Services/IOperLogService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Contracts/Services/IOperLogService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Contracts/Services/IStorageService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Contracts/Services/IStorageService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/CameraController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/CameraController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/ErrorLogController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/ErrorLogController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/MachineController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/MachineController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/MetricController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/MetricController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/OperLogController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/OperLogController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/OptionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/OptionController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/PictureController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/PictureController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Exposure.Api.http" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Exposure.Api.http" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Resources/SharedResources.en.resx" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Resources/SharedResources.en.resx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Resources/SharedResources.zh.resx" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Resources/SharedResources.zh.resx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Exposure.Api.csproj.user" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Exposure.Api.csproj.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/ApplicationHostService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/ApplicationHostService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/CameraService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/CameraService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/ErrorLogService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/ErrorLogService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/OperLogService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/OperLogService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/OptionService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/OptionService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/PictureService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/PictureService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/SerialPortService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/SerialPortService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/StorageService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/StorageService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Exposure.Api/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/appsettings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Utilities/Exposure.Utilities.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Utilities/Exposure.Utilities.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Utilities/OpenCvUtils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Utilities/OpenCvUtils.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/api/camera.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/api/camera.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/home/components/camera-options.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/home/components/camera-options.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/components/factory-settings.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/components/factory-settings.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/components/user-settings.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/components/user-settings.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/option/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/option/index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/option/locale/zh-CN.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../Exposure.App/src/renderer/src/views/settings/subpage/option/locale/zh-CN.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.SqlSugar/AppDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.SqlSugar/AppDbContext.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,6 +65,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/891a5c25823c4eeda76705f52719aef02ad600/6b/20a50cb7/AdoProvider.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8e7d133a4bc14e71834005a023e0390222600/a5/46f7e32e/LoggerConfiguration.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/1f75784e73e851b61dc0a47593745082d7ec10c118ac134b7eec36b91b2f46/MiniExcel.Async.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/bd1d5c50194fea68ff3559c160230b0ab50f5acf4ce3061bffd6d62958e2182/ExceptionDispatchInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Exposure.Api/obj/Debug/net8.0/Exposure.Api.AssemblyInfo.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
@@ -310,7 +305,7 @@
       <workItem from="1714960905907" duration="11615000" />
       <workItem from="1714985423875" duration="7132000" />
       <workItem from="1715058782755" duration="5229000" />
-      <workItem from="1715132552693" duration="55339000" />
+      <workItem from="1715132552693" duration="62838000" />
     </task>
     <servers />
   </component>

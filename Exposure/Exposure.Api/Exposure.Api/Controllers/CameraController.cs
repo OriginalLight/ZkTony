@@ -143,32 +143,23 @@ public class CameraController(
         if (usb1 == null) throw new Exception(localizer.GetString("NoUsb").Value);
         // 获取日志
         var correction = Path.Combine(usb1.Name, "Correction");
-        if (!Directory.Exists(correction))
-        {
-            throw new Exception(localizer.GetString("NotFound").Value);
-        }
-        
+        if (!Directory.Exists(correction)) throw new Exception(localizer.GetString("NotFound").Value);
+
         var files = Directory.GetFiles(correction);
-        
+
         var appCorrection = Path.Combine(FileUtils.AppLocation, @"Assets\Correction");
-        if (!Directory.Exists(appCorrection))
-        {
-            Directory.CreateDirectory(appCorrection);
-        }
-        
+        if (!Directory.Exists(appCorrection)) Directory.CreateDirectory(appCorrection);
+
         foreach (var file in files)
         {
             var dest = Path.Combine(appCorrection, Path.GetFileName(file));
-            if (System.IO.File.Exists(dest))
-            {
-                System.IO.File.Delete(dest);
-            }
+            if (System.IO.File.Exists(dest)) System.IO.File.Delete(dest);
             System.IO.File.Copy(file, dest);
         }
-        
+
         await camera.LoadCalibration();
         await camera.LoadCorrection();
-        
+
         return Ok();
     }
 

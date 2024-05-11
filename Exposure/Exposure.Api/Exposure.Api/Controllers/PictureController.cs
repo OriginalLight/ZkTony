@@ -150,6 +150,7 @@ public class PictureController(
             operLog.AddOperLog(localizer.GetString("Adjust").Value,
                 $"{localizer.GetString("Picture").Value}：id = " + dto.Id);
         }
+
         Log.Information("调整图片");
         return Ok(res);
     }

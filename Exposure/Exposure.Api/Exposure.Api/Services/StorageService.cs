@@ -5,14 +5,15 @@ using Serilog;
 namespace Exposure.Api.Services;
 
 public class StorageService(
-    IErrorLogService errorLog
+    IErrorLogService errorLog,
+    IOperLogService operLog
 ) : IStorageService
 {
     #region 清理预览图
 
-    public async Task CleanPreviewAsync()
+    public async Task ClearStorageAsync()
     {
-        await Task.Run(() =>
+        await Task.Run(async () =>
         {
             //删除文件夹里面的所有文件
             try
@@ -29,6 +30,13 @@ public class StorageService(
                 errorLog.AddErrorLog(e);
                 Log.Error(e, "清空预览图失败");
             }
+            
+            // 自动清理错误日志
+            await errorLog.AutoClear();
+            Log.Information("自动清理错误日志");
+            // 自动清理操作日志
+            await operLog.AutoClear();
+            Log.Information("自动清理操作日志");
         });
     }
 

@@ -9,8 +9,8 @@ namespace Exposure.Api.Services;
 public class ErrorLogService(IDbContext dbContext) : BaseService<ErrorLog>(dbContext), IErrorLogService
 {
     private readonly IDbContext _context = dbContext;
-
-
+    
+    
     #region 创建崩溃日志
 
     public void AddErrorLog(Exception ex)
@@ -48,5 +48,14 @@ public class ErrorLogService(IDbContext dbContext) : BaseService<ErrorLog>(dbCon
         return await _context.db.Queryable<ErrorLog>().Where(p => ids.Contains(p.Id)).ToListAsync();
     }
 
+    #endregion
+    
+    #region 自动清理
+    
+    public async Task AutoClear()
+    {
+        await _context.db.Deleteable<ErrorLog>().Where(p => p.Time < DateTime.Now.AddDays(-30)).ExecuteCommandAsync();
+    }
+    
     #endregion
 }

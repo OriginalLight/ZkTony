@@ -60,9 +60,9 @@ public class PictureService(
     }
 
     #endregion
-    
+
     #region 删除多条数据
-    
+
     public async Task<bool> DeleteByIds(object[] keys)
     {
         var list = await _context.db.Queryable<Picture>().Where(p => keys.Contains(p.Id)).ToListAsync();
@@ -71,9 +71,10 @@ public class PictureService(
             FileUtils.DeleteFile(item.Path);
             FileUtils.DeleteFile(item.Thumbnail);
         }
+
         return await _context.db.Deleteable<Picture>().In(keys).ExecuteCommandHasChangeAsync();
     }
-    
+
     #endregion
 
     #region 合并图片
@@ -116,7 +117,7 @@ public class PictureService(
             Width = mat.Width,
             Height = mat.Height,
             Type = 2,
-            Thumbnail = thumbnail,
+            Thumbnail = thumbnail
         });
     }
 

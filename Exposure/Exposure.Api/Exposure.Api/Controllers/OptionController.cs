@@ -26,9 +26,9 @@ public class OptionController(
     }
 
     #endregion
-    
+
     #region 读取所有
-    
+
     [HttpGet("All")]
     public async Task<ActionResult> GetAll()
     {
@@ -37,7 +37,7 @@ public class OptionController(
         Log.Information("获取所有参数");
         return Ok(res);
     }
-    
+
     #endregion
 
 
@@ -77,6 +77,7 @@ public class OptionController(
                         audio.Play("Assets/Voices/Voice.wav");
                         break;
                 }
+
                 break;
             case "Temperature":
                 if (camera.Camera != null)
@@ -84,6 +85,7 @@ public class OptionController(
                     var temp = short.Parse(value);
                     camera.Camera.put_Temperature(temp);
                 }
+
                 break;
             case "Gain":
                 if (camera.Camera != null)
@@ -91,6 +93,7 @@ public class OptionController(
                     var gain = ushort.Parse(value);
                     camera.Camera.put_ExpoAGain(gain);
                 }
+
                 break;
         }
     }

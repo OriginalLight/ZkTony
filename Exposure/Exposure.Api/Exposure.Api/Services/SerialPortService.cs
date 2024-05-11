@@ -148,18 +148,20 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
             Log.Information("已经打开串口: " + alias);
             return;
         }
+
         var portName = await option.GetOptionValueAsync(alias);
         if (portName == null)
         {
             Log.Information("找不到串口号: " + alias);
             return;
         }
+
         if (_serialPorts.Any(kv => kv.Value.PortName == portName))
         {
             Log.Information("已经打开串口: " + portName);
             return;
         }
-        
+
         SerialPort serialPort = new(portName, 115200, Parity.None, 8, StopBits.One);
         try
         {

@@ -27,7 +27,7 @@ public class ApplicationHostService(
                 typeof(Option));
             await serialPortService.InitAsync();
             await userService.InitializeAsync();
-            await storageService.CleanPreviewAsync();
+            await storageService.ClearStorageAsync();
             await usbService.InitializeAsync();
         }
 

@@ -31,10 +31,9 @@ public class AppDbContext : IDbContext
 
         // Dev环境打印sql
         if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
-            db.Aop.OnLogExecuting = (sql, paramster) =>
+            db.Aop.OnLogExecuting = (sql, _) =>
             {
-                Log.Information(sql + "\r\n" +
-                                       $"{db.Utilities.SerializeObject(paramster.ToDictionary(it => it.ParameterName, it => it.Value))} \r\n");
+                Log.Information(sql);
             };
     }
 

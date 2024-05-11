@@ -25,6 +25,7 @@ public class MachineController(
     /**
      * led 0 全关， 1 绿色， 2 黄色， 3 黄慢闪， 4 黄快闪， 5 红色
      */
+
     #region 串口状态
 
     [HttpGet]
@@ -106,7 +107,7 @@ public class MachineController(
             serialPort.WritePort("Com1", DefaultProtocol.LedYellowFastFlash().ToBytes());
             serialPort.SetFlag("led", 4);
         }
-        
+
         if (code == 1)
         {
             serialPort.SetFlag("hatch", 0);
@@ -117,14 +118,12 @@ public class MachineController(
                 num++;
                 await Task.Delay(100);
                 if (num >= 40 && num % 2 == 0)
-                {
                     serialPort.WritePort("Com2", DefaultProtocol.QueryOptocoupler().ToBytes());
-                }
             }
 
             if (num >= 50)
                 return Problem(localizer.GetString("OpenHatch").Value + localizer.GetString("Failure").Value);
-            
+
             serialPort.SetFlag("hatch", 1);
             Log.Information(localizer.GetString("OpenHatch").Value);
         }
@@ -144,7 +143,9 @@ public class MachineController(
             serialPort.SetFlag("hatch", 0);
             Log.Information(localizer.GetString("CloseHatch").Value);
         }
-        operLog.AddOperLog(localizer.GetString("OpenHatch").Value, code == 0 ? localizer.GetString("CloseHatch").Value : localizer.GetString("OpenHatch").Value);
+
+        operLog.AddOperLog(localizer.GetString("OpenHatch").Value,
+            code == 0 ? localizer.GetString("CloseHatch").Value : localizer.GetString("OpenHatch").Value);
         serialPort.WritePort("Com1", DefaultProtocol.LedAllClose().ToBytes());
         serialPort.SetFlag("led", 0);
 
@@ -216,16 +217,17 @@ public class MachineController(
     [Route("Version")]
     public ActionResult Version()
     {
-        var ver1 = (Assembly.GetEntryAssembly() ?? throw new InvalidOperationException()).GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+        var ver1 = (Assembly.GetEntryAssembly() ?? throw new InvalidOperationException())
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
             ?.InformationalVersion;
         var ver2 = serialPort.GetVer();
-        
+
         var dict = new Dictionary<string, string?>
         {
-            {"Ver1", ver1},
-            {"Ver2", ver2}
+            { "Ver1", ver1 },
+            { "Ver2", ver2 }
         };
-        
+
         return Ok(dict);
     }
 
@@ -260,9 +262,7 @@ public class MachineController(
                 num++;
                 await Task.Delay(100);
                 if (num >= 40 && num % 2 == 0)
-                {
                     serialPort.WritePort("Com2", DefaultProtocol.QueryOptocoupler().ToBytes());
-                }
             }
 
             if (num >= 50) throw new Exception(localizer.GetString("Error0012").Value);
@@ -321,7 +321,7 @@ public class MachineController(
             audio.PlayWithSwitch("Error");
             return Problem(localizer.GetString("Error0014").Value);
         }
-        
+
         audio.PlayWithSwitch("Start");
         return Ok();
     }
@@ -370,5 +370,4 @@ public class MachineController(
     }
 
     #endregion
-    
 }

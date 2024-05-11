@@ -8,11 +8,15 @@ namespace Exposure.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class MetricController(ISerialPortService serialPort, IUsbService usb, ICameraService camera, IOptionService option)
+public class MetricController(
+    ISerialPortService serialPort,
+    IUsbService usb,
+    ICameraService camera,
+    IOptionService option)
     : ControllerBase
 {
     #region 状态
-
+    
     [HttpGet]
     public IActionResult Metric()
     {
@@ -28,7 +32,7 @@ public class MetricController(ISerialPortService serialPort, IUsbService usb, IC
         };
 
         var target = double.Parse(option.GetOptionValue("Temperature") ?? "-150");
-        
+
         Log.Information("当前温度：" + temperature + "，目标温度：" + target + "，灯光：" + flag + "，舱门：" + hatch);
 
         if (temperature > target + 30)
@@ -36,7 +40,6 @@ public class MetricController(ISerialPortService serialPort, IUsbService usb, IC
             if (flag > 2) return Ok(dto);
             serialPort.WritePort("Com1", DefaultProtocol.LedYellow().ToBytes());
             serialPort.SetFlag("led", 2);
-
         }
         else
         {

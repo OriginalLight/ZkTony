@@ -67,14 +67,14 @@ public class OptionService(IDbContext dbContext) : BaseService<Option>(dbContext
     }
 
     #endregion
-    
+
     #region 获取所有
-    
+
     public async Task<IDictionary<string, string>> GetAllAsync()
     {
         var ops = await _context.db.Queryable<Option>().ToListAsync();
         return ops.ToDictionary(p => p.Key, p => p.Value);
     }
-    
+
     #endregion
 }

@@ -26,4 +26,10 @@ public interface IErrorLogService : IBaseService<ErrorLog>
     /// <param name="ids"></param>
     /// <returns></returns>
     Task<List<ErrorLog>> GetByIds(object[] ids);
+    
+    /// <summary>
+    ///     自动清理
+    /// </summary>
+    /// <returns></returns>
+    Task AutoClear();
 }

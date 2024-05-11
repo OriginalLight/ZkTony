@@ -19,7 +19,7 @@ public class CameraService(
     IStringLocalizer<SharedResources> localizer) : ICameraService
 {
     private readonly List<Picture> _pictureList = [];
-    private Dictionary<string, object> _caliDict = new();
+    private Dictionary<string, object> _calibration = new();
     private string _flag = "none";
     private Mat? _mat;
     private Nncam? _nncam;
@@ -150,6 +150,8 @@ public class CameraService(
         _flag = "preview";
         // 目标张数
         _target = 1;
+        // 序列
+        _seq = 0;
 
         try
         {
@@ -222,7 +224,7 @@ public class CameraService(
                 Log.Information("触发拍摄");
             else
                 throw new Exception(localizer.GetString("Error0010").Value);
-            
+
             // 延时
             await Task.Delay(1500 + (int)(expoTime / 1000), ctsToken);
         }
@@ -284,7 +286,7 @@ public class CameraService(
                 Log.Information("触发拍摄");
             else
                 throw new Exception(localizer.GetString("Error0010").Value);
-            
+
             // 延时
             await Task.Delay(1500 + (int)(expoTime / 1000), ctsToken);
         }
@@ -295,7 +297,7 @@ public class CameraService(
             Log.Error(e, "手动拍照失败！");
             throw;
         }
-        
+
 
         // 设置曝光时
         if (_nncam.put_ExpoTime((uint)(exposure / frame)))
@@ -483,7 +485,7 @@ public class CameraService(
             var dic = JsonConvert.DeserializeObject<Dictionary<string, object>>(text);
             if (dic != null)
             {
-                _caliDict = dic;
+                _calibration = dic;
                 Log.Information("加载畸形校正配置：" + json);
             }
             else
@@ -818,7 +820,7 @@ public class CameraService(
             var roi = await option.GetOptionValueAsync("Roi") ?? "0,1,0,1";
             var rot = await option.GetOptionValueAsync("Rotate") ?? "0";
             // 校准图片
-            var caliMat = OpenCvUtils.Calibrate(mat, _caliDict);
+            var caliMat = OpenCvUtils.Calibrate(mat, _calibration);
             var rotateMat = OpenCvUtils.Rotate(caliMat, double.Parse(rot));
             var dst = OpenCvUtils.CuteRoi(rotateMat, roi);
             // 灰度图

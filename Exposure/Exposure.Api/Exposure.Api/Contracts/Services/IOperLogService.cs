@@ -27,4 +27,10 @@ public interface IOperLogService : IBaseService<OperLog>
     /// <param name="ids"></param>
     /// <returns></returns>
     Task<List<OperLogOutDto>> GetByIds(object[] ids);
+    
+    /// <summary>
+    ///     自动清理
+    /// </summary>
+    /// <returns></returns>
+    Task AutoClear();
 }

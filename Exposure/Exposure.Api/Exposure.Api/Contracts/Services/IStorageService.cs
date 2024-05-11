@@ -6,7 +6,7 @@ public interface IStorageService
     ///     清理预览图
     /// </summary>
     /// <returns></returns>
-    Task CleanPreviewAsync();
+    Task ClearStorageAsync();
 
     /// <summary>
     ///     存储空间检测

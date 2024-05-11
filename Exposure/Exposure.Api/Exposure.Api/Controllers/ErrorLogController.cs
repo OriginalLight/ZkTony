@@ -69,10 +69,7 @@ public class ErrorLogController(
         if (list.Count == 0) throw new Exception(localizer.GetString("NotFound").Value);
         // 保存到U盘
         var path = Path.Combine(usb1.Name, localizer.GetString("ErrorLog").Value);
-        if (!Directory.Exists(path))
-        {
-            Directory.CreateDirectory(path);
-        }
+        if (!Directory.Exists(path)) Directory.CreateDirectory(path);
         await System.IO.File.WriteAllTextAsync(Path.Combine(path, $"{localizer.GetString("ErrorLog").Value}.json"),
             JsonConvert.SerializeObject(list),
             Encoding.UTF8);
@@ -87,6 +84,7 @@ public class ErrorLogController(
                 System.IO.File.Copy(file, Path.Combine(path, name), true);
             }
         }
+
         // 插入日志
         operLog.AddOperLog(localizer.GetString("Export").Value,
             $"{localizer.GetString("ErrorLog").Value}：ids = " + string.Join(",", ids));
