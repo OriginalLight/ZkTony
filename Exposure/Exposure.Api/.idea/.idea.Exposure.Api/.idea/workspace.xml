@@ -18,28 +18,11 @@
   <component name="ChangeListManager">
     <list default="true" id="78ea7552-3107-4483-86a7-883cf6a7e7bd" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api.sln.DotSettings.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Contracts/Services/IErrorLogService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Contracts/Services/IErrorLogService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Contracts/Services/IOperLogService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Contracts/Services/IOperLogService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Contracts/Services/IStorageService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Contracts/Services/IStorageService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Contracts/Services/ICameraService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Contracts/Services/ICameraService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/CameraController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/CameraController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/ErrorLogController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/ErrorLogController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/MachineController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/MachineController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/MetricController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/MetricController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/OperLogController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/OperLogController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/OptionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/OptionController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/PictureController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/PictureController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Exposure.Api.csproj.user" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Exposure.Api.csproj.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/ApplicationHostService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/ApplicationHostService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/CameraService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/CameraService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/ErrorLogService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/ErrorLogService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/OperLogService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/OperLogService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/OptionService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/OptionService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/PictureService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/PictureService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/SerialPortService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/SerialPortService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/StorageService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/StorageService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/appsettings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.SqlSugar/AppDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.SqlSugar/AppDbContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Utilities/FileUtils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Utilities/FileUtils.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Utilities/OpenCvUtils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Utilities/OpenCvUtils.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,6 +47,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/4d66c706110b4c618ff8a8532ab94c5d12798/d1/69a463b8/ApiVersion.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/891a5c25823c4eeda76705f52719aef02ad600/6b/20a50cb7/AdoProvider.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8e7d133a4bc14e71834005a023e0390222600/a5/46f7e32e/LoggerConfiguration.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/ccbc86d5ad0b43008ecf651f5d223466e7400/fb/b0c14d0c/Cv2.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/1f75784e73e851b61dc0a47593745082d7ec10c118ac134b7eec36b91b2f46/MiniExcel.Async.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/bd1d5c50194fea68ff3559c160230b0ab50f5acf4ce3061bffd6d62958e2182/ExceptionDispatchInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Exposure.Api/obj/Debug/net8.0/Exposure.Api.AssemblyInfo.cs" root0="FORCE_HIGHLIGHTING" />
@@ -85,7 +69,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    ".NET Launch Settings Profile.Development.executor": "Run",
+    ".NET Launch Settings Profile.Development.executor": "Debug",
     ".NET Launch Settings Profile.Exposure.Api: Api.executor": "Run",
     ".NET Launch Settings Profile.Exposure.Api: IIS Express.executor": "Run",
     ".NET Launch Settings Profile.Exposure.Api: Production.executor": "Run",
@@ -306,6 +290,7 @@
       <workItem from="1714985423875" duration="7132000" />
       <workItem from="1715058782755" duration="5229000" />
       <workItem from="1715132552693" duration="62838000" />
+      <workItem from="1715562316140" duration="8342000" />
     </task>
     <servers />
   </component>

@@ -54,10 +54,10 @@
         <a-card :title="t('option.camera')">
           <a-list>
             <a-list-item>
-              <a-list-item-meta :title="t('option.camera.correction')"></a-list-item-meta>
+              <a-list-item-meta :title="t('option.camera.calibrate')"></a-list-item-meta>
               <template #actions>
-                <a-button type="primary" @click="handleImport">{{
-                  t('option.camera.correction.import')
+                <a-button type="primary" :loading="loading" @click="handleCalibrate">{{
+                  t('option.camera.calibrate')
                 }}</a-button>
               </template>
             </a-list-item>
@@ -230,7 +230,7 @@ import { useI18n } from 'vue-i18n'
 import { setOption, getAllOptions } from '@renderer/api/option'
 import { hatch } from '@renderer/api/machine'
 import { getPorts } from '@renderer/api/machine'
-import { importFile } from '@renderer/api/camera'
+import { calibrate } from '@renderer/api/camera'
 import { Message } from '@arco-design/web-vue'
 
 const { t } = useI18n()
@@ -249,6 +249,8 @@ const option = ref({
   hatchOffset: 0
 })
 
+const loading = ref(false)
+
 const handleOption = async (key: string, value: string, flag: boolean = true) => {
   try {
     await setOption({
@@ -265,11 +267,14 @@ const handleOption = async (key: string, value: string, flag: boolean = true) =>
   }
 }
 
-const handleImport = async () => {
+const handleCalibrate = async () => {
   try {
-    await importFile()
-    Message.info(t('option.camera.correction.import.success'))
+    loading.value = true
+    await calibrate()
+    loading.value = false
+    Message.info(t('option.camera.calibrate.success'))
   } catch (error) {
+    loading.value = false
     Message.error((error as Error).message)
   }
 }

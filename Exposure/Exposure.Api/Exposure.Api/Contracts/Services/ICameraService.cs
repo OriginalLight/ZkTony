@@ -82,16 +82,11 @@ public interface ICameraService
     /// <param name="number"></param>
     /// <returns></returns>
     Task Collect(int start, int interval, int number);
+    
 
     /// <summary>
-    ///     加载畸形矫正字典
+    ///     畸形矫正
     /// </summary>
     /// <returns></returns>
-    Task LoadCalibration();
-
-    /// <summary>
-    ///     加载矫正
-    /// </summary>
-    /// <returns></returns>
-    Task LoadCorrection();
+    Task Calibrate();
 }

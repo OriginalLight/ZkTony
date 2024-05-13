@@ -207,7 +207,7 @@
       <a-countdown
         :value="Date.now() + progress.time"
         :now="Date.now()"
-        format="mm:ss.SSS"
+        format="mm:ss"
         :start="progress.visible"
         @finish="handleFinish"
       />
@@ -344,17 +344,17 @@ const handleShoot = async () => {
     progress.value.visible = true
     if (options.value.mode === 'auto') {
       progress.value.message = t('home.camera.options.calculating')
-      progress.value.time = 15000
+      progress.value.time = 20000
       const res = await auto()
       progress.value.message = t('home.camera.options.shooting')
-      progress.value.time = res.data / 1000 + 2000
+      progress.value.time = res.data / 1000 + 5000
       const ms = res.data / 1000
       options.value.time.minute = Math.floor(ms / 1000 / 60)
       options.value.time.second = Math.floor((ms / 1000) % 60)
       options.value.time.millisecond = Math.floor(ms % 1000)
     } else {
       progress.value.message = t('home.camera.options.shooting')
-      progress.value.time = exposureTime.value / 1000 + 2500
+      progress.value.time = exposureTime.value / 1000 + 5000
       await manual({
         exposure: exposureTime.value,
         frame: options.value.frame

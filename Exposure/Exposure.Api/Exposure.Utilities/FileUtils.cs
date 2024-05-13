@@ -135,6 +135,8 @@ public static class FileUtils
     public static string Thumbnail => Path.Combine(MyPictures, "Thumbnail");
 
     public static string Collect => Path.Combine(MyPictures, "Collect");
+    
+    public static string Calibration => Path.Combine(MyPictures, "Calibration");
 
     public static string AppLocation => Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) ??
                                         throw new InvalidOperationException("无法获取程序集位置");

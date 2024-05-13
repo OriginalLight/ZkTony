@@ -19,7 +19,6 @@ public class CameraService(
     IStringLocalizer<SharedResources> localizer) : ICameraService
 {
     private readonly List<Picture> _pictureList = [];
-    private Dictionary<string, object> _calibration = new();
     private string _flag = "none";
     private Mat? _mat;
     private Nncam? _nncam;
@@ -105,8 +104,6 @@ public class CameraService(
             if (SetCallBack())
             {
                 Log.Information("设置回调");
-                await LoadCorrection();
-                await LoadCalibration();
             }
             else
             {
@@ -226,7 +223,7 @@ public class CameraService(
                 throw new Exception(localizer.GetString("Error0010").Value);
 
             // 延时
-            await Task.Delay(1500 + (int)(expoTime / 1000), ctsToken);
+            await Task.Delay(3000, ctsToken);
         }
         catch (Exception e)
         {
@@ -288,7 +285,7 @@ public class CameraService(
                 throw new Exception(localizer.GetString("Error0010").Value);
 
             // 延时
-            await Task.Delay(1500 + (int)(expoTime / 1000), ctsToken);
+            await Task.Delay(3000, ctsToken);
         }
         catch (Exception e)
         {
@@ -411,7 +408,7 @@ public class CameraService(
         if (SetCallBack())
         {
             Log.Information("设置画质成功：" + index);
-            await LoadCorrection();
+            //await LoadCorrection();
             return;
         }
 
@@ -430,73 +427,6 @@ public class CameraService(
         if (_nncam == null || !_nncam.get_Temperature(out var nTemp)) return -1000.0;
 
         return nTemp;
-    }
-
-    #endregion
-
-    #region 加载暗场校正文件
-
-    public async Task LoadCorrection()
-    {
-        await InitAsync();
-        if (_nncam == null) throw new Exception(localizer.GetString("Error0011").Value);
-
-        _nncam.get_eSize(out var size);
-        var name = size switch
-        {
-            0 => "3000",
-            1 => "1500",
-            2 => "1000",
-            _ => "3000"
-        };
-        // 暗场校正
-        var dfc = Path.Combine(FileUtils.AppLocation, $@"Assets\Correction\DFC_{name}.dfc");
-        if (File.Exists(dfc))
-        {
-            if (_nncam.DfcImport(dfc))
-            {
-                Log.Information("导入暗场校正文件：" + dfc);
-                if (_nncam.put_Option(Nncam.eOPTION.OPTION_DFC, 1))
-                    Log.Information("启用暗场校正");
-                else
-                    Log.Error("启用暗场校正失败");
-            }
-            else
-            {
-                Log.Error("暗场校正文件导入失败：" + dfc);
-            }
-        }
-        else
-        {
-            Log.Warning("暗场校正文件不存在：" + dfc);
-        }
-    }
-
-    #endregion
-
-    #region 加载畸形校正配置
-
-    public async Task LoadCalibration()
-    {
-        var json = Path.Combine(FileUtils.AppLocation, @"Assets\Correction\Calibration.json");
-        if (File.Exists(json))
-        {
-            var text = await File.ReadAllTextAsync(json);
-            var dic = JsonConvert.DeserializeObject<Dictionary<string, object>>(text);
-            if (dic != null)
-            {
-                _calibration = dic;
-                Log.Information("加载畸形校正配置：" + json);
-            }
-            else
-            {
-                Log.Warning("畸形校正配置文件格式错误：" + json);
-            }
-        }
-        else
-        {
-            Log.Warning("畸形校正配置文件不存在：" + json);
-        }
     }
 
     #endregion
@@ -534,7 +464,7 @@ public class CameraService(
     private async void OnEventImage()
     {
         if (_nncam == null) return;
-        if (!_nncam.get_ExpoTime(out var expo)) return;
+        if (!_nncam.get_ExpoTime(out var expoTime)) return;
         if (!_nncam.get_Size(out var width, out var height)) return;
         var buffer = Marshal.AllocHGlobal(width * height * 6);
         if (!_nncam.PullImageV3(buffer, 0, 48, 0, out var info)) return;
@@ -550,7 +480,7 @@ public class CameraService(
             {
                 case "preview":
                 {
-                    _pictureList.Add(await SavePreviewAsync(mat, info, (int)expo));
+                    _pictureList.Add(await SavePreviewAsync(mat, info, (int)expoTime));
                     // 关闭灯光
                     serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
                 }
@@ -567,7 +497,7 @@ public class CameraService(
                         case 1:
                         {
                             // 保存图片
-                            _pictureList.Add(await SaveAsync(mat, info, (int)expo));
+                            _pictureList.Add(await SaveAsync(mat, info, (int)expoTime));
                             // 关闭灯光
                             serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
                         }
@@ -576,7 +506,7 @@ public class CameraService(
                         case 2:
                         {
                             // 保存图片
-                            var pic2 = await SaveAsync(mat, info, (int)expo, true);
+                            var pic2 = await SaveAsync(mat, info, (int)expoTime, true);
                             _pictureList.Add(pic2);
                             // 创建并保存合成图
                             if (_pictureList.Count == 2)
@@ -589,7 +519,7 @@ public class CameraService(
                                 // 正片叠底将mat叠在-mat上面
                                 var multiply = OpenCvUtils.Multiply(mat1, mat2);
                                 // 保存原图
-                                _pictureList.Add(await SaveCombineAsync(multiply, info, (int)expo));
+                                _pictureList.Add(await SaveCombineAsync(multiply, info, (int)expoTime));
                             }
                         }
                             break;
@@ -607,14 +537,14 @@ public class CameraService(
                     {
                         case 1:
                             // 保存图片
-                            _pictureList.Add(await SaveAsync(mat, info, (int)expo));
+                            _pictureList.Add(await SaveAsync(mat, info, (int)expoTime));
                             // 关闭灯光
                             serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
                             break;
                         case 2:
                             _mat = mat.Clone();
                             // 保存图片
-                            _pictureList.Add(await SaveAsync(mat, info, (int)expo, true));
+                            _pictureList.Add(await SaveAsync(mat, info, (int)expoTime, true));
                             break;
                         default:
                         {
@@ -622,7 +552,7 @@ public class CameraService(
                             if (_mat != null) Cv2.Add(mat, _mat, combine);
                             _mat = combine.Clone();
                             // 保存图片
-                            _pictureList.Add(await SaveAsync(combine, info, (int)expo * (_seq - 1), true));
+                            _pictureList.Add(await SaveAsync(combine, info, (int)expoTime * (_seq - 1), true));
                         }
                             break;
                     }
@@ -633,13 +563,32 @@ public class CameraService(
                     break;
                 case "collect":
                 {
-                    // 保存原图
-                    var date = DateTime.Now.ToString("yyMMddHHmmssfff");
                     // 保存图片
-                    var filePath = FileUtils.GetFileName(FileUtils.Collect, $"{date}.png");
+                    var filePath = FileUtils.GetFileName(FileUtils.Collect, $"{_seq}_{expoTime}.png");
                     var gray = new Mat();
                     Cv2.CvtColor(mat, gray, ColorConversionCodes.BGR2GRAY);
                     gray.SaveImage(filePath);
+                }
+                    break;
+                case "calibrate":
+                {
+                    var op = mat switch
+                    {
+                        {Width: 2992, Height: 3000 } => "3000",
+                        {Width: 1488, Height: 1500} => "1500",
+                        {Width: 992, Height: 998} => "1000",
+                        _ => "3000"
+                    };
+                    
+                    var savePath = FileUtils.GetFileName(FileUtils.Calibration, op);
+                    if (!Directory.Exists(savePath))
+                    {
+                        Directory.CreateDirectory(savePath);
+                    }
+                    var gray = new Mat();
+                    Cv2.CvtColor(mat, gray, ColorConversionCodes.BGR2GRAY);
+                    Cv2.Normalize(gray, gray, 0, 65535.0, NormTypes.MinMax, MatType.CV_16UC1);
+                    gray.SaveImage(Path.Combine(savePath, "before.png"));
                 }
                     break;
             }
@@ -817,10 +766,19 @@ public class CameraService(
 
         try
         {
+            var op = mat switch
+            {
+                {Width: 2992, Height: 3000 } => "3000",
+                {Width: 1488, Height: 1500} => "1500",
+                {Width: 992, Height: 998} => "1000",
+                _ => "3000"
+            };
             var roi = await option.GetOptionValueAsync("Roi") ?? "0,1,0,1";
             var rot = await option.GetOptionValueAsync("Rotate") ?? "0";
-            // 校准图片
-            var caliMat = OpenCvUtils.Calibrate(mat, _calibration);
+            var matrix = await option.GetOptionValueAsync($"Matrix{op}") ?? "[]";
+            var dist = await option.GetOptionValueAsync($"Dist{op}") ?? "[]";
+            // 畸形校正
+            var caliMat = OpenCvUtils.Calibrate(mat, JsonConvert.DeserializeObject<double[,]>(matrix), JsonConvert.DeserializeObject<double[]>(dist));
             var rotateMat = OpenCvUtils.Rotate(caliMat, double.Parse(rot));
             var dst = OpenCvUtils.CuteRoi(rotateMat, roi);
             // 灰度图
@@ -862,7 +820,7 @@ public class CameraService(
         // 计算曝光时间
         if (!_nncam.Trigger(1)) throw new Exception(localizer.GetString("Error0010").Value);
         // 延时1300ms
-        await Task.Delay((int)(time * 1000 + 1000), ctsToken);
+        await Task.Delay((int)(time * 1000 + 2000), ctsToken);
         // 获取图片
         if (_mat == null) throw new Exception(localizer.GetString("Error0011").Value);
         // 计算信噪比
@@ -928,6 +886,101 @@ public class CameraService(
             };
 
         return 0;
+    }
+
+    #endregion
+
+    #region 畸形校正
+    
+    public async Task Calibrate()
+    {
+        await InitAsync();
+        if (_nncam == null)
+            throw new Exception($"{localizer.GetString("Preview")}{localizer.GetString("Failure").Value}");
+        // 设置flag
+        _flag = "calibrate";
+        // 目标张数
+        _target = 3;
+        // 序列
+        _seq = 0;
+        
+        var ops = new [] {"3000", "1500", "1000"};
+        
+        try
+        {
+            Log.Information("开始校准");
+            //打开灯光
+            serialPort.WritePort("Com2", DefaultProtocol.OpenLight().ToBytes());
+            // 延时100ms
+            await Task.Delay(100);
+
+            // 设置曝光时间
+            var expoTime = uint.Parse(await option.GetOptionValueAsync("ExpoTime") ?? "30000");
+            if (_nncam.put_ExpoTime(expoTime))
+                Log.Information("设置曝光时间：" + expoTime);
+            else
+                throw new Exception(localizer.GetString("Error0009").Value);
+            foreach (var op in ops)
+            {
+                var index = op switch
+                {
+                    "3000" => 0,
+                    "1500" => 1,
+                    "1000" => 2,
+                    _ => 0
+                };
+                await SetPixel((uint)index);
+                await Task.Delay(4000);
+                // 触发拍摄
+                if (_nncam.Trigger(1))
+                    Log.Information("触发拍摄");
+                else
+                    throw new Exception(localizer.GetString("Error0010").Value);
+                await Task.Delay(2000);
+                Log.Information($"{op}校准拍摄完成！");
+            }
+            
+            serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
+        }
+        catch (Exception e)
+        {
+            serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
+            Log.Error(e, "校准失败！");
+            throw;
+        }
+        
+        
+        foreach (var op in ops)
+        {
+            var images = Path.Combine(FileUtils.Calibration, op);
+            if (!Directory.Exists(images) || Directory.GetFiles(images).Length <= 0) continue;
+            var imagesList = Directory.GetFiles(images).ToList();
+            OpenCvUtils.CalibrateCamera(imagesList, out var matrix, out var dist);
+            if (matrix != null && dist != null)
+            {
+                Log.Information($"{op}畸形校正成功！");
+                var strMatrix = JsonConvert.SerializeObject(matrix);
+                var strDist = JsonConvert.SerializeObject(dist);
+                await option.SetOptionValueAsync($"Matrix{op}", strMatrix);
+                await option.SetOptionValueAsync($"Dist{op}", strDist);
+                Log.Information($"Matrix{op}：" + strMatrix);
+                Log.Information($"Dist{op}：" + strDist);
+                var src = new Mat(imagesList[0], ImreadModes.Grayscale);
+                var mask = new Mat();
+                var newCameraMatrix =
+                    Cv2.GetOptimalNewCameraMatrix(InputArray.Create(matrix), InputArray.Create(dist), src.Size(), 0, src.Size(), out var roi);
+                // cameraMatrix 数组转换成 Mat 类型
+                Cv2.Undistort(src, mask, InputArray.Create(matrix), InputArray.Create(dist), newCameraMatrix);
+                // 裁剪图片并返回原始尺寸
+                var res = new Mat();
+                Cv2.Resize(mask[roi], res, src.Size());
+                res.SaveImage(Path.Combine(images, "after.png"));
+            }
+            else
+            {
+                Log.Error($"{op}畸形校正失败！");
+            }
+        }
     }
 
     #endregion

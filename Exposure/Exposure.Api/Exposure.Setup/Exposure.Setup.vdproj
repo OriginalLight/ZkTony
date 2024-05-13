@@ -194,7 +194,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Exposure.Api"
         "ProductCode" = "8:{36958CB8-69BA-4BED-86E6-C2428839ECFC}"
-        "PackageCode" = "8:{DB3118EA-95FB-48FF-B6E0-6417B266BA61}"
+        "PackageCode" = "8:{16D24DAD-36CA-4D5F-8088-3C3FFBBEF6D9}"
         "UpgradeCode" = "8:{6388160A-F81A-413A-8947-C494653873AF}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -713,7 +713,7 @@
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_6AD2804FD8C74253A2982CC93D2FA680"
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_22056BE7F21C4E7892FAE5513F96C714"
             {
             "SourcePath" = "8:"
             "TargetName" = "8:"

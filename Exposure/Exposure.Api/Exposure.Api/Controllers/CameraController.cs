@@ -1,5 +1,4 @@
 ﻿using Exposure.Api.Contracts.Services;
-using Exposure.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Serilog;
@@ -12,7 +11,6 @@ public class CameraController(
     ICameraService camera,
     IOperLogService operLog,
     IAudioService audio,
-    IUsbService usb,
     IStringLocalizer<SharedResources> localizer) : ControllerBase
 {
     private CancellationTokenSource? _cts;
@@ -131,35 +129,14 @@ public class CameraController(
 
     #endregion
 
-    #region 导入校正文件
+    #region 畸形校正
 
     [HttpGet]
-    [Route("Import")]
-    public async Task<IActionResult> Import()
+    [Route("Calibrate")]
+    public async Task<IActionResult> Calibration()
     {
-        // 导入校正文件
-        // 获取U盘
-        var usb1 = usb.GetDefaultUsbDrive();
-        if (usb1 == null) throw new Exception(localizer.GetString("NoUsb").Value);
-        // 获取日志
-        var correction = Path.Combine(usb1.Name, "Correction");
-        if (!Directory.Exists(correction)) throw new Exception(localizer.GetString("NotFound").Value);
-
-        var files = Directory.GetFiles(correction);
-
-        var appCorrection = Path.Combine(FileUtils.AppLocation, @"Assets\Correction");
-        if (!Directory.Exists(appCorrection)) Directory.CreateDirectory(appCorrection);
-
-        foreach (var file in files)
-        {
-            var dest = Path.Combine(appCorrection, Path.GetFileName(file));
-            if (System.IO.File.Exists(dest)) System.IO.File.Delete(dest);
-            System.IO.File.Copy(file, dest);
-        }
-
-        await camera.LoadCalibration();
-        await camera.LoadCorrection();
-
+        // 畸形校正
+        await camera.Calibrate();
         return Ok();
     }
 

@@ -45,6 +45,6 @@ export function result() {
 }
 
 // 导入
-export function importFile() {
-  return axios.get('/Camera/Import')
+export function calibrate() {
+  return axios.get('/Camera/Calibrate')
 }

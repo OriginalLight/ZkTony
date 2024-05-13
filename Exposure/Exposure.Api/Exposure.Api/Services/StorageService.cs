@@ -18,11 +18,14 @@ public class StorageService(
             //删除文件夹里面的所有文件
             try
             {
-                if (!Directory.Exists(FileUtils.Preview)) return;
-                foreach (var file in Directory.GetFiles(FileUtils.Preview))
+                var directory = FileUtils.Preview;
+                if (Directory.Exists(directory))
                 {
-                    Log.Information($"删除文件：{file}");
-                    File.Delete(file);
+                    foreach (var file in Directory.GetFiles(directory))
+                    {
+                        Log.Information($"删除文件：{file}");
+                        File.Delete(file);
+                    }
                 }
             }
             catch (Exception e)
@@ -37,6 +40,7 @@ public class StorageService(
             // 自动清理操作日志
             await operLog.AutoClear();
             Log.Information("自动清理操作日志");
+            
         });
     }
 

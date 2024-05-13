@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using OpenCvSharp;
+﻿using OpenCvSharp;
 using Serilog;
 
 namespace Exposure.Utilities;
@@ -8,109 +7,19 @@ public static class OpenCvUtils
 {
     #region 相机标定
 
-    public static Mat Calibrate(Mat src, Dictionary<string, Object> dic)
+    public static Mat Calibrate(Mat src, double[,]? cameraMatrix, double[]? distCoeffs)
     {
-        InputArray cameraMatrix;
-        InputArray distCoeffs;
-
-        switch (src)
+        if (cameraMatrix == null || distCoeffs == null || cameraMatrix.Length == 0 || distCoeffs.Length == 0)
         {
-            // 3000 分辨率
-            case { Width: 2992, Height: 3000 }:
-                var m1 = dic["Matrix_3000"].ToString();
-                var c1 = dic["Coeffs_3000"].ToString();
-                if (m1 != null && c1 != null)
-                {
-                    var m1d = JArray.Parse(m1).ToObject<double[,]>();
-                    var c1d = JArray.Parse(c1).ToObject<double[]>();
-                    if (m1d == null || c1d == null)
-                    {
-                        Log.Error("相机标定参数为空");
-                        return src;
-                    }
-                    cameraMatrix = InputArray.Create(m1d);
-                    distCoeffs = InputArray.Create(c1d);
-                }
-                else
-                {
-                    Log.Error("相机标定参数为空");
-                    return src;
-                }
-
-                break;
-            // 1500 分辨率
-            case { Width: 1488, Height: 1500 }:
-                var m2 = dic["Matrix_1500"].ToString();
-                var c2 = dic["Coeffs_1500"].ToString();
-                if (m2 != null && c2 != null)
-                {
-                    var m2d = JArray.Parse(m2).ToObject<double[,]>();
-                    var c2d = JArray.Parse(c2).ToObject<double[]>();
-                    if (m2d == null || c2d == null)
-                    {
-                        Log.Error("相机标定参数为空");
-                        return src;
-                    }
-                    cameraMatrix = InputArray.Create(m2d);
-                    distCoeffs = InputArray.Create(c2d);
-                }
-                else
-                {
-                    Log.Error("相机标定参数为空");
-                    return src;
-                }
-                break;
-            // 1000 分辨率
-            case { Width: 992, Height: 998 }:
-                var m3 = dic["Matrix_1000"].ToString();
-                var c3 = dic["Coeffs_1000"].ToString();
-                if (m3 != null && c3 != null)
-                {
-                    var m3d = JArray.Parse(m3).ToObject<double[,]>();
-                    var c3d = JArray.Parse(c3).ToObject<double[]>();
-                    if (m3d == null || c3d == null)
-                    {
-                        Log.Error("相机标定参数为空");
-                        return src;
-                    }
-                    cameraMatrix = InputArray.Create(m3d);
-                    distCoeffs = InputArray.Create(c3d);
-                }
-                else
-                {
-                    Log.Error("相机标定参数为空");
-                    return src;
-                }
-                break;
-            default:
-                var m4 = dic["Matrix_3000"].ToString();
-                var c4 = dic["Coeffs_3000"].ToString();
-                if (m4 != null && c4 != null)
-                {
-                    var m4d = JArray.Parse(m4).ToObject<double[,]>();
-                    var c4d = JArray.Parse(c4).ToObject<double[]>();
-                    if (m4d == null || c4d == null)
-                    {
-                        Log.Error("相机标定参数为空");
-                        return src;
-                    }
-                    cameraMatrix = InputArray.Create(m4d);
-                    distCoeffs = InputArray.Create(c4d);
-                }
-                else
-                {
-                    Log.Error("相机标定参数为空");
-                    return src;
-                }
-                break;
+            Log.Error("相机标定参数为空");
+            return src;
         }
-
         //根据相机内参和畸变参数矫正图片
         var mask = new Mat();
         var newCameraMatrix =
-            Cv2.GetOptimalNewCameraMatrix(cameraMatrix, distCoeffs, src.Size(), 0, src.Size(), out var roi);
+            Cv2.GetOptimalNewCameraMatrix(InputArray.Create(cameraMatrix), InputArray.Create(distCoeffs), src.Size(), 0, src.Size(), out var roi);
         // cameraMatrix 数组转换成 Mat 类型
-        Cv2.Undistort(src, mask, cameraMatrix, distCoeffs, newCameraMatrix);
+        Cv2.Undistort(src, mask, InputArray.Create(cameraMatrix), InputArray.Create(distCoeffs), newCameraMatrix);
         // 裁剪图片并返回原始尺寸
         var res = new Mat();
         Cv2.Resize(mask[roi], res, src.Size());
@@ -230,6 +139,65 @@ public static class OpenCvUtils
             Log.Error(e, "中心旋转失败");
             return src;
         }
+    }
+
+    #endregion
+
+    #region 畸形校正
+    
+    public static void CalibrateCamera(List<string> images, out double[,]? cameraMatrix, out double[]? distCoeffs)
+    {
+        // 定义棋盘格的内角点数量
+        var chessboardWidth = 17;  // 棋盘格每行内角点数量
+        var chessboardHeight = 17; // 棋盘格每列内角点数量
+        var chessboardSize = chessboardWidth * chessboardHeight; // 棋盘格总内角点数量
+        var allImagePoints = new List<List<Point2f>>();
+        var allObjectPoints = new List<List<Point3f>>();
+        var imageSize = new Size(0, 0);
+        //方格边长
+        var squareSize = 6;
+
+        foreach (var image in images)
+        {
+            // 生成棋盘格角点的三维坐标
+            var objectPoints = new Point3f[chessboardSize];
+            for (var i = 0; i < chessboardHeight; i++)
+            {
+                for (var j = 0; j < chessboardWidth; j++)
+                {
+                    objectPoints[i * chessboardWidth + j] = new Point3f(j, i, 0);
+                    // 棋盘格每个方格的边长为 10mm
+                    objectPoints[i * chessboardWidth + j] *= squareSize;
+                }
+            }
+            
+            
+            // 读取图片
+            var mat = new Mat(image, ImreadModes.Grayscale);
+            imageSize = mat.Size();
+            
+            // 查找棋盘格角点
+            var found = Cv2.FindChessboardCorners(mat, new Size(chessboardWidth, chessboardHeight), out var imagePoints, ChessboardFlags.AdaptiveThresh);
+
+            if (!found) continue;
+            // 亚像素精确化
+            Cv2.CornerSubPix(mat, imagePoints, new Size(11, 11), new Size(-1, -1), new TermCriteria(CriteriaTypes.Eps | CriteriaTypes.MaxIter, 30, 0.1));
+            allImagePoints.Add(imagePoints.ToList());
+            allObjectPoints.Add(objectPoints.ToList());
+
+        }
+
+        if (allImagePoints.Count == 0)
+        {
+            cameraMatrix = null;
+            distCoeffs = null;
+            return;
+        }
+        
+        // 标定相机
+        cameraMatrix = new double[3, 3];
+        distCoeffs = new double[5];
+        Cv2.CalibrateCamera(allObjectPoints, allImagePoints, imageSize, cameraMatrix, distCoeffs, out _, out _);
     }
 
     #endregion
