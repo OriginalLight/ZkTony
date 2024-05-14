@@ -481,9 +481,9 @@ public class CameraService(
             {
                 case "preview":
                 {
-                    _pictureList.Add(await SavePreviewAsync(mat, info, (int)expoTime));
                     // 关闭灯光
                     serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
+                    _pictureList.Add(await SavePreviewAsync(mat, info, (int)expoTime));
                 }
                     break;
                 case "auto":
@@ -497,10 +497,10 @@ public class CameraService(
                         // 暂存白光图
                         case 1:
                         {
-                            // 保存图片
-                            _pictureList.Add(await SaveAsync(mat, info, (int)expoTime));
                             // 关闭灯光
                             serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
+                            // 保存图片
+                            _pictureList.Add(await SaveAsync(mat, info, (int)expoTime));
                         }
                             break;
                         // 生成合成图
@@ -537,10 +537,10 @@ public class CameraService(
                     switch (_seq)
                     {
                         case 1:
-                            // 保存图片
-                            _pictureList.Add(await SaveAsync(mat, info, (int)expoTime));
                             // 关闭灯光
                             serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
+                            // 保存图片
+                            _pictureList.Add(await SaveAsync(mat, info, (int)expoTime));
                             break;
                         case 2:
                             _mat = mat.Clone();
@@ -622,7 +622,6 @@ public class CameraService(
             // 保存图片
             var picPath = FileUtils.GetFileName(FileUtils.Exposure, $"{picName}.png");
             gray.SaveImage(picPath);
-            Log.Error(gray.Type().ToString());
             // 保存缩略图
             //gray16 -> gray8
             var thumb = new Mat();
@@ -789,9 +788,9 @@ public class CameraService(
             // 去除杂色
             //gray.SetTo(0, gray.InRange(0, 3));
             // 中值滤波
-            Cv2.MedianBlur(gray, gray, 5);
+            //Cv2.MedianBlur(gray, gray, 5);
             // 开运算
-            //Cv2.MorphologyEx(gray, gray, MorphTypes.Open, Cv2.GetStructuringElement(MorphShapes.Rect, new Size(3, 3)));
+            Cv2.MorphologyEx(gray, gray, MorphTypes.Open, Cv2.GetStructuringElement(MorphShapes.Rect, new Size(3, 3)));
             // 直方图归一化
             Cv2.Normalize(gray, gray, 0, 65535.0, NormTypes.MinMax, MatType.CV_16UC1);
 
@@ -826,10 +825,8 @@ public class CameraService(
         if (_mat == null) throw new Exception(localizer.GetString("Error0011").Value);
         // 计算信噪比
         var snr = OpenCvUtils.CalculateSnr(_mat, time);
-        Log.Information("SNR：" + snr);
         // 计算白色区域占比
         var percentage = OpenCvUtils.CalculatePercentage(_mat, 10, 255);
-        Log.Information("白色区域占比：" + percentage);
         // 清空_mat
         _mat = null;
 

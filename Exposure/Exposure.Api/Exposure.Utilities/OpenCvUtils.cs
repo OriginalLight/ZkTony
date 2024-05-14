@@ -50,7 +50,9 @@ public static class OpenCvUtils
         var adjustedNoisePower = noisePower / time;
 
         // Calculate and return the adjusted SNR value
-        return 10 * Math.Log10(signalPower / adjustedNoisePower);
+        var snr = 10 * Math.Log10(signalPower / adjustedNoisePower);
+        Log.Information("信噪比计算成功: " + snr);
+        return snr;
     }
 
     #endregion
@@ -69,7 +71,9 @@ public static class OpenCvUtils
         // 创建一个掩码，其中在指定范围内的像素为白色，其他像素为黑色
         Cv2.Threshold(gray, mask, min, max, ThresholdTypes.Binary);
         var aboveThresholdPixels = Cv2.CountNonZero(mask);
-        return (double)aboveThresholdPixels / totalPixels;
+        var percent = (double)aboveThresholdPixels / totalPixels;
+        Log.Information("计算白色区间占比成功: " + percent);
+        return percent;
     }
 
     #endregion
@@ -87,6 +91,7 @@ public static class OpenCvUtils
         var dst = new Mat();
         Cv2.Multiply(mat3, mat4, dst);
         dst.ConvertTo(dst, baseType, 65535);
+        Log.Information("正片叠底成功");
         return dst;
     }
 
@@ -110,6 +115,7 @@ public static class OpenCvUtils
             var w = (int)(width * (right - left));
             var h = (int)(height * (bottom - top));
             var rect = new Rect(x, y, w, h);
+            Log.Information("截取部分成功");
             return src[rect].Resize(new Size(width, height));
         }
         catch (Exception e)
@@ -132,6 +138,7 @@ public static class OpenCvUtils
             var rot = Cv2.GetRotationMatrix2D(center, angle, 1.0);
             var dst = new Mat();
             Cv2.WarpAffine(src, dst, rot, src.Size());
+            Log.Information("中心旋转成功");
             return dst;
         }
         catch (Exception e)
@@ -198,6 +205,7 @@ public static class OpenCvUtils
         cameraMatrix = new double[3, 3];
         distCoeffs = new double[5];
         Cv2.CalibrateCamera(allObjectPoints, allImagePoints, imageSize, cameraMatrix, distCoeffs, out _, out _);
+        Log.Information("相机标定成功");
     }
 
     #endregion

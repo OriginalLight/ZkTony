@@ -33,7 +33,7 @@ public class MetricController(
 
         var target = double.Parse(option.GetOptionValue("Temperature") ?? "-150");
 
-        Log.Information("当前温度：" + temperature + "，目标温度：" + target + "，灯光：" + flag + "，舱门：" + hatch);
+        Log.Information("当前温度：" + temperature + "，目标温度：" + target + "，三色灯：" + flag + "，舱门：" + hatch);
 
         if (temperature > target + 30)
         {

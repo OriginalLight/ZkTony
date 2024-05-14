@@ -202,16 +202,19 @@
     @ok="handleCancel"
   >
     <template #title> {{ progress.message }} </template>
-    <a-space size="large">
-      <a-spin dot />
+    <div style="display: flex; width: 100%">
+      <div style="position: absolute; left: 24px">
+        <a-spin dot />
+      </div>
       <a-countdown
         :value="Date.now() + progress.time"
+        style="margin: 0 auto"
         :now="Date.now()"
         format="mm:ss"
         :start="progress.visible"
         @finish="handleFinish"
       />
-    </a-space>
+    </div>
   </a-modal>
 </template>
 
@@ -222,8 +225,8 @@ import { Message } from '@arco-design/web-vue'
 import { preview, pixel, manual, auto, cancel, result } from '@renderer/api/camera'
 import { hatch } from '@renderer/api/machine'
 import { useAppStore } from '@renderer/store'
-import useHomeState from '@renderer/states/home'
 import { getOption } from '@renderer/api/option'
+import useHomeState from '@renderer/states/home'
 
 const { options } = useHomeState()
 
