@@ -191,10 +191,11 @@ public class CameraService(
 
         _mat = null;
         _flag = "sampling";
-        var targetExpo = await CalculateExpo(0.1, ctsToken);
+        
+        var targetExpoTime = await CalculateExpo(0.1, ctsToken);
         // 验证曝光时间
-        if (targetExpo == 0) targetExpo = 1000;
-        Log.Information("计算曝光时间：" + targetExpo);
+        if (targetExpoTime == 0) targetExpoTime = 1000000;
+        Log.Information("计算曝光时间：" + targetExpoTime);
 
         _mat = null;
         _pictureList.Clear();
@@ -223,7 +224,7 @@ public class CameraService(
                 throw new Exception(localizer.GetString("Error0010").Value);
 
             // 延时
-            await Task.Delay(3000, ctsToken);
+            await Task.Delay(2000, ctsToken);
         }
         catch (Exception e)
         {
@@ -234,8 +235,8 @@ public class CameraService(
         }
 
         // 设置曝光时
-        if (_nncam.put_ExpoTime((uint)targetExpo))
-            Log.Information("设置曝光时间：" + targetExpo);
+        if (_nncam.put_ExpoTime((uint)targetExpoTime))
+            Log.Information("设置曝光时间：" + targetExpoTime);
         else
             throw new Exception(localizer.GetString("Error0009").Value);
 
@@ -246,7 +247,7 @@ public class CameraService(
 
         Log.Information("自动拍照成功！");
 
-        return targetExpo;
+        return targetExpoTime;
     }
 
     #endregion
@@ -285,7 +286,7 @@ public class CameraService(
                 throw new Exception(localizer.GetString("Error0010").Value);
 
             // 延时
-            await Task.Delay(3000, ctsToken);
+            await Task.Delay(2000, ctsToken);
         }
         catch (Exception e)
         {

@@ -347,14 +347,14 @@ const handleShoot = async () => {
       progress.value.time = 20000
       const res = await auto()
       progress.value.message = t('home.camera.options.shooting')
-      progress.value.time = res.data / 1000 + 5000
+      progress.value.time = res.data / 1000 + 4000
       const ms = res.data / 1000
       options.value.time.minute = Math.floor(ms / 1000 / 60)
       options.value.time.second = Math.floor((ms / 1000) % 60)
       options.value.time.millisecond = Math.floor(ms % 1000)
     } else {
       progress.value.message = t('home.camera.options.shooting')
-      progress.value.time = exposureTime.value / 1000 + 5000
+      progress.value.time = exposureTime.value / 1000 + 4000
       await manual({
         exposure: exposureTime.value,
         frame: options.value.frame
