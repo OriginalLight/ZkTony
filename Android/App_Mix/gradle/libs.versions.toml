@@ -18,9 +18,9 @@ androidx-compose-bom = "2024.05.00"
 androidx-constraintlayout = "1.0.1"
 androidx-corektx = "1.13.1"
 androidx-datastore = "1.1.1"
-androidx-lifecycle = "2.8.0"
-androidx-lifecycle-compose = "2.8.0"
-androidx-lifecycle-runtime-compose = "2.8.0"
+androidx-lifecycle = "2.7.0"
+androidx-lifecycle-compose = "2.7.0"
+androidx-lifecycle-runtime-compose = "2.7.0"
 androidx-navigation = "2.7.7"
 androidx-palette = "1.0.0"
 androidx-test = "1.5.0"
@@ -31,7 +31,7 @@ androidx-window = "1.2.0"
 androix-test-uiautomator = "2.3.0"
 coil = "2.4.0"
 compose-compiler = "1.5.13"
-compose-paging = "3.3.0"
+compose-paging = "3.2.1"
 coroutines = "1.8.1"
 gson = "2.10.1"
 hilt = "2.51.1"
@@ -44,7 +44,7 @@ ksp = "1.9.23-1.0.19"
 material = "1.12.0"
 okhttp = "5.0.0-alpha.14"
 room = "2.6.1"
-lifecycle-runtime-ktx = "2.8.0"
+lifecycle-runtime-ktx = "2.7.0"
 
 [libraries]
 accompanist-adaptive = { module = "com.google.accompanist:accompanist-adaptive", version.ref = "accompanist" }
@@ -119,4 +119,5 @@ android-application = { id = "com.android.application", version.ref = "androidGr
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

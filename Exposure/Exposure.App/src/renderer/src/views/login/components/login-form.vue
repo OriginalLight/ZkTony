@@ -20,6 +20,7 @@
           v-model="userInfo.username"
           :placeholder="t('login.form.userName.placeholder')"
           :max-length="32"
+          size="large"
         >
           <template #prefix>
             <icon-user />
@@ -30,6 +31,7 @@
         field="password"
         :rules="[{ required: true, message: t('login.form.password.errMsg') }]"
         :validate-trigger="['change', 'blur']"
+        size="large"
         hide-label
       >
         <a-input-password
@@ -44,7 +46,14 @@
         </a-input-password>
       </a-form-item>
       <a-space :size="16" direction="vertical">
-        <a-button type="primary" shape="round" html-type="submit" long :loading="loading">
+        <a-button
+          type="primary"
+          size="large"
+          shape="round"
+          html-type="submit"
+          long
+          :loading="loading"
+        >
           {{ t('login.form.login') }}
         </a-button>
       </a-space>

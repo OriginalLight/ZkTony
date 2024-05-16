@@ -409,7 +409,6 @@ public class CameraService(
         if (SetCallBack())
         {
             Log.Information("设置画质成功：" + index);
-            //await LoadCorrection();
             return;
         }
 

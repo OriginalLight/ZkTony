@@ -17,12 +17,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="78ea7552-3107-4483-86a7-883cf6a7e7bd" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Contracts/Services/ICameraService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Contracts/Services/ICameraService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/CameraController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/CameraController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/CameraService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/CameraService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Utilities/FileUtils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Utilities/FileUtils.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Utilities/OpenCvUtils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Utilities/OpenCvUtils.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -290,7 +285,7 @@
       <workItem from="1714985423875" duration="7132000" />
       <workItem from="1715058782755" duration="5229000" />
       <workItem from="1715132552693" duration="62838000" />
-      <workItem from="1715562316140" duration="8342000" />
+      <workItem from="1715562316140" duration="44440000" />
     </task>
     <servers />
   </component>
@@ -315,6 +310,23 @@
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
   </component>
   <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Exposure.Api/Services/CameraService.cs</url>
+          <line>475</line>
+          <properties documentPath="C:\Users\ThinkBook\Documents\GitHub\ZkTony\Exposure\Exposure.Api\Exposure.Api\Services\CameraService.cs" containingFunctionPresentation="Method 'OnEventImage'">
+            <startOffsets>
+              <option value="13443" />
+            </startOffsets>
+            <endOffsets>
+              <option value="13494" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
     <pin-to-top-manager>
       <pinned-members>
         <PinnedItemInfo parentTag="Type#OpenCvSharp.Mat" memberName="TypeMap" />
