@@ -16,25 +16,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="78ea7552-3107-4483-86a7-883cf6a7e7bd" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../../C/CODE_H723_HAL.zip" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/MachineController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/MachineController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/MetricController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/MetricController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/PictureController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/PictureController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Exposure.Api.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Exposure.Api.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/CameraService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/CameraService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/ErrorLogService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/ErrorLogService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/OperLogService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/OperLogService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/PictureService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/PictureService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/SerialPortService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/SerialPortService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/StorageService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/StorageService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/TestService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/TestService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.SqlSugar/Exposure.SqlSugar.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.SqlSugar/Exposure.SqlSugar.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Utilities/Exposure.Utilities.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Utilities/Exposure.Utilities.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Utilities/FileUtils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Utilities/FileUtils.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure.Utilities/OpenCvUtils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Utilities/OpenCvUtils.cs" afterDir="false" />
-    </list>
+    <list default="true" id="78ea7552-3107-4483-86a7-883cf6a7e7bd" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -302,7 +284,7 @@
       <workItem from="1715058782755" duration="5229000" />
       <workItem from="1715132552693" duration="62838000" />
       <workItem from="1715562316140" duration="44440000" />
-      <workItem from="1715910010064" duration="12477000" />
+      <workItem from="1715910010064" duration="13617000" />
     </task>
     <servers />
   </component>
