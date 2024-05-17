@@ -5,7 +5,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import javax.inject.Inject
 
-class ServiceObserver @Inject constructor(
+class BackgroundService @Inject constructor(
     private val s1: CalibrationService,
     private val s2: HistoryService
 ) : LifecycleEventObserver {

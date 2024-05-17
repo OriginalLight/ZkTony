@@ -16,5 +16,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "App"
 include(":App")
-include(":App_Test")
 include(":Lib_SerialPort")
