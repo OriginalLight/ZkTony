@@ -68,8 +68,14 @@ public class PictureService(
         var list = await _context.db.Queryable<Picture>().Where(p => keys.Contains(p.Id)).ToListAsync();
         foreach (var item in list.OfType<Picture>())
         {
-            FileUtils.DeleteFile(item.Path);
-            FileUtils.DeleteFile(item.Thumbnail);
+            if (File.Exists(item.Path))
+            {
+                File.Delete(item.Path);
+            }
+            if (File.Exists(item.Thumbnail))
+            {
+                File.Delete(item.Thumbnail);
+            }
         }
 
         return await _context.db.Deleteable<Picture>().In(keys).ExecuteCommandHasChangeAsync();
@@ -99,14 +105,14 @@ public class PictureService(
         var date = DateTime.Now.ToString("yyyyMMddHHmmss");
 
         // 保存图片
-        var path = FileUtils.GetFileName(FileUtils.Exposure, $"{date}.png");
+        var path = Path.Combine(FileUtils.Exposure, $"{date}.png");
         mat.SaveImage(path);
 
         // 保存缩略图
         var thumb = new Mat();
         Cv2.ConvertScaleAbs(mat, thumb, 255 / 65535.0);
         Cv2.Resize(thumb, thumb, new Size(500, 500));
-        var thumbnail = FileUtils.GetFileName(FileUtils.Thumbnail, $"{date}.jpg");
+        var thumbnail = Path.Combine(FileUtils.Thumbnail, $"{date}.jpg");
         thumb.SaveImage(thumbnail);
 
         return await AddReturnModel(new Picture
@@ -143,7 +149,7 @@ public class PictureService(
         // 保存图片
         if (dto.Code == 0)
         {
-            var exposure = FileUtils.GetFileName(FileUtils.Exposure, $"{date}.png");
+            var exposure = Path.Combine(FileUtils.Exposure, $"{date}.png");
             await image.SaveAsPngAsync(exposure);
 
             var width = image.Width;
@@ -151,7 +157,7 @@ public class PictureService(
 
             // 保存缩略图
             image.Mutate(x => x.Resize(500, 500));
-            var thumbnail = FileUtils.GetFileName(FileUtils.Thumbnail, $"{date}.jpg");
+            var thumbnail = Path.Combine(FileUtils.Thumbnail, $"{date}.jpg");
             await image.SaveAsJpegAsync(thumbnail);
 
             return await AddReturnModel(new Picture
@@ -170,7 +176,7 @@ public class PictureService(
         }
 
         image.Mutate(x => x.Resize(500, 500));
-        var path = FileUtils.GetFileName(FileUtils.Preview, $"{date}.jpg");
+        var path = Path.Combine(FileUtils.Preview, $"{date}.jpg");
         await image.SaveAsJpegAsync(path);
 
         return new Picture

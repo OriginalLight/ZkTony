@@ -115,7 +115,7 @@ public class PictureController(
             var filename = $"{pic.Name}.{dto.Format}";
             var fullPath = Path.Combine(path, filename);
             var counter = 1;
-            while (FileUtils.Exists(fullPath))
+            while (System.IO.File.Exists(fullPath))
             {
                 filename = $"{pic.Name}_{counter}.{dto.Format}";
                 fullPath = Path.Combine(path, filename);

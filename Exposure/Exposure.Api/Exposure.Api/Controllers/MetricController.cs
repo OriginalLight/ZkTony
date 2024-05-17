@@ -16,7 +16,7 @@ public class MetricController(
     : ControllerBase
 {
     #region 状态
-    
+
     [HttpGet]
     public IActionResult Metric()
     {

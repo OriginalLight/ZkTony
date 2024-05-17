@@ -102,13 +102,9 @@ public class CameraService(
 
             // 设置回调
             if (SetCallBack())
-            {
                 Log.Information("设置回调");
-            }
             else
-            {
                 throw new Exception(localizer.GetString("Error0008").Value);
-            }
 
             Log.Information("相机初始化成功！");
         }
@@ -191,7 +187,7 @@ public class CameraService(
 
         _mat = null;
         _flag = "sampling";
-        
+
         var targetExpoTime = await CalculateExpo(0.1, ctsToken);
         // 验证曝光时间
         if (targetExpoTime == 0) targetExpoTime = 1000000;
@@ -564,7 +560,7 @@ public class CameraService(
                 case "collect":
                 {
                     // 保存图片
-                    var filePath = FileUtils.GetFileName(FileUtils.Collect, $"{_seq}_{expoTime}.png");
+                    var filePath = Path.Combine(FileUtils.Collect, $"{_seq}_{expoTime}.png");
                     var gray = new Mat();
                     Cv2.CvtColor(mat, gray, ColorConversionCodes.BGR2GRAY);
                     gray.SaveImage(filePath);
@@ -574,17 +570,14 @@ public class CameraService(
                 {
                     var op = mat switch
                     {
-                        {Width: 2992, Height: 3000 } => "3000",
-                        {Width: 1488, Height: 1500} => "1500",
-                        {Width: 992, Height: 998} => "1000",
+                        { Width: 2992, Height: 3000 } => "3000",
+                        { Width: 1488, Height: 1500 } => "1500",
+                        { Width: 992, Height: 998 } => "1000",
                         _ => "3000"
                     };
-                    
-                    var savePath = FileUtils.GetFileName(FileUtils.Calibration, op);
-                    if (!Directory.Exists(savePath))
-                    {
-                        Directory.CreateDirectory(savePath);
-                    }
+
+                    var savePath = Path.Combine(FileUtils.Calibration, op);
+                    if (!Directory.Exists(savePath)) Directory.CreateDirectory(savePath);
                     var gray = new Mat();
                     Cv2.CvtColor(mat, gray, ColorConversionCodes.BGR2GRAY);
                     Cv2.Normalize(gray, gray, 0, 65535.0, NormTypes.MinMax, MatType.CV_16UC1);
@@ -619,14 +612,14 @@ public class CameraService(
             // 保存原图
             var picName = DateTime.Now.ToString("yyMMddHHmmssfff");
             // 保存图片
-            var picPath = FileUtils.GetFileName(FileUtils.Exposure, $"{picName}.png");
+            var picPath = Path.Combine(FileUtils.Exposure, $"{picName}.png");
             gray.SaveImage(picPath);
             // 保存缩略图
             //gray16 -> gray8
             var thumb = new Mat();
             Cv2.ConvertScaleAbs(gray, thumb, 255 / 65535.0);
             Cv2.Resize(thumb, thumb, new Size(500, 500));
-            var thumbPath = FileUtils.GetFileName(FileUtils.Thumbnail, $"{picName}.jpg");
+            var thumbPath = Path.Combine(FileUtils.Thumbnail, $"{picName}.jpg");
             thumb.SaveImage(thumbPath);
 
             return await picture.AddReturnModel(new Picture
@@ -672,14 +665,14 @@ public class CameraService(
             // 保存原图
             var picName = DateTime.Now.ToString("yyMMddHHmmssfff");
             // 保存图片
-            var picPath = FileUtils.GetFileName(FileUtils.Exposure, $"{picName}.png");
+            var picPath = Path.Combine(FileUtils.Exposure, $"{picName}.png");
             mat.SaveImage(picPath);
             // 保存缩略图
             //gray16 -> gray8
             var thumb = new Mat();
             Cv2.ConvertScaleAbs(mat, thumb, 255 / 65535.0);
             Cv2.Resize(thumb, thumb, new Size(500, 500));
-            var thumbPath = FileUtils.GetFileName(FileUtils.Thumbnail, $"{picName}.jpg");
+            var thumbPath = Path.Combine(FileUtils.Thumbnail, $"{picName}.jpg");
             thumb.SaveImage(thumbPath);
 
             return await picture.AddReturnModel(new Picture
@@ -727,7 +720,7 @@ public class CameraService(
             // 保存原图
             var picName = DateTime.Now.ToString("yyMMddHHmmssfff");
             // 保存图片
-            var path = FileUtils.GetFileName(FileUtils.Preview, $"{picName}.png");
+            var path = Path.Combine(FileUtils.Preview, $"{picName}.png");
             gray.SaveImage(path);
             // 保存缩略图
             return new Picture
@@ -767,9 +760,9 @@ public class CameraService(
         {
             var op = mat switch
             {
-                {Width: 2992, Height: 3000 } => "3000",
-                {Width: 1488, Height: 1500} => "1500",
-                {Width: 992, Height: 998} => "1000",
+                { Width: 2992, Height: 3000 } => "3000",
+                { Width: 1488, Height: 1500 } => "1500",
+                { Width: 992, Height: 998 } => "1000",
                 _ => "3000"
             };
             var roi = await option.GetOptionValueAsync("Roi") ?? "0,1,0,1";
@@ -777,7 +770,8 @@ public class CameraService(
             var matrix = await option.GetOptionValueAsync($"Matrix{op}") ?? "[]";
             var dist = await option.GetOptionValueAsync($"Dist{op}") ?? "[]";
             // 畸形校正
-            var caliMat = OpenCvUtils.Calibrate(mat, JsonConvert.DeserializeObject<double[,]>(matrix), JsonConvert.DeserializeObject<double[]>(dist));
+            var caliMat = OpenCvUtils.Calibrate(mat, JsonConvert.DeserializeObject<double[,]>(matrix),
+                JsonConvert.DeserializeObject<double[]>(dist));
             var rotateMat = OpenCvUtils.Rotate(caliMat, double.Parse(rot));
             var dst = OpenCvUtils.CuteRoi(rotateMat, roi);
             // 灰度图
@@ -819,13 +813,13 @@ public class CameraService(
         // 计算曝光时间
         if (!_nncam.Trigger(1)) throw new Exception(localizer.GetString("Error0010").Value);
         // 延时1300ms
-        await Task.Delay((int)(time * 1000 + 2000), ctsToken);
+        await Task.Delay((int)(time * 1000 + 1000), ctsToken);
         // 获取图片
         if (_mat == null) throw new Exception(localizer.GetString("Error0011").Value);
         // 计算信噪比
         var snr = OpenCvUtils.CalculateSnr(_mat, time);
         // 计算白色区域占比
-        var percentage = OpenCvUtils.CalculatePercentage(_mat, 10, 255);
+        var percentage = OpenCvUtils.CalculatePercentage(_mat, 2550, 65535);
         // 清空_mat
         _mat = null;
 
@@ -888,7 +882,7 @@ public class CameraService(
     #endregion
 
     #region 畸形校正
-    
+
     public async Task Calibrate()
     {
         await InitAsync();
@@ -900,9 +894,9 @@ public class CameraService(
         _target = 3;
         // 序列
         _seq = 0;
-        
-        var ops = new [] {"3000", "1500", "1000"};
-        
+
+        var ops = new[] { "3000", "1500", "1000" };
+
         try
         {
             Log.Information("开始校准");
@@ -936,7 +930,7 @@ public class CameraService(
                 await Task.Delay(2000);
                 Log.Information($"{op}校准拍摄完成！");
             }
-            
+
             serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
         }
         catch (Exception e)
@@ -945,8 +939,8 @@ public class CameraService(
             Log.Error(e, "校准失败！");
             throw;
         }
-        
-        
+
+
         foreach (var op in ops)
         {
             var images = Path.Combine(FileUtils.Calibration, op);
@@ -965,7 +959,8 @@ public class CameraService(
                 var src = new Mat(imagesList[0], ImreadModes.Grayscale);
                 var mask = new Mat();
                 var newCameraMatrix =
-                    Cv2.GetOptimalNewCameraMatrix(InputArray.Create(matrix), InputArray.Create(dist), src.Size(), 0, src.Size(), out var roi);
+                    Cv2.GetOptimalNewCameraMatrix(InputArray.Create(matrix), InputArray.Create(dist), src.Size(), 0,
+                        src.Size(), out var roi);
                 // cameraMatrix 数组转换成 Mat 类型
                 Cv2.Undistort(src, mask, InputArray.Create(matrix), InputArray.Create(dist), newCameraMatrix);
                 // 裁剪图片并返回原始尺寸

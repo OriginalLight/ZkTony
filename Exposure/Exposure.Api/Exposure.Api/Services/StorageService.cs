@@ -15,18 +15,11 @@ public class StorageService(
     {
         await Task.Run(async () =>
         {
-            //删除文件夹里面的所有文件
+            //删除预览文件夹里面的所有文件
             try
             {
-                var directory = FileUtils.Preview;
-                if (Directory.Exists(directory))
-                {
-                    foreach (var file in Directory.GetFiles(directory))
-                    {
-                        Log.Information($"删除文件：{file}");
-                        File.Delete(file);
-                    }
-                }
+                Directory.Delete(FileUtils.Preview, true);
+                Log.Information("清空预览图成功");
             }
             catch (Exception e)
             {
@@ -34,13 +27,24 @@ public class StorageService(
                 Log.Error(e, "清空预览图失败");
             }
             
+            // 删除校准文件夹里面的所有文件
+            try
+            {
+                Directory.Delete(FileUtils.Calibration, true);
+                Log.Information("清空校准图成功");
+            }
+            catch (Exception e)
+            {
+                errorLog.AddErrorLog(e);
+                Log.Error(e, "清空校准图失败");
+            }
+
             // 自动清理错误日志
             await errorLog.AutoClear();
             Log.Information("自动清理错误日志");
             // 自动清理操作日志
             await operLog.AutoClear();
             Log.Information("自动清理操作日志");
-            
         });
     }
 

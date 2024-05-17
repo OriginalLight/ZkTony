@@ -118,8 +118,15 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
     {
         try
         {
-            _serialPorts[alias].Write(bytes, 0, bytes.Length);
-            Log.Information(alias + " 发送: " + BitConverter.ToString(bytes));
+            if (_serialPorts.TryGetValue(alias, out var port))
+            {
+                port.Write(bytes, 0, bytes.Length);
+                Log.Information(alias + " 发送: " + BitConverter.ToString(bytes));
+            }
+            else
+            {
+                Log.Error("找不到串口: " + alias);
+            }
         }
         catch (Exception e)
         {
@@ -145,20 +152,20 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
     {
         if (_serialPorts.ContainsKey(alias))
         {
-            Log.Information("已经打开串口: " + alias);
+            Log.Warning("已经打开串口: " + alias);
             return;
         }
 
         var portName = await option.GetOptionValueAsync(alias);
         if (portName == null)
         {
-            Log.Information("找不到串口号: " + alias);
+            Log.Error("找不到串口号: " + alias);
             return;
         }
 
         if (_serialPorts.Any(kv => kv.Value.PortName == portName))
         {
-            Log.Information("已经打开串口: " + portName);
+            Log.Warning("已经打开串口: " + portName);
             return;
         }
 

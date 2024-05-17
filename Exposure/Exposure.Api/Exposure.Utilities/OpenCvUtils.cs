@@ -14,10 +14,12 @@ public static class OpenCvUtils
             Log.Error("相机标定参数为空");
             return src;
         }
+
         //根据相机内参和畸变参数矫正图片
         var mask = new Mat();
         var newCameraMatrix =
-            Cv2.GetOptimalNewCameraMatrix(InputArray.Create(cameraMatrix), InputArray.Create(distCoeffs), src.Size(), 0, src.Size(), out var roi);
+            Cv2.GetOptimalNewCameraMatrix(InputArray.Create(cameraMatrix), InputArray.Create(distCoeffs), src.Size(), 0,
+                src.Size(), out var roi);
         // cameraMatrix 数组转换成 Mat 类型
         Cv2.Undistort(src, mask, InputArray.Create(cameraMatrix), InputArray.Create(distCoeffs), newCameraMatrix);
         // 裁剪图片并返回原始尺寸
@@ -151,11 +153,11 @@ public static class OpenCvUtils
     #endregion
 
     #region 畸形校正
-    
+
     public static void CalibrateCamera(List<string> images, out double[,]? cameraMatrix, out double[]? distCoeffs)
     {
         // 定义棋盘格的内角点数量
-        var chessboardWidth = 17;  // 棋盘格每行内角点数量
+        var chessboardWidth = 17; // 棋盘格每行内角点数量
         var chessboardHeight = 17; // 棋盘格每列内角点数量
         var chessboardSize = chessboardWidth * chessboardHeight; // 棋盘格总内角点数量
         var allImagePoints = new List<List<Point2f>>();
@@ -169,29 +171,28 @@ public static class OpenCvUtils
             // 生成棋盘格角点的三维坐标
             var objectPoints = new Point3f[chessboardSize];
             for (var i = 0; i < chessboardHeight; i++)
+            for (var j = 0; j < chessboardWidth; j++)
             {
-                for (var j = 0; j < chessboardWidth; j++)
-                {
-                    objectPoints[i * chessboardWidth + j] = new Point3f(j, i, 0);
-                    // 棋盘格每个方格的边长为 10mm
-                    objectPoints[i * chessboardWidth + j] *= squareSize;
-                }
+                objectPoints[i * chessboardWidth + j] = new Point3f(j, i, 0);
+                // 棋盘格每个方格的边长为 10mm
+                objectPoints[i * chessboardWidth + j] *= squareSize;
             }
-            
-            
+
+
             // 读取图片
             var mat = new Mat(image, ImreadModes.Grayscale);
             imageSize = mat.Size();
-            
+
             // 查找棋盘格角点
-            var found = Cv2.FindChessboardCorners(mat, new Size(chessboardWidth, chessboardHeight), out var imagePoints, ChessboardFlags.AdaptiveThresh);
+            var found = Cv2.FindChessboardCorners(mat, new Size(chessboardWidth, chessboardHeight), out var imagePoints,
+                ChessboardFlags.AdaptiveThresh);
 
             if (!found) continue;
             // 亚像素精确化
-            Cv2.CornerSubPix(mat, imagePoints, new Size(11, 11), new Size(-1, -1), new TermCriteria(CriteriaTypes.Eps | CriteriaTypes.MaxIter, 30, 0.1));
+            Cv2.CornerSubPix(mat, imagePoints, new Size(11, 11), new Size(-1, -1),
+                new TermCriteria(CriteriaTypes.Eps | CriteriaTypes.MaxIter, 30, 0.1));
             allImagePoints.Add(imagePoints.ToList());
             allObjectPoints.Add(objectPoints.ToList());
-
         }
 
         if (allImagePoints.Count == 0)
@@ -200,7 +201,7 @@ public static class OpenCvUtils
             distCoeffs = null;
             return;
         }
-        
+
         // 标定相机
         cameraMatrix = new double[3, 3];
         distCoeffs = new double[5];

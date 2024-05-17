@@ -17,7 +17,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="78ea7552-3107-4483-86a7-883cf6a7e7bd" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../../C/CODE_H723_HAL.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/MachineController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/MachineController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/MetricController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/MetricController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Controllers/PictureController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Controllers/PictureController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Exposure.Api.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Exposure.Api.csproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/CameraService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/CameraService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/ErrorLogService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/ErrorLogService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/OperLogService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/OperLogService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/PictureService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/PictureService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/SerialPortService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/SerialPortService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/StorageService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/StorageService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Api/Services/TestService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Api/Services/TestService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.SqlSugar/Exposure.SqlSugar.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.SqlSugar/Exposure.SqlSugar.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Utilities/Exposure.Utilities.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Utilities/Exposure.Utilities.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Utilities/FileUtils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Utilities/FileUtils.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Exposure.Utilities/OpenCvUtils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure.Utilities/OpenCvUtils.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,7 +80,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    ".NET Launch Settings Profile.Development.executor": "Debug",
+    ".NET Launch Settings Profile.Development.executor": "Run",
     ".NET Launch Settings Profile.Exposure.Api: Api.executor": "Run",
     ".NET Launch Settings Profile.Exposure.Api: IIS Express.executor": "Run",
     ".NET Launch Settings Profile.Exposure.Api: Production.executor": "Run",
@@ -286,6 +302,7 @@
       <workItem from="1715058782755" duration="5229000" />
       <workItem from="1715132552693" duration="62838000" />
       <workItem from="1715562316140" duration="44440000" />
+      <workItem from="1715910010064" duration="12477000" />
     </task>
     <servers />
   </component>
@@ -310,23 +327,6 @@
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Exposure.Api/Services/CameraService.cs</url>
-          <line>475</line>
-          <properties documentPath="C:\Users\ThinkBook\Documents\GitHub\ZkTony\Exposure\Exposure.Api\Exposure.Api\Services\CameraService.cs" containingFunctionPresentation="Method 'OnEventImage'">
-            <startOffsets>
-              <option value="13443" />
-            </startOffsets>
-            <endOffsets>
-              <option value="13494" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="7" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <pin-to-top-manager>
       <pinned-members>
         <PinnedItemInfo parentTag="Type#OpenCvSharp.Mat" memberName="TypeMap" />

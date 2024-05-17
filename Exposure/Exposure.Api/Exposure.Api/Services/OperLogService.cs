@@ -113,13 +113,13 @@ public class OperLogService(IDbContext dbContext, IUserService userService)
     }
 
     #endregion
-    
+
     #region 自动清理
-    
+
     public async Task AutoClear()
     {
         await _context.db.Deleteable<ErrorLog>().Where(p => p.Time < DateTime.Now.AddDays(-180)).ExecuteCommandAsync();
     }
-    
+
     #endregion
 }

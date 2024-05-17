@@ -130,7 +130,7 @@ public class TestService(ICameraService cameraService, ISerialPortService serial
     {
         // 存储老化测试日志
         var date = DateTime.Now.ToString("yyyyMMdd HH:mm:ss");
-        var file = FileUtils.GetFileName(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "AgingLog.txt");
+        var file = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "AgingLog.txt");
         if (File.Exists(file))
         {
             // 文件存在
