@@ -15,8 +15,6 @@ android {
         versionCode = 1
         versionName = "0.0.1"
 
-        setProperty("archivesBaseName", "App-JiXiangAn-${versionName}")
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -78,6 +76,13 @@ android {
         jniLibs.keepDebugSymbols += listOf(
             "*/x86/*.so", "*/x86_64/*.so", "*/armeabi-v7a/*.so", "*/arm64-v8a/*.so"
         )
+    }
+
+    applicationVariants.all {
+        outputs.all {
+            (this as? com.android.build.gradle.internal.api.ApkVariantOutputImpl)?.outputFileName =
+                "App-JiXiangAn-${versionName}-${name}.apk"
+        }
     }
 
     lint {
