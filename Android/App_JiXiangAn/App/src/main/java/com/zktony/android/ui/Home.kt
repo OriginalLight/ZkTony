@@ -48,8 +48,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.zktony.android.data.datastore.rememberDataSaverState
-import com.zktony.android.data.entities.Program
+import com.zktony.datastore.rememberDataSaverState
+import com.zktony.room.entities.Program
 import com.zktony.android.ui.components.CleanDialog
 import com.zktony.android.ui.components.ConfirmDialog
 import com.zktony.android.ui.components.ErrorDialog
@@ -195,7 +195,8 @@ fun HomeContent(
                         dispatch(HomeIntent.Stop)
                     }
                     confirm = 0
-                } },
+                }
+            },
             onCancel = { confirm = 0 }
         )
     }
@@ -241,7 +242,10 @@ fun HomeContent(
                         )
                     },
                     trailingContent = {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowRight, contentDescription = null)
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                            contentDescription = null
+                        )
                     },
                     colors = ListItemDefaults.colors(
                         containerColor = MaterialTheme.colorScheme.secondaryContainer

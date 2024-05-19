@@ -81,7 +81,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -89,8 +88,8 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
-import com.zktony.android.data.datastore.rememberDataSaverState
-import com.zktony.android.data.entities.Motor
+import com.zktony.datastore.rememberDataSaverState
+import com.zktony.room.entities.Motor
 import com.zktony.android.ui.components.CircleTextField
 import com.zktony.android.ui.components.MotorItem
 import com.zktony.android.ui.components.SettingsAppBar
@@ -299,7 +298,8 @@ fun SettingContent(
                         )
                     } else {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowRight, contentDescription = null
+                            imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                            contentDescription = null
                         )
                     }
                 }
@@ -879,7 +879,11 @@ fun ConfigList() {
                             delay(300L)
                             writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
                             delay(3500L)
-                            writeRegister(startAddr = 222, slaveAddr = 0, value = (value * 6400).toLong())
+                            writeRegister(
+                                startAddr = 222,
+                                slaveAddr = 0,
+                                value = (value * 6400).toLong()
+                            )
                         }
                     }) {
                         Icon(imageVector = Icons.Default.Start, contentDescription = null)
@@ -908,7 +912,11 @@ fun ConfigList() {
                             delay(300L)
                             writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
                             delay(3500L)
-                            writeRegister(startAddr = 222, slaveAddr = 0, value = (value * 6400).toLong())
+                            writeRegister(
+                                startAddr = 222,
+                                slaveAddr = 0,
+                                value = (value * 6400).toLong()
+                            )
                         }
                     }) {
                         Icon(imageVector = Icons.Default.Start, contentDescription = null)

@@ -38,11 +38,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.compose.LazyPagingItems
 import com.zktony.android.R
-import com.zktony.android.data.entities.Calibration
-import com.zktony.android.data.entities.History
-import com.zktony.android.data.entities.Program
-import com.zktony.android.data.entities.internal.Point
-import com.zktony.android.data.entities.internal.defaults.StageDefaults
+import com.zktony.room.entities.Calibration
+import com.zktony.room.entities.History
+import com.zktony.room.entities.Program
+import com.zktony.room.entities.internal.Point
+import com.zktony.room.entities.internal.defaults.StageDefaults
 import com.zktony.android.ui.CalibrationIntent
 import com.zktony.android.ui.HistoryIntent
 import com.zktony.android.ui.ProgramIntent

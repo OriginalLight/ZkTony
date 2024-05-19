@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.zktony.android.data.entities.History
+import com.zktony.room.entities.History
 import com.zktony.android.ui.components.HistoryAppBar
 import com.zktony.android.ui.components.HistoryItem
 import com.zktony.android.ui.components.LogItem

@@ -41,9 +41,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.R
-import com.zktony.android.data.entities.Program
-import com.zktony.android.data.entities.internal.IncubationStage
-import com.zktony.android.data.entities.internal.defaults.StageDefaults
+import com.zktony.room.entities.Program
+import com.zktony.room.entities.internal.IncubationStage
+import com.zktony.room.entities.internal.defaults.StageDefaults
 import com.zktony.android.ui.components.IncubationStageItem
 import com.zktony.android.ui.components.InputDialog
 import com.zktony.android.ui.components.ProgramAppBar
@@ -329,7 +329,10 @@ fun ProgramInput(
                         style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(modifier = Modifier.weight(1f))
-                    Icon(imageVector = Icons.AutoMirrored.Filled.ArrowRight, contentDescription = null)
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                        contentDescription = null
+                    )
                 }
             }
         }

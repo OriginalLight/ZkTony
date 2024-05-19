@@ -1,6 +1,6 @@
 package com.zktony.android
 
-import com.zktony.android.data.entities.internal.Point
+import com.zktony.room.entities.internal.Point
 import com.zktony.android.utils.AlgorithmUtils
 import com.zktony.android.utils.SerialPortUtils
 import com.zktony.serialport.command.modbus.RtuProtocol

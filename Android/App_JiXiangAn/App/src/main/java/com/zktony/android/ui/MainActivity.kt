@@ -8,8 +8,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
-import com.zktony.android.data.datastore.DataSaverDataStore
-import com.zktony.android.data.datastore.LocalDataSaver
+import com.zktony.datastore.DataSaverDataStore
+import com.zktony.datastore.LocalDataSaver
 import com.zktony.android.ui.navigation.AppNavigation
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.theme.AppTheme

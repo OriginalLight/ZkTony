@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
-import com.zktony.android.data.dao.ProgramDao
-import com.zktony.android.data.entities.Program
+import com.zktony.room.dao.ProgramDao
+import com.zktony.room.entities.Program
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -49,7 +49,7 @@ class ProgramViewModel @Inject constructor(
 }
 
 sealed class ProgramIntent {
-    data class Flags(val uiFlags: UiFlags): ProgramIntent()
+    data class Flags(val uiFlags: UiFlags) : ProgramIntent()
     data class NavTo(val page: PageType) : ProgramIntent()
     data class Delete(val id: Long) : ProgramIntent()
     data class Insert(val program: Program) : ProgramIntent()

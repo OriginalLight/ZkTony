@@ -1,7 +1,7 @@
 package com.zktony.android.utils.service
 
-import com.zktony.android.data.dao.HistoryDao
-import com.zktony.android.data.entities.History
+import com.zktony.room.dao.HistoryDao
+import com.zktony.room.entities.History
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject

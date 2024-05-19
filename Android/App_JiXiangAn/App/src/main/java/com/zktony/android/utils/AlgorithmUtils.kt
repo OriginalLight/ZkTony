@@ -1,6 +1,6 @@
 package com.zktony.android.utils
 
-import com.zktony.android.data.entities.internal.Point
+import com.zktony.room.entities.internal.Point
 
 /**
  * @author 刘贺贺

@@ -36,7 +36,7 @@ fun CircleTextField(
     title: String,
     value: String,
     keyboardType: KeyboardType = KeyboardType.Decimal,
-    trailingIcon:  @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
     onValueChange: (String) -> Unit = {}
 
 ) {

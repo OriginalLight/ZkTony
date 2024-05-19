@@ -46,7 +46,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.zktony.android.data.entities.Calibration
+import com.zktony.room.entities.Calibration
 import com.zktony.android.ui.components.CalibrationAppBar
 import com.zktony.android.ui.components.CalibrationItem
 import com.zktony.android.ui.components.PointItem

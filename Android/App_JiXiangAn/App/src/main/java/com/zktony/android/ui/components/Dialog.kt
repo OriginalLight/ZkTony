@@ -217,12 +217,15 @@ fun CleanDialog(
                                 0 -> {
                                     "开始"
                                 }
+
                                 1 -> {
                                     time.timeFormat()
                                 }
+
                                 2 -> {
                                     "已完成"
                                 }
+
                                 else -> {
                                     "Unknown"
                                 }

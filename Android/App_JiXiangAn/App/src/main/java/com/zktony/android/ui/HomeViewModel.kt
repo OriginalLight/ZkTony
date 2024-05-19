@@ -5,13 +5,13 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
-import com.zktony.android.data.dao.HistoryDao
-import com.zktony.android.data.dao.ProgramDao
-import com.zktony.android.data.datastore.DataSaverDataStore
-import com.zktony.android.data.entities.History
-import com.zktony.android.data.entities.Program
-import com.zktony.android.data.entities.internal.IncubationStage
-import com.zktony.android.data.entities.internal.Log
+import com.zktony.room.dao.HistoryDao
+import com.zktony.room.dao.ProgramDao
+import com.zktony.datastore.DataSaverDataStore
+import com.zktony.room.entities.History
+import com.zktony.room.entities.Program
+import com.zktony.room.entities.internal.IncubationStage
+import com.zktony.room.entities.internal.Log
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.utils.AppStateUtils
@@ -444,7 +444,7 @@ class HomeViewModel @Inject constructor(
                 _stateList.value.find { it.index == index }?.let {
                     updateState(it.copy(flags = 5))
                 }
-                clean(index, stage, 11,(index - ((index / 4) * 4)) + 1)
+                clean(index, stage, 11, (index - ((index / 4) * 4)) + 1)
             }
             // 更新模块状态和进程状态
             _stateList.value.find { it.index == index }?.let { state ->

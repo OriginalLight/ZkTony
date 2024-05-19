@@ -12,8 +12,10 @@ android {
         applicationId = "com.zktony.android"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 10
-        versionName = "1.2.5"
+        versionCode = 1
+        versionName = "0.0.1"
+
+        setProperty("archivesBaseName", "App-JiXiangAn-${versionName}")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -78,13 +80,6 @@ android {
         )
     }
 
-    applicationVariants.all {
-        outputs.all {
-            (this as? com.android.build.gradle.internal.api.ApkVariantOutputImpl)?.outputFileName =
-                "App-JiXiangAn-${versionName}-${name}.apk"
-        }
-    }
-
     lint {
         baseline = file("lint-baseline.xml")
     }
@@ -94,9 +89,10 @@ android {
 dependencies {
     val composeBom = platform(libs.androidx.compose.bom)
 
-    ksp(libs.androidx.room.compiler)
     ksp(libs.hilt.compiler)
 
+    implementation(project(mapOf("path" to ":App_DataStore")))
+    implementation(project(mapOf("path" to ":App_Room")))
     implementation(project(mapOf("path" to ":Lib_SerialPort")))
 
     implementation(libs.androidx.activity.compose)
@@ -105,15 +101,11 @@ dependencies {
     implementation(libs.androidx.compose.paging)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.lifecycle.runtime)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewModelCompose)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.room.ktx)
-    implementation(libs.androidx.room.paging)
-    implementation(libs.androidx.room.runtime)
     implementation(libs.gson)
     implementation(libs.hilt.android)
     implementation(libs.okhttp3)

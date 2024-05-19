@@ -28,7 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.zktony.android.data.datastore.rememberDataSaverState
+import com.zktony.datastore.rememberDataSaverState
 import com.zktony.android.ui.components.CircularButtons
 import com.zktony.android.ui.components.DebugAppBar
 import com.zktony.android.ui.components.SquareTextField

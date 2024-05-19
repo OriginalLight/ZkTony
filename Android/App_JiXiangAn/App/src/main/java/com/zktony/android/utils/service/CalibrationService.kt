@@ -1,6 +1,6 @@
 package com.zktony.android.utils.service
 
-import com.zktony.android.data.dao.CalibrationDao
+import com.zktony.room.dao.CalibrationDao
 import com.zktony.android.utils.AlgorithmUtils.calculateCalibrationFactor
 import com.zktony.android.utils.AppStateUtils.hpc
 import kotlinx.coroutines.launch

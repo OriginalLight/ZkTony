@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
-import com.zktony.android.data.dao.HistoryDao
+import com.zktony.room.dao.HistoryDao
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
 import dagger.hilt.android.lifecycle.HiltViewModel

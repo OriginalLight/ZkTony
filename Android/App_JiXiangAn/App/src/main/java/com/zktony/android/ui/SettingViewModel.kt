@@ -9,8 +9,8 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
-import com.zktony.android.data.dao.MotorDao
-import com.zktony.android.data.entities.Motor
+import com.zktony.room.dao.MotorDao
+import com.zktony.room.entities.Motor
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.utils.ApplicationUtils
@@ -127,7 +127,9 @@ class SettingViewModel @Inject constructor(
                     }
                 }
             } else {
-                httpCall(exception = { _uiFlags.value = UiFlags.message(it.message ?: "Unknown") }) { app ->
+                httpCall(exception = {
+                    _uiFlags.value = UiFlags.message(it.message ?: "Unknown")
+                }) { app ->
                     if (app != null) {
                         _application.value = app
                     } else {
