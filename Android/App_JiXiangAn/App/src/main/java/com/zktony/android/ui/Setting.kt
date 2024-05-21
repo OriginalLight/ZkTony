@@ -59,7 +59,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -88,8 +87,6 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
-import com.zktony.datastore.rememberDataSaverState
-import com.zktony.room.entities.Motor
 import com.zktony.android.ui.components.CircleTextField
 import com.zktony.android.ui.components.MotorItem
 import com.zktony.android.ui.components.SettingsAppBar
@@ -100,13 +97,14 @@ import com.zktony.android.ui.utils.AnimatedContent
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.ui.utils.items
 import com.zktony.android.ui.utils.toList
 import com.zktony.android.utils.ApplicationUtils
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.SerialPortUtils.writeRegister
 import com.zktony.android.utils.extra.Application
+import com.zktony.datastore.rememberDataSaverState
+import com.zktony.room.entities.Motor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -116,13 +114,11 @@ fun SettingRoute(viewModel: SettingViewModel) {
 
     val scope = rememberCoroutineScope()
     val navigationActions = LocalNavigationActions.current
-    val snackbarHostState = LocalSnackbarHostState.current
 
     val application by viewModel.application.collectAsStateWithLifecycle()
     val selected by viewModel.selected.collectAsStateWithLifecycle()
     val progress by viewModel.progress.collectAsStateWithLifecycle()
     val page by viewModel.page.collectAsStateWithLifecycle()
-    val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
 
     val entities = viewModel.entities.collectAsLazyPagingItems()
     val navigation: () -> Unit = {
@@ -136,13 +132,6 @@ fun SettingRoute(viewModel: SettingViewModel) {
     }
 
     BackHandler { navigation() }
-
-    LaunchedEffect(key1 = uiFlags) {
-        if (uiFlags is UiFlags.Message) {
-            snackbarHostState.showSnackbar((uiFlags as UiFlags.Message).message)
-            viewModel.dispatch(SettingIntent.Flags(UiFlags.none()))
-        }
-    }
 
     Column {
         SettingsAppBar(page, viewModel::dispatch) { navigation() }

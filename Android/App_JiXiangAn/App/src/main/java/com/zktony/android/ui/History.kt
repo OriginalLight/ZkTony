@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -18,16 +17,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.zktony.room.entities.History
 import com.zktony.android.ui.components.HistoryAppBar
 import com.zktony.android.ui.components.HistoryItem
 import com.zktony.android.ui.components.LogItem
 import com.zktony.android.ui.utils.AnimatedContent
 import com.zktony.android.ui.utils.LocalNavigationActions
-import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.ui.utils.itemsIndexed
+import com.zktony.room.entities.History
 import kotlinx.coroutines.launch
 
 /**
@@ -40,11 +37,9 @@ fun HistoryRoute(viewModel: HistoryViewModel) {
 
     val scope = rememberCoroutineScope()
     val navigationActions = LocalNavigationActions.current
-    val snackbarHostState = LocalSnackbarHostState.current
 
     val page by viewModel.page.collectAsStateWithLifecycle()
     val selected by viewModel.selected.collectAsStateWithLifecycle()
-    val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
 
     val entities = viewModel.entities.collectAsLazyPagingItems()
     val navigation: () -> Unit = {
@@ -57,13 +52,6 @@ fun HistoryRoute(viewModel: HistoryViewModel) {
     }
 
     BackHandler { navigation() }
-
-    LaunchedEffect(key1 = uiFlags) {
-        if (uiFlags is UiFlags.Message) {
-            snackbarHostState.showSnackbar((uiFlags as UiFlags.Message).message)
-            viewModel.dispatch(HistoryIntent.Flags(UiFlags.none()))
-        }
-    }
 
     Column {
         HistoryAppBar(entities, selected, page, viewModel::dispatch) { navigation() }

@@ -38,11 +38,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.compose.LazyPagingItems
 import com.zktony.android.R
-import com.zktony.room.entities.Calibration
-import com.zktony.room.entities.History
-import com.zktony.room.entities.Program
-import com.zktony.room.entities.internal.Point
-import com.zktony.room.entities.internal.defaults.StageDefaults
 import com.zktony.android.ui.CalibrationIntent
 import com.zktony.android.ui.HistoryIntent
 import com.zktony.android.ui.ProgramIntent
@@ -52,6 +47,11 @@ import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.extra.dateFormat
+import com.zktony.room.entities.Calibration
+import com.zktony.room.entities.History
+import com.zktony.room.entities.Program
+import com.zktony.room.entities.internal.Point
+import com.zktony.room.entities.internal.defaults.StageDefaults
 import kotlinx.coroutines.launch
 
 /**
@@ -96,7 +96,7 @@ fun HomeAppBar(
                 }
                 TOP_LEVEL_DESTINATIONS.forEach { destination ->
                     ElevatedButton(
-                        onClick = { navigationActions.navigateTo(destination) },
+                        onClick = { navigationActions.navigate(destination.route) },
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,

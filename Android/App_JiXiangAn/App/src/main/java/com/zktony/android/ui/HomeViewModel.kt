@@ -5,13 +5,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
-import com.zktony.room.dao.HistoryDao
-import com.zktony.room.dao.ProgramDao
-import com.zktony.datastore.DataSaverDataStore
-import com.zktony.room.entities.History
-import com.zktony.room.entities.Program
-import com.zktony.room.entities.internal.IncubationStage
-import com.zktony.room.entities.internal.Log
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.utils.AppStateUtils
@@ -21,6 +14,14 @@ import com.zktony.android.utils.SerialPortUtils.writeRegister
 import com.zktony.android.utils.SerialPortUtils.writeWithPulse
 import com.zktony.android.utils.SerialPortUtils.writeWithTemperature
 import com.zktony.android.utils.SerialPortUtils.writeWithValve
+import com.zktony.android.utils.SnackbarUtils
+import com.zktony.datastore.DataSaverDataStore
+import com.zktony.room.dao.HistoryDao
+import com.zktony.room.dao.ProgramDao
+import com.zktony.room.entities.History
+import com.zktony.room.entities.Program
+import com.zktony.room.entities.internal.IncubationStage
+import com.zktony.room.entities.internal.Log
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -74,7 +75,7 @@ class HomeViewModel @Inject constructor(
                 try {
                     writeWithValve(it, 1)
                 } catch (ex: Exception) {
-                    _uiFlags.value = UiFlags.message(ex.message ?: "Unknown")
+                    SnackbarUtils.showMessage(ex.message ?: "Unknown")
                 }
                 delay(300L)
             }
@@ -116,19 +117,19 @@ class HomeViewModel @Inject constructor(
             val current = _selected.value
             val state = _stateList.value.find { it.index == current }
             if (state == null) {
-                _uiFlags.value = UiFlags.message("WARN 请选择一个程序")
+                SnackbarUtils.showMessage("WARN 请选择一个程序")
                 return@launch
             } else {
                 if (state.id == 0L) {
-                    _uiFlags.value = UiFlags.message("WARN 请选择一个程序")
+                    SnackbarUtils.showMessage("WARN 请选择一个程序")
                     return@launch
                 }
                 if (state.stages.isEmpty()) {
-                    _uiFlags.value = UiFlags.message("WARN 程序中不存在孵育流程")
+                    SnackbarUtils.showMessage("WARN 程序中不存在孵育流程")
                     return@launch
                 }
                 if (!state.isStopped()) {
-                    _uiFlags.value = UiFlags.message("WARN 该程序正在运行中")
+                    SnackbarUtils.showMessage("WARN 该程序正在运行中")
                     return@launch
                 }
                 updateState(state.copy(flags = 1, stages = state.stages.map { it.copy(flags = 2) }))
@@ -196,7 +197,7 @@ class HomeViewModel @Inject constructor(
                     }
 
                     4 -> {
-                        _uiFlags.value = UiFlags.message("WARN 请不要重复点击")
+                        SnackbarUtils.showMessage("WARN 请不要重复点击")
                     }
 
                     else -> {
@@ -205,7 +206,7 @@ class HomeViewModel @Inject constructor(
                     }
                 }
             } catch (ex: Exception) {
-                _uiFlags.value = UiFlags.message(ex.message ?: "Unknown")
+                SnackbarUtils.showMessage(ex.message ?: "Unknown")
             }
         }
     }

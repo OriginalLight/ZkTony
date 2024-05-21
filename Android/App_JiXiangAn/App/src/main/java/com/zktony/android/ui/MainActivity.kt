@@ -8,14 +8,14 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
-import com.zktony.datastore.DataSaverDataStore
-import com.zktony.datastore.LocalDataSaver
 import com.zktony.android.ui.navigation.AppNavigation
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.theme.AppTheme
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.utils.service.BackgroundService
+import com.zktony.datastore.DataSaverDataStore
+import com.zktony.datastore.LocalDataSaver
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -41,6 +41,7 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             val navigationActions = remember(navController) { NavigationActions(navController) }
             val snackbarHostState = remember { SnackbarHostState() }
+            // Create the HomeViewModel instance with activity scope
             val homeViewModel: HomeViewModel = hiltViewModel()
 
             CompositionLocalProvider(

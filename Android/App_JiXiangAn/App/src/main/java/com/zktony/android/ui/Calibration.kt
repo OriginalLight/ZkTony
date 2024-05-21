@@ -26,7 +26,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -46,7 +45,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.zktony.room.entities.Calibration
 import com.zktony.android.ui.components.CalibrationAppBar
 import com.zktony.android.ui.components.CalibrationItem
 import com.zktony.android.ui.components.PointItem
@@ -57,6 +55,7 @@ import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.toList
+import com.zktony.room.entities.Calibration
 import kotlinx.coroutines.launch
 
 /**
@@ -70,7 +69,6 @@ fun CalibrationRoute(viewModel: CalibrationViewModel) {
 
     val scope = rememberCoroutineScope()
     val navigationActions = LocalNavigationActions.current
-    val snackbarHostState = LocalSnackbarHostState.current
 
     val page by viewModel.page.collectAsStateWithLifecycle()
     val selected by viewModel.selected.collectAsStateWithLifecycle()
@@ -87,13 +85,6 @@ fun CalibrationRoute(viewModel: CalibrationViewModel) {
     }
 
     BackHandler { navigation() }
-
-    LaunchedEffect(key1 = uiFlags) {
-        if (uiFlags is UiFlags.Message) {
-            snackbarHostState.showSnackbar((uiFlags as UiFlags.Message).message)
-            viewModel.dispatch(CalibrationIntent.Flags(UiFlags.none()))
-        }
-    }
 
     Column {
         CalibrationAppBar(entities.toList(), selected, page, viewModel::dispatch) { navigation() }

@@ -6,6 +6,7 @@ import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.utils.SerialPortUtils.writeWithPulse
 import com.zktony.android.utils.SerialPortUtils.writeWithValve
+import com.zktony.android.utils.SnackbarUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,48 +21,34 @@ import javax.inject.Inject
 class DebugViewModel @Inject constructor() : ViewModel() {
 
     private val _page = MutableStateFlow(PageType.DEBUG)
-    private val _uiFlags = MutableStateFlow<UiFlags>(UiFlags.none())
+    private val _loading = MutableStateFlow(false)
 
     val page = _page.asStateFlow()
-    val uiFlags = _uiFlags.asStateFlow()
+    val loading = _loading.asStateFlow()
 
-    fun dispatch(intent: DebugIntent) {
-        when (intent) {
-            is DebugIntent.Flags -> _uiFlags.value = intent.uiFlags
-            is DebugIntent.NavTo -> _page.value = intent.page
-            is DebugIntent.Valve -> valve(intent.index, intent.value)
-            is DebugIntent.Transfer -> transfer(intent.index, intent.turns)
-        }
-    }
-
-    private fun valve(index: Int, value: Int) {
+    fun valve(value: Int) {
         viewModelScope.launch {
             try {
-                _uiFlags.value = UiFlags.loading()
-                writeWithValve(index, value)
-                _uiFlags.value = UiFlags.none()
+                _loading.value = true
+                writeWithValve(1, value)
+                _loading.value = false
             } catch (ex: Exception) {
-                _uiFlags.value = UiFlags.message(ex.message ?: "Unknown")
+                SnackbarUtils.showMessage(ex.message ?: "Unknown")
+                _loading.value = false
             }
         }
     }
 
-    private fun transfer(index: Int, turns: Double) {
+    fun transfer(turns: Double) {
         viewModelScope.launch {
             try {
-                _uiFlags.value = UiFlags.loading()
-                writeWithPulse(index, (turns * 6400).toLong())
-                _uiFlags.value = UiFlags.none()
+                _loading.value = true
+                writeWithPulse(1, (turns * 6400).toLong())
+                _loading.value = false
             } catch (ex: Exception) {
-                _uiFlags.value = UiFlags.message(ex.message ?: "Unknown")
+                SnackbarUtils.showMessage(ex.message ?: "Unknown")
+                _loading.value = false
             }
         }
     }
-}
-
-sealed class DebugIntent {
-    data class Flags(val uiFlags: UiFlags) : DebugIntent()
-    data class NavTo(val page: PageType) : DebugIntent()
-    data class Transfer(val index: Int, val turns: Double) : DebugIntent()
-    data class Valve(val index: Int, val value: Int) : DebugIntent()
 }

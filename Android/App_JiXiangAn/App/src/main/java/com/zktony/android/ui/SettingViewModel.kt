@@ -9,15 +9,15 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
-import com.zktony.room.dao.MotorDao
-import com.zktony.room.entities.Motor
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.utils.ApplicationUtils
+import com.zktony.android.utils.SnackbarUtils
 import com.zktony.android.utils.extra.Application
 import com.zktony.android.utils.extra.DownloadState
 import com.zktony.android.utils.extra.download
 import com.zktony.android.utils.extra.httpCall
+import com.zktony.room.dao.MotorDao
+import com.zktony.room.entities.Motor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,13 +38,11 @@ class SettingViewModel @Inject constructor(
     private val _selected = MutableStateFlow(0L)
     private val _progress = MutableStateFlow(0)
     private val _page = MutableStateFlow(PageType.SETTINGS)
-    private val _uiFlags = MutableStateFlow<UiFlags>(UiFlags.none())
 
     val application = _application.asStateFlow()
     val selected = _selected.asStateFlow()
     val progress = _progress.asStateFlow()
     val page = _page.asStateFlow()
-    val uiFlags = _uiFlags.asStateFlow()
     val entities = Pager(
         config = PagingConfig(pageSize = 20, initialLoadSize = 40),
     ) { dao.getByPage() }.flow.cachedIn(viewModelScope)
@@ -62,7 +60,6 @@ class SettingViewModel @Inject constructor(
             is SettingIntent.CheckUpdate -> checkUpdate()
             is SettingIntent.Delete -> viewModelScope.launch { dao.deleteById(intent.id) }
             is SettingIntent.Insert -> viewModelScope.launch { dao.insert(Motor(displayText = "None")) }
-            is SettingIntent.Flags -> _uiFlags.value = intent.uiFlags
             is SettingIntent.Navigation -> navigation(intent.navigation)
             is SettingIntent.NavTo -> _page.value = intent.page
             is SettingIntent.Network -> network()
@@ -117,7 +114,7 @@ class SettingViewModel @Inject constructor(
 
                             is DownloadState.Err -> {
                                 _progress.value = 0
-                                _uiFlags.value = UiFlags.message("下载失败: ${it.t.message}")
+                                SnackbarUtils.showMessage("下载失败: ${it.t.message}")
                             }
 
                             is DownloadState.Progress -> {
@@ -128,12 +125,12 @@ class SettingViewModel @Inject constructor(
                 }
             } else {
                 httpCall(exception = {
-                    _uiFlags.value = UiFlags.message(it.message ?: "Unknown")
+                    SnackbarUtils.showMessage(it.message ?: "Unknown")
                 }) { app ->
                     if (app != null) {
                         _application.value = app
                     } else {
-                        _uiFlags.value = UiFlags.message("未找到升级信息")
+                        SnackbarUtils.showMessage("未找到升级信息")
                     }
                 }
             }
@@ -142,7 +139,6 @@ class SettingViewModel @Inject constructor(
 }
 
 sealed class SettingIntent {
-    data class Flags(val uiFlags: UiFlags) : SettingIntent()
     data class NavTo(val page: PageType) : SettingIntent()
     data class Delete(val id: Long) : SettingIntent()
     data class Navigation(val navigation: Boolean) : SettingIntent()

@@ -23,7 +23,10 @@ fun Permissions(
     content: @Composable () -> Unit
 ) {
     val permissionStates = rememberMultiplePermissionsState(
-        permissions = listOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        permissions = listOf(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
     )
 
     if (permissionStates.allPermissionsGranted) {
@@ -35,7 +38,7 @@ fun Permissions(
             // Show the permissions screen
             // Request permissions
             permissionStates.permissions.forEach {
-                when(it.permission) {
+                when (it.permission) {
                     Manifest.permission.READ_EXTERNAL_STORAGE -> {
                         when {
                             it.status.isGranted -> {
@@ -45,13 +48,15 @@ fun Permissions(
                                 */
                                 Text(text = "Read Ext Storage permission has been granted")
                             }
+
                             it.status.shouldShowRationale -> {
                                 /*Happens if a user denies the permission two times
 
                                  */
                                 Text(text = "Read Ext Storage permission is needed")
                             }
-                            !it.status.isGranted  && !it.status.shouldShowRationale -> {
+
+                            !it.status.isGranted && !it.status.shouldShowRationale -> {
                                 /* If the permission is denied and the should not show rationale
                                     You can only allow the permission manually through app settings
                                  */
@@ -60,6 +65,7 @@ fun Permissions(
                             }
                         }
                     }
+
                     Manifest.permission.WRITE_EXTERNAL_STORAGE -> {
                         // Request write external storage permission
                         // Request permissions

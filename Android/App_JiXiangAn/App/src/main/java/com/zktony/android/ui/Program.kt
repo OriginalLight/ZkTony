@@ -25,7 +25,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -41,9 +40,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.R
-import com.zktony.room.entities.Program
-import com.zktony.room.entities.internal.IncubationStage
-import com.zktony.room.entities.internal.defaults.StageDefaults
 import com.zktony.android.ui.components.IncubationStageItem
 import com.zktony.android.ui.components.InputDialog
 import com.zktony.android.ui.components.ProgramAppBar
@@ -53,9 +49,11 @@ import com.zktony.android.ui.utils.AnimatedContent
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.toList
+import com.zktony.room.entities.Program
+import com.zktony.room.entities.internal.IncubationStage
+import com.zktony.room.entities.internal.defaults.StageDefaults
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -64,11 +62,9 @@ fun ProgramRoute(viewModel: ProgramViewModel) {
 
     val scope = rememberCoroutineScope()
     val navigationActions = LocalNavigationActions.current
-    val snackbarHostState = LocalSnackbarHostState.current
 
     val page by viewModel.page.collectAsStateWithLifecycle()
     val selected by viewModel.selected.collectAsStateWithLifecycle()
-    val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
 
     val entities = viewModel.entities.collectAsLazyPagingItems()
     val navigation: () -> Unit = {
@@ -82,13 +78,6 @@ fun ProgramRoute(viewModel: ProgramViewModel) {
 
 
     BackHandler { navigation() }
-
-    LaunchedEffect(key1 = uiFlags) {
-        if (uiFlags is UiFlags.Message) {
-            snackbarHostState.showSnackbar((uiFlags as UiFlags.Message).message)
-            viewModel.dispatch(ProgramIntent.Flags(UiFlags.none()))
-        }
-    }
 
     Column {
         ProgramAppBar(entities.toList(), selected, page, viewModel::dispatch) { navigation() }

@@ -31,7 +31,6 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -48,8 +47,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.zktony.datastore.rememberDataSaverState
-import com.zktony.room.entities.Program
 import com.zktony.android.ui.components.CleanDialog
 import com.zktony.android.ui.components.ConfirmDialog
 import com.zktony.android.ui.components.ErrorDialog
@@ -66,6 +63,8 @@ import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.toList
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.extra.dateFormat
+import com.zktony.datastore.rememberDataSaverState
+import com.zktony.room.entities.Program
 import kotlinx.coroutines.launch
 
 
@@ -74,7 +73,6 @@ import kotlinx.coroutines.launch
 fun HomeRoute(viewModel: HomeViewModel) {
 
     val scope = rememberCoroutineScope()
-    val snackbarHostState = LocalSnackbarHostState.current
 
     val page by viewModel.page.collectAsStateWithLifecycle()
     val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
@@ -95,13 +93,6 @@ fun HomeRoute(viewModel: HomeViewModel) {
     }
 
     BackHandler { navigation() }
-
-    LaunchedEffect(key1 = uiFlags) {
-        if (uiFlags is UiFlags.Message) {
-            snackbarHostState.showSnackbar((uiFlags as UiFlags.Message).message)
-            viewModel.dispatch(HomeIntent.Flags(UiFlags.none()))
-        }
-    }
 
     Column {
         HomeAppBar(page) { navigation() }

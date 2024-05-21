@@ -5,14 +5,15 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
-import com.zktony.room.dao.CalibrationDao
-import com.zktony.room.entities.Calibration
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.SerialPortUtils
+import com.zktony.android.utils.SnackbarUtils
 import com.zktony.datastore.DataSaverDataStore
+import com.zktony.room.dao.CalibrationDao
+import com.zktony.room.entities.Calibration
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -60,7 +61,7 @@ class CalibrationViewModel @Inject constructor(
             _uiFlags.value = UiFlags.loading()
             val volume = dataStore.readData(Constants.ZT_0002, 0.0)
             if (turns == 0.0) {
-                _uiFlags.value = UiFlags.message("转数不能为0")
+                SnackbarUtils.showMessage("转数不能为0")
                 return@launch
             }
             try {
@@ -77,7 +78,7 @@ class CalibrationViewModel @Inject constructor(
                 }
                 _uiFlags.value = UiFlags.none()
             } catch (ex: Exception) {
-                _uiFlags.value = UiFlags.message(ex.message ?: "Unknown")
+                SnackbarUtils.showMessage(ex.message ?: "Unknown")
             }
         }
     }

@@ -32,7 +32,6 @@
     <string name="phosphate_buffered_saline">Phosphate Buffered Saline</string>
     <string name="up">Up</string>
     <string name="down">Down</string>
-    <string name="add">Add</string>
     <string name="debug">Debug</string>
     <string name="copyright">Copyright © 2023 Zktony Inc. All rights reserved.</string>
 </resources>

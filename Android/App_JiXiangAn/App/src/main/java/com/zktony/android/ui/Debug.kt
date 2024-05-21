@@ -1,12 +1,10 @@
 package com.zktony.android.ui
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -14,8 +12,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,18 +22,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.zktony.datastore.rememberDataSaverState
 import com.zktony.android.ui.components.CircularButtons
 import com.zktony.android.ui.components.DebugAppBar
 import com.zktony.android.ui.components.SquareTextField
 import com.zktony.android.ui.utils.LocalNavigationActions
-import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.utils.AppStateUtils.hpv
-import com.zktony.android.utils.Constants
 import kotlinx.coroutines.launch
 
 /**
@@ -47,57 +41,36 @@ import kotlinx.coroutines.launch
 @Composable
 fun DebugRoute(viewModel: DebugViewModel) {
 
-    val scope = rememberCoroutineScope()
     val navigationActions = LocalNavigationActions.current
-    val snackbarHostState = LocalSnackbarHostState.current
 
     val page by viewModel.page.collectAsStateWithLifecycle()
-    val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
+    val loading by viewModel.loading.collectAsStateWithLifecycle()
 
-    val navigation: () -> Unit = {
-        scope.launch {
-            when (page) {
-                PageType.DEBUG -> navigationActions.navigateUp()
-                else -> viewModel.dispatch(DebugIntent.NavTo(PageType.DEBUG))
-            }
-        }
-    }
-
-    BackHandler { navigation() }
-
-    LaunchedEffect(key1 = uiFlags) {
-        if (uiFlags is UiFlags.Message) {
-            snackbarHostState.showSnackbar((uiFlags as UiFlags.Message).message)
-            viewModel.dispatch(DebugIntent.Flags(UiFlags.none()))
-        }
-    }
-
-    var group by remember { mutableIntStateOf(0) }
+    BackHandler { navigationActions.navigateUp() }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        DebugAppBar { navigation() }
-        PulseForm(group, uiFlags, viewModel::dispatch) { group = it }
-        ValveGroup(group, page, uiFlags, viewModel::dispatch)
+        DebugAppBar { navigationActions.navigateUp() }
+        PulseForm(loading, viewModel)
+        ValveGroup(page, loading, viewModel)
     }
 }
 
 @Composable
 fun ValveGroup(
-    group: Int,
     page: PageType,
-    uiFlags: UiFlags,
-    dispatch: (DebugIntent) -> Unit
+    loading: Boolean,
+    viewModel: DebugViewModel
 ) {
     val scope = rememberCoroutineScope()
     var valveOne by remember { mutableIntStateOf(0) }
     var valveTwo by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(key1 = page) {
-        valveOne = (hpv[0 + 2 * group] ?: 1) - 1
-        valveTwo = (hpv[1 + 2 * group] ?: 1) - 1
+        valveOne = (hpv[0] ?: 1) - 1
+        valveTwo = (hpv[1] ?: 1) - 1
     }
 
     Row(modifier = Modifier.padding(16.dp)) {
@@ -111,12 +84,12 @@ fun ValveGroup(
                     "A1", "B1", "C1", "D1", "A2", "B2",
                     "C2", "D2", "封闭", "洗涤", "废液", "空气"
                 ),
-                enabled = uiFlags is UiFlags.None,
+                enabled = !loading,
                 selected = valveOne
             ) { index ->
                 scope.launch {
                     valveOne = index
-                    dispatch(DebugIntent.Valve(0 + 2 * group + group, index + 1))
+                    viewModel.valve(index + 1)
                 }
             }
         }
@@ -128,12 +101,12 @@ fun ValveGroup(
             CircularButtons(
                 count = 6,
                 display = listOf("A", "B", "C", "D", "废液", "空气"),
-                enabled = uiFlags is UiFlags.None,
+                enabled = !loading,
                 selected = valveTwo
             ) { index ->
                 scope.launch {
                     valveTwo = index
-                    dispatch(DebugIntent.Valve(1 + 2 * group, index + 1))
+                    viewModel.valve(index + 1)
                 }
             }
         }
@@ -142,98 +115,51 @@ fun ValveGroup(
 
 @Composable
 fun PulseForm(
-    group: Int,
-    uiFlags: UiFlags,
-    dispatch: (DebugIntent) -> Unit,
-    onGroupChanged: (Int) -> Unit
+    loading: Boolean,
+    viewModel: DebugViewModel
 ) {
-    val scope = rememberCoroutineScope()
-    val number by rememberDataSaverState(key = Constants.ZT_0000, default = 4)
     var turns by remember { mutableStateOf("1") }
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth(0.5f)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        if (number > 4) {
-            Row(
-                modifier = Modifier
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = MaterialTheme.shapes.small
-                    )
-                    .padding(horizontal = 16.dp, vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "模组",
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Spacer(modifier = Modifier.weight(1f))
+    SquareTextField(
+        modifier = Modifier.fillMaxWidth(0.5f),
+        title = "圈数",
+        value = turns,
+        trailingIcon = {
+            Row {
                 ElevatedButton(
-                    onClick = {
-                        scope.launch {
-                            if (group < (number / 4) - 1) {
-                                onGroupChanged(group + 1)
-                            } else {
-                                onGroupChanged(0)
-                            }
-                        }
-                    }
+                    modifier = Modifier.padding(end = 16.dp),
+                    enabled = !loading,
+                    onClick = { viewModel.transfer((turns.toDoubleOrNull() ?: 0.0) * -1) }
                 ) {
-                    Text(text = "${'A' + group}")
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = null
+                    )
+                }
+
+                ElevatedButton(
+                    modifier = Modifier.padding(end = 16.dp),
+                    enabled = !loading,
+                    onClick = { viewModel.transfer(turns.toDoubleOrNull() ?: 0.0) }
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                        contentDescription = null
+                    )
                 }
             }
         }
+    ) { turns = it }
+}
 
-        SquareTextField(
-            title = "圈数",
-            value = turns,
-            trailingIcon = {
-                Row {
-                    ElevatedButton(
-                        modifier = Modifier.padding(end = 16.dp),
-                        enabled = uiFlags is UiFlags.None,
-                        onClick = {
-                            scope.launch {
-                                dispatch(
-                                    DebugIntent.Transfer(
-                                        1 + group,
-                                        (turns.toDoubleOrNull() ?: 0.0) * -1
-                                    )
-                                )
-                            }
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null
-                        )
-                    }
+@Preview(device = "id:Nexus 9")
+@Composable
+fun ValveGroupPreview() {
+    ValveGroup(PageType.DEBUG, false, hiltViewModel())
+}
 
-                    ElevatedButton(
-                        modifier = Modifier.padding(end = 16.dp),
-                        enabled = uiFlags is UiFlags.None,
-                        onClick = {
-                            scope.launch {
-                                dispatch(
-                                    DebugIntent.Transfer(
-                                        1 + group,
-                                        turns.toDoubleOrNull() ?: 0.0
-                                    )
-                                )
-                            }
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                            contentDescription = null
-                        )
-                    }
-                }
-            }
-        ) { turns = it }
-    }
+@Preview()
+@Composable
+fun PulseFormPreview() {
+    PulseForm(false, hiltViewModel())
 }
