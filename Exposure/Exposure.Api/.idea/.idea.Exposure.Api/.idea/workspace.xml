@@ -16,7 +16,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="78ea7552-3107-4483-86a7-883cf6a7e7bd" name="Changes" comment="" />
+    <list default="true" id="78ea7552-3107-4483-86a7-883cf6a7e7bd" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/../../Android/App_JiXiangAn/App/src/main/java/com/zktony/android/ui/Permissions.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_JiXiangAn/App/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_JiXiangAn/App/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_JiXiangAn/App/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_JiXiangAn/App/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_JiXiangAn/gradle/libs.versions.toml" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_JiXiangAn/gradle/libs.versions.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Exposure.Api/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -60,44 +66,44 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    ".NET Launch Settings Profile.Development.executor": "Run",
-    ".NET Launch Settings Profile.Exposure.Api: Api.executor": "Run",
-    ".NET Launch Settings Profile.Exposure.Api: IIS Express.executor": "Run",
-    ".NET Launch Settings Profile.Exposure.Api: Production.executor": "Run",
-    ".NET Launch Settings Profile.Exposure.Api: http.executor": "Run",
-    ".NET Launch Settings Profile.Exposure.Api: https.executor": "Run",
-    ".NET Launch Settings Profile.Production.executor": "Run",
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "HTTP Request.All in Exposure.Api.executor": "Run",
-    "HTTP Request.Exposure.Api | #1.executor": "Run",
-    "Publish to folder.Publish Exposure.Api to folder.executor": "Run",
-    "Publish to folder.Publish Exposure.Api.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "editor.preferences.smartKeys_rider",
-    "ts.external.directory.path": "C:\\Users\\ThinkBook\\AppData\\Local\\Programs\\Rider\\plugins\\javascript-impl\\jsLanguageServicesImpl\\external",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;.NET Launch Settings Profile.Development.executor&quot;: &quot;Run&quot;,
+    &quot;.NET Launch Settings Profile.Exposure.Api: Api.executor&quot;: &quot;Run&quot;,
+    &quot;.NET Launch Settings Profile.Exposure.Api: IIS Express.executor&quot;: &quot;Run&quot;,
+    &quot;.NET Launch Settings Profile.Exposure.Api: Production.executor&quot;: &quot;Run&quot;,
+    &quot;.NET Launch Settings Profile.Exposure.Api: http.executor&quot;: &quot;Run&quot;,
+    &quot;.NET Launch Settings Profile.Exposure.Api: https.executor&quot;: &quot;Run&quot;,
+    &quot;.NET Launch Settings Profile.Production.executor&quot;: &quot;Run&quot;,
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;HTTP Request.All in Exposure.Api.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.Exposure.Api | #1.executor&quot;: &quot;Run&quot;,
+    &quot;Publish to folder.Publish Exposure.Api to folder.executor&quot;: &quot;Run&quot;,
+    &quot;Publish to folder.Publish Exposure.Api.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.smartKeys_rider&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\ThinkBook\\AppData\\Local\\Programs\\Rider\\plugins\\javascript-impl\\jsLanguageServicesImpl\\external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "ChangesTree.GroupingKeys": [
-      "directory"
+  &quot;keyToStringList&quot;: {
+    &quot;ChangesTree.GroupingKeys&quot;: [
+      &quot;directory&quot;
     ],
-    "rider.external.source.directories": [
-      "C:\\Users\\ThinkBook\\AppData\\Roaming\\JetBrains\\Rider2024.1\\resharper-host\\DecompilerCache",
-      "C:\\Users\\ThinkBook\\AppData\\Roaming\\JetBrains\\Rider2024.1\\resharper-host\\SourcesCache",
-      "C:\\Users\\ThinkBook\\AppData\\Local\\Symbols\\src"
+    &quot;rider.external.source.directories&quot;: [
+      &quot;C:\\Users\\ThinkBook\\AppData\\Roaming\\JetBrains\\Rider2024.1\\resharper-host\\DecompilerCache&quot;,
+      &quot;C:\\Users\\ThinkBook\\AppData\\Roaming\\JetBrains\\Rider2024.1\\resharper-host\\SourcesCache&quot;,
+      &quot;C:\\Users\\ThinkBook\\AppData\\Local\\Symbols\\src&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected=".NET Launch Settings Profile.Development">
     <configuration name="Exposure.Api: FolderProfile" type="DotNetMsBuildPublish" factoryName="Publish to IIS">
       <riderPublish configuration="Release" platform="Any CPU" publish_profile="FolderProfile.pubxml" pubxml_path="$PROJECT_DIR$/Exposure.Api/Properties/PublishProfiles/FolderProfile.pubxml" uuid_high="3617825066592587548" uuid_low="-9007917930747795288" />
@@ -285,6 +291,8 @@
       <workItem from="1715132552693" duration="62838000" />
       <workItem from="1715562316140" duration="44440000" />
       <workItem from="1715910010064" duration="13617000" />
+      <workItem from="1716184575804" duration="27000" />
+      <workItem from="1716184622157" duration="2021000" />
     </task>
     <servers />
   </component>

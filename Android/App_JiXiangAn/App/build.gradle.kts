@@ -100,6 +100,7 @@ dependencies {
     implementation(project(mapOf("path" to ":App_Room")))
     implementation(project(mapOf("path" to ":Lib_SerialPort")))
 
+    implementation(libs.accompanist.permissions)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material.iconsExtended)
     implementation(libs.androidx.compose.material3)
