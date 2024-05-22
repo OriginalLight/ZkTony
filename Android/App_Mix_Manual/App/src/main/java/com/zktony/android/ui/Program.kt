@@ -1,11 +1,15 @@
 package com.zktony.android.ui
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Color.rgb
 import android.os.storage.StorageManager
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -30,6 +34,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
@@ -55,6 +62,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -68,6 +78,7 @@ import com.zktony.android.ui.utils.AnimatedContent
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.PermissionsScreen
 import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.toList
@@ -169,6 +180,9 @@ fun ProgramList(
      * 导入弹窗
      */
     val importDialog = remember { mutableStateOf(false) }
+
+
+    val exportDialog = remember { mutableStateOf(false) }
 
 
     var selectedIndex by remember { mutableStateOf(0) }
@@ -390,16 +404,28 @@ fun ProgramList(
                         containerColor = Color(rgb(0, 105, 52))
                     ),
                     shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
-                    onClick = {
+                    onClick ={
+
                         var path = getStoragePath(context, true)
                         if ("" != path) {
                             if (entitiesList.isNotEmpty()) {
                                 val entity = entities[selectedIndex]
                                 if (entity != null) {
                                     try {
+                    val usbPath="/storage/54A2-1C89/zktony/" + entity.displayText + ".txt"
+                                        val file = File(usbPath)
 
-
-                                        File(path + "/zktony/" + entity.displayText + ".txt").writeText(
+                                        if (!file.exists()) {
+                                            val created = file.createNewFile()
+                                            if (created) {
+                                                println("文件已创建成功：$usbPath")
+                                            } else {
+                                                println("文件创建失败。")
+                                            }
+                                        } else {
+                                            println("文件已存在：$usbPath")
+                                        }
+                                        File(usbPath).writeText(
                                             "制胶程序:" + entity.displayText
                                                     + ",开始浓度:" + entity.startRange.toString()
                                                     + ",结束浓度:" + entity.endRange.toString()
@@ -407,7 +433,9 @@ fun ProgramList(
                                                     + ",促凝剂体积:" + entity.coagulant.toString()
                                                     + ",胶液体积:" + entity.volume.toString()
                                                     + ",创建人:" + entity.founder
-                                                    + ",日期：" + entity.createTime.dateFormat("yyyy-MM-dd")
+                                                    + ",日期：" + entity.createTime.dateFormat(
+                                                "yyyy-MM-dd"
+                                            )
                                         )
                                         Toast.makeText(
                                             context,
@@ -433,6 +461,8 @@ fun ProgramList(
                         }
 
 
+
+//                        exportDialog.value = true
                     }
                 ) {
                     Text(text = "导 出", fontSize = 18.sp)
@@ -885,6 +915,53 @@ fun ProgramList(
     }
 
 
+    /**
+     * 清洗弹窗
+     */
+    if (exportDialog.value) {
+        Dialog(onDismissRequest = {}) {
+            ElevatedCard {
+                Column(
+                    modifier = Modifier
+                        .padding(30.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    PermissionsScreen()
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Button(
+                            modifier = Modifier
+                                .width(100.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ),
+                            onClick = {
+
+                            }) {
+                            Text(fontSize = 18.sp, text = "确认")
+                        }
+
+                        Button(
+                            modifier = Modifier
+                                .padding(start = 40.dp)
+                                .width(100.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ),
+                            onClick = {
+                                exportDialog.value=false
+                            }) {
+                            Text(fontSize = 18.sp, text = "取消")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
     //导入弹窗
     if (importDialog.value) {
         AlertDialog(
@@ -1044,6 +1121,11 @@ fun ProgramList(
 
 }
 
+@Composable
+fun LocationPermission() {
+    TODO("Not yet implemented")
+}
+
 
 private fun getStoragePath(context: Context, isUsb: Boolean): String? {
     var path = ""
@@ -1086,9 +1168,5 @@ private fun getStoragePath(context: Context, isUsb: Boolean): String? {
         )
         e.printStackTrace()
     }
-    Log.d(
-        "Progarm",
-        "usb的path===未获取到==$path"
-    )
     return path
 }

@@ -1,5 +1,10 @@
 package com.zktony.android.ui
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -56,9 +61,22 @@ class ProgramViewModel @Inject constructor(
 
             is ProgramIntent.Update -> viewModelScope.launch { dao.update(intent.entity) }
             is ProgramIntent.Delete -> viewModelScope.launch { dao.deleteById(intent.id) }
+            is ProgramIntent.Export -> export(intent.context)
         }
     }
+
+
 }
+
+private fun export(context: Context) {
+
+//    checkAndRequestPermissions()
+
+
+}
+
+
+
 
 
 sealed class ProgramIntent {
@@ -77,4 +95,5 @@ sealed class ProgramIntent {
 
     data class Update(val entity: Program) : ProgramIntent()
     data class Delete(val id: Long) : ProgramIntent()
+    data class Export(val context: Context) : ProgramIntent()
 }

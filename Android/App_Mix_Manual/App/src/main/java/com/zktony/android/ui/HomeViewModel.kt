@@ -464,6 +464,8 @@ class HomeViewModel @Inject constructor(
                  */
                 val coagulantResetPulse = dataStore.readData("coagulantResetPulse", 1500).toLong()
 
+                var resetBool = false
+
                 val date = Date(System.currentTimeMillis()).dateFormat("yyyy-MM-dd")
                 sportsLogDao.insert(
                     SportsLog(
@@ -554,7 +556,8 @@ class HomeViewModel @Inject constructor(
                                 "HomeViewModel",
                                 "复位失败"
                             )
-                            //复位失败
+                            resetBool = true
+                            _uiFlags.value = UiFlags.objects(14)
                         }
 
                     } else if (!getGpio(0) && getGpio(1)) {
@@ -607,6 +610,8 @@ class HomeViewModel @Inject constructor(
                                 "HomeViewModel",
                                 "复位失败"
                             )
+                            resetBool = true
+                            _uiFlags.value = UiFlags.objects(14)
                             //复位失败
                         }
 
@@ -626,6 +631,7 @@ class HomeViewModel @Inject constructor(
                                 "HomeViewModel",
                                 "复位失败"
                             )
+                            _uiFlags.value = UiFlags.objects(14)
                         } else {
                             start {
                                 timeOut = 1000L * 30
@@ -654,258 +660,316 @@ class HomeViewModel @Inject constructor(
                             "HomeViewModel",
                             "复位失败"
                         )
+                        resetBool = true
+                        _uiFlags.value = UiFlags.objects(14)
                     }
                     //x轴复位===========================================
 
 
-                    // 查询GPIO状态
-                    //柱塞泵复位===========================================
-                    gpio(2)
-                    delay(500L)
-                    Log.d(
-                        "HomeViewModel",
-                        "注射泵光电状态====2号光电===" + getGpio(2)
-                    )
-                    if (!getGpio(2)) {
-                        start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 1,
-                                pdv = coagulantpulse + 20000L,
-                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
-                            )
-                        }
-                        delay(300L)
-                        start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 1,
-                                pdv = -64000L,
-                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
-                            )
-                        }
-                        delay(300L)
-                        start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 1,
-                                pdv = 64500L,
-                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
-                            )
-                        }
-                        delay(coagulantTime)
-
-                        start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 1,
-                                pdv = -coagulantpulse,
-                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
-                            )
-                        }
-
-                        delay(300L)
-                        start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 1,
-                                pdv = coagulantResetPulse,
-                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
-                            )
-                        }
-                        delay(300L)
-                        gpio(2)
-                        delay(1500L)
-                        Log.d(
-                            "HomeViewModel",
-                            "注射泵光电状态====2号光电===" + getGpio(2)
-                        )
-                        delay(300L)
-                        if (!getGpio(2)) {
-
-                            delay(300L)
-                            Log.d(
-                                "HomeViewModel",
-                                "柱塞泵复位成功"
-                            )
-                            //复位完成
-                        } else {
-                            Log.d(
-                                "HomeViewModel",
-                                "柱塞泵复位失败"
-                            )
-                            //复位失败
-                        }
-                    } else {
-                        start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 1,
-                                pdv = -64000L,
-                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
-
-                                )
-                        }
-                        delay(300L)
-
-                        start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 1,
-                                pdv = 64500L,
-                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
-                            )
-                        }
-                        delay(coagulantTime)
-                        Log.d(
-                            "HomeViewModel",
-                            "柱塞泵复位完成"
-                        )
-                        //复位完成
-                        start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 1,
-                                pdv = -coagulantpulse,
-                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
-                            )
-                        }
-                        delay(300L)
-
-                        start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 1,
-                                pdv = coagulantResetPulse,
-                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
-                            )
-                        }
-
-                        delay(300L)
+                    if (!resetBool){
+                        // 查询GPIO状态
+                        //柱塞泵复位===========================================
                         gpio(2)
                         delay(500L)
                         Log.d(
                             "HomeViewModel",
                             "注射泵光电状态====2号光电===" + getGpio(2)
                         )
-                        if (getGpio(2)) {
+                        if (!getGpio(2)) {
+                            start {
+                                timeOut = 1000L * 30
+                                with(
+                                    index = 1,
+                                    pdv = coagulantpulse + 20000L,
+                                    ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+                                )
+                            }
+                            delay(300L)
+                            start {
+                                timeOut = 1000L * 30
+                                with(
+                                    index = 1,
+                                    pdv = -64000L,
+                                    ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+                                )
+                            }
+                            delay(300L)
+                            start {
+                                timeOut = 1000L * 30
+                                with(
+                                    index = 1,
+                                    pdv = 64500L,
+                                    ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+                                )
+                            }
+                            delay(coagulantTime)
+
+                            start {
+                                timeOut = 1000L * 30
+                                with(
+                                    index = 1,
+                                    pdv = -coagulantpulse,
+                                    ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+                                )
+                            }
+
+                            delay(300L)
+                            start {
+                                timeOut = 1000L * 30
+                                with(
+                                    index = 1,
+                                    pdv = coagulantResetPulse,
+                                    ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+                                )
+                            }
+                            delay(300L)
+                            gpio(2)
+                            delay(1500L)
                             Log.d(
                                 "HomeViewModel",
-                                "柱塞泵复位失败"
+                                "注射泵光电状态====2号光电===" + getGpio(2)
                             )
-                            //复位失败
+                            delay(300L)
+                            if (!getGpio(2)) {
+
+                                delay(300L)
+                                Log.d(
+                                    "HomeViewModel",
+                                    "柱塞泵复位成功"
+                                )
+                                //复位完成
+                            } else {
+                                Log.d(
+                                    "HomeViewModel",
+                                    "柱塞泵复位失败"
+                                )
+                                //复位失败
+                                resetBool = true
+                                _uiFlags.value = UiFlags.objects(14)
+                            }
                         } else {
+                            start {
+                                timeOut = 1000L * 30
+                                with(
+                                    index = 1,
+                                    pdv = -64000L,
+                                    ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+
+                                    )
+                            }
+                            delay(300L)
+
+                            start {
+                                timeOut = 1000L * 30
+                                with(
+                                    index = 1,
+                                    pdv = 64500L,
+                                    ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+                                )
+                            }
+                            delay(coagulantTime)
                             Log.d(
                                 "HomeViewModel",
                                 "柱塞泵复位完成"
                             )
-                        }
-
-                    }
-                    //柱塞泵复位===========================================
-                    delay(100)
-
-                    //蠕动泵复位===========================================
-                    /**
-                     * 蠕动泵复位次数
-                     */
-                    val numberOfPumpResets = dataStore.readData("numberofpumpresets", 3)
-
-                    val rinseSpeed = dataStore.readData("rinseSpeed", 600L)
-
-
-                    for (i in 1..numberOfPumpResets) {
-                        if (i == numberOfPumpResets) {
-                            //转一整圈
-                            if (i % 2 == 0) {
-                                start {
-                                    timeOut = 1000L * 60L * 10
-                                    with(
-                                        index = 2,
-                                        ads = Triple(rinseSpeed * 13, rinseSpeed * 1193, rinseSpeed * 1193),
-                                        pdv = 51200L
-                                    )
-                                    with(
-                                        index = 3,
-                                        ads = Triple(rinseSpeed * 13, rinseSpeed * 1193, rinseSpeed * 1193),
-                                        pdv = 51200L
-                                    )
-                                    with(
-                                        index = 4,
-                                        ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
-                                        pdv = 3200L
-                                    )
-                                }
-                            }else{
-                                start {
-                                    timeOut = 1000L * 60L * 10
-                                    with(
-                                        index = 2,
-                                        ads = Triple(rinseSpeed * 13, rinseSpeed * 1193, rinseSpeed * 1193),
-                                        pdv = -51200L
-                                    )
-                                    with(
-                                        index = 3,
-                                        ads = Triple(rinseSpeed * 13, rinseSpeed * 1193, rinseSpeed * 1193),
-                                        pdv = -51200L
-                                    )
-                                    with(
-                                        index = 4,
-                                        ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
-                                        pdv = -3200L
-                                    )
-                                }
+                            //复位完成
+                            start {
+                                timeOut = 1000L * 30
+                                with(
+                                    index = 1,
+                                    pdv = -coagulantpulse,
+                                    ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+                                )
                             }
-                        } else {
-                            if (i % 2 == 0) {
-                                //正转
-                                start {
-                                    timeOut = 1000L * 60L * 10
-                                    with(
-                                        index = 2,
-                                        ads = Triple(rinseSpeed * 13, rinseSpeed * 1193, rinseSpeed * 1193),
-                                        pdv = 25600L
-                                    )
-                                    with(
-                                        index = 3,
-                                        ads = Triple(rinseSpeed * 13, rinseSpeed * 1193, rinseSpeed * 1193),
-                                        pdv = 25600L
-                                    )
-                                    with(
-                                        index = 4,
-                                        ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
-                                        pdv = 1600L
-                                    )
+                            delay(300L)
+
+                            start {
+                                timeOut = 1000L * 30
+                                with(
+                                    index = 1,
+                                    pdv = coagulantResetPulse,
+                                    ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
+                                )
+                            }
+
+                            delay(300L)
+                            gpio(2)
+                            delay(500L)
+                            Log.d(
+                                "HomeViewModel",
+                                "注射泵光电状态====2号光电===" + getGpio(2)
+                            )
+                            if (getGpio(2)) {
+                                Log.d(
+                                    "HomeViewModel",
+                                    "柱塞泵复位失败"
+                                )
+                                resetBool = true
+                                _uiFlags.value = UiFlags.objects(14)
+                                //复位失败
+                            } else {
+                                Log.d(
+                                    "HomeViewModel",
+                                    "柱塞泵复位完成"
+                                )
+                            }
+
+                        }
+                        //柱塞泵复位===========================================
+
+
+                        delay(100)
+                    }
+
+                    if (!resetBool){
+                        //蠕动泵复位===========================================
+                        /**
+                         * 蠕动泵复位次数
+                         */
+                        val numberOfPumpResets = dataStore.readData("numberofpumpresets", 3)
+
+                        val rinseSpeed = dataStore.readData("rinseSpeed", 600L)
+
+
+                        for (i in 1..numberOfPumpResets) {
+                            if (i == numberOfPumpResets) {
+                                //转一整圈
+                                if (i % 2 == 0) {
+                                    start {
+                                        timeOut = 1000L * 60L * 10
+                                        with(
+                                            index = 2,
+                                            ads = Triple(
+                                                rinseSpeed * 13,
+                                                rinseSpeed * 1193,
+                                                rinseSpeed * 1193
+                                            ),
+                                            pdv = 51200L
+                                        )
+                                        with(
+                                            index = 3,
+                                            ads = Triple(
+                                                rinseSpeed * 13,
+                                                rinseSpeed * 1193,
+                                                rinseSpeed * 1193
+                                            ),
+                                            pdv = 51200L
+                                        )
+                                        with(
+                                            index = 4,
+                                            ads = Triple(
+                                                rinseSpeed * 30,
+                                                rinseSpeed * 30,
+                                                rinseSpeed * 30
+                                            ),
+                                            pdv = 3200L
+                                        )
+                                    }
+                                } else {
+                                    start {
+                                        timeOut = 1000L * 60L * 10
+                                        with(
+                                            index = 2,
+                                            ads = Triple(
+                                                rinseSpeed * 13,
+                                                rinseSpeed * 1193,
+                                                rinseSpeed * 1193
+                                            ),
+                                            pdv = -51200L
+                                        )
+                                        with(
+                                            index = 3,
+                                            ads = Triple(
+                                                rinseSpeed * 13,
+                                                rinseSpeed * 1193,
+                                                rinseSpeed * 1193
+                                            ),
+                                            pdv = -51200L
+                                        )
+                                        with(
+                                            index = 4,
+                                            ads = Triple(
+                                                rinseSpeed * 30,
+                                                rinseSpeed * 30,
+                                                rinseSpeed * 30
+                                            ),
+                                            pdv = -3200L
+                                        )
+                                    }
                                 }
                             } else {
-                                //反转
-                                start {
-                                    timeOut = 1000L * 60L * 10
-                                    with(
-                                        index = 2,
-                                        ads = Triple(rinseSpeed * 13, rinseSpeed * 1193, rinseSpeed * 1193),
-                                        pdv = -25600L
-                                    )
-                                    with(
-                                        index = 3,
-                                        ads = Triple(rinseSpeed * 13, rinseSpeed * 1193, rinseSpeed * 1193),
-                                        pdv = -25600L
-                                    )
-                                    with(
-                                        index = 4,
-                                        ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
-                                        pdv = -1600L
-                                    )
+                                if (i % 2 == 0) {
+                                    //正转
+                                    start {
+                                        timeOut = 1000L * 60L * 10
+                                        with(
+                                            index = 2,
+                                            ads = Triple(
+                                                rinseSpeed * 13,
+                                                rinseSpeed * 1193,
+                                                rinseSpeed * 1193
+                                            ),
+                                            pdv = 25600L
+                                        )
+                                        with(
+                                            index = 3,
+                                            ads = Triple(
+                                                rinseSpeed * 13,
+                                                rinseSpeed * 1193,
+                                                rinseSpeed * 1193
+                                            ),
+                                            pdv = 25600L
+                                        )
+                                        with(
+                                            index = 4,
+                                            ads = Triple(
+                                                rinseSpeed * 30,
+                                                rinseSpeed * 30,
+                                                rinseSpeed * 30
+                                            ),
+                                            pdv = 1600L
+                                        )
+                                    }
+                                } else {
+                                    //反转
+                                    start {
+                                        timeOut = 1000L * 60L * 10
+                                        with(
+                                            index = 2,
+                                            ads = Triple(
+                                                rinseSpeed * 13,
+                                                rinseSpeed * 1193,
+                                                rinseSpeed * 1193
+                                            ),
+                                            pdv = -25600L
+                                        )
+                                        with(
+                                            index = 3,
+                                            ads = Triple(
+                                                rinseSpeed * 13,
+                                                rinseSpeed * 1193,
+                                                rinseSpeed * 1193
+                                            ),
+                                            pdv = -25600L
+                                        )
+                                        with(
+                                            index = 4,
+                                            ads = Triple(
+                                                rinseSpeed * 30,
+                                                rinseSpeed * 30,
+                                                rinseSpeed * 30
+                                            ),
+                                            pdv = -1600L
+                                        )
+                                    }
                                 }
                             }
-                        }
 
+                        }
+                        //蠕动泵复位===========================================
+                        lightGreed()
                     }
 
-
-                    //蠕动泵复位===========================================
-
-                    lightGreed()
                 }
                 _uiFlags.value = UiFlags.none()
             } catch (ex: Exception) {
