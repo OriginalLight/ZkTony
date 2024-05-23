@@ -10,6 +10,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.security.InvalidParameterException
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
@@ -28,7 +29,7 @@ abstract class AbstractSerial {
     private val buffer = ByteArrayOutputStream()
     private val byteArrayQueue = LinkedBlockingQueue<ByteArray>()
 
-    var callbackHandler: ((ByteArray) -> Unit)? = null
+    val callbacks : MutableMap<String, (ByteArray) -> Unit> = ConcurrentHashMap()
 
     /**
      * Open the serial port
@@ -97,7 +98,10 @@ abstract class AbstractSerial {
         if (byteArray == null) {
             if (buffer.size() > 0) {
                 try {
-                    callbackHandler?.let { it(buffer.toByteArray()) }
+                    callbacks.forEach { (key, callback) ->
+                        Log.i(config.device, "Callback Invoke: $key")
+                        callback.invoke((buffer.toByteArray()))
+                    }
                     if (config.log) {
                         Log.i(config.device, "RX: ${buffer.toByteArray().toHexString()}")
                     }

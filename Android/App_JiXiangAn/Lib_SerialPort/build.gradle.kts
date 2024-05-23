@@ -42,7 +42,6 @@ android {
 }
 
 dependencies {
-    implementation(libs.kotlinx.coroutines.android)
 
     androidTestImplementation(libs.androidx.test.core)
     androidTestImplementation(libs.androidx.test.espresso.core)

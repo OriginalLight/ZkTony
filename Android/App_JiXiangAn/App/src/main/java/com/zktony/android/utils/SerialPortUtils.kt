@@ -1,6 +1,7 @@
 package com.zktony.android.utils
 
 import android.annotation.SuppressLint
+import android.util.Log
 import com.zktony.android.utils.AppStateUtils.hps
 import com.zktony.android.utils.AppStateUtils.hpv
 import com.zktony.serialport.command.modbus.RtuProtocol
@@ -32,7 +33,7 @@ object SerialPortUtils {
             baudRate = 57600
         })
         // rtu串口全局回调
-        SerialStoreUtils.get("rtu")?.callbackHandler = { bytes ->
+        SerialStoreUtils.get("rtu")?.registerCallback("globe") { bytes ->
             if (bytes[0] == 0xCC.toByte()) {
                 RunzeProtocol.verifyProtocol(bytes) { protocol ->
                     // 处理数据包
@@ -178,13 +179,26 @@ object SerialPortUtils {
      * 读取温度
      */
     suspend fun readWithTemperature(id: Int, block: (Int, Double) -> Unit) {
-        SerialStoreUtils.get("tec")?.sendAsciiString("TC1:TCACTUALTEMP?@$id\r") { res ->
-            if (res.isSuccess) {
-                val ascii = res.getOrElse { return@sendAsciiString }.toAsciiString()
-                val address = ascii.substring(ascii.length - 2, ascii.length - 1).toInt()
-                val data = ascii.replace("TC1:TCACTUALTEMP=", "").split("@")[0].format()
-                block(address, data.toDoubleOrNull() ?: 0.0)
+        var rx = 0
+        val key = "readWithTemperature"
+        SerialStoreUtils.get("tec")?.registerCallback(key) { res ->
+            rx += 1
+            val ascii = res.toAsciiString()
+            val address = ascii.substring(ascii.length - 2, ascii.length - 1).toInt()
+            val data = ascii.replace("TC1:TCACTUALTEMP=", "").split("@")[0].format()
+            block(address, data.toDoubleOrNull() ?: 0.0)
+        }
+        try {
+            withTimeout(1000L) {
+                SerialStoreUtils.get("tec")?.sendAsciiString("TC1:TCACTUALTEMP?@$id\r")
+                while (rx == 0) {
+                    delay(100L)
+                }
             }
+        } catch (ex: TimeoutCancellationException) {
+            Log.e("SerialPortUtils", "读取温度超时")
+        } finally {
+            SerialStoreUtils.get("tec")?.unregisterCallback(key)
         }
     }
 }

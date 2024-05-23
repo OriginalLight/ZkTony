@@ -4,8 +4,6 @@ import android.util.Log
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.ext.ascii2ByteArray
 import com.zktony.serialport.ext.hex2ByteArray
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withTimeout
 import java.io.IOException
 import java.security.InvalidParameterException
 
@@ -44,56 +42,16 @@ abstract class AbstractSerialPort(config: SerialConfig) : AbstractSerial() {
     }
 
     /**
-     * Send byte data  with callback
-     *
-     * @param bytes byte data
-     * @param timeOut Long
-     * @param block Function1<[@kotlin.ParameterName] Result<ByteArray>, Unit>
-     */
-    suspend fun sendByteArray(
-        bytes: ByteArray,
-        timeOut: Long = 1000L,
-        block: ((Result<ByteArray>) -> Unit)
-    ) {
-        try {
-            withTimeout(timeOut) {
-                var ref = ByteArray(0)
-                callbackHandler = { ref = it }
-                addByteArrayToQueue(bytes)
-                while (ref.isEmpty()) {
-                    delay(10L)
-                }
-                block(Result.success(ref))
-            }
-        } catch (ex: Exception) {
-            block(Result.failure(ex))
-        } finally {
-            callbackHandler = null
-        }
-    }
-
-    /**
      * Send byte data
      *
      * @param bytes byte data
      */
     fun sendByteArray(bytes: ByteArray) {
+        if (bytes.isEmpty()) {
+            Log.w(TAG, "The byte array to be sent is empty")
+            return
+        }
         addByteArrayToQueue(bytes)
-    }
-
-    /**
-     * Send hex string with callback
-     *
-     * @param hex String
-     * @param timeOut Long
-     * @param block Function1<[@kotlin.ParameterName] Result<ByteArray>, Unit>
-     */
-    suspend fun sendHexString(
-        hex: String,
-        timeOut: Long = 1000L,
-        block: ((Result<ByteArray>) -> Unit)
-    ) {
-        sendByteArray(hex.hex2ByteArray(), timeOut, block)
     }
 
     /**
@@ -102,22 +60,11 @@ abstract class AbstractSerialPort(config: SerialConfig) : AbstractSerial() {
      * @param hex String
      */
     fun sendHexString(hex: String) {
+        if (hex.isEmpty() || hex.isBlank()) {
+            Log.w(TAG, "The hex to be sent is empty or blank")
+            return
+        }
         sendByteArray(hex.hex2ByteArray())
-    }
-
-    /**
-     * Send ascii string with callback
-     *
-     * @param ascii String
-     * @param timeOut Long
-     * @param block Function1<[@kotlin.ParameterName] Result<ByteArray>, Unit>
-     */
-    suspend fun sendAsciiString(
-        ascii: String,
-        timeOut: Long = 1000L,
-        block: ((Result<ByteArray>) -> Unit)
-    ) {
-        sendByteArray(ascii.ascii2ByteArray(true), timeOut, block)
     }
 
     /**
@@ -126,7 +73,32 @@ abstract class AbstractSerialPort(config: SerialConfig) : AbstractSerial() {
      * @param ascii String
      */
     fun sendAsciiString(ascii: String) {
+        if (ascii.isEmpty() || ascii.isBlank()) {
+            Log.w(TAG, "The ascii to be sent is empty or blank")
+            return
+        }
         sendByteArray(ascii.ascii2ByteArray(true))
+    }
+
+    /**
+     * Register the callback function
+     */
+    fun registerCallback(key: String, callback: (ByteArray) -> Unit) {
+        if (callbacks.containsKey(key)) {
+            Log.w(TAG, "The key of the callback function already exists, the old key will be overwritten")
+            callbacks[key] = callback
+        }
+    }
+
+    /**
+     * Unregister the callback function
+     */
+    fun unregisterCallback(key: String) {
+        if (!callbacks.containsKey(key)) {
+            Log.w(TAG, "The key of the callback function does not exist")
+            return
+        }
+        callbacks.remove(key)
     }
 
     companion object {
