@@ -194,7 +194,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Exposure.Api"
         "ProductCode" = "8:{36958CB8-69BA-4BED-86E6-C2428839ECFC}"
-        "PackageCode" = "8:{16D24DAD-36CA-4D5F-8088-3C3FFBBEF6D9}"
+        "PackageCode" = "8:{1D1DDDED-1E3F-49CC-91B4-B383D6EA839C}"
         "UpgradeCode" = "8:{6388160A-F81A-413A-8947-C494653873AF}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
