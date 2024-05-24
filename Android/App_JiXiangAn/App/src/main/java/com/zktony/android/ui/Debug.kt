@@ -53,8 +53,8 @@ fun DebugRoute(viewModel: DebugViewModel) {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         DebugAppBar { navigationActions.navigateUp() }
-        PulseForm(loading, viewModel)
-        ValveGroup(page, loading, viewModel)
+        PulseForm(loading, viewModel::dispatch)
+        ValveGroup(page, loading, viewModel::dispatch)
     }
 }
 
@@ -62,7 +62,7 @@ fun DebugRoute(viewModel: DebugViewModel) {
 fun ValveGroup(
     page: PageType,
     loading: Boolean,
-    viewModel: DebugViewModel
+    dispatch : (DebugIntent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     var valveOne by remember { mutableIntStateOf(0) }
@@ -89,7 +89,7 @@ fun ValveGroup(
             ) { index ->
                 scope.launch {
                     valveOne = index
-                    viewModel.valve(index + 1)
+                    dispatch(DebugIntent.Valve(index + 1))
                 }
             }
         }
@@ -106,7 +106,7 @@ fun ValveGroup(
             ) { index ->
                 scope.launch {
                     valveTwo = index
-                    viewModel.valve(index + 1)
+                    dispatch(DebugIntent.Valve(index + 1))
                 }
             }
         }
@@ -116,7 +116,7 @@ fun ValveGroup(
 @Composable
 fun PulseForm(
     loading: Boolean,
-    viewModel: DebugViewModel
+    dispatch: (DebugIntent) -> Unit
 ) {
     var turns by remember { mutableStateOf("1") }
 
@@ -129,7 +129,7 @@ fun PulseForm(
                 ElevatedButton(
                     modifier = Modifier.padding(end = 16.dp),
                     enabled = !loading,
-                    onClick = { viewModel.transfer((turns.toDoubleOrNull() ?: 0.0) * -1) }
+                    onClick = { dispatch(DebugIntent.Transfer((turns.toDoubleOrNull() ?: 0.0) * -1)) }
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -140,7 +140,7 @@ fun PulseForm(
                 ElevatedButton(
                     modifier = Modifier.padding(end = 16.dp),
                     enabled = !loading,
-                    onClick = { viewModel.transfer(turns.toDoubleOrNull() ?: 0.0) }
+                    onClick = { dispatch(DebugIntent.Transfer(turns.toDoubleOrNull() ?: 0.0))}
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForward,

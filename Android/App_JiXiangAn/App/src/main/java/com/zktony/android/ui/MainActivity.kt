@@ -8,7 +8,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
-import com.zktony.android.ui.navigation.AppNavigation
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.theme.AppTheme
 import com.zktony.android.ui.utils.LocalNavigationActions
@@ -50,7 +49,7 @@ class MainActivity : ComponentActivity() {
                 LocalSnackbarHostState provides snackbarHostState
             ) {
                 AppTheme {
-                    AppNavigation(
+                    ZktyApp(
                         navController = navController,
                         homeViewModel = homeViewModel,
                         snackbarHostState = snackbarHostState

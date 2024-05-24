@@ -3,7 +3,6 @@ package com.zktony.android.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.utils.SerialPortUtils.writeWithPulse
 import com.zktony.android.utils.SerialPortUtils.writeWithValve
 import com.zktony.android.utils.SnackbarUtils
@@ -26,7 +25,14 @@ class DebugViewModel @Inject constructor() : ViewModel() {
     val page = _page.asStateFlow()
     val loading = _loading.asStateFlow()
 
-    fun valve(value: Int) {
+    fun dispatch(intent: DebugIntent) {
+        when (intent) {
+            is DebugIntent.Valve -> valve(intent.value)
+            is DebugIntent.Transfer -> transfer(intent.turns)
+        }
+    }
+
+    private fun valve(value: Int) {
         viewModelScope.launch {
             try {
                 _loading.value = true
@@ -39,7 +45,7 @@ class DebugViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun transfer(turns: Double) {
+    private fun transfer(turns: Double) {
         viewModelScope.launch {
             try {
                 _loading.value = true
@@ -51,4 +57,9 @@ class DebugViewModel @Inject constructor() : ViewModel() {
             }
         }
     }
+}
+
+sealed class DebugIntent {
+    data class Valve(val value: Int) : DebugIntent()
+    data class Transfer(val turns: Double) : DebugIntent()
 }
