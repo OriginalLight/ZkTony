@@ -210,4 +210,65 @@ public static class OpenCvUtils
     }
 
     #endregion
+
+    #region 统计灰度直方图
+
+    public static int Histogram(Mat src, double percentage)
+    {
+        // 计算灰度直方图
+        var hist = new Mat();
+        Cv2.CalcHist([src], [0], null, hist, 1, [65535], [new Rangef(0, 65535)]);
+
+        var total = src.Rows * src.Cols;
+        var pixels = total * percentage;
+        
+        var sum = 0;
+        var threshold = 0;
+        for (var i = 65535; i >= 0; i--)
+        {
+            sum += (int)hist.At<float>(i);
+            if (!(sum >= pixels)) continue;
+            threshold = i;
+            break;
+        }
+
+        Log.Information("计算灰度直方图成功: " + threshold);
+        return threshold;
+    }
+    
+
+    #endregion
+    
+    #region LUT线性变换
+    
+    public static Mat LutLinearTransform(Mat src, int inLow, int inHigh, int outLow, int outHigh)
+    {
+        // 计算斜率和截距
+        var scale = (outHigh - outLow) / (inHigh - inLow);
+        var shift = outLow - inLow * scale;
+
+        var enhancedImage = new Mat(src.Rows, src.Cols, MatType.CV_16U);
+
+        unsafe
+        {
+            var srcPtr = (ushort*)src.Data.ToPointer();
+            var dstPtr = (ushort*)enhancedImage.Data.ToPointer();
+
+            var totalPixels = src.Rows * src.Cols;
+
+            for (var i = 0; i < totalPixels; i++)
+            {
+                var pixelValue = srcPtr[i];
+
+                // 线性变换
+                var newValue = pixelValue * scale + shift;
+                dstPtr[i] = (ushort)Math.Max(0, Math.Min(65535, newValue));
+            }
+        }
+
+        return enhancedImage;
+    }
+    
+    #endregion
+    
 }

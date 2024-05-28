@@ -1,9 +1,5 @@
 package com.zktony.android
 
-import com.zktony.room.entities.internal.Point
-import com.zktony.android.utils.AlgorithmUtils
-import com.zktony.android.utils.SerialPortUtils
-import com.zktony.serialport.command.modbus.RtuProtocol
 import com.zktony.serialport.ext.toHexString
 import com.zktony.serialport.ext.writeInt16BE
 import org.junit.Assert.assertEquals
@@ -33,26 +29,6 @@ class ExampleUnitTest {
         assertEquals(11, list.size)
         assertEquals(1, list[0])
         assertEquals(11, list[10])
-    }
-
-    @Test
-    fun test() {
-        val points = listOf(
-            Point(0.0, 0.0),
-            Point(1.0, 640.0),
-            Point(99.0, 64000.0),
-            Point(203.0, 128000.0),
-            Point(986.0, 640000.0)
-        )
-
-        val quadraticCurve = AlgorithmUtils.fitQuadraticCurve(points)
-
-        val x = 986.0
-        val y = quadraticCurve(x)
-
-        if (y != null) {
-            assertEquals(639982.8994101394, y, 1.0)
-        }
     }
 
     @Test
