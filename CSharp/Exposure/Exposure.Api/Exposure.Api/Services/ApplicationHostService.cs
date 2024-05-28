@@ -23,7 +23,7 @@ public class ApplicationHostService(
         if (!_isInitialized)
         {
             WindowUtils.Hide();
-            dbContext.CreateTable(false, 50, typeof(User), typeof(Picture), typeof(OperLog), typeof(ErrorLog),
+            dbContext.CreateTable(false, 50, typeof(Album), typeof(User), typeof(Picture), typeof(OperLog), typeof(ErrorLog),
                 typeof(Option));
             await serialPortService.InitAsync();
             await userService.InitializeAsync();
