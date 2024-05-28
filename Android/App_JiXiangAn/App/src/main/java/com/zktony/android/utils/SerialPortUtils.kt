@@ -22,16 +22,16 @@ object SerialPortUtils {
 
     fun with() {
         // 初始化rtu串口
-        SerialStoreUtils.put("rtu", serialPortOf {
+        serialPortOf {
             device = "/dev/ttyS3"
             baudRate = 9600
             log = true
-        })
+        }?.let { SerialStoreUtils.put("rtu", it) }
         // 初始化tec串口
-        SerialStoreUtils.put("tec", serialPortOf {
+        serialPortOf {
             device = "/dev/ttyS0"
             baudRate = 57600
-        })
+        }?.let { SerialStoreUtils.put("tec", it) }
         // rtu串口全局回调
         SerialStoreUtils.get("rtu")?.registerCallback("globe") { bytes ->
             if (bytes[0] == 0xCC.toByte()) {
@@ -101,10 +101,11 @@ object SerialPortUtils {
     suspend fun writeWithValve(slaveAddr: Int, channel: Int, retry: Int = 1) {
         val current = hpv[slaveAddr] ?: 0
         if (current == channel) return
+        val rtu = SerialStoreUtils.get("rtu") ?: error("ERROR 0X0000 - 串口未初始化")
         try {
             withTimeout((current - channel).absoluteValue * 1000L + 1000L) {
                 // 切阀命令
-                SerialStoreUtils.get("rtu")?.sendByteArray(bytes = RunzeProtocol().apply {
+                rtu.sendByteArray(bytes = RunzeProtocol().apply {
                     this.slaveAddr = slaveAddr.toByte()
                     funcCode = 0x44
                     data = byteArrayOf(channel.toByte(), 0x00)
@@ -117,7 +118,7 @@ object SerialPortUtils {
                         if (hpv[slaveAddr] == channel) return@withTimeout
                     }
                     // 读取阀门状态
-                    SerialStoreUtils.get("rtu")?.sendByteArray(bytes = RunzeProtocol().apply {
+                    rtu.sendByteArray(bytes = RunzeProtocol().apply {
                         this.slaveAddr = slaveAddr.toByte()
                         funcCode = 0x3E
                         data = byteArrayOf(0x00, 0x00)
@@ -138,6 +139,7 @@ object SerialPortUtils {
      */
     suspend fun writeWithPulse(slaveAddr: Int, value: Long) {
         if (value == 0L) return
+        val rtu = SerialStoreUtils.get("rtu") ?: error("ERROR 0X0000 - 串口未初始化")
         try {
             withTimeout(maxOf(value.absoluteValue / 32000L, 1) * 1000L + 2000L) {
                 writeRegister(startAddr = 222, slaveAddr = slaveAddr, value = value)
@@ -149,7 +151,7 @@ object SerialPortUtils {
                         if ((hps[slaveAddr] ?: 0) == 0) return@withTimeout
                     }
                     // 读取当前的速度
-                    SerialStoreUtils.get("rtu")?.sendByteArray(bytes = RtuProtocol().apply {
+                    rtu.sendByteArray(bytes = RtuProtocol().apply {
                         this.slaveAddr = (slaveAddr + 1).toByte()
                         funcCode = 0x03
                         data = ByteArray(4).writeInt16BE(25).writeInt16BE(1, 2)
@@ -158,7 +160,7 @@ object SerialPortUtils {
             }
         } catch (ex: TimeoutCancellationException) {
             writeRegister(slaveAddr = slaveAddr, startAddr = 200, value = 0)
-            throw Exception("ERROR 0X0001 - 电机运行超时")
+            error("ERROR 0X0001 - 电机运行超时")
         }
     }
 
@@ -167,12 +169,12 @@ object SerialPortUtils {
      */
     @SuppressLint("DefaultLocale")
     suspend fun writeWithTemperature(id: Int, value: Double) {
-        SerialStoreUtils.get("tec")?.sendAsciiString("TC1:TCSW=0@$id\r")
+        val tec = SerialStoreUtils.get("tec") ?: return
+        tec.sendAsciiString("TC1:TCSW=0@$id\r")
         delay(15 * 1000L)
-        SerialStoreUtils.get("tec")
-            ?.sendAsciiString("TC1:TCADJUSTTEMP=${String.format("%.2f", value)}@$id\r")
+        tec.sendAsciiString("TC1:TCADJUSTTEMP=${String.format("%.2f", value)}@$id\r")
         delay(15 * 1000L)
-        SerialStoreUtils.get("tec")?.sendAsciiString("TC1:TCSW=1@$id\r")
+        tec.sendAsciiString("TC1:TCSW=1@$id\r")
     }
 
     /**
@@ -181,24 +183,25 @@ object SerialPortUtils {
     suspend fun readWithTemperature(id: Int, block: (Int, Double) -> Unit) {
         var rx = 0
         val key = "readWithTemperature"
-        SerialStoreUtils.get("tec")?.registerCallback(key) { res ->
-            rx += 1
-            val ascii = res.toAsciiString()
-            val address = ascii.substring(ascii.length - 2, ascii.length - 1).toInt()
-            val data = ascii.replace("TC1:TCACTUALTEMP=", "").split("@")[0].format()
-            block(address, data.toDoubleOrNull() ?: 0.0)
-        }
+        val tec = SerialStoreUtils.get("tec") ?: return
         try {
+            tec.registerCallback(key) { res ->
+                rx += 1
+                val ascii = res.toAsciiString()
+                val address = ascii.substring(ascii.length - 2, ascii.length - 1).toInt()
+                val data = ascii.replace("TC1:TCACTUALTEMP=", "").split("@")[0].format()
+                block(address, data.toDoubleOrNull() ?: 0.0)
+            }
             withTimeout(1000L) {
-                SerialStoreUtils.get("tec")?.sendAsciiString("TC1:TCACTUALTEMP?@$id\r")
+                tec.sendAsciiString("TC1:TCACTUALTEMP?@$id\r")
                 while (rx == 0) {
                     delay(100L)
                 }
             }
-        } catch (ex: TimeoutCancellationException) {
-            Log.e("SerialPortUtils", "读取温度超时")
+        } catch (ex: Exception) {
+            Log.e("SerialPortUtils", ex.message ?: "Unknown")
         } finally {
-            SerialStoreUtils.get("tec")?.unregisterCallback(key)
+            tec.unregisterCallback(key)
         }
     }
 }

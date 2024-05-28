@@ -64,8 +64,7 @@ class SerialPortFinder {
         get() {
             val devices = Vector<String>()
             // Parse each driver
-            val itdriv: Iterator<Driver>
-            itdriv = drivers.iterator()
+            val itdriv = drivers.iterator()
             while (itdriv.hasNext()) {
                 val driver = itdriv.next()
                 val itdev: Iterator<File> = driver.devices.iterator()
@@ -84,8 +83,7 @@ class SerialPortFinder {
         get() {
             val devices = Vector<String>()
             // Parse each driver
-            val itdriv: Iterator<Driver>
-            itdriv = drivers.iterator()
+            val itdriv = drivers.iterator()
             while (itdriv.hasNext()) {
                 val driver = itdriv.next()
                 val itdev: Iterator<File> = driver.devices.iterator()
