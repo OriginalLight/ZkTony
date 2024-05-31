@@ -1,7 +1,6 @@
 using Exposure.Api.Contracts.Services;
 using Exposure.Api.Models;
 using Exposure.Api.Models.Dto;
-using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SqlSugar;
@@ -90,11 +89,16 @@ public class UserController(
     public async Task<IActionResult> Add([FromBody] UserAddDto dto)
     {
         // 添加
-        var user1 = dto.Adapt<User>();
-        user1.Sha = BCrypt.Net.BCrypt.HashPassword(dto.Password);
-        user1.CreateTime = DateTime.Now;
-        user1.UpdateTime = DateTime.Now;
-        user1.LastLoginTime = DateTime.Now;
+        var user1 = new User
+        {
+            Name = dto.Name,
+            Role = dto.Role,
+            Enabled = dto.Enabled,
+            Sha = BCrypt.Net.BCrypt.HashPassword(dto.Password),
+            CreateTime = DateTime.Now,
+            UpdateTime = DateTime.Now,
+            LastLoginTime = DateTime.Now
+        };
         // 验证用户名是否重复
         if (await user.GetByName(dto.Name) != null) return Problem(localizer.GetString("DuplicateUserName").Value);
         if (!await user.Add(user1))

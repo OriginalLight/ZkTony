@@ -51,7 +51,7 @@ const options = ref({
 const isInit = ref(false)
 
 // 初始化
-const init = () => {
+const homeInit = () => {
   preview.value = {
     id: 0,
     name: 'None',
@@ -98,6 +98,6 @@ export default function useHomeState() {
     albumPreview,
     options,
     isInit,
-    init
+    homeInit
   }
 }

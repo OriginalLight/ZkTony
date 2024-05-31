@@ -48,11 +48,47 @@ const subpage = ref<{
   }
 })
 
+const galleryInit = () => {
+  selected.value = []
+  options.value = {
+    name: '',
+    date: []
+  }
+  paginationProps.current = 1
+  paginationProps.total = 0
+  subpage.value = {
+    album: {
+      id: 0,
+      name: '',
+      user: null,
+      photos: [],
+      original: [],
+      createTime: '',
+      updateTime: ''
+    },
+    selected: [],
+    preview: {
+      id: 0,
+      name: '',
+      albumId: 0,
+      path: '',
+      width: 0,
+      height: 0,
+      type: 0,
+      thumbnail: '',
+      exposureTime: 0,
+      Gain: 0,
+      createTime: ''
+    }
+  }
+}
+
 export default function useGalleryState() {
   return {
     selected,
     options,
     paginationProps,
-    subpage
+    subpage,
+    galleryInit
   }
 }
