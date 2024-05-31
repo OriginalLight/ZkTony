@@ -34,13 +34,11 @@ export default {
   'home.camera.options.shooting': 'Shooting...',
   'home.camera.options.calculating': 'Calculating...',
   'home.camera.options.cancel': 'Cancel',
-  'home.thumbnail.view.combine': 'Combine',
-  'home.thumbnail.view.export': 'Export',
-  'home.thumbnail.view.export.success': 'Export Success',
-  'home.thumbnail.view.picture.light': 'Light',
-  'home.thumbnail.view.picture.dark': 'Dark',
-  'home.thumbnail.view.picture.combine': 'Combine',
-  'home.thumbnail.view.preview': 'Preview',
+  'home.album.view.combine': 'Combine',
+  'home.album.view.export': 'Export',
+  'home.album.view.export.success': 'Export Success',
+  'home.album.view.album': 'Album',
+  'home.album.view.preview': 'Preview',
   'home.camera.options.temperature.warn':
     'The current camera temperature has not reached the set temperature. Clicking shoot will affect the image quality!',
   'home.camera.options.temperature.error':

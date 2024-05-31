@@ -25,7 +25,7 @@ public class TestController(
     }
 
     #endregion
-    
+
     [HttpGet]
     [Route("Test1")]
     public IActionResult AvailableStorage()

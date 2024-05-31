@@ -1,16 +1,19 @@
 <template>
   <a-row class="container">
     <a-col :span="14" class="image-preview">
-      <ImagePreview :image="preview" @adjust="handleAdjust" />
+      <ImagePreview :image="preview" @adjust="handlePhotoAdd" />
     </a-col>
     <a-col :span="10" class="operation">
       <CameraOptions @shoot="handleShoot" @preview="handlePreview" />
-      <ThumbnailView
+      <AlbumView
         :preview="preview"
-        :thumbnail="thumbnail"
-        :selected="selected"
-        @selected="handleSelected"
-        @combine="handleCombine"
+        :albums="albums"
+        :selected-albums="selectedAlbums"
+        :selected-photos="selectedPhotos"
+        :album-preview="albumPreview"
+        @click-album="handleClickAlbum"
+        @click-photo="handleClickPhoto"
+        @combine="handlePhotoAdd"
       />
     </a-col>
   </a-row>
@@ -19,48 +22,65 @@
 <script lang="ts" setup>
 import ImagePreview from './components/image-preview.vue'
 import CameraOptions from './components/camera-options.vue'
-import ThumbnailView from './components/thumbnail-view.vue'
-import { Picture } from '@renderer/api/picture'
+import AlbumView from './components/album-view.vue'
+import { Album, Photo } from '@renderer/api/album'
 import useHomeState from '@renderer/states/home'
 
-const { preview, thumbnail, selected } = useHomeState()
+const { preview, selectedAlbums, selectedPhotos, albums, albumPreview } = useHomeState()
 
 // 拍摄
-const handleShoot = (images: Picture[]) => {
-  preview.value = images[0]
-  thumbnail.value = images.concat(thumbnail.value)
-  selected.value = []
+const handleShoot = (album: Album) => {
+  if (album.photos.length > 0) {
+    preview.value = album.photos.find((item) => item.type === 1) ?? album.photos[0]
+  }
+  const list: Album[] = []
+  albums.value = list.concat(album).concat(albums.value)
+  selectedPhotos.value = []
+  albumPreview.value = album
 }
 
 // 预览
-const handlePreview = (image: Picture) => {
+const handlePreview = (image: Photo) => {
   preview.value = image
-  selected.value = []
 }
 
-// 选择
-const handleSelected = (image: Picture) => {
-  if (selected.value.find((item) => item.id === image.id)) {
-    selected.value = selected.value.filter((item) => item.id !== image.id)
-  } else {
-    selected.value.push(image)
+// 点击相册
+const handleClickAlbum = (album: Album) => {
+  if (album.photos.length > 0) {
+    preview.value = album.photos.find((item) => item.type === 1) ?? album.photos[0]
   }
-  preview.value = image
+  if (selectedAlbums.value.some((item) => item.id === album.id)) {
+    selectedAlbums.value = selectedAlbums.value.filter((item) => item.id !== album.id)
+  } else {
+    selectedAlbums.value = selectedAlbums.value.concat(album)
+  }
+  selectedPhotos.value = []
+  albumPreview.value = album
 }
 
-// 合成
-const handleCombine = (image: Picture) => {
-  preview.value = image
-  // image 放到thumbnail中
-  thumbnail.value = thumbnail.value.concat(image)
-  selected.value = []
+// 点击照片
+const handleClickPhoto = (photo: Photo) => {
+  if (selectedPhotos.value.some((item) => item.id === photo.id)) {
+    selectedPhotos.value = selectedPhotos.value.filter((item) => item.id !== photo.id)
+  } else {
+    selectedPhotos.value = selectedPhotos.value.concat(photo)
+  }
+  preview.value = photo
 }
 
-// 调整
-const handleAdjust = (image: Picture) => {
-  preview.value = image
-  thumbnail.value = thumbnail.value.concat(image)
-  selected.value = []
+const handlePhotoAdd = (photo: Photo | null) => {
+  if (photo) {
+    preview.value = photo
+    selectedPhotos.value = []
+    const album = albums.value.find((item) => item.id === photo.albumId)
+    if (album) {
+      const photos = album.photos.concat(photo)
+      album.photos = photos
+      // repace album to update the album list
+      albums.value = albums.value.map((item) => (item.id === album.id ? album : item))
+      albumPreview.value = album
+    }
+  }
 }
 </script>
 

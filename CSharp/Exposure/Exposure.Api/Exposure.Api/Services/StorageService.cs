@@ -26,7 +26,7 @@ public class StorageService(
                 errorLog.AddErrorLog(e);
                 Log.Error(e, "清空预览图失败");
             }
-            
+
             // 删除校准文件夹里面的所有文件
             try
             {

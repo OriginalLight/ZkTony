@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.compose)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
 }
@@ -20,9 +20,21 @@ android {
         buildConfig = true
     }
 
+    composeCompiler {
+        enableStrongSkippingMode = true
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_17.toString()
+    }
+
+    lint {
+        baseline = file("lint-baseline.xml")
     }
 }
 

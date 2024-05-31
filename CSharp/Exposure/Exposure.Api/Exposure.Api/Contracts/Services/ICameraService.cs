@@ -1,4 +1,5 @@
 ﻿using Exposure.Api.Models;
+using Exposure.Api.Models.Dto;
 
 namespace Exposure.Api.Contracts.Services;
 
@@ -38,7 +39,7 @@ public interface ICameraService
     ///     预览
     /// </summary>
     /// <returns></returns>
-    Task PreviewAsync();
+    Task<Photo> PreviewAsync();
 
     /// <summary>
     ///     自动拍照
@@ -66,7 +67,7 @@ public interface ICameraService
     ///     获取缓存
     /// </summary>
     /// <returns></returns>
-    Task<List<Picture>> GetCacheAsync();
+    Task<AlbumOutDto?> GetCacheAsync();
 
     /// <summary>
     ///     老化测试

@@ -122,7 +122,7 @@ img.onload = () => {
   loading.value = false
 }
 
-img.src = subpage.value.item?.thumbnail || ''
+img.src = subpage.value.preview?.thumbnail || ''
 </script>
 
 <style scoped>

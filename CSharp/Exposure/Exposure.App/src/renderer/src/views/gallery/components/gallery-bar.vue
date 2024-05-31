@@ -16,26 +16,36 @@
       >
     </a-space>
     <a-space size="large">
-      <a-button type="primary" shape="round" :disabled="diableDetail" @click="handleDetail">
+      <a-button
+        type="primary"
+        shape="round"
+        :loading="loading.update"
+        :disabled="selected.length !== 1 || loading.update"
+        @click="showUpdate"
+      >
         <template #icon>
           <icon-edit />
         </template>
-        <template #default>{{ t('gallery.bar.detail') }}</template>
+        <template #default>{{ t('gallery.bar.rename') }}</template>
       </a-button>
       <a-button
         type="primary"
         shape="round"
-        :disabled="diableCombine"
-        :loading="loading.combine"
-        @click="handleCombine"
+        :disabled="selected.length !== 1"
+        @click="handleDetail"
       >
         <template #icon>
-          <icon-common />
+          <icon-image />
         </template>
-        <template #default>{{ t('gallery.bar.combine') }}</template>
+        <template #default>{{ t('gallery.bar.detail') }}</template>
       </a-button>
       <a-popover position="br" trigger="click">
-        <a-button type="primary" shape="round" :disabled="disableExport" :loading="loading.export">
+        <a-button
+          type="primary"
+          shape="round"
+          :disabled="selected.length === 0 || loading.export"
+          :loading="loading.export"
+        >
           <template #icon>
             <icon-export />
           </template>
@@ -54,8 +64,8 @@
         shape="round"
         status="danger"
         :loading="loading.delete"
-        :disabled="disableDelete"
-        @click="visible = true"
+        :disabled="selected.length === 0 || loading.delete"
+        @click="visible.delete = true"
       >
         <template #icon>
           <icon-delete />
@@ -64,68 +74,73 @@
       </a-button>
     </a-space>
   </div>
-  <a-modal v-model:visible="visible" draggable @ok="handleDelete" @cancel="visible = false">
+  <a-modal
+    v-model:visible="visible.delete"
+    draggable
+    @ok="handleDelete"
+    @cancel="visible.delete = false"
+  >
     <template #title> {{ t('gallery.bar.delete.title') }} </template>
     <div>
       {{ t('gallery.bar.delete.content') }}
     </div>
   </a-modal>
+  <a-modal
+    v-model:visible="visible.update"
+    draggable
+    @ok="handleUpdate"
+    @cancel="visible.update = false"
+  >
+    <template #title> {{ t('gallery.bar.rename') }} </template>
+    <a-input v-model="update.name" allow-clear :max-length="32"> </a-input>
+  </a-modal>
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { combinePicture, exportPicture, deletePicture } from '@renderer/api/picture'
 import { Message } from '@arco-design/web-vue'
 import useGalleryState from '@renderer/states/gallery'
+import { deleteAlbum, exportAlbum, updateAlbum } from '@renderer/api/album'
 
-const { selected, options } = useGalleryState()
+const { selected, options, subpage } = useGalleryState()
 
-const emit = defineEmits(['search', 'combine'])
+const emit = defineEmits(['search'])
 
 const { t } = useI18n()
 const router = useRouter()
 
-const visible = ref(false)
+const visible = ref({
+  delete: false,
+  update: false
+})
 
 const loading = ref({
-  combine: false,
+  update: false,
   export: false,
   delete: false
 })
 
-// 是否禁用详细
-const diableDetail = computed(() => {
-  // 数量不等于1
-  return selected.value.length !== 1
-})
-
-// 是否禁用合并
-const diableCombine = computed(() => {
-  // 数量等于2, 类型一个是白光一个是曝光, 不能同时是白光或者曝光
-  return (
-    selected.value.length !== 2 ||
-    selected.value[0].type === selected.value[1].type ||
-    selected.value.some((item) => item.type === 2) ||
-    loading.value.combine
-  )
-})
-
-// 是否禁用导出
-const disableExport = computed(() => {
-  // 数量等于0
-  return selected.value.length === 0 || loading.value.export
-})
-
-// 是否禁用删除
-const disableDelete = computed(() => {
-  // 数量等于0
-  return selected.value.length === 0 || loading.value.delete
+const update = ref({
+  id: 0,
+  name: ''
 })
 
 // 详细
 const handleDetail = () => {
+  if (selected.value.length === 0) {
+    return
+  }
+  const item = selected.value[0]
+  if (!item || item.photos.length === 0) {
+    return
+  }
+  subpage.value = {
+    album: item,
+    selected: [],
+    preview: item.photos.find((photo) => photo.type === 1) ?? item.photos[0]
+  }
   router.push('/gallery-detail')
 }
 
@@ -134,26 +149,12 @@ const handleSearch = () => {
   emit('search')
 }
 
-// 合并
-const handleCombine = async () => {
-  try {
-    loading.value.combine = true
-    const ids: number[] = selected.value.map((item) => item.id)
-    await combinePicture(ids)
-    emit('combine')
-  } catch (error) {
-    Message.error((error as Error).message)
-  } finally {
-    loading.value.combine = false
-  }
-}
-
 // 导出
 const handleExport = async (format: string) => {
   try {
     loading.value.export = true
     const ids: number[] = selected.value.map((item) => item.id)
-    await exportPicture({ ids: ids, format: format })
+    await exportAlbum({ ids: ids, format: format })
     Message.success(t('gallery.bar.export.success'))
   } catch (error) {
     Message.error((error as Error).message)
@@ -164,17 +165,47 @@ const handleExport = async (format: string) => {
 
 // 删除
 const handleDelete = async () => {
-  visible.value = false
+  visible.value.delete = false
   try {
     loading.value.delete = true
     const ids: number[] = selected.value.map((item) => item.id)
-    await deletePicture(ids)
+    await deleteAlbum(ids)
     selected.value = []
     emit('search')
   } catch (error) {
     Message.error((error as Error).message)
   } finally {
     loading.value.delete = false
+  }
+}
+
+// 显示更新
+const showUpdate = () => {
+  if (selected.value.length === 0) {
+    return
+  }
+  const item = selected.value[0]
+  update.value = {
+    id: item.id,
+    name: item.name
+  }
+  visible.value.update = true
+}
+
+// 更新
+const handleUpdate = async () => {
+  try {
+    loading.value.update = true
+    visible.value.update = false
+    await updateAlbum(update.value)
+    const album = selected.value.find((item) => item.id === update.value.id)
+    if (album) {
+      album.name = update.value.name
+    }
+  } catch (error) {
+    Message.error((error as Error).message)
+  } finally {
+    loading.value.update = false
   }
 }
 </script>

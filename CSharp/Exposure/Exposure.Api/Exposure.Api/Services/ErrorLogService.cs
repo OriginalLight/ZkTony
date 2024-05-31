@@ -43,7 +43,7 @@ public class ErrorLogService(IDbContext dbContext) : BaseService<ErrorLog>(dbCon
 
     #region 根据id查询
 
-    public async Task<List<ErrorLog>> GetByIds(object[] ids)
+    public async Task<List<ErrorLog>> GetByIds(int[] ids)
     {
         return await _context.db.Queryable<ErrorLog>().Where(p => ids.Contains(p.Id)).ToListAsync();
     }

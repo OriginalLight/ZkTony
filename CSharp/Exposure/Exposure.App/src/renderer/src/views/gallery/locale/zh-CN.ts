@@ -15,6 +15,7 @@ export default {
   'gallery.bar.export.success': '导出成功',
   'gallery.bar.3dchart': '3D图',
   'gallery.bar.detail': '详\u2002情',
+  'gallery.bar.rename': '重命名',
   'gallery.content.picture.light': '白光图',
   'gallery.content.picture.dark': '曝光图',
   'gallery.content.picture.combine': '合成图',

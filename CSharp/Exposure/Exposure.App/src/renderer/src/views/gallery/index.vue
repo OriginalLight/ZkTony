@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <gallery-bar @combine="handleCombine" @search="handleSearch" />
+    <gallery-bar @search="handleSearch" />
     <gallery-content ref="content" />
   </div>
 </template>
@@ -14,12 +14,6 @@ import useGalleryState from '@renderer/states/gallery'
 const { selected, paginationProps } = useGalleryState()
 
 const content = ref<InstanceType<typeof GalleryContent>>()
-
-const handleCombine = () => {
-  selected.value = []
-  paginationProps.current = 1
-  content.value?.fetchData()
-}
 
 const handleSearch = () => {
   selected.value = []

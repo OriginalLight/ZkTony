@@ -105,6 +105,7 @@ public static class OpenCvUtils
     {
         try
         {
+            if (roi == "0,1,0,1") return src;
             var arr = roi.Split(',');
             var left = double.Parse(arr[0]);
             var right = double.Parse(arr[1]);
@@ -136,6 +137,7 @@ public static class OpenCvUtils
         try
         {
             // ReSharper disable PossibleLossOfFraction
+            if (angle == 0) return src;
             var center = new Point2f(src.Width / 2, src.Height / 2);
             var rot = Cv2.GetRotationMatrix2D(center, angle, 1.0);
             var dst = new Mat();
@@ -224,7 +226,8 @@ public static class OpenCvUtils
         
         var sum = 0;
         var threshold = 0;
-        for (var i = 65535; i >= 0; i--)
+        // 白底从前往后找，黑底从后往前找
+        for (var i = 0; i < 65535; i++)
         {
             sum += (int)hist.At<float>(i);
             if (!(sum >= pixels)) continue;
@@ -243,6 +246,8 @@ public static class OpenCvUtils
     
     public static Mat LutLinearTransform(Mat src, int inLow, int inHigh, int outLow, int outHigh)
     {
+        // check if the input range is valid
+        if (inHigh == inLow || (inHigh - inLow) == (outHigh - outLow)) return src;
         // 计算斜率和截距
         var scale = (outHigh - outLow) / (inHigh - inLow);
         var shift = outLow - inLow * scale;

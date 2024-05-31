@@ -1,9 +1,9 @@
 import { reactive, ref } from 'vue'
-import { Picture, PictureGallery } from '@renderer/api/picture'
 import { PaginationProps } from '@arco-design/web-vue'
+import { Album, Photo } from '@renderer/api/album'
 
 // 缩略图选中
-const selected = ref<Picture[]>([])
+const selected = ref<Album[]>([])
 
 // 选项
 const options = ref({
@@ -13,37 +13,38 @@ const options = ref({
 
 const paginationProps = reactive<PaginationProps>({
   current: 1,
-  defaultPageSize: 200,
+  defaultPageSize: 100,
   total: 0,
   showTotal: true
 })
 
 const subpage = ref<{
-  list: PictureGallery
-  item: Picture
+  album: Album
+  selected: Photo[]
+  preview: Photo
 }>({
-  list: {
-    date: '',
-    light: [],
-    dark: [],
-    combine: []
-  },
-  item: {
+  album: {
     id: 0,
-    userId: 0,
-    name: 'None',
+    name: '',
+    user: null,
+    photos: [],
+    original: [],
+    createTime: '',
+    updateTime: ''
+  },
+  selected: [],
+  preview: {
+    id: 0,
+    name: '',
+    albumId: 0,
     path: '',
-    width: 1000,
-    height: 1000,
+    width: 0,
+    height: 0,
     type: 0,
     thumbnail: '',
     exposureTime: 0,
-    exposureGain: 0,
-    blackLevel: 0,
-    isDelete: false,
-    createTime: '',
-    updateTime: '',
-    deleteTime: ''
+    Gain: 0,
+    createTime: ''
   }
 })
 

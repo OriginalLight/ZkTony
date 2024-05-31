@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { Picture } from './picture'
+import { Album, Photo } from './album'
 
 export interface PixelParam {
   index: number
@@ -16,7 +16,7 @@ export function init() {
 
 // 预览
 export function preview() {
-  return axios.get('/Camera/Preview')
+  return axios.get<Photo>('/Camera/Preview')
 }
 
 // 设置画质
@@ -41,7 +41,7 @@ export function cancel() {
 
 // 获取结果
 export function result() {
-  return axios.get<Picture[]>('/Camera/Result')
+  return axios.get<Album>('/Camera/Result')
 }
 
 // 导入

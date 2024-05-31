@@ -2,16 +2,16 @@
 
 namespace Exposure.Api.Models;
 
-[SugarTable("Picture")]
-public class Picture
+[SugarTable("Photo")]
+public class Photo
 {
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
     public int Id { get; set; }
 
     /// <summary>
-    ///     用户ID
+    ///     图集ID
     /// </summary>
-    public int UserId { get; set; }
+    public int AlbumId { get; set; }
 
     /// <summary>
     ///     图片名称
@@ -38,6 +38,9 @@ public class Picture
     /// </summary>
     public int Height { get; set; }
 
+    /// <summary>
+    ///     图片类型 -2: 原始图片 -1:预览图 0:白光 1：曝光 2：合成
+    /// </summary>
     public int Type { get; set; }
 
     /// <summary>
@@ -46,32 +49,13 @@ public class Picture
     public int ExposureTime { get; set; }
 
     /// <summary>
-    ///     曝光增益
+    ///     增益
     /// </summary>
-    public int ExposureGain { get; set; }
-
-    /// <summary>
-    ///     白平衡
-    /// </summary>
-    public int BlackLevel { get; set; }
-
-    /// <summary>
-    ///     是否删除
-    /// </summary>
-    public bool IsDelete { get; set; }
-
+    public int Gain { get; set; }
+    
     /// <summary>
     ///     创建时间
     /// </summary>
     public DateTime CreateTime { get; set; } = DateTime.Now;
-
-    /// <summary>
-    ///     更新时间
-    /// </summary>
-    public DateTime UpdateTime { get; set; } = DateTime.Now;
-
-    /// <summary>
-    ///     删除时间
-    /// </summary>
-    public DateTime DeleteTime { get; set; } = DateTime.Now;
+    
 }

@@ -1,30 +1,39 @@
 import { ref } from 'vue'
-import { Picture } from '@renderer/api/picture'
+import { Album, Photo } from '@renderer/api/album'
 
 // 预览
-const preview = ref<Picture>({
+const preview = ref<Photo>({
   id: 0,
-  userId: 0,
   name: 'None',
+  albumId: 0,
   path: '',
   width: 1000,
   height: 1000,
   type: 0,
   thumbnail: '',
   exposureTime: 0,
-  exposureGain: 0,
-  blackLevel: 0,
-  isDelete: false,
+  Gain: 0,
+  createTime: ''
+})
+
+const albumPreview = ref<Album>({
+  id: 0,
+  name: 'None',
   createTime: '',
   updateTime: '',
-  deleteTime: ''
+  user: null,
+  photos: [],
+  original: []
 })
 
 // 缩略图
-const thumbnail = ref<Picture[]>([])
+const albums = ref<Album[]>([])
 
-// 缩略图选中
-const selected = ref<Picture[]>([])
+// 选中的图片
+const selectedPhotos = ref<Photo[]>([])
+
+// 选中的相册
+const selectedAlbums = ref<Album[]>([])
 
 // 选项
 const options = ref({
@@ -45,23 +54,20 @@ const isInit = ref(false)
 const init = () => {
   preview.value = {
     id: 0,
-    userId: 0,
     name: 'None',
+    albumId: 0,
     path: '',
     width: 1000,
     height: 1000,
     type: 0,
     thumbnail: '',
     exposureTime: 0,
-    exposureGain: 0,
-    blackLevel: 0,
-    isDelete: false,
-    createTime: '',
-    updateTime: '',
-    deleteTime: ''
+    Gain: 0,
+    createTime: ''
   }
-  thumbnail.value = []
-  selected.value = []
+  albums.value = []
+  selectedAlbums.value = []
+  selectedPhotos.value = []
   options.value = {
     mode: 'auto',
     quality: '0',
@@ -72,13 +78,24 @@ const init = () => {
     },
     frame: 1
   }
+  albumPreview.value = {
+    id: 0,
+    name: 'None',
+    createTime: '',
+    updateTime: '',
+    user: null,
+    photos: [],
+    original: []
+  }
 }
 
 export default function useHomeState() {
   return {
     preview,
-    thumbnail,
-    selected,
+    albums,
+    selectedAlbums,
+    selectedPhotos,
+    albumPreview,
     options,
     isInit,
     init

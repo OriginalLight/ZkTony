@@ -105,13 +105,13 @@
 import { ref, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Brightness, Contrast, Refresh, Save } from '@icon-park/vue-next'
-import { Picture, adjustPicture } from '@renderer/api/picture'
 import { Message } from '@arco-design/web-vue'
 import Slider from '@vueform/slider'
+import { Photo, adjustPhoto } from '@renderer/api/album'
 
 const props = defineProps({
   image: {
-    type: Object as () => Picture,
+    type: Object as () => Photo,
     required: true
   }
 })
@@ -144,7 +144,7 @@ const handleRedo = () => {
 const handleSave = async () => {
   try {
     loading.value = true
-    const res = await adjustPicture({
+    const res = await adjustPhoto({
       id: props.image.id,
       brightness: imageOptions.value.brightness,
       contrast: imageOptions.value.contrast,

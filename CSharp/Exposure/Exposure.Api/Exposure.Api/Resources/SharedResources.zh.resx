@@ -269,4 +269,7 @@
     <data name="Error0016" xml:space="preserve">
       <value>0x0016 相机校正失败</value>
     </data>
+    <data name="Original" xml:space="preserve">
+      <value>原图</value>
+    </data>
 </root>

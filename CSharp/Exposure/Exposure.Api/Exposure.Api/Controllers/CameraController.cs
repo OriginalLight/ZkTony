@@ -35,9 +35,9 @@ public class CameraController(
     public async Task<IActionResult> Preview()
     {
         // 预览
-        await camera.PreviewAsync();
+        var photo = await camera.PreviewAsync();
         operLog.AddOperLog(localizer.GetString("Preview").Value, localizer.GetString("Success").Value);
-        return Ok();
+        return Ok(photo);
     }
 
     #endregion

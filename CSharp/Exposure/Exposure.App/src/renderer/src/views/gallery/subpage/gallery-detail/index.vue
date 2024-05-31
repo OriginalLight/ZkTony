@@ -1,86 +1,57 @@
 <template>
   <div class="box">
-    <a-space direction="vertical" class="preview">
+    <div class="preview-box">
       <a-button
-        v-if="subpage.list.light.length > 0"
-        size="small"
-        style="width: 108px"
-        @click="expand.light = !expand.light"
+        class="button"
+        type="primary"
+        style="width: 100px"
+        :disabled="diableCombine"
+        :loading="loading.combine"
+        @click="handleCombine"
       >
         <template #icon>
-          <icon-list v-if="expand.light" />
-          <icon-more v-else />
+          <icon-export />
         </template>
-        {{ t('gallery.detail.picture.light') }}</a-button
+        {{ t('home.album.view.combine') }}</a-button
       >
-      <a-space v-if="expand.light && subpage.list.light.length > 0" direction="vertical">
-        <div
-          v-for="img in subpage.list.light"
-          :key="img.id"
-          class="img-box"
-          @click="handelSelected(img)"
-        >
-          <img v-lazy="img.thumbnail" class="img" />
-          <icon-check v-if="showSelected(img)" class="selected" />
-          <div class="img-name">{{ img.name }}</div>
-        </div>
-      </a-space>
       <a-button
-        v-if="subpage.list.dark.length > 0"
-        size="small"
-        style="width: 108px"
-        @click="expand.dark = !expand.dark"
+        class="button"
+        type="primary"
+        status="danger"
+        style="width: 100px"
+        :disabled="subpage.selected.length === 0"
+        :loading="loading.delete"
+        @click="visible.delete = true"
       >
         <template #icon>
-          <icon-list v-if="expand.dark" />
-          <icon-more v-else />
+          <icon-delete />
         </template>
-        {{ t('gallery.detail.picture.dark') }}</a-button
+        {{ t('gallery.bar.delete') }}</a-button
       >
-      <a-space v-if="expand.dark && subpage.list.dark.length > 0" direction="vertical">
+      <a-space direction="vertical" class="preview">
         <div
-          v-for="img in subpage.list.dark"
-          :key="img.id"
+          v-for="(item, index) in subpage.album.photos"
+          :key="item.id"
           class="img-box"
-          @click="handelSelected(img)"
+          @click="handelSelected(item)"
         >
-          <img v-lazy="img.thumbnail" class="img" />
-          <icon-check v-if="showSelected(img)" class="selected" />
-          <div class="img-name">{{ img.name }}</div>
+          <img v-lazy="item.thumbnail" class="img" />
+          <div v-if="showSelected(item)" class="selected">√</div>
+          <div v-if="showPreview(item)" class="img-preview">
+            {{ t('home.album.view.preview') }}
+          </div>
+          <div class="img-index">{{ index + 1 }}</div>
+          <div class="img-name">{{ item.name }}</div>
         </div>
       </a-space>
-      <a-button
-        v-if="subpage.list.combine.length > 0"
-        size="small"
-        style="width: 108px"
-        @click="expand.combine = !expand.combine"
-      >
-        <template #icon>
-          <icon-list v-if="expand.combine" />
-          <icon-more v-else />
-        </template>
-        {{ t('gallery.detail.picture.combine') }}</a-button
-      >
-      <a-space v-if="expand.combine && subpage.list.combine.length > 0" direction="vertical">
-        <div
-          v-for="img in subpage.list.combine"
-          :key="img.id"
-          class="img-box"
-          @click="handelSelected(img)"
-        >
-          <img v-lazy="img.thumbnail" class="img" />
-          <icon-check v-if="showSelected(img)" class="selected" />
-          <div class="img-name">{{ img.name }}</div>
-        </div>
-      </a-space>
-    </a-space>
+    </div>
     <a-divider direction="vertical" style="height: 100%" :margin="8" />
     <div class="col">
       <div class="col-1">
         <div class="img-preview-box">
           <img
             id="img-preview"
-            v-lazy="subpage.item?.path"
+            v-lazy="subpage.preview?.path"
             class="img"
             :style="{
               filter: `brightness(${options.brightness}%) contrast(${options.contrast}%) invert(${options.invert ? 100 : 0}%)`,
@@ -122,24 +93,24 @@
       <div class="col-2">
         <a-space direction="vertical" style="width: 100%">
           <a-input
-            v-model="subpage.item.name"
+            v-model="subpage.preview.name"
             allow-clear
             :max-length="32"
             @change="handleUpdate()"
           >
             <template #prepend> {{ t('gallery.detail.name') }} </template>
           </a-input>
-          <a-input :model-value="subpage.item.width + ' x ' + subpage.item.height" readonly>
+          <a-input :model-value="subpage.preview.width + ' x ' + subpage.preview.height" readonly>
             <template #prepend> {{ t('gallery.detail.size') }} </template>
           </a-input>
-          <a-input :model-value="(subpage.item.exposureTime / 1000).toString()" readonly>
+          <a-input :model-value="(subpage.preview.exposureTime / 1000).toString()" readonly>
             <template #prepend> {{ t('gallery.detail.expo') }} </template>
             <template #append> {{ t('gallery.detail.unit') }} </template>
           </a-input>
-          <a-input :model-value="user?.name" readonly>
+          <a-input :model-value="subpage.album.user?.name" readonly>
             <template #prepend> {{ t('gallery.detail.user') }} </template>
           </a-input>
-          <a-input :model-value="subpage.item.createTime" readonly>
+          <a-input :model-value="subpage.preview.createTime" readonly>
             <template #prepend> {{ t('gallery.detail.time') }} </template>
           </a-input>
           <a-divider margin="0" />
@@ -198,6 +169,17 @@
       </div>
     </div>
   </div>
+  <a-modal
+    v-model:visible="visible.delete"
+    draggable
+    @ok="handleDelete"
+    @cancel="visible.delete = false"
+  >
+    <template #title> {{ t('gallery.bar.delete.title') }} </template>
+    <div>
+      {{ t('gallery.bar.delete.content') }}
+    </div>
+  </a-modal>
 </template>
 
 <script lang="ts" setup>
@@ -208,9 +190,15 @@ import { CoordinateSystem, Refresh, Save } from '@icon-park/vue-next'
 import { Message } from '@arco-design/web-vue'
 import useGalleryState from '@renderer/states/gallery'
 import { useWindowSize } from '@vueuse/core'
-import { User, getUserById } from '@renderer/api/user'
-import { Picture, updatePicture, adjustPicture } from '@renderer/api/picture'
 import Slider from '@vueform/slider'
+import {
+  Photo,
+  adjustPhoto,
+  combinePhoto,
+  deleteAlbum,
+  deletePhoto,
+  updatePhoto
+} from '@renderer/api/album'
 
 const { subpage } = useGalleryState()
 
@@ -218,8 +206,6 @@ const { t } = useI18n()
 const router = useRouter()
 // 窗口高度
 const { height } = useWindowSize()
-
-const user = ref<User>()
 
 const options = ref({
   brightness: 100,
@@ -233,13 +219,25 @@ const options = ref({
 })
 
 const loading = ref({
-  save: false
+  save: false,
+  delete: false,
+  combine: false
 })
 
-const expand = ref({
-  light: true,
-  dark: true,
-  combine: true
+const visible = ref({
+  delete: false
+})
+
+// 是否禁用合并
+const diableCombine = computed(() => {
+  // 数量等于2, 类型一个是白光一个是曝光, 不能同时是白光或者曝光
+  return (
+    subpage.value.selected.length !== 2 ||
+    !(
+      subpage.value.selected.some((item) => item.type === 0) &&
+      subpage.value.selected.some((item) => item.type === 1)
+    )
+  )
 })
 
 const resetOptions = () => {
@@ -257,7 +255,7 @@ const resetOptions = () => {
   img.style.left = '0px'
   img.style.top = '0px'
 
-  handleHistogram(subpage.value.item.thumbnail)
+  handleHistogram(subpage.value.preview.thumbnail)
 }
 
 const disabledRedo = computed(() => {
@@ -272,34 +270,74 @@ const disabledRedo = computed(() => {
   )
 })
 
-const showSelected = (img: Picture) => {
-  return subpage.value.item.id === img.id
+const showSelected = (img: Photo) => {
+  return subpage.value.selected.some((p) => p.id === img.id)
+}
+
+const showPreview = (img: Photo) => {
+  return subpage.value.preview.id === img.id
+}
+
+// 删除
+const handleDelete = async () => {
+  visible.value.delete = false
+  try {
+    loading.value.delete = true
+    const ids: number[] = subpage.value.selected.map((item) => item.id)
+    await deletePhoto(ids)
+    // 如果删除了所有的图片, 则返回上一页
+    if (subpage.value.album.photos.length === ids.length) {
+      router.push('/gallery')
+      await deleteAlbum([subpage.value.album.id])
+    }
+    subpage.value.selected = []
+    subpage.value.album.photos = subpage.value.album.photos.filter((item) => !ids.includes(item.id))
+  } catch (error) {
+    Message.error((error as Error).message)
+  } finally {
+    loading.value.delete = false
+  }
+}
+
+// 合并
+const handleCombine = async () => {
+  try {
+    loading.value.combine = true
+    const res = await combinePhoto(subpage.value.selected.map((item) => item.id))
+    if (res.data) {
+      subpage.value.preview = res.data
+      subpage.value.selected = []
+      const photos = subpage.value.album.photos.concat(res.data)
+      subpage.value.album.photos = photos
+    }
+  } catch (error) {
+    Message.error((error as Error).message)
+  } finally {
+    loading.value.combine = false
+  }
 }
 
 const handle3dChart = async () => {
   router.push('/gallery-chart')
 }
 
-const handelSelected = async (img: Picture) => {
-  subpage.value.item = img
+const handelSelected = async (img: Photo) => {
+  subpage.value.preview = img
+  const photos = subpage.value.selected
+  if (photos.some((p) => p.id === img.id)) {
+    subpage.value.selected = photos.filter((p) => p.id != img.id)
+  } else {
+    subpage.value.selected = photos.concat(img)
+  }
   resetOptions()
   handleHistogram(img.thumbnail)
-  if (img.userId === user.value?.id) {
-    return
-  }
-  try {
-    const res = await getUserById(img.userId)
-    user.value = res.data
-  } catch (error) {
-    console.error(error)
-  }
 }
 
 const handleUpdate = async () => {
   try {
-    await updatePicture({
-      id: subpage.value.item.id,
-      name: subpage.value.item.name
+    await updatePhoto({
+      id: subpage.value.preview.id,
+      name: subpage.value.preview.name
     })
   } catch (error) {
     console.error(error)
@@ -309,24 +347,19 @@ const handleUpdate = async () => {
 const handleSave = async () => {
   try {
     loading.value.save = true
-    const res = await adjustPicture({
-      id: subpage.value.item.id,
+    const res = await adjustPhoto({
+      id: subpage.value.preview.id,
       brightness: options.value.brightness,
       contrast: options.value.contrast,
       invert: options.value.invert,
       code: 0
     })
-    subpage.value.item = res.data
-    if (res.data.type === 0) {
-      subpage.value.list.light = subpage.value.list.light.concat(res.data)
+    if (res.data) {
+      subpage.value.preview = res.data
+      const photos = subpage.value.album.photos.concat(res.data)
+      subpage.value.album.photos = photos
+      resetOptions()
     }
-    if (res.data.type === 1) {
-      subpage.value.list.dark = subpage.value.list.dark.concat(res.data)
-    }
-    if (res.data.type === 2) {
-      subpage.value.list.combine = subpage.value.list.combine.concat(res.data)
-    }
-    resetOptions()
   } catch (error) {
     Message.error((error as Error).message)
   } finally {
@@ -417,14 +450,16 @@ const handleHistogram = (src: string) => {
 
 const handleRefreshHistogram = async () => {
   try {
-    const res = await adjustPicture({
-      id: subpage.value.item.id,
+    const res = await adjustPhoto({
+      id: subpage.value.preview.id,
       brightness: options.value.brightness,
       contrast: options.value.contrast,
       invert: options.value.invert,
       code: 1
     })
-    handleHistogram(res.data.thumbnail)
+    if (res.data) {
+      handleHistogram(res.data.thumbnail)
+    }
   } catch (error) {
     console.error(error)
   }
@@ -512,8 +547,7 @@ const handleTouch = () => {
 }
 
 onMounted(() => {
-  handelSelected(subpage.value.item)
-  handleHistogram(subpage.value.item.thumbnail)
+  handleHistogram(subpage.value.preview.thumbnail)
   handleTouch()
 })
 </script>
@@ -529,7 +563,19 @@ onMounted(() => {
   background: var(--color-bg-2);
 }
 
+.preview-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .button {
+    margin-bottom: 8px;
+  }
+}
+
 .preview {
+  display: flex;
+  flex: 1;
   overflow-x: hidden;
   overflow-y: scroll;
   align-items: center;
@@ -547,28 +593,55 @@ onMounted(() => {
     width: 100px;
     height: 100px;
     object-fit: contain;
-    border-radius: 4px;
+    border-radius: 2px;
+  }
+
+  .img-preview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 8px;
+    padding: 2px;
+    color: var(--color-bg-2);
+    border-radius: 2px 0px 2px 0px;
+    background-color: rgb(var(--primary-6));
   }
 
   .selected {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 50%;
+    right: 50%;
+    transform: translate(50%, -50%);
+    font-size: 24px;
+    font-weight: bold;
+    color: rgb(var(--primary-6));
+    user-select: none;
+  }
+
+  .img-index {
+    position: absolute;
+    top: 2px;
+    right: 2px;
     color: var(--color-bg-2);
-    border-radius: 2px;
-    background-color: rgb(var(--primary-6));
+    font-size: 12px;
+    text-align: center;
+    overflow: hidden;
+    color: rgb(var(--primary-6));
   }
 
   .img-name {
     position: absolute;
     bottom: 0;
     width: 100%;
-    border-radius: 4px;
+    border-radius: 0px 0px 2px 2px;
     color: var(--color-bg-2);
-    font-size: 10px;
+    font-size: 8px;
     text-align: center;
     overflow: hidden;
     background-color: rgb(var(--primary-6));
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 

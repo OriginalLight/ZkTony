@@ -374,12 +374,9 @@ const handlePreview = async () => {
   try {
     loading.value.preview = true
     disabled.value = { hatch: true, preview: true, shot: true, quality: true }
-    await preview()
-    // 延时500ms
-    await delay(500)
-    const res = await result()
-    if (res.data.length > 0) {
-      emit('preview', res.data[0])
+    const res = await preview()
+    if (res.data) {
+      emit('preview', res.data)
     } else {
       Message.error(t('home.camera.options.preview.failed'))
     }
@@ -416,9 +413,7 @@ const handleFinish = async () => {
     progress.value.visible = false
     try {
       const res = await result()
-      if (res.data.length > 0) {
-        emit('shoot', res.data)
-      }
+      emit('shoot', res.data)
     } catch (error) {
       Message.error((error as Error).message)
     }

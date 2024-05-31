@@ -85,7 +85,7 @@ public class OperLogService(IDbContext dbContext, IUserService userService)
     /// </summary>
     /// <param name="ids"></param>
     /// <returns></returns>
-    public async Task<List<OperLogOutDto>> GetByIds(object[] ids)
+    public async Task<List<OperLogOutDto>> GetByIds(int[] ids)
     {
         var list = await _context.db.Queryable<OperLog>().Where(p => ids.Contains(p.Id)).ToListAsync();
         // 提取出userI并去重

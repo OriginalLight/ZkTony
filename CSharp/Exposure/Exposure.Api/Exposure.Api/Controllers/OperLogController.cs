@@ -50,7 +50,7 @@ public class OperLogController(
 
     [HttpPost]
     [Route("Export")]
-    public async Task<IActionResult> Export([FromBody] object[] ids)
+    public async Task<IActionResult> Export([FromBody] int[] ids)
     {
         // 获取U盘
         var usb1 = usb.GetDefaultUsbDrive();

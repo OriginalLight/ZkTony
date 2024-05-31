@@ -12,56 +12,34 @@
       <a-list-item action-layout="vertical">
         <a-space>
           <a-tag size="large">{{ item.date }}</a-tag>
-          <a-button shape="round" style="width: 100px" @click="handleSelectedAll(item)">
-            {{ selectedNumber(item) }}
+          <a-button shape="round" style="width: 100px" @click="handleSelectedAll(item.albums)">
+            {{ selectedNumber(item.albums) }}
           </a-button>
         </a-space>
-        <a-divider v-if="item.light.length > 0" orientation="right">{{
-          t('gallery.content.picture.light') + ' - ' + item.light.length
-        }}</a-divider>
+        <a-divider />
         <a-space wrap>
           <div
-            v-for="img in item.light"
-            :key="img.id"
-            class="img-box"
-            @click="handleSelected(item, img)"
-            @dblclick="handleDetail(item, img)"
+            v-for="(album, index) in item.albums"
+            :key="album.id"
+            class="scroll-item"
+            @click="handleSelected(album)"
+            @dblclick="handleDetail(album)"
+            @longClick="handleSelected(album)"
           >
-            <img v-lazy="img.thumbnail" class="img" />
-            <icon-check v-if="showSelected(img)" class="selected" />
-            <div class="img-name">{{ img.name }}</div>
-          </div>
-        </a-space>
-        <a-divider v-if="item.dark.length > 0" orientation="right">{{
-          t('gallery.content.picture.dark') + ' - ' + item.dark.length
-        }}</a-divider>
-        <a-space wrap>
-          <div
-            v-for="img in item.dark"
-            :key="img.id"
-            class="img-box"
-            @click="handleSelected(item, img)"
-            @dblclick="handleDetail(item, img)"
-          >
-            <img v-lazy="img.thumbnail" class="img" />
-            <icon-check v-if="showSelected(img)" class="selected" />
-            <div class="img-name">{{ img.name }}</div>
-          </div>
-        </a-space>
-        <a-divider v-if="item.combine.length > 0" orientation="right">{{
-          t('gallery.content.picture.combine') + ' - ' + item.combine.length
-        }}</a-divider>
-        <a-space wrap>
-          <div
-            v-for="img in item.combine"
-            :key="img.id"
-            class="img-box"
-            @click="handleSelected(item, img)"
-            @dblclick="handleDetail(item, img)"
-          >
-            <img v-lazy="img.thumbnail" class="img" />
-            <icon-check v-if="showSelected(img)" class="selected" />
-            <div class="img-name">{{ img.name }}</div>
+            <div
+              v-for="(photo, index1) in album.photos"
+              :key="photo.id"
+              class="album-img-box"
+              :style="{
+                top: (20 / (album.photos.length - 1)) * index1 + 'px',
+                left: (20 / (album.photos.length - 1)) * index1 + 'px'
+              }"
+            >
+              <img v-lazy="photo.thumbnail" class="album-img" alt="dessert" />
+            </div>
+            <div v-if="showSelected(album)" class="selected">√</div>
+            <div class="img-index">{{ index + 1 }}</div>
+            <div class="img-name">{{ album.name }}</div>
           </div>
         </a-space>
       </a-list-item>
@@ -71,15 +49,12 @@
 
 <script lang="ts" setup>
 import { ref, computed, onActivated } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import dayjs from 'dayjs'
 import { useWindowSize } from '@vueuse/core'
-import { Picture, PictureGallery, getByPage } from '@renderer/api/picture'
 import useGalleryState from '@renderer/states/gallery'
 import { Message } from '@arco-design/web-vue'
-
-const { t } = useI18n()
+import { Album, getByPage } from '@renderer/api/album'
+import dayjs from 'dayjs'
 
 const router = useRouter()
 // 窗口高度
@@ -93,70 +68,52 @@ const { selected, options, paginationProps, subpage } = useGalleryState()
 // 加载状态
 const loading = ref(false)
 // 图片列表
-const data = ref<Picture[]>([])
-// 图片列表
-const list = computed<PictureGallery[]>(() => {
-  // 根据日期分类同一天的放入一个数组并按照时间倒序排列并且按照type分类
-  const map = new Map()
+const data = ref<Album[]>([])
+// data 处理
+const list = computed<{ date: string; albums: Album[] }[]>(() => {
+  const map = new Map<string, Album[]>()
   data.value.forEach((item) => {
     const date = dayjs(item.createTime).format('YYYY-MM-DD')
     if (map.has(date)) {
-      map.get(date).push(item)
+      map.get(date)?.push(item)
     } else {
       map.set(date, [item])
     }
   })
-  const arr = Array.from(map)
-  arr.sort((a, b) => {
-    return dayjs(b[0]).valueOf() - dayjs(a[0]).valueOf()
+  return Array.from(map).map(([date, albums]) => {
+    return {
+      date,
+      albums
+    }
   })
-  const gallery: PictureGallery[] = []
-
-  arr.forEach((item) => {
-    gallery.push({
-      date: item[0],
-      light: item[1].filter((item) => item.type === 0),
-      dark: item[1].filter((item) => item.type === 1),
-      combine: item[1].filter((item) => item.type === 2)
-    })
-  })
-
-  return gallery
 })
 // 是否显示选中
-const showSelected = (item: Picture) => {
+const showSelected = (item: Album) => {
   return selected.value.some((selected) => selected.id === item.id)
 }
 // 选择
-const handleSelected = (list: PictureGallery, item: Picture) => {
+const handleSelected = (item: Album) => {
   if (selected.value.find((selected) => selected.id === item.id)) {
     selected.value = selected.value.filter((selected) => selected.id !== item.id)
   } else {
     selected.value.push(item)
   }
-  subpage.value = {
-    list,
-    item
-  }
 }
 // 全选或者取消全选
-const handleSelectedAll = (list: PictureGallery) => {
-  const item = list.light.concat(list.dark).concat(list.combine)
-  // item 全在选中列表中 则取消全选
-  if (item.every((item) => selected.value.find((selected) => selected.id === item.id))) {
+const handleSelectedAll = (list: Album[]) => {
+  if (list.every((item) => selected.value.find((selected) => selected.id === item.id))) {
     selected.value = selected.value.filter(
-      (selected) => !item.find((item) => item.id === selected.id)
+      (selected) => !list.find((item) => item.id === selected.id)
     )
   } else {
-    selected.value = selected.value.concat(item)
+    selected.value = selected.value.concat(list)
   }
 }
 
-const selectedNumber = (gallery: PictureGallery) => {
+const selectedNumber = (albums: Album[]) => {
   // list中被选中的
-  const item = gallery.light.concat(gallery.dark).concat(gallery.combine)
-  const num = item.filter((item) => selected.value.find((selected) => selected.id === item.id))
-  return num.length + ' / ' + item.length
+  const num = albums.filter((item) => selected.value.find((selected) => selected.id === item.id))
+  return num.length + ' / ' + albums.length
 }
 // 分页
 const handlePageChange = (page: number) => {
@@ -164,10 +121,14 @@ const handlePageChange = (page: number) => {
   fetchData()
 }
 // 详情
-const handleDetail = (list: PictureGallery, item: Picture) => {
+const handleDetail = (item: Album) => {
+  if (item.photos.length === 0) {
+    return
+  }
   subpage.value = {
-    list,
-    item
+    album: item,
+    selected: [],
+    preview: item.photos.find((photo) => photo.type === 1) ?? item.photos[0]
   }
   router.push('/gallery-detail')
 }
@@ -180,7 +141,6 @@ const fetchData = async () => {
       page: paginationProps.current ? paginationProps.current : 1,
       size: paginationProps.defaultPageSize ? paginationProps.defaultPageSize : 200,
       name: options.value.name,
-      isDeleted: false,
       startTime: options.value.date ? options.value.date[0] : null,
       endTime: options.value.date ? options.value.date[1] : null
     })
@@ -219,36 +179,68 @@ onActivated(async () => {
   margin-top: 12px;
 }
 
-.img-box {
+.scroll-item {
   display: flex;
   position: relative;
+  width: 100px;
+  height: 100px;
 
-  .img {
-    width: 100px;
-    height: 100px;
-    object-fit: contain;
-    border-radius: 4px;
+  .img-preview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 10px;
+    padding: 2px;
+    color: var(--color-bg-2);
+    border-radius: 2px 0px 2px 0px;
+    background-color: rgb(var(--primary-6));
   }
 
   .selected {
     position: absolute;
+    top: 50%;
+    right: 50%;
+    transform: translate(50%, -50%);
+    font-size: 24px;
+    font-weight: bold;
+    color: rgb(var(--primary-6));
+    user-select: none;
+  }
+
+  .album-img-box {
+    position: absolute;
+
+    .album-img {
+      height: 80px;
+      min-height: 80px;
+      object-fit: contain;
+      border-radius: 2px;
+    }
+  }
+  .img-index {
+    position: absolute;
     top: 0;
     right: 0;
     color: var(--color-bg-2);
-    border-radius: 2px;
-    background-color: rgb(var(--primary-6));
+    font-size: 12px;
+    text-align: center;
+    overflow: hidden;
+    color: rgb(var(--primary-6));
   }
 
   .img-name {
     position: absolute;
     bottom: 0;
     width: 100%;
-    border-radius: 4px;
     color: var(--color-bg-2);
     font-size: 10px;
     text-align: center;
     overflow: hidden;
+    border-radius: 0px 0px 2px 2px;
     background-color: rgb(var(--primary-6));
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 </style>

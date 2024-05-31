@@ -7,6 +7,8 @@ export default {
   'option.camera': '相机',
   'option.camera.correction': '校正',
   'option.camera.calibrate': '畸变校正',
+  'option.camera.lut': 'LUT图像增强',
+  'option.camera.threshold': '二值化所占比例',
   'option.camera.calibrate.success': '校正成功',
   'option.camera.expoTime': '曝光时间',
   'option.camera.gain': '增益',

@@ -4,7 +4,7 @@ using SqlSugar;
 
 namespace Exposure.Api.Contracts.Services;
 
-public interface IPictureService : IBaseService<Picture>
+public interface IAlbumService : IBaseService<Album>
 {
     /// <summary>
     ///     分页查询
@@ -12,48 +12,41 @@ public interface IPictureService : IBaseService<Picture>
     /// <param name="dto"></param>
     /// <param name="total"></param>
     /// <returns></returns>
-    Task<List<Picture>> GetByPage(PictureQueryDto dto, RefAsync<int> total);
+    Task<List<AlbumOutDto>> GetByPage(AlbumQueryDto dto, RefAsync<int> total);
 
     /// <summary>
     ///     添加并返回实体
     /// </summary>
-    /// <param name="picture"></param>
+    /// <param name="album"></param>
     /// <returns></returns>
-    Task<Picture> AddReturnModel(Picture picture);
+    Task<Album> AddReturnModel(Album album);
 
     /// <summary>
     ///     根据id查询
     /// </summary>
     /// <param name="ids"></param>
     /// <returns></returns>
-    Task<List<Picture>> GetByIds(object[] ids);
+    Task<List<AlbumOutDto>> GetByIds(int[] ids);
+    
+    
+    /// <summary>
+    ///     根据id查询
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task<AlbumOutDto> GetById(int id);
     
     /// <summary>
     ///     删除多条数据
     /// </summary>
     /// <param name="keys"></param>
     /// <returns></returns>
-    Task<bool> DeleteByIds(object[] keys);
-
-    /// <summary>
-    ///     合成
-    /// </summary>
-    /// <param name="pic1"></param>
-    /// <param name="pic2"></param>
-    /// <returns></returns>
-    Task<Picture> Combine(Picture pic1, Picture pic2);
-
-    /// <summary>
-    ///     调整图片
-    /// </summary>
-    /// <param name="dto"></param>
-    /// <returns></returns>
-    Task<Picture> Adjust(PictureAdjustDto dto);
-
+    Task<bool> DeleteByIds(int[] keys);
+    
     /// <summary>
     ///     更新
     /// </summary>
     /// <param name="model"></param>
     /// <returns></returns>
-    Task<bool> Update(PictureUpdateDto model);
+    Task<bool> Update(AlbumUpdateDto model);
 }

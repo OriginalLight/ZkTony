@@ -295,12 +295,8 @@ public class MachineController(
         // 灯光自检
         try
         {
-            await camera.PreviewAsync();
-            await Task.Delay(1000);
-            var res = await camera.GetCacheAsync();
-            if (res.Count == 0) throw new Exception(localizer.GetString("Error0014").Value);
-            var img = res[0];
-            var mat = new Mat(img.Path, ImreadModes.Grayscale);
+            var res = await camera.PreviewAsync();
+            var mat = new Mat(res.Path, ImreadModes.Grayscale);
             var mask = new Mat();
             // 转换成灰度图
             var totalPixels = mat.Rows * mat.Cols;

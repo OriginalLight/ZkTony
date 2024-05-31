@@ -15,6 +15,7 @@ export default {
   'gallery.bar.export.success': 'Export successfully',
   'gallery.bar.3dchart': '3D Chart',
   'gallery.bar.detail': 'Detail',
+  'gallery.bar.rename': 'Rename',
   'gallery.content.picture.light': 'Light Picture',
   'gallery.content.picture.dark': 'Dark Picture',
   'gallery.content.picture.combine': 'Combine Picture',

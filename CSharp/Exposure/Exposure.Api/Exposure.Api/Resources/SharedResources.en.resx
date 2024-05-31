@@ -269,4 +269,7 @@
     <data name="Error0016" xml:space="preserve">
       <value>0x0016 Camera correction failed</value>
     </data>
+    <data name="Original" xml:space="preserve">
+      <value>Original</value>
+    </data>
 </root>

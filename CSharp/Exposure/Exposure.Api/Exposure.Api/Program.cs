@@ -51,10 +51,11 @@ builder.Services.AddSingleton<ISerialPortService, SerialPortService>();
 builder.Services.AddSingleton<IUsbService, UsbService>();
 builder.Services.AddSingleton<IUserService, UserService>();
 builder.Services.AddSingleton<ICameraService, CameraService>();
+builder.Services.AddSingleton<IAlbumService, AlbumService>();
 builder.Services.AddSingleton<IErrorLogService, ErrorLogService>();
 builder.Services.AddSingleton<IOptionService, OptionService>();
 builder.Services.AddSingleton<IOperLogService, OperLogService>();
-builder.Services.AddSingleton<IPictureService, PictureService>();
+builder.Services.AddSingleton<IPhotoService, PhotoService>();
 builder.Services.AddSingleton<ITestService, TestService>();
 builder.Services.AddSingleton<IAudioService, AudioService>();
 

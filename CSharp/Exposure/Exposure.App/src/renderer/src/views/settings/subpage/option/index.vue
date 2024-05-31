@@ -62,6 +62,33 @@
               </template>
             </a-list-item>
             <a-list-item>
+              <a-list-item-meta :title="t('option.camera.lut')"></a-list-item-meta>
+              <template #actions>
+                <a-switch v-model="option.lut" @change="handleOption('Lut', String(option.lut))" />
+              </template>
+            </a-list-item>
+            <a-list-item v-if="option.lut">
+              <a-list-item-meta :title="t('option.camera.threshold')"></a-list-item-meta>
+              <template #actions>
+                <a-input-group>
+                  <a-input-number
+                    v-model="option.threshold"
+                    style="width: 350px"
+                    :min="0"
+                    :max="1"
+                    mode="button"
+                    :step="0.001"
+                  >
+                  </a-input-number>
+                  <a-button
+                    type="primary"
+                    @click="handleOption('Threshold', String(option.threshold))"
+                    >{{ t('option.set') }}</a-button
+                  >
+                </a-input-group>
+              </template>
+            </a-list-item>
+            <a-list-item>
               <a-list-item-meta :title="t('option.camera.expoTime')"></a-list-item-meta>
               <template #actions>
                 <a-input-group>
@@ -246,7 +273,9 @@ const option = ref({
   rotate: 0,
   roi: '0,1,0,1',
   hatchStep: 256000,
-  hatchOffset: 0
+  hatchOffset: 0,
+  lut: true,
+  threshold: 0.001
 })
 
 const loading = ref(false)
@@ -293,6 +322,8 @@ onMounted(async () => {
     if (ops.HatchOffset) option.value.hatchOffset = Number(ops.HatchOffset)
     if (ops.Rotate) option.value.rotate = Number(ops.Rotate)
     if (ops.Roi) option.value.roi = ops.Roi
+    if (ops.Lut) ops.Lut === 'true' ? (option.value.lut = true) : (option.value.lut = false)
+    if (ops.Threshold) option.value.threshold = Number(ops.Threshold)
     const res = await getPorts()
     option.value.ports = res.data
   } catch (error) {

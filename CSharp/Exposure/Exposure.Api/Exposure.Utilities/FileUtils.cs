@@ -7,6 +7,8 @@ public static class FileUtils
     #region 静态文件夹
 
     private static string MyPictures => Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+    
+    public static string Original => Directory.Exists(Path.Combine(MyPictures, "Original")) ? Path.Combine(MyPictures, "Original") : Directory.CreateDirectory(Path.Combine(MyPictures, "Original")).FullName;
 
     public static string Exposure => Directory.Exists(Path.Combine(MyPictures, "Exposure")) ? Path.Combine(MyPictures, "Exposure") : Directory.CreateDirectory(Path.Combine(MyPictures, "Exposure")).FullName;
 
