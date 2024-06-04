@@ -58,20 +58,26 @@ fun CircularButtons(
             val y = (circleRadius / 2).value * sin(angle)
             val isSelected = selected == i
 
-            Button(
-                onClick = { onSelected(i) },
-                enabled = enabled,
-                modifier = Modifier
-                    .size(radius * 2)
-                    .offset { IntOffset(x.roundToInt(), y.roundToInt()) }
-                    .background(
-                        color = if (isSelected) Color.Red else Color.Green,
-                        shape = CircleShape
-                    )
-                    .padding(8.dp)
-                    .clip(CircleShape)
-                    .clickable { onSelected(i) }
-            ) {}
+            Box(modifier = Modifier.offset { IntOffset(x.roundToInt(), y.roundToInt()) }) {
+                Button(
+                    onClick = { onSelected(i) },
+                    enabled = enabled,
+                    modifier = Modifier
+                        .size(radius * 2)
+                        .background(
+                            color = if (isSelected) Color.Red else Color.Green,
+                            shape = CircleShape
+                        )
+                        .padding(8.dp)
+                        .clip(CircleShape)
+                ) {}
+
+                Text(
+                    modifier = Modifier
+                        .align(Alignment.Center),
+                    text = (i + 1).toString()
+                )
+            }
         }
 
         Text(
