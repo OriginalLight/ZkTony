@@ -42,7 +42,7 @@ fun AppNavigation(
             //系统设置
             composable(Route.SETTING) { SettingRoute(viewModel = hiltViewModel()) }
             //首页
-            composable(Route.SPLASH) { Splash() }
+            composable(Route.SPLASH) { Splash(viewModel = homeViewModel) }
         }
     }
 }

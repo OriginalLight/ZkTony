@@ -2,6 +2,7 @@ package com.zktony.android.ui
 
 import android.content.Context
 import android.graphics.Color.rgb
+import android.os.Build
 import android.os.storage.StorageManager
 import android.util.Log
 import android.view.View.OnLongClickListener
@@ -539,8 +540,17 @@ fun debugMode(
                             shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                             onClick = {
                                 //获取usb地址
-                                val path = getStoragePath(context, true)
+                                var path = getStoragePath(context, true)
                                 if (!"".equals(path)) {
+
+                                    val release = Build.VERSION.RELEASE
+                                    if (release == "6.0.1") {
+                                        //Android6.0.1系统是迈冲
+                                        if (path != null) {
+                                            path = path.replace("storage", "/mnt/media_rw")
+                                        }
+                                    }
+
                                     val filePath = "$path/zktony/config.txt"
                                     uiEvent(SettingIntent.ImportData(filePath = filePath))
                                 } else {

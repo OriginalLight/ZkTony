@@ -599,13 +599,13 @@ class DebugModeViewModel @Inject constructor(
 
             //04高浓度泵启动速度（rpm）=制胶总流速（μL/s）×（制胶高浓度-母液低浓度）/（母液高浓度-母液低浓度）×高浓度泵校准数据（步/μL）*60/每圈脉冲数
             //母液低浓度
-            val lowCoagulant = dataStore.readData("lowCoagulant", 4)
+            val lowCoagulant = dataStore.readData("lowCoagulant", 4.0)
             Log.d(
                 "HomeViewModel_startJob",
                 "===母液低浓度===$lowCoagulant"
             )
             //母液高浓度
-            val highCoagulant = dataStore.readData("highCoagulant", 20)
+            val highCoagulant = dataStore.readData("highCoagulant", 20.0)
             Log.d(
                 "HomeViewModel_startJob",
                 "===母液高浓度===$highCoagulant"

@@ -82,6 +82,7 @@ import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.line
 import com.zktony.android.ui.utils.toList
+import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.extra.format
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -116,6 +117,8 @@ fun HomeRoute(viewModel: HomeViewModel) {
     val erEntities = viewModel.erEntities.collectAsLazyPagingItems()
 
     val hint by viewModel.hint.collectAsStateWithLifecycle()
+
+    val heartbeatError by viewModel.heartbeatError.collectAsStateWithLifecycle()
 
 
     val navigation: () -> Unit = {
@@ -170,7 +173,8 @@ fun HomeRoute(viewModel: HomeViewModel) {
                 pipelineDialogOpen,
                 cleanDialogOpen,
                 watermother,
-                coagulantmother
+                coagulantmother,
+                heartbeatError,
             )
         }
     }
@@ -202,6 +206,7 @@ fun operate(
     cleanDialogOpen: Boolean,
     watermother: Float,
     coagulantmother: Float,
+    heartbeatErrorHome: Boolean,
 ) {
 
     val scope = rememberCoroutineScope()
@@ -341,6 +346,11 @@ fun operate(
     val resetError = remember { mutableStateOf(false) }
 
     /**
+     * 上下位机失联弹窗
+     */
+    val heartbeatError = remember { mutableStateOf(false) }
+
+    /**
      * 纯水进度
      */
     var waterSweepState by remember {
@@ -389,21 +399,33 @@ fun operate(
         )
     }
 
-
     if (uiFlags is UiFlags.Objects && uiFlags.objects == 4) {
         continueGlueDialog.value = true
+        if (wasteprogress > 0.9) {
+            wasteDialog.value = true
+        }
     } else if (uiFlags is UiFlags.Objects && uiFlags.objects == 6) {
         expectedMakeNum.value = 0
         expectedMakeNum_ex = "0"
         uiEvent(HomeIntent.MotherVolZero)
-        experimentRecord.status = EPStatus.COMPLETED
-        experimentRecord.number = complate
-        uiEvent(HomeIntent.Update(experimentRecord))
+//        experimentRecord.status = EPStatus.COMPLETED
+//        experimentRecord.number = complate
+//        uiEvent(HomeIntent.Update(experimentRecord))
         continueGlueDialog.value = false
-        uiEvent(HomeIntent.MoveCom(complate))
+        uiEvent(HomeIntent.MoveCom(1))
     } else if (uiFlags is UiFlags.Objects && uiFlags.objects == 14) {
+        //复位失败弹窗
         resetError.value = true
     }
+//    else if (uiFlags is UiFlags.Objects && uiFlags.objects == 15) {
+//        //上下位机失联弹窗
+//        heartbeatError.value = true
+//    }
+//
+//    if (AppStateUtils.hpe[0] == true) {
+//        heartbeatError.value = true
+//    }
+
     Column(
         modifier = Modifier
             .padding(start = 13.75.dp)
@@ -1181,9 +1203,9 @@ fun operate(
                                 expectedMakeNum.value = 0
                                 expectedMakeNum_ex = "0"
                                 uiEvent(HomeIntent.MotherVolZero)
-                                experimentRecord.status = EPStatus.ABORT
-                                experimentRecord.detail = "手动停止制胶"
-                                uiEvent(HomeIntent.Update(experimentRecord))
+//                                experimentRecord.status = EPStatus.ABORT
+//                                experimentRecord.detail = "手动停止制胶"
+//                                uiEvent(HomeIntent.Update(experimentRecord))
                                 startMake = "开始制胶"
                                 uiEvent(HomeIntent.Stop)
                                 stopGlueDialog.value = false
@@ -1211,58 +1233,6 @@ fun operate(
 
 
     /**
-     * 清空废液槽弹窗
-     */
-    if (wasteDialog.value) {
-        Dialog(onDismissRequest = {}) {
-            ElevatedCard {
-                Column(
-                    modifier = Modifier
-                        .padding(30.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(
-                        modifier = Modifier.padding(start = 80.dp),
-                        fontSize = 20.sp,
-                        text = "清空废液槽！"
-                    )
-
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        Button(
-                            modifier = Modifier
-                                .width(100.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(rgb(0, 105, 52))
-                            ),
-                            onClick = {
-                                uiEvent(HomeIntent.CleanWasteState)
-                                wasteDialog.value = false
-                            }) {
-                            Text(fontSize = 18.sp, text = "确认")
-                        }
-
-                        Button(
-                            modifier = Modifier
-                                .padding(start = 40.dp)
-                                .width(100.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(rgb(0, 105, 52))
-                            ),
-                            onClick = {
-                                wasteDialog.value = false
-                            }) {
-                            Text(fontSize = 18.sp, text = "取消")
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * 继续制胶弹窗
      */
     if (continueGlueDialog.value) {
@@ -1282,32 +1252,9 @@ fun operate(
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        Button(
-                            modifier = Modifier
-                                .width(100.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(rgb(0, 105, 52))
-                            ),
-                            onClick = {
-                                if (uiFlags is UiFlags.Objects && uiFlags.objects == 13) {
-                                    Toast.makeText(
-                                        context,
-                                        "正在冲洗,请稍后再操作!",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                } else {
-                                    experimentRecord.number = complate
-                                    uiEvent(HomeIntent.Update(experimentRecord))
-                                    continueGlueDialog.value = false
-                                    uiEvent(HomeIntent.Start(complate))
-                                }
-                            }) {
-                            Text(fontSize = 18.sp, text = "继续")
-                        }
 
                         Button(
                             modifier = Modifier
-                                .padding(start = 40.dp)
                                 .width(100.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(rgb(0, 105, 52))
@@ -1322,16 +1269,81 @@ fun operate(
                                 } else {
                                     expectedMakeNum.value = 0
                                     expectedMakeNum_ex = "0"
-                                    experimentRecord.number = complate
-                                    experimentRecord.status = EPStatus.ABORT
-                                    experimentRecord.detail = "手动停止制胶"
-                                    uiEvent(HomeIntent.Update(experimentRecord))
+//                                    experimentRecord.number = complate
+//                                    experimentRecord.status = EPStatus.ABORT
+//                                    experimentRecord.detail = "手动停止制胶"
+//                                    uiEvent(HomeIntent.Update(experimentRecord))
                                     uiEvent(HomeIntent.MotherVolZero)
-                                    uiEvent(HomeIntent.MoveCom(complate))
+                                    uiEvent(HomeIntent.MoveCom(0))
                                     continueGlueDialog.value = false
                                 }
                             }) {
                             Text(fontSize = 18.sp, text = "停止")
+                        }
+
+                        Button(
+                            enabled = hint,
+                            modifier = Modifier
+                                .padding(start = 40.dp)
+                                .width(100.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ),
+                            onClick = {
+                                if (uiFlags is UiFlags.Objects && uiFlags.objects == 13) {
+                                    Toast.makeText(
+                                        context,
+                                        "正在冲洗,请稍后再操作!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+//                                    experimentRecord.number = complate
+//                                    uiEvent(HomeIntent.Update(experimentRecord))
+                                    continueGlueDialog.value = false
+                                    uiEvent(HomeIntent.Start(complate))
+                                }
+                            }) {
+                            Text(fontSize = 18.sp, text = "继续")
+                        }
+
+
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 清空废液槽弹窗
+     */
+    if (wasteDialog.value) {
+        Dialog(onDismissRequest = {}) {
+            ElevatedCard {
+                Column(
+                    modifier = Modifier
+                        .padding(30.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        fontSize = 20.sp,
+                        text = "清空废液槽！"
+                    )
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Button(
+                            modifier = Modifier
+                                .width(100.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ),
+                            onClick = {
+                                uiEvent(HomeIntent.CleanWasteState)
+                                wasteDialog.value = false
+                            }) {
+                            Text(fontSize = 18.sp, text = "确认")
                         }
                     }
                 }
@@ -1374,18 +1386,18 @@ fun operate(
 
                                     startMake = "停止制胶"
                                     uiEvent(HomeIntent.Start(0))
-                                    uiEvent(
-                                        HomeIntent.Insert(
-                                            program.startRange,
-                                            program.endRange,
-                                            program.thickness,
-                                            program.coagulant,
-                                            program.volume,
-                                            0,
-                                            EPStatus.RUNNING,
-                                            ""
-                                        )
-                                    )
+//                                    uiEvent(
+//                                        HomeIntent.Insert(
+//                                            program.startRange,
+//                                            program.endRange,
+//                                            program.thickness,
+//                                            program.coagulant,
+//                                            program.volume,
+//                                            0,
+//                                            EPStatus.RUNNING,
+//                                            ""
+//                                        )
+//                                    )
                                     guleDialog.value = false
                                 } else {
                                     Toast.makeText(
@@ -2136,7 +2148,6 @@ fun operate(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
-                        modifier = Modifier.padding(start = 80.dp),
                         fontSize = 20.sp,
                         text = "复位失败！请重新复位或者关机重启！"
                     )
@@ -2151,6 +2162,7 @@ fun operate(
                                 containerColor = Color(rgb(0, 105, 52))
                             ),
                             onClick = {
+                                resetError.value = false
                                 uiEvent(HomeIntent.Reset)
                             }) {
                             Text(fontSize = 18.sp, text = "复位")

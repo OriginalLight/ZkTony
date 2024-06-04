@@ -2,6 +2,7 @@ package com.zktony.android.ui
 
 import android.content.Context
 import android.graphics.Color.rgb
+import android.os.Build
 import android.os.storage.StorageManager
 import android.util.Log
 import android.widget.Toast
@@ -64,6 +65,7 @@ import com.zktony.android.ui.utils.toList
 import com.zktony.android.utils.extra.dateFormat
 import kotlinx.coroutines.launch
 import java.io.File
+import java.io.FileWriter
 import java.lang.reflect.Method
 import kotlin.reflect.KFunction1
 
@@ -133,7 +135,7 @@ fun experimentList(
     dispatch: KFunction1<ExperimentRecordsIntent, Unit>
 ) {
     val context = LocalContext.current
-
+    val scope = rememberCoroutineScope()
 
     /**
      * 新建和打开的弹窗
@@ -276,47 +278,92 @@ fun experimentList(
                     ),
                     shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                     onClick = {
+                        scope.launch {
+                            var path = getStoragePath(context, true)
+                            if (!"".equals(path)) {
+                                if (entitiesList.isNotEmpty()) {
+                                    val entity = entities[selectedIndex]
+                                    if (entity != null) {
+                                        try {
+                                            val release = Build.VERSION.RELEASE
+                                            if (release == "6.0.1") {
+                                                //Android6.0.1系统是迈冲
+                                                if (path != null) {
+                                                    path = path.replace("storage", "/mnt/media_rw")
+                                                }
+                                            }
+                                            path += "/erlog.txt"
 
-                        var path = getStoragePath(context, true)
-                        if (!"".equals(path)) {
-                            if (entitiesList.isNotEmpty()) {
+                                            val file = File(path)
+                                            if (!file.exists()) {
+                                                if (file.createNewFile()) {
+                                                    FileWriter(path, true).use { writer ->
+                                                        writer.write(
+                                                            "实验记录:" + ",日期：" + entity.createTime.dateFormat(
+                                                                "yyyy-MM-dd"
+                                                            )
+                                                                    + ",开始浓度:" + entity.startRange.toString()
+                                                                    + ",结束浓度:" + entity.endRange.toString()
+                                                                    + ",常用厚度:" + entity.thickness
+                                                                    + ",促凝剂体积:" + entity.coagulant.toString()
+                                                                    + ",胶液体积:" + entity.volume.toString()
+                                                                    + ",制胶数量:" + entity.number.toString()
+                                                                    + ",状态:" + entity.status
+                                                                    + ",状态详情:" + entity.detail
+                                                        )
+                                                    }
+                                                    Toast.makeText(
+                                                        context,
+                                                        "导出成功!",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                } else {
+                                                    Toast.makeText(
+                                                        context,
+                                                        "创建文件失败,请重试!",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                }
+                                            } else {
+                                                FileWriter(path, true).use { writer ->
+                                                    writer.write(
+                                                        "实验记录:" + ",日期：" + entity.createTime.dateFormat(
+                                                            "yyyy-MM-dd"
+                                                        )
+                                                                + ",开始浓度:" + entity.startRange.toString()
+                                                                + ",结束浓度:" + entity.endRange.toString()
+                                                                + ",常用厚度:" + entity.thickness
+                                                                + ",促凝剂体积:" + entity.coagulant.toString()
+                                                                + ",胶液体积:" + entity.volume.toString()
+                                                                + ",制胶数量:" + entity.number.toString()
+                                                                + ",状态:" + entity.status
+                                                                + ",状态详情:" + entity.detail
+                                                    )
+                                                }
+                                                Toast.makeText(
+                                                    context,
+                                                    "导出成功!",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
 
-
-                                val entity = entities[selectedIndex]
-                                if (entity != null) {
-                                    val filePath = "$path/zktony/erlog.txt"
-
-                                    val file =
-                                        File(filePath)
-                                    if (!file.exists()) {
-                                        file.createNewFile() // 创建新文件（若不存在）
+                                        } catch (e: Exception) {
+                                            Toast.makeText(
+                                                context,
+                                                "导出异常,请重试!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
                                     }
-
-                                    File(filePath).writeText(
-                                        "实验记录:" + ",日期：" + entity.createTime.dateFormat("yyyy-MM-dd")
-                                                + ",开始浓度:" + entity.startRange.toString()
-                                                + ",结束浓度:" + entity.endRange.toString()
-                                                + ",常用厚度:" + entity.thickness
-                                                + ",促凝剂体积:" + entity.coagulant.toString()
-                                                + ",胶液体积:" + entity.volume.toString()
-                                                + ",制胶数量:" + entity.number.toString()
-                                                + ",状态:" + entity.status
-                                                + ",状态详情:" + entity.detail
-                                    )
-                                    Toast.makeText(
-                                        context,
-                                        "导出成功！",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
                                 }
-                            }
-                        } else {
-                            Toast.makeText(
-                                context,
-                                "未检测到USB！",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "未检测到USB!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
 
+                            }
                         }
 
 
@@ -475,7 +522,7 @@ fun experimentList(
             AlertDialog(
                 onDismissRequest = { deleteDialog.value = false },
                 title = {
-                    Text(text = "是否确认删除！")
+                    Text(text = "是否确认删除!")
                 },
                 text = {
 
@@ -495,7 +542,7 @@ fun experimentList(
                                 } else {
                                     Toast.makeText(
                                         context,
-                                        "制胶程序还在运动中,无法删除！",
+                                        "制胶程序还在运动中,无法删除!",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }

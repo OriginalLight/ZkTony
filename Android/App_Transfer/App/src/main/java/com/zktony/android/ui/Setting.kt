@@ -2142,6 +2142,7 @@ fun SettingLits(
                             }
                         }
                     } else {
+<<<<<<< Updated upstream:Android/App_Transfer/App/src/main/java/com/zktony/android/ui/Setting.kt
                         Row(
                             modifier = Modifier
                                 .padding(top = 20.dp)
@@ -2173,13 +2174,38 @@ fun SettingLits(
                                     })
                             }
                             Row(
+=======
+                        Row {
+                            Text(
+                                modifier = Modifier.padding(top = 20.dp),
+                                text = "导航栏",
+                                fontSize = 30.sp
+                            )
+                            Switch(colors = SwitchDefaults.colors(
+                                checkedTrackColor = Color(rgb(0, 105, 52)),
+                            ),
+>>>>>>> Stashed changes:Android/App_New/App_Mix_Manual/src/main/java/com/zktony/android/ui/Setting.kt
                                 modifier = Modifier
-                                    .padding(top = 20.dp)
-                                    .fillMaxWidth()
-                            ) {
-                                line(Color(rgb(240, 240, 240)), 0f, 400f)
-                            }
+                                    .height(32.dp)
+                                    .padding(top = 40.dp, start = 220.dp),
+                                checked = navigation,
+                                onCheckedChange = {
+                                    scope.launch {
+                                        navigation = it
+                                        uiEvent(SettingIntent.Navigation(it))
+                                    }
+                                })
+                        }
 
+                        Row(
+                            modifier = Modifier
+                                .padding(top = 20.dp)
+                                .fillMaxWidth()
+                        ) {
+                            line(Color(rgb(240, 240, 240)), 0f, 400f)
+                        }
+
+                        if (factoryAdminPwd.value == currentpwd) {
                             Row(modifier = Modifier.clickable {
                                 uiEvent(SettingIntent.NavTo(PageType.DEBUGMODE))
                             }) {

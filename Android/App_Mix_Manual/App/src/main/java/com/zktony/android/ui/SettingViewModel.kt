@@ -48,6 +48,7 @@ import com.zktony.android.utils.extra.dateFormat
 import com.zktony.android.utils.extra.download
 import com.zktony.android.utils.extra.httpCall
 import com.zktony.android.utils.extra.playAudio
+import com.zktony.android.utils.internal.ExceptionPolicy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -448,6 +449,7 @@ class SettingViewModel @Inject constructor(
                 File(filePath).bufferedReader().useLines { lines ->
                     for (line in lines) {
                         if (line.isNotEmpty()) {
+                            println("line=============$line")
                             var textList = ArrayList<String>()
                             var contents = line.split(",")
                             contents.forEach {
@@ -2364,13 +2366,13 @@ class SettingViewModel @Inject constructor(
 
             //04高浓度泵启动速度（rpm）=制胶总流速（μL/s）×（制胶高浓度-母液低浓度）/（母液高浓度-母液低浓度）×高浓度泵校准数据（步/μL）*60/每圈脉冲数
             //母液低浓度
-            val lowCoagulant = dataStore.readData("lowCoagulant", 4)
+            val lowCoagulant = dataStore.readData("lowCoagulant", 4.0)
             Log.d(
                 "HomeViewModel_startJob",
                 "===母液低浓度===$lowCoagulant"
             )
             //母液高浓度
-            val highCoagulant = dataStore.readData("highCoagulant", 20)
+            val highCoagulant = dataStore.readData("highCoagulant", 20.0)
             Log.d(
                 "HomeViewModel_startJob",
                 "===母液高浓度===$highCoagulant"
@@ -3040,6 +3042,7 @@ class SettingViewModel @Inject constructor(
                         )
                         //废液槽位置
                         start {
+                            exceptionPolicy = ExceptionPolicy.SKIP
                             timeOut = 1000L * 60L
                             with(
                                 index = 0,
@@ -3063,8 +3066,8 @@ class SettingViewModel @Inject constructor(
                         )
 
                         start {
+                            exceptionPolicy = ExceptionPolicy.SKIP
                             timeOut = 1000L * 60 * 1
-
                             with(
                                 index = 1,
                                 pdv = coagulantExpectedPulse.toLong(),
@@ -3110,6 +3113,7 @@ class SettingViewModel @Inject constructor(
                         )
                         //制胶位置
                         start {
+                            exceptionPolicy = ExceptionPolicy.SKIP
                             timeOut = 1000L * 60L
 //                        with(index = 0, pdv = glueBoardPosition)
                             with(
@@ -3145,7 +3149,8 @@ class SettingViewModel @Inject constructor(
 
 
                         start {
-                            timeOut = 1000L * 60 * 10
+                            exceptionPolicy = ExceptionPolicy.SKIP
+                            timeOut = (ceil(guleTime) + 30).toLong() * 1000L
                             with(
                                 index = 1,
                                 pdv = coagulantPulseCount.toLong(),
@@ -3197,6 +3202,7 @@ class SettingViewModel @Inject constructor(
                             SerialPortUtils.pulse(index = 4, dvp = setting.rinseCleanVolume * 1000)
 
                         start {
+                            exceptionPolicy = ExceptionPolicy.SKIP
                             timeOut = 1000L * 60L
                             with(
                                 index = 0,
@@ -3207,6 +3213,7 @@ class SettingViewModel @Inject constructor(
 
 
                         start {
+                            exceptionPolicy = ExceptionPolicy.SKIP
                             timeOut = 1000L * 60L
                             with(
                                 index = 4,

@@ -38,5 +38,10 @@ object AppStateUtils {
      */
     val hpd: MutableMap<Int, Boolean> = ConcurrentHashMap()
 
+    /**
+     * 上下位机是否断开
+     */
+    val hpe: MutableMap<Int, Boolean> = ConcurrentHashMap()
+
 
 }

@@ -3,6 +3,7 @@ package com.zktony.android.data
 import androidx.room.*
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.zktony.android.BuildConfig
 import com.zktony.android.data.dao.CalibrationDao
 import com.zktony.android.data.dao.ErrorRecordDao
 import com.zktony.android.data.dao.ExpectedDao
@@ -57,9 +58,9 @@ abstract class AppDatabase : RoomDatabase() {
 val MIGRATION_1_2 = object : Migration(1, 2) {
     override fun migrate(database: SupportSQLiteDatabase) {
 
-
         // 创建新的 program 表
-        database.execSQL("""
+        database.execSQL(
+            """
                     CREATE TABLE program_new (
                         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                         displayText TEXT NOT NULL DEFAULT 'None',
@@ -71,13 +72,16 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
                         founder TEXT NOT NULL DEFAULT '',
                         createTime INTEGER NOT NULL DEFAULT 0
                     )
-                """.trimIndent())
+                """.trimIndent()
+        )
 
         // 将旧表 program 中的数据插入到新表 program_new 中
-        database.execSQL("""
+        database.execSQL(
+            """
                     INSERT INTO program_new (id, displayText, startRange, endRange, thickness, coagulant, volume, founder, createTime)
                     SELECT id, displayText, startRange, endRange, thickness, coagulant, volume, founder, createTime FROM program
-                """.trimIndent())
+                """.trimIndent()
+        )
 
         // 删除旧的 program 表
         database.execSQL("DROP TABLE program")
@@ -87,7 +91,8 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
 
 
 
-        database.execSQL("""
+        database.execSQL(
+            """
                     CREATE TABLE experimentrecord_new (
                         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                         startRange REAL NOT NULL DEFAULT 0.0,
@@ -100,17 +105,37 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
                         detail TEXT NOT NULL DEFAULT '',
                         createTime INTEGER NOT NULL DEFAULT 0
                     )
-                """.trimIndent())
+                """.trimIndent()
+        )
 
-        database.execSQL("""
+        database.execSQL(
+            """
                     INSERT INTO experimentrecord_new (id, startRange, endRange, thickness, coagulant, volume, number,status,detail, createTime)
                     SELECT id, startRange, endRange, thickness, coagulant, volume, number,status,detail, createTime FROM experimentrecord
-                """.trimIndent())
+                """.trimIndent()
+        )
 
         database.execSQL("DROP TABLE experimentrecord")
 
         database.execSQL("ALTER TABLE experimentrecord_new RENAME TO experimentrecord")
 
+        /**
+         * 1.0升级2.0需要创建expected表
+         * 1.1升级2.0不需要创建
+         */
+        database.execSQL(
+            "CREATE TABLE IF NOT EXISTS `expected` (" +
+                    "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`lowFillingDefault` REAL NOT NULL, " +
+                    "`coagulantFillingDefault` REAL NOT NULL, " +
+                    "`coagulantCleanDefault` REAL NOT NULL, " +
+                    "`rinseFillingDefault` REAL NOT NULL, " +
+                    "`higeRehearsalDefault` REAL NOT NULL, " +
+                    "`higeFillingDefault` REAL NOT NULL, " +
+                    "`rinseCleanDefault` REAL NOT NULL, " +
+                    "`higeCleanDefault` REAL NOT NULL, " +
+                    "`lowCleanDefault` REAL NOT NULL)"
+        )
 
     }
 }

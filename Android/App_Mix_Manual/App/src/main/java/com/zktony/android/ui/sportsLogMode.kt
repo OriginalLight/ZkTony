@@ -2,6 +2,7 @@ package com.zktony.android.ui
 
 import android.content.Context
 import android.graphics.Color.rgb
+import android.os.Build
 import android.os.storage.StorageManager
 import android.util.Log
 import android.widget.Toast
@@ -191,32 +192,72 @@ fun sportsLogMode(
                                 if (entity != null) {
                                     try {
                                         exportDialog.value = true
-                                        val filePath =
-                                            "$path/zktony/${entity.logName}.txt"
-                                        FileWriter(filePath, true).use { writer ->
-                                            writer.write(entity.createTime.dateFormat("yyyy-MM-dd") + "\n")
-                                            delay(500)
-                                            exportSweepStateCount = entitiesList.size
-                                            entitiesList.forEach {
-                                                if (entity.logName == it.logName) {
-                                                    writer.append("使用模块：${it.startModel}\n")
-                                                    writer.append("运行数据：${it.detail}\n")
-                                                }
-                                                delay(500)
-                                                exportSweepState += 1f
+
+                                        val release = Build.VERSION.RELEASE
+                                        if (release == "6.0.1") {
+                                            //Android6.0.1系统是迈冲
+                                            if (path != null) {
+                                                path = path.replace("storage", "/mnt/media_rw")
                                             }
                                         }
-                                        exportSweepState = 0f
-                                        exportDialog.value = false
-                                        Toast.makeText(
-                                            context,
-                                            "导出完成",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                        path += "/${entity.logName}.txt"
+
+                                        val file = File(path)
+                                        if (!file.exists()) {
+                                            if (file.createNewFile()) {
+                                                FileWriter(path, true).use { writer ->
+                                                    writer.write(entity.createTime.dateFormat("yyyy-MM-dd") + "\n")
+                                                    delay(500)
+                                                    exportSweepStateCount = entitiesList.size
+                                                    entitiesList.forEach {
+                                                        if (entity.logName == it.logName) {
+                                                            writer.append("使用模块：${it.startModel}\n")
+                                                            writer.append("运行数据：${it.detail}\n")
+                                                        }
+                                                        delay(500)
+                                                        exportSweepState += 1f
+                                                    }
+                                                }
+                                                exportSweepState = 0f
+                                                exportDialog.value = false
+                                                Toast.makeText(
+                                                    context,
+                                                    "导出完成",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }else{
+                                                Toast.makeText(
+                                                    context,
+                                                    "创建文件失败,请重试!",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+                                        }else{
+                                            FileWriter(path, true).use { writer ->
+                                                writer.write(entity.createTime.dateFormat("yyyy-MM-dd") + "\n")
+                                                delay(500)
+                                                exportSweepStateCount = entitiesList.size
+                                                entitiesList.forEach {
+                                                    if (entity.logName == it.logName) {
+                                                        writer.append("使用模块：${it.startModel}\n")
+                                                        writer.append("运行数据：${it.detail}\n")
+                                                    }
+                                                    delay(500)
+                                                    exportSweepState += 1f
+                                                }
+                                            }
+                                            exportSweepState = 0f
+                                            exportDialog.value = false
+                                            Toast.makeText(
+                                                context,
+                                                "导出完成!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
                                     } catch (e: Exception) {
                                         Toast.makeText(
                                             context,
-                                            "导出异常===${e.printStackTrace()}",
+                                            "导出异常,请重试!",
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     }
@@ -227,7 +268,7 @@ fun sportsLogMode(
                         } else {
                             Toast.makeText(
                                 context,
-                                "U盘不存在！",
+                                "U盘不存在!",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }

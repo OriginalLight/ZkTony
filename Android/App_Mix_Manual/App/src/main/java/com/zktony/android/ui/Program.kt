@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Color.rgb
+import android.os.Build
 import android.os.storage.StorageManager
 import android.util.Log
 import android.widget.Toast
@@ -68,6 +69,11 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.blankj.utilcode.util.FileIOUtils
+import com.blankj.utilcode.util.FileUtils
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.zktony.android.R
 import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.Program
@@ -78,14 +84,18 @@ import com.zktony.android.ui.utils.AnimatedContent
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.Permissions
 import com.zktony.android.ui.utils.PermissionsScreen
 import com.zktony.android.ui.utils.UiFlags
+import com.zktony.android.ui.utils.getStoragePath
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.toList
 import com.zktony.android.utils.extra.dateFormat
 import com.zktony.android.utils.extra.format
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
+import java.io.FileWriter
 import java.io.IOException
 import java.lang.reflect.Method
 import java.util.regex.Pattern
@@ -146,7 +156,10 @@ fun ProgramRoute(viewModel: ProgramViewModel) {
 }
 
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
+@OptIn(
+    ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class,
+    ExperimentalPermissionsApi::class
+)
 @Composable
 fun ProgramList(
     entities: LazyPagingItems<Program>,
@@ -158,6 +171,24 @@ fun ProgramList(
     val context = LocalContext.current
 
     val keyboard = LocalSoftwareKeyboardController.current
+
+
+    /**
+     * 权限的弹窗
+     */
+    val permissionsDialog = remember { mutableStateOf(false) }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
+        } else {
+            permissionsDialog.value = true
+        }
+    }
+
+    val storagePermissionState = rememberPermissionState(Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
     /**
      * 新建和打开的弹窗
@@ -342,7 +373,7 @@ fun ProgramList(
                                 if (programId.value == entity.id) {
                                     Toast.makeText(
                                         context,
-                                        "已在制胶操作选中,不能编辑！",
+                                        "已在制胶操作选中,不能编辑!",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 } else {
@@ -404,65 +435,76 @@ fun ProgramList(
                         containerColor = Color(rgb(0, 105, 52))
                     ),
                     shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
-                    onClick ={
-
-                        var path = getStoragePath(context, true)
-                        if ("" != path) {
-                            if (entitiesList.isNotEmpty()) {
-                                val entity = entities[selectedIndex]
-                                if (entity != null) {
-                                    try {
-                    val usbPath="/storage/54A2-1C89/zktony/" + entity.displayText + ".txt"
-                                        val file = File(usbPath)
-
-                                        if (!file.exists()) {
-                                            val created = file.createNewFile()
-                                            if (created) {
-                                                println("文件已创建成功：$usbPath")
-                                            } else {
-                                                println("文件创建失败。")
+                    onClick = {
+                        scope.launch {
+                            var path = getStoragePath(context, true)
+                            if ("" != path) {
+                                if (entitiesList.isNotEmpty()) {
+                                    val entity = entities[selectedIndex]
+                                    if (entity != null) {
+                                        try {
+                                            val release = Build.VERSION.RELEASE
+                                            if (release == "6.0.1") {
+                                                //Android6.0.1系统是迈冲
+                                                if (path != null) {
+                                                    path = path.replace("storage", "/mnt/media_rw")
+                                                }
                                             }
-                                        } else {
-                                            println("文件已存在：$usbPath")
-                                        }
-                                        File(usbPath).writeText(
-                                            "制胶程序:" + entity.displayText
-                                                    + ",开始浓度:" + entity.startRange.toString()
-                                                    + ",结束浓度:" + entity.endRange.toString()
-                                                    + ",常用厚度:" + entity.thickness
-                                                    + ",促凝剂体积:" + entity.coagulant.toString()
-                                                    + ",胶液体积:" + entity.volume.toString()
-                                                    + ",创建人:" + entity.founder
-                                                    + ",日期：" + entity.createTime.dateFormat(
-                                                "yyyy-MM-dd"
-                                            )
-                                        )
-                                        Toast.makeText(
-                                            context,
-                                            "导出成功！",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    } catch (e: IOException) {
-                                        Toast.makeText(
-                                            context,
-                                            "导出异常===${e.printStackTrace()}",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
+                                            path += "/${entity.displayText}.txt"
+                                            val text =
+                                                "制胶程序:" + entity.displayText + ",开始浓度:" + entity.startRange.toString() + ",结束浓度:" + entity.endRange.toString() + ",常用厚度:" + entity.thickness + ",促凝剂体积:" + entity.coagulant.toString() + ",胶液体积:" + entity.volume.toString() + ",创建人:" + entity.founder + ",日期：" + entity.createTime.dateFormat(
+                                                    "yyyy-MM-dd"
+                                                )
 
+                                            val file = File(path)
+                                            if (!file.exists()) {
+                                                if (file.createNewFile()) {
+                                                    FileWriter(path, true).use { writer ->
+                                                        writer.write(text)
+                                                    }
+                                                    Toast.makeText(
+                                                        context,
+                                                        "导出成功!",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                } else {
+                                                    Toast.makeText(
+                                                        context,
+                                                        "创建文件失败,请重试!",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                }
+                                            } else {
+                                                FileWriter(path, true).use { writer ->
+                                                    writer.write(text)
+                                                }
+                                            }
+                                            Toast.makeText(
+                                                context,
+                                                "导出成功!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+
+
+                                        } catch (e: Exception) {
+                                            Toast.makeText(
+                                                context,
+                                                "导出异常,请重试!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+
+                                    }
                                 }
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "U盘不存在!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
-                        } else {
-                            Toast.makeText(
-                                context,
-                                "U盘不存在！",
-                                Toast.LENGTH_SHORT
-                            ).show()
                         }
 
-
-
-//                        exportDialog.value = true
                     }
                 ) {
                     Text(text = "导 出", fontSize = 18.sp)
@@ -679,7 +721,7 @@ fun ProgramList(
                                 val entity = entities[selectedIndex]
 
                                 var speChat =
-                                    "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？\\s]"
+                                    "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~!@#￥%……&*（）——+|{}【】‘；：”“’。，、？\\s]"
 
                                 var nameRepeat = false
 
@@ -696,14 +738,14 @@ fun ProgramList(
                                 if (nameRepeat) {
                                     Toast.makeText(
                                         context,
-                                        "文件名不能重复！",
+                                        "文件名不能重复!",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 } else {
                                     if (Pattern.compile(speChat).matcher(displayText).find()) {
                                         Toast.makeText(
                                             context,
-                                            "文件名不能包含特殊字符！",
+                                            "文件名不能包含特殊字符!",
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     } else {
@@ -758,7 +800,7 @@ fun ProgramList(
                             } else {
                                 //新建
                                 var speChat =
-                                    "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？\\s]"
+                                    "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~!@#￥%……&*（）——+|{}【】‘；：”“’。，、？\\s]"
 
                                 var nameRepeat = false
 
@@ -771,14 +813,14 @@ fun ProgramList(
                                 if (nameRepeat) {
                                     Toast.makeText(
                                         context,
-                                        "文件名不能重复！",
+                                        "文件名不能重复!",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 } else {
                                     if (Pattern.compile(speChat).matcher(displayText).find()) {
                                         Toast.makeText(
                                             context,
-                                            "文件名不能包含特殊字符！",
+                                            "文件名不能包含特殊字符!",
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     } else {
@@ -864,7 +906,7 @@ fun ProgramList(
         AlertDialog(
             onDismissRequest = { deleteDialog.value = false },
             title = {
-                Text(text = "是否确认删除！")
+                Text(text = "是否确认删除!")
             },
             text = {
 
@@ -887,7 +929,7 @@ fun ProgramList(
                                 if (programId.value == entity.id) {
                                     Toast.makeText(
                                         context,
-                                        "已在制胶操作选中,无法删除！",
+                                        "已在制胶操作选中,无法删除!",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 } else {
@@ -915,10 +957,7 @@ fun ProgramList(
     }
 
 
-    /**
-     * 清洗弹窗
-     */
-    if (exportDialog.value) {
+    if (permissionsDialog.value) {
         Dialog(onDismissRequest = {}) {
             ElevatedCard {
                 Column(
@@ -928,34 +967,7 @@ fun ProgramList(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     PermissionsScreen()
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        Button(
-                            modifier = Modifier
-                                .width(100.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(rgb(0, 105, 52))
-                            ),
-                            onClick = {
-
-                            }) {
-                            Text(fontSize = 18.sp, text = "确认")
-                        }
-
-                        Button(
-                            modifier = Modifier
-                                .padding(start = 40.dp)
-                                .width(100.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(rgb(0, 105, 52))
-                            ),
-                            onClick = {
-                                exportDialog.value=false
-                            }) {
-                            Text(fontSize = 18.sp, text = "取消")
-                        }
-                    }
+                    permissionsDialog.value = false
                 }
             }
         }
@@ -971,7 +983,7 @@ fun ProgramList(
                     Text(text = "导入zktony文件夹下的program.txt文件")
                     Text(text = "导入格式为:")
                     Text(text = "(制胶程序名称:test,开始浓度:4,结束浓度:20,厚度:1.5,促凝剂体积:75,胶液体积:9.5,创建人:)")
-                    Text(text = "以此类推,一行是一个制胶程序！")
+                    Text(text = "以此类推,一行是一个制胶程序!")
                 }
             }, confirmButton = {
                 Button(
@@ -985,7 +997,7 @@ fun ProgramList(
 
                             try {
                                 var speChat =
-                                    "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？\\s]"
+                                    "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~!@#￥%……&*（）——+|{}【】‘；：”“’。，、？\\s]"
 
                                 var nameRepeat = false
 
@@ -1009,7 +1021,7 @@ fun ProgramList(
                                                 if (nameRepeat) {
                                                     Toast.makeText(
                                                         context,
-                                                        "文件名不能重复！",
+                                                        "文件名不能重复!",
                                                         Toast.LENGTH_SHORT
                                                     ).show()
                                                 } else {
@@ -1018,7 +1030,7 @@ fun ProgramList(
                                                     ) {
                                                         Toast.makeText(
                                                             context,
-                                                            "文件名不能包含特殊字符！",
+                                                            "文件名不能包含特殊字符!",
                                                             Toast.LENGTH_SHORT
                                                         ).show()
 
@@ -1103,6 +1115,12 @@ fun ProgramList(
                             }
 
 
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "U盘不存在!",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
 
 
@@ -1119,54 +1137,9 @@ fun ProgramList(
             })
     }
 
-}
 
-@Composable
-fun LocationPermission() {
-    TODO("Not yet implemented")
 }
 
 
-private fun getStoragePath(context: Context, isUsb: Boolean): String? {
-    var path = ""
-    val mStorageManager: StorageManager =
-        context.getSystemService(Context.STORAGE_SERVICE) as StorageManager
-    val volumeInfoClazz: Class<*>
-    val diskInfoClaszz: Class<*>
-    try {
-        volumeInfoClazz = Class.forName("android.os.storage.VolumeInfo")
-        diskInfoClaszz = Class.forName("android.os.storage.DiskInfo")
-        val StorageManager_getVolumes: Method =
-            Class.forName("android.os.storage.StorageManager").getMethod("getVolumes")
-        val VolumeInfo_GetDisk: Method = volumeInfoClazz.getMethod("getDisk")
-        val VolumeInfo_GetPath: Method = volumeInfoClazz.getMethod("getPath")
-        val DiskInfo_IsUsb: Method = diskInfoClaszz.getMethod("isUsb")
-        val DiskInfo_IsSd: Method = diskInfoClaszz.getMethod("isSd")
-        val List_VolumeInfo = (StorageManager_getVolumes.invoke(mStorageManager) as List<Any>)
-        for (i in List_VolumeInfo.indices) {
-            val volumeInfo = List_VolumeInfo[i]
-            val diskInfo: Any = VolumeInfo_GetDisk.invoke(volumeInfo) ?: continue
-            val sd = DiskInfo_IsSd.invoke(diskInfo) as Boolean
-            val usb = DiskInfo_IsUsb.invoke(diskInfo) as Boolean
-            val file: File = VolumeInfo_GetPath.invoke(volumeInfo) as File
-            if (isUsb == usb) { //usb
-                assert(file != null)
-                path = file.getAbsolutePath()
-                Log.d(
-                    "Progarm",
-                    "usb的path=====$path"
-                )
-            } else if (!isUsb == sd) { //sd
-                assert(file != null)
-                path = file.getAbsolutePath()
-            }
-        }
-    } catch (e: Exception) {
-        Log.d(
-            "Progarm",
-            "获取usb地址异常=====" + e.printStackTrace()
-        )
-        e.printStackTrace()
-    }
-    return path
-}
+
+

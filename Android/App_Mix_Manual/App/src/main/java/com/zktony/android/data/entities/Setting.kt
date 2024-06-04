@@ -113,6 +113,12 @@ data class Setting(
      */
     var coagulantFilling: Double = 3.0,
 
+
+    /**
+     *  促凝剂泵冲洗液量/μL
+     */
+    var coagulantRinse: Double = 10.0,
+
     //================预排设置=============================
 
 )
