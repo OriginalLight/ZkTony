@@ -39,6 +39,7 @@ export default {
   'home.album.view.export.success': '导出成功',
   'home.album.view.album': '图\u2002集',
   'home.album.view.preview': '预览中',
+  'home.camera.options.cancel.warn': '请等待计算完成后再取消！',
   'home.camera.options.temperature.warn': '当前相机温度未达到设置温度，点击拍摄会影响图片质量！',
   'home.camera.options.temperature.error': '当前相机超过最高限制温度，无法拍摄！'
 }

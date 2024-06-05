@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <gallery-bar @search="handleSearch" />
+    <gallery-bar @search="handleSearch" @update="handleUpdate" />
     <gallery-content ref="content" />
   </div>
 </template>
@@ -18,6 +18,10 @@ const content = ref<InstanceType<typeof GalleryContent>>()
 const handleSearch = () => {
   selected.value = []
   paginationProps.current = 1
+  content.value?.fetchData()
+}
+
+const handleUpdate = () => {
   content.value?.fetchData()
 }
 

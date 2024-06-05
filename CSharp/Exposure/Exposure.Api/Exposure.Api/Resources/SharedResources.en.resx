@@ -272,4 +272,10 @@
     <data name="Original" xml:space="preserve">
       <value>Original</value>
     </data>
+    <data name="Error0017" xml:space="preserve">
+      <value>0x0017 Preview failed</value>
+    </data>
+    <data name="Error0018" xml:space="preserve">
+      <value>0x0018 Calculate failed</value>
+    </data>
 </root>

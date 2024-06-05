@@ -272,4 +272,10 @@
     <data name="Original" xml:space="preserve">
       <value>原图</value>
     </data>
+    <data name="Error0017" xml:space="preserve">
+      <value>0x0017 预览失败</value>
+    </data>
+    <data name="Error0018" xml:space="preserve">
+      <value>0x0018 计算失败</value>
+    </data>
 </root>

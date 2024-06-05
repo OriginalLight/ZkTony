@@ -434,6 +434,28 @@ fun ByteArray.splitByteArray(head: ByteArray, end: ByteArray): List<ByteArray> {
     return list
 }
 
+fun ByteArray.splitByteArray(): List<ByteArray> {
+    if (this.size < 11) return listOf()
+    var byteArray = this.copyOfRange(0, this.size)
+    val list = mutableListOf<ByteArray>()
+    while (byteArray.isNotEmpty()) {
+        val length = byteArray.readInt16LE(3)
+        val pacLength = length + 11
+        if (byteArray.size >= pacLength) {
+            val bytes = byteArray.copyOfRange(0, pacLength)
+            list.add(bytes)
+            if (bytes.size == byteArray.size) {
+                break
+            } else {
+                byteArray = byteArray.copyOfRange(pacLength, byteArray.size)
+            }
+        } else {
+            break
+        }
+    }
+    return list
+}
+
 fun ByteArray.indexOf(bytes: ByteArray): Int {
     if (bytes.isEmpty() || this.isEmpty()) return -1
     val index = this.indexOf(bytes.first())

@@ -98,11 +98,9 @@ abstract class AbstractSerialPort {
         if (byteArray == null) {
             if (buffer.size() > 0) {
                 try {
-                    callbacks.forEach { (key, callback) ->
-                        Log.i(config.device, "Callback Invoke: $key")
-                        callback.invoke((buffer.toByteArray()))
-                    }
+                    callbacks.values.forEach { it.invoke((buffer.toByteArray())) }
                     if (config.log) {
+                        Log.i(config.device, "All Callbacks Invoked! ${callbacks.keys}")
                         Log.i(config.device, "RX: ${buffer.toByteArray().toHexString()}")
                     }
                 } catch (ex: Exception) {

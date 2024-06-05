@@ -96,7 +96,7 @@
             v-model="subpage.preview.name"
             allow-clear
             :max-length="32"
-            @change="handleUpdate()"
+            @input="handleUpdate()"
           >
             <template #prepend> {{ t('gallery.detail.name') }} </template>
           </a-input>

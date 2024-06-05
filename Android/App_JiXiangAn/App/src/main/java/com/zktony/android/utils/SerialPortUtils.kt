@@ -23,8 +23,8 @@ object SerialPortUtils {
     fun with() {
         // 初始化rtu串口
         serialPortOf {
-            device = "/dev/ttyS3"
-            baudRate = 9600
+            device = "/dev/ttyS2"
+            baudRate = 115200
             log = true
         }?.let { SerialStoreUtils.put("rtu", it) }
         // 初始化tec串口
@@ -33,38 +33,38 @@ object SerialPortUtils {
             baudRate = 57600
         }?.let { SerialStoreUtils.put("tec", it) }
         // rtu串口全局回调
-        SerialStoreUtils.get("rtu")?.registerCallback("globe") { bytes ->
-            if (bytes[0] == 0xCC.toByte()) {
-                RunzeProtocol.verifyProtocol(bytes) { protocol ->
-                    // 处理数据包
-                    when (protocol.funcCode) {
-                        0x00.toByte() -> {
-                            hpv[protocol.slaveAddr.toInt()] = protocol.data[0].toInt()
-                        }
-
-                        0x01.toByte() -> throw Exception("帧错误")
-                        0x02.toByte() -> throw Exception("参数错误")
-                        0x03.toByte() -> throw Exception("光耦错误")
-                        0x04.toByte() -> throw Exception("电机忙")
-                        0x05.toByte() -> throw Exception("电机堵转")
-                        0x06.toByte() -> throw Exception("未知位置")
-                        0xFE.toByte() -> throw Exception("任务挂起")
-                        0xFF.toByte() -> throw Exception("未知错误")
-                        else -> {}
-                    }
-                }
-            } else {
-                RtuProtocol.verifyProtocol(bytes) { protocol ->
-                    when (protocol.funcCode) {
-                        0x03.toByte() -> {
-                            hps[protocol.slaveAddr.toInt() - 1] = protocol.data.readInt16BE(1)
-                        }
-
-                        else -> {}
-                    }
-                }
-            }
-        }
+//        SerialStoreUtils.get("rtu")?.registerCallback("globe") { bytes ->
+//            if (bytes[0] == 0xCC.toByte()) {
+//                RunzeProtocol.verifyProtocol(bytes) { protocol ->
+//                    // 处理数据包
+//                    when (protocol.funcCode) {
+//                        0x00.toByte() -> {
+//                            hpv[protocol.slaveAddr.toInt()] = protocol.data[0].toInt()
+//                        }
+//
+//                        0x01.toByte() -> throw Exception("帧错误")
+//                        0x02.toByte() -> throw Exception("参数错误")
+//                        0x03.toByte() -> throw Exception("光耦错误")
+//                        0x04.toByte() -> throw Exception("电机忙")
+//                        0x05.toByte() -> throw Exception("电机堵转")
+//                        0x06.toByte() -> throw Exception("未知位置")
+//                        0xFE.toByte() -> throw Exception("任务挂起")
+//                        0xFF.toByte() -> throw Exception("未知错误")
+//                        else -> {}
+//                    }
+//                }
+//            } else {
+//                RtuProtocol.verifyProtocol(bytes) { protocol ->
+//                    when (protocol.funcCode) {
+//                        0x03.toByte() -> {
+//                            hps[protocol.slaveAddr.toInt() - 1] = protocol.data.readInt16BE(1)
+//                        }
+//
+//                        else -> {}
+//                    }
+//                }
+//            }
+//        }
     }
 
     /**

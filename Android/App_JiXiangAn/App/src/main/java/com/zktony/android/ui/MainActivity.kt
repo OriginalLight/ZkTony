@@ -37,25 +37,26 @@ class MainActivity : ComponentActivity() {
 
         setContent {
 
-            val navController = rememberNavController()
-            val navigationActions = remember(navController) { NavigationActions(navController) }
-            val snackbarHostState = remember { SnackbarHostState() }
+            //val navController = rememberNavController()
+           // val navigationActions = remember(navController) { NavigationActions(navController) }
+            // snackbarHostState = remember { SnackbarHostState() }
             // Create the HomeViewModel instance with activity scope
-            val homeViewModel: HomeViewModel = hiltViewModel()
+//val homeViewModel: HomeViewModel = hiltViewModel()
 
-            CompositionLocalProvider(
-                LocalDataSaver provides dataSaverDataStore,
-                LocalNavigationActions provides navigationActions,
-                LocalSnackbarHostState provides snackbarHostState
-            ) {
-                AppTheme {
-                    ZktyApp(
-                        navController = navController,
-                        homeViewModel = homeViewModel,
-                        snackbarHostState = snackbarHostState
-                    )
-                }
-            }
+//            CompositionLocalProvider(
+//                LocalDataSaver provides dataSaverDataStore,
+//                LocalNavigationActions provides navigationActions,
+//                LocalSnackbarHostState provides snackbarHostState
+//            ) {
+//                AppTheme {
+//                    ZktyApp(
+//                        navController = navController,
+//                        homeViewModel = homeViewModel,
+//                        snackbarHostState = snackbarHostState
+//                    )
+//                }
+//            }
+            EmbeddedTest()
         }
     }
 }

@@ -154,6 +154,17 @@
                 {
                 }
             }
+            "{1525181F-901A-416C-8A58-119130FE478E}:_8AA33C4C840D46DF9C9C74AA9F3BEB05"
+            {
+            "Name" = "8:#1928"
+            "AlwaysCreate" = "11:FALSE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Property" = "8:StartupFolder"
+                "Folders"
+                {
+                }
+            }
             "{1525181F-901A-416C-8A58-119130FE478E}:_A85B5EABB05844778F7A0256FFD6C994"
             {
             "Name" = "8:#1916"
@@ -193,12 +204,12 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Exposure.Api"
-        "ProductCode" = "8:{7E74BFE5-C754-48E6-93AA-27AADA1702D8}"
-        "PackageCode" = "8:{9EBE705F-A705-4F33-AA93-5B7206EF31CB}"
+        "ProductCode" = "8:{A815FBF1-4B25-460C-B0DC-F4AEE61C5AB0}"
+        "PackageCode" = "8:{B1DE7D8A-45C6-454F-96CF-96DF2BECEA00}"
         "UpgradeCode" = "8:{6388160A-F81A-413A-8947-C494653873AF}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
-        "RemovePreviousVersions" = "11:FALSE"
+        "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
         "ProductVersion" = "8:1.1.0"
@@ -287,6 +298,20 @@
         "Shortcut"
         {
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_54F27A0B6AC64B8CA6C977D4C2A12C45"
+            {
+            "Name" = "8:Exposure Api"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_CB308D5BC9804C63B7B48093C64F6F25"
+            "Folder" = "8:_8AA33C4C840D46DF9C9C74AA9F3BEB05"
+            "WorkingFolder" = "8:_A9CEBE140EDD4B9A8F5457C1D5BEEA15"
+            "Icon" = "8:_153D57D0B9454460863BD220CBB6B3E5"
+            "Feature" = "8:"
+            }
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_5E09D454EDDA45CD81FFA3441D2F0D11"
             {
             "Name" = "8:Exposure Api"
             "Arguments" = "8:"

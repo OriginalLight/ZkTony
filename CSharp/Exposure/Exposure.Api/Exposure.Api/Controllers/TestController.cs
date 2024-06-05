@@ -35,8 +35,8 @@ public class TestController(
         var mat = new Mat(pic, ImreadModes.AnyDepth);
         var i = OpenCvUtils.Histogram(mat, 0.001);
         var dst = OpenCvUtils.LutLinearTransform(mat, 0, i, 0, 65535);
-        //var path = Path.Combine(FileUtils.Exposure, "test1.png");
-        //dst.SaveImage(path);
+        var path = Path.Combine(FileUtils.Exposure, "test1.png");
+        dst.SaveImage(path);
         var end = DateTime.Now;
         Log.Information($"耗时：{(end - start).TotalMilliseconds}ms");
         return Ok();

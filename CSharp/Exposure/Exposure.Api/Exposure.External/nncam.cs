@@ -1,27 +1,15 @@
-﻿// 忽略所有警告
-#pragma warning disable 1591
-#pragma warning disable 8600
-#pragma warning disable 8601
-#pragma warning disable 8603
-#pragma warning disable 8618
-#pragma warning disable 8625
-#pragma warning disable SYSLIB0004
-
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
-#if !(NETFX_CORE || NETCOREAPP || WINDOWS_UWP)
 using System.Security.Permissions;
 using System.Runtime.ConstrainedExecution;
-#endif
 using System.Collections.Generic;
-using System.Runtime.ConstrainedExecution;
 using System.Threading;
 
 /*
-    Version: 55.24686.20240225
+    Version: 55.25747.20240602
 
-    For Microsoft dotNET Framework & dotNet SqlSugar
+    For Microsoft dotNET Framework & dotNet Core
 
     We use P/Invoke to call into the nncam.dll API, the c# class Nncam is a thin wrapper class to the native api of nncam.dll.
     So the manual en.html(English) and hans.html(Simplified Chinese) are also applicable for programming with nncam.cs.
@@ -523,9 +511,9 @@ public class Nncam : IDisposable
         OPTION_RESET_SENSOR = 0x5e,
         /* Enable hardware ISP: 0 => auto (disable in RAW mode, otherwise enable), 1 => enable, -1 => disable; default: 0 */
         OPTION_ISP = 0x5f,
-        /* Auto exposure damp: time (thousandths) */
+        /* Auto exposure damp: time (thousandths). The larger the damping coefficient, the smoother and slower the exposure time changes */
         OPTION_AUTOEXP_EXPOTIME_DAMP = 0x60,
-        /* Auto exposure damp: gain (thousandths) */
+        /* Auto exposure damp: gain (thousandths). The larger the damping coefficient, the smoother and slower the gain changes */
         OPTION_AUTOEXP_GAIN_DAMP = 0x61,
         /* range: [1, 20] */
         OPTION_MOTOR_NUMBER = 0x62,
@@ -535,7 +523,7 @@ public class Nncam : IDisposable
         OPTION_PSEUDO_COLOR_START = 0x63,
         /* Pseudo: end color, BGR format */
         OPTION_PSEUDO_COLOR_END = 0x64,
-        /*  Pseudo: 
+        /*  Pseudo:
             -1 => custom: use startcolor & endcolor to generate the colormap
             0 => disable
             1 => spot
@@ -561,6 +549,9 @@ public class Nncam : IDisposable
             21 => twilight
             22 => twilight_shifted
             23 => turbo
+            24 => red
+            25 => green
+            26 => blue
         */
         OPTION_PSEUDO_COLOR_ENABLE = 0x65,
         /* Low Power Consumption: 0 => disable, 1 => enable */
@@ -580,13 +571,26 @@ public class Nncam : IDisposable
         /* Auto exposure over exposure policy: when overexposed,
                 0 => directly reduce the exposure time/gain to the minimum value; or
                 1 => reduce exposure time/gain in proportion to current and target brightness.
+                n(n>1) => first adjust the exposure time to (maximum automatic exposure time * maximum automatic exposure gain) * n / 1000, and then adjust according to the strategy of 1
             The advantage of policy 0 is that the convergence speed is faster, but there is black screen.
             Policy 1 avoids the black screen, but the convergence speed is slower.
             Default: 0
         */
         OPTION_OVEREXP_POLICY = 0x68,
         /* Readout mode: 0 = IWR (Integrate While Read), 1 = ITR (Integrate Then Read) */
-        OPTION_READOUT_MODE = 0x69
+        OPTION_READOUT_MODE = 0x69,
+        /* Turn on/off tail Led light: 0 => off, 1 => on; default: on */
+        OPTION_TAILLIGHT = 0x6a,
+        /* Load/Save lens state to EEPROM: 0 => load, 1 => save */
+        OPTION_LENSSTATE = 0x6b,
+        /* Auto White Balance: continuous mode
+               0:  disable (default)
+               n>0: every n millisecond(s)
+               n<0: every -n frame
+        */
+        OPTION_AWB_CONTINUOUS = 0x6c,
+        /* TEC target range: min(low 16 bits) = (short)(val & 0xffff), max(high 16 bits) = (short)((val >> 16) & 0xffff) */
+        OPTION_TECTARGET_RANGE = 0x6d
     };
 
     /* HRESULT: error code */
@@ -623,10 +627,10 @@ public class Nncam : IDisposable
     public const int EXPOGAIN_DEF = 100;      /* exposure gain, default value */
     public const int EXPOGAIN_MIN = 100;      /* exposure gain, minimum value */
     public const int TEMP_DEF = 6503;     /* color temperature, default value */
-    public const int TEMP_MIN = 1000;     /* color temperature, minimum value */
-    public const int TEMP_MAX = 25000;    /* color temperature, maximum value */
+    public const int TEMP_MIN = 2000;     /* color temperature, minimum value */
+    public const int TEMP_MAX = 15000;    /* color temperature, maximum value */
     public const int TINT_DEF = 1000;     /* tint */
-    public const int TINT_MIN = 100;      /* tint */
+    public const int TINT_MIN = 200;      /* tint */
     public const int TINT_MAX = 2500;     /* tint */
     public const int HUE_DEF = 0;        /* hue */
     public const int HUE_MIN = -180;     /* hue */
@@ -668,18 +672,15 @@ public class Nncam : IDisposable
     public const int AUTOEXPO_THRESHOLD_DEF = 5;        /* auto exposure threshold */
     public const int AUTOEXPO_THRESHOLD_MIN = 2;        /* auto exposure threshold */
     public const int AUTOEXPO_THRESHOLD_MAX = 15;       /* auto exposure threshold */
-    public const int AUTOEXPO_DAMP_DEF = 0;        /* auto exposure damp: thousandths */
-    public const int AUTOEXPO_DAMP_MIN = 0;        /* auto exposure damp: thousandths */
-    public const int AUTOEXPO_DAMP_MAX = 1000;     /* auto exposure damp: thousandths */
+    public const int AUTOEXPO_DAMP_DEF = 0;        /* auto exposure damping coefficient: thousandths */
+    public const int AUTOEXPO_DAMP_MIN = 0;        /* auto exposure damping coefficient: thousandths */
+    public const int AUTOEXPO_DAMP_MAX = 1000;     /* auto exposure damping coefficient: thousandths */
     public const int BANDWIDTH_DEF = 100;      /* bandwidth */
     public const int BANDWIDTH_MIN = 1;        /* bandwidth */
     public const int BANDWIDTH_MAX = 100;      /* bandwidth */
     public const int DENOISE_DEF = 0;        /* denoise */
     public const int DENOISE_MIN = 0;        /* denoise */
     public const int DENOISE_MAX = 100;      /* denoise */
-    public const int TEC_TARGET_MIN = -500;     /* TEC target: -50.0 degrees Celsius */
-    public const int TEC_TARGET_DEF = 100;      /* TEC target: 10.0 degrees Celsius */
-    public const int TEC_TARGET_MAX = 400;      /* TEC target: 40.0 degrees Celsius */
     public const int HEARTBEAT_MIN = 100;      /* millisecond */
     public const int HEARTBEAT_MAX = 10000;    /* millisecond */
     public const int AE_PERCENT_MIN = 0;        /* auto exposure percent; 0 or 100 => full roi average, means "disabled" */
@@ -853,7 +854,24 @@ public class Nncam : IDisposable
         IOCONTROLTYPE_GET_OUTPUTCOUNTERVALUE = 0x37,
         IOCONTROLTYPE_SET_OUTPUTCOUNTERVALUE = 0x38,
         /* Output pause: 1 => puase, 0 => unpause */
-        IOCONTROLTYPE_SET_OUTPUT_PAUSE = 0x3a
+        IOCONTROLTYPE_SET_OUTPUT_PAUSE = 0x3a,
+        /* Input state: 0 (low level) or 1 (high level) */
+        IOCONTROLTYPE_GET_INPUT_STATE = 0x3b,
+        /* User pulse high level time: us */
+        IOCONTROLTYPE_GET_USER_PULSE_HIGH = 0x3d,
+        IOCONTROLTYPE_SET_USER_PULSE_HIGH = 0x3e,
+        /* User pulse low level time: us */
+        IOCONTROLTYPE_GET_USER_PULSE_LOW = 0x3f,
+        IOCONTROLTYPE_SET_USER_PULSE_LOW = 0x40,
+        /* User pulse number: default 0 */
+        IOCONTROLTYPE_GET_USER_PULSE_NUMBER = 0x41,
+        IOCONTROLTYPE_SET_USER_PULSE_NUMBER = 0x42,
+        /* External trigger number */
+        NNCAM_IOCONTROLTYPE_GET_EXTERNAL_TRIGGER_NUMBER = 0x43,
+        /* Trigger signal number after debounce */
+        NNCAM_IOCONTROLTYPE_GET_DEBOUNCER_TRIGGER_NUMBER = 0x45,
+        /* Effective trigger signal number */
+        NNCAM_IOCONTROLTYPE_GET_EFFECTIVE_TRIGGER_NUMBER = 0x47
     };
 
     public const int IOCONTROL_DELAYTIME_MAX = 5 * 1000 * 1000;
@@ -864,8 +882,8 @@ public class Nncam : IDisposable
         AAF_SETPOSITION = 0x01,
         AAF_GETPOSITION = 0x02,
         AAF_SETZERO = 0x03,
-        AAF_GETZERO = 0x04,
         AAF_SETDIRECTION = 0x05,
+        AAF_GETDIRECTION = 0x06,
         AAF_SETMAXINCREMENT = 0x07,
         AAF_GETMAXINCREMENT = 0x08,
         AAF_SETFINE = 0x09,
@@ -997,6 +1015,7 @@ public class Nncam : IDisposable
     };
     public enum eAFStatus : uint
     {
+        AFStatus_NA = 0x0,           /* Not available */
         AFStatus_PEAKPOINT = 0x1,    /* Focus completed, find the focus position */
         AFStatus_DEFOCUS = 0x2,      /* End of focus, defocus */
         AFStatus_NEAR = 0x3,         /* Focusing ended, object too close */
@@ -1077,7 +1096,7 @@ public class Nncam : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    /* get the version of this dll/so, which is: 55.24686.20240225 */
+    /* get the version of this dll/so, which is: 55.25747.20240602 */
     public static string Version()
     {
         return Nncam_Version();
@@ -1298,6 +1317,32 @@ public class Nncam : IDisposable
             if (handle_ == null || handle_.IsInvalid || handle_.IsClosed)
                 return 0;
             return Nncam_get_FanMaxSpeed(handle_);
+        }
+    }
+
+    public short TecTargetMax
+    {
+        get
+        {
+            if (handle_ != null && !handle_.IsInvalid && !handle_.IsClosed) {
+                int range = 0;
+                if (CheckHResult(Nncam_get_Option(handle_, eOPTION.OPTION_TECTARGET_RANGE, out range)))
+                    return unchecked((short)((range >> 16) & 0xffff));
+            }
+            return short.MaxValue;
+        }
+    }
+
+    public short TecTargetMin
+    {
+        get
+        {
+            if (handle_ != null && !handle_.IsInvalid && !handle_.IsClosed) {
+                int range = 0;
+                if (CheckHResult(Nncam_get_Option(handle_, eOPTION.OPTION_TECTARGET_RANGE, out range)))
+                    return unchecked((short)(range & 0xffff));
+            }
+            return short.MinValue;
         }
     }
 
@@ -1843,35 +1888,35 @@ public class Nncam : IDisposable
 
     /*
         trigger synchronously
-        nTimeout:   0:              by default, exposure * 102% + 4000 milliseconds
+        nWaitMS:    0:              by default, exposure * 102% + 4000 milliseconds
                     0xffffffff:     wait infinite
                     other:          milliseconds to wait
     */
-    public bool TriggerSync(uint nTimeout, IntPtr pImageData, int bits, int rowPitch, out FrameInfoV3 pInfo)
+    public bool TriggerSync(uint nWaitMS, IntPtr pImageData, int bits, int rowPitch, out FrameInfoV3 pInfo)
     {
         if (handle_ == null || handle_.IsInvalid || handle_.IsClosed) {
             zeroInfo(out pInfo);
             return false;
         }
-        return CheckHResult(Nncam_TriggerSync(handle_, nTimeout, pImageData, bits, rowPitch, out pInfo));
+        return CheckHResult(Nncam_TriggerSync(handle_, nWaitMS, pImageData, bits, rowPitch, out pInfo));
     }
 
-    public bool TriggerSync(uint nTimeout, byte[] pImageData, int bits, int rowPitch, out FrameInfoV3 pInfo)
+    public bool TriggerSync(uint nWaitMS, byte[] pImageData, int bits, int rowPitch, out FrameInfoV3 pInfo)
     {
         if (handle_ == null || handle_.IsInvalid || handle_.IsClosed) {
             zeroInfo(out pInfo);
             return false;
         }
-        return CheckHResult(Nncam_TriggerSync(handle_, nTimeout, pImageData, bits, rowPitch, out pInfo));
+        return CheckHResult(Nncam_TriggerSync(handle_, nWaitMS, pImageData, bits, rowPitch, out pInfo));
     }
 
-    public bool TriggerSync(uint nTimeout, ushort[] pImageData, int bits, int rowPitch, out FrameInfoV3 pInfo)
+    public bool TriggerSync(uint nWaitMS, ushort[] pImageData, int bits, int rowPitch, out FrameInfoV3 pInfo)
     {
         if (handle_ == null || handle_.IsInvalid || handle_.IsClosed) {
             zeroInfo(out pInfo);
             return false;
         }
-        return CheckHResult(Nncam_TriggerSync(handle_, nTimeout, pImageData, bits, rowPitch, out pInfo));
+        return CheckHResult(Nncam_TriggerSync(handle_, nWaitMS, pImageData, bits, rowPitch, out pInfo));
     }
 
     public bool put_Size(int nWidth, int nHeight)
@@ -2977,46 +3022,46 @@ public class Nncam : IDisposable
         return CheckHResult(Nncam_FpncOnce(handle_));
     }
 
-    public bool FfcExport(string filepath)
+    public bool FfcExport(string filePath)
     {
         if (handle_ == null || handle_.IsInvalid || handle_.IsClosed)
             return false;
-        return CheckHResult(Nncam_FfcExport(handle_, filepath));
+        return CheckHResult(Nncam_FfcExport(handle_, filePath));
     }
 
-    public bool FfcImport(string filepath)
+    public bool FfcImport(string filePath)
     {
         if (handle_ == null || handle_.IsInvalid || handle_.IsClosed)
             return false;
-        return CheckHResult(Nncam_FfcImport(handle_, filepath));
+        return CheckHResult(Nncam_FfcImport(handle_, filePath));
     }
 
-    public bool DfcExport(string filepath)
+    public bool DfcExport(string filePath)
     {
         if (handle_ == null || handle_.IsInvalid || handle_.IsClosed)
             return false;
-        return CheckHResult(Nncam_DfcExport(handle_, filepath));
+        return CheckHResult(Nncam_DfcExport(handle_, filePath));
     }
 
-    public bool DfcImport(string filepath)
+    public bool DfcImport(string filePath)
     {
         if (handle_ == null || handle_.IsInvalid || handle_.IsClosed)
             return false;
-        return CheckHResult(Nncam_DfcImport(handle_, filepath));
+        return CheckHResult(Nncam_DfcImport(handle_, filePath));
     }
 
-    public bool FpncExport(string filepath)
+    public bool FpncExport(string filePath)
     {
         if (handle_ == null || handle_.IsInvalid || handle_.IsClosed)
             return false;
-        return CheckHResult(Nncam_FpncExport(handle_, filepath));
+        return CheckHResult(Nncam_FpncExport(handle_, filePath));
     }
 
-    public bool FpncImport(string filepath)
+    public bool FpncImport(string filePath)
     {
         if (handle_ == null || handle_.IsInvalid || handle_.IsClosed)
             return false;
-        return CheckHResult(Nncam_FpncImport(handle_, filepath));
+        return CheckHResult(Nncam_FpncImport(handle_, filePath));
     }
 
     public bool IoControl(uint ioLineNumber, eIoControType eType, int outVal, out int inVal)
@@ -3711,11 +3756,11 @@ public class Nncam : IDisposable
     private static extern int Nncam_Trigger(SafeCamHandle h, ushort nNumber);
 
     [DllImport(dll, ExactSpelling = true, CallingConvention = CallingConvention.Winapi)]
-    private static extern int Nncam_TriggerSync(SafeCamHandle h, uint nTimeout, IntPtr pImageData, int bits, int rowPitch, out FrameInfoV3 pInfo);
+    private static extern int Nncam_TriggerSync(SafeCamHandle h, uint nWaitMS, IntPtr pImageData, int bits, int rowPitch, out FrameInfoV3 pInfo);
     [DllImport(dll, ExactSpelling = true, CallingConvention = CallingConvention.Winapi)]
-    private static extern int Nncam_TriggerSync(SafeCamHandle h, uint nTimeout, byte[] pImageData, int bits, int rowPitch, out FrameInfoV3 pInfo);
+    private static extern int Nncam_TriggerSync(SafeCamHandle h, uint nWaitMS, byte[] pImageData, int bits, int rowPitch, out FrameInfoV3 pInfo);
     [DllImport(dll, ExactSpelling = true, CallingConvention = CallingConvention.Winapi)]
-    private static extern int Nncam_TriggerSync(SafeCamHandle h, uint nTimeout, ushort[] pImageData, int bits, int rowPitch, out FrameInfoV3 pInfo);
+    private static extern int Nncam_TriggerSync(SafeCamHandle h, uint nWaitMS, ushort[] pImageData, int bits, int rowPitch, out FrameInfoV3 pInfo);
 
     [DllImport(dll, ExactSpelling = true, CallingConvention = CallingConvention.Winapi)]
     private static extern int Nncam_put_Size(SafeCamHandle h, int nWidth, int nHeight);
@@ -4033,17 +4078,17 @@ public class Nncam : IDisposable
     [DllImport(dll, ExactSpelling = true, CallingConvention = CallingConvention.Winapi)]
     private static extern int Nncam_FpncOnce(SafeCamHandle h);
     [DllImport(dll, ExactSpelling = true, CallingConvention = CallingConvention.Winapi)]
-    private static extern int Nncam_FfcExport(SafeCamHandle h, [MarshalAs(ut)] string filepath);
+    private static extern int Nncam_FfcExport(SafeCamHandle h, [MarshalAs(ut)] string filePath);
     [DllImport(dll, ExactSpelling = true, CallingConvention = CallingConvention.Winapi)]
-    private static extern int Nncam_FfcImport(SafeCamHandle h, [MarshalAs(ut)] string filepath);
+    private static extern int Nncam_FfcImport(SafeCamHandle h, [MarshalAs(ut)] string filePath);
     [DllImport(dll, ExactSpelling = true, CallingConvention = CallingConvention.Winapi)]
-    private static extern int Nncam_DfcExport(SafeCamHandle h, [MarshalAs(ut)] string filepath);
+    private static extern int Nncam_DfcExport(SafeCamHandle h, [MarshalAs(ut)] string filePath);
     [DllImport(dll, ExactSpelling = true, CallingConvention = CallingConvention.Winapi)]
-    private static extern int Nncam_DfcImport(SafeCamHandle h, [MarshalAs(ut)] string filepath);
+    private static extern int Nncam_DfcImport(SafeCamHandle h, [MarshalAs(ut)] string filePath);
     [DllImport(dll, ExactSpelling = true, CallingConvention = CallingConvention.Winapi)]
-    private static extern int Nncam_FpncExport(SafeCamHandle h, [MarshalAs(ut)] string filepath);
+    private static extern int Nncam_FpncExport(SafeCamHandle h, [MarshalAs(ut)] string filePath);
     [DllImport(dll, ExactSpelling = true, CallingConvention = CallingConvention.Winapi)]
-    private static extern int Nncam_FpncImport(SafeCamHandle h, [MarshalAs(ut)] string filepath);
+    private static extern int Nncam_FpncImport(SafeCamHandle h, [MarshalAs(ut)] string filePath);
 
     [DllImport(dll, ExactSpelling = true, CallingConvention = CallingConvention.Winapi)]
     private static extern int Nncam_IoControl(SafeCamHandle h, uint ioLineNumber, eIoControType eType, int outVal, out int inVal);

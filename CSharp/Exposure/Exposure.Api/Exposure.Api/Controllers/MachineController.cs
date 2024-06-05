@@ -144,7 +144,7 @@ public class MachineController(
             Log.Information(localizer.GetString("CloseHatch").Value);
         }
 
-        operLog.AddOperLog(localizer.GetString("OpenHatch").Value,
+        operLog.AddOperLog(localizer.GetString("Hatch").Value,
             code == 0 ? localizer.GetString("CloseHatch").Value : localizer.GetString("OpenHatch").Value);
         serialPort.WritePort("Com1", DefaultProtocol.LedAllClose().ToBytes());
         serialPort.SetFlag("led", 0);

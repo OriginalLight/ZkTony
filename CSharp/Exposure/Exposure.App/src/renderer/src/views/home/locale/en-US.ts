@@ -39,6 +39,8 @@ export default {
   'home.album.view.export.success': 'Export Success',
   'home.album.view.album': 'Album',
   'home.album.view.preview': 'Preview',
+  'home.camera.options.cancel.warn':
+    'Please wait for the calculation to complete before canceling!',
   'home.camera.options.temperature.warn':
     'The current camera temperature has not reached the set temperature. Clicking shoot will affect the image quality!',
   'home.camera.options.temperature.error':

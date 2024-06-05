@@ -19,7 +19,7 @@ export default {
   'user.managemet.table.id': '序号',
   'user.managemet.table.name': '用户名',
   'user.managemet.table.role': '角色',
-  'user.managemet.table.enabled': '状态',
+  'user.managemet.table.enabled': '允许登录',
   'user.managemet.table.lastLoginTime': '最后登录时间',
   'user.managemet.table.action': '操作',
   'user.managemet.table.role.0': '工厂管理员',

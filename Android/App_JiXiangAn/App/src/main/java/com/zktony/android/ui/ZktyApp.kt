@@ -25,9 +25,11 @@ fun ZktyApp(
         }
     }
 
-    AppNavigation(
-        navController = navController,
-        homeViewModel = homeViewModel,
-        snackbarHostState = snackbarHostState
-    )
+    Permissions {
+        AppNavigation(
+            navController = navController,
+            homeViewModel = homeViewModel,
+            snackbarHostState = snackbarHostState
+        )
+    }
 }

@@ -106,7 +106,7 @@ import { deleteAlbum, exportAlbum, updateAlbum } from '@renderer/api/album'
 
 const { selected, options, subpage } = useGalleryState()
 
-const emit = defineEmits(['search'])
+const emit = defineEmits(['search', 'update'])
 
 const { t } = useI18n()
 const router = useRouter()
@@ -201,6 +201,7 @@ const handleUpdate = async () => {
     const album = selected.value.find((item) => item.id === update.value.id)
     if (album) {
       album.name = update.value.name
+      emit('update', album)
     }
   } catch (error) {
     Message.error((error as Error).message)

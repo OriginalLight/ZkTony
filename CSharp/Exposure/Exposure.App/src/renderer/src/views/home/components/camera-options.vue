@@ -261,6 +261,9 @@ const disabled = ref({
   quality: false
 })
 
+// 是否可以取消
+const canCancel = ref(true)
+
 //根据曝光时间计算最大帧数不能超过曝光时间除以5秒
 const maxFrams = computed(() => {
   const min = options.value.time.minute ? options.value.time.minute : 0
@@ -346,9 +349,11 @@ const handleShoot = async () => {
     }
     progress.value.visible = true
     if (options.value.mode === 'auto') {
+      canCancel.value = false
       progress.value.message = t('home.camera.options.calculating')
       progress.value.time = 20000
       const res = await auto()
+      canCancel.value = true
       progress.value.message = t('home.camera.options.shooting')
       progress.value.time = res.data / 1000 + 4000
       const ms = res.data / 1000
@@ -364,6 +369,7 @@ const handleShoot = async () => {
       })
     }
   } catch (error) {
+    canCancel.value = true
     progress.value.visible = false
     Message.error((error as Error).message)
   }
@@ -399,11 +405,15 @@ const exposureTime = computed(() => {
 
 // 取消
 const handleCancel = async () => {
-  progress.value.visible = false
-  try {
-    await cancel()
-  } catch (error) {
-    Message.error((error as Error).message)
+  if (canCancel.value) {
+    progress.value.visible = false
+    try {
+      await cancel()
+    } catch (error) {
+      Message.error((error as Error).message)
+    }
+  } else {
+    Message.warning(t('home.camera.options.cancel.warn'))
   }
 }
 

@@ -176,7 +176,7 @@ public class CameraService(
                 flag--;
             }
 
-            if (_photoList.Count == 0) throw new Exception(localizer.GetString("Error0012").Value);
+            if (_photoList.Count == 0) throw new Exception(localizer.GetString("Error0017").Value);
 
             return _photoList[0];
         }
@@ -340,6 +340,12 @@ public class CameraService(
         if (_nncam == null) throw new Exception(localizer.GetString("Error0011").Value);
         // 关闭灯光
         serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
+        
+        if (_album != null)
+        {
+            await album.DeleteByIds([_album.Id]);
+        }
+        
         if (!_nncam.Trigger(0)) throw new Exception(localizer.GetString("Error0010").Value);
 
         _photoList.Clear();
@@ -709,8 +715,6 @@ public class CameraService(
 
             var mat1 = new Mat(light.Path, ImreadModes.AnyDepth);
             var mat2 = new Mat(dark.Path, ImreadModes.AnyDepth);
-            // _mat 黑白反色处理
-            Cv2.BitwiseNot(mat2, mat2);
             // 正片叠底将mat叠在-mat上面
             var multiply = OpenCvUtils.Multiply(mat1, mat2);
 
@@ -829,7 +833,7 @@ public class CameraService(
             // 中值滤波
             //Cv2.MedianBlur(gray, gray, 5);
             // 开运算
-            Cv2.MorphologyEx(gray, gray, MorphTypes.Open, Cv2.GetStructuringElement(MorphShapes.Rect, new Size(3, 3)));
+            Cv2.MorphologyEx(gray, gray, MorphTypes.Open, Cv2.GetStructuringElement(MorphShapes.Rect, new Size(5, 5)));
             // 直方图归一化
             Cv2.Normalize(gray, gray, 0, 65535.0, NormTypes.MinMax, MatType.CV_16UC1);
 
@@ -884,7 +888,7 @@ public class CameraService(
         // 延时1300ms
         await Task.Delay((int)(time * 1000 + 1000), ctsToken);
         // 获取图片
-        if (_mat == null) throw new Exception(localizer.GetString("Error0011").Value);
+        if (_mat == null) throw new Exception(localizer.GetString("Error0018").Value);
         // 计算信噪比
         var snr = OpenCvUtils.CalculateSnr(_mat, time);
         // 计算白色区域占比
@@ -897,13 +901,13 @@ public class CameraService(
             {
                 <= 0.05 => snr switch
                 {
-                    <= -10 => GetScale(-50, -10, 1_500_000, 4_500_000, snr),
+                    <= -10 => GetScale(-50, -10, 1_000_000, 3_000_000, snr),
                     > -10 => await CalculateExpo(1, ctsToken),
                     _ => 1_500_000
                 },
-                <= 0.1 => GetScale(0.05, 0.1, 7_500_000, 15_000_000, percentage),
-                <= 0.5 => GetScale(0.1, 0.5, 3_000_000, 7_500_000, percentage),
-                _ => GetScale(0.5, 1, 150_000, 3_000_000, percentage)
+                <= 0.1 => GetScale(0.05, 0.1, 5_000_000, 10_000_000, percentage),
+                <= 0.5 => GetScale(0.1, 0.5, 2_000_000, 5_000_000, percentage),
+                _ => GetScale(0.5, 1, 100_000, 2_000_000, percentage)
             };
 
 
@@ -912,17 +916,17 @@ public class CameraService(
             {
                 <= 0.05 => snr switch
                 {
-                    <= -15 => GetScale(-50, -15, 3_000_000, 4_500_000, snr),
-                    <= 0 => GetScale(-15, 0, 4_500_000, 15_000_000, snr),
-                    <= 1 => GetScale(0, 1, 15_000_000, 21_000_000, snr),
-                    <= 1.5 => GetScale(1, 1.5, 21_000_000, 30_000_000, snr),
-                    <= 2 => GetScale(1.5, 2, 30_000_000, 45_000_000, snr),
+                    <= -15 => GetScale(-50, -15, 2_000_000, 3_000_000, snr),
+                    <= 0 => GetScale(-15, 0, 3_000_000, 10_000_000, snr),
+                    <= 1 => GetScale(0, 1, 10_000_000, 14_000_000, snr),
+                    <= 1.5 => GetScale(1, 1.5, 14_000_000, 20_000_000, snr),
+                    <= 2 => GetScale(1.5, 2, 20_000_000, 30_000_000, snr),
                     > 2 => await CalculateExpo(5, ctsToken),
                     _ => 2_000_000
                 },
-                <= 0.1 => GetScale(0.05, 0.1, 7_500_000, 15_000_000, percentage),
-                <= 0.5 => GetScale(0.1, 0.5, 3_000_000, 7_500_000, percentage),
-                _ => GetScale(0.5, 1, 150_000, 3_000_000, percentage)
+                <= 0.1 => GetScale(0.05, 0.1, 5_000_000, 10_000_000, percentage),
+                <= 0.5 => GetScale(0.1, 0.5, 2_000_000, 5_000_000, percentage),
+                _ => GetScale(0.5, 1, 100_000, 2_000_000, percentage)
             };
 
         if (Math.Abs(time - 5) < 0.1)
@@ -930,19 +934,19 @@ public class CameraService(
             {
                 <= 0.05 => snr switch
                 {
-                    <= 2 => GetScale(0, 2, 30_000_000, 45_000_000, snr),
-                    <= 5 => GetScale(2, 5, 45_000_000, 60_000_000, snr),
-                    <= 6 => GetScale(5, 6, 60_000_000, 120_000_000, snr),
-                    <= 7 => GetScale(6, 7, 120_000_000, 210_000_000, snr),
-                    <= 7.5 => GetScale(7, 7.5, 210_000_000, 300_000_000, snr),
-                    <= 8 => GetScale(7.5, 8, 300_000_000, 450_000_000, snr),
-                    <= 20 => GetScale(8, 20, 450_000_000, 600_000_000, snr),
+                    <= 2 => GetScale(0, 2, 15_000_000, 30_000_000, snr),
+                    <= 5 => GetScale(2, 5, 30_000_000, 40_000_000, snr),
+                    <= 6 => GetScale(5, 6, 40_000_000, 80_000_000, snr),
+                    <= 7 => GetScale(6, 7, 80_000_000, 140_000_000, snr),
+                    <= 7.5 => GetScale(7, 7.5, 140_000_000, 240_000_000, snr),
+                    <= 8 => GetScale(7.5, 8, 240_000_000, 300_000_000, snr),
+                    <= 20 => GetScale(8, 20, 300_000_000, 600_000_000, snr),
                     > 20 => 600_000_000,
-                    _ => 4_500_000
+                    _ => 15_000_000
                 },
-                <= 0.1 => GetScale(0.05, 0.1, 22_500_000, 45_000_000, percentage),
-                <= 0.5 => GetScale(0.1, 0.5, 9_000_000, 22_500_000, percentage),
-                _ => GetScale(0.5, 1, 450_000, 9_000_000, percentage)
+                <= 0.1 => GetScale(0.05, 0.1, 15_000_000, 30_000_000, percentage),
+                <= 0.5 => GetScale(0.1, 0.5, 6_000_000, 15_000_000, percentage),
+                _ => GetScale(0.5, 1, 30_000, 6_000_000, percentage)
             };
 
         return 0;
