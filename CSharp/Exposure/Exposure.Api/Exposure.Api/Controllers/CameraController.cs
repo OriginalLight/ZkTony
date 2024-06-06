@@ -64,9 +64,17 @@ public class CameraController(
         // 自动拍照
         _cts = new CancellationTokenSource();
         audio.PlayWithSwitch("Shot");
-        var res = await camera.TakeAutoPhotoAsync(_cts.Token);
-        operLog.AddOperLog(localizer.GetString("AutoShot").Value, localizer.GetString("Success").Value);
-        return Ok(res);
+        try
+        {
+            var res = await camera.TakeAutoPhotoAsync(_cts.Token);
+            operLog.AddOperLog(localizer.GetString("AutoShot").Value, localizer.GetString("Success").Value);
+            return Ok(res);
+        }
+        catch (Exception)
+        {
+            await camera.ClearAlbum();
+            throw;
+        }
     }
 
     #endregion
@@ -80,8 +88,16 @@ public class CameraController(
         // 手动拍照
         _cts = new CancellationTokenSource();
         audio.PlayWithSwitch("Shot");
-        await camera.TakeManualPhotoAsync(exposure, frame, _cts.Token);
-        operLog.AddOperLog(localizer.GetString("ManualShot").Value, localizer.GetString("Success").Value);
+        try
+        {
+            await camera.TakeManualPhotoAsync(exposure, frame, _cts.Token);
+            operLog.AddOperLog(localizer.GetString("ManualShot").Value, localizer.GetString("Success").Value);
+        }
+        catch (Exception)
+        {
+            await camera.ClearAlbum();
+            throw;
+        }
         return Ok();
     }
 

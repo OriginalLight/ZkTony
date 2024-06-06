@@ -38,6 +38,10 @@ public static class OpenCvUtils
         var gray = new Mat();
         // 转换成灰度图
         Cv2.CvtColor(src, gray, ColorConversionCodes.BGR2GRAY);
+        
+        Cv2.MorphologyEx(gray, gray, MorphTypes.Open, Cv2.GetStructuringElement(MorphShapes.Rect, new Size(5, 5)));
+        // 直方图归一化
+        Cv2.Normalize(gray, gray, 0, 65535.0, NormTypes.MinMax, MatType.CV_16UC1);
 
         // 计算信噪比
         Cv2.MeanStdDev(gray, out var mean, out var stddev);

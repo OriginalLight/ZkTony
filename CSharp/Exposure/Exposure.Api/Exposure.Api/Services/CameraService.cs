@@ -832,6 +832,8 @@ public class CameraService(
             //gray.SetTo(0, gray.InRange(0, 3));
             // 中值滤波
             //Cv2.MedianBlur(gray, gray, 5);
+            // 14 bit 转 16 bit
+            gray.ConvertTo(gray, MatType.CV_16UC1, 4.0);
             // 开运算
             Cv2.MorphologyEx(gray, gray, MorphTypes.Open, Cv2.GetStructuringElement(MorphShapes.Rect, new Size(5, 5)));
             // 直方图归一化
@@ -934,19 +936,19 @@ public class CameraService(
             {
                 <= 0.05 => snr switch
                 {
-                    <= 2 => GetScale(0, 2, 15_000_000, 30_000_000, snr),
-                    <= 5 => GetScale(2, 5, 30_000_000, 40_000_000, snr),
-                    <= 6 => GetScale(5, 6, 40_000_000, 80_000_000, snr),
-                    <= 7 => GetScale(6, 7, 80_000_000, 140_000_000, snr),
-                    <= 7.5 => GetScale(7, 7.5, 140_000_000, 240_000_000, snr),
-                    <= 8 => GetScale(7.5, 8, 240_000_000, 300_000_000, snr),
-                    <= 20 => GetScale(8, 20, 300_000_000, 600_000_000, snr),
+                    <= 2 => GetScale(0, 2, 5_000_000, 10_000_000, snr),
+                    <= 5 => GetScale(2, 5, 10_000_000, 15_000_000, snr),
+                    <= 6 => GetScale(5, 6, 15_000_000, 30_000_000, snr),
+                    <= 7 => GetScale(6, 7, 30_000_000, 45_000_000, snr),
+                    <= 7.5 => GetScale(7, 7.5, 45_000_000, 60_000_000, snr),
+                    <= 8 => GetScale(7.5, 8, 60_000_000, 100_000_000, snr),
+                    <= 20 => GetScale(8, 20, 100_000_000, 200_000_000, snr),
                     > 20 => 600_000_000,
                     _ => 15_000_000
                 },
-                <= 0.1 => GetScale(0.05, 0.1, 15_000_000, 30_000_000, percentage),
-                <= 0.5 => GetScale(0.1, 0.5, 6_000_000, 15_000_000, percentage),
-                _ => GetScale(0.5, 1, 30_000, 6_000_000, percentage)
+                <= 0.1 => GetScale(0.05, 0.1, 5_000_000, 10_000_000, percentage),
+                <= 0.5 => GetScale(0.1, 0.5, 2_000_000, 5_000_000, percentage),
+                _ => GetScale(0.5, 1, 30_000, 2_000_000, percentage)
             };
 
         return 0;
@@ -1057,5 +1059,18 @@ public class CameraService(
         return (long)((maxTarget - minTarget) * (value - min) / (max - min) + minTarget);
     }
 
+    #endregion
+    
+    #region 清除相册
+    
+    public async Task ClearAlbum()
+    {
+        if (_album != null)
+        {
+            await album.DeleteByIds([_album.Id]);
+            _album = null;
+        }
+    }
+    
     #endregion
 }

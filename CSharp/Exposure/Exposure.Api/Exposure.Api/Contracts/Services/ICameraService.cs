@@ -90,4 +90,10 @@ public interface ICameraService
     /// </summary>
     /// <returns></returns>
     Task Calibrate();
+    
+    /// <summary>
+    ///     清除相册
+    /// </summary>
+    /// <returns></returns>
+    Task ClearAlbum();
 }

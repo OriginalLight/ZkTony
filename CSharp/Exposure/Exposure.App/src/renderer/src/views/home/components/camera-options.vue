@@ -365,7 +365,7 @@ const handleShoot = async () => {
       progress.value.time = exposureTime.value / 1000 + 4000
       await manual({
         exposure: exposureTime.value,
-        frame: options.value.frame
+        frame: options.value.frame ? options.value.frame : 1
       })
     }
   } catch (error) {

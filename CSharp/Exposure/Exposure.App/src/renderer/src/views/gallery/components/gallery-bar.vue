@@ -102,9 +102,12 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { Message } from '@arco-design/web-vue'
 import useGalleryState from '@renderer/states/gallery'
+import useHomeState from '@renderer/states/home'
 import { deleteAlbum, exportAlbum, updateAlbum } from '@renderer/api/album'
 
 const { selected, options, subpage } = useGalleryState()
+
+const { selectedAlbums, albums, albumPreview, preview } = useHomeState()
 
 const emit = defineEmits(['search', 'update'])
 
@@ -172,6 +175,32 @@ const handleDelete = async () => {
     await deleteAlbum(ids)
     selected.value = []
     emit('search')
+    selectedAlbums.value = selectedAlbums.value.filter((item) => !ids.includes(item.id))
+    albums.value = albums.value.filter((item) => !ids.includes(item.id))
+    if (ids.includes(albumPreview.value.id)) {
+      albumPreview.value = {
+        id: 0,
+        name: 'None',
+        createTime: '',
+        updateTime: '',
+        user: null,
+        photos: [],
+        original: []
+      }
+      preview.value = {
+        id: 0,
+        name: 'None',
+        albumId: 0,
+        path: '',
+        width: 1000,
+        height: 1000,
+        type: 0,
+        thumbnail: '',
+        exposureTime: 0,
+        Gain: 0,
+        createTime: ''
+      }
+    }
   } catch (error) {
     Message.error((error as Error).message)
   } finally {
