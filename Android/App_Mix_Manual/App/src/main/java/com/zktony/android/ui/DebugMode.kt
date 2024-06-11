@@ -162,6 +162,12 @@ fun debugMode(
     val numberOfPumpResets = rememberDataSaverState(key = "numberofpumpresets", default = 3)
     var numberOfPumpResets_ex by remember { mutableStateOf(numberOfPumpResets.value.toString()) }
 
+
+    /**
+     * SN码
+     */
+    val snNumber = rememberDataSaverState(key = "snNumber", default = "")
+
     /**
      * 胶板位置
      */
@@ -509,7 +515,27 @@ fun debugMode(
                                     keyboard?.hide()
                                 })
                             )
+
+                            OutlinedTextField(
+                                modifier = Modifier
+                                    .padding(start = 10.dp)
+                                    .width(130.dp),
+                                value = snNumber.value,
+                                label = { Text(text = "SN码") },
+                                onValueChange = {
+                                    snNumber.value = it
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(onDone = {
+                                    keyboard?.hide()
+                                })
+                            )
+
                         }
+
 
                     }
 

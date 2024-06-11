@@ -61,6 +61,11 @@ data class Expected(
      */
     var coagulantFillingDefault: Double = 0.0,
 
+    /**
+     *  促凝剂泵冲洗液量/μL
+     */
+    var coagulantRinseDefault: Double = 10.0,
+
     //================预排设置=============================
 
 )

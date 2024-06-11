@@ -1,3 +1,13 @@
+import com.android.build.gradle.internal.api.ApkVariantOutputImpl
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Date
+
+val date = Date(System.currentTimeMillis())
+val sdf = SimpleDateFormat("yyyyMMddHHmmss")
+val time = sdf.format(date)
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.hilt)
@@ -6,6 +16,7 @@ plugins {
 }
 
 android {
+
     compileSdk = libs.versions.compileSdk.get().toInt()
     namespace = "com.zktony.android"
     defaultConfig {
@@ -13,7 +24,7 @@ android {
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = 3
-        versionName = "2.0.0"
+        versionName = "2.0.0-$time"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -81,7 +92,7 @@ android {
 
     applicationVariants.all {
         outputs.all {
-            (this as? com.android.build.gradle.internal.api.ApkVariantOutputImpl)?.outputFileName =
+            (this as? ApkVariantOutputImpl)?.outputFileName =
                 "zktony-manual-${versionName}-${name}.apk"
         }
     }

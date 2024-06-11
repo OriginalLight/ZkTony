@@ -4,6 +4,7 @@ import android.util.Log
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.core.SerialPort
 import com.zktony.serialport.ext.toHexString
+import com.zktony.serialport.utils.writeThread
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
@@ -100,6 +101,7 @@ abstract class AbstractSerial {
                     callbackHandler?.let { it(buffer.toByteArray()) }
                     if (config.log) {
                         Log.i(config.device, "RX: ${buffer.toByteArray().toHexString()}")
+                        writeThread("RX: ${buffer.toByteArray().toHexString()}")
                     }
                 } catch (ex: Exception) {
                     ex.printStackTrace()
@@ -111,6 +113,7 @@ abstract class AbstractSerial {
             buffer.write(byteArray)
         }
     }
+
 
     /**
      * Thread for receiving data
@@ -156,6 +159,7 @@ abstract class AbstractSerial {
                         send(message)
                         if (config.log) {
                             Log.i(config.device, "TX: ${message.toHexString()}")
+                            writeThread("TX: ${message.toHexString()}")
                         }
                     }
                 } catch (ex: Exception) {

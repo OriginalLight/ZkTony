@@ -106,7 +106,8 @@ fun Splash(viewModel: HomeViewModel) {
                 modifier = Modifier.padding(start = 350.dp),
                 fontSize = 18.sp,
                 color = Color.White,
-                text = "${BuildConfig.VERSION_NAME}"
+                text = "${BuildConfig.VERSION_NAME.substringBefore("-")}"
+
             )
         }
 

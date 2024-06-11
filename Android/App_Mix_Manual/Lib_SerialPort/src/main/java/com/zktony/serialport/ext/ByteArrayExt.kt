@@ -428,6 +428,7 @@ fun ByteArray.splitByteArray(head: ByteArray, end: ByteArray): List<ByteArray> {
                 byteArray = byteArray.copyOfRange(bytes.size, byteArray.size)
             }
         } else {
+            list.add(byteArray)
             break
         }
     }

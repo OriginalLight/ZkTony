@@ -345,10 +345,6 @@ fun operate(
      */
     val resetError = remember { mutableStateOf(false) }
 
-    /**
-     * 上下位机失联弹窗
-     */
-    val heartbeatError = remember { mutableStateOf(false) }
 
     /**
      * 纯水进度
@@ -399,6 +395,7 @@ fun operate(
         )
     }
 
+//    println("heartbeatErrorHome====$heartbeatErrorHome")
     if (uiFlags is UiFlags.Objects && uiFlags.objects == 4) {
         continueGlueDialog.value = true
         if (wasteprogress > 0.9) {
@@ -408,9 +405,6 @@ fun operate(
         expectedMakeNum.value = 0
         expectedMakeNum_ex = "0"
         uiEvent(HomeIntent.MotherVolZero)
-//        experimentRecord.status = EPStatus.COMPLETED
-//        experimentRecord.number = complate
-//        uiEvent(HomeIntent.Update(experimentRecord))
         continueGlueDialog.value = false
         uiEvent(HomeIntent.MoveCom(1))
     } else if (uiFlags is UiFlags.Objects && uiFlags.objects == 14) {
@@ -419,10 +413,6 @@ fun operate(
     }
 //    else if (uiFlags is UiFlags.Objects && uiFlags.objects == 15) {
 //        //上下位机失联弹窗
-//        heartbeatError.value = true
-//    }
-//
-//    if (AppStateUtils.hpe[0] == true) {
 //        heartbeatError.value = true
 //    }
 
@@ -852,19 +842,28 @@ fun operate(
                                             uiEvent(HomeIntent.CleanWaste)
                                             wasteDialog.value = true
                                         } else {
-                                            if (expectedMakeNum.value > 0) {
-                                                uiEvent(HomeIntent.Calculate)
-                                                guleDialog.value = true
-                                            } else {
+                                            if (AppStateUtils.hpe[1] == null) {
                                                 Toast
                                                     .makeText(
                                                         context,
-                                                        "预计制胶数量不能为0!",
+                                                        "上下位机已失联！",
                                                         Toast.LENGTH_SHORT
                                                     )
                                                     .show()
+                                            } else {
+                                                if (expectedMakeNum.value > 0) {
+                                                    uiEvent(HomeIntent.Calculate)
+                                                    guleDialog.value = true
+                                                } else {
+                                                    Toast
+                                                        .makeText(
+                                                            context,
+                                                            "预计制胶数量不能为0!",
+                                                            Toast.LENGTH_SHORT
+                                                        )
+                                                        .show()
+                                                }
                                             }
-
                                         }
                                     } else {
                                         Toast
@@ -895,12 +894,32 @@ fun operate(
                                                 wasteDialog.value = true
                                             } else {
                                                 if (uiFlags is UiFlags.None) {
-                                                    uiEvent(HomeIntent.Pipeline(1))
+                                                    if (AppStateUtils.hpe[1] == null) {
+                                                        Toast
+                                                            .makeText(
+                                                                context,
+                                                                "上下位机已失联！",
+                                                                Toast.LENGTH_SHORT
+                                                            )
+                                                            .show()
+                                                    } else {
+                                                        uiEvent(HomeIntent.Pipeline(1))
+                                                    }
                                                 }
                                             }
                                         }
                                     } else {
-                                        pipelineDialog.value = true
+                                        if (AppStateUtils.hpe[1] == null) {
+                                            Toast
+                                                .makeText(
+                                                    context,
+                                                    "上下位机已失联！",
+                                                    Toast.LENGTH_SHORT
+                                                )
+                                                .show()
+                                        } else {
+                                            pipelineDialog.value = true
+                                        }
                                     }
                                 } else {
                                     Toast
@@ -922,6 +941,7 @@ fun operate(
                             .padding(start = 80.4.dp)
                             .size(63.dp, 63.dp)
                             .clickable {
+//                                uiEvent(HomeIntent.Clean)
                                 if (uiFlags is UiFlags.None) {
                                     if (cleanDialogOpen) {
                                         scope.launch {
@@ -929,12 +949,32 @@ fun operate(
                                                 wasteDialog.value = true
                                             } else {
                                                 if (uiFlags is UiFlags.None || (uiFlags is UiFlags.Objects && uiFlags.objects == 2)) {
-                                                    uiEvent(HomeIntent.Clean)
+                                                    if (AppStateUtils.hpe[1] == null) {
+                                                        Toast
+                                                            .makeText(
+                                                                context,
+                                                                "上下位机已失联！",
+                                                                Toast.LENGTH_SHORT
+                                                            )
+                                                            .show()
+                                                    } else {
+                                                        uiEvent(HomeIntent.Clean)
+                                                    }
                                                 }
                                             }
                                         }
                                     } else {
-                                        cleanDialog.value = true
+                                        if (AppStateUtils.hpe[1] == null) {
+                                            Toast
+                                                .makeText(
+                                                    context,
+                                                    "上下位机已失联！",
+                                                    Toast.LENGTH_SHORT
+                                                )
+                                                .show()
+                                        } else {
+                                            cleanDialog.value = true
+                                        }
                                     }
                                 } else {
                                     Toast
@@ -957,7 +997,18 @@ fun operate(
                             .size(63.dp, 63.dp)
                             .clickable {
                                 if (uiFlags is UiFlags.None) {
-                                    uiEvent(HomeIntent.Reset)
+                                    if (AppStateUtils.hpe[1] == null) {
+                                        Toast
+                                            .makeText(
+                                                context,
+                                                "上下位机已失联！",
+                                                Toast.LENGTH_SHORT
+                                            )
+                                            .show()
+                                    } else {
+                                        uiEvent(HomeIntent.Reset)
+                                    }
+//                                    uiEvent(HomeIntent.Reset)
                                 } else {
                                     Toast
                                         .makeText(
@@ -1203,9 +1254,6 @@ fun operate(
                                 expectedMakeNum.value = 0
                                 expectedMakeNum_ex = "0"
                                 uiEvent(HomeIntent.MotherVolZero)
-//                                experimentRecord.status = EPStatus.ABORT
-//                                experimentRecord.detail = "手动停止制胶"
-//                                uiEvent(HomeIntent.Update(experimentRecord))
                                 startMake = "开始制胶"
                                 uiEvent(HomeIntent.Stop)
                                 stopGlueDialog.value = false
@@ -1269,10 +1317,6 @@ fun operate(
                                 } else {
                                     expectedMakeNum.value = 0
                                     expectedMakeNum_ex = "0"
-//                                    experimentRecord.number = complate
-//                                    experimentRecord.status = EPStatus.ABORT
-//                                    experimentRecord.detail = "手动停止制胶"
-//                                    uiEvent(HomeIntent.Update(experimentRecord))
                                     uiEvent(HomeIntent.MotherVolZero)
                                     uiEvent(HomeIntent.MoveCom(0))
                                     continueGlueDialog.value = false
@@ -1386,18 +1430,6 @@ fun operate(
 
                                     startMake = "停止制胶"
                                     uiEvent(HomeIntent.Start(0))
-//                                    uiEvent(
-//                                        HomeIntent.Insert(
-//                                            program.startRange,
-//                                            program.endRange,
-//                                            program.thickness,
-//                                            program.coagulant,
-//                                            program.volume,
-//                                            0,
-//                                            EPStatus.RUNNING,
-//                                            ""
-//                                        )
-//                                    )
                                     guleDialog.value = false
                                 } else {
                                     Toast.makeText(
@@ -2166,6 +2198,44 @@ fun operate(
                                 uiEvent(HomeIntent.Reset)
                             }) {
                             Text(fontSize = 18.sp, text = "复位")
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 上下位机失联弹窗
+     */
+    if (heartbeatErrorHome) {
+        Dialog(onDismissRequest = {}) {
+            ElevatedCard {
+                Column(
+                    modifier = Modifier
+                        .padding(30.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        fontSize = 20.sp,
+                        text = "上下位机已失联!"
+                    )
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Button(
+                            modifier = Modifier
+                                .width(100.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ),
+                            onClick = {
+                                uiEvent(HomeIntent.Heartbeat)
+                            }) {
+                            Text(fontSize = 18.sp, text = "确定")
                         }
 
                     }

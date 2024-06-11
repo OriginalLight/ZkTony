@@ -10,6 +10,7 @@ object PageType {
     const val SETTINGS = 5
     const val DEBUGMODE = 12
     const val SPORTSLOG = 13
+    const val UPGRADE = 14
 
 
 

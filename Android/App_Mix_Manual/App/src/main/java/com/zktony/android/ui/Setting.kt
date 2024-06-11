@@ -65,6 +65,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.zktony.android.BuildConfig
 //import com.zktony.android.BuildConfig
 import com.zktony.android.R
 import com.zktony.android.data.datastore.rememberDataSaverState
@@ -90,9 +91,11 @@ import com.zktony.android.ui.utils.toList
 import com.zktony.android.utils.AlgorithmUtils.calculateCalibrationFactorNew
 import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.Constants
+import com.zktony.android.utils.SerialPortUtils
 import com.zktony.android.utils.SerialPortUtils.lightGreed
 import com.zktony.android.utils.SerialPortUtils.lightYellow
 import com.zktony.android.utils.SerialPortUtils.start
+import com.zktony.android.utils.SerialPortUtils.version
 import com.zktony.android.utils.extra.dateFormat
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -205,6 +208,10 @@ fun SettingRoute(viewModel: SettingViewModel) {
                         sportsLogEntitiesDis,
                         sportsLogEntitiesDis.toList(),
                         sportsLogEntities.toList()
+                    )
+
+                    PageType.UPGRADE -> upgrade(
+                        viewModel::dispatch,
                     )
 
                     else -> {}
@@ -328,6 +335,12 @@ fun SettingLits(
      * 位置的弹窗
      */
     val positionDialog = remember { mutableStateOf(false) }
+
+
+    /**
+     * 关于软件的弹窗
+     */
+    val softwareDialog = remember { mutableStateOf(false) }
     //===============位置设置==============================
 
 
@@ -391,7 +404,7 @@ fun SettingLits(
     /**
      * 促凝剂泵冲洗液量/μL
      */
-    var coagulantRinse_ex by remember(setting) { mutableStateOf(setting.coagulantFilling.toString()) }
+    var coagulantRinse_ex by remember(setting) { mutableStateOf(setting.coagulantRinse.toString()) }
     //促凝剂泵
 
     /**
@@ -1180,7 +1193,7 @@ fun SettingLits(
                         Column(
                             modifier = Modifier
                                 .width(400.dp)
-                                .height(150.dp)
+                                .height(230.dp)
                                 .padding(top = 20.3.dp)
                                 .clip(RoundedCornerShape(10.dp))
                                 .background(
@@ -1237,7 +1250,7 @@ fun SettingLits(
 
                             OutlinedTextField(
                                 modifier = Modifier.padding(top = 14.8.dp, start = 47.7.dp),
-                                value = lowCleanVolume_ex,
+                                value = coagulantRinse_ex,
                                 textStyle = TextStyle.Default.copy(
                                     fontSize = 18.sp,
                                 ),
@@ -1255,13 +1268,11 @@ fun SettingLits(
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     } else {
-                                        lowCleanVolume_ex = it
+                                        coagulantRinse_ex = it
 
-                                        val temp = lowCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                        val temp = coagulantRinse_ex.toDoubleOrNull() ?: 0.0
                                         if (temp < 0) {
-                                            lowCleanVolume_ex = "0"
-                                        } else if (temp > 20) {
-                                            lowCleanVolume_ex = "20"
+                                            coagulantRinse_ex = "0"
                                         }
                                     }
 
@@ -1308,6 +1319,8 @@ fun SettingLits(
                                     coagulantCleanVolume_ex.toDoubleOrNull() ?: 0.0
                                 setting.coagulantFilling =
                                     coagulantFilling_ex.toDoubleOrNull() ?: 0.0
+                                setting.coagulantRinse =
+                                    coagulantRinse_ex.toDoubleOrNull() ?: 0.0
                                 uiEvent(SettingIntent.UpdateSet(setting))
 
                                 Toast.makeText(
@@ -2377,28 +2390,31 @@ fun SettingLits(
                         }
 
                         Row(modifier = Modifier.clickable {
-                            //获取usb地址
-                            val path = getStoragePath(context, true)
-                            if (!"".equals(path)) {
-                                try {
-                                    val apkPath = "$path/zktony/apk/update.apk"
-                                    uiEvent(SettingIntent.UpdateApkU(context, apkPath))
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                    Toast.makeText(
-                                        context,
-                                        "版本信息错误！",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
 
-                            } else {
-                                Toast.makeText(
-                                    context,
-                                    "U盘不存在！",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
+                            uiEvent(SettingIntent.NavTo(PageType.UPGRADE))
+
+                            //获取usb地址
+//                            val path = getStoragePath(context, true)
+//                            if (!"".equals(path)) {
+//                                try {
+//                                    val apkPath = "$path/zktony/apk/update.apk"
+//                                    uiEvent(SettingIntent.UpdateApkU(context, apkPath))
+//                                } catch (e: Exception) {
+//                                    e.printStackTrace()
+//                                    Toast.makeText(
+//                                        context,
+//                                        "版本信息错误！",
+//                                        Toast.LENGTH_SHORT
+//                                    ).show()
+//                                }
+//
+//                            } else {
+//                                Toast.makeText(
+//                                    context,
+//                                    "U盘不存在！",
+//                                    Toast.LENGTH_SHORT
+//                                ).show()
+//                            }
                         }) {
                             Text(
                                 modifier = Modifier.padding(top = 20.dp),
@@ -2483,6 +2499,36 @@ fun SettingLits(
                             Text(
                                 modifier = Modifier.padding(top = 20.dp),
                                 text = "位置设置",
+                                fontSize = 30.sp
+                            )
+
+                            Image(
+                                modifier = Modifier
+                                    .padding(top = 20.dp, start = 200.dp)
+                                    .size(40.dp),
+                                painter = painterResource(id = R.mipmap.rightarrow),
+                                contentDescription = null
+                            )
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .padding(top = 20.dp)
+                                .fillMaxWidth()
+                        ) {
+                            line(Color(rgb(240, 240, 240)), 0f, 400f)
+                        }
+
+                        Row(modifier = Modifier.clickable {
+                            scope.launch {
+                                version()
+                                delay(100)
+                                softwareDialog.value = true
+                            }
+                        }) {
+                            Text(
+                                modifier = Modifier.padding(top = 20.dp),
+                                text = "关于软件",
                                 fontSize = 30.sp
                             )
 
@@ -3421,6 +3467,75 @@ fun SettingLits(
                 }
             })
         }
+
+        //关于软件弹窗
+        if (softwareDialog.value) {
+            val snNumber = rememberDataSaverState(key = "snNumber", default = "")
+            AlertDialog(onDismissRequest = {
+                softwareDialog.value = false
+            }, title = {
+                Text(text = "软件信息")
+            }, text = {
+                Column {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalAlignment = CenterVertically
+                    ) {
+
+                        Text(
+                            text = "上位机版本号:",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        Text(
+                            text = "${BuildConfig.VERSION_NAME}",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.padding(top = 20.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalAlignment = CenterVertically
+                    ) {
+                        Text(
+                            text = "下位机版本号:",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        Text(
+                            text = "${AppStateUtils.hpv[1]}",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.padding(top = 20.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalAlignment = CenterVertically
+                    ) {
+                        Text(
+                            text = "SN码:",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        Text(
+                            text = "${snNumber.value}",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+
+                }
+
+
+            }, confirmButton = {
+            }, dismissButton = {
+            })
+        }
+
     }
 
 
@@ -3473,6 +3588,18 @@ fun sportsLog(
         modifier = Modifier.fillMaxSize()
     ) {
         sportsLogMode(uiEvent, sportsLogEntitiesDis, entitiesListDis, entitiesList)
+    }
+}
+
+
+@Composable
+fun upgrade(
+    uiEvent: (SettingIntent) -> Unit,
+) {
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        upgradeMode(uiEvent)
     }
 }
 

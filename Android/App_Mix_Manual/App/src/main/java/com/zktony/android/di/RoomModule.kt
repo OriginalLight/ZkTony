@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.zktony.android.data.AppDatabase
 import com.zktony.android.data.MIGRATION_1_2
+import com.zktony.android.data.MIGRATION_2_3
 import com.zktony.android.utils.Constants
 import dagger.Module
 import dagger.Provides
@@ -22,7 +23,7 @@ object RoomModule {
             context = appContext,
             klass = AppDatabase::class.java,
             name = Constants.DATABASE_NAME
-        ).addMigrations(MIGRATION_1_2).build()
+        ).addMigrations(MIGRATION_1_2).addMigrations(MIGRATION_2_3).build()
     }
 
     @Provides

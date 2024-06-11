@@ -12,4 +12,6 @@ object ControlType {
     const val GPIO: Byte = 0x04
     const val VALVE: Byte = 0x05
     const val GLUE: Byte = 0x06
+    const val SEND: Byte = 0x09
+    const val VERSION: Byte = 0x0A
 }

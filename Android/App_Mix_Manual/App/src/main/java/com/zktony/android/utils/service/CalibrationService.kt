@@ -152,7 +152,7 @@ class CalibrationService @Inject constructor(
                     slDao.insert(
                         Setting(
                             1, 0.0, 0.0, 0.0, 500.0, 500.0, 500.0, 0.0, 0.0, 5.0, 1.0, 3.0,
-                            5.0, 3.0, 5.0, 3.0, 5.0, 3.0
+                            5.0, 3.0, 5.0, 3.0, 5.0, 3.0,10.0
                         )
                     )
 

@@ -4,7 +4,9 @@ import android.util.Log
 import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.utils.AppStateUtils.hpa
 import com.zktony.android.utils.AppStateUtils.hpd
+import com.zktony.android.utils.AppStateUtils.hpe
 import com.zktony.android.utils.AppStateUtils.hpg
+import com.zktony.android.utils.AppStateUtils.hpv
 import com.zktony.android.utils.LogUtils.logD
 import com.zktony.android.utils.internal.ControlType
 import com.zktony.android.utils.internal.ExceptionPolicy
@@ -38,14 +40,21 @@ object SerialPortUtils {
         // rtu串口全局回调
         SerialStoreUtils.get("zkty")?.callbackHandler = { bytes ->
             Protocol.verifyProtocol(bytes) { protocol ->
+//                println("protocol.func===${protocol.func}")
+//                println("protocol.data===${protocol.data.readInt8()}")
+//                println("protocol.data===${protocol.data.toAsciiString()}")
                 if (protocol.func == 0xFF.toByte()) {
-                    when (protocol.data.readInt16LE()) {
-                        1 -> throw Exception("TX Header Error")
-                        2 -> throw Exception("TX Addr Error")
-                        3 -> throw Exception("TX Crc Error")
-                        4 -> throw Exception("TX No Com")
-                    }
+                    hpe[1] = false
+//                    when (protocol.data.readInt16LE()) {
+//                        1 -> throw Exception("TX Header Error")
+//                        2 -> throw Exception("TX Addr Error")
+//                        3 -> throw Exception("TX Crc Error")
+//                        4 -> throw Exception("TX No Com")
+//                    }
                 } else {
+//                    println("protocol.func===${protocol.func}")
+//                    println("protocol.data===${protocol.data.readInt8()}")
+//                    println("protocol.data===${protocol.data.toAsciiString()}")
                     when (protocol.func) {
                         0x01.toByte() -> {
                             for (i in 0 until protocol.data.size / 2) {
@@ -63,12 +72,19 @@ object SerialPortUtils {
                             }
                         }
 
+                        0x09.toByte() -> {
+                            hpe[1] = true
+                        }
+
+                        0x0A.toByte() -> {
+                            hpv[1] = protocol.data.toAsciiString()
+                        }
+
                         else -> {}
                     }
                 }
             }
         }
-
 
         // rtu串口全局回调
         SerialStoreUtils.get("led")?.callbackHandler = { bytes ->
@@ -83,15 +99,15 @@ object SerialPortUtils {
                 } else {
                     when (protocol.data[0]) {
                         0x0B.toByte() -> {
-                            hpd[protocol.data[0].toInt()]=true
+                            hpd[protocol.data[0].toInt()] = true
                         }
 
                         0x0C.toByte() -> {
-                            hpd[protocol.data[0].toInt()]=true
+                            hpd[protocol.data[0].toInt()] = true
                         }
 
                         0x0D.toByte() -> {
-                            hpd[protocol.data[0].toInt()]=true
+                            hpd[protocol.data[0].toInt()] = true
                         }
 
                         else -> {}
@@ -293,6 +309,23 @@ object SerialPortUtils {
         }
     }
 
+
+    /**
+     * 心跳
+     */
+    suspend fun sendPING() {
+        sendProtocol {
+            func = ControlType.SEND
+            data = byteArrayOf(0x01)
+//            func = 0x0B
+        }
+    }
+
+    suspend fun version() {
+        sendProtocol {
+            func = ControlType.VERSION
+        }
+    }
 
     /**
      * 红-常亮

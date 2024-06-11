@@ -3,15 +3,10 @@ package com.zktony.android.ui
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
-import android.os.storage.StorageManager
 import android.provider.Settings
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -29,12 +24,10 @@ import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.dao.SettingDao
 import com.zktony.android.data.dao.SportsLogDao
 import com.zktony.android.data.datastore.DataSaverDataStore
-import com.zktony.android.data.entities.ErrorRecord
 import com.zktony.android.data.entities.Motor
 import com.zktony.android.data.entities.NewCalibration
 import com.zktony.android.data.entities.Program
 import com.zktony.android.data.entities.Setting
-import com.zktony.android.data.entities.SportsLog
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.utils.AppStateUtils
@@ -44,7 +37,6 @@ import com.zktony.android.utils.SerialPortUtils.start
 import com.zktony.android.utils.SerialPortUtils.stop
 import com.zktony.android.utils.extra.Application
 import com.zktony.android.utils.extra.DownloadState
-import com.zktony.android.utils.extra.dateFormat
 import com.zktony.android.utils.extra.download
 import com.zktony.android.utils.extra.httpCall
 import com.zktony.android.utils.extra.playAudio
@@ -53,20 +45,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
 import java.io.File
-import java.io.FileWriter
-import java.lang.reflect.Method
-import java.util.Calendar
-import java.util.Date
 import java.util.zip.ZipFile
 import javax.inject.Inject
 import kotlin.math.abs
@@ -255,7 +240,7 @@ class SettingViewModel @Inject constructor(
                     ApplicationUtils.ctx.playAudio(R.raw.setting_buzz)
                 } else if (intent.state == 2) {
                     //语音
-                    ApplicationUtils.ctx.playAudio(R.raw.power_voice)
+                    ApplicationUtils.ctx.playAudio(R.raw.setting_voice)
                 }
 
 
@@ -503,6 +488,8 @@ class SettingViewModel @Inject constructor(
                                         textList[9].toDouble()
                                     setting.glueBoardPosition =
                                         textList[10].toDouble()
+                                    setting.coagulantRinse =
+                                        textList[11].toDouble()
 
                                     slDao.update(setting)
 
@@ -521,6 +508,8 @@ class SettingViewModel @Inject constructor(
                                             setting.coagulantCleanVolume
                                         expectedEntity.coagulantFillingDefault =
                                             setting.coagulantFilling
+                                        expectedEntity.coagulantRinseDefault =
+                                            setting.coagulantRinse
                                         expectedDao.update(expectedEntity)
                                     }
 

@@ -28,6 +28,7 @@ import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.AppStateUtils.hpa
 import com.zktony.android.utils.AppStateUtils.hpd
 import com.zktony.android.utils.AppStateUtils.hpe
+import com.zktony.android.utils.AppStateUtils.hpv
 import com.zktony.android.utils.ApplicationUtils
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.SerialPortUtils.cleanLight
@@ -40,9 +41,11 @@ import com.zktony.android.utils.SerialPortUtils.lightRed
 import com.zktony.android.utils.SerialPortUtils.lightYellow
 import com.zktony.android.utils.SerialPortUtils.pulse
 import com.zktony.android.utils.SerialPortUtils.query
+import com.zktony.android.utils.SerialPortUtils.sendPING
 import com.zktony.android.utils.SerialPortUtils.start
 import com.zktony.android.utils.SerialPortUtils.stop
 import com.zktony.android.utils.SerialPortUtils.valve
+import com.zktony.android.utils.SerialPortUtils.version
 import com.zktony.android.utils.extra.dateFormat
 import com.zktony.android.utils.extra.playAudio
 import com.zktony.android.utils.internal.ExceptionPolicy
@@ -220,17 +223,19 @@ class HomeViewModel @Inject constructor(
 
 
     init {
+
         _initHintDialog.value = true
         dataStore.saveData("expectedMakenum", 0)
         val selectRudio = dataStore.readData("selectRudio", 2)
-//        heartbeat()
-        initreset()
         if (selectRudio == 1) {
             //开机
             ApplicationUtils.ctx.playAudio(R.raw.power_buzz)
         } else if (selectRudio == 2) {
-
+            ApplicationUtils.ctx.playAudio(R.raw.power_voice)
         }
+        initreset()
+        heartbeat()
+
     }
 
     fun dispatch(intent: HomeIntent) {
@@ -308,8 +313,11 @@ class HomeViewModel @Inject constructor(
             }
 
             is HomeIntent.Heartbeat -> viewModelScope.launch {
-                hpe.remove(16)
-                _uiFlags.value = UiFlags.none()
+                _heartbeatError.value = false
+                sendPING()
+                delay(100)
+                heartbeat()
+//                _uiFlags.value = UiFlags.none()
             }
 
             is HomeIntent.InitHintDialog -> viewModelScope.launch {
@@ -347,48 +355,63 @@ class HomeViewModel @Inject constructor(
     fun heartbeat() {
         viewModelScope.launch {
             _heartbeatJob.value = launch {
-                var num = 0
-                val endNum = 30
-                var queryState = false
-                while (num < endNum) {
-                    if (_heartbeatJob.value == null) {
-                        break
+                hpe.remove(1)
+                sendPING()
+                delay(100)
+                if (hpe[1] != false) {
+                    var num = 0
+                    val endNum = 30
+                    var queryState = false
+                    while (num < endNum) {
+                        if (_heartbeatJob.value == null) {
+                            break
+                        }
+                        num += 2
+                        Log.d("heartbeat", "心跳检测的时间$num")
+                        delay(2000L)
                     }
-                    num += 2
-                    delay(2000L)
-                }
-                if (num >= endNum) {
-                    hpa.remove(16)
-                    query(16)
-                    delay(100)
-                    if (hpa[16] == null) {
-                        queryState = true
-                    }
-                    if (queryState) {
-                        queryState = false
-                        for (i in 1..2) {
-                            hpa.remove(16)
-                            query(16)
-                            delay(100)
-                            if (hpa[16] == null) {
-                                queryState = true
+                    if (num >= endNum) {
+                        hpe.remove(1)
+                        sendPING()
+                        delay(100)
+                        Log.d("heartbeat", "30秒的心跳检测结果:${hpe[1]}")
+                        if (hpe[1] == null) {
+                            queryState = true
+                        }
+                        if (queryState) {
+                            queryState = false
+                            for (i in 1..2) {
+                                hpe.remove(1)
+                                sendPING()
+                                delay(100)
+                                if (hpe[1] == null) {
+                                    queryState = true
+                                } else {
+                                    queryState = false
+                                }
                             }
                         }
-                    }
-                    if (queryState) {
-                        _heartbeatError.value = true
-                        _heartbeatJob.value?.cancel()
-                        _heartbeatJob.value = null
-                        hpe[16] = true
-                        _uiFlags.value = UiFlags.objects(15)
-                    } else {
-                        _heartbeatJob.value?.cancel()
-                        _heartbeatJob.value = null
-                        //继续执行心跳方法
-                        heartbeat()
-                    }
+                        Log.d("heartbeat", "30秒的心跳检测结果queryState:$queryState")
+                        if (queryState) {
+                            _heartbeatError.value = true
+                            _heartbeatJob.value?.cancel()
+                            _heartbeatJob.value = null
+                            errorDao.insert(ErrorRecord(detail = "上下位机失联"))
+                        } else {
+                            _heartbeatError.value = false
+                            _heartbeatJob.value?.cancel()
+                            _heartbeatJob.value = null
+                            //继续执行心跳方法
+                            heartbeat()
+                        }
 
+                    }
+                } else {
+                    Log.d("heartbeat", "老版本下位机,不设置心跳")
+                    _heartbeatJob.value?.cancel()
+                    _heartbeatJob.value = null
                 }
+
             }
 
         }
@@ -415,7 +438,6 @@ class HomeViewModel @Inject constructor(
                 }
                 if (num >= waitTime) {
                     _uiFlags.value = UiFlags.objects(13)
-                    _waitTimeRinseNum.value += 1
                     val slEnetity = slDao.getById(1L).firstOrNull()
                     if (slEnetity != null) {
                         val rinseCleanVolume = slEnetity.rinseCleanVolume
@@ -431,6 +453,7 @@ class HomeViewModel @Inject constructor(
                          */
                         val xSpeed = dataStore.readData("xSpeed", 100L)
 
+                        val rinse1 = rinseCleanVolume / 3
                         start {
                             timeOut = 1000L * 60L * 10
                             with(
@@ -444,14 +467,49 @@ class HomeViewModel @Inject constructor(
                          * 冲洗转速
                          */
                         val rinseSpeed = dataStore.readData("rinseSpeed", 600L)
-                        start {
-                            timeOut = 1000L * 60L * 10
-                            with(
-                                index = 4,
-                                ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
-                                pdv = rinseCleanVolume * 1000
-                            )
+
+
+                        if (_waitTimeRinseNum.value == 0) {
+                            start {
+                                timeOut = 1000L * 60L * 10
+                                with(
+                                    index = 4,
+                                    ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
+                                    pdv = rinse1 * 1000
+                                )
+                            }
+                            start {
+                                timeOut = 1000L * 60L * 10
+                                with(
+                                    index = 1,
+                                    ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
+                                    pdv = slEnetity.coagulantRinse
+                                )
+                            }
+
+                            start {
+                                timeOut = 1000L * 60L * 10
+                                with(
+                                    index = 4,
+                                    ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
+                                    pdv = rinse1 * 2 * 1000
+                                )
+                            }
+                        } else {
+                            start {
+                                timeOut = 1000L * 60L * 10
+                                with(
+                                    index = 4,
+                                    ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
+                                    pdv = rinseCleanVolume * 1000
+                                )
+                            }
                         }
+
+
+
+
+                        _waitTimeRinseNum.value += 1
                     }
                     _waitTimeRinseJob.value?.cancel()
                     _waitTimeRinseJob.value = null
@@ -527,8 +585,14 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _uiFlags.value = UiFlags.objects(1)
             try {
+                delay(500)
 
+                val selectRudio = dataStore.readData("selectRudio", 2)
+                if (selectRudio == 1) {
 
+                } else if (selectRudio == 2) {
+                    ApplicationUtils.ctx.playAudio(R.raw.startreset_voice)
+                }
                 lightFlashYellow()
                 delay(100)
 
@@ -1054,6 +1118,13 @@ class HomeViewModel @Inject constructor(
 
                         }
                         //蠕动泵复位===========================================
+
+                        if (selectRudio == 1) {
+
+                        } else if (selectRudio == 2) {
+                            ApplicationUtils.ctx.playAudio(R.raw.endreset_voice)
+                        }
+
                         lightGreed()
                     }
 
@@ -1073,13 +1144,25 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+//    private fun reset() {
+//        viewModelScope.launch {
+//            sendPING()
+//            println("心跳====${hpe[1]}")
+////            delay(100)
+////            version()
+//        }
+//    }
 
     private fun reset() {
         viewModelScope.launch {
             _uiFlags.value = UiFlags.objects(1)
             try {
+                val selectRudio = dataStore.readData("selectRudio", 2)
+                if (selectRudio == 1) {
 
-
+                } else if (selectRudio == 2) {
+                    ApplicationUtils.ctx.playAudio(R.raw.startreset_voice)
+                }
                 lightFlashYellow()
                 delay(100)
 
@@ -1447,6 +1530,13 @@ class HomeViewModel @Inject constructor(
                     }
                     //柱塞泵复位===========================================
                     delay(100)
+
+                    if (selectRudio == 1) {
+
+                    } else if (selectRudio == 2) {
+                        ApplicationUtils.ctx.playAudio(R.raw.endreset_voice)
+                    }
+
                     lightGreed()
                 }
                 waitTimeRinse()
@@ -2655,34 +2745,38 @@ class HomeViewModel @Inject constructor(
             )
             delay(100)
 
-            launch {
-                var startTime = 0
-                val guleTimeToInt = ceil(guleTime) + 30
-                while (startTime < guleTimeToInt) {
-                    delay(1000L)
-                    startTime += 1
-                    if (_heartbeatError.value) {
-                        _job.value?.cancel()
-                        _job.value = null
-                        delay(100)
-                        var experimentRecord = erDao.getById(_selectedER.value).firstOrNull()
-                        if (experimentRecord != null) {
-                            experimentRecord.status = EPStatus.FAULT
-                            experimentRecord.detail = "上下位机断开连接"
-                            erDao.update(experimentRecord)
-                        }
-                        delay(100)
-                        errorDao.insert(ErrorRecord(detail = "上下位机断开连接"))
-                        break
-                    }
-                }
-            }
+
 
             _job2.value?.cancel()
             _job2.value = null
             _job.value?.cancel()
             _job.value = launch {
                 try {
+
+                    launch {
+                        var startTime = 0
+                        val guleTimeToInt = ceil(guleTime) + 30
+                        while (startTime < guleTimeToInt) {
+                            delay(1000L)
+                            startTime += 1
+                            if (_heartbeatError.value) {
+                                var experimentRecord =
+                                    erDao.getById(_selectedER.value).firstOrNull()
+                                if (experimentRecord != null) {
+                                    experimentRecord.status = EPStatus.FAULT
+                                    experimentRecord.detail = "上下位机断开连接"
+                                    erDao.update(experimentRecord)
+                                }
+                                delay(100)
+                                errorDao.insert(ErrorRecord(detail = "上下位机断开连接"))
+                                delay(100)
+                                _job.value?.cancel()
+                                _job.value = null
+                                break
+                            }
+                        }
+                    }
+
                     if (selectRudio == 2) {
                         ApplicationUtils.ctx.playAudio(R.raw.startjob_voice)
                     } else if (selectRudio == 1) {
@@ -2992,8 +3086,7 @@ class HomeViewModel @Inject constructor(
                             pdv = rinseP
                         )
                     }
-//                    _wasteprogress.value += (setting.rinseCleanVolume / 150).toFloat()
-                    _wasteprogress.value = 0.91f
+                    _wasteprogress.value += (setting.rinseCleanVolume / 150).toFloat()
                     endTime = Calendar.getInstance().timeInMillis
                     Log.d(
                         "HomeViewModel",
@@ -3092,21 +3185,33 @@ class HomeViewModel @Inject constructor(
             }
 
             val selectedER = erDao.getById(_selectedER.value).firstOrNull()
-
+            val selectRudio = dataStore.readData("selectRudio", 2)
             if (selectedER != null) {
                 if (startNum == 1) {
                     selectedER.number = _complate.value
                     selectedER.status = EPStatus.COMPLETED
                     erDao.update(selectedER)
+
+                    if (selectRudio == 1) {
+
+                    } else if (selectRudio == 2) {
+                        ApplicationUtils.ctx.playAudio(R.raw.startend_voice)
+                    }
                 } else {
                     selectedER.number = _complate.value
                     selectedER.status = EPStatus.ABORT
                     selectedER.detail = "手动停止制胶"
                     erDao.update(selectedER)
+
+                    if (selectRudio == 1) {
+
+                    } else if (selectRudio == 2) {
+                        ApplicationUtils.ctx.playAudio(R.raw.startstop_voice)
+                    }
                 }
 
-
             }
+
 
             val rinseSpeed = dataStore.readData("rinseSpeed", 600L)
 
@@ -3157,7 +3262,11 @@ class HomeViewModel @Inject constructor(
             _job.value?.cancel()
             _job.value = null
 
+
+
+
             lightFlashYellow()
+
 
             val selectedER = erDao.getById(_selectedER.value).firstOrNull()
 
@@ -3173,8 +3282,11 @@ class HomeViewModel @Inject constructor(
             sportsLogDao.insert(SportsLog(logName = "${date}-MBG1500", startModel = "停止制胶"))
             delay(100)
             val selectRudio = dataStore.readData("selectRudio", 2)
-            if (selectRudio == 2) {
-                ApplicationUtils.ctx.playAudio(R.raw.startend_voice)
+
+            if (selectRudio == 1) {
+
+            } else if (selectRudio == 2) {
+                ApplicationUtils.ctx.playAudio(R.raw.startstop_voice)
             }
             _uiFlags.value = UiFlags.objects(1)
 
@@ -3183,358 +3295,7 @@ class HomeViewModel @Inject constructor(
             stop(0, 1, 2, 3, 4)
             delay(200L)
 
-            try {
-                /**
-                 * 柱塞泵总行程
-                 */
-                val coagulantpulse = dataStore.readData("coagulantpulse", 550000).toLong()
-
-                /**
-                 * 复位等待时间
-                 */
-                val coagulantTime = dataStore.readData("coagulantTime", 800).toLong()
-
-                /**
-                 * 复位后预排步数
-                 */
-                val coagulantResetPulse = dataStore.readData("coagulantResetPulse", 1500).toLong()
-                withTimeout(60 * 1000L) {
-                    /**
-                     * 0-x轴    3200/圈    0号光电-复位光电；1号光电-限位光电
-                     * 1-柱塞泵 12800/圈    2号光电
-                     * 2-高浓度
-                     * 3-低浓度
-                     * 4-清洗泵
-                     */
-                    //x轴复位===========================================
-                    gpio(0, 1)
-                    delay(500L)
-                    Log.d(
-                        "HomeViewModel",
-                        "x轴光电状态====0号光电===" + getGpio(0) + "====1号光电===" + getGpio(1)
-                    )
-                    if (!getGpio(0) && !getGpio(1)) {
-                        Log.d(
-                            "HomeViewModel",
-                            "x轴反转64000L"
-                        )
-                        start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 0,
-                                pdv = -64000L,
-                                ads = Triple(1600, 1600, 1600),
-
-                                )
-                        }
-                        Log.d(
-                            "HomeViewModel",
-                            "x轴正转6400L"
-                        )
-                        start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 0,
-                                pdv = 3200L,
-                                ads = Triple(1600, 1600, 1600),
-
-                                )
-                        }
-                        Log.d(
-                            "HomeViewModel",
-                            "x轴反转6500L"
-                        )
-                        start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 0,
-                                pdv = -3300L,
-                                ads = Triple(1600, 1600, 1600),
-                            )
-                        }
-                        gpio(0)
-                        delay(500L)
-                        if (getGpio(0)) {
-
-                            Log.d(
-                                "HomeViewModel",
-                                "x轴正转1600L"
-                            )
-                            start {
-                                timeOut = 1000L * 30
-                                with(
-                                    index = 0,
-                                    pdv = 1200L,
-                                    ads = Triple(1600, 1600, 1600),
-                                )
-                            }
-                            Log.d(
-                                "HomeViewModel",
-                                "复位完成"
-                            )
-                            //复位完成
-                        } else {
-                            Log.d(
-                                "HomeViewModel",
-                                "复位失败"
-                            )
-                            //复位失败
-                        }
-
-                    } else if (!getGpio(0) && getGpio(1)) {
-                        start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 0,
-                                pdv = -64000L,
-                                ads = Triple(1600, 1600, 1600),
-
-                                )
-                        }
-                        start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 0,
-                                pdv = 3200L,
-                                ads = Triple(1600, 1600, 1600),
-
-                                )
-                        }
-                        start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 0,
-                                pdv = -3300L,
-                                ads = Triple(1600, 1600, 1600),
-
-                                )
-                        }
-                        gpio(0)
-                        delay(500L)
-                        if (getGpio(0)) {
-                            start {
-                                timeOut = 1000L * 30
-                                with(
-                                    index = 0,
-                                    pdv = 1600L,
-                                    ads = Triple(1600, 1600, 1600),
-
-                                    )
-                            }
-                            Log.d(
-                                "HomeViewModel",
-                                "复位完成"
-                            )
-                            //复位完成
-                        } else {
-                            Log.d(
-                                "HomeViewModel",
-                                "复位失败"
-                            )
-                            //复位失败
-                        }
-
-                    } else if (getGpio(0) && !getGpio(1)) {
-                        start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 0,
-                                pdv = 3200L,
-                                ads = Triple(1600, 1600, 1600),
-                            )
-                        }
-                        gpio(0)
-                        delay(500L)
-                        if (getGpio(0)) {
-                            Log.d(
-                                "HomeViewModel",
-                                "复位失败"
-                            )
-                        } else {
-                            start {
-                                timeOut = 1000L * 30
-                                with(
-                                    index = 0,
-                                    pdv = -3300L,
-                                    ads = Triple(1600, 1600, 1600),
-
-                                    )
-                            }
-                            Log.d(
-                                "HomeViewModel",
-                                "复位完成"
-                            )
-                            start {
-                                timeOut = 1000L * 30
-                                with(
-                                    index = 0,
-                                    pdv = 1200L,
-                                    ads = Triple(1600, 1600, 1600),
-                                )
-                            }
-                        }
-                    } else {
-                        Log.d(
-                            "HomeViewModel",
-                            "复位失败"
-                        )
-                    }
-                    //x轴复位===========================================
-
-
-                    // 查询GPIO状态
-                    //柱塞泵复位===========================================
-                    gpio(2)
-                    delay(500L)
-                    Log.d(
-                        "HomeViewModel",
-                        "注射泵光电状态====2号光电===" + getGpio(2)
-                    )
-                    if (!getGpio(2)) {
-                        start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 1,
-                                pdv = coagulantpulse + 20000L,
-                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
-                            )
-                        }
-                        delay(300L)
-                        start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 1,
-                                pdv = -64000L,
-                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
-                            )
-                        }
-                        delay(300L)
-                        start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 1,
-                                pdv = 64500L,
-                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
-                            )
-                        }
-                        delay(coagulantTime)
-
-                        start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 1,
-                                pdv = -coagulantpulse,
-                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
-                            )
-                        }
-
-                        delay(300L)
-                        start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 1,
-                                pdv = coagulantResetPulse,
-                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
-                            )
-                        }
-                        delay(300L)
-                        gpio(2)
-                        delay(1500L)
-                        Log.d(
-                            "HomeViewModel",
-                            "注射泵光电状态====2号光电===" + getGpio(2)
-                        )
-                        delay(300L)
-                        if (!getGpio(2)) {
-
-                            delay(300L)
-                            Log.d(
-                                "HomeViewModel",
-                                "柱塞泵复位成功"
-                            )
-                            //复位完成
-                        } else {
-                            Log.d(
-                                "HomeViewModel",
-                                "柱塞泵复位失败"
-                            )
-                            //复位失败
-                        }
-                    } else {
-                        start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 1,
-                                pdv = -64000L,
-                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
-
-                                )
-                        }
-                        delay(300L)
-
-                        start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 1,
-                                pdv = 64500L,
-                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
-                            )
-                        }
-                        delay(coagulantTime)
-                        Log.d(
-                            "HomeViewModel",
-                            "柱塞泵复位完成"
-                        )
-                        //复位完成
-                        start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 1,
-                                pdv = -coagulantpulse,
-                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
-                            )
-                        }
-                        delay(300L)
-
-                        start {
-                            timeOut = 1000L * 30
-                            with(
-                                index = 1,
-                                pdv = coagulantResetPulse,
-                                ads = Triple(200 * 13, 200 * 1193, 200 * 1193),
-                            )
-                        }
-
-                        delay(300L)
-                        gpio(2)
-                        delay(500L)
-                        Log.d(
-                            "HomeViewModel",
-                            "注射泵光电状态====2号光电===" + getGpio(2)
-                        )
-                        if (getGpio(2)) {
-                            Log.d(
-                                "HomeViewModel",
-                                "柱塞泵复位失败"
-                            )
-                            //复位失败
-                        } else {
-                            Log.d(
-                                "HomeViewModel",
-                                "柱塞泵复位完成"
-                            )
-                        }
-
-                    }
-                    //柱塞泵复位===========================================
-
-                }
-
-
-            } catch (ex: Exception) {
-                errorDao.insert(ErrorRecord(detail = "复位超时请重试"))
-                _uiFlags.value = UiFlags.message("复位超时请重试")
-            }
+            reset()
 
             delay(200L)
             val slEnetity = slDao.getById(1L).firstOrNull()
@@ -3563,6 +3324,11 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+//    private fun clean() {
+//        viewModelScope.launch {
+//            version()
+//        }
+//    }
 
     private fun clean() {
         viewModelScope.launch {
