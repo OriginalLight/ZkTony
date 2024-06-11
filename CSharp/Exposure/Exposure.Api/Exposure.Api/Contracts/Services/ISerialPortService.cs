@@ -41,4 +41,11 @@ public interface ISerialPortService
     /// </summary>
     /// <returns></returns>
     string GetVer();
+
+    /// <summary>
+    ///     串口更新
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    Task EmbeddedUpdate(string path);
 }

@@ -342,6 +342,18 @@ public class MachineController(
     }
 
     #endregion
+    
+    #region 下位机更新
+
+    [HttpGet]
+    [Route("EmbeddedUpdate")]
+    public async Task<IActionResult> EmbeddedUpdate()
+    {
+        await serialPort.EmbeddedUpdate("C:\\Users\\ThinkBook\\Desktop\\test.bin");
+        return Ok();
+    }
+
+    #endregion
 
     #region 关机
 

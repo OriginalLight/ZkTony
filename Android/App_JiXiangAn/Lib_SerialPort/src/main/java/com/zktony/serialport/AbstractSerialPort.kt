@@ -98,11 +98,11 @@ abstract class AbstractSerialPort {
         if (byteArray == null) {
             if (buffer.size() > 0) {
                 try {
-                    callbacks.values.forEach { it.invoke((buffer.toByteArray())) }
                     if (config.log) {
-                        Log.i(config.device, "All Callbacks Invoked! ${callbacks.keys}")
                         Log.i(config.device, "RX: ${buffer.toByteArray().toHexString()}")
+                        Log.i(config.device, "Callbacks: ${callbacks.keys}")
                     }
+                    callbacks.values.forEach { it.invoke((buffer.toByteArray())) }
                 } catch (ex: Exception) {
                     ex.printStackTrace()
                 } finally {
@@ -155,10 +155,10 @@ abstract class AbstractSerialPort {
                 try {
                     val message = byteArrayQueue.poll(config.delay, TimeUnit.MILLISECONDS)
                     if (message != null) {
-                        send(message)
                         if (config.log) {
                             Log.i(config.device, "TX: ${message.toHexString()}")
                         }
+                        send(message)
                     }
                 } catch (ex: Exception) {
                     ex.printStackTrace()

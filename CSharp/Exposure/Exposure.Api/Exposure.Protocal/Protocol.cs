@@ -5,9 +5,9 @@ public class Protocol
     private byte Head { get; } = 0xEE;
     public byte Address { get; set; } = 0x01;
     public byte Function { get; set; } = 0x01;
-    private byte[] DataLength { get; set; } = Array.Empty<byte>();
+    public byte[] DataLength { get; set; } = Array.Empty<byte>();
     public byte[] Data { get; set; } = Array.Empty<byte>();
-    private byte[] End { get; } = [0xFF, 0xFC];
+    public byte[] End { get; set; } = [0xFF, 0xFC];
 
     public byte[] ToBytes()
     {

@@ -53,5 +53,5 @@ data class Application(
     val versionName: String,
     val createTime: String,
     val description: String,
-    val downloadUrl: String,
+    val downloadUrl: String
 )

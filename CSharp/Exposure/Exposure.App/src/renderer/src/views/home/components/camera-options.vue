@@ -272,6 +272,9 @@ const maxFrams = computed(() => {
   if (max < 1) {
     return 1
   }
+  if (max > 100) {
+    return 100
+  }
 
   return max
 })

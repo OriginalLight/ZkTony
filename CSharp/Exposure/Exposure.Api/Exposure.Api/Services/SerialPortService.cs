@@ -12,6 +12,9 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
     private readonly Dictionary<string, int> _flags = new();
     private readonly Dictionary<string, SerialPort> _serialPorts = new();
     private string _ver = "1.0.0";
+    // 下位机返回的标志
+    private int flag = -1;
+    private bool rx = false;
 
     #region 初始化
 
@@ -62,6 +65,63 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
                             Log.Error(e, e.Message);
                         }
                     }
+                        break;
+                    case 0xA0:
+                    {
+                        if (bytes[5] == 0x00)
+                        {
+                            flag = 0;
+                        }
+                        else
+                        {
+                            flag = -1;
+                        }
+                    }
+                        break;
+                    case 0xA1:
+                    {
+                        if (bytes[5] == 0x00)
+                        {
+                            flag = 1;
+                        }
+                        else
+                        {
+                            flag = -1;
+                        }
+                    }   
+                        break;
+                    case 0xA2:
+                    {
+                        if (bytes[5] == 0x00)
+                        {
+                            flag = 2;
+                        }
+                        else
+                        {
+                            flag = -1;
+                        }
+                    }   
+                        break;
+                    case 0xA3:
+                    {
+                        if (bytes[5] == 0x01)
+                        {
+                            flag = -1;
+                        }
+                        rx = true;
+                    }   
+                        break;
+                    case 0xA4:
+                    {
+                        if (bytes[5] == 0x00)
+                        {
+                            flag = 4;
+                        }
+                        else
+                        {
+                            flag = -1;
+                        }
+                    }   
                         break;
                 }
             }
@@ -142,6 +202,67 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
     public string GetVer()
     {
         return _ver;
+    }
+
+    #endregion
+
+    #region 下位机升级
+
+    public async Task EmbeddedUpdate(string path)
+    {
+        const int byteLength = 1024;
+        var bytes = await File.ReadAllBytesAsync(path);
+        var totalPackage = bytes.Length / byteLength + (bytes.Length % byteLength == 0 ? 0 : 1);
+        
+        // 准备升级
+        WritePort("Com2", DefaultProtocol.UpgradePrepare().ToBytes());
+        await Task.Delay(1000);
+        if (flag != 0)
+        {
+            throw new Exception("准备升级失败");
+        }
+        
+        // 发送升级数据信息
+        WritePort("Com2", DefaultProtocol.UpgradeData(totalPackage, bytes.Length).ToBytes());
+        await Task.Delay(1000);
+        if (flag != 1)
+        {
+            throw new Exception("发送升级数据信息失败");
+        }
+        
+        // 地址擦除
+        WritePort("Com2", DefaultProtocol.EraseAddress(byteLength).ToBytes());
+        await Task.Delay(2000);
+        if (flag != 2)
+        {
+            throw new Exception("地址擦除失败");
+        }
+        
+        // 发送升级数据
+        for (var i = 0; i < totalPackage; i++)
+        {
+            rx = false;
+            var data = bytes.Skip(i * byteLength).Take(byteLength).ToArray();
+            WritePort("Com2", DefaultProtocol.WriteData(i, data).ToBytes());
+            var count = 10;
+            while (count > 0 && !rx)
+            {
+                await Task.Delay(100);
+                count--;
+            }
+            if (!rx)
+            {
+                throw new Exception("发送升级数据失败");
+            }
+        }
+        
+        // 升级完成
+        WritePort("Com2", DefaultProtocol.UpgradeEnd().ToBytes());
+        await Task.Delay(300);
+        if (flag != 4)
+        {
+            throw new Exception("升级失败");
+        }
     }
 
     #endregion

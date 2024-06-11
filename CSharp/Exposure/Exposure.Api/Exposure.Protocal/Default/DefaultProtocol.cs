@@ -371,4 +371,95 @@ public class DefaultProtocol
     }
 
     #endregion
+
+    #region 升级准备命令
+
+    public static Protocol UpgradePrepare()
+    {
+        return new Protocol
+        {
+            Address = 0x01,
+            Function = 0xA0,
+            End = [0xFF, 0xFC, 0xFF, 0xFF]
+        };
+    }
+
+    #endregion
+    
+    #region 升级数据命令
+    
+    public static Protocol UpgradeData(int totalPackage, int totalLength)
+    {
+        var data1 = BitConverter.GetBytes((ushort)totalPackage);
+        if (BitConverter.IsLittleEndian == false)
+            Array.Reverse(data1);
+        var data2 = BitConverter.GetBytes((ushort)totalLength);
+        if (BitConverter.IsLittleEndian == false)
+            Array.Reverse(data2);
+        return new Protocol
+        {
+            Address = 0x01,
+            Function = 0xA1,
+            Data = [data1[0], data1[1], data2[0], data2[1]],
+            End = [0xFF, 0xFC, 0xFF, 0xFF]
+        };
+    }
+    
+    #endregion
+    
+    
+    #region 地址擦除命令
+    
+    public static Protocol EraseAddress(int totalLength)
+    {
+        const int start = 0x8020000;
+        var end = start + totalLength;
+        var data1 = BitConverter.GetBytes(start);
+        if (BitConverter.IsLittleEndian == false)
+            Array.Reverse(data1);
+        var data2 = BitConverter.GetBytes(end);
+        if (BitConverter.IsLittleEndian == false)
+            Array.Reverse(data2);
+        return new Protocol
+        {
+            Address = 0x01,
+            Function = 0xA2,
+            Data = [data1[0], data1[1], data1[2], data1[3], data2[0], data2[1], data2[2], data2[3]],
+            End = [0xFF, 0xFC, 0xFF, 0xFF]
+        };
+    }
+    
+    #endregion
+    
+    #region 升级数据写入命令
+
+    public static Protocol WriteData(int index, byte[] data)
+    {
+        var data1 = BitConverter.GetBytes((ushort)index);
+        if (BitConverter.IsLittleEndian == false)
+            Array.Reverse(data1);
+        return new Protocol
+        {
+            Address = 0x01,
+            Function = 0xA3,
+            Data = data1.Concat(data).ToArray(),
+            End = [0xFF, 0xFC, 0xFF, 0xFF]
+        };
+    }
+
+    #endregion
+    
+    #region 升级结束命令
+    
+    public static Protocol UpgradeEnd()
+    {
+        return new Protocol
+        {
+            Address = 0x01,
+            Function = 0xA4,
+            End = [0xFF, 0xFC, 0xFF, 0xFF]
+        };
+    }
+    
+    #endregion
 }
