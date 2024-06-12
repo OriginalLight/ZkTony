@@ -14,7 +14,7 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
     private string _ver = "1.0.0";
     // 下位机返回的标志
     private int flag = -1;
-    private bool rx = false;
+    private bool rx;
 
     #region 初始化
 
@@ -149,16 +149,16 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
 
     public int GetFlag(string alias)
     {
-        return _flags.TryGetValue(alias, out var flag) ? flag : 0;
+        return _flags.TryGetValue(alias, out var flag1) ? flag1 : 0;
     }
 
     #endregion
 
     #region 设置标志
 
-    public void SetFlag(string alias, int flag)
+    public void SetFlag(string alias, int flag1)
     {
-        _flags[alias] = flag;
+        _flags[alias] = flag1;
     }
 
     #endregion

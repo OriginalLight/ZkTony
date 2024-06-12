@@ -354,7 +354,7 @@ const handleShoot = async () => {
     if (options.value.mode === 'auto') {
       canCancel.value = false
       progress.value.message = t('home.camera.options.calculating')
-      progress.value.time = 20000
+      progress.value.time = 7000
       const res = await auto()
       canCancel.value = true
       progress.value.message = t('home.camera.options.shooting')

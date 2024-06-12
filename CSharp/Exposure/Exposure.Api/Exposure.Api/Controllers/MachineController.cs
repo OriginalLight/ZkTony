@@ -292,30 +292,6 @@ public class MachineController(
             return Problem(localizer.GetString("Error0013").Value);
         }
 
-        // 灯光自检
-        try
-        {
-            var res = await camera.PreviewAsync();
-            var mat = new Mat(res.Path, ImreadModes.Grayscale);
-            var mask = new Mat();
-            // 转换成灰度图
-            var totalPixels = mat.Rows * mat.Cols;
-            // 创建一个掩码，其中在指定范围内的像素为白色，其他像素为黑色
-            Cv2.Threshold(mat, mask, 10, 255, ThresholdTypes.Binary);
-            var aboveThresholdPixels = Cv2.CountNonZero(mask);
-            var p = (double)aboveThresholdPixels / totalPixels;
-            if (p < 0.1) throw new Exception(localizer.GetString("Error0014").Value);
-        }
-        catch (Exception e)
-        {
-            errorLog.AddErrorLog(e);
-            Log.Error(e, "灯光自检失败");
-            serialPort.WritePort("Com1", DefaultProtocol.LedRed().ToBytes());
-            serialPort.SetFlag("led", 5);
-            audio.PlayWithSwitch("Error");
-            return Problem(localizer.GetString("Error0014").Value);
-        }
-
         audio.PlayWithSwitch("Start");
         return Ok();
     }

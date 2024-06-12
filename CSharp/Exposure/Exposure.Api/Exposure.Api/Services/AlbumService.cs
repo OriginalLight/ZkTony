@@ -37,6 +37,7 @@ public class AlbumService(
         foreach (var album in albums)
         {
             var u = users.FirstOrDefault(u => u.Id == album.UserId);
+            if (u != null) u.Sha = string.Empty;
             var photos = photoList.Where(p => p.AlbumId == album.Id && p.Type != -2).ToList();
             var original = photoList.Where(p => p.AlbumId == album.Id && p.Type == -2).ToList();
             albumOutList.Add(new AlbumOutDto
@@ -104,7 +105,7 @@ public class AlbumService(
     {
         var album = await _context.db.Queryable<Album>().FirstAsync(p => p.Id == id);
         var u = await _context.db.Queryable<User>().FirstAsync(u => u.Id == album.UserId);
-        u.Sha = string.Empty;
+        if (u != null) u.Sha = string.Empty;
         var photos = await _context.db.Queryable<Photo>().Where(p => p.AlbumId == album.Id && p.Type != -2)
             .ToListAsync();
         var original = await _context.db.Queryable<Photo>().Where(p => p.AlbumId == album.Id && p.Type == -2)

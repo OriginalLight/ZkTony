@@ -38,10 +38,6 @@ public static class OpenCvUtils
         var gray = new Mat();
         // 转换成灰度图
         Cv2.CvtColor(src, gray, ColorConversionCodes.BGR2GRAY);
-        
-        Cv2.MorphologyEx(gray, gray, MorphTypes.Open, Cv2.GetStructuringElement(MorphShapes.Rect, new Size(5, 5)));
-        // 直方图归一化
-        Cv2.Normalize(gray, gray, 0, 65535.0, NormTypes.MinMax, MatType.CV_16UC1);
 
         // 计算信噪比
         Cv2.MeanStdDev(gray, out var mean, out var stddev);
@@ -228,15 +224,17 @@ public static class OpenCvUtils
         var total = src.Rows * src.Cols;
         var pixels = total * percentage;
         
-        var sum = 0;
-        var threshold = 0;
         // 白底从前往后找，黑底从后往前找
-        for (var i = 0; i < 65535; i++)
+        var threshold = 65535;
+        float count = 0;
+        for (var i = 65535; i >= 0; i--)
         {
-            sum += (int)hist.At<float>(i);
-            if (!(sum >= pixels)) continue;
-            threshold = i;
-            break;
+            count += hist.At<float>(i);
+            if (count >= pixels)
+            {
+                threshold = i;
+                break;
+            }
         }
 
         Log.Information("计算灰度直方图成功: " + threshold);

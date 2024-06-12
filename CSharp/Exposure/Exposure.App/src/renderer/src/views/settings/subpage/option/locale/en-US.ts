@@ -7,7 +7,7 @@ export default {
   'option.camera': 'Camera',
   'option.camera.correction': 'Correction',
   'option.camera.calibrate': 'Calibrate',
-  'option.camera.lut': 'LUT Image Enhancement',
+  'option.camera.targetThreshold': 'Target Gray Value',
   'option.camera.threshold': 'Binary Threshold Ratio',
   'option.camera.calibrate.success': 'Calibrate Successfully',
   'option.camera.expoTime': 'Exposure Time',

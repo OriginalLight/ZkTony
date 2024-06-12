@@ -196,15 +196,11 @@ public class CameraService(
     {
         await InitAsync();
         if (_nncam == null) throw new Exception(localizer.GetString("Error0011").Value);
-
-        _mat = null;
+        
         _seq = 0;
         _flag = "sampling";
 
-        var targetExpoTime = await CalculateExpo(0.1, ctsToken);
-        // 验证曝光时间
-        if (targetExpoTime == 0) targetExpoTime = 1000000;
-        Log.Information("计算曝光时间：" + targetExpoTime);
+        var targetExpoTime = await ExpoWithThreshold( ctsToken);
 
         _mat = null;
         _album = await album.AddReturnModel(new Album
@@ -826,19 +822,11 @@ public class CameraService(
             var dst = OpenCvUtils.CuteRoi(rotateMat, roi);
             // 灰度图
             var gray = new Mat();
-
             Cv2.CvtColor(dst, gray, ColorConversionCodes.BGR2GRAY);
-            // 去除杂色
-            //gray.SetTo(0, gray.InRange(0, 3));
-            // 中值滤波
-            //Cv2.MedianBlur(gray, gray, 5);
+            
             // 14 bit 转 16 bit
             gray.ConvertTo(gray, MatType.CV_16UC1, 4.0);
-            // 开运算
-            Cv2.MorphologyEx(gray, gray, MorphTypes.Open, Cv2.GetStructuringElement(MorphShapes.Rect, new Size(5, 5)));
-            // 直方图归一化
-            Cv2.Normalize(gray, gray, 0, 65535.0, NormTypes.MinMax, MatType.CV_16UC1);
-
+            
             return gray;
         }
         catch (Exception e)
@@ -852,21 +840,20 @@ public class CameraService(
     {
         try
         {
-            // 反色
-            Cv2.BitwiseNot(mat, mat);
-            // 判断是否需要LUT
-            var lut = await option.GetOptionValueAsync("Lut") ?? "true";
-            // 不需要LUT
-            if (!bool.Parse(lut)) return mat;
             // 目标灰度在直方图的占比
-            var threshold = await option.GetOptionValueAsync("Threshold") ?? "0.001";
+            var threshold = await option.GetOptionValueAsync("Threshold") ?? "0.0001";
             // 计算直方图分布
             var hist = OpenCvUtils.Histogram(mat, double.Parse(threshold));
-            // LUT 映射
-            var dstMat = OpenCvUtils.LutLinearTransform(mat, hist, 65535, 0, 65535);
-            // 直方图归一化
-            Cv2.Normalize(dstMat, dstMat, 0, 65535.0, NormTypes.MinMax, MatType.CV_16UC1);
-
+            // 计算比例
+            var scale = 65535.0 / hist;
+            // 缩放
+            mat.ConvertTo(mat, MatType.CV_16UC1, scale);
+            // 反色
+            Cv2.BitwiseNot(mat, mat);
+            // 降噪
+            var dstMat = new Mat();
+            Cv2.MedianBlur(mat, dstMat, 3);
+            // 返回
             return dstMat;
         }
         catch (Exception e)
@@ -880,7 +867,8 @@ public class CameraService(
 
     #region 计算曝光时间
 
-    private async Task<long> CalculateExpo(double time, CancellationToken ctsToken)
+    // snr 方式
+    private async Task<long> ExpoWithSnr(double time, CancellationToken ctsToken)
     {
         if (_nncam == null) throw new Exception(localizer.GetString("Error0011").Value);
         // 设置曝光时间
@@ -904,7 +892,7 @@ public class CameraService(
                 <= 0.05 => snr switch
                 {
                     <= -10 => GetScale(-50, -10, 1_000_000, 3_000_000, snr),
-                    > -10 => await CalculateExpo(1, ctsToken),
+                    > -10 => await ExpoWithSnr(1, ctsToken),
                     _ => 1_500_000
                 },
                 <= 0.1 => GetScale(0.05, 0.1, 5_000_000, 10_000_000, percentage),
@@ -923,7 +911,7 @@ public class CameraService(
                     <= 1 => GetScale(0, 1, 10_000_000, 14_000_000, snr),
                     <= 1.5 => GetScale(1, 1.5, 14_000_000, 20_000_000, snr),
                     <= 2 => GetScale(1.5, 2, 20_000_000, 30_000_000, snr),
-                    > 2 => await CalculateExpo(5, ctsToken),
+                    > 2 => await ExpoWithSnr(5, ctsToken),
                     _ => 2_000_000
                 },
                 <= 0.1 => GetScale(0.05, 0.1, 5_000_000, 10_000_000, percentage),
@@ -943,7 +931,7 @@ public class CameraService(
                     <= 7.5 => GetScale(7, 7.5, 45_000_000, 60_000_000, snr),
                     <= 8 => GetScale(7.5, 8, 60_000_000, 100_000_000, snr),
                     <= 20 => GetScale(8, 20, 100_000_000, 200_000_000, snr),
-                    > 20 => 600_000_000,
+                    > 20 => 200_000_000,
                     _ => 15_000_000
                 },
                 <= 0.1 => GetScale(0.05, 0.1, 5_000_000, 10_000_000, percentage),
@@ -952,6 +940,60 @@ public class CameraService(
             };
 
         return 0;
+    }
+    
+    // 灰度方式
+    private async Task<long> ExpoWithThreshold(CancellationToken ctsToken)
+    {
+        if (_nncam == null) throw new Exception(localizer.GetString("Error0011").Value);
+        
+        var start = DateTime.Now;
+        
+        var threshold = await option.GetOptionValueAsync("Threshold") ?? "0.0001";
+        var targetThreshold = await option.GetOptionValueAsync("TargetThreshold") ?? "30000";
+        
+        var gray1S = new Mat();
+        var gray2S = new Mat();
+        
+        // 拍摄1秒曝光
+        _mat = null;
+        if (!_nncam.put_ExpoTime(1_000_000)) throw new Exception(localizer.GetString("Error0009").Value);
+        if (!_nncam.Trigger(1)) throw new Exception(localizer.GetString("Error0010").Value);
+        await Task.Delay(1500, ctsToken);
+        if (_mat == null) throw new Exception(localizer.GetString("Error0018").Value);
+        Cv2.CvtColor(_mat, gray1S, ColorConversionCodes.BGR2GRAY);
+        gray1S.ConvertTo(gray1S, MatType.CV_16UC1, 4.0);
+        
+        // 拍摄2秒曝光
+        _mat = null;
+        if (!_nncam.put_ExpoTime(2_000_000)) throw new Exception(localizer.GetString("Error0009").Value);
+        if (!_nncam.Trigger(1)) throw new Exception(localizer.GetString("Error0010").Value);
+        await Task.Delay(2500, ctsToken);
+        if (_mat == null) throw new Exception(localizer.GetString("Error0018").Value);
+        Cv2.CvtColor(_mat, gray2S, ColorConversionCodes.BGR2GRAY);
+        gray2S.ConvertTo(gray2S, MatType.CV_16UC1, 4.0);
+        
+        var thr1 = OpenCvUtils.Histogram(gray1S, double.Parse(threshold));
+        var thr2 = OpenCvUtils.Histogram(gray2S, double.Parse(threshold));
+        
+        if (thr1 == 0 || thr2 == 0)
+        {
+            return 300_000_000;
+        }
+        
+        // x1 = 1, x2 = 2 => y1 = thr1, y2 = thr2
+        // k = (y2 - y1) / (x2 - x1)
+        // b = y1 - kx1
+        // y = kx + b
+        // x = (y - b) / k
+        var k = thr2 - thr1;
+        var b = thr1 - k;
+        var target = (double.Parse(targetThreshold) - b) / k;
+        
+        var end = DateTime.Now;
+        Log.Information($"计算曝光时间：target = {target} k = {k} b= {b} 耗时 = {(end - start).TotalMilliseconds}ms");
+
+        return Math.Max(1000, Math.Min(300_000_000, (long)(target * 1_000_000)));
     }
 
     #endregion
