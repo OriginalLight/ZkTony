@@ -8,6 +8,7 @@ export default {
   'option.camera.correction': 'Correction',
   'option.camera.calibrate': 'Calibrate',
   'option.camera.targetThreshold': 'Target Gray Value',
+  'option.camera.enhanceThreshold': 'Enhance Gray Value',
   'option.camera.threshold': 'Binary Threshold Ratio',
   'option.camera.calibrate.success': 'Calibrate Successfully',
   'option.camera.expoTime': 'Exposure Time',

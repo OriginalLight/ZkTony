@@ -17,16 +17,27 @@ public static class OpenCvUtils
 
         //根据相机内参和畸变参数矫正图片
         var mask = new Mat();
-        var newCameraMatrix =
-            Cv2.GetOptimalNewCameraMatrix(InputArray.Create(cameraMatrix), InputArray.Create(distCoeffs), src.Size(), 0,
-                src.Size(), out var roi);
-        // cameraMatrix 数组转换成 Mat 类型
-        Cv2.Undistort(src, mask, InputArray.Create(cameraMatrix), InputArray.Create(distCoeffs), newCameraMatrix);
-        // 裁剪图片并返回原始尺寸
-        var res = new Mat();
-        Cv2.Resize(mask[roi], res, src.Size());
-        Log.Information("图片标定成功");
-        return res;
+        var newCameraMatrix = new Mat();
+        var roiMat = new Mat();
+        try
+        {
+            newCameraMatrix = Cv2.GetOptimalNewCameraMatrix(InputArray.Create(cameraMatrix), InputArray.Create(distCoeffs), src.Size(), 0, src.Size(), out var roi);
+            // cameraMatrix 数组转换成 Mat 类型
+            Cv2.Undistort(src, mask, InputArray.Create(cameraMatrix), InputArray.Create(distCoeffs), newCameraMatrix);
+            // 裁剪图片并返回原始尺寸
+            var res = new Mat();
+            roiMat = mask[roi];
+            Cv2.Resize(roiMat, res, src.Size());
+            Log.Information("图片标定成功");
+            return res;
+        }
+        finally
+        {
+            mask.Dispose();
+            newCameraMatrix.Dispose();
+            roiMat.Dispose();
+        }
+       
     }
 
     #endregion
@@ -36,25 +47,32 @@ public static class OpenCvUtils
     public static double CalculateSnr(Mat src, double time)
     {
         var gray = new Mat();
-        // 转换成灰度图
-        Cv2.CvtColor(src, gray, ColorConversionCodes.BGR2GRAY);
+        try
+        {
+            // 转换成灰度图
+            Cv2.CvtColor(src, gray, ColorConversionCodes.BGR2GRAY);
 
-        // 计算信噪比
-        Cv2.MeanStdDev(gray, out var mean, out var stddev);
+            // 计算信噪比
+            Cv2.MeanStdDev(gray, out var mean, out var stddev);
 
-        // Calculate the signal power (square of the mean)
-        var signalPower = Math.Pow(mean.Val0, 2);
+            // Calculate the signal power (square of the mean)
+            var signalPower = Math.Pow(mean.Val0, 2);
 
-        // Calculate the noise power (square of the standard deviation)
-        var noisePower = Math.Pow(stddev.Val0, 2);
+            // Calculate the noise power (square of the standard deviation)
+            var noisePower = Math.Pow(stddev.Val0, 2);
 
-        // Adjust the noise power based on the exposure time
-        var adjustedNoisePower = noisePower / time;
+            // Adjust the noise power based on the exposure time
+            var adjustedNoisePower = noisePower / time;
 
-        // Calculate and return the adjusted SNR value
-        var snr = 10 * Math.Log10(signalPower / adjustedNoisePower);
-        Log.Information("信噪比计算成功: " + snr);
-        return snr;
+            // Calculate and return the adjusted SNR value
+            var snr = 10 * Math.Log10(signalPower / adjustedNoisePower);
+            Log.Information("信噪比计算成功: " + snr);
+            return snr;
+        }
+        finally
+        {
+            gray.Dispose();
+        }
     }
 
     #endregion
@@ -65,17 +83,25 @@ public static class OpenCvUtils
     {
         var gray = new Mat();
         var mask = new Mat();
-        // 转换成灰度图
-        Cv2.CvtColor(mat, gray, ColorConversionCodes.BGR2GRAY);
+        try
+        {
+            // 转换成灰度图
+            Cv2.CvtColor(mat, gray, ColorConversionCodes.BGR2GRAY);
 
-        var totalPixels = mat.Rows * mat.Cols;
+            var totalPixels = mat.Rows * mat.Cols;
 
-        // 创建一个掩码，其中在指定范围内的像素为白色，其他像素为黑色
-        Cv2.Threshold(gray, mask, min, max, ThresholdTypes.Binary);
-        var aboveThresholdPixels = Cv2.CountNonZero(mask);
-        var percent = (double)aboveThresholdPixels / totalPixels;
-        Log.Information("计算白色区间占比成功: " + percent);
-        return percent;
+            // 创建一个掩码，其中在指定范围内的像素为白色，其他像素为黑色
+            Cv2.Threshold(gray, mask, min, max, ThresholdTypes.Binary);
+            var aboveThresholdPixels = Cv2.CountNonZero(mask);
+            var percent = (double)aboveThresholdPixels / totalPixels;
+            Log.Information("计算白色区间占比成功: " + percent);
+            return percent;
+        }
+        finally
+        {
+            gray.Dispose();
+            mask.Dispose();
+        }
     }
 
     #endregion
@@ -84,17 +110,26 @@ public static class OpenCvUtils
 
     public static Mat Multiply(Mat mat1, Mat mat2)
     {
-        var baseType = mat1.Type();
         // 转换成CV_64FC4
         var mat3 = new Mat();
         var mat4 = new Mat();
-        mat1.ConvertTo(mat3, MatType.CV_64FC4, 1.0 / 65535);
-        mat2.ConvertTo(mat4, MatType.CV_64FC4, 1.0 / 65535);
-        var dst = new Mat();
-        Cv2.Multiply(mat3, mat4, dst);
-        dst.ConvertTo(dst, baseType, 65535);
-        Log.Information("正片叠底成功");
-        return dst;
+
+        try
+        {
+            var baseType = mat1.Type();
+            mat1.ConvertTo(mat3, MatType.CV_64FC4, 1.0 / 65535);
+            mat2.ConvertTo(mat4, MatType.CV_64FC4, 1.0 / 65535);
+            var dst = new Mat();
+            Cv2.Multiply(mat3, mat4, dst);
+            dst.ConvertTo(dst, baseType, 65535);
+            Log.Information("正片叠底成功");
+            return dst;
+        }
+        finally
+        {
+            mat3.Dispose();
+            mat4.Dispose();
+        }
     }
 
     #endregion
@@ -103,6 +138,7 @@ public static class OpenCvUtils
 
     public static Mat CuteRoi(Mat src, string roi)
     {
+        var dst = new Mat();
         try
         {
             if (roi == "0,1,0,1") return src;
@@ -119,12 +155,18 @@ public static class OpenCvUtils
             var h = (int)(height * (bottom - top));
             var rect = new Rect(x, y, w, h);
             Log.Information("截取部分成功");
-            return src[rect].Resize(new Size(width, height));
+            dst = src[rect];
+            var res = dst.Resize(new Size(width, height));
+            return res;
         }
         catch (Exception e)
         {
             Log.Error(e, "截取部分失败");
             return src;
+        }
+        finally
+        {
+            dst.Dispose();
         }
     }
 
@@ -134,12 +176,13 @@ public static class OpenCvUtils
 
     public static Mat Rotate(Mat src, double angle)
     {
+        var rot = new Mat();
         try
         {
             // ReSharper disable PossibleLossOfFraction
             if (angle == 0) return src;
             var center = new Point2f(src.Width / 2, src.Height / 2);
-            var rot = Cv2.GetRotationMatrix2D(center, angle, 1.0);
+            rot = Cv2.GetRotationMatrix2D(center, angle, 1.0);
             var dst = new Mat();
             Cv2.WarpAffine(src, dst, rot, src.Size());
             Log.Information("中心旋转成功");
@@ -149,6 +192,10 @@ public static class OpenCvUtils
         {
             Log.Error(e, "中心旋转失败");
             return src;
+        }
+        finally
+        {
+            rot.Dispose();
         }
     }
 
@@ -219,26 +266,33 @@ public static class OpenCvUtils
     {
         // 计算灰度直方图
         var hist = new Mat();
-        Cv2.CalcHist([src], [0], null, hist, 1, [65535], [new Rangef(0, 65535)]);
-
-        var total = src.Rows * src.Cols;
-        var pixels = total * percentage;
-        
-        // 白底从前往后找，黑底从后往前找
-        var threshold = 65535;
-        float count = 0;
-        for (var i = 65535; i >= 0; i--)
+        try
         {
-            count += hist.At<float>(i);
-            if (count >= pixels)
-            {
-                threshold = i;
-                break;
-            }
-        }
+            Cv2.CalcHist([src], [0], null, hist, 1, [65535], [new Rangef(0, 65535)]);
 
-        Log.Information("计算灰度直方图成功: " + threshold);
-        return threshold;
+            var total = src.Rows * src.Cols;
+            var pixels = total * percentage;
+        
+            // 白底从前往后找，黑底从后往前找
+            var threshold = 65535;
+            float count = 0;
+            for (var i = 65535; i >= 0; i--)
+            {
+                count += hist.At<float>(i);
+                if (count >= pixels)
+                {
+                    threshold = i;
+                    break;
+                }
+            }
+
+            Log.Information("计算灰度直方图成功: " + threshold);
+            return threshold;
+        }
+        finally
+        {
+            hist.Dispose();
+        }
     }
     
 

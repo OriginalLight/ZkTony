@@ -9,8 +9,8 @@ namespace Exposure.Api.Services;
 public class SerialPortService(IOptionService option, IErrorLogService errorLog)
     : ISerialPortService
 {
-    private readonly Dictionary<string, int> _flags = new();
-    private readonly Dictionary<string, SerialPort> _serialPorts = new();
+    private readonly Dictionary<string, int> _flags = new Dictionary<string, int>();
+    private readonly Dictionary<string, SerialPort> _serialPorts = new Dictionary<string, SerialPort>();
     private string _ver = "1.0.0";
     // 下位机返回的标志
     private int flag = -1;
@@ -88,7 +88,7 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
                         {
                             flag = -1;
                         }
-                    }   
+                    }
                         break;
                     case 0xA2:
                     {
@@ -100,7 +100,7 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
                         {
                             flag = -1;
                         }
-                    }   
+                    }
                         break;
                     case 0xA3:
                     {
@@ -109,7 +109,7 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
                             flag = -1;
                         }
                         rx = true;
-                    }   
+                    }
                         break;
                     case 0xA4:
                     {
@@ -121,7 +121,7 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
                         {
                             flag = -1;
                         }
-                    }   
+                    }
                         break;
                 }
             }
@@ -213,7 +213,7 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
         const int byteLength = 1024;
         var bytes = await File.ReadAllBytesAsync(path);
         var totalPackage = bytes.Length / byteLength + (bytes.Length % byteLength == 0 ? 0 : 1);
-        
+
         // 准备升级
         WritePort("Com2", DefaultProtocol.UpgradePrepare().ToBytes());
         await Task.Delay(1000);
@@ -221,7 +221,7 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
         {
             throw new Exception("准备升级失败");
         }
-        
+
         // 发送升级数据信息
         WritePort("Com2", DefaultProtocol.UpgradeData(totalPackage, bytes.Length).ToBytes());
         await Task.Delay(1000);
@@ -229,7 +229,7 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
         {
             throw new Exception("发送升级数据信息失败");
         }
-        
+
         // 地址擦除
         WritePort("Com2", DefaultProtocol.EraseAddress(byteLength).ToBytes());
         await Task.Delay(2000);
@@ -237,7 +237,7 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
         {
             throw new Exception("地址擦除失败");
         }
-        
+
         // 发送升级数据
         for (var i = 0; i < totalPackage; i++)
         {
@@ -255,7 +255,7 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
                 throw new Exception("发送升级数据失败");
             }
         }
-        
+
         // 升级完成
         WritePort("Com2", DefaultProtocol.UpgradeEnd().ToBytes());
         await Task.Delay(300);
@@ -290,7 +290,7 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
             return;
         }
 
-        SerialPort serialPort = new(portName, 115200, Parity.None, 8, StopBits.One);
+        SerialPort serialPort = new SerialPort(portName, 115200, Parity.None, 8, StopBits.One);
         try
         {
             serialPort.Open();

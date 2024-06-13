@@ -8,7 +8,7 @@ public class OptionService(IDbContext dbContext) : BaseService<Option>(dbContext
 {
     private readonly IDbContext _context = dbContext;
     // Key-Value Cache
-    private readonly Dictionary<string, string> _options = new();
+    private readonly Dictionary<string, string> _options = new Dictionary<string, string>();
 
     #region 获取Key对应的值
 
@@ -57,7 +57,7 @@ public class OptionService(IDbContext dbContext) : BaseService<Option>(dbContext
         {
             return value;
         }
-        
+
         value = _context.db.Queryable<Option>().Where(p => p.Key == key).Select(p => p.Value).First();
         _options[key] = value;
         return value;
@@ -94,7 +94,7 @@ public class OptionService(IDbContext dbContext) : BaseService<Option>(dbContext
     {
         var ops = await _context.db.Queryable<Option>().ToListAsync();
         var dict = ops.ToDictionary(p => p.Key, p => p.Value);
-        
+
         // Clear and re-add
         _options.Clear();
         foreach (var (key, value) in dict)

@@ -143,6 +143,19 @@ public class CameraController(
         return Ok();
     }
 
+    #region 丢失测试
+
+    [HttpGet]
+    [Route("LostTest")]
+    public async Task<IActionResult> LostTest([FromQuery] int number)
+    {
+        // 丢失测试
+        await camera.LostTest(number);
+        return Ok();
+    }
+
+    #endregion
+
     #endregion
 
     #region 畸形校正

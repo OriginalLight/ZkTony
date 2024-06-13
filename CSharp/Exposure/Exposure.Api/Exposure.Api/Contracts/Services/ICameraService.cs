@@ -83,6 +83,13 @@ public interface ICameraService
     /// <param name="number"></param>
     /// <returns></returns>
     Task Collect(int start, int interval, int number);
+
+    /// <summary>
+    ///     丢失测试
+    /// </summary>
+    /// <param name="number"></param>
+    /// <returns></returns>
+    public Task LostTest(int number);
     
 
     /// <summary>

@@ -6,8 +6,8 @@ namespace Exposure.Api.Services;
 
 public class UsbService : IUsbService
 {
-    private readonly ManagementEventWatcher _insertWatcher = new();
-    private readonly ManagementEventWatcher _removeWatcher = new();
+    private readonly ManagementEventWatcher _insertWatcher = new ManagementEventWatcher();
+    private readonly ManagementEventWatcher _removeWatcher = new ManagementEventWatcher();
 
     #region 外设插入
 

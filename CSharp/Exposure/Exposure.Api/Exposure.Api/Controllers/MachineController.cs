@@ -318,7 +318,7 @@ public class MachineController(
     }
 
     #endregion
-    
+
     #region 下位机更新
 
     [HttpGet]

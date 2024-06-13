@@ -196,12 +196,13 @@ public class CameraService(
     {
         await InitAsync();
         if (_nncam == null) throw new Exception(localizer.GetString("Error0011").Value);
-        
+
         _seq = 0;
         _flag = "sampling";
 
-        var targetExpoTime = await ExpoWithThreshold( ctsToken);
+        var targetExpoTime = await ExpoWithThreshold(ctsToken);
 
+        _mat?.Dispose();
         _mat = null;
         _album = await album.AddReturnModel(new Album
         {
@@ -269,6 +270,7 @@ public class CameraService(
         await InitAsync();
         if (_nncam == null) throw new Exception(localizer.GetString("Error0011").Value);
 
+        _mat?.Dispose();
         _mat = null;
         _album = await album.AddReturnModel(new Album
         {
@@ -336,15 +338,16 @@ public class CameraService(
         if (_nncam == null) throw new Exception(localizer.GetString("Error0011").Value);
         // 关闭灯光
         serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
-        
+
         if (_album != null)
         {
             await album.DeleteByIds([_album.Id]);
         }
-        
+
         if (!_nncam.Trigger(0)) throw new Exception(localizer.GetString("Error0010").Value);
 
         _photoList.Clear();
+        _mat?.Dispose();
         _mat = null;
         _seq = 0;
         _album = null;
@@ -411,6 +414,38 @@ public class CameraService(
             if (!_nncam.Trigger(1)) throw new Exception(localizer.GetString("Error0010").Value);
 
             await Task.Delay(start + interval * i + 100);
+        }
+    }
+
+    #endregion
+
+    #region 丢图测试
+
+    public async Task LostTest(int number)
+    {
+        await InitAsync();
+        if (_nncam == null) throw new Exception(localizer.GetString("Error0011").Value);
+
+        _flag = "lost";
+        _seq = 0;
+        _mat?.Dispose();
+        _mat = null;
+
+        for (var i = 0; i < number; i++)
+        {
+            // 随机曝光时间
+            var expoTime = new Random().Next(1, 3000) * 1000;
+            if (!_nncam.put_ExpoTime((uint)expoTime))
+                throw new Exception(localizer.GetString("Error0009").Value);
+            // 触发拍摄
+            if (!_nncam.Trigger(1)) throw new Exception(localizer.GetString("Error0010").Value);
+            await Task.Delay(expoTime / 1000 + 500);
+            if (_mat == null)
+            {
+                throw new Exception("Lost Photo At " + i);
+            }
+            _mat.Dispose();
+            _mat = null;
         }
     }
 
@@ -566,10 +601,18 @@ public class CameraService(
                         default:
                         {
                             var combine = new Mat(height, width, MatType.CV_16UC3, new Scalar(0));
-                            if (_mat != null) Cv2.Add(mat, _mat, combine);
-                            _mat = combine.Clone();
-                            // 保存图片
-                            _photoList.Add(await SaveAsync(combine, info, (int)expoTime * (_seq - 1), true));
+                            try
+                            {
+                                if (_mat != null) Cv2.Add(mat, _mat, combine);
+                                _mat?.Dispose();
+                                _mat = combine.Clone();
+                                // 保存图片
+                                _photoList.Add(await SaveAsync(combine, info, (int)expoTime * (_seq - 1), true));
+                            }
+                            finally
+                            {
+                                combine.Dispose();
+                            }
                         }
                             break;
                     }
@@ -580,29 +623,46 @@ public class CameraService(
                     break;
                 case "collect":
                 {
-                    // 保存图片
-                    var filePath = Path.Combine(FileUtils.Collect, $"{_seq}_{expoTime}.png");
                     var gray = new Mat();
-                    Cv2.CvtColor(mat, gray, ColorConversionCodes.BGR2GRAY);
-                    gray.SaveImage(filePath);
+                    try
+                    {
+                        // 保存图片
+                        var filePath = Path.Combine(FileUtils.Collect, $"{_seq}_{expoTime}.png");
+                        Cv2.CvtColor(mat, gray, ColorConversionCodes.BGR2GRAY);
+                        gray.SaveImage(filePath);
+                    }
+                    finally
+                    {
+                        gray.Dispose();
+                    }
                 }
+                    break;
+                case "lost":
+                    _mat = mat.Clone();
                     break;
                 case "calibrate":
                 {
-                    var op = mat switch
-                    {
-                        { Width: 2992, Height: 3000 } => "3000",
-                        { Width: 1488, Height: 1500 } => "1500",
-                        { Width: 992, Height: 998 } => "1000",
-                        _ => "3000"
-                    };
-
-                    var savePath = Path.Combine(FileUtils.Calibration, op);
-                    if (!Directory.Exists(savePath)) Directory.CreateDirectory(savePath);
                     var gray = new Mat();
-                    Cv2.CvtColor(mat, gray, ColorConversionCodes.BGR2GRAY);
-                    Cv2.Normalize(gray, gray, 0, 65535.0, NormTypes.MinMax, MatType.CV_16UC1);
-                    gray.SaveImage(Path.Combine(savePath, "before.png"));
+                    try
+                    {
+                        var op = mat switch
+                        {
+                            { Width: 2992, Height: 3000 } => "3000",
+                            { Width: 1488, Height: 1500 } => "1500",
+                            { Width: 992, Height: 998 } => "1000",
+                            _ => "3000"
+                        };
+
+                        var savePath = Path.Combine(FileUtils.Calibration, op);
+                        if (!Directory.Exists(savePath)) Directory.CreateDirectory(savePath);
+                        Cv2.CvtColor(mat, gray, ColorConversionCodes.BGR2GRAY);
+                        Cv2.Normalize(gray, gray, 0, 65535.0, NormTypes.MinMax, MatType.CV_16UC1);
+                        gray.SaveImage(Path.Combine(savePath, "before.png"));
+                    }
+                    finally
+                    {
+                        gray.Dispose();
+                    }
                 }
                     break;
             }
@@ -610,6 +670,11 @@ public class CameraService(
         catch (Exception e)
         {
             Log.Error(e, "保存图片错误！");
+        }
+        finally
+        {
+            mat.Dispose();
+            Marshal.FreeHGlobal(buffer);
         }
     }
 
@@ -625,13 +690,15 @@ public class CameraService(
     )
     {
         var start = DateTime.Now;
+        var original = new Mat();
+        var thumb = new Mat();
 
         try
         {
             var prefix = isDark ? "D_" : "L_";
             var picName = $"{DateTime.Now:yyMMddHHmmssfff}";
             // 原始灰度图
-            var original = await CommonProcessAsync(mat);
+            original = await CommonProcessAsync(mat);
             if (isDark)
             {
                 // 保存原始图片
@@ -652,14 +719,11 @@ public class CameraService(
                 // 黑白反色处理和LUT处理
                 original = await DarkProcessAsync(original);
             }
-
             // 保存图片
             var picPath = Path.Combine(FileUtils.Exposure, $"{prefix}{picName}.png");
             // 保存灰度图处理后的文件
             original.SaveImage(picPath);
-            // 保存缩略图
-            //gray16 -> gray8
-            var thumb = new Mat();
+
             // 转换成8位灰度图节省空间
             Cv2.ConvertScaleAbs(original, thumb, 255 / 65535.0);
             // 缩放
@@ -689,6 +753,9 @@ public class CameraService(
         }
         finally
         {
+            original.Dispose();
+            thumb.Dispose();
+            GC.Collect();
             var end = DateTime.Now;
             Log.Information($"保存图片耗时：{(end - start).TotalMilliseconds}ms");
         }
@@ -701,6 +768,10 @@ public class CameraService(
     private async Task<Photo?> SaveCombineAsync()
     {
         var start = DateTime.Now;
+        var mat1 = new Mat();
+        var mat2 = new Mat();
+        var multiply = new Mat();
+        var thumb = new Mat();
 
         try
         {
@@ -709,10 +780,10 @@ public class CameraService(
             var dark = _photoList.Find(p => p.Type == 1);
             if (light == null || dark == null) return null;
 
-            var mat1 = new Mat(light.Path, ImreadModes.AnyDepth);
-            var mat2 = new Mat(dark.Path, ImreadModes.AnyDepth);
+            mat1 = new Mat(light.Path, ImreadModes.AnyDepth);
+            mat2 = new Mat(dark.Path, ImreadModes.AnyDepth);
             // 正片叠底将mat叠在-mat上面
-            var multiply = OpenCvUtils.Multiply(mat1, mat2);
+            multiply = OpenCvUtils.Multiply(mat1, mat2);
 
             // 保存原图
             var picName = $"C_{DateTime.Now:yyMMddHHmmssfff}";
@@ -721,7 +792,6 @@ public class CameraService(
             multiply.SaveImage(picPath);
             // 保存缩略图
             //gray16 -> gray8
-            var thumb = new Mat();
             Cv2.ConvertScaleAbs(multiply, thumb, 255 / 65535.0);
             Cv2.Resize(thumb, thumb, new Size(500, 500));
             var thumbPath = Path.Combine(FileUtils.Thumbnail, $"{picName}.jpg");
@@ -747,6 +817,11 @@ public class CameraService(
         }
         finally
         {
+            mat1.Dispose();
+            mat2.Dispose();
+            multiply.Dispose();
+            thumb.Dispose();
+            GC.Collect();
             var end = DateTime.Now;
             Log.Information($"保存合成图耗时：{(end - start).TotalMilliseconds}ms");
         }
@@ -763,11 +838,12 @@ public class CameraService(
     )
     {
         var start = DateTime.Now;
+        var gray = new Mat();
 
         try
         {
             // 灰度图
-            var gray = await CommonProcessAsync(mat);
+            gray = await CommonProcessAsync(mat);
             // 保存路径
             var path = Path.Combine(FileUtils.Preview, $"{DateTime.Now:yyMMddHHmmssfff}.png");
             // 保存图片
@@ -791,6 +867,8 @@ public class CameraService(
         }
         finally
         {
+            gray.Dispose();
+            GC.Collect();
             var end = DateTime.Now;
             Log.Information($"保存预览图耗时：{(end - start).TotalMilliseconds}ms");
         }
@@ -802,6 +880,10 @@ public class CameraService(
 
     private async Task<Mat> CommonProcessAsync(Mat mat)
     {
+        var cali = new Mat();
+        var rotate = new Mat();
+        var dst = new Mat();
+        
         try
         {
             var op = mat switch
@@ -815,22 +897,27 @@ public class CameraService(
             var rot = await option.GetOptionValueAsync("Rotate") ?? "0";
             var matrix = await option.GetOptionValueAsync($"Matrix{op}") ?? "[]";
             var dist = await option.GetOptionValueAsync($"Dist{op}") ?? "[]";
+            
             // 畸形校正
-            var caliMat = OpenCvUtils.Calibrate(mat, JsonConvert.DeserializeObject<double[,]>(matrix),
+            cali = OpenCvUtils.Calibrate(mat, JsonConvert.DeserializeObject<double[,]>(matrix),
                 JsonConvert.DeserializeObject<double[]>(dist));
-            var rotateMat = OpenCvUtils.Rotate(caliMat, double.Parse(rot));
-            var dst = OpenCvUtils.CuteRoi(rotateMat, roi);
+            // 旋转
+            rotate = OpenCvUtils.Rotate(cali, double.Parse(rot));
+            // 截取
+            dst = OpenCvUtils.CuteRoi(rotate, roi);
             // 灰度图
             var gray = new Mat();
             Cv2.CvtColor(dst, gray, ColorConversionCodes.BGR2GRAY);
-            
             // 14 bit 转 16 bit
             gray.ConvertTo(gray, MatType.CV_16UC1, 4.0);
-            
+
             return gray;
         }
         catch (Exception e)
         {
+            cali.Dispose();
+            rotate.Dispose();
+            dst.Dispose();
             Log.Error(e, "处理图片错误！");
             return mat;
         }
@@ -842,17 +929,19 @@ public class CameraService(
         {
             // 目标灰度在直方图的占比
             var threshold = await option.GetOptionValueAsync("Threshold") ?? "0.0001";
+            // 增强到目标灰度
+            var enhanceThreshold = await option.GetOptionValueAsync("EnhanceThreshold") ?? "65535";
             // 计算直方图分布
             var hist = OpenCvUtils.Histogram(mat, double.Parse(threshold));
             // 计算比例
-            var scale = 65535.0 / hist;
+            var scale = double.Parse(enhanceThreshold) / hist;
             // 缩放
             mat.ConvertTo(mat, MatType.CV_16UC1, scale);
             // 反色
             Cv2.BitwiseNot(mat, mat);
             // 降噪
             var dstMat = new Mat();
-            Cv2.MedianBlur(mat, dstMat, 3);
+            Cv2.MedianBlur(mat, dstMat, 5);
             // 返回
             return dstMat;
         }
@@ -884,6 +973,7 @@ public class CameraService(
         // 计算白色区域占比
         var percentage = OpenCvUtils.CalculatePercentage(_mat, 2550, 65535);
         // 清空_mat
+        _mat?.Dispose();
         _mat = null;
 
         if (Math.Abs(time - 0.1) < 0.1)
@@ -941,59 +1031,68 @@ public class CameraService(
 
         return 0;
     }
-    
+
     // 灰度方式
     private async Task<long> ExpoWithThreshold(CancellationToken ctsToken)
     {
         if (_nncam == null) throw new Exception(localizer.GetString("Error0011").Value);
-        
+
         var start = DateTime.Now;
-        
-        var threshold = await option.GetOptionValueAsync("Threshold") ?? "0.0001";
-        var targetThreshold = await option.GetOptionValueAsync("TargetThreshold") ?? "30000";
-        
         var gray1S = new Mat();
         var gray2S = new Mat();
-        
-        // 拍摄1秒曝光
-        _mat = null;
-        if (!_nncam.put_ExpoTime(1_000_000)) throw new Exception(localizer.GetString("Error0009").Value);
-        if (!_nncam.Trigger(1)) throw new Exception(localizer.GetString("Error0010").Value);
-        await Task.Delay(1500, ctsToken);
-        if (_mat == null) throw new Exception(localizer.GetString("Error0018").Value);
-        Cv2.CvtColor(_mat, gray1S, ColorConversionCodes.BGR2GRAY);
-        gray1S.ConvertTo(gray1S, MatType.CV_16UC1, 4.0);
-        
-        // 拍摄2秒曝光
-        _mat = null;
-        if (!_nncam.put_ExpoTime(2_000_000)) throw new Exception(localizer.GetString("Error0009").Value);
-        if (!_nncam.Trigger(1)) throw new Exception(localizer.GetString("Error0010").Value);
-        await Task.Delay(2500, ctsToken);
-        if (_mat == null) throw new Exception(localizer.GetString("Error0018").Value);
-        Cv2.CvtColor(_mat, gray2S, ColorConversionCodes.BGR2GRAY);
-        gray2S.ConvertTo(gray2S, MatType.CV_16UC1, 4.0);
-        
-        var thr1 = OpenCvUtils.Histogram(gray1S, double.Parse(threshold));
-        var thr2 = OpenCvUtils.Histogram(gray2S, double.Parse(threshold));
-        
-        if (thr1 == 0 || thr2 == 0)
-        {
-            return 300_000_000;
-        }
-        
-        // x1 = 1, x2 = 2 => y1 = thr1, y2 = thr2
-        // k = (y2 - y1) / (x2 - x1)
-        // b = y1 - kx1
-        // y = kx + b
-        // x = (y - b) / k
-        var k = thr2 - thr1;
-        var b = thr1 - k;
-        var target = (double.Parse(targetThreshold) - b) / k;
-        
-        var end = DateTime.Now;
-        Log.Information($"计算曝光时间：target = {target} k = {k} b= {b} 耗时 = {(end - start).TotalMilliseconds}ms");
 
-        return Math.Max(1000, Math.Min(300_000_000, (long)(target * 1_000_000)));
+        try
+        {
+            var threshold = await option.GetOptionValueAsync("Threshold") ?? "0.0001";
+            var targetThreshold = await option.GetOptionValueAsync("TargetThreshold") ?? "30000";
+
+            // 拍摄1秒曝光
+            _mat?.Dispose();
+            _mat = null;
+            if (!_nncam.put_ExpoTime(1_000_000)) throw new Exception(localizer.GetString("Error0009").Value);
+            if (!_nncam.Trigger(1)) throw new Exception(localizer.GetString("Error0010").Value);
+            await Task.Delay(1500, ctsToken);
+            if (_mat == null) throw new Exception(localizer.GetString("Error0018").Value);
+            Cv2.CvtColor(_mat, gray1S, ColorConversionCodes.BGR2GRAY);
+            gray1S.ConvertTo(gray1S, MatType.CV_16UC1, 4.0);
+
+            // 拍摄2秒曝光
+            _mat?.Dispose();
+            _mat = null;
+            if (!_nncam.put_ExpoTime(2_000_000)) throw new Exception(localizer.GetString("Error0009").Value);
+            if (!_nncam.Trigger(1)) throw new Exception(localizer.GetString("Error0010").Value);
+            await Task.Delay(2500, ctsToken);
+            if (_mat == null) throw new Exception(localizer.GetString("Error0018").Value);
+            Cv2.CvtColor(_mat, gray2S, ColorConversionCodes.BGR2GRAY);
+            gray2S.ConvertTo(gray2S, MatType.CV_16UC1, 4.0);
+
+            var thr1 = OpenCvUtils.Histogram(gray1S, double.Parse(threshold));
+            var thr2 = OpenCvUtils.Histogram(gray2S, double.Parse(threshold));
+
+            if (thr1 == 0 || thr2 == 0)
+            {
+                return 300_000_000;
+            }
+
+            // x1 = 1, x2 = 2 => y1 = thr1, y2 = thr2
+            // k = (y2 - y1) / (x2 - x1)
+            // b = y1 - kx1
+            // y = kx + b
+            // x = (y - b) / k
+            var k = thr2 - thr1;
+            var b = thr1 - k;
+            var target = (double.Parse(targetThreshold) - b) / k;
+
+            var end = DateTime.Now;
+            Log.Information($"计算曝光时间：target = {target} k = {k} b= {b} 耗时 = {(end - start).TotalMilliseconds}ms");
+
+            return Math.Max(1000, Math.Min(300_000_000, (long)(target * 1_000_000)));
+        }
+        finally
+        {
+            gray1S.Dispose();
+            gray2S.Dispose();
+        }
     }
 
     #endregion
@@ -1102,9 +1201,9 @@ public class CameraService(
     }
 
     #endregion
-    
+
     #region 清除相册
-    
+
     public async Task ClearAlbum()
     {
         if (_album != null)
@@ -1113,6 +1212,6 @@ public class CameraService(
             _album = null;
         }
     }
-    
+
     #endregion
 }

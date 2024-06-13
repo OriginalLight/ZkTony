@@ -8,7 +8,7 @@ namespace Exposure.Api.Services;
 public class TestService(ICameraService cameraService, ISerialPortService serialPort)
     : ITestService
 {
-    private TestAgingDto _agingDto = new();
+    private TestAgingDto _agingDto = new TestAgingDto();
     private Task? _agingTask;
 
     #region 老化测试

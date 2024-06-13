@@ -142,41 +142,52 @@ public class PhotoService(
 
     public async Task<Photo?> Combine(int[] ids)
     {
-        var photos = await GetByIds(ids);
-        if (photos.Count != 2) return null;
-        if (photos[0].Width != photos[1].Width || photos[0].Height != photos[1].Height) return null;
-        var pic1 = photos[0];
-        var pic2 = photos[1];
-        var mat1 = new Mat(pic1.Path, ImreadModes.AnyDepth);
-        var mat2 = new Mat(pic2.Path, ImreadModes.AnyDepth);
-        var mat = new Mat();
-        if (pic1.Type == 1) mat = OpenCvUtils.Multiply(mat2, mat1);
-
-        if (pic2.Type == 1) mat = OpenCvUtils.Multiply(mat1, mat2);
-
-        var picName = $"C_{DateTime.Now:yyyyMMddHHmmss}";
-
-        // 保存图片
-        var path = Path.Combine(FileUtils.Exposure, $"{picName}.png");
-        mat.SaveImage(path);
-
-        // 保存缩略图
+        var mat1 = new Mat();
+        var mat2 = new Mat();
         var thumb = new Mat();
-        Cv2.ConvertScaleAbs(mat, thumb, 255 / 65535.0);
-        Cv2.Resize(thumb, thumb, new Size(500, 500));
-        var thumbnail = Path.Combine(FileUtils.Thumbnail, $"{picName}.jpg");
-        thumb.SaveImage(thumbnail);
+        var mat = new Mat();
 
-        return await AddReturnModel(new Photo
+        try
         {
-            AlbumId = pic1.AlbumId,
-            Name = picName,
-            Path = path,
-            Width = mat.Width,
-            Height = mat.Height,
-            Type = 2,
-            Thumbnail = thumbnail
-        });
+            var photos = await GetByIds(ids);
+            if (photos.Count != 2) return null;
+            if (photos[0].Width != photos[1].Width || photos[0].Height != photos[1].Height) return null;
+            var pic1 = photos[0];
+            var pic2 = photos[1];
+            mat1 = new Mat(pic1.Path, ImreadModes.AnyDepth);
+            mat2 = new Mat(pic2.Path, ImreadModes.AnyDepth);
+            if (pic1.Type == 1) mat = OpenCvUtils.Multiply(mat2, mat1);
+            if (pic2.Type == 1) mat = OpenCvUtils.Multiply(mat1, mat2);
+            var picName = $"C_{DateTime.Now:yyyyMMddHHmmss}";
+
+            // 保存图片
+            var path = Path.Combine(FileUtils.Exposure, $"{picName}.png");
+            mat.SaveImage(path);
+
+            // 保存缩略图
+            Cv2.ConvertScaleAbs(mat, thumb, 255 / 65535.0);
+            Cv2.Resize(thumb, thumb, new Size(500, 500));
+            var thumbnail = Path.Combine(FileUtils.Thumbnail, $"{picName}.jpg");
+            thumb.SaveImage(thumbnail);
+
+            return await AddReturnModel(new Photo
+            {
+                AlbumId = pic1.AlbumId,
+                Name = picName,
+                Path = path,
+                Width = mat.Width,
+                Height = mat.Height,
+                Type = 2,
+                Thumbnail = thumbnail
+            });
+        }
+        finally
+        {
+            mat1.Dispose();
+            mat2.Dispose();
+            thumb.Dispose();
+            mat.Dispose();
+        }
     }
 
     #endregion
