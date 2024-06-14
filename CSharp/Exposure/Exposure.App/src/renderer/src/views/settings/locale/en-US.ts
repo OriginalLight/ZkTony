@@ -48,5 +48,8 @@ export default {
   'settings.factory.option': 'Option',
   'settings.factory.debug': 'Debug',
   'settings.factory.fqc': 'FQC',
-  'settings.factory.aging': 'Aging'
+  'settings.factory.aging': 'Aging',
+  'settings.factory.reset': 'Factory Reset',
+  'settings.factory.reset.confirm':
+    'Are you sure you want to restore the factory settings? Error logs and operation logs will be cleared, and all images and data will be deleted! Not recoverable!'
 }

@@ -13,4 +13,8 @@ public interface IStorageService
     /// </summary>
     /// <returns></returns>
     double AvailableStorage();
+    /// <summary>
+    ///     删除所有文件
+    /// </summary>
+    void DeleteAll();
 }

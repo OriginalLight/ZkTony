@@ -72,7 +72,7 @@ export function update() {
   return axios.get('/Machine/Update')
 }
 
-//关机
-export function shutdown() {
-  return axios.get('/Machine/Shutdown')
+//恢复出厂设置
+export function reset() {
+  return axios.get('/Machine/Reset')
 }

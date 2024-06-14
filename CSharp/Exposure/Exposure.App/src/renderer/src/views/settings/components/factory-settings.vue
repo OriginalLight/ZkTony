@@ -57,19 +57,53 @@
           </a-button>
         </template>
       </a-list-item>
+      <a-list-item>
+        <a-list-item-meta :title="t('settings.factory.reset')">
+          <template #avatar>
+            <Delete size="20" />
+          </template>
+        </a-list-item-meta>
+        <template #actions>
+          <a-button status="danger" shape="round" style="width: 120px" @click="visible = true">
+            <template #icon>
+              <Delete />
+            </template>
+          </a-button>
+        </template>
+      </a-list-item>
     </a-list>
   </a-card>
+  <a-modal v-model:visible="visible" draggable @ok="handleReset" @cancel="visible = false">
+    <template #title> {{ t('settings.factory.reset') }} </template>
+    <div>
+      {{ t('settings.factory.reset.confirm') }}
+    </div>
+  </a-modal>
 </template>
 
 <script lang="ts" setup>
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@renderer/store'
-import { Bug, FactoryBuilding, Inbox, Tea } from '@icon-park/vue-next'
+import { Bug, FactoryBuilding, Inbox, Tea, Delete } from '@icon-park/vue-next'
+import { reset } from '@renderer/api/machine'
 
 const { t } = useI18n()
 const router = useRouter()
 const userStore = useUserStore()
+
+const visible = ref(false)
+
+const handleReset = async () => {
+  try {
+    await reset()
+    visible.value = false
+    router.push('/login')
+  } catch (error) {
+    console.error(error)
+  }
+}
 </script>
 
 <style lang="less" scoped>

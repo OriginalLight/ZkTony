@@ -1,11 +1,12 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using Exposure.Api.Contracts.Services;
+using Exposure.Api.Models;
 using Exposure.Api.Models.Dto;
 using Exposure.Protocal.Default;
+using Exposure.SqlSugar.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using OpenCvSharp;
 using Serilog;
 
 namespace Exposure.Api.Controllers;
@@ -20,6 +21,7 @@ public class MachineController(
     IErrorLogService errorLog,
     IAudioService audio,
     IUsbService usb,
+    IDbContext dbContext,
     IStringLocalizer<SharedResources> localizer) : ControllerBase
 {
     /**
@@ -330,26 +332,21 @@ public class MachineController(
     }
 
     #endregion
-
-    #region 关机
-
+    
+    #region 重置到出厂设置
+    
     [HttpGet]
-    [Route("Shutdown")]
-    public IActionResult Shutdown()
+    [Route("Reset")]
+    public async Task<IActionResult> Reset()
     {
-        var process = new Process
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = "shutdown",
-                Arguments = "/s /t 0",
-                UseShellExecute = false,
-                CreateNoWindow = true
-            }
-        };
-        process.Start();
+        await dbContext.db.Deleteable<OperLog>().Where(p => p.Id > 0).ExecuteCommandAsync();
+        await dbContext.db.Deleteable<ErrorLog>().Where(p => p.Id > 0).ExecuteCommandAsync();
+        await dbContext.db.Deleteable<Album>().Where(p => p.Id > 0).ExecuteCommandAsync();
+        await dbContext.db.Deleteable<Photo>().Where(p => p.Id > 0).ExecuteCommandAsync();
+        storage.DeleteAll();
         return Ok();
     }
-
+    
     #endregion
+    
 }

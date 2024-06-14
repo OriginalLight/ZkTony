@@ -354,7 +354,7 @@ const handleShoot = async () => {
     if (options.value.mode === 'auto') {
       canCancel.value = false
       progress.value.message = t('home.camera.options.calculating')
-      progress.value.time = 7000
+      progress.value.time = 8000
       const res = await auto()
       canCancel.value = true
       progress.value.message = t('home.camera.options.shooting')
@@ -364,12 +364,16 @@ const handleShoot = async () => {
       options.value.time.second = Math.floor((ms / 1000) % 60)
       options.value.time.millisecond = Math.floor(ms % 1000)
     } else {
-      progress.value.message = t('home.camera.options.shooting')
-      progress.value.time = exposureTime.value / 1000 + 4000
+      canCancel.value = false
+      progress.value.message = t('home.camera.options.calculating')
+      progress.value.time = 4000
       await manual({
         exposure: exposureTime.value,
         frame: options.value.frame ? options.value.frame : 1
       })
+      progress.value.time = exposureTime.value / 1000 + 2000
+      progress.value.message = t('home.camera.options.shooting')
+      canCancel.value = true
     }
   } catch (error) {
     canCancel.value = true

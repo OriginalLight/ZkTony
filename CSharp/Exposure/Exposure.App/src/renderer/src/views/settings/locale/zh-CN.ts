@@ -47,5 +47,8 @@ export default {
   'settings.factory.option': '参数',
   'settings.factory.debug': '调试',
   'settings.factory.fqc': 'FQC',
-  'settings.factory.aging': '老化'
+  'settings.factory.aging': '老化',
+  'settings.factory.reset': '恢复出厂设置',
+  'settings.factory.reset.confirm':
+    '确定恢复出厂设置吗？错误日志和操作日志将被清空，所有图片和数据将被删除！不可恢复！'
 }

@@ -62,4 +62,25 @@ public class StorageService(
     }
 
     #endregion
+    
+    #region 删除所有文件
+    
+    public void DeleteAll()
+    {
+        try
+        {
+            Directory.Delete(FileUtils.Exposure, true);
+            Directory.Delete(FileUtils.Original, true);
+            Directory.Delete(FileUtils.Thumbnail, true);
+            Directory.Delete(FileUtils.Calibration, true);
+            Log.Information("删除所有文件成功");
+        }
+        catch (Exception e)
+        {
+            errorLog.AddErrorLog(e);
+            Log.Error(e, "删除所有文件失败");
+        }
+    }
+    
+    #endregion
 }
