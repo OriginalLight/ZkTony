@@ -108,7 +108,7 @@ import java.util.regex.Pattern
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun SettingRoute(viewModel: SettingViewModel) {
+fun SettingRoute(viewModel: SettingViewModel,homeViewModel: HomeViewModel) {
 
     val scope = rememberCoroutineScope()
     val navigationActions = LocalNavigationActions.current
@@ -119,6 +119,8 @@ fun SettingRoute(viewModel: SettingViewModel) {
     val page by viewModel.page.collectAsStateWithLifecycle()
     val currentpwd by viewModel.currentpwd.collectAsStateWithLifecycle()
     val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
+
+    val uiFlagsHome by homeViewModel.uiFlags.collectAsStateWithLifecycle()
 
     val job by viewModel.job.collectAsStateWithLifecycle()
     val proEntities = viewModel.proEntities.collectAsLazyPagingItems()
@@ -212,6 +214,7 @@ fun SettingRoute(viewModel: SettingViewModel) {
 
                     PageType.UPGRADE -> upgrade(
                         viewModel::dispatch,
+                        homeViewModel::dispatch,
                     )
 
                     else -> {}
@@ -2511,35 +2514,35 @@ fun SettingLits(
                             )
                         }
 
-                        Row(
-                            modifier = Modifier
-                                .padding(top = 20.dp)
-                                .fillMaxWidth()
-                        ) {
-                            line(Color(rgb(240, 240, 240)), 0f, 400f)
-                        }
-
-                        Row(modifier = Modifier.clickable {
-                            scope.launch {
-                                version()
-                                delay(100)
-                                softwareDialog.value = true
-                            }
-                        }) {
-                            Text(
-                                modifier = Modifier.padding(top = 20.dp),
-                                text = "关于软件",
-                                fontSize = 30.sp
-                            )
-
-                            Image(
-                                modifier = Modifier
-                                    .padding(top = 20.dp, start = 200.dp)
-                                    .size(40.dp),
-                                painter = painterResource(id = R.mipmap.rightarrow),
-                                contentDescription = null
-                            )
-                        }
+//                        Row(
+//                            modifier = Modifier
+//                                .padding(top = 20.dp)
+//                                .fillMaxWidth()
+//                        ) {
+//                            line(Color(rgb(240, 240, 240)), 0f, 400f)
+//                        }
+//
+//                        Row(modifier = Modifier.clickable {
+//                            scope.launch {
+//                                version()
+//                                delay(100)
+//                                softwareDialog.value = true
+//                            }
+//                        }) {
+//                            Text(
+//                                modifier = Modifier.padding(top = 20.dp),
+//                                text = "关于软件",
+//                                fontSize = 30.sp
+//                            )
+//
+//                            Image(
+//                                modifier = Modifier
+//                                    .padding(top = 20.dp, start = 200.dp)
+//                                    .size(40.dp),
+//                                painter = painterResource(id = R.mipmap.rightarrow),
+//                                contentDescription = null
+//                            )
+//                        }
 
                         Row(
                             modifier = Modifier
@@ -3595,11 +3598,13 @@ fun sportsLog(
 @Composable
 fun upgrade(
     uiEvent: (SettingIntent) -> Unit,
+    uiEventHome: (HomeIntent) -> Unit,
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        upgradeMode(uiEvent)
+        upgradeMode(uiEvent,uiEventHome)
+//        EmbeddedTest(uiEventHome)
     }
 }
 
@@ -3617,52 +3622,3 @@ val AUDIO_DESTINATION = listOf(
 data class AudioDestination(
     val id: Int, val name: String
 )
-
-
-private fun getStoragePath(context: Context, isUsb: Boolean): String? {
-    var path = ""
-    val mStorageManager: StorageManager =
-        context.getSystemService(Context.STORAGE_SERVICE) as StorageManager
-    val volumeInfoClazz: Class<*>
-    val diskInfoClaszz: Class<*>
-    try {
-        volumeInfoClazz = Class.forName("android.os.storage.VolumeInfo")
-        diskInfoClaszz = Class.forName("android.os.storage.DiskInfo")
-        val StorageManager_getVolumes: Method =
-            Class.forName("android.os.storage.StorageManager").getMethod("getVolumes")
-        val VolumeInfo_GetDisk: Method = volumeInfoClazz.getMethod("getDisk")
-        val VolumeInfo_GetPath: Method = volumeInfoClazz.getMethod("getPath")
-        val DiskInfo_IsUsb: Method = diskInfoClaszz.getMethod("isUsb")
-        val DiskInfo_IsSd: Method = diskInfoClaszz.getMethod("isSd")
-        val List_VolumeInfo = (StorageManager_getVolumes.invoke(mStorageManager) as List<Any>)
-        for (i in List_VolumeInfo.indices) {
-            val volumeInfo = List_VolumeInfo[i]
-            val diskInfo: Any = VolumeInfo_GetDisk.invoke(volumeInfo) ?: continue
-            val sd = DiskInfo_IsSd.invoke(diskInfo) as Boolean
-            val usb = DiskInfo_IsUsb.invoke(diskInfo) as Boolean
-            val file: File = VolumeInfo_GetPath.invoke(volumeInfo) as File
-            if (isUsb == usb) { //usb
-                assert(file != null)
-                path = file.getAbsolutePath()
-                Log.d(
-                    "Progarm",
-                    "usb的path=====$path"
-                )
-            } else if (!isUsb == sd) { //sd
-                assert(file != null)
-                path = file.getAbsolutePath()
-            }
-        }
-    } catch (e: Exception) {
-        Log.d(
-            "Progarm",
-            "获取usb地址异常=====" + e.printStackTrace()
-        )
-        e.printStackTrace()
-    }
-    Log.d(
-        "Progarm",
-        "usb的path===未获取到==$path"
-    )
-    return path
-}

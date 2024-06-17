@@ -3,7 +3,10 @@ package com.zktony.android.ui
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
+import android.os.ParcelFileDescriptor
+import android.provider.DocumentsContract
 import android.provider.Settings
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -52,6 +55,9 @@ import kotlinx.coroutines.withTimeout
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
 import java.util.zip.ZipFile
 import javax.inject.Inject
 import kotlin.math.abs
@@ -332,7 +338,36 @@ class SettingViewModel @Inject constructor(
                 // Launch the Wi-Fi settings screen
                 ApplicationUtils.ctx.startActivity(intent)
             }
+
+            is SettingIntent.CopyFileToUSB -> copyFileToUSB(intent.context, intent.usbPath)
+
         }
+    }
+
+    private fun copyFileToUSB(context: Context, usbPath: String) {
+
+        val targetDir = File(usbPath)
+
+        var files =
+            File("sdcard/Download").listFiles { _, name -> name.endsWith(".txt") }?.toList()
+                ?: emptyList()
+
+        files?.forEach { file ->
+            val targetFile = File(targetDir, file.name)
+            try {
+                file.copyTo(targetFile, overwrite = true)
+                Log.d(
+                    "copyFileToUSB",
+                    "拷贝文件名:${file.name}到${targetDir.path}里"
+                )
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+
+
+        }
+
+
     }
 
     @RequiresApi(Build.VERSION_CODES.P)
@@ -2583,7 +2618,7 @@ class SettingViewModel @Inject constructor(
             _job.value?.cancel()
             _job.value = launch {
                 try {
-                    for (i in 1..8) {
+                    for (i in 1..100) {
                         var coagulantBool = false
 
                         if (i == 1) {
@@ -3334,6 +3369,7 @@ class SettingViewModel @Inject constructor(
     }
 }
 
+
 sealed class SettingIntent {
     data class Navigation(val navigation: Boolean) : SettingIntent()
     data class NavTo(val page: Int) : SettingIntent()
@@ -3410,9 +3446,10 @@ sealed class SettingIntent {
 
     data class UpdateApkU(val context: Context, val apkPath: String) : SettingIntent()
 
-
     data class XStart(val xNum: Int) : SettingIntent()
 
     data object XStop : SettingIntent()
     data object exit : SettingIntent()
+
+    data class CopyFileToUSB(val context: Context, val usbPath: String) : SettingIntent()
 }

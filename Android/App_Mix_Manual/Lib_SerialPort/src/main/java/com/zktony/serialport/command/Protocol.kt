@@ -90,8 +90,8 @@ class Protocol : BaseProtocol {
          */
         @kotlin.jvm.Throws(Exception::class)
         fun verifyProtocol(byteArray: ByteArray, block: (Protocol) -> Unit) {
-            // 验证包长 >= 12
-            if (byteArray.size < 12) {
+            // 验证包长 >= 11
+            if (byteArray.size < 11) {
                 throw Exception("RX Length Error")
             }
 

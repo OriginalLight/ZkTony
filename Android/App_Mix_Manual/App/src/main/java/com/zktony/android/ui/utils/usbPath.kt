@@ -1,11 +1,12 @@
 package com.zktony.android.ui.utils
 
 import android.content.Context
+import android.os.Build
 import android.os.storage.StorageManager
 import java.io.File
 import java.lang.reflect.Method
 
-fun getStoragePath(context: Context, isUsb: Boolean): String? {
+fun getStoragePath(context: Context, isUsb: Boolean): String {
     var path = ""
     val mStorageManager: StorageManager =
         context.getSystemService(Context.STORAGE_SERVICE) as StorageManager
@@ -30,6 +31,13 @@ fun getStoragePath(context: Context, isUsb: Boolean): String? {
             if (isUsb == usb) { //usb
                 assert(file != null)
                 path = file.getAbsolutePath()
+                val release = Build.VERSION.RELEASE
+                if (release == "6.0.1") {
+                    //Android6.0.1系统是迈冲
+                    if (path != null) {
+                        path = path.replace("storage", "/mnt/media_rw")
+                    }
+                }
             } else if (!isUsb == sd) { //sd
                 assert(file != null)
                 path = file.getAbsolutePath()

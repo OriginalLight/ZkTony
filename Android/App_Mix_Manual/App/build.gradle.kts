@@ -7,6 +7,7 @@ import java.util.Date
 val date = Date(System.currentTimeMillis())
 val sdf = SimpleDateFormat("yyyyMMddHHmmss")
 val time = sdf.format(date)
+println("time====$time")
 
 plugins {
     alias(libs.plugins.android.application)
@@ -23,8 +24,8 @@ android {
         applicationId = "com.zktony.android"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 3
-        versionName = "2.0.0-$time"
+        versionCode = 4
+        versionName = "2.0.1-$time"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

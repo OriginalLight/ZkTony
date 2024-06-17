@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,6 +27,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -118,36 +121,99 @@ fun Splash(viewModel: HomeViewModel) {
             ElevatedCard {
                 Column(
                     modifier = Modifier
-                        .padding(30.dp),
+                        .padding(30.dp)
+                            .width(600.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
-                        fontSize = 20.sp,
-                        text = "请确认加液针是否已清洁!"
+                        fontSize = 35.sp,
+                        fontWeight = FontWeight.Bold,
+                        text = "使  用  须  知",
+                        color = Color.Red
                     )
+                    Column {
+                        Text(
+                            modifier = Modifier.padding(top = 10.dp),
+                            fontSize = 25.sp,
+                            lineHeight = 40.sp,
+                            text = "1.实验前请检查混合针内是否有残胶，若有残胶，请先取下混合针清除残胶后再安装使用；",
+                        )
 
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        Button(
-                            modifier = Modifier
-                                .width(100.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(android.graphics.Color.rgb(0, 105, 52))
-                            ),
-                            onClick = {
-                                viewModel.dispatch(HomeIntent.InitHintDialog)
-                            }) {
-                            Text(fontSize = 18.sp, text = "确定")
+
+                        Text(
+                            modifier = Modifier.padding(top = 6.dp),
+                            fontSize = 25.sp,
+                            lineHeight = 40.sp,
+                            text = "2.请正确配制高、低浓度母液，禁止在母液中加入促凝剂；",
+                        )
+
+                        Text(
+                            modifier = Modifier.padding(top = 6.dp),
+                            fontSize = 25.sp,
+                            lineHeight = 40.sp,
+                            text = "3.请确保冲洗液充足，可外接大容量试剂瓶；",
+                        )
+
+                        Text(
+                            modifier = Modifier.padding(top = 6.dp),
+                            fontSize = 25.sp,
+                            lineHeight = 40.sp,
+                            text = "4.开机第一次制胶前，务必先填充管路；",
+                        )
+
+                        Text(
+                            modifier = Modifier.padding(top = 6.dp),
+                            fontSize = 25.sp,
+                            lineHeight = 40.sp,
+                            text = "5.制胶前请确认管路被制胶试剂填充，如若没有需再次填充直至充满；",
+                        )
+
+                        Text(
+                            modifier = Modifier.padding(top = 6.dp),
+                            fontSize = 25.sp,
+                            lineHeight = 40.sp,
+                            text = "6.小心插入梳子，插入后请勿晃动梳子；",
+                        )
+
+                        Text(
+                            modifier = Modifier.padding(top = 6.dp),
+                            fontSize = 25.sp,
+                            lineHeight = 40.sp,
+                            text = "7.若发生管路堵塞，请立即停止使用，并联系售后工程师。",
+                        )
+
+
+                        Row(
+                            modifier = Modifier.padding(top = 10.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Spacer(modifier = Modifier.weight(1f))
+                            Button(
+                                modifier = Modifier
+                                    .width(120.dp)
+                                    .height(50.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(
+                                        android.graphics.Color.rgb(
+                                            0,
+                                            105,
+                                            52
+                                        )
+                                    )
+                                ),
+                                shape = RoundedCornerShape(0.dp),
+                                onClick = {
+                                    viewModel.dispatch(HomeIntent.InitHintDialog)
+                                }) {
+                                Text(fontSize = 25.sp, text = "关   闭")
+                            }
+
                         }
-
                     }
                 }
             }
         }
     }
-
 }
-
 

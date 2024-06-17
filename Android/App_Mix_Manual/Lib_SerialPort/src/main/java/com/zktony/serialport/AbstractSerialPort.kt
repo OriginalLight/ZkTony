@@ -2,135 +2,171 @@ package com.zktony.serialport
 
 import android.util.Log
 import com.zktony.serialport.config.SerialConfig
-import com.zktony.serialport.ext.ascii2ByteArray
-import com.zktony.serialport.ext.hex2ByteArray
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withTimeout
+import com.zktony.serialport.core.SerialPort
+import com.zktony.serialport.ext.toHexString
+import com.zktony.serialport.utils.writeThread
+import java.io.ByteArrayOutputStream
+import java.io.File
 import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 import java.security.InvalidParameterException
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Executors
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.TimeUnit
 
 /**
- * @author: 刘贺贺
- * @date: 2022-12-08 14:39
+ * Serial port helper class (abstract class)
  */
-abstract class AbstractSerialPort(config: SerialConfig) : AbstractSerial() {
+abstract class AbstractSerialPort {
 
-    init {
-        // Open the serial port when the class is initialized
-        openDevice(config)
-    }
+    private val executor = Executors.newFixedThreadPool(2)
+    private var serialPort: SerialPort? = null
+    private var outputStream: OutputStream? = null
+    private var inputStream: InputStream? = null
+    private var config: SerialConfig = SerialConfig()
+    private var isOpen: Boolean = false
+    private val buffer = ByteArrayOutputStream()
+    private val byteArrayQueue = LinkedBlockingQueue<ByteArray>()
+
+    val callbacks : MutableMap<String, (ByteArray) -> Unit> = ConcurrentHashMap()
 
     /**
      * Open the serial port
      */
-    private fun openDevice(config: SerialConfig): Int {
-        return try {
-            open(config)
-            Log.i(TAG, "Open the serial port successfully")
-            0
-        } catch (e: SecurityException) {
-            Log.e(TAG, "Failed to open the serial port: no serial port read/write permission!")
-            -1
-        } catch (e: IOException) {
-            Log.e(TAG, "Failed to open serial port: unknown error!")
-            -2
-        } catch (e: InvalidParameterException) {
-            Log.e(TAG, "Failed to open the serial port: the parameter is wrong!")
-            -3
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to open the serial port: other error!")
-            -4
+    @Throws(SecurityException::class, IOException::class, InvalidParameterException::class)
+    fun open(config: SerialConfig) {
+        this.config = config
+        serialPort = SerialPort(
+            device = File(config.device),
+            baudRate = config.baudRate,
+            stopBits = config.stopBits,
+            dataBits = config.dataBits,
+            parity = config.parity,
+            flowCon = config.flowCon,
+            flags = config.flags
+        )
+        serialPort?.let {
+            outputStream = it.outputStream
+            inputStream = it.inputStream
         }
+
+        isOpen = true
+        byteArrayReceiver()
+        byteArraySender()
     }
 
     /**
-     * Send byte data  with callback
-     *
-     * @param bytes byte data
-     * @param timeOut Long
-     * @param block Function1<[@kotlin.ParameterName] Result<ByteArray>, Unit>
+     * Close the serial port
      */
-    suspend fun sendByteArray(
-        bytes: ByteArray,
-        timeOut: Long = 1000L,
-        block: ((Result<ByteArray>) -> Unit)
-    ) {
+    open fun close() {
         try {
-            withTimeout(timeOut) {
-                var ref = ByteArray(0)
-                callbackHandler = { ref = it }
-                addByteArrayToQueue(bytes)
-                while (ref.isEmpty()) {
-                    delay(10L)
-                }
-                block(Result.success(ref))
-            }
-        } catch (ex: Exception) {
-            block(Result.failure(ex))
-        } finally {
-            callbackHandler = null
+            inputStream?.close()
+            outputStream?.close()
+            serialPort?.close()
+            executor.shutdownNow()
+            isOpen = false
+        } catch (ex: IOException) {
+            ex.printStackTrace()
         }
     }
 
     /**
-     * Send byte data
-     *
-     * @param bytes byte data
+     * Add message to the message queue
      */
-    fun sendByteArray(bytes: ByteArray) {
-        addByteArrayToQueue(bytes)
+    fun addByteArrayToQueue(byteArray: ByteArray) {
+        byteArrayQueue.add(byteArray)
     }
 
     /**
-     * Send hex string with callback
-     *
-     * @param hex String
-     * @param timeOut Long
-     * @param block Function1<[@kotlin.ParameterName] Result<ByteArray>, Unit>
+     * Send data
      */
-    suspend fun sendHexString(
-        hex: String,
-        timeOut: Long = 1000L,
-        block: ((Result<ByteArray>) -> Unit)
-    ) {
-        sendByteArray(hex.hex2ByteArray(), timeOut, block)
+    private fun send(bOutArray: ByteArray) {
+        if (isOpen) {
+            try {
+                outputStream?.write(bOutArray)
+            } catch (ex: IOException) {
+                ex.printStackTrace()
+            }
+        }
     }
 
     /**
-     * Send hex string
-     *
-     * @param hex String
+     * data processing
      */
-    fun sendHexString(hex: String) {
-        sendByteArray(hex.hex2ByteArray())
+    private fun dataProcess(byteArray: ByteArray?) {
+        if (byteArray == null) {
+            if (buffer.size() > 0) {
+                try {
+                    if (config.log) {
+                        Log.i(config.device, "RX: ${buffer.toByteArray().toHexString()}")
+                        Log.i(config.device, "Callbacks: ${callbacks.keys}")
+                        writeThread("RX: ${buffer.toByteArray().toHexString()}")
+                    }
+                    callbacks.values.forEach { it.invoke((buffer.toByteArray())) }
+                } catch (ex: Exception) {
+                    ex.printStackTrace()
+                } finally {
+                    buffer.reset()
+                }
+            }
+        } else {
+            buffer.write(byteArray)
+        }
     }
 
     /**
-     * Send ascii string with callback
-     *
-     * @param ascii String
-     * @param timeOut Long
-     * @param block Function1<[@kotlin.ParameterName] Result<ByteArray>, Unit>
+     * Thread for receiving data
      */
-    suspend fun sendAsciiString(
-        ascii: String,
-        timeOut: Long = 1000L,
-        block: ((Result<ByteArray>) -> Unit)
-    ) {
-        sendByteArray(ascii.ascii2ByteArray(true), timeOut, block)
+    private fun byteArrayReceiver() {
+        executor.execute {
+            val buffer = ByteArray(1024)
+            while (isOpen) {
+                try {
+                    val available = inputStream?.available()
+                    if (available != null && available > 0) {
+                        val bytesRead = inputStream?.read(buffer)
+                        if (bytesRead != null && bytesRead > 0) {
+                            dataProcess(buffer.copyOfRange(0, bytesRead))
+                        } else {
+                            dataProcess(null)
+                        }
+                    } else {
+                        dataProcess(null)
+                    }
+
+                    try {
+                        Thread.sleep(10L)
+                    } catch (ex: InterruptedException) {
+                        ex.printStackTrace()
+                    }
+                } catch (ex: Exception) {
+                    ex.printStackTrace()
+                }
+            }
+        }
     }
 
     /**
-     * Send ascii string
-     *
-     * @param ascii String
+     * Thread for sending data
      */
-    fun sendAsciiString(ascii: String) {
-        sendByteArray(ascii.ascii2ByteArray(true))
+    private fun byteArraySender() {
+        executor.execute {
+            while (isOpen) {
+                try {
+                    val message = byteArrayQueue.poll(config.delay, TimeUnit.MILLISECONDS)
+                    if (message != null) {
+                        if (config.log) {
+                            Log.i(config.device, "TX: ${message.toHexString()}")
+                            writeThread("TX: ${message.toHexString()}")
+                        }
+                        send(message)
+                    }
+                } catch (ex: Exception) {
+                    ex.printStackTrace()
+                }
+            }
+        }
     }
-
-    companion object {
-        private const val TAG = "AbstractSerialHelper"
-    }
-
 }

@@ -1,5 +1,6 @@
 package com.zktony.serialport.utils
 
+import android.os.Environment
 import android.util.Log
 import java.io.File
 import java.io.FileOutputStream
@@ -15,6 +16,7 @@ fun writeThread(content: String) {
     val lock = ReentrantLock()
 
     lock.lock()
+
 
     // 获取当前日期
     val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())

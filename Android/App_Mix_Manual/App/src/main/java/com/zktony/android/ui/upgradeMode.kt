@@ -24,8 +24,10 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -50,9 +52,13 @@ import com.zktony.android.ui.components.TableTextBody
 import com.zktony.android.ui.components.TableTextHead
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.getStoragePath
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.line
+import com.zktony.android.utils.extra.UpgradeState
 import com.zktony.android.utils.extra.dateFormat
+import com.zktony.android.utils.extra.embeddedUpgrade
+import com.zktony.android.utils.extra.embeddedVersion
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -69,7 +75,7 @@ import kotlin.math.ceil
  */
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun upgradeMode(uiEvent: (SettingIntent) -> Unit) {
+fun upgradeMode(uiEvent: (SettingIntent) -> Unit, uiEventHome: (HomeIntent) -> Unit) {
     val context = LocalContext.current
 
     val scope = rememberCoroutineScope()
@@ -91,6 +97,17 @@ fun upgradeMode(uiEvent: (SettingIntent) -> Unit) {
         mutableIntStateOf(0)
     }
 
+
+    var text by remember { mutableStateOf("下位机升级") }
+    var ver by remember { mutableStateOf("Unknown") }
+    var binList by remember { mutableStateOf(emptyList<File>()) }
+
+//    SideEffect {
+//        scope.launch {
+//            var path = getStoragePath(context, true)
+//            binList = File(path).listFiles { _, name -> name.endsWith(".bin") }?.toList() ?: emptyList()
+//        }
+//    }
 
 
     Column(
@@ -128,19 +145,14 @@ fun upgradeMode(uiEvent: (SettingIntent) -> Unit) {
         Row(
             modifier = Modifier
                 .padding(top = 100.dp, start = 150.dp)
-                .background(Color.Blue)
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(
-                    text = "上位机更新",
-                    fontSize = 18.sp,
-                    color = Color(rgb(112, 112, 112))
-                )
                 Image(
-                    painter = painterResource(id = R.mipmap.syjl), contentDescription = null,
+                    painter = painterResource(id = R.mipmap.android_update),
+                    contentDescription = null,
                     modifier = Modifier
                         .size(200.dp)
                         .clickable {
@@ -191,52 +203,117 @@ fun upgradeMode(uiEvent: (SettingIntent) -> Unit) {
         Row {
             Column(
                 modifier = Modifier
-                    .padding(top = 100.dp, start = 50.dp)
-                    .background(Color.Red),
+                    .padding(top = 100.dp, start = 50.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
 
             ) {
-                Text(
-                    text = "主控板更新",
-                    fontSize = 18.sp,
-                    color = Color(rgb(112, 112, 112))
-                )
                 Image(
-                    painter = painterResource(id = R.mipmap.syjl), contentDescription = null,
+                    painter = painterResource(id = R.mipmap.master_update),
+                    contentDescription = null,
                     modifier = Modifier
-                        .size(200.dp)
+                        .size(180.dp)
                         .clickable {
+                            scope.launch {
+                                var path = getStoragePath(context, true)
+                                if (!"".equals(path)) {
+                                    path += "/master.bin"
+                                    val file = File(path)
+                                    if (!file.exists()) {
+                                        text = "文件不存在"
+                                        return@launch
+                                    }
+                                    embeddedUpgrade(file).collect {
+                                        text = when (it) {
+                                            is UpgradeState.Message -> it.message
+                                            is UpgradeState.Success -> "升级成功"
+                                            is UpgradeState.Err -> "${it.t.message}"
+                                            is UpgradeState.Progress -> "升级中 ${
+                                                String.format("%.2f", it.progress * 100)
+                                            } %"
+                                        }
+                                    }
+                                } else {
+                                    Toast
+                                        .makeText(
+                                            context,
+                                            "U盘不存在！",
+                                            Toast.LENGTH_SHORT
+                                        )
+                                        .show()
+                                }
 
+
+                            }
                         }
                 )
             }
 
             Column(
                 modifier = Modifier
-                    .padding(top = 100.dp, start = 80.dp)
-                    .background(Color.Red),
+                    .padding(top = 100.dp, start = 80.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(
-                    text = "状态检测板更新",
-                    fontSize = 18.sp,
-                    color = Color(rgb(112, 112, 112))
-                )
                 Image(
-                    painter = painterResource(id = R.mipmap.gulecx), contentDescription = null,
+                    painter = painterResource(id = R.mipmap.state_update),
+                    contentDescription = null,
                     modifier = Modifier
                         .size(200.dp)
                         .clickable {
+                            scope.launch {
+                                var path = getStoragePath(context, true)
+                                if (!"".equals(path)) {
+                                    path += "/state.bin"
+                                    val file = File(path)
+                                    if (!file.exists()) {
+                                        Toast
+                                            .makeText(
+                                                context,
+                                                "U盘不存在！",
+                                                Toast.LENGTH_SHORT
+                                            )
+                                            .show()
+                                        return@launch
+                                    }
+                                    embeddedUpgrade(file).collect {
+                                        text = when (it) {
+                                            is UpgradeState.Message -> it.message
+                                            is UpgradeState.Success -> "升级成功"
+                                            is UpgradeState.Err -> "${it.t.message}"
+                                            is UpgradeState.Progress -> "升级中 ${
+                                                String.format(
+                                                    "%.2f",
+                                                    it.progress * 100
+                                                )
+                                            } %"
+                                        }
+                                    }
+                                }else {
+                                    Toast
+                                        .makeText(
+                                            context,
+                                            "U盘不存在！",
+                                            Toast.LENGTH_SHORT
+                                        )
+                                        .show()
+                                }
 
+                            }
                         }
                 )
             }
 
         }
 
-
+//        Text(text = ver, style = MaterialTheme.typography.displaySmall)
+//        Button(onClick = {
+//            scope.launch {
+//                ver = embeddedVersion()
+//            }
+//        }) {
+//            Text(text = "查询版本")
+//        }
     }
 
 
@@ -259,61 +336,3 @@ fun upgradeMode(uiEvent: (SettingIntent) -> Unit) {
 
 }
 
-private fun <T, K> Iterable<T>.distinctBy(selector: (T) -> K): List<T> {
-    val set = HashSet<K>()
-    val list = ArrayList<T>()
-    for (e in this) {
-        val key = selector(e)
-        if (set.add(key))
-            list.add(e)
-    }
-    return list
-}
-
-private fun getStoragePath(context: Context, isUsb: Boolean): String? {
-    var path = ""
-    val mStorageManager: StorageManager =
-        context.getSystemService(Context.STORAGE_SERVICE) as StorageManager
-    val volumeInfoClazz: Class<*>
-    val diskInfoClaszz: Class<*>
-    try {
-        volumeInfoClazz = Class.forName("android.os.storage.VolumeInfo")
-        diskInfoClaszz = Class.forName("android.os.storage.DiskInfo")
-        val StorageManager_getVolumes: Method =
-            Class.forName("android.os.storage.StorageManager").getMethod("getVolumes")
-        val VolumeInfo_GetDisk: Method = volumeInfoClazz.getMethod("getDisk")
-        val VolumeInfo_GetPath: Method = volumeInfoClazz.getMethod("getPath")
-        val DiskInfo_IsUsb: Method = diskInfoClaszz.getMethod("isUsb")
-        val DiskInfo_IsSd: Method = diskInfoClaszz.getMethod("isSd")
-        val List_VolumeInfo = (StorageManager_getVolumes.invoke(mStorageManager) as List<Any>)
-        for (i in List_VolumeInfo.indices) {
-            val volumeInfo = List_VolumeInfo[i]
-            val diskInfo: Any = VolumeInfo_GetDisk.invoke(volumeInfo) ?: continue
-            val sd = DiskInfo_IsSd.invoke(diskInfo) as Boolean
-            val usb = DiskInfo_IsUsb.invoke(diskInfo) as Boolean
-            val file: File = VolumeInfo_GetPath.invoke(volumeInfo) as File
-            if (isUsb == usb) { //usb
-                assert(file != null)
-                path = file.getAbsolutePath()
-                Log.d(
-                    "Progarm",
-                    "usb的path=====$path"
-                )
-            } else if (!isUsb == sd) { //sd
-                assert(file != null)
-                path = file.getAbsolutePath()
-            }
-        }
-    } catch (e: Exception) {
-        Log.d(
-            "Progarm",
-            "获取usb地址异常=====" + e.printStackTrace()
-        )
-        e.printStackTrace()
-    }
-    Log.d(
-        "Progarm",
-        "usb的path===未获取到==$path"
-    )
-    return path
-}

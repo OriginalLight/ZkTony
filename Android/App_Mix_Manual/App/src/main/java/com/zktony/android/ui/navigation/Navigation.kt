@@ -1,5 +1,7 @@
 package com.zktony.android.ui.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
@@ -14,6 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.zktony.android.ui.*
 
+@RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AppNavigation(
@@ -40,7 +43,7 @@ fun AppNavigation(
             //实验记录
             composable(Route.EXPERIMENTRECORDS) {ExperimentRecords(viewModel = hiltViewModel())}
             //系统设置
-            composable(Route.SETTING) { SettingRoute(viewModel = hiltViewModel()) }
+            composable(Route.SETTING) { SettingRoute(viewModel = hiltViewModel(),homeViewModel) }
             //首页
             composable(Route.SPLASH) { Splash(viewModel = homeViewModel) }
         }

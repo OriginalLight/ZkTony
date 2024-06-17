@@ -27,22 +27,24 @@ import kotlinx.coroutines.withTimeout
 object SerialPortUtils {
     fun with() {
         // 初始化zkty串口
-        SerialStoreUtils.put("zkty", serialPortOf {
+        serialPortOf {
             log = true
             device = "/dev/ttyS0"
-        })
+        }?.let { SerialStoreUtils.put("zkty", it) }
 
         // 初始化tec串口
-        SerialStoreUtils.put("led", serialPortOf {
+        serialPortOf {
             log = true
             device = "/dev/ttyS3"
-        })
+        }?.let { SerialStoreUtils.put("led", it) }
         // rtu串口全局回调
-        SerialStoreUtils.get("zkty")?.callbackHandler = { bytes ->
+        SerialStoreUtils.get("zkty")?.registerCallback("globe") { bytes ->
             Protocol.verifyProtocol(bytes) { protocol ->
-//                println("protocol.func===${protocol.func}")
-//                println("protocol.data===${protocol.data.readInt8()}")
+                println("protocol.func===${protocol.func}")
+                println("protocol.data===${protocol.data.size}")
+                println("protocol.data===${protocol.data.readInt8()}")
 //                println("protocol.data===${protocol.data.toAsciiString()}")
+                println("hpa===0==${hpa[0]}===1===${hpa[1]}===2===${hpa[2]}===3===${hpa[3]}===4===${hpa[4]}")
                 if (protocol.func == 0xFF.toByte()) {
                     hpe[1] = false
 //                    when (protocol.data.readInt16LE()) {
@@ -87,7 +89,7 @@ object SerialPortUtils {
         }
 
         // rtu串口全局回调
-        SerialStoreUtils.get("led")?.callbackHandler = { bytes ->
+        SerialStoreUtils.get("led")?.registerCallback("globe") { bytes ->
             Protocol.verifyProtocol(bytes) { protocol ->
                 if (protocol.func == 0xFF.toByte()) {
                     when (protocol.data.readInt16LE()) {
@@ -260,17 +262,57 @@ object SerialPortUtils {
      * 查询轴状态
      */
     suspend fun query(ids: List<Int>) {
-        val byteArray = ByteArray(ids.size)
-        ids.forEachIndexed { index, i ->
-            byteArray.writeInt8(i, index)
-        }
-        if (byteArray.isNotEmpty()) {
-            sendProtocol {
-                func = ControlType.QUERY
-                data = byteArray
+
+        withTimeout(1000L) {
+            val byteArray = ByteArray(ids.size)
+            ids.forEachIndexed { index, i ->
+                byteArray.writeInt8(i, index)
+            }
+            if (byteArray.isNotEmpty()) {
+                sendProtocol {
+                    func = ControlType.QUERY
+                    data = byteArray
+                }
             }
         }
+
+
     }
+
+//    suspend fun queryNew(ids: List<Int>): Boolean {
+//
+//        val serialPort = SerialStoreUtils.get("zkty") ?: return false
+//
+//        try {
+//            // 注册回调
+//            serialPort.registerCallback(ids.toString()) { bytes ->
+//                Protocol.verifyProtocol(bytes) {
+//                    for (i in 0 until it.data.size / 2) {
+//                        val index = it.data.readInt8(offset = i * 2)
+//                        val status = it.data.readInt8(offset = i * 2 + 1)
+//                        hpa[index] = status == 1
+//                    }
+//                }
+//            }
+//            // 发送版本查询命令
+//            serialPort.sendByteArray(Protocol().apply {
+//                func = 0x0A.toByte()
+//            }.serialization())
+//            // 等待版本响应
+//            withTimeout(1000L) {
+//                repeat(3) {
+//                    queryNew(ids)
+//                }
+//            }
+//        } catch (e: Exception) {
+//            Log.e("EmbeddedExt", e.message ?: "Unknown")
+//        } finally {
+//            // 取消注册
+//            serialPort.unregisterCallback(ids.toString())
+//        }
+//        // 返回版本号
+//        return true
+//    }
 
     suspend fun query(vararg ids: Int) = query(ids.toList())
 

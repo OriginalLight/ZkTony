@@ -20,9 +20,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -40,6 +42,7 @@ class CalibrationService @Inject constructor(
     override fun create() {
         job = scope.launch {
 
+
             val calendar = Calendar.getInstance() // 创建一个 Calendar 对象表示当前时间
 
             calendar.add(Calendar.DAY_OF_MONTH, -3) // 将日期向前调整三天
@@ -52,6 +55,53 @@ class CalibrationService @Inject constructor(
 
             val format = SimpleDateFormat("yyyy-MM-dd")
             val date1 = format.parse(date)
+
+
+            var binList =
+                File("sdcard/Download").listFiles { _, name -> name.endsWith(".txt") }?.toList()
+                    ?: emptyList()
+
+            val currentTime = System.currentTimeMillis()
+
+            Log.d(
+                "writeThread",
+                "判断删除命令日志文件的当前时间:$currentTime"
+            )
+
+            if (binList.size > 7) {
+                binList.forEach {
+                    Log.d(
+                        "writeThread",
+                        "Filename======${it.name}"
+                    )
+                    Log.d(
+                        "writeThread",
+                        "命令日志文件名称:${it.name},文件最后修改的时间:${it.lastModified()}"
+                    )
+
+                    if (currentTime - it.lastModified() > TimeUnit.DAYS.toMillis(7)) {
+                        it.delete()
+                        Log.d(
+                            "writeThread",
+                            "删除命令日志文件是否成功:${it.delete()},删除的文件名称:${it.name}"
+                        )
+                    } else {
+                        Log.d(
+                            "writeThread",
+                            "删除命令日志文件的时间不够,时间差是:${currentTime - it.lastModified()}"
+                        )
+                    }
+
+                }
+            } else {
+                Log.d(
+                    "writeThread",
+                    "命令日志文件小于7的具体文件数量:${binList.size}"
+                )
+            }
+
+
+
 
             sportsLogDao.deleteByDate(date1)
             val erAll = erDao.getList()
@@ -152,7 +202,7 @@ class CalibrationService @Inject constructor(
                     slDao.insert(
                         Setting(
                             1, 0.0, 0.0, 0.0, 500.0, 500.0, 500.0, 0.0, 0.0, 5.0, 1.0, 3.0,
-                            5.0, 3.0, 5.0, 3.0, 5.0, 3.0,10.0
+                            5.0, 3.0, 5.0, 3.0, 5.0, 3.0, 10.0
                         )
                     )
 
@@ -164,6 +214,7 @@ class CalibrationService @Inject constructor(
                     )
                 }
             }
+
 
         }
     }

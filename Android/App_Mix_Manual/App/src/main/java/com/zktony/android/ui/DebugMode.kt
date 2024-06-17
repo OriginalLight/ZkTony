@@ -81,6 +81,7 @@ import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
+import com.zktony.android.ui.utils.getStoragePath
 import com.zktony.android.ui.utils.line
 import com.zktony.android.ui.utils.toList
 import com.zktony.android.utils.AppStateUtils
@@ -540,9 +541,9 @@ fun debugMode(
                     }
 
                     Column(
-                        modifier = Modifier.padding(top = 20.dp, start = 50.dp)
+                        modifier = Modifier.padding(top = 20.dp)
                     ) {
-                        Button(modifier = Modifier
+                        Button(modifier = Modifier.padding(start = 50.dp)
                             .width(100.dp)
                             .height(50.dp),
                             colors = ButtonDefaults.buttonColors(
@@ -557,7 +558,7 @@ fun debugMode(
                         }
 
                         Button(modifier = Modifier
-                            .padding(top = 20.dp)
+                            .padding(top = 20.dp,start = 50.dp)
                             .width(120.dp)
                             .height(50.dp),
                             colors = ButtonDefaults.buttonColors(
@@ -567,7 +568,7 @@ fun debugMode(
                             onClick = {
                                 //获取usb地址
                                 var path = getStoragePath(context, true)
-                                if (!"".equals(path)) {
+                                if ("" != path) {
 
                                     val release = Build.VERSION.RELEASE
                                     if (release == "6.0.1") {
@@ -591,7 +592,7 @@ fun debugMode(
                         }
 
                         Button(modifier = Modifier
-                            .padding(top = 20.dp)
+                            .padding(top = 20.dp,start = 50.dp)
                             .width(120.dp)
                             .height(50.dp),
                             colors = ButtonDefaults.buttonColors(
@@ -602,6 +603,31 @@ fun debugMode(
                                 clearAllDialog.value = true
                             }) {
                             Text(text = "一键清除", fontSize = 18.sp)
+                        }
+
+                        Button(modifier = Modifier
+                            .padding(top = 20.dp,start = 10.dp)
+                            .width(150.dp)
+                            .height(50.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ),
+                            shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
+                            onClick = {
+                                //获取usb地址
+                                var path = getStoragePath(context, true)
+                                if ("" != path) {
+                                    uiEvent(SettingIntent.CopyFileToUSB(context, path))
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "U盘不存在！",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+
+                            }) {
+                            Text(text = "导出命令日志", fontSize = 18.sp)
                         }
 
                     }
@@ -2153,53 +2179,4 @@ fun debugMode(
     }
 
 
-}
-
-
-private fun getStoragePath(context: Context, isUsb: Boolean): String? {
-    var path = ""
-    val mStorageManager: StorageManager =
-        context.getSystemService(Context.STORAGE_SERVICE) as StorageManager
-    val volumeInfoClazz: Class<*>
-    val diskInfoClaszz: Class<*>
-    try {
-        volumeInfoClazz = Class.forName("android.os.storage.VolumeInfo")
-        diskInfoClaszz = Class.forName("android.os.storage.DiskInfo")
-        val StorageManager_getVolumes: Method =
-            Class.forName("android.os.storage.StorageManager").getMethod("getVolumes")
-        val VolumeInfo_GetDisk: Method = volumeInfoClazz.getMethod("getDisk")
-        val VolumeInfo_GetPath: Method = volumeInfoClazz.getMethod("getPath")
-        val DiskInfo_IsUsb: Method = diskInfoClaszz.getMethod("isUsb")
-        val DiskInfo_IsSd: Method = diskInfoClaszz.getMethod("isSd")
-        val List_VolumeInfo = (StorageManager_getVolumes.invoke(mStorageManager) as List<Any>)
-        for (i in List_VolumeInfo.indices) {
-            val volumeInfo = List_VolumeInfo[i]
-            val diskInfo: Any = VolumeInfo_GetDisk.invoke(volumeInfo) ?: continue
-            val sd = DiskInfo_IsSd.invoke(diskInfo) as Boolean
-            val usb = DiskInfo_IsUsb.invoke(diskInfo) as Boolean
-            val file: File = VolumeInfo_GetPath.invoke(volumeInfo) as File
-            if (isUsb == usb) { //usb
-                assert(file != null)
-                path = file.getAbsolutePath()
-                Log.d(
-                    "Progarm",
-                    "usb的path=====$path"
-                )
-            } else if (!isUsb == sd) { //sd
-                assert(file != null)
-                path = file.getAbsolutePath()
-            }
-        }
-    } catch (e: Exception) {
-        Log.d(
-            "Progarm",
-            "获取usb地址异常=====" + e.printStackTrace()
-        )
-        e.printStackTrace()
-    }
-    Log.d(
-        "Progarm",
-        "usb的path===未获取到==$path"
-    )
-    return path
 }
