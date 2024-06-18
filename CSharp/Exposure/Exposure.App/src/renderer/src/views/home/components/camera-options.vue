@@ -225,7 +225,6 @@ import { Message } from '@arco-design/web-vue'
 import { preview, pixel, manual, auto, cancel, result } from '@renderer/api/camera'
 import { hatch } from '@renderer/api/machine'
 import { useAppStore } from '@renderer/store'
-import { getOption } from '@renderer/api/option'
 import useHomeState from '@renderer/states/home'
 
 const { options } = useHomeState()
@@ -340,14 +339,12 @@ const handleHatch = async () => {
 // 拍摄
 const handleShoot = async () => {
   try {
-    const res6 = await getOption({ key: 'Temperature' })
-    const targetTemperature = res6.data === 'None' ? -150 : Number(res6.data)
     const currentTemperature = appStore.temperature
-    if (currentTemperature >= -50) {
+    if (currentTemperature >= 0) {
       Message.warning(t('home.camera.options.temperature.error'))
       return
     }
-    if (currentTemperature - targetTemperature >= 30) {
+    if (currentTemperature >= -50) {
       Message.warning(t('home.camera.options.temperature.warn'))
     }
     progress.value.visible = true
