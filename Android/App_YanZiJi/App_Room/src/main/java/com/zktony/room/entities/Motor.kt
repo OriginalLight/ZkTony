@@ -1,0 +1,21 @@
+package com.zktony.room.entities
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import java.util.Date
+
+/**
+ * @author: 刘贺贺
+ * @date: 2022-10-13 11:27
+ */
+@Entity(tableName = "motor")
+data class Motor(
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0L,
+    val index: Int = 0,
+    val displayText: String,
+    val speed: Long = 600L,
+    val acceleration: Long = 50L,
+    val deceleration: Long = 50L,
+    val createTime: Date = Date(System.currentTimeMillis())
+)

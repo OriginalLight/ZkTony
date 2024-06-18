@@ -1,0 +1,37 @@
+<resources>
+    <string name="already_latest">Already latest</string>
+    <string name="app_name">ZkTony</string>
+    <string name="cancel">Cancel</string>
+    <string name="finish">Finish</string>
+    <string name="help">Help</string>
+    <string name="motor_config">Motor config</string>
+    <string name="navigation">Navigation</string>
+    <string name="parameters">Parameters</string>
+    <string name="qrcode">Scan this QR code</string>
+    <string name="system_config">System config</string>
+    <string name="calibration">Calibration</string>
+    <string name="history">History</string>
+    <string name="program">Program</string>
+    <string name="update">Update</string>
+    <string name="update_available">Update available</string>
+    <string name="version">Version</string>
+    <string name="network">Network</string>
+    <string name="downloading">Downloading</string>
+    <string name="speed">Speed</string>
+    <string name="acceleration">Acceleration</string>
+    <string name="deceleration">Deceleration</string>
+    <string name="delete">Delete</string>
+    <string name="setting">Setting</string>
+    <string name="notice_content">1. Do not open the drawer while the kinematic mechanism is running.\n2.Make sure you have enough washing liquid before performing the procedure.\n3. Please clean the container in time after the procedure.\n4. Immediate power off after the end of the experiment prolongs the life of Tec.\n5. Please read the instruction manual before use.</string>
+    <string name="notice">Notice</string>
+    <string name="confirm">Confirm</string>
+    <string name="blocking">Blocking</string>
+    <string name="washing">Washing</string>
+    <string name="primary_antibody">Primary Antibody</string>
+    <string name="secondary_antibody">Secondary Antibody</string>
+    <string name="phosphate_buffered_saline">Phosphate Buffered Saline</string>
+    <string name="up">Up</string>
+    <string name="down">Down</string>
+    <string name="debug">Debug</string>
+    <string name="copyright">Copyright © 2023 Zktony Inc. All rights reserved.</string>
+</resources>
