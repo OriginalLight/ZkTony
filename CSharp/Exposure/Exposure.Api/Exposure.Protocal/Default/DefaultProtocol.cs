@@ -379,8 +379,7 @@ public class DefaultProtocol
         return new Protocol
         {
             Address = 0x01,
-            Function = 0xA0,
-            End = [0xFF, 0xFC, 0xFF, 0xFF]
+            Function = 0xA0
         };
     }
 
@@ -400,8 +399,7 @@ public class DefaultProtocol
         {
             Address = 0x01,
             Function = 0xA1,
-            Data = [data1[0], data1[1], data2[0], data2[1]],
-            End = [0xFF, 0xFC, 0xFF, 0xFF]
+            Data = [data1[0], data1[1], data2[0], data2[1]]
         };
     }
     
@@ -424,8 +422,7 @@ public class DefaultProtocol
         {
             Address = 0x01,
             Function = 0xA2,
-            Data = [data1[0], data1[1], data1[2], data1[3], data2[0], data2[1], data2[2], data2[3]],
-            End = [0xFF, 0xFC, 0xFF, 0xFF]
+            Data = [data1[0], data1[1], data1[2], data1[3], data2[0], data2[1], data2[2], data2[3]]
         };
     }
     
@@ -442,8 +439,7 @@ public class DefaultProtocol
         {
             Address = 0x01,
             Function = 0xA3,
-            Data = data1.Concat(data).ToArray(),
-            End = [0xFF, 0xFC, 0xFF, 0xFF]
+            Data = data1.Concat(data).ToArray()
         };
     }
 
@@ -456,8 +452,7 @@ public class DefaultProtocol
         return new Protocol
         {
             Address = 0x01,
-            Function = 0xA4,
-            End = [0xFF, 0xFC, 0xFF, 0xFF]
+            Function = 0xA4
         };
     }
     

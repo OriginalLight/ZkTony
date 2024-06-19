@@ -327,7 +327,12 @@ public class MachineController(
     [Route("EmbeddedUpdate")]
     public async Task<IActionResult> EmbeddedUpdate()
     {
-        await serialPort.EmbeddedUpdate("C:\\Users\\ThinkBook\\Desktop\\test.bin");
+        var usb1 = usb.GetDefaultUsbDrive();
+        if (usb1 == null) throw new Exception(localizer.GetString("NoUsb").Value);
+        var files = usb1.RootDirectory.GetFiles();
+        var file = files.FirstOrDefault(p => p.Name.EndsWith(".bin"));
+        if (file == null) throw new Exception(localizer.GetString("NotFound"));
+        await serialPort.EmbeddedUpdate(file.FullName);
         return Ok();
     }
 
