@@ -227,6 +227,10 @@ import { hatch } from '@renderer/api/machine'
 import { useAppStore } from '@renderer/store'
 import useHomeState from '@renderer/states/home'
 
+const props = defineProps({
+  cycle: Boolean
+})
+
 const { options } = useHomeState()
 
 // 获取应用信息
@@ -289,6 +293,29 @@ watch(
     immediate: true
   }
 )
+
+watch(
+  () => props.cycle,
+  (value) => {
+    if (value) {
+      handleCycle()
+    }
+  },
+  {
+    immediate: true
+  }
+)
+
+const handleCycle = async () => {
+  try {
+    while (props.cycle) {
+      await handlePreview()
+      await delay(1000)
+    }
+  } catch (error) {
+    Message.error((error as Error).message)
+  }
+}
 
 const handleQualityChange = async (value: unknown) => {
   try {

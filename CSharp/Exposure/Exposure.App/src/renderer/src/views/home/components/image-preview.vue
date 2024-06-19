@@ -11,6 +11,17 @@
   </div>
   <div class="image-edit">
     <a-space size="medium">
+      <a-tooltip
+        v-if="userStore.role === 0"
+        placement="top"
+        :content="t('home.image.preview.cycle')"
+      >
+        <a-button type="primary" size="medium" @click="handleCycle">
+          <template #icon>
+            <Cycle />
+          </template>
+        </a-button>
+      </a-tooltip>
       <a-tooltip placement="top" :content="t('home.image.preview.brightness')">
         <a-popover position="br" trigger="click">
           <a-button type="primary" size="medium">
@@ -104,10 +115,13 @@
 <script lang="ts" setup>
 import { ref, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Brightness, Contrast, Refresh, Save } from '@icon-park/vue-next'
+import { Brightness, Contrast, Refresh, Save, Cycle } from '@icon-park/vue-next'
 import { Message } from '@arco-design/web-vue'
 import Slider from '@vueform/slider'
 import { Photo, adjustPhoto } from '@renderer/api/album'
+import { useUserStore } from '@renderer/store'
+
+const userStore = useUserStore()
 
 const props = defineProps({
   image: {
@@ -116,7 +130,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['adjust'])
+const emit = defineEmits(['adjust', 'cycle'])
 
 const { t } = useI18n()
 
@@ -157,6 +171,11 @@ const handleSave = async () => {
   } finally {
     loading.value = false
   }
+}
+
+// 循环预览
+const handleCycle = () => {
+  emit('cycle')
 }
 
 watch(

@@ -1,10 +1,10 @@
 <template>
   <a-row class="container">
     <a-col :span="14" class="image-preview">
-      <ImagePreview :image="preview" @adjust="handlePhotoAdd" />
+      <ImagePreview :image="preview" @adjust="handlePhotoAdd" @cycle="cycle = !cycle" />
     </a-col>
     <a-col :span="10" class="operation">
-      <CameraOptions @shoot="handleShoot" @preview="handlePreview" />
+      <CameraOptions :cycle="cycle" @shoot="handleShoot" @preview="handlePreview" />
       <AlbumView
         :preview="preview"
         :albums="albums"
@@ -25,8 +25,11 @@ import CameraOptions from './components/camera-options.vue'
 import AlbumView from './components/album-view.vue'
 import { Album, Photo } from '@renderer/api/album'
 import useHomeState from '@renderer/states/home'
+import { ref } from 'vue'
 
 const { preview, selectedAlbums, selectedPhotos, albums, albumPreview } = useHomeState()
+
+const cycle = ref(false)
 
 // 拍摄
 const handleShoot = (album: Album) => {

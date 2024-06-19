@@ -5,6 +5,7 @@ export default {
   'home.image.preview.undo': 'Undo',
   'home.image.preview.redo': 'Reset',
   'home.image.preview.save': 'Save',
+  'home.image.preview.cycle': 'Cycle Preview',
   'home.camera.options.model': 'Model',
   'home.camera.options.auto': 'Auto',
   'home.camera.options.manual': 'Manual',

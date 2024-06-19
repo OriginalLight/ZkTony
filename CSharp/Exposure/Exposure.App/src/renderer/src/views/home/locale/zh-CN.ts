@@ -5,6 +5,7 @@ export default {
   'home.image.preview.undo': '撤销',
   'home.image.preview.redo': '重置',
   'home.image.preview.save': '保存',
+  'home.image.preview.cycle': '循环预览',
   'home.camera.options.model': '模式',
   'home.camera.options.auto': '自\u2002动',
   'home.camera.options.manual': '手\u2002动',
