@@ -12,7 +12,6 @@ import com.zktony.android.utils.SnackbarUtils
 @Composable
 fun ZktyApp(
     navController: NavHostController,
-    homeViewModel: HomeViewModel,
     snackbarHostState: SnackbarHostState
 ) {
     // 收集Snackbar消息
@@ -28,7 +27,6 @@ fun ZktyApp(
     Permissions {
         AppNavigation(
             navController = navController,
-            homeViewModel = homeViewModel,
             snackbarHostState = snackbarHostState
         )
     }

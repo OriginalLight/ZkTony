@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.util.Log
 import com.zktony.android.utils.AppStateUtils.hps
 import com.zktony.android.utils.AppStateUtils.hpv
+import com.zktony.log.LogUtils
+import com.zktony.room.entities.Fault
 import com.zktony.serialport.command.modbus.RtuProtocol
 import com.zktony.serialport.command.runze.RunzeProtocol
 import com.zktony.serialport.ext.toAsciiString
@@ -15,6 +17,7 @@ import com.zktony.serialport.serialPortOf
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
+import java.io.File
 import kotlin.math.absoluteValue
 
 object SerialPortUtils {
@@ -25,12 +28,30 @@ object SerialPortUtils {
             device = "/dev/ttyS2"
             baudRate = 115200
             log = true
-        }?.let { SerialStoreUtils.put("rtu", it) }
+        }?.let {
+            SerialStoreUtils.put("rtu", it)
+            LogUtils.info("ttyS2 串口初始化完成", true)
+        }
         // 初始化tec串口
         serialPortOf {
             device = "/dev/ttyS0"
             baudRate = 57600
-        }?.let { SerialStoreUtils.put("tec", it) }
+        }?.let {
+            SerialStoreUtils.put("tec", it)
+            LogUtils.info("ttyS0 串口初始化完成", true)
+        }
+
+        HzmctUtils.setNavigationStatus(true)
+
+        val usbs = StorageUtils.getUsbStorageDir()
+        if (usbs.isNotEmpty()) {
+            val usb = usbs[0]
+            val file = File(usb, "t111.txt")
+            if (!file.exists()) {
+                file.createNewFile()
+            }
+            file.writeText("Hello, World!")
+        }
         // rtu串口全局回调
 //        SerialStoreUtils.get("rtu")?.registerCallback("globe") { bytes ->
 //            if (bytes[0] == 0xCC.toByte()) {

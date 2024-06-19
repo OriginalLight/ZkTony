@@ -5,16 +5,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -52,14 +49,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zktony.android.R
-import com.zktony.android.ui.IncubationState
 import com.zktony.android.ui.utils.selectedColor
 import com.zktony.android.utils.extra.dateFormat
-import com.zktony.android.utils.extra.timeFormat
 import com.zktony.room.entities.Calibration
 import com.zktony.room.entities.History
 import com.zktony.room.entities.Motor
@@ -731,80 +725,4 @@ fun MotorItem(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
     )
-}
-
-@Composable
-fun ModuleItem(
-    index: Int,
-    selected: Int,
-    stateList: List<IncubationState>,
-    insulation: List<Double>,
-    onClick: () -> Unit
-) {
-    val state = stateList.find { it.index == index } ?: IncubationState()
-
-    Box {
-        Column(
-            modifier = Modifier
-                .sizeIn(minWidth = 196.dp, minHeight = 96.dp)
-                .background(
-                    color = selectedColor(index == selected),
-                    shape = MaterialTheme.shapes.small
-                )
-                .clip(MaterialTheme.shapes.small)
-                .clickable { onClick() }
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Bottom,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-
-            val message = when (state.flags) {
-                0 -> "已就绪"
-                1 -> state.time.timeFormat()
-                2 -> "已完成"
-                3 -> "等待中"
-                4 -> "加液中"
-                5 -> "排液中"
-                6 -> "回收中"
-                else -> "未知"
-            }
-
-            Text(
-                text = message,
-                style = MaterialTheme.typography.headlineSmall,
-                fontStyle = FontStyle.Italic
-            )
-        }
-
-        Text(
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .offset {
-                    IntOffset(
-                        x = -16.dp.roundToPx(),
-                        y = -32.dp.roundToPx()
-                    )
-                },
-            text = "${'A' + index}",
-            style = TextStyle(
-                fontSize = 64.sp,
-                fontStyle = FontStyle.Italic,
-                color = if (index == selected) Color.Blue else Color.Black
-            )
-        )
-
-        Text(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .offset {
-                    IntOffset(
-                        x = -8.dp.roundToPx(),
-                        y = 4.dp.roundToPx()
-                    )
-                },
-            text = "${insulation.getOrNull(index + 1) ?: 0.0} ℃",
-            style = MaterialTheme.typography.bodyMedium,
-            fontStyle = FontStyle.Italic
-        )
-    }
 }

@@ -101,7 +101,9 @@ dependencies {
 
     ksp(libs.hilt.compiler)
 
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
     implementation(project(mapOf("path" to ":App_DataStore")))
+    implementation(project(mapOf("path" to ":App_Log")))
     implementation(project(mapOf("path" to ":App_Room")))
     implementation(project(mapOf("path" to ":Lib_SerialPort")))
 

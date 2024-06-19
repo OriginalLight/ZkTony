@@ -2,7 +2,10 @@ package com.zktony.android
 
 import android.app.Application
 import com.zktony.android.utils.ApplicationUtils
+import com.zktony.android.utils.HzmctUtils
 import com.zktony.android.utils.SerialPortUtils
+import com.zktony.android.utils.StorageUtils
+import com.zktony.log.LogUtils
 import dagger.hilt.android.HiltAndroidApp
 
 /**
@@ -18,7 +21,12 @@ class App : Application() {
         super.onCreate()
 
         // Initialize the application context
+        StorageUtils.with(this)
+        LogUtils.with(this)
         ApplicationUtils.with(this)
+        HzmctUtils.with(this)
+
+        // Initialize the application without context
         SerialPortUtils.with()
     }
 }

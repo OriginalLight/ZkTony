@@ -4,12 +4,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Terminal
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.zktony.android.R
 
 object Route {
+    const val LOGIN = "Login"
     const val HOME = "Home"
     const val PROGRAM = "Program"
     const val CALIBRATION = "Calibration"
@@ -52,6 +55,11 @@ class NavigationActions(private val navController: NavHostController) {
 
     fun popBackStack() {
         navController.popBackStack()
+    }
+
+    @Composable
+    fun isCurrentRoute(route: String): Boolean {
+        return navController.currentBackStackEntryAsState().value?.destination?.route == route
     }
 }
 

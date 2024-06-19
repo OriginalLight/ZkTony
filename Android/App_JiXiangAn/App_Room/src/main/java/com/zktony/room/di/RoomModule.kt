@@ -3,6 +3,8 @@ package com.zktony.room.di
 import android.content.Context
 import androidx.room.Room
 import com.zktony.room.AppDatabase
+import com.zktony.room.dao.FaultDao
+import com.zktony.room.repository.FaultRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,4 +36,11 @@ object RoomModule {
 
     @Provides
     fun programDao(database: AppDatabase) = database.ProgramDao()
+
+    @Provides
+    fun faultDao(database: AppDatabase) = database.FaultDao()
+
+    // Repository
+    @Provides
+    fun faultRepository(faultDao: FaultDao) = FaultRepository(faultDao)
 }

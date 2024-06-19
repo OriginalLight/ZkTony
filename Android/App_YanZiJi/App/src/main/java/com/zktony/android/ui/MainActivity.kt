@@ -40,8 +40,6 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             val navigationActions = remember(navController) { NavigationActions(navController) }
             val snackbarHostState = remember { SnackbarHostState() }
-            // Create the HomeViewModel instance with activity scope
-            val homeViewModel: HomeViewModel = hiltViewModel()
 
             CompositionLocalProvider(
                 LocalDataSaver provides dataSaverDataStore,
@@ -51,7 +49,6 @@ class MainActivity : ComponentActivity() {
                 AppTheme {
                     ZktyApp(
                         navController = navController,
-                        homeViewModel = homeViewModel,
                         snackbarHostState = snackbarHostState
                     )
                 }

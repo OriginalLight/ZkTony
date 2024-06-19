@@ -17,5 +17,6 @@ dependencyResolutionManagement {
 rootProject.name = "App"
 include(":App")
 include(":App_DataStore")
+include(":App_Log")
 include(":App_Room")
 include(":Lib_SerialPort")

@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.util.Log
 import com.zktony.android.utils.AppStateUtils.hps
 import com.zktony.android.utils.AppStateUtils.hpv
+import com.zktony.log.LogUtils
+import com.zktony.room.entities.Fault
 import com.zktony.serialport.command.modbus.RtuProtocol
 import com.zktony.serialport.command.runze.RunzeProtocol
 import com.zktony.serialport.ext.toAsciiString
@@ -31,6 +33,8 @@ object SerialPortUtils {
             device = "/dev/ttyS0"
             baudRate = 57600
         }?.let { SerialStoreUtils.put("tec", it) }
+        LogUtils.info("串口初始化完成", true)
+        LogUtils.fault(Fault(code = "E0001", description = "串口初始化完成", severity = 0))
         // rtu串口全局回调
 //        SerialStoreUtils.get("rtu")?.registerCallback("globe") { bytes ->
 //            if (bytes[0] == 0xCC.toByte()) {

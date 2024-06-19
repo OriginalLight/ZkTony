@@ -365,7 +365,7 @@ fun SettingContent(
                             modifier = Modifier
                                 .size(200.dp)
                                 .align(Alignment.Center),
-                            painter = painterResource(id = R.mipmap.qrcode),
+                            painter = painterResource(id = R.mipmap.wx),
                             contentDescription = null
                         )
                     }

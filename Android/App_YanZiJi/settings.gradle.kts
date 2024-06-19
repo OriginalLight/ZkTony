@@ -14,8 +14,9 @@ dependencyResolutionManagement {
         maven { url = uri("https://jitpack.io") }
     }
 }
-rootProject.name = "App"
+rootProject.name = "App_YanZiJi"
 include(":App")
 include(":App_DataStore")
+include(":App_Log")
 include(":App_Room")
 include(":Lib_SerialPort")

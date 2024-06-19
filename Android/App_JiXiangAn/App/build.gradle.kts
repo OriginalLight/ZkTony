@@ -102,6 +102,7 @@ dependencies {
     ksp(libs.hilt.compiler)
 
     implementation(project(mapOf("path" to ":App_DataStore")))
+    implementation(project(mapOf("path" to ":App_Log")))
     implementation(project(mapOf("path" to ":App_Room")))
     implementation(project(mapOf("path" to ":Lib_SerialPort")))
 
