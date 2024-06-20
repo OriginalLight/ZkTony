@@ -153,26 +153,21 @@ class HomeViewModel @Inject constructor(
             }
             delay(10)
 
-            val orificePlates = selected.orificePlates.first()
-            delay(10)
+            var orificePlates = selected.orificePlates.first()
 
-            // 更新状态 status = 2 的孔位
-            _selected.value = _selected.value?.copy(
-                orificePlates = _selected.value?.orificePlates?.map {
-                    if (it == orificePlates) {
-                        it.copy(
-                            orifices = it.orifices.map { o ->
-                                if (o.status == 2) {
-                                    o.copy(status = 1)
-                                } else {
-                                    o
-                                }
-                            }
-                        )
+            orificePlates = orificePlates.copy(
+                orifices = orificePlates.orifices.map {
+                    if (it.status == 2) {
+                        it.copy(status = 1)
                     } else {
                         it
                     }
-                } ?: emptyList()
+                }
+            )
+
+            // 更新状态 status = 2 的孔位
+            _selected.value = selected.copy(
+                orificePlates = listOf(orificePlates)
             )
 
             previousAlgorithm(orificePlates)
@@ -281,7 +276,7 @@ class HomeViewModel @Inject constructor(
                         if (i * 6 + t < row) {
                             val orifice = op.orifices.find { it.row == i * 6 + t && it.column == j }
                             orifice?.let { o ->
-                                if (o.status == 1) {
+                                if (o.status > 0) {
                                     with(index = 2 + t, pdv = o.volume.getOrNull(0) ?: 0.0)
                                     // op.orifices
                                     oes = oes.map {
