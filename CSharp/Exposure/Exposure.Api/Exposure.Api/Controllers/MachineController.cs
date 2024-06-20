@@ -324,8 +324,8 @@ public class MachineController(
     #region 下位机更新
 
     [HttpGet]
-    [Route("EmbeddedUpdate")]
-    public async Task<IActionResult> EmbeddedUpdate()
+    [Route("UpdateFirmware")]
+    public async Task<IActionResult> UpdateFirmware()
     {
         var usb1 = usb.GetDefaultUsbDrive();
         if (usb1 == null) throw new Exception(localizer.GetString("NoUsb").Value);

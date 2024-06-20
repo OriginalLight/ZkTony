@@ -50,5 +50,7 @@ export default {
   'settings.factory.aging': '老化',
   'settings.factory.reset': '恢复出厂设置',
   'settings.factory.reset.confirm':
-    '确定恢复出厂设置吗？错误日志和操作日志将被清空，所有图片和数据将被删除！不可恢复！'
+    '确定恢复出厂设置吗？错误日志和操作日志将被清空，所有图片和数据将被删除！不可恢复！',
+  'settings.factory.updateFirmware': '下位机升级',
+  'settings.factory.updateFirmware.confirm': '确定升级下位机吗？请勿断电！'
 }

@@ -76,3 +76,8 @@ export function update() {
 export function reset() {
   return axios.get('/Machine/Reset')
 }
+
+// 下位机更新
+export function updateFirmware() {
+  return axios.get('/Machine/UpdateFirmware')
+}

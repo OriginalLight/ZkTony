@@ -51,5 +51,8 @@ export default {
   'settings.factory.aging': 'Aging',
   'settings.factory.reset': 'Factory Reset',
   'settings.factory.reset.confirm':
-    'Are you sure you want to restore the factory settings? Error logs and operation logs will be cleared, and all images and data will be deleted! Not recoverable!'
+    'Are you sure you want to restore the factory settings? Error logs and operation logs will be cleared, and all images and data will be deleted! Not recoverable!',
+  'settings.factory.updateFirmware': 'Update Firmware',
+  'settings.factory.updateFirmware.confirm':
+    'Are you sure you want to upgrade the firmware? Do not power off!'
 }
