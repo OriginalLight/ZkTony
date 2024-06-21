@@ -52,8 +52,12 @@
         </a-list-item-meta>
         <template #actions>
           <a-space>
-            <a-tag v-if="version.ver2 != ''"> {{ version.ver2 }} </a-tag>
-            <a-tag v-if="version.ver1 != ''"> {{ version.ver1 }} </a-tag>
+            <a-tag v-if="version.ver2 != ''">
+              {{ t('settings.system.version.framework') + version.ver2 }}
+            </a-tag>
+            <a-tag v-if="version.ver1 != ''">
+              {{ t('settings.system.version.software') + version.ver1 }}
+            </a-tag>
           </a-space>
         </template>
       </a-list-item>

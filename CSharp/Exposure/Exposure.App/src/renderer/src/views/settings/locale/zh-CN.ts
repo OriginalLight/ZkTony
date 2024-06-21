@@ -25,6 +25,8 @@ export default {
   'settings.system.sound.2': '语音模式',
   'settings.system.errlog.title': '错误日志',
   'settings.system.version.title': '版本信息',
+  'settings.system.version.software': '软件\u2002',
+  'settings.system.version.framework': '固件\u2002',
   'settings.system.machine.title': '设备序列号',
   'settings.system.update': '检查更新',
   'settings.system.update.check': '检查更新',
@@ -51,6 +53,6 @@ export default {
   'settings.factory.reset': '恢复出厂设置',
   'settings.factory.reset.confirm':
     '确定恢复出厂设置吗？错误日志和操作日志将被清空，所有图片和数据将被删除！不可恢复！',
-  'settings.factory.updateFirmware': '下位机升级',
+  'settings.factory.updateFirmware': '固件升级',
   'settings.factory.updateFirmware.confirm': '确定升级下位机吗？请勿断电！'
 }

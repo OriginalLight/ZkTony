@@ -25,6 +25,8 @@ export default {
   'settings.system.sound.2': 'Voice',
   'settings.system.errlog.title': 'Error Log',
   'settings.system.version.title': 'Version',
+  'settings.system.version.software': 'Software\u2002',
+  'settings.system.version.framework': 'Firmware\u2002',
   'settings.system.machine.title': 'Machine ID',
   'settings.system.update': 'Update',
   'settings.system.update.check': 'Update',

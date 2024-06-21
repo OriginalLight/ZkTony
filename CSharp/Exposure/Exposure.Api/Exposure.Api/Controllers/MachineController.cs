@@ -221,7 +221,7 @@ public class MachineController(
     {
         var ver1 = (Assembly.GetEntryAssembly() ?? throw new InvalidOperationException())
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-            ?.InformationalVersion;
+            ?.InformationalVersion.Split("+")[0];
         var ver2 = serialPort.GetVer();
 
         var dict = new Dictionary<string, string?>
