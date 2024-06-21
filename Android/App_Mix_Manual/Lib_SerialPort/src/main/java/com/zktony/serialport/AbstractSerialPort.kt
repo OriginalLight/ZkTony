@@ -4,7 +4,7 @@ import android.util.Log
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.core.SerialPort
 import com.zktony.serialport.ext.toHexString
-import com.zktony.serialport.utils.writeThread
+import com.zktony.serialport.utils.log
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
@@ -30,7 +30,7 @@ abstract class AbstractSerialPort {
     private val buffer = ByteArrayOutputStream()
     private val byteArrayQueue = LinkedBlockingQueue<ByteArray>()
 
-    val callbacks : MutableMap<String, (ByteArray) -> Unit> = ConcurrentHashMap()
+    val callbacks: MutableMap<String, (ByteArray) -> Unit> = ConcurrentHashMap()
 
     /**
      * Open the serial port
@@ -100,9 +100,10 @@ abstract class AbstractSerialPort {
             if (buffer.size() > 0) {
                 try {
                     if (config.log) {
-                        Log.i(config.device, "RX: ${buffer.toByteArray().toHexString()}")
-                        Log.i(config.device, "Callbacks: ${callbacks.keys}")
-                        writeThread("RX: ${buffer.toByteArray().toHexString()}")
+                        log(
+                            config.device,
+                            "RX: ${buffer.toByteArray().toHexString()}"
+                        )
                     }
                     callbacks.values.forEach { it.invoke((buffer.toByteArray())) }
                 } catch (ex: Exception) {
@@ -157,9 +158,9 @@ abstract class AbstractSerialPort {
                 try {
                     val message = byteArrayQueue.poll(config.delay, TimeUnit.MILLISECONDS)
                     if (message != null) {
+                        println("message====$message")
                         if (config.log) {
-                            Log.i(config.device, "TX: ${message.toHexString()}")
-                            writeThread("TX: ${message.toHexString()}")
+                            log(config.device, "TX: ${message.toHexString()}")
                         }
                         send(message)
                     }

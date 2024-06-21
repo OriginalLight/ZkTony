@@ -338,25 +338,13 @@ private fun getStoragePath(context: Context, isUsb: Boolean): String? {
             if (isUsb == usb) { //usb
                 assert(file != null)
                 path = file.getAbsolutePath()
-                Log.d(
-                    "Progarm",
-                    "usb的path=====$path"
-                )
             } else if (!isUsb == sd) { //sd
                 assert(file != null)
                 path = file.getAbsolutePath()
             }
         }
     } catch (e: Exception) {
-        Log.d(
-            "Progarm",
-            "获取usb地址异常=====" + e.printStackTrace()
-        )
         e.printStackTrace()
     }
-    Log.d(
-        "Progarm",
-        "usb的path===未获取到==$path"
-    )
     return path
 }

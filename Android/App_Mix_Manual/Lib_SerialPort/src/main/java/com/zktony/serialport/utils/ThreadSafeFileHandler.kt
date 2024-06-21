@@ -24,7 +24,7 @@ fun writeThread(content: String) {
     val file = File("sdcard/Download/log_${currentDate.substringBefore(" ")}.txt")
     if (!file.exists()) {
         if (file.createNewFile()) {
-            Log.i("创建日志", "创建${currentDate}日志成功")
+            log("创建日志", "创建${currentDate}日志成功")
         }
     }
 

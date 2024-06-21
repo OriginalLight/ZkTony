@@ -8,6 +8,7 @@ import com.zktony.serialport.ext.toAsciiString
 import com.zktony.serialport.ext.writeInt16LE
 import com.zktony.serialport.ext.writeInt32LE
 import com.zktony.serialport.lifecycle.SerialStoreUtils
+import com.zktony.serialport.utils.log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -19,10 +20,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import java.io.File
 
-suspend fun embeddedUpgrade(hexFile: File) = channelFlow {
-    val key = "embeddedUpgrade"
+suspend fun embeddedUpgrade(hexFile: File,keyName:String,serialName:String) = channelFlow {
+    val key = keyName
     val byteLength = 1024
-    val serialPort = SerialStoreUtils.get("zkty") ?: return@channelFlow
+    val serialPort = SerialStoreUtils.get(serialName) ?: return@channelFlow
     try {
         var flag = -1
         var rx: Boolean
@@ -32,7 +33,7 @@ suspend fun embeddedUpgrade(hexFile: File) = channelFlow {
                 launch {
                     when(it.func) {
                         0xA0.toByte() -> {
-                            Log.d("EmbeddedExt", "升级准备就绪")
+                            log("EmbeddedExt", "升级准备就绪")
                             flag = if (it.data.readInt8() == 1) {
                                 -1
                             } else {
@@ -40,7 +41,7 @@ suspend fun embeddedUpgrade(hexFile: File) = channelFlow {
                             }
                         }
                         0xA1.toByte() -> {
-                            Log.d("EmbeddedExt", "升级数据信息就绪")
+                            log("EmbeddedExt", "升级数据信息就绪")
                             flag = if (it.data.readInt8() == 1) {
                                 -1
                             } else {
@@ -48,7 +49,7 @@ suspend fun embeddedUpgrade(hexFile: File) = channelFlow {
                             }
                         }
                         0xA2.toByte() -> {
-                            Log.d("EmbeddedExt", "地址擦除就绪")
+                            log("EmbeddedExt", "地址擦除就绪")
                             flag = if (it.data.readInt8() == 1) {
                                 -1
                             } else {
@@ -69,11 +70,11 @@ suspend fun embeddedUpgrade(hexFile: File) = channelFlow {
                             } else {
                                 send(UpgradeState.Success)
                                 flag = 3
-                                Log.d("EmbeddedExt", "升级成功")
+                                log("EmbeddedExt", "升级成功")
                             }
                         }
                         else -> {
-                            Log.d("EmbeddedExt", "未知命令")
+                            log("EmbeddedExt", "未知命令")
                         }
                     }
                 }

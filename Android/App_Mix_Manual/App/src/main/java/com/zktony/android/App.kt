@@ -2,6 +2,7 @@ package com.zktony.android
 
 import android.app.Application
 import com.zktony.android.utils.ApplicationUtils
+import com.zktony.android.utils.LogUtils
 import com.zktony.android.utils.SerialPortUtils
 import dagger.hilt.android.HiltAndroidApp
 

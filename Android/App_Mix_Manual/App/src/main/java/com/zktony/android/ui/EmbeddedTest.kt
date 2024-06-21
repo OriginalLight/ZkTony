@@ -42,7 +42,8 @@ fun EmbeddedTest(uiEventHome: (HomeIntent) -> Unit) {
     SideEffect {
         scope.launch {
             val media = getStoragePath(context, true)
-            binList = File(media).listFiles { _, name -> name.endsWith(".bin") }?.toList() ?: emptyList()
+            binList =
+                File(media).listFiles { _, name -> name.endsWith(".bin") }?.toList() ?: emptyList()
         }
     }
 
@@ -60,12 +61,17 @@ fun EmbeddedTest(uiEventHome: (HomeIntent) -> Unit) {
                                 text = "文件不存在"
                                 return@launch
                             }
-                            embeddedUpgrade(it).collect {
-                                text = when(it) {
+                            embeddedUpgrade(it, "state", "led").collect {
+                                text = when (it) {
                                     is UpgradeState.Message -> it.message
                                     is UpgradeState.Success -> "升级成功"
                                     is UpgradeState.Err -> "${it.t.message}"
-                                    is UpgradeState.Progress -> "升级中 ${String.format("%.2f", it.progress * 100)} %"
+                                    is UpgradeState.Progress -> "升级中 ${
+                                        String.format(
+                                            "%.2f",
+                                            it.progress * 100
+                                        )
+                                    } %"
                                 }
                             }
                         }

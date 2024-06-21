@@ -16,6 +16,7 @@ import com.zktony.android.utils.AlgorithmUtils.calculateCalibrationFactor
 import com.zktony.android.utils.AlgorithmUtils.calculateCalibrationFactorNew
 import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.AppStateUtils.hpc
+import com.zktony.serialport.utils.log
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
@@ -63,39 +64,39 @@ class CalibrationService @Inject constructor(
 
             val currentTime = System.currentTimeMillis()
 
-            Log.d(
-                "writeThread",
+            log(
+                "CalibrationService",
                 "判断删除命令日志文件的当前时间:$currentTime"
             )
 
             if (binList.size > 7) {
                 binList.forEach {
-                    Log.d(
-                        "writeThread",
+                    log(
+                        "CalibrationService",
                         "Filename======${it.name}"
                     )
-                    Log.d(
-                        "writeThread",
+                    log(
+                        "CalibrationService",
                         "命令日志文件名称:${it.name},文件最后修改的时间:${it.lastModified()}"
                     )
 
                     if (currentTime - it.lastModified() > TimeUnit.DAYS.toMillis(7)) {
                         it.delete()
-                        Log.d(
-                            "writeThread",
+                        log(
+                            "CalibrationService",
                             "删除命令日志文件是否成功:${it.delete()},删除的文件名称:${it.name}"
                         )
                     } else {
-                        Log.d(
-                            "writeThread",
+                        log(
+                            "CalibrationService",
                             "删除命令日志文件的时间不够,时间差是:${currentTime - it.lastModified()}"
                         )
                     }
 
                 }
             } else {
-                Log.d(
-                    "writeThread",
+                log(
+                    "CalibrationService",
                     "命令日志文件小于7的具体文件数量:${binList.size}"
                 )
             }
@@ -106,16 +107,8 @@ class CalibrationService @Inject constructor(
             sportsLogDao.deleteByDate(date1)
             val erAll = erDao.getList()
 
-            Log.d(
-                "experimentRecord",
-                "=========experimentRecord========${erAll.size}"
-            )
             if (erAll.isNotEmpty()) {
                 erAll.forEach {
-                    Log.d(
-                        "experimentRecord",
-                        "=========experimentRecord========$it"
-                    )
                     if (it.status == EPStatus.RUNNING) {
                         it.status = EPStatus.ABORT
                         erDao.update(it)
@@ -127,28 +120,24 @@ class CalibrationService @Inject constructor(
 
             var newCalibrations = ncDao.getById(1L)
             newCalibrations.collect { newCalibration ->
-                Log.d(
-                    "CalibrationService",
-                    "newCalibration=========$newCalibration"
-                )
 
                 if (newCalibration != null) {
-                    Log.d(
+                    log(
                         "CalibrationService",
                         "newCalibration.higeAvg=========" + newCalibration.higeAvg
                     )
 
-                    Log.d(
+                    log(
                         "CalibrationService",
                         "newCalibration.lowAvg=========" + newCalibration.lowAvg
                     )
 
-                    Log.d(
+                    log(
                         "CalibrationService",
                         "newCalibration.rinseAvg=========" + newCalibration.rinseAvg
                     )
 
-                    Log.d(
+                    log(
                         "CalibrationService",
                         "newCalibration.coagulantAvg=========" + newCalibration.coagulantAvg
                     )
@@ -183,7 +172,7 @@ class CalibrationService @Inject constructor(
 
 
                 } else {
-                    Log.d(
+                    log(
                         "CalibrationService",
                         "=========插入默认校准数据========"
                     )
@@ -195,7 +184,7 @@ class CalibrationService @Inject constructor(
                             1.0, 1.6, 1.6, 1.6, 1.6
                         )
                     )
-                    Log.d(
+                    log(
                         "CalibrationService",
                         "=========插入默认校准数据完成....插入默认设置数据开始========"
                     )
@@ -208,7 +197,7 @@ class CalibrationService @Inject constructor(
 
                     expectedDao.insert(Expected())
 
-                    Log.d(
+                    log(
                         "CalibrationService",
                         "=========插入默认设置数据完成========"
                     )

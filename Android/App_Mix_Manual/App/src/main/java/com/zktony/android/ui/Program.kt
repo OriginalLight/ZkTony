@@ -915,16 +915,8 @@ fun ProgramList(
                     modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
                         containerColor = Color(rgb(0, 105, 52))
                     ), onClick = {
-                        Log.d(
-                            "Test",
-                            "删除选中的selectedIndex===$selectedIndex"
-                        )
                         if (entitiesList.size > 0) {
                             val entity = entities[selectedIndex]
-                            Log.d(
-                                "Test",
-                                "删除选中的entity===$entity==="
-                            )
                             if (entity != null) {
                                 if (programId.value == entity.id) {
                                     Toast.makeText(
