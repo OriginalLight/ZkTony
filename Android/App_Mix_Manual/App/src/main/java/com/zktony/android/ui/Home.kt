@@ -85,6 +85,7 @@ import com.zktony.android.ui.utils.toList
 import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.extra.format
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.regex.Pattern
 
@@ -373,6 +374,11 @@ fun operate(
     var highCoagulantSweepState by remember {
         mutableStateOf(0f)
     }
+
+    /**
+     * 复位按钮是否点击
+     */
+    var isResetButton1Enabled by remember { mutableStateOf(true) }
 
 
     /**
@@ -836,24 +842,25 @@ fun operate(
                         modifier = Modifier
                             .size(63.dp, 63.dp)
                             .clickable {
-                                if (job == null) {
-                                    if (uiFlags is UiFlags.None) {
-                                        if (wasteprogress >= 0.9f) {
-                                            uiEvent(HomeIntent.CleanWaste)
-                                            wasteDialog.value = true
-                                        } else {
-                                            if (expectedMakeNum.value > 0) {
-                                                uiEvent(HomeIntent.Calculate)
-                                                guleDialog.value = true
+                                if (isResetButton1Enabled) {
+                                    if (job == null) {
+                                        if (uiFlags is UiFlags.None) {
+                                            if (wasteprogress >= 0.9f) {
+                                                uiEvent(HomeIntent.CleanWaste)
+                                                wasteDialog.value = true
                                             } else {
-                                                Toast
-                                                    .makeText(
-                                                        context,
-                                                        "预计制胶数量不能为0!",
-                                                        Toast.LENGTH_SHORT
-                                                    )
-                                                    .show()
-                                            }
+                                                if (expectedMakeNum.value > 0) {
+                                                    uiEvent(HomeIntent.Calculate)
+                                                    guleDialog.value = true
+                                                } else {
+                                                    Toast
+                                                        .makeText(
+                                                            context,
+                                                            "预计制胶数量不能为0!",
+                                                            Toast.LENGTH_SHORT
+                                                        )
+                                                        .show()
+                                                }
 //                                            if (AppStateUtils.hpe[1] == null) {
 //                                                Toast
 //                                                    .makeText(
@@ -876,19 +883,21 @@ fun operate(
 //                                                        .show()
 //                                                }
 //                                            }
+                                            }
+                                        } else {
+                                            Toast
+                                                .makeText(
+                                                    context,
+                                                    "正在运行中,请稍后再操作！",
+                                                    Toast.LENGTH_SHORT
+                                                )
+                                                .show()
                                         }
                                     } else {
-                                        Toast
-                                            .makeText(
-                                                context,
-                                                "正在运行中,请稍后再操作！",
-                                                Toast.LENGTH_SHORT
-                                            )
-                                            .show()
+                                        stopGlueDialog.value = true
                                     }
-                                } else {
-                                    stopGlueDialog.value = true
                                 }
+
                             }
                     )
 
@@ -906,17 +915,18 @@ fun operate(
                                                 wasteDialog.value = true
                                             } else {
                                                 if (uiFlags is UiFlags.None) {
-                                                    if (AppStateUtils.hpe[1] == null) {
-                                                        Toast
-                                                            .makeText(
-                                                                context,
-                                                                "上下位机已失联！",
-                                                                Toast.LENGTH_SHORT
-                                                            )
-                                                            .show()
-                                                    } else {
-                                                        uiEvent(HomeIntent.Pipeline(1))
-                                                    }
+//                                                    if (AppStateUtils.hpe[1] == null) {
+//                                                        Toast
+//                                                            .makeText(
+//                                                                context,
+//                                                                "上下位机已失联！",
+//                                                                Toast.LENGTH_SHORT
+//                                                            )
+//                                                            .show()
+//                                                    } else {
+//                                                        uiEvent(HomeIntent.Pipeline(1))
+//                                                    }
+                                                    uiEvent(HomeIntent.Pipeline(1))
                                                 }
                                             }
                                         }
@@ -962,17 +972,18 @@ fun operate(
                                                 wasteDialog.value = true
                                             } else {
                                                 if (uiFlags is UiFlags.None || (uiFlags is UiFlags.Objects && uiFlags.objects == 2)) {
-                                                    if (AppStateUtils.hpe[1] == null) {
-                                                        Toast
-                                                            .makeText(
-                                                                context,
-                                                                "上下位机已失联！",
-                                                                Toast.LENGTH_SHORT
-                                                            )
-                                                            .show()
-                                                    } else {
-                                                        uiEvent(HomeIntent.Clean)
-                                                    }
+//                                                    if (AppStateUtils.hpe[1] == null) {
+//                                                        Toast
+//                                                            .makeText(
+//                                                                context,
+//                                                                "上下位机已失联！",
+//                                                                Toast.LENGTH_SHORT
+//                                                            )
+//                                                            .show()
+//                                                    } else {
+//                                                        uiEvent(HomeIntent.Clean)
+//                                                    }
+                                                    uiEvent(HomeIntent.Clean)
                                                 }
                                             }
                                         }
@@ -1011,6 +1022,12 @@ fun operate(
                             .size(63.dp, 63.dp)
                             .clickable {
                                 if (uiFlags is UiFlags.None) {
+                                    scope.launch {
+                                        isResetButton1Enabled = false
+                                        uiEvent(HomeIntent.Reset)
+                                        delay(500)
+                                        isResetButton1Enabled = true
+                                    }
 //                                    if (AppStateUtils.hpe[1] == null) {
 //                                        Toast
 //                                            .makeText(
@@ -1022,7 +1039,7 @@ fun operate(
 //                                    } else {
 //                                        uiEvent(HomeIntent.Reset)
 //                                    }
-                                    uiEvent(HomeIntent.Reset)
+
                                 } else {
                                     Toast
                                         .makeText(
@@ -1436,21 +1453,25 @@ fun operate(
                                 containerColor = Color(rgb(0, 105, 52))
                             ),
                             onClick = {
-                                if (calculate >= expectedMakeNum.value) {
-                                    waterSweepState = watermother
-                                    coagulantSweepState = coagulantmother
-                                    lowCoagulantSweepState = lowmother
-                                    highCoagulantSweepState = higemother
+                                if (job == null) {
+                                    if (uiFlags is UiFlags.None) {
+                                        if (calculate >= expectedMakeNum.value) {
+                                            waterSweepState = watermother
+                                            coagulantSweepState = coagulantmother
+                                            lowCoagulantSweepState = lowmother
+                                            highCoagulantSweepState = higemother
 
-                                    startMake = "停止制胶"
-                                    uiEvent(HomeIntent.Start(0))
-                                    guleDialog.value = false
-                                } else {
-                                    Toast.makeText(
-                                        context,
-                                        "剩余液量不足,请补充!",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                            startMake = "停止制胶"
+                                            uiEvent(HomeIntent.Start(0))
+                                            guleDialog.value = false
+                                        } else {
+                                            Toast.makeText(
+                                                context,
+                                                "剩余液量不足,请补充!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    }
                                 }
                             }) {
                             Text(fontSize = 18.sp, text = "确认")
@@ -1807,17 +1828,16 @@ fun operate(
                                         containerColor = Color(rgb(0, 105, 52))
                                     ),
                                     onClick = {
-                                        if ((lowCoagulant_ex.toIntOrNull() ?: 0) < 3) {
+                                        val temp = lowCoagulant_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 1) {
                                             Toast.makeText(
                                                 context,
-                                                "母液低浓度不能小于3",
+                                                "母液低浓度不能小于1",
                                                 Toast.LENGTH_SHORT
                                             ).show()
                                         } else {
-                                            if ((lowCoagulant_ex.toIntOrNull()
-                                                    ?: 0) <= program.startRange
-                                            ) {
-                                                if ((lowCoagulant_ex.toIntOrNull() ?: 0) > 0) {
+                                            if (temp <= program.startRange) {
+                                                if (temp > 0 && temp <= 30) {
                                                     lowCoagulant.value =
                                                         lowCoagulant_ex.toDoubleOrNull() ?: 0.0
                                                     uiEvent(HomeIntent.HigeLowMotherVol)
@@ -1825,7 +1845,7 @@ fun operate(
                                                 } else {
                                                     Toast.makeText(
                                                         context,
-                                                        "母液低浓度必须是整数并且大于0!",
+                                                        "母液低浓度必须大于0或小于等于30!",
                                                         Toast.LENGTH_SHORT
                                                     ).show()
                                                 }
@@ -1836,8 +1856,6 @@ fun operate(
                                                     Toast.LENGTH_SHORT
                                                 ).show()
                                             }
-
-
                                         }
                                     }) {
                                     Text(fontSize = 18.sp, text = "确认")
@@ -1973,10 +1991,10 @@ fun operate(
                                         containerColor = Color(rgb(0, 105, 52))
                                     ),
                                     onClick = {
-                                        if ((highCoagulant_ex.toIntOrNull()
-                                                ?: 0) >= program.endRange
-                                        ) {
-                                            if ((highCoagulant_ex.toIntOrNull() ?: 0) > 0) {
+                                        val temp = highCoagulant_ex.toDoubleOrNull() ?: 0.0
+
+                                        if (temp >= program.endRange) {
+                                            if (temp > 0 && temp <= 30) {
                                                 highCoagulant.value =
                                                     highCoagulant_ex.toDoubleOrNull() ?: 0.0
                                                 uiEvent(HomeIntent.HigeLowMotherVol)
@@ -1984,7 +2002,7 @@ fun operate(
                                             } else {
                                                 Toast.makeText(
                                                     context,
-                                                    "母液高浓度必须是整数并且大于0!",
+                                                    "母液高浓度必须大于0或小于等于30!",
                                                     Toast.LENGTH_SHORT
                                                 ).show()
                                             }
@@ -2146,14 +2164,14 @@ fun operate(
                                         highCoagulant_ex = entity.endRange.toString()
                                     } else {
                                         highCoagulant.value = 20.0
-                                        highCoagulant_ex = "20"
+                                        highCoagulant_ex = "20.0"
                                     }
                                     if (entity.startRange < 4) {
                                         lowCoagulant.value = entity.startRange
                                         lowCoagulant_ex = entity.startRange.toString()
                                     } else {
                                         lowCoagulant.value = 4.0
-                                        lowCoagulant_ex = "4"
+                                        lowCoagulant_ex = "4.0"
                                     }
 
 

@@ -25,7 +25,7 @@ class StartBuilder {
         ads: Triple<Long, Long, Long>? = null
     ) {
         val step = SerialPortUtils.pulse(index, pdv)
-        Log.d("", "index===$index====step===$step")
+//        Log.d("", "index===$index====step===$step")
         if (step != 0L) {
             val ba1 = ByteArray(5)
             val ba2 = ByteArray(12)

@@ -97,6 +97,7 @@ import com.zktony.android.utils.SerialPortUtils.lightYellow
 import com.zktony.android.utils.SerialPortUtils.start
 import com.zktony.android.utils.SerialPortUtils.version
 import com.zktony.android.utils.extra.dateFormat
+import com.zktony.android.utils.extra.embeddedVersion
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 //import com.zktony.serialport.BuildConfig
@@ -108,7 +109,7 @@ import java.util.regex.Pattern
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun SettingRoute(viewModel: SettingViewModel,homeViewModel: HomeViewModel) {
+fun SettingRoute(viewModel: SettingViewModel, homeViewModel: HomeViewModel) {
 
     val scope = rememberCoroutineScope()
     val navigationActions = LocalNavigationActions.current
@@ -520,6 +521,9 @@ fun SettingLits(
     var selectedIndex by remember { mutableStateOf(0) }
     //	定义列宽
     val cellWidthList = arrayListOf(70, 115, 241)
+
+    //下位机版本号
+    var lowVersion by remember { mutableStateOf("Unknown") }
 
 
     Column(
@@ -2514,35 +2518,35 @@ fun SettingLits(
                             )
                         }
 
-//                        Row(
-//                            modifier = Modifier
-//                                .padding(top = 20.dp)
-//                                .fillMaxWidth()
-//                        ) {
-//                            line(Color(rgb(240, 240, 240)), 0f, 400f)
-//                        }
-//
-//                        Row(modifier = Modifier.clickable {
-//                            scope.launch {
-//                                version()
-//                                delay(100)
-//                                softwareDialog.value = true
-//                            }
-//                        }) {
-//                            Text(
-//                                modifier = Modifier.padding(top = 20.dp),
-//                                text = "关于软件",
-//                                fontSize = 30.sp
-//                            )
-//
-//                            Image(
-//                                modifier = Modifier
-//                                    .padding(top = 20.dp, start = 200.dp)
-//                                    .size(40.dp),
-//                                painter = painterResource(id = R.mipmap.rightarrow),
-//                                contentDescription = null
-//                            )
-//                        }
+                        Row(
+                            modifier = Modifier
+                                .padding(top = 20.dp)
+                                .fillMaxWidth()
+                        ) {
+                            line(Color(rgb(240, 240, 240)), 0f, 400f)
+                        }
+
+                        Row(modifier = Modifier.clickable {
+                            scope.launch {
+                                lowVersion = embeddedVersion()
+                                delay(100)
+                                softwareDialog.value = true
+                            }
+                        }) {
+                            Text(
+                                modifier = Modifier.padding(top = 20.dp),
+                                text = "关于软件",
+                                fontSize = 30.sp
+                            )
+
+                            Image(
+                                modifier = Modifier
+                                    .padding(top = 20.dp, start = 200.dp)
+                                    .size(40.dp),
+                                painter = painterResource(id = R.mipmap.rightarrow),
+                                contentDescription = null
+                            )
+                        }
 
                         Row(
                             modifier = Modifier
@@ -3508,7 +3512,7 @@ fun SettingLits(
                             fontWeight = FontWeight.Bold,
                         )
                         Text(
-                            text = "${AppStateUtils.hpv[1]}",
+                            text = "$lowVersion",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                         )
@@ -3603,7 +3607,7 @@ fun upgrade(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        upgradeMode(uiEvent,uiEventHome)
+        upgradeMode(uiEvent, uiEventHome)
 //        EmbeddedTest(uiEventHome)
     }
 }

@@ -44,6 +44,9 @@ import com.zktony.android.utils.extra.download
 import com.zktony.android.utils.extra.httpCall
 import com.zktony.android.utils.extra.playAudio
 import com.zktony.android.utils.internal.ExceptionPolicy
+import com.zktony.serialport.ext.toHexString
+import com.zktony.serialport.utils.log
+import com.zktony.serialport.utils.writeThread
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -356,10 +359,6 @@ class SettingViewModel @Inject constructor(
             val targetFile = File(targetDir, file.name)
             try {
                 file.copyTo(targetFile, overwrite = true)
-                Log.d(
-                    "copyFileToUSB",
-                    "拷贝文件名:${file.name}到${targetDir.path}里"
-                )
             } catch (e: IOException) {
                 e.printStackTrace()
             }
@@ -956,15 +955,7 @@ class SettingViewModel @Inject constructor(
 
                     //向下取整
                     val count = floor(p1Count).toInt()
-                    Log.d(
-                        "HomeViewModel_pipeline",
-                        "循环向下取整===$count"
-                    )
                     val qyu = p1 % (coagulantpulse - 50000)
-                    Log.d(
-                        "HomeViewModel_pipeline",
-                        "取余===$qyu"
-                    )
 
                     /**
                      * 废液槽位置
@@ -1196,15 +1187,15 @@ class SettingViewModel @Inject constructor(
                     //x轴复位===========================================
                     SerialPortUtils.gpio(0, 1)
                     delay(500L)
-                    Log.d(
-                        "HomeViewModel",
+                    log(
+                        "setting_xreset",
                         "x轴光电状态====0号光电===" + SerialPortUtils.getGpio(0) + "====1号光电===" + SerialPortUtils.getGpio(
                             1
                         )
                     )
                     if (!SerialPortUtils.getGpio(0) && !SerialPortUtils.getGpio(1)) {
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_xreset",
                             "x轴反转64000L"
                         )
                         start {
@@ -1216,8 +1207,8 @@ class SettingViewModel @Inject constructor(
 
                                 )
                         }
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_xreset",
                             "x轴正转6400L"
                         )
                         start {
@@ -1229,8 +1220,8 @@ class SettingViewModel @Inject constructor(
 
                                 )
                         }
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_xreset",
                             "x轴反转6500L"
                         )
                         start {
@@ -1245,8 +1236,8 @@ class SettingViewModel @Inject constructor(
                         delay(500L)
                         if (SerialPortUtils.getGpio(0)) {
 
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_xreset",
                                 "x轴正转1600L"
                             )
                             start {
@@ -1257,14 +1248,14 @@ class SettingViewModel @Inject constructor(
                                     ads = Triple(1600, 1600, 1600),
                                 )
                             }
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_xreset",
                                 "复位完成"
                             )
                             //复位完成
                         } else {
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_xreset",
                                 "复位失败"
                             )
                             //复位失败
@@ -1310,14 +1301,14 @@ class SettingViewModel @Inject constructor(
 
                                     )
                             }
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_xreset",
                                 "复位完成"
                             )
                             //复位完成
                         } else {
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_xreset",
                                 "复位失败"
                             )
                             //复位失败
@@ -1335,8 +1326,8 @@ class SettingViewModel @Inject constructor(
                         SerialPortUtils.gpio(0)
                         delay(500L)
                         if (SerialPortUtils.getGpio(0)) {
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_xreset",
                                 "复位失败"
                             )
                         } else {
@@ -1349,8 +1340,8 @@ class SettingViewModel @Inject constructor(
 
                                     )
                             }
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_xreset",
                                 "复位完成"
                             )
                             start {
@@ -1363,8 +1354,8 @@ class SettingViewModel @Inject constructor(
                             }
                         }
                     } else {
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_xreset",
                             "复位失败"
                         )
                     }
@@ -1375,8 +1366,8 @@ class SettingViewModel @Inject constructor(
                     //柱塞泵复位===========================================
                     SerialPortUtils.gpio(2)
                     delay(500L)
-                    Log.d(
-                        "HomeViewModel",
+                    log(
+                        "setting_xreset",
                         "注射泵光电状态====2号光电===" + SerialPortUtils.getGpio(2)
                     )
                     if (!SerialPortUtils.getGpio(2)) {
@@ -1429,22 +1420,22 @@ class SettingViewModel @Inject constructor(
                         delay(300L)
                         SerialPortUtils.gpio(2)
                         delay(1500L)
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_xreset",
                             "注射泵光电状态====2号光电===" + SerialPortUtils.getGpio(2)
                         )
                         delay(300L)
                         if (!SerialPortUtils.getGpio(2)) {
 
                             delay(300L)
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_xreset",
                                 "柱塞泵复位成功"
                             )
                             //复位完成
                         } else {
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_xreset",
                                 "柱塞泵复位失败"
                             )
                             //复位失败
@@ -1470,8 +1461,8 @@ class SettingViewModel @Inject constructor(
                             )
                         }
                         delay(coagulantTime)
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_xreset",
                             "柱塞泵复位完成"
                         )
                         //复位完成
@@ -1497,19 +1488,19 @@ class SettingViewModel @Inject constructor(
                         delay(300L)
                         SerialPortUtils.gpio(2)
                         delay(500L)
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_xreset",
                             "注射泵光电状态====2号光电===" + SerialPortUtils.getGpio(2)
                         )
                         if (SerialPortUtils.getGpio(2)) {
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_xreset",
                                 "柱塞泵复位失败"
                             )
                             //复位失败
                         } else {
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_xreset",
                                 "柱塞泵复位完成"
                             )
                         }
@@ -1548,15 +1539,15 @@ class SettingViewModel @Inject constructor(
                     //x轴复位===========================================
                     SerialPortUtils.gpio(0, 1)
                     delay(500L)
-                    Log.d(
-                        "HomeViewModel",
+                    log(
+                        "setting_xreset",
                         "x轴光电状态====0号光电===" + SerialPortUtils.getGpio(0) + "====1号光电===" + SerialPortUtils.getGpio(
                             1
                         )
                     )
                     if (!SerialPortUtils.getGpio(0) && !SerialPortUtils.getGpio(1)) {
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_xreset",
                             "x轴反转64000L"
                         )
                         start {
@@ -1568,8 +1559,8 @@ class SettingViewModel @Inject constructor(
 
                                 )
                         }
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_xreset",
                             "x轴正转6400L"
                         )
                         start {
@@ -1581,8 +1572,8 @@ class SettingViewModel @Inject constructor(
 
                                 )
                         }
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_xreset",
                             "x轴反转6500L"
                         )
                         start {
@@ -1597,8 +1588,8 @@ class SettingViewModel @Inject constructor(
                         delay(500L)
                         if (SerialPortUtils.getGpio(0)) {
 
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_xreset",
                                 "x轴正转1600L"
                             )
                             start {
@@ -1609,14 +1600,14 @@ class SettingViewModel @Inject constructor(
                                     ads = Triple(1600, 1600, 1600),
                                 )
                             }
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_xreset",
                                 "复位完成"
                             )
                             //复位完成
                         } else {
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_xreset",
                                 "复位失败"
                             )
                             //复位失败
@@ -1662,14 +1653,14 @@ class SettingViewModel @Inject constructor(
 
                                     )
                             }
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_xreset",
                                 "复位完成"
                             )
                             //复位完成
                         } else {
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_xreset",
                                 "复位失败"
                             )
                             //复位失败
@@ -1687,8 +1678,8 @@ class SettingViewModel @Inject constructor(
                         SerialPortUtils.gpio(0)
                         delay(500L)
                         if (SerialPortUtils.getGpio(0)) {
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_xreset",
                                 "复位失败"
                             )
                         } else {
@@ -1701,8 +1692,8 @@ class SettingViewModel @Inject constructor(
 
                                     )
                             }
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_xreset",
                                 "复位完成"
                             )
                             start {
@@ -1715,8 +1706,8 @@ class SettingViewModel @Inject constructor(
                             }
                         }
                     } else {
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_xreset",
                             "复位失败"
                         )
                     }
@@ -1768,8 +1759,8 @@ class SettingViewModel @Inject constructor(
                     //柱塞泵复位===========================================
                     SerialPortUtils.gpio(2)
                     delay(500L)
-                    Log.d(
-                        "HomeViewModel",
+                    log(
+                        "setting_zsreset",
                         "注射泵光电状态====2号光电===" + SerialPortUtils.getGpio(2)
                     )
                     if (!SerialPortUtils.getGpio(2)) {
@@ -1822,22 +1813,22 @@ class SettingViewModel @Inject constructor(
                         delay(300L)
                         SerialPortUtils.gpio(2)
                         delay(1500L)
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_zsreset",
                             "注射泵光电状态====2号光电===" + SerialPortUtils.getGpio(2)
                         )
                         delay(300L)
                         if (!SerialPortUtils.getGpio(2)) {
 
                             delay(300L)
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_zsreset",
                                 "柱塞泵复位成功"
                             )
                             //复位完成
                         } else {
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_zsreset",
                                 "柱塞泵复位失败"
                             )
                             //复位失败
@@ -1863,8 +1854,8 @@ class SettingViewModel @Inject constructor(
                             )
                         }
                         delay(coagulantTime)
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_zsreset",
                             "柱塞泵复位完成"
                         )
                         //复位完成
@@ -1890,19 +1881,19 @@ class SettingViewModel @Inject constructor(
                         delay(300L)
                         SerialPortUtils.gpio(2)
                         delay(500L)
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_zsreset",
                             "注射泵光电状态====2号光电===" + SerialPortUtils.getGpio(2)
                         )
                         if (SerialPortUtils.getGpio(2)) {
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_zsreset",
                                 "柱塞泵复位失败"
                             )
                             //复位失败
                         } else {
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_zsreset",
                                 "柱塞泵复位完成"
                             )
                         }
@@ -1961,15 +1952,15 @@ class SettingViewModel @Inject constructor(
                     //x轴复位===========================================
                     SerialPortUtils.gpio(0, 1)
                     delay(500L)
-                    Log.d(
-                        "HomeViewModel",
+                    log(
+                        "setting_stopJob",
                         "x轴光电状态====0号光电===" + SerialPortUtils.getGpio(0) + "====1号光电===" + SerialPortUtils.getGpio(
                             1
                         )
                     )
                     if (!SerialPortUtils.getGpio(0) && !SerialPortUtils.getGpio(1)) {
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_stopJob",
                             "x轴反转64000L"
                         )
                         start {
@@ -1981,8 +1972,8 @@ class SettingViewModel @Inject constructor(
 
                                 )
                         }
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_stopJob",
                             "x轴正转6400L"
                         )
                         start {
@@ -1994,8 +1985,8 @@ class SettingViewModel @Inject constructor(
 
                                 )
                         }
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_stopJob",
                             "x轴反转6500L"
                         )
                         start {
@@ -2010,8 +2001,8 @@ class SettingViewModel @Inject constructor(
                         delay(500L)
                         if (SerialPortUtils.getGpio(0)) {
 
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_stopJob",
                                 "x轴正转1600L"
                             )
                             start {
@@ -2022,14 +2013,14 @@ class SettingViewModel @Inject constructor(
                                     ads = Triple(1600, 1600, 1600),
                                 )
                             }
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_stopJob",
                                 "复位完成"
                             )
                             //复位完成
                         } else {
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_stopJob",
                                 "复位失败"
                             )
                             //复位失败
@@ -2075,14 +2066,14 @@ class SettingViewModel @Inject constructor(
 
                                     )
                             }
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_stopJob",
                                 "复位完成"
                             )
                             //复位完成
                         } else {
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_stopJob",
                                 "复位失败"
                             )
                             //复位失败
@@ -2100,8 +2091,8 @@ class SettingViewModel @Inject constructor(
                         SerialPortUtils.gpio(0)
                         delay(500L)
                         if (SerialPortUtils.getGpio(0)) {
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_stopJob",
                                 "复位失败"
                             )
                         } else {
@@ -2114,8 +2105,8 @@ class SettingViewModel @Inject constructor(
 
                                     )
                             }
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_stopJob",
                                 "复位完成"
                             )
                             start {
@@ -2128,8 +2119,8 @@ class SettingViewModel @Inject constructor(
                             }
                         }
                     } else {
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_stopJob",
                             "复位失败"
                         )
                     }
@@ -2140,8 +2131,8 @@ class SettingViewModel @Inject constructor(
                     //柱塞泵复位===========================================
                     SerialPortUtils.gpio(2)
                     delay(500L)
-                    Log.d(
-                        "HomeViewModel",
+                    log(
+                        "setting_stopJob",
                         "注射泵光电状态====2号光电===" + SerialPortUtils.getGpio(2)
                     )
                     if (!SerialPortUtils.getGpio(2)) {
@@ -2194,22 +2185,22 @@ class SettingViewModel @Inject constructor(
                         delay(300L)
                         SerialPortUtils.gpio(2)
                         delay(1500L)
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_stopJob",
                             "注射泵光电状态====2号光电===" + SerialPortUtils.getGpio(2)
                         )
                         delay(300L)
                         if (!SerialPortUtils.getGpio(2)) {
 
                             delay(300L)
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_stopJob",
                                 "柱塞泵复位成功"
                             )
                             //复位完成
                         } else {
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_stopJob",
                                 "柱塞泵复位失败"
                             )
                             //复位失败
@@ -2235,8 +2226,8 @@ class SettingViewModel @Inject constructor(
                             )
                         }
                         delay(coagulantTime)
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_stopJob",
                             "柱塞泵复位完成"
                         )
                         //复位完成
@@ -2262,19 +2253,19 @@ class SettingViewModel @Inject constructor(
                         delay(300L)
                         SerialPortUtils.gpio(2)
                         delay(500L)
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_stopJob",
                             "注射泵光电状态====2号光电===" + SerialPortUtils.getGpio(2)
                         )
                         if (SerialPortUtils.getGpio(2)) {
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_stopJob",
                                 "柱塞泵复位失败"
                             )
                             //复位失败
                         } else {
-                            Log.d(
-                                "HomeViewModel",
+                            log(
+                                "setting_stopJob",
                                 "柱塞泵复位完成"
                             )
                         }
@@ -2329,8 +2320,8 @@ class SettingViewModel @Inject constructor(
 
 
 
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===制胶前期准备数据开始==="
             )
             //01胶液总步数=制胶体积（mL）×1000×高低浓度平均校准因子（步/μL）
@@ -2339,28 +2330,28 @@ class SettingViewModel @Inject constructor(
             val p2jz = (AppStateUtils.hpc[2] ?: { x -> x * 100 }).invoke(1.0)
             val p3jz = (AppStateUtils.hpc[3] ?: { x -> x * 100 }).invoke(1.0)
             val highLowAvg = (p2jz + p3jz) / 2
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===获取高低浓度的平均校准因子===$highLowAvg"
             )
             //1.2   胶液总步数
             val volumePulseCount = selected.volume * 1000 * highLowAvg
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===01胶液总步数===$volumePulseCount"
             )
             //01胶液总步数=制胶体积（mL）×1000×高低浓度平均校准因子（步/μL）
 
             //02促凝剂总步数=促凝剂体积（μL）×校准数据（步/μL）
             val coagulantVol = selected.coagulant
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===促凝剂加液量===$coagulantVol"
             )
             //促凝剂总步数
             val coagulantPulseCount = coagulantVol * p1jz
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===02促凝剂总步数===$coagulantPulseCount"
             )
             //02促凝剂总步数=促凝剂体积（μL）×校准数据（步/μL）
@@ -2368,22 +2359,22 @@ class SettingViewModel @Inject constructor(
             //03制胶所需时间（s）=制胶总步数/每圈脉冲数/制胶速度（rpm）×60
             //制胶速度，根据这个速度转换其他泵的速度
             val speed = dataStore.readData("speed", 180)
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===制胶速度===$speed"
             )
             //制胶所需时间
             val guleTime = volumePulseCount / 51200 / speed * 60
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===03制胶所需时间===$guleTime"
             )
             //03制胶所需时间（s）=制胶总步数/每圈脉冲数/制胶速度（rpm）×60
 
             //03A制胶总流速（μL/s）=制胶体积（mL）×1000/制胶所需时间（s）
             val guleFlow = selected.volume * 1000 / guleTime
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===03A制胶总流速===$guleFlow"
             )
             //03A制胶总流速（μL/s）=制胶体积（mL）×1000/制胶所需时间（s）
@@ -2391,21 +2382,21 @@ class SettingViewModel @Inject constructor(
             //04高浓度泵启动速度（rpm）=制胶总流速（μL/s）×（制胶高浓度-母液低浓度）/（母液高浓度-母液低浓度）×高浓度泵校准数据（步/μL）*60/每圈脉冲数
             //母液低浓度
             val lowCoagulant = dataStore.readData("lowCoagulant", 4.0)
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===母液低浓度===$lowCoagulant"
             )
             //母液高浓度
             val highCoagulant = dataStore.readData("highCoagulant", 20.0)
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===母液高浓度===$highCoagulant"
             )
             //高浓度泵启动速度
             val highStartSpeed =
                 guleFlow * (selected.endRange - lowCoagulant) / (highCoagulant - lowCoagulant) * p2jz * 60 / 51200
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===04高浓度泵启动速度===$highStartSpeed"
             )
             //04高浓度泵启动速度（rpm）=制胶总流速（μL/s）×（制胶高浓度-母液低浓度）/（母液高浓度-母液低浓度）×高浓度泵校准数据（步/μL）*60/每圈脉冲数
@@ -2413,8 +2404,8 @@ class SettingViewModel @Inject constructor(
             //05低浓度泵结束速度（rpm）=制胶总流速（μL/s）×（制胶低浓度-母液高浓度）/（母液低浓度-母液高浓度）×低浓度泵校准数据（步/μL）*60/每圈脉冲数
             val lowEndSpeed =
                 guleFlow * (selected.startRange - highCoagulant) / (lowCoagulant - highCoagulant) * p3jz * 60 / 51200
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===05低浓度泵结束速度===$lowEndSpeed"
             )
             //05低浓度泵结束速度（rpm）=制胶总流速（μL/s）×（制胶低浓度-母液高浓度）/（母液低浓度-母液高浓度）×低浓度泵校准数据（步/μL）*60/每圈脉冲数
@@ -2422,8 +2413,8 @@ class SettingViewModel @Inject constructor(
             //06高浓度泵结束速度（rpm）=制胶总流速（μL/s）×（母液低浓度-制胶低浓度）/（母液低浓度-母液高浓度）×高浓度泵校准数据（步/μL）*60/每圈脉冲数
             val highEndSpeed =
                 guleFlow * (lowCoagulant - selected.startRange) / (lowCoagulant - highCoagulant) * p2jz * 60 / 51200
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===06高浓度泵结束速度===$highEndSpeed"
             )
             //06高浓度泵结束速度（rpm）=制胶总流速（μL/s）×（母液低浓度-制胶低浓度）/（母液低浓度-母液高浓度）×高浓度泵校准数据（步/μL）*60/每圈脉冲数
@@ -2431,8 +2422,8 @@ class SettingViewModel @Inject constructor(
             //07低浓度泵启动速度（rpm）=制胶总流速（μL/s）×（母液高浓度-制胶高浓度）/（母液高浓度-母液低浓度）×低浓度泵校准数据（步/μL）*60/每圈脉冲数
             val lowStartSpeed =
                 guleFlow * (highCoagulant - selected.endRange) / (highCoagulant - lowCoagulant) * p3jz * 60 / 51200
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===07低浓度泵启动速度===$lowStartSpeed"
             )
             //07低浓度泵启动速度（rpm）=制胶总流速（μL/s）×（母液高浓度-制胶高浓度）/（母液高浓度-母液低浓度）×低浓度泵校准数据（步/μL）*60/每圈脉冲数
@@ -2440,77 +2431,77 @@ class SettingViewModel @Inject constructor(
             //08促凝剂泵启动速度（rpm）=促凝剂泵总步数/每圈脉冲数/制胶所需时间（s）×60×促凝剂变速比
             //促凝剂变速比-默认1
             val ratio = 1
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===促凝剂变速比===$ratio"
             )
             //促凝剂泵启动速度
             val coagulantStartSpeed = coagulantPulseCount / 51200 / guleTime * 60 * ratio
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===08促凝剂泵启动速度===$coagulantStartSpeed"
             )
             //08促凝剂泵启动速度（rpm）=促凝剂泵总步数/每圈脉冲数/制胶所需时间（s）×60×促凝剂变速比
 
             //09促凝剂泵结束速度（rpm）=促凝剂泵总步数/每圈脉冲数/制胶所需时间（s）×60×（2-促凝剂变速比）
             val coagulantEndSpeed = coagulantPulseCount / 51200 / guleTime * 60 * (2 - ratio)
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===09促凝剂泵结束速度===$coagulantEndSpeed"
             )
             //09促凝剂泵结束速度（rpm）=促凝剂泵总步数/每圈脉冲数/制胶所需时间（s）×60×（2-促凝剂变速比）
 
             //10制胶高浓度泵步数=（高浓度泵启动速度（rpm）+高浓度泵结束速度（rpm））/2×制胶所需时间（s）/60×每圈脉冲数
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===高浓度泵启动速度===$highStartSpeed====高浓度泵结束速度===$highEndSpeed===制胶所需时间===$guleTime==="
             )
             val guleHighPulse = (highStartSpeed + highEndSpeed) / 2 * guleTime / 60 * 51200
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===10制胶高浓度泵步数===$guleHighPulse"
             )
             //10制胶高浓度泵步数=（高浓度泵启动速度（rpm）+高浓度泵结束速度（rpm））/2×制胶所需时间（s）/60×每圈脉冲数
 
             //11制胶低浓度泵步数=（低浓度泵启动速度（rpm）+低浓度泵结束速度（rpm））/2×制胶所需时间（s）/60×每圈脉冲数
             val guleLowPulse = (lowStartSpeed + lowEndSpeed) / 2 * guleTime / 60 * 51200
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===11制胶低浓度泵步数===$guleLowPulse"
             )
             //11制胶低浓度泵步数=（低浓度泵启动速度（rpm）+低浓度泵结束速度（rpm））/2×制胶所需时间（s）/60×每圈脉冲数
 
             //12高浓度泵加速度（rpm/s）=ABS（（高浓度泵启动速度（rpm）-高浓度泵结束速度（rpm））/制胶所需时间（s））
             val highAcc = abs(highStartSpeed - highEndSpeed) / guleTime
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===12高浓度泵加速度===$highAcc"
             )
             //12高浓度泵加速度（rpm/s）=ABS（（高浓度泵启动速度（rpm）-高浓度泵结束速度（rpm））/制胶所需时间（s））
 
             //13低浓度泵加速度（rpm/s）=ABS（（低浓度泵启动速度（rpm）-低浓度泵结束速度（rpm））/制胶所需时间（s）)
             val lowAcc = abs(lowStartSpeed - lowEndSpeed) / guleTime
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===13低浓度泵加速度===$lowAcc"
             )
             //13低浓度泵加速度（rpm/s）=ABS（（低浓度泵启动速度（rpm）-低浓度泵结束速度（rpm））/制胶所需时间（s）)
 
             //14促凝剂泵加速度（rpm/s）=ABS（促凝剂泵启动速度（rpm）-促凝剂泵结束速度（rpm））/制胶所需时间（s）
             val coagulantAcc = abs(coagulantStartSpeed - coagulantEndSpeed) / guleTime
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===14促凝剂泵加速度===$coagulantAcc"
             )
             //14促凝剂泵加速度（rpm/s）=ABS（促凝剂泵启动速度（rpm）-促凝剂泵结束速度（rpm））/制胶所需时间（s）
 
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===制胶前期准备数据结束==="
             )
 
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===预排前期准备数据开始==="
             )
 
@@ -2519,14 +2510,14 @@ class SettingViewModel @Inject constructor(
              * 高浓度预排液量
              */
             val higeRehearsalVolume = setting.higeRehearsalVolume * 1000
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===高浓度预排液量===$higeRehearsalVolume"
             )
 
             val highExpectedPulseCount = higeRehearsalVolume * highLowAvg
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===15预排总步数===$highExpectedPulseCount"
             )
             //15预排总步数=预排胶液体积（mL）×1000×平均校准数据（步/μL）
@@ -2535,23 +2526,23 @@ class SettingViewModel @Inject constructor(
              *冲洗液泵转速
              */
             val rinseSpeed = dataStore.readData("rinseSpeed", 600L)
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===冲洗液泵转速===$rinseSpeed"
             )
 
             //16预排时间=预排总步数/每圈步数/冲洗液泵速度（rpm）×60
             val expectedTime = highExpectedPulseCount / 51200 / rinseSpeed * 60
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===16预排时间===$expectedTime"
             )
             //16预排时间=预排总步数/每圈步数/冲洗液泵速度（rpm）×60
 
             //17预排总流速（μL/s）=高浓度泵预排液量（mL）×1000/预排时间（s）
             val expectedFlow = higeRehearsalVolume / expectedTime
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===17预排总流速===$expectedFlow"
             )
             //17预排总流速（μL/s）=高浓度泵预排液量（mL）×1000/预排时间（s）
@@ -2559,8 +2550,8 @@ class SettingViewModel @Inject constructor(
             //18预排高浓度泵速度（rpm）=预排总流速（μL/s）×（制胶高浓度-母液低浓度）/（母液高浓度-母液低浓度）×高浓度泵校准数据（步/μL）*60/每圈脉冲数
             val highExpectedSpeed =
                 expectedFlow * (selected.endRange - lowCoagulant) / (highCoagulant - lowCoagulant) * p2jz * 60 / 51200
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===18预排高浓度泵速度===$highExpectedSpeed"
             )
             //18预排高浓度泵速度（rpm）=预排总流速（μL/s）×（制胶高浓度-母液低浓度）/（母液高浓度-母液低浓度）×高浓度泵校准数据（步/μL）*60/每圈脉冲数
@@ -2568,8 +2559,8 @@ class SettingViewModel @Inject constructor(
             //19预排低浓度泵速度（rpm）=预排总流速（μL/s）×（母液高浓度-制胶高浓度）/（母液高浓度-母液低浓度）×低浓度泵校准数据（步/μL）*60/每圈脉冲数
             val lowExpectedSpeed =
                 expectedFlow * (highCoagulant - selected.endRange) / (highCoagulant - lowCoagulant) * p3jz * 60 / 51200
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===19预排低浓度泵速度===$lowExpectedSpeed"
             )
             //19预排低浓度泵速度（rpm）=预排总流速（μL/s）×（母液高浓度-制胶高浓度）/（母液高浓度-母液低浓度）×低浓度泵校准数据（步/μL）*60/每圈脉冲数
@@ -2577,8 +2568,8 @@ class SettingViewModel @Inject constructor(
             //20预排促凝剂步数=预排胶液体积（mL）×促凝剂体积（μL）/制胶体积（mL）×校准数据（步/μL）×促凝剂变速比
             val coagulantExpectedPulse =
                 setting.higeRehearsalVolume * selected.coagulant / selected.volume * p1jz * ratio
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===20预排促凝剂步数===$coagulantExpectedPulse"
             )
             //20预排促凝剂步数=预排胶液体积（mL）×促凝剂体积（μL）/制胶体积（mL）×校准数据（步/μL）×促凝剂变速比
@@ -2586,31 +2577,31 @@ class SettingViewModel @Inject constructor(
 
             //21预排高浓度泵步数=预排高浓度泵速度（rpm）*预排时间（s）/60×每圈脉冲数
             val highExpectedPulse = highExpectedSpeed * expectedTime / 60 * 51200
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===21预排高浓度泵步数===$highExpectedPulse"
             )
             //21预排高浓度泵步数=预排高浓度泵速度（rpm）*预排时间（s）/60×每圈脉冲数
 
             //22预排低浓度泵步数=预排低浓度泵速度（rpm）*预排时间（s）/60×每圈脉冲数
             val lowExpectedPulse = lowExpectedSpeed * expectedTime / 60 * 51200
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===22预排低浓度泵步数===$lowExpectedPulse"
             )
             //22预排低浓度泵步数=预排低浓度泵速度（rpm）*预排时间（s）/60×每圈脉冲数
 
             //23预排促凝剂泵速度=预排促凝剂泵步数/每圈步数/预排时间（s）×60×促凝剂转速比
             val coagulantExpectedSpeed = coagulantExpectedPulse / 51200 / expectedTime * 60 * ratio
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===23预排促凝剂泵速度===$coagulantExpectedSpeed"
             )
             //23预排促凝剂泵速度=预排促凝剂泵总步数/每圈步数/预排时间（s）×60×促凝剂转速比
 
 
-            Log.d(
-                "HomeViewModel_startJob",
+            log(
+                "setting_startJob",
                 "===预排前期准备数据结束==="
             )
 
@@ -2619,6 +2610,10 @@ class SettingViewModel @Inject constructor(
             _job.value = launch {
                 try {
                     for (i in 1..100) {
+                        log(
+                            "setting_startJob",
+                            "第$i" + "老化运动开始"
+                        )
                         var coagulantBool = false
 
                         if (i == 1) {
@@ -2638,8 +2633,8 @@ class SettingViewModel @Inject constructor(
                              * 柱塞泵剩余步数
                              */
                             val coagulantSy = coagulantpulse - coagulantStart.value
-                            Log.d(
-                                "HomeViewModel_startJob",
+                            log(
+                                "setting_startJob",
                                 "===柱塞泵剩余步数===$coagulantSy"
                             )
 
@@ -2649,8 +2644,8 @@ class SettingViewModel @Inject constructor(
                                  */
                                 _stautsNum.value = 1
                                 coagulantBool = true
-                                Log.d(
-                                    "HomeViewModel_startJob",
+                                log(
+                                    "setting_startJob",
                                     "===柱塞泵剩余步数的_stautsNum.value===${_stautsNum.value}"
                                 )
                             } else {
@@ -2665,15 +2660,21 @@ class SettingViewModel @Inject constructor(
 
                         }
 
+                        //第一次运行的管路填充
                         if (i == 1) {
                             /**
                              * 高浓度管路填充
                              */
+
+                            log(
+                                "setting_startJob",
+                                "第一次运行的管路填充"
+                            )
                             val slEnetity = slDao.getById(1L).firstOrNull()
                             if (slEnetity != null) {
                                 val higeFilling = slEnetity.higeFilling
-                                Log.d(
-                                    "HomeViewModel_pipeline",
+                                log(
+                                    "setting_pipeline",
                                     "高浓度管路填充液量===$higeFilling"
                                 )
 
@@ -2681,8 +2682,8 @@ class SettingViewModel @Inject constructor(
                                  * 低浓度管路填充
                                  */
                                 val lowFilling = slEnetity.lowFilling
-                                Log.d(
-                                    "HomeViewModel_pipeline",
+                                log(
+                                    "setting_pipeline",
                                     "低浓度管路填充液量===$lowFilling"
                                 )
 
@@ -2691,8 +2692,8 @@ class SettingViewModel @Inject constructor(
                                  */
                                 val rinseFilling = slEnetity.rinseFilling
 
-                                Log.d(
-                                    "HomeViewModel_pipeline",
+                                log(
+                                    "setting_pipeline",
                                     "冲洗液泵管路填充液量===$rinseFilling"
                                 )
 
@@ -2700,32 +2701,32 @@ class SettingViewModel @Inject constructor(
                                  * 促凝剂泵管路填充
                                  */
                                 val coagulantFilling = slEnetity.coagulantFilling
-                                Log.d(
-                                    "HomeViewModel_pipeline",
+                                log(
+                                    "setting_pipeline",
                                     "促凝剂泵管路填充液量===$coagulantFilling"
                                 )
                                 val p1jz = (AppStateUtils.hpc[1] ?: { x -> x * 100 }).invoke(1.0)
-                                Log.d(
-                                    "HomeViewModel_pipeline",
+                                log(
+                                    "setting_pipeline",
                                     "促凝剂泵校准因子===$p1jz"
                                 )
 
                                 val coagulantpipeline = dataStore.readData("coagulantpipeline", 50)
 
-                                Log.d(
-                                    "HomeViewModel_pipeline",
+                                log(
+                                    "setting_pipeline",
                                     "coagulantpipeline===$coagulantpipeline"
                                 )
 
                                 var p1 = (coagulantFilling * 1000 * p1jz).toLong()
                                 val p2 = (coagulantpipeline * p1jz).toLong()
-                                Log.d(
-                                    "HomeViewModel_pipeline",
+                                log(
+                                    "setting_pipeline",
                                     "p2===$p2"
                                 )
                                 p1 -= p2
-                                Log.d(
-                                    "HomeViewModel_pipeline",
+                                log(
+                                    "setting_pipeline",
                                     "促凝剂泵管路填充加液步数===$p1"
                                 )
                                 /**
@@ -2733,8 +2734,8 @@ class SettingViewModel @Inject constructor(
                                  */
                                 val coagulantpulse =
                                     dataStore.readData("coagulantpulse", 550000).toLong()
-                                Log.d(
-                                    "HomeViewModel_pipeline",
+                                log(
+                                    "setting_pipeline",
                                     "促凝剂总行程===$coagulantpulse"
                                 )
                                 /**
@@ -2742,8 +2743,8 @@ class SettingViewModel @Inject constructor(
                                  */
                                 val coagulantResetPulse =
                                     dataStore.readData("coagulantResetPulse", 1500).toLong()
-                                Log.d(
-                                    "HomeViewModel_pipeline",
+                                log(
+                                    "setting_pipeline",
                                     "促凝剂复位后预排步数===$coagulantResetPulse"
                                 )
 
@@ -2751,8 +2752,8 @@ class SettingViewModel @Inject constructor(
                                  * 促凝剂转速
                                  */
                                 val coagulantSpeed = dataStore.readData("coagulantSpeed", 200L)
-                                Log.d(
-                                    "HomeViewModel_pipeline",
+                                log(
+                                    "setting_pipeline",
                                     "促凝剂转速===$coagulantSpeed"
                                 )
 
@@ -2760,8 +2761,8 @@ class SettingViewModel @Inject constructor(
                                  * 冲洗转速
                                  */
                                 val rinseSpeed = dataStore.readData("rinseSpeed", 600L)
-                                Log.d(
-                                    "HomeViewModel_pipeline",
+                                log(
+                                    "setting_pipeline",
                                     "冲洗转速===$rinseSpeed"
                                 )
 
@@ -2769,8 +2770,8 @@ class SettingViewModel @Inject constructor(
                                  * x轴转速
                                  */
                                 val xSpeed = dataStore.readData("xSpeed", 100L)
-                                Log.d(
-                                    "HomeViewModel_pipeline",
+                                log(
+                                    "setting_pipeline",
                                     "x轴转速===$xSpeed"
                                 )
 
@@ -2778,8 +2779,8 @@ class SettingViewModel @Inject constructor(
                                  * 废液槽位置
                                  */
                                 val wastePosition = slEnetity.wastePosition
-                                Log.d(
-                                    "HomeViewModel_pipeline",
+                                log(
+                                    "setting_pipeline",
                                     "废液槽位置===$wastePosition"
                                 )
 
@@ -2794,19 +2795,19 @@ class SettingViewModel @Inject constructor(
                                 }
 
                                 val p1Count = p1.toDouble() / (coagulantpulse - 50000)
-                                Log.d(
-                                    "HomeViewModel_pipeline",
+                                log(
+                                    "setting_pipeline",
                                     "促凝剂运动次数===$p1Count"
                                 )
                                 //向下取整
                                 val count = floor(p1Count).toInt()
-                                Log.d(
-                                    "HomeViewModel_pipeline",
+                                log(
+                                    "setting_pipeline",
                                     "循环向下取整===$count"
                                 )
                                 val qyu = p1 % (coagulantpulse - 50000)
-                                Log.d(
-                                    "HomeViewModel_pipeline",
+                                log(
+                                    "setting_pipeline",
                                     "取余===$qyu"
                                 )
                                 for (i in 1..count) {
@@ -3030,9 +3031,10 @@ class SettingViewModel @Inject constructor(
                             delay(100L)
                         }
 
+                        //促凝剂不够增加促凝剂量
                         if (coagulantBool) {
-                            Log.d(
-                                "HomeViewModel_startJob",
+                            log(
+                                "setting_startJob",
                                 "===柱塞泵回到下拉到底==="
                             )
                             start {
@@ -3048,8 +3050,8 @@ class SettingViewModel @Inject constructor(
                                     )
                                 )
                             }
-                            Log.d(
-                                "HomeViewModel_startJob",
+                            log(
+                                "setting_startJob",
                                 "===柱塞泵回到下拉到底==="
                             )
 
@@ -3060,8 +3062,8 @@ class SettingViewModel @Inject constructor(
 
 
 //===================废液槽运动开始=====================
-                        Log.d(
-                            "HomeViewModel_startJob",
+                        log(
+                            "setting_startJob",
                             "===废液槽运动开始==="
                         )
                         //废液槽位置
@@ -3074,8 +3076,8 @@ class SettingViewModel @Inject constructor(
                                 ads = Triple(xSpeed * 20, xSpeed * 20, xSpeed * 20),
                             )
                         }
-                        Log.d(
-                            "HomeViewModel_startJob",
+                        log(
+                            "setting_startJob",
                             "===废液槽运动结束==="
                         )
 //===================废液槽运动结束=====================
@@ -3084,8 +3086,8 @@ class SettingViewModel @Inject constructor(
                          * 预排液
                          */
                         //===================预排液开始=====================
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_startJob",
                             "===预排液开始==="
                         )
 
@@ -3124,15 +3126,15 @@ class SettingViewModel @Inject constructor(
                         }
 
                         //===================预排液结束=====================
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_startJob",
                             "===预排液结束==="
                         )
 
 
                         //===================制胶位置移动开始=====================
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_startJob",
                             "===制胶位置移动开始==="
                         )
                         //制胶位置
@@ -3147,27 +3149,27 @@ class SettingViewModel @Inject constructor(
                             )
 
                         }
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_startJob",
                             "===制胶位置移动结束==="
                         )
                         delay(100)
 
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_startJob",
                             "===制胶运动开始==="
                         )
 
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_startJob",
                             "===柱塞泵参数===步数===$coagulantPulseCount===加速度===${(coagulantAcc * 13).toLong()}===开始速度===${(coagulantStartSpeed * 1193).toLong()}===结束速度==${(coagulantEndSpeed * 1193).toLong()}"
                         )
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_startJob",
                             "===高浓度泵参数===步数===${guleHighPulse.toLong()}===加速度===${(highAcc * 13).toLong()}===开始速度===${(highEndSpeed * 1193).toLong()}===结束速度==${(highStartSpeed * 1193).toLong()}"
                         )
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_startJob",
                             "===低浓度泵参数===步数===${guleLowPulse.toLong()}===加速度===${(lowAcc * 13).toLong()}===开始速度===${(lowStartSpeed * 1193).toLong()}===结束速度==${(lowEndSpeed * 1193).toLong()}"
                         )
 
@@ -3205,16 +3207,16 @@ class SettingViewModel @Inject constructor(
                         }
 
 
-                        Log.d(
-                            "HomeViewModel",
+                        log(
+                            "setting_startJob",
                             "===制胶运动结束==="
                         )
 
 
                         //===================制胶运动结束=====================
                         val rinseSpeed = dataStore.readData("rinseSpeed", 600L)
-                        Log.d(
-                            "HomeViewModel_clean",
+                        log(
+                            "setting_startJob",
                             "冲洗转速===$rinseSpeed"
                         )
                         delay(2000)
@@ -3234,7 +3236,7 @@ class SettingViewModel @Inject constructor(
                                 pdv = setting.wastePosition
                             )
                         }
-
+                        delay(100)
 
                         start {
                             exceptionPolicy = ExceptionPolicy.SKIP
@@ -3247,7 +3249,12 @@ class SettingViewModel @Inject constructor(
                         }
 
                         delay(100)
+                        log(
+                            "setting_startJob",
+                            "第$i" + "老化运动结束"
+                        )
                     }
+                    _complate.value += 1
                     val glueNum = dataStore.readData("glueNum", 1)
                     if (_complate.value == glueNum) {
                         _uiFlags.value = UiFlags.objects(6)
@@ -3270,23 +3277,23 @@ class SettingViewModel @Inject constructor(
 
 //            // 获取系统版本号（API 级别）
 //            val sdkInt = Build.VERSION.SDK_INT
-//            Log.d("SystemInfo", "获取系统版本号（API 级别）: $sdkInt")
+//            log("SystemInfo", "获取系统版本号（API 级别）: $sdkInt")
 //
 //            // 获取设备名
 //            val device = Build.DEVICE
-//            Log.d("SystemInfo", "获取设备名: $device")
+//            log("SystemInfo", "获取设备名: $device")
 //
 //            // 获取设备型号
 //            val model = Build.MODEL
-//            Log.d("SystemInfo", "获取设备型号: $model")
+//            log("SystemInfo", "获取设备型号: $model")
 //
 //            // 获取设备制造商
 //            val manufacturer = Build.MANUFACTURER
-//            Log.d("SystemInfo", "获取设备制造商: $manufacturer")
+//            log("SystemInfo", "获取设备制造商: $manufacturer")
 
             // 获取系统版本名称
             val release = Build.VERSION.RELEASE
-            Log.d("SystemInfo", "获取系统版本名称: $release")
+            log("setting_SystemInfo", "获取系统版本名称: $release")
 
             if (release == "6.0.1") {
                 //Android6.0.1系统是迈冲

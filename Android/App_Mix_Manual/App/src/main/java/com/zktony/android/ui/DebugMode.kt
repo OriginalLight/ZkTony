@@ -607,7 +607,7 @@ fun debugMode(
 
                         Button(modifier = Modifier
                             .padding(top = 20.dp,start = 10.dp)
-                            .width(150.dp)
+                            .width(160.dp)
                             .height(50.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(rgb(0, 105, 52))

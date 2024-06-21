@@ -202,10 +202,6 @@ fun experimentList(
                         )
                         .clickable(onClick = {
                             selectedIndex = index
-                            Log.d(
-                                "Test",
-                                "点击选中的=========$selectedIndex"
-                            )
                         })
                 ) {
                     //(index + 1).toString()

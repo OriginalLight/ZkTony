@@ -9,24 +9,41 @@ import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -42,8 +59,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.paging.compose.LazyPagingItems
 import com.zktony.android.R
 import com.zktony.android.data.entities.SportsLog
@@ -67,13 +89,17 @@ import java.io.FileOutputStream
 import java.io.FileWriter
 import java.io.IOException
 import java.lang.reflect.Method
+import java.util.regex.Pattern
 import kotlin.math.abs
 import kotlin.math.ceil
 
 /**
  * 上下位机升级
  */
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
+@OptIn(
+    ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class,
+    ExperimentalLayoutApi::class
+)
 @Composable
 fun upgradeMode(uiEvent: (SettingIntent) -> Unit, uiEventHome: (HomeIntent) -> Unit) {
     val context = LocalContext.current
@@ -82,33 +108,40 @@ fun upgradeMode(uiEvent: (SettingIntent) -> Unit, uiEventHome: (HomeIntent) -> U
 
 
     /**
-     * 下位机升级弹窗
+     * 主控板升级弹窗
      */
-    val upgradeLowDialog = remember { mutableStateOf(false) }
+    val masterDialog = remember { mutableStateOf(false) }
+
+    val stateDialog = remember { mutableStateOf(false) }
+
+    val apkDialog = remember { mutableStateOf(false) }
+
+
+    var text by remember { mutableStateOf("") }
+
+    var showButton by remember { mutableStateOf(true) }
 
     /**
-     * 下位机升级进度
+     * bin文件列表
      */
-    var upgradeStateLow by remember {
-        mutableFloatStateOf(0f)
+    var masterList by remember { mutableStateOf(emptyList<File>()) }
+
+    var stateList by remember { mutableStateOf(emptyList<File>()) }
+
+    var apkList by remember { mutableStateOf(emptyList<File>()) }
+
+    LaunchedEffect(text) {
+        if (text.contains("成功")) {
+            uiEventHome(HomeIntent.WaitTimeRinse)
+            uiEventHome(HomeIntent.Heartbeat)
+            text = ""
+            masterDialog.value = false
+            showButton = true
+        } else if (text.contains("失败") || text.contains("超时") || text.contains("未知")) {
+            showButton = true
+            text = ""
+        }
     }
-
-    var upgradeSweepStateCount by remember {
-        mutableIntStateOf(0)
-    }
-
-
-    var text by remember { mutableStateOf("下位机升级") }
-    var ver by remember { mutableStateOf("Unknown") }
-    var binList by remember { mutableStateOf(emptyList<File>()) }
-
-//    SideEffect {
-//        scope.launch {
-//            var path = getStoragePath(context, true)
-//            binList = File(path).listFiles { _, name -> name.endsWith(".bin") }?.toList() ?: emptyList()
-//        }
-//    }
-
 
     Column(
         modifier = Modifier
@@ -156,31 +189,35 @@ fun upgradeMode(uiEvent: (SettingIntent) -> Unit, uiEventHome: (HomeIntent) -> U
                     modifier = Modifier
                         .size(200.dp)
                         .clickable {
-                            // 获取usb地址
-                            val path = getStoragePath(context, true)
-                            if (!"".equals(path)) {
-                                try {
-                                    val apkPath = "$path/zktony/apk/update.apk"
-                                    uiEvent(SettingIntent.UpdateApkU(context, apkPath))
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
+                            scope.launch {
+                                var path = getStoragePath(context, true)
+                                if (!"".equals(path)) {
+                                    path += "/zktony/apk"
+                                    apkList =
+                                        File(path)
+                                            .listFiles { _, name -> name.endsWith(".apk") }
+                                            ?.toList() ?: emptyList()
+                                    if (apkList.isNotEmpty()) {
+                                        apkDialog.value = true
+                                    } else {
+                                        Toast
+                                            .makeText(
+                                                context,
+                                                "没有更新文件！",
+                                                Toast.LENGTH_SHORT
+                                            )
+                                            .show()
+                                    }
+                                } else {
                                     Toast
                                         .makeText(
                                             context,
-                                            "版本信息错误！",
+                                            "U盘不存在！",
                                             Toast.LENGTH_SHORT
                                         )
                                         .show()
                                 }
 
-                            } else {
-                                Toast
-                                    .makeText(
-                                        context,
-                                        "U盘不存在！",
-                                        Toast.LENGTH_SHORT
-                                    )
-                                    .show()
                             }
                         }
                 )
@@ -196,9 +233,6 @@ fun upgradeMode(uiEvent: (SettingIntent) -> Unit, uiEventHome: (HomeIntent) -> U
         ) {
             line(Color(0, 105, 5), 5f, 530f)
         }
-
-
-
 
         Row {
             Column(
@@ -217,21 +251,21 @@ fun upgradeMode(uiEvent: (SettingIntent) -> Unit, uiEventHome: (HomeIntent) -> U
                             scope.launch {
                                 var path = getStoragePath(context, true)
                                 if (!"".equals(path)) {
-                                    path += "/master.bin"
-                                    val file = File(path)
-                                    if (!file.exists()) {
-                                        text = "文件不存在"
-                                        return@launch
-                                    }
-                                    embeddedUpgrade(file).collect {
-                                        text = when (it) {
-                                            is UpgradeState.Message -> it.message
-                                            is UpgradeState.Success -> "升级成功"
-                                            is UpgradeState.Err -> "${it.t.message}"
-                                            is UpgradeState.Progress -> "升级中 ${
-                                                String.format("%.2f", it.progress * 100)
-                                            } %"
-                                        }
+                                    path += "/zktony/apk/master"
+                                    masterList =
+                                        File(path)
+                                            .listFiles { _, name -> name.endsWith(".bin") }
+                                            ?.toList() ?: emptyList()
+                                    if (masterList.isNotEmpty()) {
+                                        masterDialog.value = true
+                                    } else {
+                                        Toast
+                                            .makeText(
+                                                context,
+                                                "没有更新文件！",
+                                                Toast.LENGTH_SHORT
+                                            )
+                                            .show()
                                     }
                                 } else {
                                     Toast
@@ -242,7 +276,6 @@ fun upgradeMode(uiEvent: (SettingIntent) -> Unit, uiEventHome: (HomeIntent) -> U
                                         )
                                         .show()
                                 }
-
 
                             }
                         }
@@ -264,32 +297,23 @@ fun upgradeMode(uiEvent: (SettingIntent) -> Unit, uiEventHome: (HomeIntent) -> U
                             scope.launch {
                                 var path = getStoragePath(context, true)
                                 if (!"".equals(path)) {
-                                    path += "/state.bin"
-                                    val file = File(path)
-                                    if (!file.exists()) {
+                                    path += "/zktony/apk/state"
+                                    stateList =
+                                        File(path)
+                                            .listFiles { _, name -> name.endsWith(".bin") }
+                                            ?.toList() ?: emptyList()
+                                    if (stateList.isNotEmpty()) {
+                                        stateDialog.value = true
+                                    } else {
                                         Toast
                                             .makeText(
                                                 context,
-                                                "U盘不存在！",
+                                                "没有更新文件！",
                                                 Toast.LENGTH_SHORT
                                             )
                                             .show()
-                                        return@launch
                                     }
-                                    embeddedUpgrade(file).collect {
-                                        text = when (it) {
-                                            is UpgradeState.Message -> it.message
-                                            is UpgradeState.Success -> "升级成功"
-                                            is UpgradeState.Err -> "${it.t.message}"
-                                            is UpgradeState.Progress -> "升级中 ${
-                                                String.format(
-                                                    "%.2f",
-                                                    it.progress * 100
-                                                )
-                                            } %"
-                                        }
-                                    }
-                                }else {
+                                } else {
                                     Toast
                                         .makeText(
                                             context,
@@ -318,21 +342,303 @@ fun upgradeMode(uiEvent: (SettingIntent) -> Unit, uiEventHome: (HomeIntent) -> U
 
 
 
-    if (upgradeLowDialog.value) {
-        AlertDialog(
-            onDismissRequest = {},
-            title = {
-                Text(text = "导出进度", fontSize = 18.sp)
-            },
-            text = {
-                HorizontalProgressBar(upgradeStateLow / upgradeSweepStateCount)
-            }, confirmButton = {
+    if (masterDialog.value) {
+        Dialog(onDismissRequest = {
+        }) {
+            ElevatedCard {
+                var selectedFile by remember { mutableStateOf<File?>(null) }
+                Column(
+                    modifier = Modifier
+                        .padding(30.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    LazyColumn(
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(masterList) { file ->
+                            FileItem(file, selectedFile) {
+                                selectedFile = it
+                            }
+                        }
+                        item {
+                            if (showButton) {
+                                Column {
+                                    Row {
+                                        Button(
+                                            modifier = Modifier
+                                                .width(100.dp),
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = Color(rgb(0, 105, 52))
+                                            ),
+                                            onClick = {
+                                                scope.launch {
+                                                    if (selectedFile != null) {
+                                                        showButton = false
+                                                        uiEventHome(HomeIntent.StopWaitTimeRinse)
+                                                        uiEventHome(HomeIntent.StopHeartbeat)
+                                                        delay(200)
+                                                        embeddedUpgrade(
+                                                            selectedFile!!,
+                                                            "master",
+                                                            "zkty"
+                                                        ).collect {
+                                                            text = when (it) {
+                                                                is UpgradeState.Message -> it.message
+                                                                is UpgradeState.Success -> "升级成功"
+                                                                is UpgradeState.Err -> "${it.t.message}"
+                                                                is UpgradeState.Progress -> "升级中 ${
+                                                                    String.format(
+                                                                        "%.2f",
+                                                                        it.progress * 100
+                                                                    )
+                                                                } %"
+                                                            }
+                                                        }
+                                                    } else {
+                                                        Toast.makeText(
+                                                            context,
+                                                            "未选择更新程序!",
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+                                                    }
+                                                }
 
-            }, dismissButton = {
+                                            }) {
+                                            Text(fontSize = 18.sp, text = "确认")
+                                        }
 
-            })
+                                        Button(
+                                            modifier = Modifier
+                                                .padding(start = 250.dp)
+                                                .width(100.dp),
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = Color(rgb(0, 105, 52))
+                                            ),
+                                            onClick = {
+                                                masterDialog.value = false
+                                            }) {
+                                            Text(fontSize = 18.sp, text = "取消")
+                                        }
+                                    }
+                                    Row(modifier = Modifier.padding(top = 10.dp, start = 180.dp)) {
+                                        Text(text = "升级中请勿关机!", fontSize = 18.sp)
+                                    }
+                                }
+
+                            } else {
+                                Row {
+                                    Text(text = text, style = MaterialTheme.typography.displaySmall)
+                                }
+                            }
+
+                        }
+                    }
+                }
+
+            }
+        }
+
+    }
+
+    if (stateDialog.value) {
+        Dialog(onDismissRequest = {
+        }) {
+            ElevatedCard {
+                var selectedFile by remember { mutableStateOf<File?>(null) }
+                Column(
+                    modifier = Modifier
+                        .padding(30.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    LazyColumn(
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(stateList) { file ->
+                            FileItem(file, selectedFile) {
+                                selectedFile = it
+                            }
+                        }
+                        item {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                Button(
+                                    modifier = Modifier
+                                        .width(100.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(rgb(0, 105, 52))
+                                    ),
+                                    onClick = {
+                                        scope.launch {
+                                            if (selectedFile != null) {
+                                                embeddedUpgrade(
+                                                    selectedFile!!,
+                                                    "state",
+                                                    "led"
+                                                ).collect {
+                                                    text = when (it) {
+                                                        is UpgradeState.Message -> it.message
+                                                        is UpgradeState.Success -> "升级成功"
+                                                        is UpgradeState.Err -> "${it.t.message}"
+                                                        is UpgradeState.Progress -> "升级中 ${
+                                                            String.format(
+                                                                "%.2f",
+                                                                it.progress * 100
+                                                            )
+                                                        } %"
+                                                    }
+                                                    Toast.makeText(
+                                                        context,
+                                                        text,
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                    if (text == "升级成功") {
+                                                        stateDialog.value = false
+                                                    }
+                                                }
+                                            } else {
+                                                Toast.makeText(
+                                                    context,
+                                                    "未选择更新程序!",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+                                        }
+
+                                    }) {
+                                    Text(fontSize = 18.sp, text = "确认")
+                                }
+
+                                Button(
+                                    modifier = Modifier
+                                        .padding(start = 250.dp)
+                                        .width(100.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(rgb(0, 105, 52))
+                                    ),
+                                    onClick = {
+                                        stateDialog.value = false
+                                    }) {
+                                    Text(fontSize = 18.sp, text = "取消")
+                                }
+                            }
+                        }
+
+                    }
+
+                }
+            }
+        }
+
     }
 
 
+    if (apkDialog.value) {
+        Dialog(onDismissRequest = {
+        }) {
+            ElevatedCard {
+                var selectedFile by remember { mutableStateOf<File?>(null) }
+                Column(
+                    modifier = Modifier
+                        .padding(30.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    LazyColumn(
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(apkList) { file ->
+                            FileItem(file, selectedFile) {
+                                selectedFile = it
+                            }
+                        }
+                        item {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                Button(
+                                    modifier = Modifier
+                                        .width(100.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(rgb(0, 105, 52))
+                                    ),
+                                    onClick = {
+                                        scope.launch {
+                                            if (selectedFile != null) {
+                                                uiEvent(
+                                                    SettingIntent.UpdateApkU(
+                                                        context,
+                                                        selectedFile!!.path
+                                                    )
+                                                )
+                                            } else {
+                                                Toast.makeText(
+                                                    context,
+                                                    "未选择更新程序!",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+
+                                        }
+
+                                    }) {
+                                    Text(fontSize = 18.sp, text = "确认")
+                                }
+
+                                Button(
+                                    modifier = Modifier
+                                        .padding(start = 250.dp)
+                                        .width(100.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(rgb(0, 105, 52))
+                                    ),
+                                    onClick = {
+                                        apkDialog.value = false
+                                    }) {
+                                    Text(fontSize = 18.sp, text = "取消")
+                                }
+                            }
+                        }
+
+                    }
+
+                }
+            }
+        }
+
+    }
+
 }
 
+@Composable
+fun FileItem(
+    file: File,
+    selectedFile: File?,
+    onFileClick: (File) -> Unit
+) {
+    val isSelected = file == selectedFile
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onFileClick(file) }
+            .padding(vertical = 4.dp),
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = "Name: ${file.name}",
+                color = if (isSelected) Color.Red else Color.Black
+            )
+            Text(
+                text = "Path: ${file.path}",
+                color = if (isSelected) Color.Red else Color.Black
+            )
+        }
+    }
+}

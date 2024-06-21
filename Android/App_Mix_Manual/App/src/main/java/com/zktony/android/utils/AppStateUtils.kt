@@ -43,9 +43,4 @@ object AppStateUtils {
      */
     val hpe: MutableMap<Int, Boolean> = ConcurrentHashMap()
 
-    /**
-     * 获取下位机版本号
-     */
-    val hpv: MutableMap<Int, String> = ConcurrentHashMap()
-
 }

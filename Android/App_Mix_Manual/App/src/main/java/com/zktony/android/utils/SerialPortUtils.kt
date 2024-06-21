@@ -6,7 +6,6 @@ import com.zktony.android.utils.AppStateUtils.hpa
 import com.zktony.android.utils.AppStateUtils.hpd
 import com.zktony.android.utils.AppStateUtils.hpe
 import com.zktony.android.utils.AppStateUtils.hpg
-import com.zktony.android.utils.AppStateUtils.hpv
 import com.zktony.android.utils.LogUtils.logD
 import com.zktony.android.utils.internal.ControlType
 import com.zktony.android.utils.internal.ExceptionPolicy
@@ -40,19 +39,19 @@ object SerialPortUtils {
         // rtu串口全局回调
         SerialStoreUtils.get("zkty")?.registerCallback("globe") { bytes ->
             Protocol.verifyProtocol(bytes) { protocol ->
-                println("protocol.func===${protocol.func}")
-                println("protocol.data===${protocol.data.size}")
-                println("protocol.data===${protocol.data.readInt8()}")
-//                println("protocol.data===${protocol.data.toAsciiString()}")
-                println("hpa===0==${hpa[0]}===1===${hpa[1]}===2===${hpa[2]}===3===${hpa[3]}===4===${hpa[4]}")
+//                println("protocol.func===${protocol.func}")
+//                println("protocol.data===${protocol.data.size}")
+//                println("protocol.data===${protocol.data.readInt8()}")
+////                println("protocol.data===${protocol.data.toAsciiString()}")
+//                println("hpa===0==${hpa[0]}===1===${hpa[1]}===2===${hpa[2]}===3===${hpa[3]}===4===${hpa[4]}")
                 if (protocol.func == 0xFF.toByte()) {
-                    hpe[1] = false
-//                    when (protocol.data.readInt16LE()) {
-//                        1 -> throw Exception("TX Header Error")
-//                        2 -> throw Exception("TX Addr Error")
-//                        3 -> throw Exception("TX Crc Error")
-//                        4 -> throw Exception("TX No Com")
-//                    }
+//                    hpe[1] = false
+                    when (protocol.data.readInt16LE()) {
+                        1 -> throw Exception("TX Header Error")
+                        2 -> throw Exception("TX Addr Error")
+                        3 -> throw Exception("TX Crc Error")
+                        4 -> throw Exception("TX No Com")
+                    }
                 } else {
 //                    println("protocol.func===${protocol.func}")
 //                    println("protocol.data===${protocol.data.readInt8()}")
@@ -77,11 +76,6 @@ object SerialPortUtils {
                         0x09.toByte() -> {
                             hpe[1] = true
                         }
-
-                        0x0A.toByte() -> {
-                            hpv[1] = protocol.data.toAsciiString()
-                        }
-
                         else -> {}
                     }
                 }

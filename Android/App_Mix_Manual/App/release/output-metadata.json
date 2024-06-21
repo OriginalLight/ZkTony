@@ -12,8 +12,8 @@
       "filters": [],
       "attributes": [],
       "versionCode": 4,
-      "versionName": "2.0.1-20240617122310",
-      "outputFile": "zktony-manual-2.0.1-20240617122310-release.apk"
+      "versionName": "2.0.1-20240618141501",
+      "outputFile": "zktony-manual-2.0.1-20240618141501-release.apk"
     }
   ],
   "elementType": "File",
@@ -22,14 +22,14 @@
       "minApi": 28,
       "maxApi": 30,
       "baselineProfiles": [
-        "baselineProfiles/1/zktony-manual-2.0.1-20240617122310-release.dm"
+        "baselineProfiles/1/zktony-manual-2.0.1-20240618141501-release.dm"
       ]
     },
     {
       "minApi": 31,
       "maxApi": 2147483647,
       "baselineProfiles": [
-        "baselineProfiles/0/zktony-manual-2.0.1-20240617122310-release.dm"
+        "baselineProfiles/0/zktony-manual-2.0.1-20240618141501-release.dm"
       ]
     }
   ],

@@ -1,7 +1,15 @@
 package com.zktony.android.utils
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.zktony.android.BuildConfig
+import com.zktony.serialport.ext.toHexString
+import com.zktony.serialport.utils.writeThread
+import java.io.BufferedReader
+import java.io.File
+import java.io.InputStreamReader
+import java.util.concurrent.Executors
 
 //import com.zktony.android.BuildConfig
 
@@ -19,20 +27,15 @@ object LogUtils {
 
     val show = BuildConfig.DEBUG
 
-    fun logV(tag: String = TAG, message: String) =
-        log(V, tag, message)
+    fun logV(tag: String = TAG, message: String) = log(V, tag, message)
 
-    fun logD(tag: String = TAG, message: String) =
-        log(D, tag, message)
+    fun logD(tag: String = TAG, message: String) = log(D, tag, message)
 
-    fun logI(tag: String = TAG, message: String) =
-        log(I, tag, message)
+    fun logI(tag: String = TAG, message: String) = log(I, tag, message)
 
-    fun logW(tag: String = TAG, message: String) =
-        log(W, tag, message)
+    fun logW(tag: String = TAG, message: String) = log(W, tag, message)
 
-    fun logE(tag: String = TAG, message: String) =
-        log(E, tag, message)
+    fun logE(tag: String = TAG, message: String) = log(E, tag, message)
 
     fun log(level: Int, tag: String, message: String) {
 //        if (!show) return
