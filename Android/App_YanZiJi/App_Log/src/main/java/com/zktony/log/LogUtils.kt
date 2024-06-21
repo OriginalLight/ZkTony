@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.util.Log
 import com.zktony.log.storage.LogStorage
+import java.io.File
 
 @SuppressLint("StaticFieldLeak")
 object LogUtils {
@@ -16,6 +17,12 @@ object LogUtils {
         logStorage = LogStorage(app)
     }
 
+    // 导出
+    fun export() : List<File> {
+        return logStorage.exportLogs()
+    }
+
+    // Error日志级别
     fun error(msg: String, storage: Boolean = false) {
         Log.e(TAG, msg)
         if (storage) {
@@ -23,6 +30,7 @@ object LogUtils {
         }
     }
 
+    // Info日志级别
     fun info(msg: String, storage: Boolean = false) {
         Log.i(TAG, msg)
         if (storage) {
@@ -30,6 +38,7 @@ object LogUtils {
         }
     }
 
+    // Debug日志级别
     fun debug(msg: String, storage: Boolean = false) {
         Log.d(TAG, msg)
         if (storage) {
@@ -37,6 +46,7 @@ object LogUtils {
         }
     }
 
+    // Warn日志级别
     fun warn(msg: String, storage: Boolean = false) {
         Log.w(TAG, msg)
         if (storage) {
@@ -44,6 +54,7 @@ object LogUtils {
         }
     }
 
+    // Verbose日志级别
     fun verbose(msg: String, storage: Boolean = false) {
         Log.v(TAG, msg)
         if (storage) {
@@ -51,6 +62,7 @@ object LogUtils {
         }
     }
 
+    // WTF日志级别
     fun wtf(msg: String, storage: Boolean = false) {
         Log.wtf(TAG, msg)
         if (storage) {
@@ -58,6 +70,7 @@ object LogUtils {
         }
     }
 
+    // Error日志级别
     fun error(tag: String, msg: String, storage: Boolean = false) {
         Log.e(tag, msg)
         if (storage) {
@@ -65,6 +78,7 @@ object LogUtils {
         }
     }
 
+    // Info日志级别
     fun info(tag: String, msg: String, storage: Boolean = false) {
         Log.i(tag, msg)
         if (storage) {
@@ -72,6 +86,7 @@ object LogUtils {
         }
     }
 
+    // Debug日志级别
     fun debug(tag: String, msg: String, storage: Boolean = false) {
         Log.d(tag, msg)
         if (storage) {
@@ -79,6 +94,7 @@ object LogUtils {
         }
     }
 
+    // Warn日志级别
     fun warn(tag: String, msg: String, storage: Boolean = false) {
         Log.w(tag, msg)
         if (storage) {
@@ -86,6 +102,7 @@ object LogUtils {
         }
     }
 
+    // Verbose日志级别
     fun verbose(tag: String, msg: String, storage: Boolean = false) {
         Log.v(tag, msg)
         if (storage) {
@@ -93,6 +110,7 @@ object LogUtils {
         }
     }
 
+    // WTF日志级别
     fun wtf(tag: String, msg: String, storage: Boolean = false) {
         Log.wtf(tag, msg)
         if (storage) {

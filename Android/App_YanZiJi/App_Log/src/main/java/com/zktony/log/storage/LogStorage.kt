@@ -10,7 +10,7 @@ import java.util.concurrent.Executors
 
 class LogStorage(ctx: Context) {
     private val logDir: File = File(ctx.filesDir, "logs")
-    private val logFileName: String = "${SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())}.txt"
+    private val logFileName: String = "${SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())}.log"
     private val executor = Executors.newSingleThreadExecutor()
 
     init {
@@ -22,7 +22,7 @@ class LogStorage(ctx: Context) {
 
     fun writeLog(msg: String) {
         executor.execute {
-            val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+            val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault()).format(Date())
             val message = "$timestamp: $msg\n"
             try {
                 val logFile = File(logDir, logFileName)
@@ -37,13 +37,8 @@ class LogStorage(ctx: Context) {
         }
     }
 
-    fun readLog(): String {
-        val logFile = File(logDir, logFileName)
-        return if (logFile.exists()) {
-            logFile.readText()
-        } else {
-            ""
-        }
+    fun exportLogs(): List<File> {
+        return logDir.listFiles()?.toList() ?: emptyList()
     }
 
     private fun clearLog() {

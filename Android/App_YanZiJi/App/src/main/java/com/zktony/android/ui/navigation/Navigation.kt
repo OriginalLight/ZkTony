@@ -15,7 +15,7 @@ import com.zktony.android.ui.CalibrationRoute
 import com.zktony.android.ui.DebugRoute
 import com.zktony.android.ui.HistoryRoute
 import com.zktony.android.ui.HomeRoute
-import com.zktony.android.ui.LoginRoute
+import com.zktony.android.ui.LoginView
 import com.zktony.android.ui.ProgramRoute
 import com.zktony.android.ui.SettingRoute
 
@@ -36,7 +36,7 @@ fun AppNavigation(
                 .padding(scaffoldPadding)
                 .consumeWindowInsets(scaffoldPadding)
         ) {
-            composable(Route.LOGIN) { LoginRoute() }
+            composable(Route.LOGIN) { LoginView() }
             composable(Route.HOME) { HomeRoute(viewModel = hiltViewModel()) }
             composable(Route.PROGRAM) { ProgramRoute(viewModel = hiltViewModel()) }
             composable(Route.CALIBRATION) { CalibrationRoute(viewModel = hiltViewModel()) }

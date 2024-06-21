@@ -75,3 +75,5 @@
     <fields>;
     <methods>;
 }
+
+-keep class com.hzmct.enjoysdk.api.EnjoySDK.** { *; }
