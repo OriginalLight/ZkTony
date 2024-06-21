@@ -211,6 +211,9 @@ fun ProgramEdit(
                     }
                     orificePlate = orificePlate.copy(orifices = lists)
                     dispatch(ProgramIntent.Update(item.copy(orificePlates = listOf(orificePlate))))
+                    volume = orificePlate.getVolume()[0].toString()
+                    previous = orificePlate.previous.toString()
+                    delay = orificePlate.delay.toString()
                 } else {
                     val lists = orificePlate.orifices.toMutableList()
                     lists.forEachIndexed { index1, o ->
@@ -220,6 +223,9 @@ fun ProgramEdit(
                     }
                     orificePlate = orificePlate.copy(orifices = lists)
                     dispatch(ProgramIntent.Update(item.copy(orificePlates = listOf(orificePlate))))
+                    volume = orificePlate.getVolume()[0].toString()
+                    previous = orificePlate.previous.toString()
+                    delay = orificePlate.delay.toString()
                 }
             }
         }
@@ -250,6 +256,9 @@ fun ProgramEdit(
                             orificePlate = orificePlate.copy(row = r)
                             orificePlate = orificePlate.copy(orifices = orificePlate.generateOrifices())
                             dispatch(ProgramIntent.Update(item.copy(orificePlates = listOf(orificePlate))))
+                            volume = orificePlate.getVolume()[0].toString()
+                            previous = orificePlate.previous.toString()
+                            delay = orificePlate.delay.toString()
                         }
                     }
                 }
@@ -268,6 +277,9 @@ fun ProgramEdit(
                             orificePlate = orificePlate.copy(column = c)
                             orificePlate = orificePlate.copy(orifices = orificePlate.generateOrifices())
                             dispatch(ProgramIntent.Update(item.copy(orificePlates = listOf(orificePlate))))
+                            volume = orificePlate.getVolume()[0].toString()
+                            previous = orificePlate.previous.toString()
+                            delay = orificePlate.delay.toString()
                         }
                     }
                 }
@@ -286,6 +298,9 @@ fun ProgramEdit(
                                 orificePlate = orificePlate.copy(points = cd)
                                 orificePlate = orificePlate.copy(orifices = orificePlate.generateOrifices())
                                 dispatch(ProgramIntent.Update(item.copy(orificePlates = listOf(orificePlate))))
+                                volume = orificePlate.getVolume()[0].toString()
+                                previous = orificePlate.previous.toString()
+                                delay = orificePlate.delay.toString()
                             }
                         }
                     }
@@ -313,6 +328,9 @@ fun ProgramEdit(
                                 orificePlate = orificePlate.copy(points = cd)
                                 orificePlate = orificePlate.copy(orifices = orificePlate.generateOrifices())
                                 dispatch(ProgramIntent.Update(item.copy(orificePlates = listOf(orificePlate))))
+                                volume = orificePlate.getVolume()[0].toString()
+                                previous = orificePlate.previous.toString()
+                                delay = orificePlate.delay.toString()
                             }
                         }
                     }
