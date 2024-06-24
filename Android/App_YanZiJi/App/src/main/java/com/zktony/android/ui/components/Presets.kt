@@ -5,7 +5,9 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.PromptSoundUtils
+import com.zktony.datastore.LocalDataSaver
 import com.zktony.datastore.rememberDataSaverState
+import com.zktony.log.LogUtils
 import java.util.Locale
 
 /**
@@ -15,8 +17,11 @@ import java.util.Locale
 @Suppress("DEPRECATION")
 @Composable
 fun Presets(content: @Composable () -> Unit) {
+    // 数据存储
+    val dataSaver = LocalDataSaver.current
+
     // 语言
-    val language by rememberDataSaverState(key = Constants.LANGUAGE, default = "zh")
+    val language = dataSaver.readData(Constants.LANGUAGE, "zh")
     val configuration = LocalConfiguration.current
     val resource = LocalContext.current.resources
 
@@ -24,10 +29,12 @@ fun Presets(content: @Composable () -> Unit) {
     Locale.setDefault(locale)
     configuration.setLocale(locale)
     resource.updateConfiguration(configuration, resource.displayMetrics)
+    LogUtils.info("Presets", "Language: $language")
 
     // 提示音
-    val promptSound by rememberDataSaverState(key = Constants.PROMPT_SOUND, default = "mute")
+    val promptSound = dataSaver.readData(Constants.PROMPT_SOUND, "mute")
     PromptSoundUtils.setPromptSound(promptSound)
+    LogUtils.info("Presets", "Prompt sound: $promptSound")
 
     content()
 }
