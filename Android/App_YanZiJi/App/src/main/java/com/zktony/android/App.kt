@@ -2,6 +2,7 @@ package com.zktony.android
 
 import android.app.Application
 import com.zktony.android.utils.ApplicationUtils
+import com.zktony.android.utils.PromptSoundUtils
 import com.zktony.android.utils.HzmctUtils
 import com.zktony.android.utils.SerialPortUtils
 import com.zktony.android.utils.StorageUtils
@@ -25,6 +26,7 @@ class App : Application() {
         LogUtils.with(this)
         ApplicationUtils.with(this)
         HzmctUtils.with(this)
+        PromptSoundUtils.with(this)
 
         // Initialize the application without context
         SerialPortUtils.with()

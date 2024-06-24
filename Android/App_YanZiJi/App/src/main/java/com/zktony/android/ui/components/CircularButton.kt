@@ -29,7 +29,7 @@ import kotlin.math.roundToInt
 import kotlin.math.sin
 
 @Composable
-fun CircularButtons(
+fun CircularButton(
     count: Int = 12,
     display: List<String>,
     radius: Dp = 24.dp,
@@ -90,7 +90,7 @@ fun CircularButtons(
 fun CircularButtonsWithSelectionPreview() {
     var selected by remember { mutableIntStateOf(0) }
 
-    CircularButtons(
+    CircularButton(
         selected = selected,
         display = listOf("1", "2", "3", "4", "5", "6"),
         onSelected = { index ->

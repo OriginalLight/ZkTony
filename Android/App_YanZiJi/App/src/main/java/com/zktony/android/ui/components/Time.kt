@@ -1,5 +1,6 @@
-package com.zktony.android.ui.components.system
+package com.zktony.android.ui.components
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -7,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.tooling.preview.Preview
 import com.zktony.android.utils.extra.dateFormat
 import kotlinx.coroutines.delay
@@ -24,10 +26,16 @@ fun Time() {
         }
     }
 
-    Text(
-        text = currentDateTime.value.dateFormat("yyyy-MM-dd HH:mm:ss"),
-        style = MaterialTheme.typography.bodyLarge
-    )
+    Column(horizontalAlignment = Alignment.End) {
+        Text(
+            text = currentDateTime.value.dateFormat(" HH:mm"),
+            style = MaterialTheme.typography.bodyMedium
+        )
+        Text(
+            text = currentDateTime.value.dateFormat("yyyy-MM-dd"),
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
 }
 
 @Preview

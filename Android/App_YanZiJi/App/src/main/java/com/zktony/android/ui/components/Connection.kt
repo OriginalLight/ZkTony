@@ -1,4 +1,4 @@
-package com.zktony.android.ui.components.system
+package com.zktony.android.ui.components
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothManager

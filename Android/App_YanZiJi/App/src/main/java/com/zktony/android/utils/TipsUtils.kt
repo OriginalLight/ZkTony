@@ -1,6 +1,6 @@
 package com.zktony.android.utils
 
-import com.zktony.android.ui.components.tips.Tips
+import com.zktony.android.ui.components.Tips
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 

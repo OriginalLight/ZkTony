@@ -26,7 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.zktony.android.ui.components.CircularButtons
+import com.zktony.android.ui.components.CircularButton
 import com.zktony.android.ui.components.DebugAppBar
 import com.zktony.android.ui.components.SquareTextField
 import com.zktony.android.ui.utils.LocalNavigationActions
@@ -78,7 +78,7 @@ fun ValveGroup(
             modifier = Modifier.weight(1f),
             contentAlignment = Alignment.Center
         ) {
-            CircularButtons(
+            CircularButton(
                 count = 12,
                 display = listOf(
                     "A1", "B1", "C1", "D1", "A2", "B2",
@@ -98,7 +98,7 @@ fun ValveGroup(
             modifier = Modifier.weight(1f),
             contentAlignment = Alignment.Center
         ) {
-            CircularButtons(
+            CircularButton(
                 count = 6,
                 display = listOf("A", "B", "C", "D", "废液", "空气"),
                 enabled = !loading,

@@ -1,4 +1,4 @@
-package com.zktony.android.ui.components.tips
+package com.zktony.android.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
