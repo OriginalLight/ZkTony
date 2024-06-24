@@ -61,7 +61,7 @@ class CalibrationViewModel @Inject constructor(
             _uiFlags.value = UiFlags.loading()
             val volume = dataStore.readData(Constants.ZT_0002, 0.0)
             if (turns == 0.0) {
-                SnackbarUtils.showMessage("转数不能为0")
+                SnackbarUtils.showSnackbar("转数不能为0")
                 return@launch
             }
             try {
@@ -78,7 +78,7 @@ class CalibrationViewModel @Inject constructor(
                 }
                 _uiFlags.value = UiFlags.none()
             } catch (ex: Exception) {
-                SnackbarUtils.showMessage(ex.message ?: "Unknown")
+                SnackbarUtils.showSnackbar(ex.message ?: "Unknown")
             }
         }
     }

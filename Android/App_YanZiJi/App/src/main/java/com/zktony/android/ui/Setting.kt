@@ -162,7 +162,7 @@ fun SettingContent(
     val scope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackbarHostState.current
     val navigationActions = LocalNavigationActions.current
-    var navigation by rememberDataSaverState(key = Constants.NAVIGATION, default = false)
+    var navigation by rememberDataSaverState(key = Constants.NAVIGATION_BAR, default = false)
     var helpInfo by remember { mutableStateOf(false) }
 
     Row(

@@ -39,7 +39,7 @@ class DebugViewModel @Inject constructor() : ViewModel() {
                 writeWithValve(1, value)
                 _loading.value = false
             } catch (ex: Exception) {
-                SnackbarUtils.showMessage(ex.message ?: "Unknown")
+                SnackbarUtils.showSnackbar(ex.message ?: "Unknown")
                 _loading.value = false
             }
         }
@@ -52,7 +52,7 @@ class DebugViewModel @Inject constructor() : ViewModel() {
                 writeWithPulse(1, (turns * 6400).toLong())
                 _loading.value = false
             } catch (ex: Exception) {
-                SnackbarUtils.showMessage(ex.message ?: "Unknown")
+                SnackbarUtils.showSnackbar(ex.message ?: "Unknown")
                 _loading.value = false
             }
         }

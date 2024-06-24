@@ -18,6 +18,7 @@ import com.zktony.android.ui.HomeRoute
 import com.zktony.android.ui.LoginView
 import com.zktony.android.ui.ProgramRoute
 import com.zktony.android.ui.SettingRoute
+import com.zktony.android.ui.SettingsView
 
 @Composable
 fun AppNavigation(
@@ -31,7 +32,7 @@ fun AppNavigation(
 
         NavHost(
             navController = navController,
-            startDestination = Route.LOGIN,
+            startDestination = Route.SETTINGS,
             modifier = Modifier
                 .padding(scaffoldPadding)
                 .consumeWindowInsets(scaffoldPadding)
@@ -43,6 +44,7 @@ fun AppNavigation(
             composable(Route.HISTORY) { HistoryRoute(viewModel = hiltViewModel()) }
             composable(Route.DEBUG) { DebugRoute(viewModel = hiltViewModel()) }
             composable(Route.SETTING) { SettingRoute(viewModel = hiltViewModel()) }
+            composable(Route.SETTINGS) { SettingsView() }
         }
     }
 }

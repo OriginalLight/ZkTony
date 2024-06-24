@@ -16,11 +16,11 @@ object HzmctUtils {
         enjoySdk.registSafeProgram("Abc123456")
     }
 
-    fun setNavigationStatus(status: Boolean) {
+    fun setNavigationBar(status: Boolean) {
         enjoySdk.setNavigationBarShowStatus(if (status) 1 else 0)
     }
 
-    fun setStatusBarStatus(status: Boolean) {
+    fun setStatusBar(status: Boolean) {
         enjoySdk.setStatusBarShowStatus(status)
     }
 

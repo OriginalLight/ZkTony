@@ -4,14 +4,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 object SnackbarUtils {
-    private val _state = MutableStateFlow<String?>(null)
-    val state = _state.asStateFlow()
+    private val _snackbar = MutableStateFlow<String?>(null)
+    val snackbar = _snackbar.asStateFlow()
 
-    fun showMessage(msg: String) {
-        _state.value = msg
+    fun showSnackbar(msg: String) {
+        _snackbar.value = msg
     }
 
-    fun clearMessage() {
-        _state.value = null
+    fun clearSnackbar() {
+        _snackbar.value = null
     }
 }

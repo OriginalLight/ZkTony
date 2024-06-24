@@ -114,7 +114,7 @@ class SettingViewModel @Inject constructor(
 
                             is DownloadState.Err -> {
                                 _progress.value = 0
-                                SnackbarUtils.showMessage("下载失败: ${it.t.message}")
+                                SnackbarUtils.showSnackbar("下载失败: ${it.t.message}")
                             }
 
                             is DownloadState.Progress -> {
@@ -125,12 +125,12 @@ class SettingViewModel @Inject constructor(
                 }
             } else {
                 httpCall(exception = {
-                    SnackbarUtils.showMessage(it.message ?: "Unknown")
+                    SnackbarUtils.showSnackbar(it.message ?: "Unknown")
                 }) { app ->
                     if (app != null) {
                         _application.value = app
                     } else {
-                        SnackbarUtils.showMessage("未找到升级信息")
+                        SnackbarUtils.showSnackbar("未找到升级信息")
                     }
                 }
             }

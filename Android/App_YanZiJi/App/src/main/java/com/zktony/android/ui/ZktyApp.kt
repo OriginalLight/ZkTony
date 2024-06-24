@@ -15,12 +15,12 @@ fun ZktyApp(
     snackbarHostState: SnackbarHostState
 ) {
     // 收集Snackbar消息
-    val snackbar by SnackbarUtils.state.collectAsStateWithLifecycle()
+    val snackbar by SnackbarUtils.snackbar.collectAsStateWithLifecycle()
     // 处理Snackbar消息
     LaunchedEffect(key1 = snackbar) {
         snackbar?.let {
             snackbarHostState.showSnackbar(it)
-            SnackbarUtils.clearMessage()
+            SnackbarUtils.clearSnackbar()
         }
     }
 

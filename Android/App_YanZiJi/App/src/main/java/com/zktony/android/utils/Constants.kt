@@ -9,9 +9,24 @@ object Constants {
     const val OSS_APP = "https://njzkty.oss-cn-beijing.aliyuncs.com/Application.json"
 
     /**
-     * Navigation
+     * 导航栏 true false
      */
-    const val NAVIGATION = "NAVIGATION"
+    const val NAVIGATION_BAR = "NAVIGATION_BAR"
+
+    /**
+     * 状态栏 true false
+     */
+    const val STATUS_BAR = "STATUS_BAR"
+
+    /**
+     * 语言 zh en
+     */
+    const val LANGUAGE = "LANGUAGE"
+
+    /**
+     * 提示音 mute ring voice
+     */
+    const val PROMPT_SOUND = "PROMPT_SOUND"
 
     /**
      * 模块数量

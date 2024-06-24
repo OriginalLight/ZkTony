@@ -19,6 +19,7 @@ object Route {
     const val HISTORY = "History"
     const val DEBUG = "Debug"
     const val SETTING = "Setting"
+    const val SETTINGS = "Settings"
     const val SPLASH = "Splash"
 }
 
