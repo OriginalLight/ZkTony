@@ -54,9 +54,9 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
                     {
                         try
                         {
-                            var arr = bytes.Skip(5).Take(5).ToArray();
+                            var arr = bytes.Skip(5).Take(bytes.Length - 9).ToArray();
                             // arr to string
-                            var str = Encoding.ASCII.GetString(arr);
+                            var str = Encoding.ASCII.GetString(arr).Split("+")[0];
                             Log.Information("下位机版本：" + str);
                             _ver = str;
                         }

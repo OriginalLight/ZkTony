@@ -35,15 +35,15 @@ public class MetricController(
 
         Log.Information("当前温度：" + temperature + "，目标温度：" + target + "，三色灯：" + flag + "，舱门：" + hatch);
 
-        if (temperature > target + 30)
+        if (temperature > -50)
         {
-            if (flag > 2) return Ok(dto);
+            if (flag >= 2) return Ok(dto);
             serialPort.WritePort("Com1", DefaultProtocol.LedYellow().ToBytes());
             serialPort.SetFlag("led", 2);
         }
         else
         {
-            if (flag > 2) return Ok(dto);
+            if (flag >= 1) return Ok(dto);
             serialPort.WritePort("Com1", DefaultProtocol.LedGreen().ToBytes());
             serialPort.SetFlag("led", 1);
         }
