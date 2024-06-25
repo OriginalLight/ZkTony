@@ -7,7 +7,6 @@ import com.zktony.android.utils.Constants
 import com.zktony.android.utils.PromptSoundUtils
 import com.zktony.android.utils.ResourceUtils
 import com.zktony.datastore.LocalDataSaver
-import com.zktony.datastore.rememberDataSaverState
 import com.zktony.log.LogUtils
 import java.util.Locale
 

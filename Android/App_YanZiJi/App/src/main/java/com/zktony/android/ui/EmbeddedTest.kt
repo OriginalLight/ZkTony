@@ -39,7 +39,8 @@ fun EmbeddedTest() {
     SideEffect {
         scope.launch {
             val media = "/mnt/media_rw/AC7D-16F8"
-            binList = File(media).listFiles { _, name -> name.endsWith(".bin") }?.toList() ?: emptyList()
+            binList =
+                File(media).listFiles { _, name -> name.endsWith(".bin") }?.toList() ?: emptyList()
         }
     }
 
@@ -58,11 +59,16 @@ fun EmbeddedTest() {
                                 return@launch
                             }
                             embeddedUpgrade(it).collect {
-                                text = when(it) {
+                                text = when (it) {
                                     is UpgradeState.Message -> it.message
                                     is UpgradeState.Success -> "升级成功"
                                     is UpgradeState.Err -> "${it.t.message}"
-                                    is UpgradeState.Progress -> "升级中 ${String.format("%.2f", it.progress * 100)} %"
+                                    is UpgradeState.Progress -> "升级中 ${
+                                        String.format(
+                                            "%.2f",
+                                            it.progress * 100
+                                        )
+                                    } %"
                                 }
                             }
                         }

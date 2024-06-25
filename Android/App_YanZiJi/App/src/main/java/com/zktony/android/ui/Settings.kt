@@ -28,11 +28,10 @@ import com.zktony.android.R
 import com.zktony.android.ui.components.RadioButtonGroup
 import com.zktony.android.ui.components.Tips
 import com.zktony.android.ui.components.TipsType
-import com.zktony.android.utils.PromptSoundUtils
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.HzmctUtils
+import com.zktony.android.utils.PromptSoundUtils
 import com.zktony.android.utils.ResourceUtils
-import com.zktony.android.utils.SnackbarUtils
 import com.zktony.android.utils.TipsUtils
 import com.zktony.datastore.rememberDataSaverState
 import kotlinx.coroutines.delay
@@ -77,7 +76,10 @@ fun SystemSettingsView(modifier: Modifier = Modifier) {
         // 主屏幕
         var homeScreen by remember { mutableStateOf(HzmctUtils.getHomePackage() == BuildConfig.APPLICATION_ID) }
 
-        Text(text = stringResource(id = R.string.system_settings), style = MaterialTheme.typography.headlineMedium)
+        Text(
+            text = stringResource(id = R.string.system_settings),
+            style = MaterialTheme.typography.headlineMedium
+        )
 
         SettingsRaw(stringResource(id = R.string.language)) {
             RadioButtonGroup(
@@ -94,12 +96,21 @@ fun SystemSettingsView(modifier: Modifier = Modifier) {
         SettingsRaw(stringResource(id = R.string.prompt_sound)) {
             RadioButtonGroup(
                 selected = PromptSoundUtils.getPromptSoundId(promptSound),
-                options = listOf(stringResource(id = R.string.mute), stringResource(id = R.string.ring), stringResource(id = R.string.voice))
+                options = listOf(
+                    stringResource(id = R.string.mute),
+                    stringResource(id = R.string.ring),
+                    stringResource(id = R.string.voice)
+                )
             ) {
                 scope.launch {
                     promptSound = PromptSoundUtils.getPromptSoundStr(it)
                     PromptSoundUtils.setPromptSound(promptSound)
-                    TipsUtils.showTips(Tips(TipsType.INFO, "${ResourceUtils.stringResource(R.string.prompt_sound)} 设置成功"))
+                    TipsUtils.showTips(
+                        Tips(
+                            TipsType.INFO,
+                            "${ResourceUtils.stringResource(R.string.prompt_sound)} 设置成功"
+                        )
+                    )
                 }
             }
         }
@@ -140,7 +151,8 @@ fun SystemSettingsView(modifier: Modifier = Modifier) {
             Switch(checked = homeScreen, onCheckedChange = {
                 scope.launch {
                     homeScreen = it
-                    val bool = HzmctUtils.setHomePackage(if (it) BuildConfig.APPLICATION_ID else "com.android.launcher3")
+                    val bool =
+                        HzmctUtils.setHomePackage(if (it) BuildConfig.APPLICATION_ID else "com.android.launcher3")
                     if (bool) {
                         TipsUtils.showTips(Tips(TipsType.INFO, "设置成功"))
                     } else {

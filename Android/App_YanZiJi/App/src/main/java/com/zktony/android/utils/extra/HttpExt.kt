@@ -5,7 +5,11 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.zktony.android.BuildConfig
 import com.zktony.android.utils.Constants
-import okhttp3.*
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
 import java.io.IOException
 
 /**

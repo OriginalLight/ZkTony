@@ -1,6 +1,5 @@
 package com.zktony.android.ui
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 
 /**

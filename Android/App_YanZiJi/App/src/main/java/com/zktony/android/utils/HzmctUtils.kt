@@ -1,12 +1,11 @@
 package com.zktony.android.utils
 
 import android.annotation.SuppressLint
-import android.app.Application
 import com.hzmct.enjoysdk.api.EnjoySDK
 
 object HzmctUtils {
     @SuppressLint("StaticFieldLeak")
-    private lateinit var enjoySdk : EnjoySDK
+    private lateinit var enjoySdk: EnjoySDK
 
     fun with() {
         enjoySdk = EnjoySDK(ApplicationUtils.ctx)
@@ -18,7 +17,7 @@ object HzmctUtils {
         }
     }
 
-    fun setNavigationBar(status: Boolean) : Boolean {
+    fun setNavigationBar(status: Boolean): Boolean {
         try {
             val res = enjoySdk.setNavigationBarShowStatus(if (status) 1 else 0)
             return res != -1
@@ -47,7 +46,7 @@ object HzmctUtils {
         }
     }
 
-    fun setHomePackage(packageName: String) : Boolean {
+    fun setHomePackage(packageName: String): Boolean {
         try {
             val res = enjoySdk.setHomePackage(packageName)
             return res != -1

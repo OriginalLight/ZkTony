@@ -1,7 +1,6 @@
 package com.zktony.android.utils
 
 import android.annotation.SuppressLint
-import android.app.Application
 import java.io.File
 
 
@@ -21,7 +20,8 @@ object StorageUtils {
     @SuppressLint("PrivateApi")
     fun getUsbStorageDir(): List<String> {
         val storageDirectories = mutableListOf<String>()
-        val storageManager = ApplicationUtils.ctx.getSystemService(android.content.Context.STORAGE_SERVICE) as android.os.storage.StorageManager
+        val storageManager =
+            ApplicationUtils.ctx.getSystemService(android.content.Context.STORAGE_SERVICE) as android.os.storage.StorageManager
         val volumeInfoClazz: Class<*>?
         val diskInfoClazz: Class<*>?
         try {
@@ -55,7 +55,8 @@ object StorageUtils {
     @SuppressLint("PrivateApi")
     fun getTfStorageDir(): List<String> {
         val storageDirectories = mutableListOf<String>()
-        val storageManager = ApplicationUtils.ctx.getSystemService(android.content.Context.STORAGE_SERVICE) as android.os.storage.StorageManager
+        val storageManager =
+            ApplicationUtils.ctx.getSystemService(android.content.Context.STORAGE_SERVICE) as android.os.storage.StorageManager
         val volumeInfoClazz: Class<*>?
         val diskInfoClazz: Class<*>?
 

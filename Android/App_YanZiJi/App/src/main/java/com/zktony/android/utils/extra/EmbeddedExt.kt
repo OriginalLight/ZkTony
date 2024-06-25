@@ -2,19 +2,13 @@ package com.zktony.android.utils.extra
 
 import android.util.Log
 import com.zktony.serialport.command.Protocol
-import com.zktony.serialport.ext.readInt16LE
 import com.zktony.serialport.ext.readInt8
 import com.zktony.serialport.ext.toAsciiString
 import com.zktony.serialport.ext.writeInt16LE
 import com.zktony.serialport.ext.writeInt32LE
 import com.zktony.serialport.lifecycle.SerialStoreUtils
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import java.io.File
@@ -30,7 +24,7 @@ suspend fun embeddedUpgrade(hexFile: File) = channelFlow {
         serialPort.registerCallback(key) { bytes ->
             Protocol.verifyProtocol(bytes) {
                 launch {
-                    when(it.func) {
+                    when (it.func) {
                         0xA0.toByte() -> {
                             Log.d("EmbeddedExt", "升级准备就绪")
                             flag = if (it.data.readInt8() == 1) {
@@ -39,6 +33,7 @@ suspend fun embeddedUpgrade(hexFile: File) = channelFlow {
                                 0
                             }
                         }
+
                         0xA1.toByte() -> {
                             Log.d("EmbeddedExt", "升级数据信息就绪")
                             flag = if (it.data.readInt8() == 1) {
@@ -47,6 +42,7 @@ suspend fun embeddedUpgrade(hexFile: File) = channelFlow {
                                 1
                             }
                         }
+
                         0xA2.toByte() -> {
                             Log.d("EmbeddedExt", "地址擦除就绪")
                             flag = if (it.data.readInt8() == 1) {
@@ -55,12 +51,14 @@ suspend fun embeddedUpgrade(hexFile: File) = channelFlow {
                                 2
                             }
                         }
+
                         0xA3.toByte() -> {
                             if (it.data.readInt8() == 1) {
                                 flag = -1
                             }
                             rx = true
                         }
+
                         0xA4.toByte() -> {
                             if (it.data.readInt8() == 1) {
                                 flag = -1
@@ -72,6 +70,7 @@ suspend fun embeddedUpgrade(hexFile: File) = channelFlow {
                                 Log.d("EmbeddedExt", "升级成功")
                             }
                         }
+
                         else -> {
                             Log.d("EmbeddedExt", "未知命令")
                         }
@@ -95,7 +94,10 @@ suspend fun embeddedUpgrade(hexFile: File) = channelFlow {
         send(UpgradeState.Message("升级数据信息中"))
         serialPort.sendByteArray(Protocol().apply {
             func = 0xA1.toByte()
-            data = byteArrayOf(0x00, 0x00).writeInt16LE(totalPackage) + byteArrayOf(0x00, 0x00).writeInt16LE(totalLength)
+            data = byteArrayOf(0x00, 0x00).writeInt16LE(totalPackage) + byteArrayOf(
+                0x00,
+                0x00
+            ).writeInt16LE(totalLength)
         }.serialization())
         delay(300)
         if (flag != 1) error("升级数据信息响应失败")
@@ -106,7 +108,17 @@ suspend fun embeddedUpgrade(hexFile: File) = channelFlow {
         val endAddress = 0x8020000 + totalLength
         serialPort.sendByteArray(Protocol().apply {
             func = 0xA2.toByte()
-            data = byteArrayOf(0x00, 0x00, 0x00, 0x00).writeInt32LE(startAddress.toLong()) + byteArrayOf(0x00, 0x00, 0x00, 0x00).writeInt32LE(endAddress.toLong())
+            data = byteArrayOf(
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            ).writeInt32LE(startAddress.toLong()) + byteArrayOf(
+                0x00,
+                0x00,
+                0x00,
+                0x00
+            ).writeInt32LE(endAddress.toLong())
         }.serialization())
         delay(2000)
         if (flag != 2) error("地址擦除响应失败")

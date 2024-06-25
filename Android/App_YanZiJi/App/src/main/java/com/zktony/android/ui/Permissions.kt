@@ -38,7 +38,8 @@ fun Permissions(
 ) {
     val progressions = listOf(
         Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        Manifest.permission.WRITE_EXTERNAL_STORAGE
+    )
 
     val permissionStates = rememberMultiplePermissionsState(permissions = progressions)
 

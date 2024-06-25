@@ -10,7 +10,10 @@ object ResourceUtils {
         Locale.setDefault(locale)
         val configuration = ApplicationUtils.ctx.resources.configuration
         configuration.setLocale(locale)
-        ApplicationUtils.ctx.resources.updateConfiguration(configuration, ApplicationUtils.ctx.resources.displayMetrics)
+        ApplicationUtils.ctx.resources.updateConfiguration(
+            configuration,
+            ApplicationUtils.ctx.resources.displayMetrics
+        )
     }
 
     fun stringResource(id: Int): String {
