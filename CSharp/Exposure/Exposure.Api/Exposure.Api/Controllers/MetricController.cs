@@ -43,7 +43,7 @@ public class MetricController(
         }
         else
         {
-            if (flag >= 1) return Ok(dto);
+            if (flag is > 2 or 1) return Ok(dto);
             serialPort.WritePort("Com1", DefaultProtocol.LedGreen().ToBytes());
             serialPort.SetFlag("led", 1);
         }

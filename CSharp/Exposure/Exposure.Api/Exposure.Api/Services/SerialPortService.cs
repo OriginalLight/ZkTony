@@ -133,7 +133,7 @@ public class SerialPortService(IOptionService option, IErrorLogService errorLog)
         };
 
         // 设置LED灯
-        SetFlag("led", 1);
+        SetFlag("led", 0);
 
         // 查询门的状态
         WritePort("Com2", DefaultProtocol.QueryOptocoupler().ToBytes());
