@@ -12,7 +12,6 @@ import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.theme.AppTheme
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
-import com.zktony.android.utils.service.BackgroundService
 import com.zktony.datastore.DataSaverDataStore
 import com.zktony.datastore.LocalDataSaver
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,15 +24,10 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
 
     @Inject
-    lateinit var backgroundService: BackgroundService
-
-    @Inject
     lateinit var dataSaverDataStore: DataSaverDataStore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Add the service observer to the lifecycle
-        lifecycle.addObserver(backgroundService)
 
         setContent {
 

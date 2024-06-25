@@ -12,18 +12,30 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.zktony.android.BuildConfig
+import com.zktony.android.R
 import com.zktony.android.ui.components.RadioButtonGroup
+import com.zktony.android.ui.components.Tips
+import com.zktony.android.ui.components.TipsType
 import com.zktony.android.utils.PromptSoundUtils
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.HzmctUtils
+import com.zktony.android.utils.ResourceUtils
 import com.zktony.android.utils.SnackbarUtils
+import com.zktony.android.utils.TipsUtils
 import com.zktony.datastore.rememberDataSaverState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -31,13 +43,7 @@ fun SettingsView() {
 
     LazyColumn {
         item {
-            UserSettingsView()
-        }
-        item {
             SystemSettingsView()
-        }
-        item {
-            FactorySettingsView()
         }
     }
 }
@@ -46,7 +52,7 @@ fun SettingsView() {
 @Composable
 fun UserSettingsView() {
     Column {
-        Text(text = "用户设置")
+        Text(text = stringResource(id = R.string.user_settings))
     }
 }
 
@@ -63,55 +69,85 @@ fun SystemSettingsView(modifier: Modifier = Modifier) {
         // 语言
         var language by rememberDataSaverState(key = Constants.LANGUAGE, default = "zh")
         // 提示音
-        var sound by rememberDataSaverState(key = Constants.PROMPT_SOUND, default = "mute")
+        var promptSound by rememberDataSaverState(key = Constants.PROMPT_SOUND, default = "mute")
         // 导航栏
         var navigationBar by rememberDataSaverState(key = Constants.NAVIGATION_BAR, default = false)
         // 状态栏
         var statusBar by rememberDataSaverState(key = Constants.STATUS_BAR, default = false)
+        // 主屏幕
+        var homeScreen by remember { mutableStateOf(HzmctUtils.getHomePackage() == BuildConfig.APPLICATION_ID) }
 
-        Text(text = "系统设置", style = MaterialTheme.typography.headlineMedium)
+        Text(text = stringResource(id = R.string.system_settings), style = MaterialTheme.typography.headlineMedium)
 
-        SettingsRaw("系统语言") {
+        SettingsRaw(stringResource(id = R.string.language)) {
             RadioButtonGroup(
                 selected = if (language == "zh") 0 else 1,
                 options = listOf("简体中文", "English")
             ) {
                 scope.launch {
                     language = if (it == 0) "zh" else "en"
-                    SnackbarUtils.showSnackbar("设置成功，重启应用生效。")
+                    TipsUtils.showTips(Tips(TipsType.INFO, "设置成功 重启应用生效"))
                 }
             }
         }
 
-        SettingsRaw("提示音") {
+        SettingsRaw(stringResource(id = R.string.prompt_sound)) {
             RadioButtonGroup(
-                selected = PromptSoundUtils.getPromptSoundId(sound),
-                options = listOf("静音", "铃声", "语音")
+                selected = PromptSoundUtils.getPromptSoundId(promptSound),
+                options = listOf(stringResource(id = R.string.mute), stringResource(id = R.string.ring), stringResource(id = R.string.voice))
             ) {
                 scope.launch {
-                    sound = PromptSoundUtils.getPromptSoundStr(it)
-                    PromptSoundUtils.setPromptSound(sound)
-                    SnackbarUtils.showSnackbar("设置成功")
+                    promptSound = PromptSoundUtils.getPromptSoundStr(it)
+                    PromptSoundUtils.setPromptSound(promptSound)
+                    TipsUtils.showTips(Tips(TipsType.INFO, "${ResourceUtils.stringResource(R.string.prompt_sound)} 设置成功"))
                 }
             }
         }
 
-        SettingsRaw("导航栏") {
+        SettingsRaw(stringResource(id = R.string.navigation_bar)) {
             Switch(checked = navigationBar, onCheckedChange = {
                 scope.launch {
                     navigationBar = it
-                    HzmctUtils.setNavigationBar(it)
-                    SnackbarUtils.showSnackbar("设置成功")
+                    val bool = HzmctUtils.setNavigationBar(it)
+                    if (bool) {
+                        TipsUtils.showTips(Tips(TipsType.INFO, "设置成功"))
+                    } else {
+                        TipsUtils.showTips(Tips(TipsType.ERROR, "设置失败"))
+                        delay(1000)
+                        navigationBar = !navigationBar
+                    }
                 }
             })
         }
 
-        SettingsRaw(title = "状态栏") {
+        SettingsRaw(stringResource(id = R.string.status_bar)) {
             Switch(checked = statusBar, onCheckedChange = {
                 scope.launch {
                     statusBar = it
-                    HzmctUtils.setStatusBar(it)
-                    SnackbarUtils.showSnackbar("设置成功")
+                    val bool = HzmctUtils.setStatusBar(it)
+                    if (bool) {
+                        TipsUtils.showTips(Tips(TipsType.INFO, "设置成功"))
+                    } else {
+                        TipsUtils.showTips(Tips(TipsType.ERROR, "设置失败"))
+                        delay(1000)
+                        statusBar = !statusBar
+                    }
+                }
+            })
+        }
+
+        SettingsRaw(stringResource(id = R.string.home_screen)) {
+            Switch(checked = homeScreen, onCheckedChange = {
+                scope.launch {
+                    homeScreen = it
+                    val bool = HzmctUtils.setHomePackage(if (it) BuildConfig.APPLICATION_ID else "com.android.launcher3")
+                    if (bool) {
+                        TipsUtils.showTips(Tips(TipsType.INFO, "设置成功"))
+                    } else {
+                        TipsUtils.showTips(Tips(TipsType.ERROR, "设置失败"))
+                        delay(1000)
+                        homeScreen = !homeScreen
+                    }
                 }
             })
         }

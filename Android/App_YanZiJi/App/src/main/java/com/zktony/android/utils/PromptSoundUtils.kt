@@ -4,12 +4,7 @@ import android.app.Application
 import android.media.MediaPlayer
 
 object PromptSoundUtils {
-    private lateinit var ctx: Application
     private var code: Int = 0
-
-    fun with(app: Application) {
-        ctx = app
-    }
 
     // Set the audio
     fun setPromptSound(id: Int) {
@@ -44,7 +39,7 @@ object PromptSoundUtils {
     // Play the audio
     fun playAudio(resId: Int) {
         // Play audio
-        val mediaPlayer = MediaPlayer.create(ctx, resId)
+        val mediaPlayer = MediaPlayer.create(ApplicationUtils.ctx, resId)
         mediaPlayer.setVolume(1f, 1f)
         mediaPlayer.start()
         mediaPlayer.setOnCompletionListener {

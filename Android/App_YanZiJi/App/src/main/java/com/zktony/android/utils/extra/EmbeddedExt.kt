@@ -22,7 +22,7 @@ import java.io.File
 suspend fun embeddedUpgrade(hexFile: File) = channelFlow {
     val key = "embeddedUpgrade"
     val byteLength = 1024
-    val serialPort = SerialStoreUtils.get("rtu") ?: return@channelFlow
+    val serialPort = SerialStoreUtils.get("A") ?: return@channelFlow
     try {
         var flag = -1
         var rx: Boolean
@@ -156,7 +156,7 @@ suspend fun embeddedUpgrade(hexFile: File) = channelFlow {
 suspend fun embeddedVersion(): String {
     var version = "Unknown"
     val key = "embeddedVersion"
-    val serialPort = SerialStoreUtils.get("rtu") ?: return version
+    val serialPort = SerialStoreUtils.get("A") ?: return version
     try {
         // 注册回调
         serialPort.registerCallback(key) { bytes ->

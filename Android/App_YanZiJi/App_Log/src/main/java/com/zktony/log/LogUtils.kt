@@ -13,7 +13,6 @@ object LogUtils {
     private lateinit var logStorage: LogStorage
 
     fun with(app: Application) {
-        this.ctx = app
         logStorage = LogStorage(app)
     }
 

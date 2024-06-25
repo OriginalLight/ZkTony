@@ -73,6 +73,6 @@ val TOP_LEVEL_DESTINATIONS = listOf(
     TopLevelDestination(
         route = Route.SETTINGS,
         icon = Icons.Outlined.Settings,
-        iconTextId = R.string.setting
+        iconTextId = R.string.settings
     )
 )

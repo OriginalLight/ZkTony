@@ -5,6 +5,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.PromptSoundUtils
+import com.zktony.android.utils.ResourceUtils
 import com.zktony.datastore.LocalDataSaver
 import com.zktony.datastore.rememberDataSaverState
 import com.zktony.log.LogUtils
@@ -29,6 +30,7 @@ fun Presets(content: @Composable () -> Unit) {
     Locale.setDefault(locale)
     configuration.setLocale(locale)
     resource.updateConfiguration(configuration, resource.displayMetrics)
+    ResourceUtils.setLanguage(language)
     LogUtils.info("Presets", "Language: $language")
 
     // 提示音

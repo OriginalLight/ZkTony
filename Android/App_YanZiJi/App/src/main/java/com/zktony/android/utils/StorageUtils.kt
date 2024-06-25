@@ -6,27 +6,22 @@ import java.io.File
 
 
 object StorageUtils {
-    private lateinit var ctx: Application
-
-    fun with(app: Application) {
-        this.ctx = app
-    }
 
     // 获取内部存储路径 /data/data/com.zktony.android/files
     fun getStorageDir(): String {
-        return ctx.filesDir.absolutePath
+        return ApplicationUtils.ctx.filesDir.absolutePath
     }
 
     // 获取缓存路径 /data/data/com.zktony.android/cache
     fun getCacheDir(): String {
-        return ctx.cacheDir.absolutePath
+        return ApplicationUtils.ctx.cacheDir.absolutePath
     }
 
     // 获取USB存储路径 /mnt/media_rw
     @SuppressLint("PrivateApi")
     fun getUsbStorageDir(): List<String> {
         val storageDirectories = mutableListOf<String>()
-        val storageManager = ctx.getSystemService(android.content.Context.STORAGE_SERVICE) as android.os.storage.StorageManager
+        val storageManager = ApplicationUtils.ctx.getSystemService(android.content.Context.STORAGE_SERVICE) as android.os.storage.StorageManager
         val volumeInfoClazz: Class<*>?
         val diskInfoClazz: Class<*>?
         try {
@@ -60,7 +55,7 @@ object StorageUtils {
     @SuppressLint("PrivateApi")
     fun getTfStorageDir(): List<String> {
         val storageDirectories = mutableListOf<String>()
-        val storageManager = ctx.getSystemService(android.content.Context.STORAGE_SERVICE) as android.os.storage.StorageManager
+        val storageManager = ApplicationUtils.ctx.getSystemService(android.content.Context.STORAGE_SERVICE) as android.os.storage.StorageManager
         val volumeInfoClazz: Class<*>?
         val diskInfoClazz: Class<*>?
 
