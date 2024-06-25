@@ -256,7 +256,7 @@ class HomeViewModel @Inject constructor(
                 }
 
                 // 移动到加液位置
-                val coordinate = op.orifices.find { it.row == i && it.column == j }?.point
+                val coordinate = op.orifices.find { it.row == (i * 6) && it.column == j }?.point
                 coordinate?.let {
                     start {
                         with(index = 0, pdv = it.x)
