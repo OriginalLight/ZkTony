@@ -18,32 +18,7 @@ import javax.inject.Inject
  * @date: 2023-02-14 15:37
  */
 @HiltViewModel
-class HistoryViewModel @Inject constructor(
-    private val dao: HistoryDao
-) : ViewModel() {
+class HistoryViewModel @Inject constructor() : ViewModel() {
 
-    private val _page = MutableStateFlow(PageType.HISTORY_LIST)
-    private val _selected = MutableStateFlow(0L)
-
-    val page = _page.asStateFlow()
-    val selected = _selected.asStateFlow()
-    val entities = Pager(
-        config = PagingConfig(pageSize = 20, initialLoadSize = 40)
-    ) { dao.getByPage() }.flow.cachedIn(viewModelScope)
-
-    fun dispatch(intent: HistoryIntent) {
-        when (intent) {
-            is HistoryIntent.Delete -> viewModelScope.launch { dao.deleteById(intent.id) }
-            is HistoryIntent.NavTo -> _page.value = intent.page
-            is HistoryIntent.Selected -> _selected.value = intent.id
-        }
-    }
-
-}
-
-sealed class HistoryIntent {
-    data class NavTo(val page: PageType) : HistoryIntent()
-    data class Delete(val id: Long) : HistoryIntent()
-    data class Selected(val id: Long) : HistoryIntent()
 }
 

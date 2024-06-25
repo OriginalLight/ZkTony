@@ -29,6 +29,11 @@ object Constants {
     const val PROMPT_SOUND = "PROMPT_SOUND"
 
     /**
+     * S/N
+     */
+    const val SN = "SN"
+
+    /**
      * 模块数量
      */
     const val ZT_0000 = "ZT_0000"

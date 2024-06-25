@@ -1,26 +1,21 @@
 package com.zktony.android.ui.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.DonutSmall
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Terminal
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.zktony.android.R
 
 object Route {
     const val LOGIN = "Login"
-    const val HOME = "Home"
+    const val EXPERIMENTAL = "Experimental"
     const val PROGRAM = "Program"
-    const val CALIBRATION = "Calibration"
     const val HISTORY = "History"
-    const val DEBUG = "Debug"
-    const val SETTING = "Setting"
     const val SETTINGS = "Settings"
-    const val SPLASH = "Splash"
 }
 
 data class TopLevelDestination(
@@ -48,7 +43,7 @@ class NavigationActions(private val navController: NavHostController) {
 
     fun navigateUp() {
         if (navController.previousBackStackEntry == null) {
-            navigate(Route.HOME)
+            navigate(Route.EXPERIMENTAL)
         } else {
             navController.navigateUp()
         }
@@ -57,14 +52,14 @@ class NavigationActions(private val navController: NavHostController) {
     fun popBackStack() {
         navController.popBackStack()
     }
-
-    @Composable
-    fun isCurrentRoute(route: String): Boolean {
-        return navController.currentBackStackEntryAsState().value?.destination?.route == route
-    }
 }
 
 val TOP_LEVEL_DESTINATIONS = listOf(
+    TopLevelDestination(
+        route = Route.EXPERIMENTAL,
+        icon = Icons.Outlined.DonutSmall,
+        iconTextId = R.string.program
+    ),
     TopLevelDestination(
         route = Route.PROGRAM,
         icon = Icons.Outlined.Terminal,
@@ -76,7 +71,7 @@ val TOP_LEVEL_DESTINATIONS = listOf(
         iconTextId = R.string.history
     ),
     TopLevelDestination(
-        route = Route.SETTING,
+        route = Route.SETTINGS,
         icon = Icons.Outlined.Settings,
         iconTextId = R.string.setting
     )

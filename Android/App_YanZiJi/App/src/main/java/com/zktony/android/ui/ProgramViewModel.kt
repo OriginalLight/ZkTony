@@ -19,35 +19,6 @@ import javax.inject.Inject
  * @date 2023/5/15 14:51
  */
 @HiltViewModel
-class ProgramViewModel @Inject constructor(
-    private val dao: ProgramDao
-) : ViewModel() {
+class ProgramViewModel @Inject constructor(): ViewModel() {
 
-    private val _page = MutableStateFlow(PageType.PROGRAM_LIST)
-    private val _selected = MutableStateFlow(0L)
-
-    val page = _page.asStateFlow()
-    val selected = _selected.asStateFlow()
-    val entities = Pager(
-        config = PagingConfig(pageSize = 20, initialLoadSize = 40)
-    ) { dao.getByPage() }.flow.cachedIn(viewModelScope)
-
-
-    fun dispatch(intent: ProgramIntent) {
-        when (intent) {
-            is ProgramIntent.Delete -> viewModelScope.launch { dao.deleteById(intent.id) }
-            is ProgramIntent.Insert -> viewModelScope.launch { dao.insert(intent.program) }
-            is ProgramIntent.NavTo -> _page.value = intent.page
-            is ProgramIntent.Selected -> _selected.value = intent.id
-            is ProgramIntent.Update -> viewModelScope.launch { dao.update(intent.program) }
-        }
-    }
-}
-
-sealed class ProgramIntent {
-    data class NavTo(val page: PageType) : ProgramIntent()
-    data class Delete(val id: Long) : ProgramIntent()
-    data class Insert(val program: Program) : ProgramIntent()
-    data class Selected(val id: Long) : ProgramIntent()
-    data class Update(val program: Program) : ProgramIntent()
 }
