@@ -1,6 +1,7 @@
 package com.zktony.android.utils
 
 import android.annotation.SuppressLint
+import android.os.SystemClock
 import com.hzmct.enjoysdk.api.EnjoySDK
 
 object HzmctUtils {
@@ -50,6 +51,15 @@ object HzmctUtils {
         try {
             val res = enjoySdk.setHomePackage(packageName)
             return res != -1
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
+        }
+    }
+
+    fun setSystemTime(time: Long): Boolean {
+        try {
+            return SystemClock.setCurrentTimeMillis(time)
         } catch (e: Exception) {
             e.printStackTrace()
             return false

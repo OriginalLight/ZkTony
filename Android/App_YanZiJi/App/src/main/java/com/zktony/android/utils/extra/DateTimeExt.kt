@@ -42,7 +42,7 @@ fun String.dateFormat(format: String): Date? {
  */
 
 @SuppressLint("SimpleDateFormat")
-fun Date.dateFormat(format: String): String {
+fun Date.dateFormat(format: String = "yyyy-MM-dd HH:mm:ss"): String {
     val sdf = SimpleDateFormat(format)
     return sdf.format(this)
 }

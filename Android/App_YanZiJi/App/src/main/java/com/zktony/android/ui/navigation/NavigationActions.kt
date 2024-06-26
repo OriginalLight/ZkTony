@@ -5,9 +5,11 @@ import androidx.compose.material.icons.outlined.DonutSmall
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Terminal
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.zktony.android.R
 
 object Route {
@@ -16,6 +18,8 @@ object Route {
     const val PROGRAM = "Program"
     const val HISTORY = "History"
     const val SETTINGS = "Settings"
+    const val SETTINGS_ARGUMENTS = "SettingsArguments"
+    const val SETTINGS_DEBUG = "SettingsDebug"
 }
 
 data class TopLevelDestination(
@@ -25,6 +29,9 @@ data class TopLevelDestination(
 )
 
 class NavigationActions(private val navController: NavHostController) {
+
+    fun navController() = navController
+
     fun navigate(route: String) {
         navController.navigate(route) {
             // Pop up to the start destination of the graph to
@@ -42,7 +49,8 @@ class NavigationActions(private val navController: NavHostController) {
     }
 
     fun navigateUp() {
-        if (navController.previousBackStackEntry == null) {
+        if (navController.previousBackStackEntry == null || navController.previousBackStackEntry?.destination?.route == Route.LOGIN) {
+            // If we are already at the start destination, navigate to the experimental screen
             navigate(Route.EXPERIMENTAL)
         } else {
             navController.navigateUp()
@@ -52,6 +60,9 @@ class NavigationActions(private val navController: NavHostController) {
     fun popBackStack() {
         navController.popBackStack()
     }
+
+    @Composable
+    fun selectDestination() = navController.currentBackStackEntryAsState().value?.destination?.route ?: Route.LOGIN
 }
 
 val TOP_LEVEL_DESTINATIONS = listOf(

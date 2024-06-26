@@ -1,5 +1,6 @@
 package com.zktony.android.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,6 +29,11 @@ import com.zktony.android.ui.utils.LocalNavigationActions
 
 @Composable
 fun LoginView() {
+
+    BackHandler {
+        // 拦截返回键
+        return@BackHandler
+    }
 
     Box(
         modifier = Modifier

@@ -3,7 +3,7 @@
     <string name="experimental">Experimental</string>
     <string name="factory_settings">Factory Settings</string>
     <string name="history">History</string>
-    <string name="home_screen">Home Screen</string>
+    <string name="home_package">Home Screen</string>
     <string name="language">Language</string>
     <string name="login">Login</string>
     <string name="mute">Mute</string>
@@ -16,4 +16,12 @@
     <string name="system_settings">System Settings</string>
     <string name="user_settings">User Settings</string>
     <string name="voice">Voice</string>
+    <string name="system_time">System Time</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">Ok</string>
+    <string name="next">Next</string>
+    <string name="set_success">Set Success</string>
+    <string name="set_failed">Set Failed</string>
+    <string name="arguments">Arguments</string>
+    <string name="debug">Debug</string>
 </resources>
