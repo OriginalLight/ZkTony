@@ -1,0 +1,281 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <!-- 
+      Microsoft ResX Schema 
+      
+      Version 2.0
+      
+      The primary goals of this format is to allow a simple XML format 
+      that is mostly human readable. The generation and parsing of the 
+      various data types are done through the TypeConverter classes 
+      associated with the data types.
+      
+      Example:
+      
+      ... ado.net/XML headers & schema ...
+      <resheader name="resmimetype">text/microsoft-resx</resheader>
+      <resheader name="version">2.0</resheader>
+      <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+      <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+      <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+      <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+      <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+          <value>[base64 mime encoded serialized .NET Framework object]</value>
+      </data>
+      <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+          <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+          <comment>This is a comment</comment>
+      </data>
+                  
+      There are any number of "resheader" rows that contain simple 
+      name/value pairs.
+      
+      Each data row contains a name, and value. The row also contains a 
+      type or mimetype. Type corresponds to a .NET class that support 
+      text/value conversion through the TypeConverter architecture. 
+      Classes that don't support this are serialized and stored with the 
+      mimetype set.
+      
+      The mimetype is used for serialized objects, and tells the 
+      ResXResourceReader how to depersist the object. This is currently not 
+      extensible. For a given mimetype the value must be set accordingly:
+      
+      Note - application/x-microsoft.net.object.binary.base64 is the format 
+      that the ResXResourceWriter will generate, however the reader can 
+      read any of the formats listed below.
+      
+      mimetype: application/x-microsoft.net.object.binary.base64
+      value   : The object must be serialized with 
+              : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+              : and then encoded with base64 encoding.
+      
+      mimetype: application/x-microsoft.net.object.soap.base64
+      value   : The object must be serialized with 
+              : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+              : and then encoded with base64 encoding.
+  
+      mimetype: application/x-microsoft.net.object.bytearray.base64
+      value   : The object must be serialized into a byte array 
+              : using a System.ComponentModel.TypeConverter
+              : and then encoded with base64 encoding.
+      -->
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root"
+                xmlns="">
+        <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+        <xsd:element name="root" msdata:IsDataSet="true">
+            <xsd:complexType>
+                <xsd:choice maxOccurs="unbounded">
+                    <xsd:element name="metadata">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+                            </xsd:sequence>
+                            <xsd:attribute name="name" use="required" type="xsd:string"/>
+                            <xsd:attribute name="type" type="xsd:string"/>
+                            <xsd:attribute name="mimetype" type="xsd:string"/>
+                            <xsd:attribute ref="xml:space"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="assembly">
+                        <xsd:complexType>
+                            <xsd:attribute name="alias" type="xsd:string"/>
+                            <xsd:attribute name="name" type="xsd:string"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="data">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+                            </xsd:sequence>
+                            <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+                            <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+                            <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+                            <xsd:attribute ref="xml:space"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="resheader">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                            </xsd:sequence>
+                            <xsd:attribute name="name" type="xsd:string" use="required"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:choice>
+            </xsd:complexType>
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>2.0</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <data name="Preview" xml:space="preserve">
+    <value>Preview</value>
+  </data>
+    <data name="Success" xml:space="preserve">
+    <value> Success</value>
+  </data>
+    <data name="Init" xml:space="preserve">
+    <value>Init</value>
+  </data>
+    <data name="SetPixel" xml:space="preserve">
+    <value>Set Pixel</value>
+  </data>
+    <data name="AutoShot" xml:space="preserve">
+    <value>Auto Shot</value>
+  </data>
+    <data name="Failure" xml:space="preserve">
+    <value> Failure</value>
+  </data>
+    <data name="ManualShot" xml:space="preserve">
+    <value>Manual Shot</value>
+  </data>
+    <data name="CancelShot" xml:space="preserve">
+    <value>Cancel Shot</value>
+  </data>
+    <data name="Error0001" xml:space="preserve">
+    <value>0x0001 Device not found</value>
+  </data>
+    <data name="Error0002" xml:space="preserve">
+    <value>0x0002 Open device failure</value>
+  </data>
+    <data name="Error0003" xml:space="preserve">
+    <value>0x0003 Failed to set temperature</value>
+  </data>
+    <data name="Error0004" xml:space="preserve">
+      <value>0x0004 Failed to set option</value>
+    </data>
+    <data name="Error0005" xml:space="preserve">
+    <value>0x0005 Failed to set automatic exposure</value>
+  </data>
+    <data name="Error0006" xml:space="preserve">
+    <value>0x0006 Failed to set monochrome</value>
+  </data>
+    <data name="Error0007" xml:space="preserve">
+    <value>0x0007 Gain setting failure</value>
+  </data>
+    <data name="Error0008" xml:space="preserve">
+    <value>0x0008 Failed to set the callback</value>
+  </data>
+    <data name="Error0009" xml:space="preserve">
+    <value>0x0009 Failed to set the exposure time</value>
+  </data>
+    <data name="Error0010" xml:space="preserve">
+    <value>0x0010 Failed to trigger</value>
+  </data>
+    <data name="Error0011" xml:space="preserve">
+    <value>0x0011 SDK Error</value>
+  </data>
+    <data name="NotFound" xml:space="preserve">
+    <value>Not Found</value>
+  </data>
+    <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+    <data name="ErrorLog" xml:space="preserve">
+    <value>Error Log</value>
+  </data>
+    <data name="OperLog" xml:space="preserve">
+    <value>Oper Log</value>
+  </data>
+    <data name="NoUsb" xml:space="preserve">
+    <value>No available USB flash drive found</value>
+  </data>
+    <data name="Export" xml:space="preserve">
+    <value>Export</value>
+  </data>
+    <data name="Update" xml:space="preserve">
+    <value>Update</value>
+  </data>
+    <data name="Picture" xml:space="preserve">
+    <value>Picture</value>
+  </data>
+    <data name="Adjust" xml:space="preserve">
+    <value>Adjust</value>
+  </data>
+    <data name="LogIn" xml:space="preserve">
+    <value>LogIn</value>
+  </data>
+    <data name="LogOut" xml:space="preserve">
+    <value>LogOut</value>
+  </data>
+    <data name="NoUser" xml:space="preserve">
+    <value>User does not exist</value>
+  </data>
+    <data name="ErrorPassword" xml:space="preserve">
+    <value>Password error</value>
+  </data>
+    <data name="DisabledUser" xml:space="preserve">
+    <value>User is disabled</value>
+  </data>
+    <data name="ErrorUnknown" xml:space="preserve">
+    <value>Unknown Error</value>
+  </data>
+    <data name="Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+    <data name="DuplicateUserName" xml:space="preserve">
+    <value>Duplicate user name</value>
+  </data>
+    <data name="User" xml:space="preserve">
+    <value>User</value>
+  </data>
+    <data name="PortNotExist" xml:space="preserve">
+    <value>The port not exist</value>
+  </data>
+    <data name="Hatch" xml:space="preserve">
+    <value>Hatch</value>
+  </data>
+    <data name="OpenHatch" xml:space="preserve">
+    <value>Open Hatch</value>
+  </data>
+    <data name="CloseHatch" xml:space="preserve">
+    <value>Close Hatch</value>
+  </data>
+    <data name="Camera" xml:space="preserve">
+    <value>Camera</value>
+  </data>
+    <data name="Error0012" xml:space="preserve">
+    <value>0x0012 Hatch selfcheck failure</value>
+  </data>
+    <data name="Error0013" xml:space="preserve">
+    <value>0x0013 Camera selfcheck failure</value>
+  </data>
+    <data name="Error0014" xml:space="preserve">
+    <value>0x0014 Light selfcheck failure</value>
+  </data>
+    <data name="Combine" xml:space="preserve">
+    <value>Combine</value>
+  </data>
+    <data name="SizeInconsistency" xml:space="preserve">
+    <value>Size inconsistency</value>
+  </data>
+    <data name="Error0015" xml:space="preserve">
+      <value>0x0015 Camera calibration, please try again later</value>
+    </data>
+    <data name="Error0016" xml:space="preserve">
+      <value>0x0016 Camera correction failed</value>
+    </data>
+    <data name="Original" xml:space="preserve">
+      <value>Original</value>
+    </data>
+    <data name="Error0017" xml:space="preserve">
+      <value>0x0017 Preview failed</value>
+    </data>
+    <data name="Error0018" xml:space="preserve">
+      <value>0x0018 Calculate failed</value>
+    </data>
+</root>
