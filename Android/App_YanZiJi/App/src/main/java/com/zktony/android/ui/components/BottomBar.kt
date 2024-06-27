@@ -19,7 +19,11 @@ import com.zktony.datastore.rememberDataSaverState
 @Composable
 fun BottomBar(modifier: Modifier = Modifier) {
     // S/N
-    val sn by rememberDataSaverState(key = Constants.SN, initialValue = "Unknown", senseExternalDataChange = true)
+    val sn by rememberDataSaverState(
+        key = Constants.SN,
+        initialValue = "Unknown",
+        senseExternalDataChange = true
+    )
 
     Box(
         modifier = modifier
@@ -29,11 +33,7 @@ fun BottomBar(modifier: Modifier = Modifier) {
             .padding(horizontal = 8.dp),
     ) {
         // Bottom bar content
-        Tips(
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .height(48.dp)
-        )
+        Tips(modifier = Modifier.align(Alignment.CenterStart))
 
         Text(
             modifier = Modifier.align(Alignment.Center),

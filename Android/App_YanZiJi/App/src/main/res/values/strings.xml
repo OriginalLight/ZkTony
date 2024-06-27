@@ -29,4 +29,9 @@
     <string name="aging">老化</string>
     <string name="equipment_arguments">设备参数</string>
     <string name="runtime_arguments">运行参数</string>
+    <string name="serial_number">产品序列号</string>
+    <string name="pruduct_number">产品型号</string>
+    <string name="set">设置</string>
+    <string name="export">导 出</string>
+    <string name="bring">导 入</string>
 </resources>

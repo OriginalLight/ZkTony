@@ -102,7 +102,10 @@ fun LoginForm(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val navigationActions = LocalNavigationActions.current
-        Button(onClick = { navigationActions.navigate(Route.SETTINGS) }) {
+        Button(onClick = {
+            navigationActions.popBackStack()
+            navigationActions.navigate(Route.EXPERIMENTAL)
+        }) {
             Text(text = "Test")
         }
     }

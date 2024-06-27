@@ -34,6 +34,11 @@ object Constants {
     const val SN = "SN"
 
     /**
+     * P/N
+     */
+    const val PN = "PN"
+
+    /**
      * 模块数量
      */
     const val ZT_0000 = "ZT_0000"

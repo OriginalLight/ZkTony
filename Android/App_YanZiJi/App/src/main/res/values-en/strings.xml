@@ -28,4 +28,9 @@
     <string name="aging">Aging</string>
     <string name="equipment_arguments">Equipment Arguments</string>
     <string name="runtime_arguments">Runtime Arguments</string>
+    <string name="serial_number">Serial Number</string>
+    <string name="pruduct_number">Product Number</string>
+    <string name="set">Set</string>
+    <string name="export">Export</string>
+    <string name="bring">Import</string>
 </resources>

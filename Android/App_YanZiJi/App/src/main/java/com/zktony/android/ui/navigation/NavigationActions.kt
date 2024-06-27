@@ -32,8 +32,10 @@ data class TopLevelDestination(
 
 class NavigationActions(private val navController: NavHostController) {
 
+    // 导航控制器
     fun navController() = navController
 
+    // 导航到指定页面
     fun navigate(route: String) {
         navController.navigate(route) {
             // Pop up to the start destination of the graph to
@@ -50,8 +52,9 @@ class NavigationActions(private val navController: NavHostController) {
         }
     }
 
+    // 导航到上一层
     fun navigateUp() {
-        if (navController.previousBackStackEntry == null || navController.previousBackStackEntry?.destination?.route == Route.LOGIN) {
+        if (navController.previousBackStackEntry == null) {
             // If we are already at the start destination, navigate to the experimental screen
             navigate(Route.EXPERIMENTAL)
         } else {
@@ -59,10 +62,12 @@ class NavigationActions(private val navController: NavHostController) {
         }
     }
 
+    // 导航到下一层
     fun popBackStack() {
         navController.popBackStack()
     }
 
+    // 当前选中的页面
     @Composable
     fun selectDestination() = navController.currentBackStackEntryAsState().value?.destination?.route ?: Route.LOGIN
 }
