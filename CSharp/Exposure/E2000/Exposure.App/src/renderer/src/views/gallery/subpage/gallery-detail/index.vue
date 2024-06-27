@@ -103,9 +103,8 @@
           <a-input :model-value="subpage.preview.width + ' x ' + subpage.preview.height" readonly>
             <template #prepend> {{ t('gallery.detail.size') }} </template>
           </a-input>
-          <a-input :model-value="(subpage.preview.exposureTime / 1000).toString()" readonly>
+          <a-input :model-value="getExposureTime(subpage.preview.exposureTime / 1000)" readonly>
             <template #prepend> {{ t('gallery.detail.expo') }} </template>
-            <template #append> {{ t('gallery.detail.unit') }} </template>
           </a-input>
           <a-input :model-value="subpage.album.user?.name" readonly>
             <template #prepend> {{ t('gallery.detail.user') }} </template>
@@ -365,6 +364,14 @@ const handleSave = async () => {
   } finally {
     loading.value.save = false
   }
+}
+
+const getExposureTime = (time: number) => {
+  // 返回 分钟：秒：毫秒
+  const min = Math.floor(time / 60000)
+  const sec = Math.floor((time % 60000) / 1000)
+  const ms = Math.floor((time % 1000) / 10)
+  return `${min}:${sec}:${ms}`
 }
 
 const handleHistogram = (src: string) => {

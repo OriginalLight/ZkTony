@@ -70,8 +70,8 @@ public class CameraService(
                 throw new Exception(localizer.GetString("Error0004").Value);
 
             // 设置RGB48
-            if (_nncam.put_Option(Nncam.eOPTION.OPTION_RGB, 1))
-                Log.Information("设置RGB48");
+            if (_nncam.put_Option(Nncam.eOPTION.OPTION_RAW, 1))
+                Log.Information("设置RAW");
             else
                 throw new Exception(localizer.GetString("Error0004").Value);
 
@@ -84,6 +84,12 @@ public class CameraService(
             // 设置位深度
             if (_nncam.put_Option(Nncam.eOPTION.OPTION_BITDEPTH, 1))
                 Log.Information("设置位深度 14");
+            else
+                throw new Exception(localizer.GetString("Error0004").Value);
+            
+            // 设置Binning
+            if (_nncam.put_Option(Nncam.eOPTION.OPTION_BINNING, 1))
+                Log.Information("设置Binning 1");
             else
                 throw new Exception(localizer.GetString("Error0004").Value);
 
@@ -457,27 +463,15 @@ public class CameraService(
     {
         await InitAsync();
         if (_nncam == null) return;
-        if (_nncam.get_eSize(out var size))
+        if (_nncam.put_Option(Nncam.eOPTION.OPTION_BINNING, (int)index + 1))
         {
-            if (size == index) return;
-        }
-        else
-        {
-            return;
-        }
-
-        _nncam.Stop();
-        _nncam.put_eSize(index);
-
-        if (SetCallBack())
-        {
-            Log.Information("设置画质成功：" + index);
+            Log.Information("设置画质成功：" + (index + 1));
             return;
         }
 
         _nncam.Close();
         _nncam = null;
-        Log.Error("设置画质失败：" + index);
+        Log.Error("设置画质失败：" + (index + 1));
         throw new Exception(localizer.GetString("Error0008").Value);
     }
 
@@ -528,11 +522,18 @@ public class CameraService(
     {
         if (_nncam == null) return;
         if (!_nncam.get_ExpoTime(out var expoTime)) return;
-        if (!_nncam.get_Size(out var width, out var height)) return;
-        var buffer = Marshal.AllocHGlobal(width * height * 6);
-        if (!_nncam.PullImageV3(buffer, 0, 48, 0, out var info)) return;
+        if (!_nncam.get_Option(Nncam.eOPTION.OPTION_BINNING, out var binning)) return;
+        var size = binning switch
+        {
+            1 => new Size(2992, 3000),
+            2 => new Size(1496, 1500),
+            3 => new Size(996, 1000),
+            _ => new Size(2992, 3000)
+        };
+        var buffer = Marshal.AllocHGlobal(size.Width * size.Height * 2);
+        if (!_nncam.PullImageV3(buffer, 0, 16, 0, out var info)) return;
         // buffer => mat
-        var mat = new Mat(height, width, MatType.CV_16UC3, buffer);
+        var mat = new Mat(size.Height, size.Width, MatType.CV_16UC1, buffer);
 
         // 序列
         _seq++;
@@ -600,7 +601,7 @@ public class CameraService(
                             break;
                         default:
                         {
-                            var combine = new Mat(height, width, MatType.CV_16UC3, new Scalar(0));
+                            var combine = new Mat(size.Height, size.Width, MatType.CV_16UC3, new Scalar(0));
                             try
                             {
                                 if (_mat != null) Cv2.Add(mat, _mat, combine);
@@ -648,8 +649,8 @@ public class CameraService(
                         var op = mat switch
                         {
                             { Width: 2992, Height: 3000 } => "3000",
-                            { Width: 1488, Height: 1500 } => "1500",
-                            { Width: 992, Height: 998 } => "1000",
+                            { Width: 1496, Height: 1500 } => "1500",
+                            { Width: 996, Height: 1000 } => "1000",
                             _ => "3000"
                         };
 
@@ -889,8 +890,8 @@ public class CameraService(
             var op = mat switch
             {
                 { Width: 2992, Height: 3000 } => "3000",
-                { Width: 1488, Height: 1500 } => "1500",
-                { Width: 992, Height: 998 } => "1000",
+                { Width: 1496, Height: 1500 } => "1500",
+                { Width: 996, Height: 1000 } => "1000",
                 _ => "3000"
             };
             var roi = await option.GetOptionValueAsync("Roi") ?? "0,1,0,1";
@@ -906,12 +907,10 @@ public class CameraService(
             // 截取
             dst = OpenCvUtils.CuteRoi(rotate, roi);
             // 灰度图
-            var gray = new Mat();
-            Cv2.CvtColor(dst, gray, ColorConversionCodes.BGR2GRAY);
             // 14 bit 转 16 bit
-            gray.ConvertTo(gray, MatType.CV_16UC1, 4.0);
+            dst.ConvertTo(dst, MatType.CV_16UC1, 4.0);
 
-            return gray;
+            return dst;
         }
         catch (Exception e)
         {
@@ -941,7 +940,7 @@ public class CameraService(
             Cv2.BitwiseNot(mat, mat);
             // 降噪
             var dstMat = new Mat();
-            Cv2.MedianBlur(mat, dstMat, 5);
+            Cv2.MedianBlur(mat, dstMat, 3);
             // 返回
             return dstMat;
         }
@@ -1137,7 +1136,7 @@ public class CameraService(
                     _ => 0
                 };
                 await SetPixel((uint)index);
-                await Task.Delay(4000);
+                await Task.Delay(1000);
                 // 触发拍摄
                 if (_nncam.Trigger(1))
                     Log.Information("触发拍摄");

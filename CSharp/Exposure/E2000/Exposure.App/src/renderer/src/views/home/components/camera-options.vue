@@ -324,7 +324,7 @@ const handleQualityChange = async (value: unknown) => {
     disabled.value.quality = true
     await pixel({ index: Number(value) })
     // 延时2s
-    await delay(2500)
+    await delay(1000)
   } catch (error) {
     Message.error((error as Error).message)
   } finally {

@@ -334,7 +334,7 @@ public static class OpenCvUtils
 
     #region 自动灰阶
 
-    public static void AdjustImageColorLevelAuto(Mat src, out int leftGrayLevel, out int rightGrayLevel)
+    public static Mat AdjustImageColorLevelAuto(Mat src, out int leftGrayLevel, out int rightGrayLevel)
     {
         // 统计灰度直方图
         var grayHist = new Mat();
@@ -413,6 +413,8 @@ public static class OpenCvUtils
                     srcPtr[i] = (ushort)bTable[srcPtr[i]];
                 }
             }
+            
+            return src;
         }
         finally
         {
