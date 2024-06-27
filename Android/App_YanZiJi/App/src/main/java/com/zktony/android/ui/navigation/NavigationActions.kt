@@ -20,6 +20,8 @@ object Route {
     const val SETTINGS = "Settings"
     const val SETTINGS_ARGUMENTS = "SettingsArguments"
     const val SETTINGS_DEBUG = "SettingsDebug"
+    const val SETTINGS_FQC = "SettingsFqc"
+    const val SETTINGS_AGING = "SettingsAging"
 }
 
 data class TopLevelDestination(

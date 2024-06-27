@@ -5,7 +5,9 @@ import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import androidx.compose.ui.util.trace
 import androidx.core.content.FileProvider
+import com.zktony.log.LogUtils
 import java.io.File
 
 /**
@@ -17,6 +19,16 @@ object ApplicationUtils {
 
     fun with(app: Application) {
         ctx = app
+        withCrashHandler()
+    }
+
+    // 全局异常捕获
+    private fun withCrashHandler() {
+        Thread.currentThread().setUncaughtExceptionHandler { _, e ->
+            LogUtils.error(e.stackTraceToString(), true)
+            Thread.sleep(2000) // 等待日志写入文件
+            android.os.Process.killProcess(android.os.Process.myPid())
+        }
     }
 
     fun installApp(apk: File) {

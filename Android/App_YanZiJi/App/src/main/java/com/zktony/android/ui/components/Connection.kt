@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.Usb
 import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -56,19 +57,19 @@ fun Connection() {
         Icon(
             imageVector = Icons.Default.Wifi,
             contentDescription = "Wifi",
-            tint = if (wifiStatus.value) Color.Green else Color.LightGray
+            tint = if (wifiStatus.value) MaterialTheme.colorScheme.primary else Color.LightGray
         )
 
         Icon(
             imageVector = Icons.Default.Bluetooth,
             contentDescription = "Bluetooth",
-            tint = if (bluetoothStatus.value) Color.Green else Color.LightGray
+            tint = if (bluetoothStatus.value) MaterialTheme.colorScheme.primary else Color.LightGray
         )
 
         Icon(
             imageVector = Icons.Default.Usb,
             contentDescription = "Usb",
-            tint = if (usbStatus.value) Color.Green else Color.LightGray
+            tint = if (usbStatus.value) MaterialTheme.colorScheme.primary else Color.LightGray
         )
     }
 }

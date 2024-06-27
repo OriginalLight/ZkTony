@@ -25,4 +25,8 @@
     <string name="set_failed">设置失败</string>
     <string name="arguments">参数</string>
     <string name="debug">调试</string>
+    <string name="fqc">FQC</string>
+    <string name="aging">老化</string>
+    <string name="equipment_arguments">设备参数</string>
+    <string name="runtime_arguments">运行参数</string>
 </resources>

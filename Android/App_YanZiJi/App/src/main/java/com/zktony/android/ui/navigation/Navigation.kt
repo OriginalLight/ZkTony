@@ -27,8 +27,10 @@ import com.zktony.android.ui.ExperimentalView
 import com.zktony.android.ui.HistoryView
 import com.zktony.android.ui.LoginView
 import com.zktony.android.ui.ProgramView
+import com.zktony.android.ui.SettingsAgingView
 import com.zktony.android.ui.SettingsArgumentsView
 import com.zktony.android.ui.SettingsDebugView
+import com.zktony.android.ui.SettingsFqcView
 import com.zktony.android.ui.SettingsView
 import com.zktony.android.ui.components.BottomBar
 import com.zktony.android.ui.utils.LocalNavigationActions
@@ -63,9 +65,12 @@ fun AppNavigation() {
                 composable(Route.PROGRAM) { ProgramView() }
                 composable(Route.EXPERIMENTAL) { ExperimentalView() }
                 composable(Route.HISTORY) { HistoryView() }
+                // Settings and sub-settings
                 composable(Route.SETTINGS) { SettingsView() }
                 composable(Route.SETTINGS_ARGUMENTS) { SettingsArgumentsView() }
                 composable(Route.SETTINGS_DEBUG) { SettingsDebugView() }
+                composable(Route.SETTINGS_FQC) { SettingsFqcView() }
+                composable(Route.SETTINGS_AGING) { SettingsAgingView() }
             }
         }
     }
@@ -103,7 +108,6 @@ fun AppNavigationDrawer(
             }
         }
     }
-
 }
 
 @Composable

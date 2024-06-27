@@ -19,13 +19,13 @@ import com.zktony.datastore.rememberDataSaverState
 @Composable
 fun BottomBar(modifier: Modifier = Modifier) {
     // S/N
-    val sn by rememberDataSaverState(key = Constants.SN, initialValue = "0000000000000000")
+    val sn by rememberDataSaverState(key = Constants.SN, initialValue = "Unknown", senseExternalDataChange = true)
 
     Box(
         modifier = modifier
             .fillMaxWidth()
             .height(48.dp)
-            .background(color = MaterialTheme.colorScheme.secondaryContainer)
+            .background(color = MaterialTheme.colorScheme.tertiaryContainer)
             .padding(horizontal = 8.dp),
     ) {
         // Bottom bar content

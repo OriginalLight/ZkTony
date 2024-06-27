@@ -24,4 +24,8 @@
     <string name="set_failed">Set Failed</string>
     <string name="arguments">Arguments</string>
     <string name="debug">Debug</string>
+    <string name="fqc">FQC</string>
+    <string name="aging">Aging</string>
+    <string name="equipment_arguments">Equipment Arguments</string>
+    <string name="runtime_arguments">Runtime Arguments</string>
 </resources>

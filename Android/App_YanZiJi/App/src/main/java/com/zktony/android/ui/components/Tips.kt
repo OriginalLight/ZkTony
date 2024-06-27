@@ -51,7 +51,7 @@ fun TipsIcon(tips: Tips?) {
             Icon(
                 imageVector = Icons.Default.Info,
                 contentDescription = "Info",
-                tint = Color.Green
+                tint = MaterialTheme.colorScheme.primary
             )
         }
 
@@ -67,7 +67,7 @@ fun TipsIcon(tips: Tips?) {
             Icon(
                 imageVector = Icons.Default.Error,
                 contentDescription = "Error",
-                tint = Color.Red
+                tint = MaterialTheme.colorScheme.error
             )
         }
 

@@ -27,8 +27,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
@@ -36,6 +39,7 @@ import com.zktony.android.ui.components.DateTimePicker
 import com.zktony.android.ui.components.RadioButtonGroup
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
+import com.zktony.android.ui.viewmodel.SettingsViewModel
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.HzmctUtils
 import com.zktony.android.utils.PromptSoundUtils
@@ -83,13 +87,13 @@ fun SystemSettingsView(
     // 语言
     var language by rememberDataSaverState(key = Constants.LANGUAGE, default = "zh")
     // 提示音
-    var promptSound by rememberDataSaverState(key = Constants.PROMPT_SOUND, default = "mute")
+    var promptSound by rememberDataSaverState(key = Constants.PROMPT_SOUND, default = "voice")
     // 导航栏
     var navigationBar by rememberDataSaverState(key = Constants.NAVIGATION_BAR, default = false)
     // 状态栏
     var statusBar by rememberDataSaverState(key = Constants.STATUS_BAR, default = false)
     // 主屏幕
-    var homePackage by remember { mutableStateOf(HzmctUtils.getHomePackage() == BuildConfig.APPLICATION_ID) }
+    var homePackage by remember { mutableStateOf(HzmctUtils.getHomePackage()?.contains(BuildConfig.APPLICATION_ID) ?: false) }
     // 系统时间
     var systemTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
     var showDateTimePicker by remember { mutableStateOf(false) }
@@ -264,6 +268,32 @@ fun FactorySettingsView(modifier: Modifier = Modifier) {
                 contentDescription = "ArrowForwardIos"
             )
         }
+
+        // Fqc
+        SettingsRaw(
+            modifier = Modifier
+                .clip(MaterialTheme.shapes.small)
+                .clickable { navigationActions.navigate(Route.SETTINGS_FQC) },
+            title = stringResource(id = R.string.fqc)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
+                contentDescription = "ArrowForwardIos"
+            )
+        }
+
+        // Aging
+        SettingsRaw(
+            modifier = Modifier
+                .clip(MaterialTheme.shapes.small)
+                .clickable { navigationActions.navigate(Route.SETTINGS_AGING) },
+            title = stringResource(id = R.string.aging)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
+                contentDescription = "ArrowForwardIos"
+            )
+        }
     }
 }
 
@@ -282,7 +312,7 @@ fun SettingsRaw(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = title, style = MaterialTheme.typography.titleMedium)
+        Text(text = title, style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Normal))
         content()
     }
 }
