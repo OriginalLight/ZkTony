@@ -12,64 +12,35 @@ object Constants {
      * 导航栏 true false
      */
     const val NAVIGATION_BAR = "NAVIGATION_BAR"
+    const val DEFAULT_NAVIGATION_BAR = true
 
     /**
      * 状态栏 true false
      */
     const val STATUS_BAR = "STATUS_BAR"
+    const val DEFAULT_STATUS_BAR = true
 
     /**
      * 语言 zh en
      */
     const val LANGUAGE = "LANGUAGE"
+    const val DEFAULT_LANGUAGE = "zh"
 
     /**
      * 提示音 mute ring voice
      */
     const val PROMPT_SOUND = "PROMPT_SOUND"
+    const val DEFAULT_PROMPT_SOUND = "voice"
 
     /**
      * S/N
      */
     const val SN = "SN"
+    const val DEFAULT_SN = "Unknown"
 
     /**
      * P/N
      */
     const val PN = "PN"
-
-    /**
-     * 模块数量
-     */
-    const val ZT_0000 = "ZT_0000"
-
-    /**
-     * 保温温度
-     */
-    const val ZT_0001 = "ZT_0001"
-
-    /**
-     * 抗体补偿
-     */
-    const val ZT_0002 = "ZT_0002"
-
-    /**
-     * 封闭液补偿
-     */
-    const val ZT_0003 = "ZT_0003"
-
-    /**
-     * 洗涤液补偿
-     */
-    const val ZT_0004 = "ZT_0004"
-
-    /**
-     * 摇床复位到平面补偿
-     */
-    const val ZT_0005 = "ZT_0005"
-
-    /**
-     * 摇床复位到低点补偿
-     */
-    const val ZT_0006 = "ZT_0006"
+    const val DEFAULT_PN = "T4000"
 }

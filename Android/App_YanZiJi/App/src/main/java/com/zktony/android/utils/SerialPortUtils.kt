@@ -1,19 +1,14 @@
 package com.zktony.android.utils
 
-import com.zktony.android.utils.AppStateUtils.hps
-import com.zktony.android.utils.AppStateUtils.hpv
 import com.zktony.log.LogUtils
-import com.zktony.serialport.command.modbus.RtuProtocol
-import com.zktony.serialport.command.runze.RunzeProtocol
-import com.zktony.serialport.ext.writeInt16BE
-import com.zktony.serialport.ext.writeInt32BE
-import com.zktony.serialport.ext.writeInt8
+import com.zktony.serialport.command.Protocol
+import com.zktony.serialport.ext.ascii2ByteArray
+import com.zktony.serialport.ext.readInt8
+import com.zktony.serialport.ext.toHexString
 import com.zktony.serialport.lifecycle.SerialStoreUtils
 import com.zktony.serialport.serialPortOf
-import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
-import kotlin.math.absoluteValue
 
 object SerialPortUtils {
 
@@ -34,107 +29,93 @@ object SerialPortUtils {
             log = true
         }?.let {
             SerialStoreUtils.put("B", it)
-            LogUtils.info("串口-B-下位机-ttyS0-初始化完成", true)
+            LogUtils.info("串口-B-灯板-ttyS0-初始化完成", true)
         } ?: {
-            LogUtils.error("串口-B-下位机-ttyS0-初始化失败", true)
+            LogUtils.error("串口-B-灯板-ttyS0-初始化失败", true)
         }
     }
 
-    /**
-     * 写入 16 位整数
-     */
-    fun writeRegister(slaveAddr: Int, startAddr: Int, value: Int) {
-        SerialStoreUtils.get("rtu")?.sendByteArray(bytes = RtuProtocol().apply {
-            this.slaveAddr = (slaveAddr + 1).toByte()
-            funcCode = 0x06
-            data = ByteArray(4).writeInt16BE(startAddr).writeInt16BE(value, 2)
-        }.serialization())
-    }
+    // 设置仪器SN号
+    suspend fun setSerialNumber(sn: String, target: Int) {
+        val serialPort = SerialStoreUtils.get("A") ?: return
+        val callbackKey = "SetSerialNumber"
+        var callback = -1
 
-    /**
-     * 写入 32 位整数
-     */
-    fun writeRegister(slaveAddr: Int, startAddr: Int, value: Long) {
-        SerialStoreUtils.get("rtu")?.sendByteArray(bytes = RtuProtocol().apply {
-            val byteArray = ByteArray(4).writeInt32BE(value)
-            this.slaveAddr = (slaveAddr + 1).toByte()
-            funcCode = 0x10
-            data = ByteArray(5)
-                .plus(byteArray.copyOfRange(2, 4))
-                .plus(byteArray.copyOfRange(0, 2))
-                .writeInt16BE(startAddr)
-                .writeInt16BE(2, 2)
-                .writeInt8(4, 4)
-        }.serialization())
-    }
-
-    /**
-     * 设置阀门状态
-     */
-    suspend fun writeWithValve(slaveAddr: Int, channel: Int, retry: Int = 1) {
-        val current = hpv[slaveAddr] ?: 0
-        if (current == channel) return
-        val rtu = SerialStoreUtils.get("rtu") ?: error("ERROR 0X0000 - 串口未初始化")
         try {
-            withTimeout((current - channel).absoluteValue * 1000L + 1000L) {
-                // 切阀命令
-                rtu.sendByteArray(bytes = RunzeProtocol().apply {
-                    this.slaveAddr = slaveAddr.toByte()
-                    funcCode = 0x44
-                    data = byteArrayOf(channel.toByte(), 0x00)
-                }.serialization())
-
-                while (hpv[slaveAddr] != channel) {
-                    // 减小反应时间
-                    repeat(3) {
-                        delay(100L)
-                        if (hpv[slaveAddr] == channel) return@withTimeout
+            serialPort.registerCallback(callbackKey) { bytes ->
+                LogUtils.info(callbackKey, "$target 接收到数据: ${bytes.toHexString()}", true)
+                Protocol.verifyProtocol(bytes) {
+                    if (it.function == 0x31.toByte()) {
+                        callback = it.data.readInt8()
                     }
-                    // 读取阀门状态
-                    rtu.sendByteArray(bytes = RunzeProtocol().apply {
-                        this.slaveAddr = slaveAddr.toByte()
-                        funcCode = 0x3E
-                        data = byteArrayOf(0x00, 0x00)
-                    }.serialization())
                 }
             }
-        } catch (ex: TimeoutCancellationException) {
-            if (hpv[slaveAddr] != channel && retry > 0) {
-                writeWithValve(slaveAddr, channel, retry - 1)
+            // 设置SN号
+            val protocol = Protocol().apply {
+                targetAddress = target.toByte()
+                function = 0x31.toByte()
+                data = sn.ascii2ByteArray(true)
+            }.serialization()
+            LogUtils.info(callbackKey, "$target 发送数据: ${protocol.toHexString()}", true)
+            // 发送设置SN号命令
+            serialPort.sendByteArray(protocol)
+            // 等待设置结果
+            withTimeout(1000) {
+                while (callback == -1) {
+                    delay(100)
+                }
+            }
+            if (callback == 0) {
+                LogUtils.info(callbackKey, "$target S/N设置成功", true)
             } else {
-                throw Exception("ERROR 0X0002 - 切阀超时")
+                LogUtils.error(callbackKey, "$target S/N设置失败", true)
             }
+        } catch (e: Exception) {
+            LogUtils.error(e.stackTraceToString(), true)
+        }finally {
+            serialPort.unregisterCallback(callbackKey)
         }
     }
 
-    /**
-     * 发送脉冲数
-     */
-    suspend fun writeWithPulse(slaveAddr: Int, value: Long) {
-        if (value == 0L) return
-        val rtu = SerialStoreUtils.get("rtu") ?: error("ERROR 0X0000 - 串口未初始化")
+    // 设置仪器PN号
+    suspend fun setProductNumber(pn: String, target: Int) {
+        val serialPort = SerialStoreUtils.get("A") ?: return
+        val callbackKey = "SetProductNumber"
+        var callback = -1
+
         try {
-            withTimeout(maxOf(value.absoluteValue / 32000L, 1) * 1000L + 2000L) {
-                writeRegister(startAddr = 222, slaveAddr = slaveAddr, value = value)
-                hps[slaveAddr] = 1
-                while ((hps[slaveAddr] ?: 0) != 0) {
-                    // 减小反应时间
-                    repeat(3) {
-                        delay(50L)
-                        if ((hps[slaveAddr] ?: 0) == 0) return@withTimeout
+            serialPort.registerCallback(callbackKey) { bytes ->
+                LogUtils.info(callbackKey, "$target 接收到数据: ${bytes.toHexString()}", true)
+                Protocol.verifyProtocol(bytes) {
+                    if (it.function == 0x30.toByte()) {
+                        callback = it.data.readInt8()
                     }
-                    // 读取当前的速度
-                    rtu.sendByteArray(bytes = RtuProtocol().apply {
-                        this.slaveAddr = (slaveAddr + 1).toByte()
-                        funcCode = 0x03
-                        data = ByteArray(4).writeInt16BE(25).writeInt16BE(1, 2)
-                    }.serialization())
                 }
             }
-        } catch (ex: TimeoutCancellationException) {
-            writeRegister(slaveAddr = slaveAddr, startAddr = 200, value = 0)
-            error("ERROR 0X0001 - 电机运行超时")
+            // 设置PN号
+            val protocol = Protocol().apply {
+                function = 0x30.toByte()
+                targetAddress = target.toByte()
+                data = byteArrayOf(ProductUtils.ProductNumberList.indexOf(pn).toByte())
+            }.serialization()
+            LogUtils.info(callbackKey, "$target 发送数据: ${protocol.toHexString()}", true)
+            // 发送设置PN号命令
+            serialPort.sendByteArray(protocol)
+            // 等待设置结果
+            withTimeout(1000) {
+                while (callback == -1) {
+                    delay(100)
+                }
+            }
+            if (callback == 0) {
+                LogUtils.info(callbackKey, "$target P/N设置成功", true)
+            } else {
+                LogUtils.error(callbackKey, "$target P/N设置失败", true)
+            }
+        } catch (e: Exception) {
+            LogUtils.error(e.stackTraceToString(), true)
+        }finally {
+            serialPort.unregisterCallback(callbackKey)
         }
     }
-
 }

@@ -21,7 +21,7 @@ fun BottomBar(modifier: Modifier = Modifier) {
     // S/N
     val sn by rememberDataSaverState(
         key = Constants.SN,
-        initialValue = "Unknown",
+        initialValue = Constants.DEFAULT_SN,
         senseExternalDataChange = true
     )
 

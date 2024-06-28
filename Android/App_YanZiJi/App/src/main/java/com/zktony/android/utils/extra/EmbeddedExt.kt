@@ -24,7 +24,7 @@ suspend fun embeddedUpgrade(hexFile: File) = channelFlow {
         serialPort.registerCallback(key) { bytes ->
             Protocol.verifyProtocol(bytes) {
                 launch {
-                    when (it.func) {
+                    when (it.function) {
                         0xA0.toByte() -> {
                             Log.d("EmbeddedExt", "升级准备就绪")
                             flag = if (it.data.readInt8() == 1) {
@@ -86,14 +86,14 @@ suspend fun embeddedUpgrade(hexFile: File) = channelFlow {
 
         // 发送升级准备命令
         send(UpgradeState.Message("升级准备中"))
-        serialPort.sendByteArray(Protocol().apply { func = 0xA0.toByte() }.serialization())
+        serialPort.sendByteArray(Protocol().apply { function = 0xA0.toByte() }.serialization())
         delay(300)
         if (flag != 0) error("升级准备响应失败")
 
         // 发送升级数据信息
         send(UpgradeState.Message("升级数据信息中"))
         serialPort.sendByteArray(Protocol().apply {
-            func = 0xA1.toByte()
+            function = 0xA1.toByte()
             data = byteArrayOf(0x00, 0x00).writeInt16LE(totalPackage) + byteArrayOf(
                 0x00,
                 0x00
@@ -107,7 +107,7 @@ suspend fun embeddedUpgrade(hexFile: File) = channelFlow {
         val startAddress = 0x8020000
         val endAddress = 0x8020000 + totalLength
         serialPort.sendByteArray(Protocol().apply {
-            func = 0xA2.toByte()
+            function = 0xA2.toByte()
             data = byteArrayOf(
                 0x00,
                 0x00,
@@ -132,7 +132,7 @@ suspend fun embeddedUpgrade(hexFile: File) = channelFlow {
             val bytes = byteArray.copyOfRange(start, end)
             // 发送升级数据
             serialPort.sendByteArray(Protocol().apply {
-                func = 0xA3.toByte()
+                function = 0xA3.toByte()
                 data = byteArrayOf(0x00, 0x00).writeInt16LE(i) + bytes
             }.serialization())
             // 等待升级数据响应
@@ -150,7 +150,7 @@ suspend fun embeddedUpgrade(hexFile: File) = channelFlow {
 
         // 发送升级完成命令
         send(UpgradeState.Message("等待升级完成"))
-        serialPort.sendByteArray(Protocol().apply { func = 0xA4.toByte() }.serialization())
+        serialPort.sendByteArray(Protocol().apply { function = 0xA4.toByte() }.serialization())
         // 等待升级完成响应
         withTimeout(2000L) {
             while (flag != 3) {
@@ -173,14 +173,14 @@ suspend fun embeddedVersion(): String {
         // 注册回调
         serialPort.registerCallback(key) { bytes ->
             Protocol.verifyProtocol(bytes) {
-                if (it.func == 0x0A.toByte()) {
+                if (it.function == 0x0A.toByte()) {
                     version = it.data.toAsciiString()
                 }
             }
         }
         // 发送版本查询命令
         serialPort.sendByteArray(Protocol().apply {
-            func = 0x0A.toByte()
+            function = 0x0A.toByte()
         }.serialization())
         // 等待版本响应
         withTimeout(2000L) {

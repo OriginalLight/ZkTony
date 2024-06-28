@@ -28,7 +28,12 @@ import com.zktony.android.ui.HistoryView
 import com.zktony.android.ui.LoginView
 import com.zktony.android.ui.ProgramView
 import com.zktony.android.ui.SettingsAgingView
+import com.zktony.android.ui.SettingsArgumentsEquipmentView
+import com.zktony.android.ui.SettingsArgumentsPumpView
+import com.zktony.android.ui.SettingsArgumentsRuntimeView
+import com.zktony.android.ui.SettingsArgumentsSensorView
 import com.zktony.android.ui.SettingsArgumentsView
+import com.zktony.android.ui.SettingsArgumentsVoltageView
 import com.zktony.android.ui.SettingsDebugView
 import com.zktony.android.ui.SettingsFqcView
 import com.zktony.android.ui.SettingsView
@@ -65,12 +70,17 @@ fun AppNavigation() {
                 composable(Route.PROGRAM) { ProgramView() }
                 composable(Route.EXPERIMENTAL) { ExperimentalView() }
                 composable(Route.HISTORY) { HistoryView() }
-                // Settings and sub-settings
                 composable(Route.SETTINGS) { SettingsView() }
                 composable(Route.SETTINGS_ARGUMENTS) { SettingsArgumentsView() }
+                composable(Route.SETTINGS_ARGUMENTS_EQUIPMENT) { SettingsArgumentsEquipmentView() }
+                composable(Route.SETTINGS_ARGUMENTS_RUNTIME) { SettingsArgumentsRuntimeView() }
+                composable(Route.SETTINGS_ARGUMENTS_PUMP) { SettingsArgumentsPumpView() }
+                composable(Route.SETTINGS_ARGUMENTS_VOLTAGE) { SettingsArgumentsVoltageView() }
+                composable(Route.SETTINGS_ARGUMENTS_SENSOR) { SettingsArgumentsSensorView() }
                 composable(Route.SETTINGS_DEBUG) { SettingsDebugView() }
                 composable(Route.SETTINGS_FQC) { SettingsFqcView() }
                 composable(Route.SETTINGS_AGING) { SettingsAgingView() }
+
             }
         }
     }

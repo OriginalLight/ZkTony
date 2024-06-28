@@ -16,7 +16,7 @@ fun ImportSecondConfirmationDialog(
     onConfirm: () -> Unit
 ) {
     AlertDialog(
-        title = { Text(stringResource(id = R.string.bring)) },
+        title = { Text(stringResource(id = R.string.oneclick_import)) },
         text = { Text("将覆盖当前所有参数，无法恢复！！！确认导入吗？") },
         modifier = modifier,
         onDismissRequest = { onDismiss() },

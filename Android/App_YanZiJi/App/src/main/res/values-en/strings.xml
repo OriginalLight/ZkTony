@@ -31,6 +31,10 @@
     <string name="serial_number">Serial Number</string>
     <string name="pruduct_number">Product Number</string>
     <string name="set">Set</string>
-    <string name="export">Export</string>
-    <string name="bring">Import</string>
+    <string name="oneclick_export">One-click Export</string>
+    <string name="oneclick_import">One-click Import</string>
+    <string name="oneclick_clear">One-click Clear</string>
+    <string name="pump_arguments">Pump Arguments</string>
+    <string name="voltage_arguments">Voltage Arguments</string>
+    <string name="sensor_arguments">Sensor Arguments</string>
 </resources>

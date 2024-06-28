@@ -85,13 +85,13 @@ fun SystemSettingsView(
 
     val scope = rememberCoroutineScope()
     // 语言
-    var language by rememberDataSaverState(key = Constants.LANGUAGE, default = "zh")
+    var language by rememberDataSaverState(key = Constants.LANGUAGE, default = Constants.DEFAULT_LANGUAGE)
     // 提示音
-    var promptSound by rememberDataSaverState(key = Constants.PROMPT_SOUND, default = "voice")
+    var promptSound by rememberDataSaverState(key = Constants.PROMPT_SOUND, default = Constants.DEFAULT_PROMPT_SOUND)
     // 导航栏
-    var navigationBar by rememberDataSaverState(key = Constants.NAVIGATION_BAR, default = false)
+    var navigationBar by rememberDataSaverState(key = Constants.NAVIGATION_BAR, default = Constants.DEFAULT_NAVIGATION_BAR)
     // 状态栏
-    var statusBar by rememberDataSaverState(key = Constants.STATUS_BAR, default = false)
+    var statusBar by rememberDataSaverState(key = Constants.STATUS_BAR, default = Constants.DEFAULT_STATUS_BAR)
     // 主屏幕
     var homePackage by remember { mutableStateOf(HzmctUtils.getHomePackage()?.contains(BuildConfig.APPLICATION_ID) ?: false) }
     // 系统时间
@@ -128,7 +128,7 @@ fun SystemSettingsView(
         )
 
         // 语言
-        SettingsRaw(title = stringResource(id = R.string.language)) {
+        SettingsRow(title = stringResource(id = R.string.language)) {
             RadioButtonGroup(
                 selected = if (language == "zh") 0 else 1,
                 options = listOf("简体中文", "English")
@@ -141,7 +141,7 @@ fun SystemSettingsView(
         }
 
         // 提示音
-        SettingsRaw(title = stringResource(id = R.string.prompt_sound)) {
+        SettingsRow(title = stringResource(id = R.string.prompt_sound)) {
             RadioButtonGroup(
                 selected = PromptSoundUtils.getPromptSoundId(promptSound),
                 options = listOf(
@@ -158,7 +158,7 @@ fun SystemSettingsView(
         }
 
         // 导航栏
-        SettingsRaw(title = stringResource(id = R.string.navigation_bar)) {
+        SettingsRow(title = stringResource(id = R.string.navigation_bar)) {
             Switch(
                 checked = navigationBar,
                 onCheckedChange = {
@@ -174,7 +174,7 @@ fun SystemSettingsView(
         }
 
         // 状态栏
-        SettingsRaw(title = stringResource(id = R.string.status_bar)) {
+        SettingsRow(title = stringResource(id = R.string.status_bar)) {
             Switch(
                 checked = statusBar,
                 onCheckedChange = {
@@ -190,7 +190,7 @@ fun SystemSettingsView(
         }
 
         // 主屏幕
-        SettingsRaw(title = stringResource(id = R.string.home_package)) {
+        SettingsRow(title = stringResource(id = R.string.home_package)) {
             Switch(checked = homePackage, onCheckedChange = {
                 scope.launch {
                     homePackage = it
@@ -203,7 +203,7 @@ fun SystemSettingsView(
         }
 
         // 系统时间
-        SettingsRaw(
+        SettingsRow(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable { showDateTimePicker = true },
@@ -244,7 +244,7 @@ fun FactorySettingsView(modifier: Modifier = Modifier) {
         )
 
         // 参数
-        SettingsRaw(
+        SettingsRow(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable { navigationActions.navigate(Route.SETTINGS_ARGUMENTS) },
@@ -257,7 +257,7 @@ fun FactorySettingsView(modifier: Modifier = Modifier) {
         }
 
         // 调试
-        SettingsRaw(
+        SettingsRow(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable { navigationActions.navigate(Route.SETTINGS_DEBUG) },
@@ -270,7 +270,7 @@ fun FactorySettingsView(modifier: Modifier = Modifier) {
         }
 
         // Fqc
-        SettingsRaw(
+        SettingsRow(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable { navigationActions.navigate(Route.SETTINGS_FQC) },
@@ -283,7 +283,7 @@ fun FactorySettingsView(modifier: Modifier = Modifier) {
         }
 
         // Aging
-        SettingsRaw(
+        SettingsRow(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable { navigationActions.navigate(Route.SETTINGS_AGING) },
@@ -298,7 +298,7 @@ fun FactorySettingsView(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun SettingsRaw(
+fun SettingsRow(
     modifier: Modifier = Modifier,
     title: String,
     content: @Composable () -> Unit

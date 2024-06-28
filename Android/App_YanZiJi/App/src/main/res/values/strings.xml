@@ -32,6 +32,10 @@
     <string name="serial_number">产品序列号</string>
     <string name="pruduct_number">产品型号</string>
     <string name="set">设置</string>
-    <string name="export">导 出</string>
-    <string name="bring">导 入</string>
+    <string name="oneclick_export">一键导出</string>
+    <string name="oneclick_import">一键导入</string>
+    <string name="oneclick_clear">一键清除</string>
+    <string name="pump_arguments">蠕动泵参数</string>
+    <string name="voltage_arguments">电流电压参数</string>
+    <string name="sensor_arguments">传感器参数</string>
 </resources>

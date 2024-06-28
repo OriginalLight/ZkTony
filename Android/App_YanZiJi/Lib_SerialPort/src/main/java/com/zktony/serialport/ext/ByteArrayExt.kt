@@ -435,12 +435,12 @@ fun ByteArray.splitByteArray(head: ByteArray, end: ByteArray): List<ByteArray> {
 }
 
 fun ByteArray.splitByteArray(): List<ByteArray> {
-    if (this.size < 11) return listOf()
+    if (this.size < 10) throw Exception("RX Length Error")
     var byteArray = this.copyOfRange(0, this.size)
     val list = mutableListOf<ByteArray>()
     while (byteArray.isNotEmpty()) {
-        val length = byteArray.readInt16LE(3)
-        val pacLength = length + 11
+        val length = byteArray.readInt16LE(4)
+        val pacLength = length + 10
         if (byteArray.size >= pacLength) {
             val bytes = byteArray.copyOfRange(0, pacLength)
             list.add(bytes)

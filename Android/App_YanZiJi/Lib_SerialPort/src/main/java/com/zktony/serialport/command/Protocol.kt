@@ -8,20 +8,21 @@ import com.zktony.serialport.ext.writeInt16LE
 /**
  * Protocol
  *
- * @property head Byte
- * @property addr Byte
- * @property func Byte
+ * @property frameHeader Byte
+ * @property targetAddress Byte
+ * @property function Byte
  * @property length ByteArray
  * @property data ByteArray
  * @property crc ByteArray
- * @property end ByteArray
+ * @property frameEnd ByteArray
  */
 class Protocol : BaseProtocol {
-    // Head 1byte 0xEE
-    var head: Byte = 0xEE.toByte()
-
-    // Addr 1byte 0x01 0x02
-    var addr: Byte = 0x01.toByte()
+    // 帧头 1byte 0xEE
+    private var frameHeader: Byte = 0xEE.toByte()
+    // 源地址 1byte 0x01
+    var sourceAddress: Byte = 0x01.toByte()
+    // 目标地址 1byte 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08
+    var targetAddress: Byte = 0x01.toByte()
 
     /**
      * control
@@ -37,7 +38,7 @@ class Protocol : BaseProtocol {
      *     0x02 gpio status
      *     0xFF error
      */
-    var func: Byte = 0x01.toByte()
+    var function: Byte = 0x01.toByte()
 
     // Length of data 2byte 0x0000 ~ 0xFFFF
     var length: ByteArray = byteArrayOf(0x00.toByte(), 0x00.toByte())
@@ -49,38 +50,38 @@ class Protocol : BaseProtocol {
     var crc: ByteArray = byteArrayOf(0x00.toByte(), 0x00.toByte())
 
     // End 4byte 0xFF 0xFC 0xFF 0xFF
-    var end: ByteArray = byteArrayOf(0xFF.toByte(), 0xFC.toByte(), 0xFF.toByte(), 0xFF.toByte())
+    private var frameEnd: ByteArray = byteArrayOf(0xFF.toByte(), 0xFC.toByte())
 
     override fun serialization(): ByteArray {
-        val byteArray = byteArrayOf(head, addr, func)
+        val byteArray = byteArrayOf(frameHeader, sourceAddress, targetAddress, function)
             .plus(length.writeInt16LE(data.size, 0))
             .plus(data)
             .plus(crc)
-            .plus(end)
+            .plus(frameEnd)
 
         // crc
         return byteArray.replaceByteArrayBE(
-            byteArray.copyOfRange(0, byteArray.size - 6).crc16LE(),
-            byteArray.size - 6,
+            byteArray.copyOfRange(0, byteArray.size - 4).crc16LE(),
+            byteArray.size - 4,
             0
         )
     }
 
     override fun deserialization(byteArray: ByteArray) {
-        head = byteArray[0]
-        addr = byteArray[1]
-        func = byteArray[2]
-        length = byteArray.copyOfRange(3, 5)
-        data = byteArray.copyOfRange(5, byteArray.size - 6)
-        crc = byteArray.copyOfRange(byteArray.size - 6, byteArray.size - 4)
-        end = byteArray.copyOfRange(byteArray.size - 4, byteArray.size)
+        frameHeader = byteArray[0]
+        sourceAddress = byteArray[1]
+        targetAddress = byteArray[2]
+        function = byteArray[3]
+        length = byteArray.copyOfRange(4, 6)
+        data = byteArray.copyOfRange(6, byteArray.size - 4)
+        crc = byteArray.copyOfRange(byteArray.size - 4, byteArray.size - 2)
+        frameEnd = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
     }
 
     companion object {
         // 协议包头和包尾
         private val expectHead = byteArrayOf(0xEE.toByte())
-        private val expectEnd =
-            byteArrayOf(0xFF.toByte(), 0xFC.toByte(), 0xFF.toByte(), 0xFF.toByte())
+        private val expectEnd = byteArrayOf(0xFF.toByte(), 0xFC.toByte())
 
         /**
          * Verify the protocol
@@ -90,8 +91,8 @@ class Protocol : BaseProtocol {
          */
         @kotlin.jvm.Throws(Exception::class)
         fun verifyProtocol(byteArray: ByteArray, block: (Protocol) -> Unit) {
-            // 验证包长 >= 11
-            if (byteArray.size < 11) {
+            // 验证包长 >= 10
+            if (byteArray.size < 10) {
                 throw Exception("RX Length Error")
             }
 
@@ -102,14 +103,14 @@ class Protocol : BaseProtocol {
                 if (!head.contentEquals(expectHead)) {
                     throw Exception("RX Header Error")
                 }
-                val end = pkg.copyOfRange(pkg.size - 4, pkg.size)
+                val end = pkg.copyOfRange(pkg.size - 2, pkg.size)
                 if (!end.contentEquals(expectEnd)) {
                     throw Exception("RX End Error")
                 }
 
                 // crc 校验
-                val crc = pkg.copyOfRange(pkg.size - 6, pkg.size - 4)
-                val bytes = pkg.copyOfRange(0, pkg.size - 6)
+                val crc = pkg.copyOfRange(pkg.size - 4, pkg.size - 2)
+                val bytes = pkg.copyOfRange(0, pkg.size - 4)
                 if (!bytes.crc16LE().contentEquals(crc)) {
                     throw Exception("RX Crc Error")
                 }
