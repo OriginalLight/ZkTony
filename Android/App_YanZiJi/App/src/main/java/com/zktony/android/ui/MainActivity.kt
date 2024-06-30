@@ -45,8 +45,8 @@ class MainActivity : ComponentActivity() {
                 LocalNavigationActions provides navigationActions,
                 LocalSnackbarHostState provides snackbarHostState
             ) {
-                AppTheme {
-                    Presets {
+                Presets {
+                    AppTheme {
                         Permissions {
                             val snackbar by SnackbarUtils.snackbar.collectAsStateWithLifecycle()
                             LaunchedEffect(key1 = snackbar) {

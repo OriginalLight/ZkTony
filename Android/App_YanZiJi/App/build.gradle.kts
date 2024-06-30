@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
 }
 
@@ -119,8 +120,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewModelCompose)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.gson)
     implementation(libs.hilt.android)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.okhttp3)
 
     debugImplementation(libs.androidx.compose.ui.test.manifest)

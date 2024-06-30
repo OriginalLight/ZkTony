@@ -1,22 +1,22 @@
 package com.zktony.android.utils
 
-import java.util.Locale
+import android.content.res.Resources
 
-@Suppress("DEPRECATION")
 object ResourceUtils {
+    // 上下文 LocalContext.current
+    private lateinit var resources: Resources
 
-    fun setLanguage(language: String) {
-        val locale = Locale(language)
-        Locale.setDefault(locale)
-        val configuration = ApplicationUtils.ctx.resources.configuration
-        configuration.setLocale(locale)
-        ApplicationUtils.ctx.resources.updateConfiguration(
-            configuration,
-            ApplicationUtils.ctx.resources.displayMetrics
-        )
+    fun with(resources: Resources) {
+        this.resources = resources
     }
 
+    // 获取字符串资源
     fun stringResource(id: Int): String {
-        return ApplicationUtils.ctx.getString(id)
+        return resources.getString(id)
+    }
+
+    // 获取字符串资源，并替换占位符
+    fun stringResource(id: Int, vararg formatArgs: Any): String {
+        return resources.getString(id, *formatArgs)
     }
 }

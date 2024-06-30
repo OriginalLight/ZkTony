@@ -9,14 +9,12 @@ import com.zktony.room.entities.*
  */
 @Database(
     entities =
-    [Calibration::class, Motor::class, History::class, Program::class, Fault::class],
+    [History::class, Program::class, Fault::class],
     version = 1,
     exportSchema = false
 )
 @TypeConverters(DateConverters::class)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun CalibrationDao(): CalibrationDao
-    abstract fun MotorDao(): MotorDao
     abstract fun HistoryDao(): HistoryDao
     abstract fun ProgramDao(): ProgramDao
     abstract fun FaultDao(): FaultDao

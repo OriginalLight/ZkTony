@@ -26,13 +26,7 @@ object RoomModule {
     }
 
     @Provides
-    fun calibrationDao(database: AppDatabase) = database.CalibrationDao()
-
-    @Provides
     fun historyDao(database: AppDatabase) = database.HistoryDao()
-
-    @Provides
-    fun motorDao(database: AppDatabase) = database.MotorDao()
 
     @Provides
     fun programDao(database: AppDatabase) = database.ProgramDao()

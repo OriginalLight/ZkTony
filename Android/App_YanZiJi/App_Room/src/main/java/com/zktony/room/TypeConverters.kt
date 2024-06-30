@@ -1,11 +1,6 @@
 package com.zktony.room
 
 import androidx.room.TypeConverter
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import com.zktony.room.entities.internal.IncubationStage
-import com.zktony.room.entities.internal.Log
-import com.zktony.room.entities.internal.Point
 import java.util.Date
 
 /**
@@ -24,50 +19,5 @@ object DateConverters {
     @JvmStatic
     fun dateToTimestamp(date: Date?): Long? {
         return date?.time
-    }
-}
-
-object IncubationStageConverters {
-    @TypeConverter
-    @JvmStatic
-    fun toObject(value: String): List<IncubationStage> {
-        val listType = object : TypeToken<List<IncubationStage>>() {}.type
-        return Gson().fromJson(value, listType)
-    }
-
-    @TypeConverter
-    @JvmStatic
-    fun toString(list: List<IncubationStage>): String {
-        return Gson().toJson(list)
-    }
-}
-
-object PointConverters {
-    @TypeConverter
-    @JvmStatic
-    fun toObject(value: String): List<Point> {
-        val listType = object : TypeToken<List<Point>>() {}.type
-        return Gson().fromJson(value, listType)
-    }
-
-    @TypeConverter
-    @JvmStatic
-    fun toString(list: List<Point>): String {
-        return Gson().toJson(list)
-    }
-}
-
-object LogConverters {
-    @TypeConverter
-    @JvmStatic
-    fun toObject(value: String): List<Log> {
-        val listType = object : TypeToken<List<Log>>() {}.type
-        return Gson().fromJson(value, listType)
-    }
-
-    @TypeConverter
-    @JvmStatic
-    fun toString(list: List<Log>): String {
-        return Gson().toJson(list)
     }
 }

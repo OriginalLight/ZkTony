@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -99,7 +99,7 @@ fun DateTimePicker(
                     // 上一步按钮
                     IconButton(onClick = { step = 0 }) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Default.Reply,
                             contentDescription = "ArrowBack"
                         )
                     }
@@ -163,6 +163,5 @@ fun DateTimePickerPreview() {
         Button(onClick = { showDialog = true }) {
             Text(text = "Show Dialog")
         }
-
     }
 }

@@ -1,20 +1,24 @@
 package com.zktony.android.ui
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Reply
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.zktony.android.R
-import com.zktony.android.ui.components.TitleBackTopBar
 import com.zktony.android.ui.utils.LocalNavigationActions
+import com.zktony.android.ui.viewmodel.SettingsArgumentsRuntimeViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsArgumentsRuntimeView() {
+fun SettingsArgumentsRuntimeView(viewModel: SettingsArgumentsRuntimeViewModel = hiltViewModel()) {
     val navigationActions = LocalNavigationActions.current
 
     BackHandler {
@@ -22,12 +26,15 @@ fun SettingsArgumentsRuntimeView() {
         navigationActions.navigateUp()
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        TitleBackTopBar(stringResource(id = R.string.pump_arguments))
+    Column {
+        // 顶部导航栏
+        TopAppBar(
+            title = { Text(text = stringResource(id = R.string.runtime_arguments)) },
+            navigationIcon = {
+                IconButton(onClick = { navigationActions.navigateUp() }) {
+                    Icon(imageVector = Icons.AutoMirrored.Default.Reply, contentDescription = "Back")
+                }
+            }
+        )
     }
 }

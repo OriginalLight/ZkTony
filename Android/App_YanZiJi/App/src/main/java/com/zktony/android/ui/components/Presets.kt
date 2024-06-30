@@ -1,8 +1,12 @@
 package com.zktony.android.ui.components
 
+import android.app.LocaleManager
+import android.os.Build
+import android.os.LocaleList
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.getSystemService
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.ProductUtils
 import com.zktony.android.utils.PromptSoundUtils
@@ -19,18 +23,28 @@ import java.util.Locale
 @Composable
 fun Presets(content: @Composable () -> Unit) {
     // 数据存储
+    val context = LocalContext.current
+    val config = LocalConfiguration.current
     val dataSaver = LocalDataSaver.current
 
     // 语言
+    ResourceUtils.with(context.resources)
     val language = dataSaver.readData(Constants.LANGUAGE, Constants.DEFAULT_LANGUAGE)
-    val configuration = LocalConfiguration.current
-    val resource = LocalContext.current.resources
 
-    val locale = Locale(language)
-    Locale.setDefault(locale)
-    configuration.setLocale(locale)
-    resource.updateConfiguration(configuration, resource.displayMetrics)
-    ResourceUtils.setLanguage(language)
+    config.setLocale(Locale(language))
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        config.setLocales(
+            LocaleList(
+                Locale(language)
+            )
+        )
+    }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        context.getSystemService<LocaleManager>()?.applicationLocales = LocaleList(
+            Locale(language)
+        )
+    }
+    context.resources.updateConfiguration(config, context.resources.displayMetrics)
     LogUtils.info("Presets", "Language: $language")
 
     // 提示音

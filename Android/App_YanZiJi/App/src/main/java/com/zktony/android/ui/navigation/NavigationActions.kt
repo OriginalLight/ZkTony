@@ -29,12 +29,7 @@ object Route {
     const val SETTINGS_AGING = "SettingsAging"
 }
 
-data class TopLevelDestination(
-    val route: String,
-    val icon: ImageVector,
-    val iconTextId: Int
-)
-
+// Navigation actions
 class NavigationActions(private val navController: NavHostController) {
 
     // 导航控制器
@@ -77,6 +72,14 @@ class NavigationActions(private val navController: NavHostController) {
     fun selectDestination() = navController.currentBackStackEntryAsState().value?.destination?.route ?: Route.LOGIN
 }
 
+// 顶级目的地
+data class TopLevelDestination(
+    val route: String,
+    val icon: ImageVector,
+    val iconTextId: Int
+)
+
+// 顶级目的地列表
 val TOP_LEVEL_DESTINATIONS = listOf(
     TopLevelDestination(
         route = Route.EXPERIMENTAL,

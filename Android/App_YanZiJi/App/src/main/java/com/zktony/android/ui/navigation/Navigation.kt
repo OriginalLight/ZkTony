@@ -80,7 +80,6 @@ fun AppNavigation() {
                 composable(Route.SETTINGS_DEBUG) { SettingsDebugView() }
                 composable(Route.SETTINGS_FQC) { SettingsFqcView() }
                 composable(Route.SETTINGS_AGING) { SettingsAgingView() }
-
             }
         }
     }

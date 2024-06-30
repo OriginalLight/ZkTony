@@ -1,9 +1,25 @@
 package com.zktony.android.utils
 
+import android.media.AudioAttributes
 import android.media.MediaPlayer
+import android.media.SoundPool
 
 object PromptSoundUtils {
+    private var soundPool: SoundPool? = null
     private var code: Int = 0
+
+    init {
+        val audioAttributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .build()
+
+        soundPool = SoundPool.Builder()
+            .setMaxStreams(1)
+            .setAudioAttributes(audioAttributes)
+            .build()
+
+    }
 
     // Set the audio
     fun setPromptSound(id: Int) {
@@ -43,6 +59,13 @@ object PromptSoundUtils {
         mediaPlayer.start()
         mediaPlayer.setOnCompletionListener {
             mediaPlayer.release()
+        }
+    }
+
+    fun playSound(resId: Int) {
+        soundPool?.load(ApplicationUtils.ctx, resId, 1)
+        soundPool?.setOnLoadCompleteListener { soundPool, sampleId, _ ->
+            soundPool.play(sampleId, 1f, 1f, 1, 0, 1f)
         }
     }
 

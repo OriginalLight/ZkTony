@@ -22,7 +22,6 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
 
     // 语言
     fun setLanguage(language: String) {
-        ResourceUtils.setLanguage(language)
         val tipsMessage = "${ResourceUtils.stringResource(R.string.language)} ${ResourceUtils.stringResource(R.string.set_success)}"
         TipsUtils.showTips(Tips(TipsType.INFO, tipsMessage))
         LogUtils.info("$tipsMessage $language", true)

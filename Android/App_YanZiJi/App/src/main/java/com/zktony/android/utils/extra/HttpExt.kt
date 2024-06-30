@@ -1,10 +1,9 @@
 package com.zktony.android.utils.extra
 
 import androidx.annotation.Keep
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.zktony.android.BuildConfig
 import com.zktony.android.utils.Constants
+import com.zktony.android.utils.JsonUtils
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
@@ -34,8 +33,7 @@ fun httpCall(
             if (response.isSuccessful) {
                 try {
                     val resp = response.body.string()
-                    val type = object : TypeToken<List<Application>>() {}.type
-                    val list = Gson().fromJson<List<Application>>(resp, type)
+                    val list = JsonUtils.fromJson<List<Application>>(resp)
                     callback(list.find { app -> app.applicationId == BuildConfig.APPLICATION_ID })
                 } catch (ex: Exception) {
                     ex.printStackTrace()

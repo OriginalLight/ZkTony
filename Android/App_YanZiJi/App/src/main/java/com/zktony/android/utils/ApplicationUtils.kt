@@ -1,13 +1,18 @@
 package com.zktony.android.utils
 
 import android.app.Application
+import android.app.LocaleManager
+import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import android.os.LocaleList
 import androidx.core.content.FileProvider
+import androidx.core.content.getSystemService
 import com.zktony.log.LogUtils
 import java.io.File
+import java.util.Locale
 
 /**
  * @author 刘贺贺
@@ -82,5 +87,26 @@ object ApplicationUtils {
             return cm.activeNetworkInfo?.isAvailable?: false
         }
         return false
+    }
+
+    @Suppress("DEPRECATION")
+    fun setLanguage(context: Context, language: String): Context {
+        val resources = context.resources
+        val config = resources.configuration
+        config.setLocale(Locale(language))
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            config.setLocales(
+                LocaleList(
+                    Locale(language)
+                )
+            )
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.getSystemService<LocaleManager>()?.applicationLocales = LocaleList(
+                Locale(language)
+            )
+        }
+        resources.updateConfiguration(config, resources.displayMetrics)
+        return context.createConfigurationContext(config)
     }
 }
