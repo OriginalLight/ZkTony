@@ -1,5 +1,7 @@
 package com.zktony.android.utils
 
+import com.zktony.android.data.Arguments
+import com.zktony.android.data.toArguments
 import com.zktony.log.LogUtils
 import com.zktony.serialport.command.Protocol
 import com.zktony.serialport.ext.ascii2ByteArray
@@ -36,17 +38,17 @@ object SerialPortUtils {
     }
 
     // 设置仪器SN号
-    suspend fun setSerialNumber(sn: String, target: Int) {
-        val serialPort = SerialStoreUtils.get("A") ?: return
+    suspend fun setSerialNumber(sn: String, target: Int) : Boolean {
+        val serialPort = SerialStoreUtils.get("A") ?: return false
         val callbackKey = "SetSerialNumber"
-        var callback = -1
+        var success = false
 
         try {
             serialPort.registerCallback(callbackKey) { bytes ->
                 LogUtils.info(callbackKey, "$target 接收到数据: ${bytes.toHexString()}", true)
                 Protocol.verifyProtocol(bytes) {
                     if (it.function == 0x31.toByte()) {
-                        callback = it.data.readInt8()
+                        success = it.data.readInt8() == 0
                     }
                 }
             }
@@ -61,34 +63,31 @@ object SerialPortUtils {
             serialPort.sendByteArray(protocol)
             // 等待设置结果
             withTimeout(1000) {
-                while (callback == -1) {
+                while (!success) {
                     delay(100)
                 }
-            }
-            if (callback == 0) {
-                LogUtils.info(callbackKey, "$target S/N设置成功", true)
-            } else {
-                LogUtils.error(callbackKey, "$target S/N设置失败", true)
             }
         } catch (e: Exception) {
             LogUtils.error(e.stackTraceToString(), true)
         }finally {
             serialPort.unregisterCallback(callbackKey)
         }
+
+        return success
     }
 
     // 设置仪器PN号
-    suspend fun setProductNumber(pn: String, target: Int) {
-        val serialPort = SerialStoreUtils.get("A") ?: return
+    suspend fun setProductNumber(pn: String, target: Int): Boolean {
+        val serialPort = SerialStoreUtils.get("A") ?: return false
         val callbackKey = "SetProductNumber"
-        var callback = -1
+        var success = false
 
         try {
             serialPort.registerCallback(callbackKey) { bytes ->
                 LogUtils.info(callbackKey, "$target 接收到数据: ${bytes.toHexString()}", true)
                 Protocol.verifyProtocol(bytes) {
                     if (it.function == 0x30.toByte()) {
-                        callback = it.data.readInt8()
+                        success = it.data.readInt8() == 0
                     }
                 }
             }
@@ -103,19 +102,67 @@ object SerialPortUtils {
             serialPort.sendByteArray(protocol)
             // 等待设置结果
             withTimeout(1000) {
-                while (callback == -1) {
+                while (!success) {
                     delay(100)
                 }
             }
-            if (callback == 0) {
-                LogUtils.info(callbackKey, "$target P/N设置成功", true)
-            } else {
-                LogUtils.error(callbackKey, "$target P/N设置失败", true)
+        } catch (e: Exception) {
+            LogUtils.error(e.stackTraceToString(), true)
+        }finally {
+            serialPort.unregisterCallback(callbackKey)
+
+        }
+
+        return success
+    }
+
+    // 查询Arguments
+    suspend fun queryArguments(target: Int): Boolean {
+        val serialPort = SerialStoreUtils.get("A") ?: return false
+        val callbackKey = "QueryArguments"
+        var success = false
+
+        try {
+            serialPort.registerCallback(callbackKey) { bytes ->
+                LogUtils.info(callbackKey, "$target 接收到数据: ${bytes.toHexString()}", true)
+                Protocol.verifyProtocol(bytes) {
+                    if (it.function == 0x32.toByte()) {
+                        val arguments = toArguments(it.data)
+                        if (arguments != null) {
+                            AppStateUtils.setArgumentsList(AppStateUtils.argumentsList.value.mapIndexed { index, arg ->
+                                if (index == target) {
+                                    arguments
+                                } else {
+                                    arg
+                                }
+                            })
+                            success = true
+                        } else {
+                            LogUtils.error(callbackKey, "$target Arguments解析失败", true)
+                        }
+                    }
+                }
+            }
+            // 查询Arguments
+            val protocol = Protocol().apply {
+                function = 0x32.toByte()
+                targetAddress = target.toByte()
+            }.serialization()
+            LogUtils.info(callbackKey, "$target 发送数据: ${protocol.toHexString()}", true)
+            // 发送查询Arguments命令
+            serialPort.sendByteArray(protocol)
+            // 等待查询结果
+            withTimeout(1000) {
+                while (!success) {
+                    delay(100)
+                }
             }
         } catch (e: Exception) {
             LogUtils.error(e.stackTraceToString(), true)
         }finally {
             serialPort.unregisterCallback(callbackKey)
         }
+
+        return success
     }
 }
