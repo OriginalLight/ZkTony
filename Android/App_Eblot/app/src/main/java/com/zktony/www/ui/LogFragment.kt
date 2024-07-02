@@ -49,7 +49,11 @@ class LogFragment :
     private fun initView() {
         binding.apply {
             recycleView.adapter = adapter
-            adapter.callback =  { viewModel.select(it) }
+            adapter.callback =  {
+                viewModel.select(it)
+                lineChart.isEnabled =  adapter.selected.size == 1
+                delete.isEnabled =  adapter.selected.size > 0
+            }
             adapter.onDoubleClick = {
                 viewModel.select(adapter.selected)
                 findNavController().navigate(

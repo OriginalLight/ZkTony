@@ -16,6 +16,7 @@ import com.zktony.datastore.ext.read
 import com.zktony.www.BuildConfig
 import com.zktony.www.R
 import com.zktony.www.core.ext.aboutDialog
+import com.zktony.www.core.ext.spannerDialog
 import com.zktony.www.databinding.FragmentAdminBinding
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -74,6 +75,15 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                             if (it > 0) binding.motorSpeed.setEqualText(it.toString())
                         }
                     }
+                    launch {
+                        dataStore.read(Constants.LANGUAGE, "zh").collect {
+                            binding.btnLanguage.text = when (it) {
+                                "zh" -> "简体中文"
+                                "en" -> "English"
+                                else -> "简体中文"
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -97,6 +107,16 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
 
             swBar.setOnCheckedChangeListener { _, isChecked ->
                 viewModel.toggleNavigationBar(isChecked)
+            }
+
+            btnLanguage.clickNoRepeat {
+                spannerDialog(
+                    it,
+                    menu = listOf(
+                        "简体中文", "English"
+                    ),
+                    block = { _, index -> viewModel.setLanguage(index) }
+                )
             }
 
             swAudio.setOnCheckedChangeListener { _, isChecked ->

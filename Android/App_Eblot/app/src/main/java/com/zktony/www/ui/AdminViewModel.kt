@@ -9,8 +9,10 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.*
 import com.zktony.core.utils.Constants
+import com.zktony.datastore.ext.read
 import com.zktony.datastore.ext.save
 import com.zktony.www.BuildConfig
+import com.zktony.www.MainActivity
 import com.zktony.www.R
 import com.zktony.www.core.SerialPort
 import com.zktony.www.core.ext.updateDialog
@@ -18,6 +20,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -75,6 +78,27 @@ class AdminViewModel constructor(
                 )
             }
             Ext.ctx.startActivity(intent)
+        }
+    }
+
+    /**
+     * 设置语言
+     * @param index [Int]
+     */
+    fun setLanguage(index: Int) {
+        viewModelScope.launch {
+            val language = when (index) {
+                0 -> "zh"
+                1 -> "en"
+                else -> "zh"
+            }
+            DS.save(Constants.LANGUAGE, language)
+            val old = DS.read(Constants.LANGUAGE, "zh").first()
+            if (old != language) {
+                Ext.ctx.startActivity(Intent(Ext.ctx, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                })
+            }
         }
     }
 
