@@ -28,9 +28,13 @@ fun BottomBar(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(48.dp)
-            .background(color = MaterialTheme.colorScheme.tertiaryContainer)
-            .padding(horizontal = 8.dp),
+            .height(64.dp)
+            .padding(8.dp)
+            .background(
+                color = MaterialTheme.colorScheme.surfaceDim,
+                shape = MaterialTheme.shapes.medium
+            )
+            .padding(horizontal = 8.dp)
     ) {
         // Bottom bar content
         Tips(modifier = Modifier.align(Alignment.CenterStart))

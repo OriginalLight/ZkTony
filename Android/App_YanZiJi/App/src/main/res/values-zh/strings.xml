@@ -38,4 +38,6 @@
     <string name="pump_arguments">蠕动泵参数</string>
     <string name="voltage_arguments">电流电压参数</string>
     <string name="sensor_arguments">传感器参数</string>
+    <string name="wechat">公众号</string>
+    <string name="video">视频号</string>
 </resources>

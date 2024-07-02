@@ -2,6 +2,7 @@ package com.zktony.android.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -26,6 +28,7 @@ import com.zktony.android.BuildConfig
 import com.zktony.android.R
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
+import com.zktony.android.ui.utils.zktyBrush
 import com.zktony.android.ui.viewmodel.LoginViewModel
 
 
@@ -40,6 +43,7 @@ fun LoginView(viewModel: LoginViewModel = hiltViewModel()) {
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .background(brush = zktyBrush)
             .padding(16.dp)
     ) {
         Logo(modifier = Modifier.align(Alignment.TopStart))
@@ -63,24 +67,32 @@ fun QrCode(modifier: Modifier = Modifier) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(48.dp)
+        horizontalArrangement = Arrangement.spacedBy(32.dp)
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
-                modifier = modifier.width(150.dp),
+                modifier = modifier.width(100.dp),
                 painter = painterResource(id = R.mipmap.wx),
                 contentDescription = "WX Code"
             )
-            Text(text = "公众号", style = MaterialTheme.typography.bodyLarge)
+            Text(
+                text = stringResource(id = R.string.wechat),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.surface
+            )
         }
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
-                modifier = modifier.width(150.dp),
+                modifier = modifier.width(100.dp),
                 painter = painterResource(id = R.mipmap.sph),
                 contentDescription = "SPH Code"
             )
-            Text(text = "视频号", style = MaterialTheme.typography.bodyLarge)
+            Text(
+                text = stringResource(id = R.string.video),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.surface
+            )
         }
     }
 }
@@ -92,7 +104,8 @@ fun Ver(modifier: Modifier = Modifier) {
     Text(
         modifier = modifier,
         text = ver,
-        style = MaterialTheme.typography.bodyLarge
+        style = MaterialTheme.typography.titleLarge,
+        color = MaterialTheme.colorScheme.surface
     )
 }
 

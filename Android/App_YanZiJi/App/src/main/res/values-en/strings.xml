@@ -37,4 +37,6 @@
     <string name="pump_arguments">Pump Arguments</string>
     <string name="voltage_arguments">Voltage Arguments</string>
     <string name="sensor_arguments">Sensor Arguments</string>
+    <string name="wechat">WeChat</string>
+    <string name="video">Video ID</string>
 </resources>

@@ -20,7 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zktony.android.R
-import com.zktony.android.ui.components.ArgumentsInputGroup
+import com.zktony.android.ui.components.ArgumentsInputField
 import com.zktony.android.ui.components.DropDownBox
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.viewmodel.SettingsArgumentsEquipmentViewModel
@@ -74,7 +74,7 @@ fun SettingsArgumentsEquipmentView(viewModel: SettingsArgumentsEquipmentViewMode
             }
 
             SettingsRow(title = stringResource(id = R.string.serial_number)) {
-                ArgumentsInputGroup(
+                ArgumentsInputField(
                     modifier = Modifier.width(350.dp),
                     value = sn
                 ) {

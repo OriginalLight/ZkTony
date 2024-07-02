@@ -3,11 +3,14 @@ package com.zktony.android.ui.navigation
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
@@ -40,6 +43,7 @@ import com.zktony.android.ui.SettingsView
 import com.zktony.android.ui.components.BottomBar
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
+import com.zktony.android.ui.utils.zktyBrush
 
 @Composable
 fun AppNavigation() {
@@ -91,30 +95,33 @@ fun AppNavigationDrawer(
     selectedDestination: String,
     navigationActions: NavigationActions
 ) {
-    NavigationRail(
+    Column(
         modifier = modifier
             .fillMaxHeight()
-            .width(100.dp),
-        containerColor = MaterialTheme.colorScheme.inverseSurface
+            .width(100.dp)
+            .padding(8.dp)
+            .background(
+                shape = MaterialTheme.shapes.medium,
+                brush = zktyBrush
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            TOP_LEVEL_DESTINATIONS.forEach { destination ->
-                NavigationRailItem(
-                    selected = selectedDestination.contains(destination.route),
-                    onClick = { navigationActions.navigate(destination.route) },
-                    icon = {
-                        Icon(
-                            imageVector = destination.icon,
-                            contentDescription = stringResource(
-                                id = destination.iconTextId
-                            )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        TOP_LEVEL_DESTINATIONS.forEach { destination ->
+            NavigationRailItem(
+                selected = selectedDestination.contains(destination.route),
+                onClick = { navigationActions.navigate(destination.route) },
+                icon = {
+                    Icon(
+                        imageVector = destination.icon,
+                        contentDescription = stringResource(
+                            id = destination.iconTextId
                         )
-                    }
-                )
-            }
+                    )
+                }
+            )
         }
     }
 }

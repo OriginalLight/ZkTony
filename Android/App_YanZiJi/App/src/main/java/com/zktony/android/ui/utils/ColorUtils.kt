@@ -1,18 +1,31 @@
 package com.zktony.android.ui.utils
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.LinearGradient
+import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 
-/**
- * @author 刘贺贺
- * @date 2023/9/4 14:23
- */
+val zktyGreen = Color(0xFF1D9858)
+val zktyBlue = Color(0xFF1C68A9)
+
+val zktyBrush = Brush.linearGradient(
+    colors = listOf(zktyGreen, zktyBlue)
+)
+
+@Preview
 @Composable
-fun selectedColor(boolean: Boolean): Color {
-    return if (boolean) {
-        MaterialTheme.colorScheme.secondaryContainer
-    } else {
-        MaterialTheme.colorScheme.surfaceVariant
+fun PreviewColorUtils() {
+    MaterialTheme {
+        Box(modifier = Modifier.size(200.dp).background(brush = zktyBrush)) {
+        }
     }
 }
