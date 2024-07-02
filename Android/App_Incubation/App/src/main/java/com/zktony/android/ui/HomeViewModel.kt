@@ -793,7 +793,7 @@ class HomeViewModel @Inject constructor(
                     // 洗涤封闭液管路
                     writeWithValve(0, 9)
                     writeWithValve(1, 5)
-                    writeWithPulse(1, (pulse + (r2 * 6400)).toLong())
+                    writeWithPulse(1, (pulse * 3 + (r2 * 6400)).toLong())
                     delay(500L)
                     // 切阀排空后半段
                     writeWithValve(0, 12)
