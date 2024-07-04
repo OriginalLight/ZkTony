@@ -4,24 +4,36 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationRail
-import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.NavigationRailItemColors
+import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
@@ -44,6 +56,8 @@ import com.zktony.android.ui.components.BottomBar
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.zktyBrush
+import com.zktony.android.utils.AuthUtils
+import kotlinx.coroutines.launch
 
 @Composable
 fun AppNavigation() {
@@ -52,7 +66,10 @@ fun AppNavigation() {
     val snackbarHostState = LocalSnackbarHostState.current
     val selectedDestination = navigationActions.selectDestination()
 
-    Row {
+    Row(
+        modifier = Modifier.padding(if (selectedDestination == Route.LOGIN) 0.dp else 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         AnimatedVisibilityWithLogin(selectedDestination) {
             AppNavigationDrawer(
                 selectedDestination = selectedDestination,
@@ -95,32 +112,52 @@ fun AppNavigationDrawer(
     selectedDestination: String,
     navigationActions: NavigationActions
 ) {
-    Column(
+    val scope = rememberCoroutineScope()
+
+    Box(
         modifier = modifier
             .fillMaxHeight()
-            .width(100.dp)
-            .padding(8.dp)
+            .width(120.dp)
             .background(
                 shape = MaterialTheme.shapes.medium,
                 brush = zktyBrush
-            ),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+            )
+            .padding(vertical = 16.dp),
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
+        Column(
+            modifier = Modifier.align(Alignment.TopCenter),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            TOP_LEVEL_DESTINATIONS.forEach { destination ->
+                NavigationItem(
+                    selected = selectedDestination.contains(destination.route),
+                    onClick = { navigationActions.navigate(destination.route) },
+                    icon = destination.icon,
+                    text = stringResource(id = destination.iconTextId)
+                )
+            }
+        }
 
-        TOP_LEVEL_DESTINATIONS.forEach { destination ->
-            NavigationRailItem(
-                selected = selectedDestination.contains(destination.route),
-                onClick = { navigationActions.navigate(destination.route) },
-                icon = {
-                    Icon(
-                        imageVector = destination.icon,
-                        contentDescription = stringResource(
-                            id = destination.iconTextId
-                        )
-                    )
-                }
+        // Logout
+        Box(
+            modifier = Modifier
+                .size(64.dp)
+                .align(Alignment.BottomCenter)
+                .clip(MaterialTheme.shapes.medium)
+                .clickable {
+                    scope.launch {
+                        AuthUtils.logout()
+                        navigationActions.navigate(Route.LOGIN)
+                    }
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                modifier = Modifier.size(36.dp),
+                imageVector = Icons.AutoMirrored.Filled.Logout,
+                contentDescription = "Logout",
+                tint = Color.White
             )
         }
     }
@@ -134,5 +171,43 @@ fun AnimatedVisibilityWithLogin(selectedDestination: String, content: @Composabl
         exit = fadeOut()
     ) {
         content()
+    }
+}
+
+@Composable
+fun NavigationItem(
+    selected: Boolean,
+    onClick: () -> Unit,
+    icon: ImageVector,
+    text: String,
+    colors: NavigationRailItemColors = NavigationRailItemDefaults.colors(),
+) {
+    val backgroundColor = if (selected) colors.selectedIndicatorColor else Color.Transparent
+    val contentColor = if (selected) colors.selectedTextColor else Color.White
+
+    Box(
+        modifier = Modifier
+            .background(color = backgroundColor, shape = MaterialTheme.shapes.medium)
+            .clip(MaterialTheme.shapes.medium)
+            .clickable { onClick() }
+            .padding(12.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                modifier = Modifier.size(36.dp),
+                imageVector = icon,
+                contentDescription = text,
+                tint = contentColor
+            )
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodyMedium,
+                color = contentColor
+            )
+        }
     }
 }

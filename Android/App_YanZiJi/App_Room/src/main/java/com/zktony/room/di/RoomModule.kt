@@ -34,6 +34,9 @@ object RoomModule {
     @Provides
     fun faultDao(database: AppDatabase) = database.FaultDao()
 
+    @Provides
+    fun userDao(database: AppDatabase) = database.UserDao()
+
     // Repository
     @Provides
     fun faultRepository(faultDao: FaultDao) = FaultRepository(faultDao)

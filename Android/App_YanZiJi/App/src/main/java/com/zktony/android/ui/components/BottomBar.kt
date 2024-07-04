@@ -29,7 +29,7 @@ fun BottomBar(modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxWidth()
             .height(64.dp)
-            .padding(8.dp)
+            .padding(top = 8.dp)
             .background(
                 color = MaterialTheme.colorScheme.surfaceDim,
                 shape = MaterialTheme.shapes.medium

@@ -42,5 +42,5 @@ object Constants {
      * P/N
      */
     const val PN = "PN"
-    const val DEFAULT_PN = "T4000"
+    const val DEFAULT_PN = "M-Blot T4000"
 }

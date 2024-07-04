@@ -1,6 +1,5 @@
 package com.zktony.android.utils
 
-import com.zktony.android.data.Arguments
 import com.zktony.android.data.toArguments
 import com.zktony.log.LogUtils
 import com.zktony.serialport.command.Protocol
@@ -18,22 +17,28 @@ object SerialPortUtils {
         // 初始化rtu串口
         serialPortOf {
             device = "/dev/ttyS2"
-            log = true
         }?.let {
             SerialStoreUtils.put("A", it)
-            LogUtils.info("串口-A-下位机-ttyS2-初始化完成", true)
+            LogUtils.info("下位机串口初始化完成: ID = A, Device = ttyS2", true)
         } ?: {
-            LogUtils.error("串口-A-下位机-ttyS2-初始化化失败", true)
+            LogUtils.error("下位机串口初始化化失败: ID = A, Device = ttyS2", true)
         }
         // 初始化tec串口
         serialPortOf {
             device = "/dev/ttyS0"
-            log = true
         }?.let {
             SerialStoreUtils.put("B", it)
-            LogUtils.info("串口-B-灯板-ttyS0-初始化完成", true)
+            LogUtils.info("灯板串口初始化完成: ID = B, Device = ttyS0", true)
         } ?: {
-            LogUtils.error("串口-B-灯板-ttyS0-初始化失败", true)
+            LogUtils.error("灯板串口初始化失败: ID = B, Device = ttyS0", true)
+        }
+
+        SerialStoreUtils.get("A")?.registerCallback("GlobeLogger") { bytes ->
+            LogUtils.info("A 收到数据: ${bytes.toHexString()}", true)
+        }
+
+        SerialStoreUtils.get("B")?.registerCallback("GlobeLogger") { bytes ->
+            LogUtils.info("B 收到数据: ${bytes.toHexString()}", true)
         }
     }
 
@@ -45,7 +50,6 @@ object SerialPortUtils {
 
         try {
             serialPort.registerCallback(callbackKey) { bytes ->
-                LogUtils.info(callbackKey, "$target 接收到数据: ${bytes.toHexString()}", true)
                 Protocol.verifyProtocol(bytes) {
                     if (it.function == 0x31.toByte()) {
                         success = it.data.readInt8() == 0
@@ -68,7 +72,7 @@ object SerialPortUtils {
                 }
             }
         } catch (e: Exception) {
-            LogUtils.error(e.stackTraceToString(), true)
+            LogUtils.error(callbackKey, e.stackTraceToString(), true)
         }finally {
             serialPort.unregisterCallback(callbackKey)
         }
@@ -84,7 +88,6 @@ object SerialPortUtils {
 
         try {
             serialPort.registerCallback(callbackKey) { bytes ->
-                LogUtils.info(callbackKey, "$target 接收到数据: ${bytes.toHexString()}", true)
                 Protocol.verifyProtocol(bytes) {
                     if (it.function == 0x30.toByte()) {
                         success = it.data.readInt8() == 0
@@ -107,7 +110,7 @@ object SerialPortUtils {
                 }
             }
         } catch (e: Exception) {
-            LogUtils.error(e.stackTraceToString(), true)
+            LogUtils.error(callbackKey, e.stackTraceToString(), true)
         }finally {
             serialPort.unregisterCallback(callbackKey)
 
@@ -124,9 +127,8 @@ object SerialPortUtils {
 
         try {
             serialPort.registerCallback(callbackKey) { bytes ->
-                LogUtils.info(callbackKey, "$target 接收到数据: ${bytes.toHexString()}", true)
                 Protocol.verifyProtocol(bytes) {
-                    if (it.function == 0x32.toByte()) {
+                    if (it.function == 0x41.toByte()) {
                         val arguments = toArguments(it.data)
                         if (arguments != null) {
                             AppStateUtils.setArgumentsList(AppStateUtils.argumentsList.value.mapIndexed { index, arg ->
@@ -138,15 +140,16 @@ object SerialPortUtils {
                             })
                             success = true
                         } else {
-                            LogUtils.error(callbackKey, "$target Arguments解析失败", true)
+                            LogUtils.error(callbackKey, "$target 基本参数解析失败", true)
                         }
                     }
                 }
             }
             // 查询Arguments
             val protocol = Protocol().apply {
-                function = 0x32.toByte()
+                function = 0x41.toByte()
                 targetAddress = target.toByte()
+                data = byteArrayOf(0x00, 0x00)
             }.serialization()
             LogUtils.info(callbackKey, "$target 发送数据: ${protocol.toHexString()}", true)
             // 发送查询Arguments命令
@@ -158,7 +161,7 @@ object SerialPortUtils {
                 }
             }
         } catch (e: Exception) {
-            LogUtils.error(e.stackTraceToString(), true)
+            LogUtils.error(callbackKey, e.stackTraceToString(), true)
         }finally {
             serialPort.unregisterCallback(callbackKey)
         }

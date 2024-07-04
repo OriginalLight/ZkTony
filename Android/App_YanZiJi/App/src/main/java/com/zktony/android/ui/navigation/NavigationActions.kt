@@ -3,6 +3,7 @@ package com.zktony.android.ui.navigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DonutSmall
 import androidx.compose.material.icons.outlined.History
+import androidx.compose.material.icons.outlined.Science
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Terminal
 import androidx.compose.runtime.Composable
@@ -62,7 +63,7 @@ class NavigationActions(private val navController: NavHostController) {
         }
     }
 
-    // 导航到下一层
+    // 清空上一个返回栈
     fun popBackStack() {
         navController.popBackStack()
     }
@@ -83,8 +84,8 @@ data class TopLevelDestination(
 val TOP_LEVEL_DESTINATIONS = listOf(
     TopLevelDestination(
         route = Route.EXPERIMENTAL,
-        icon = Icons.Outlined.DonutSmall,
-        iconTextId = R.string.program
+        icon = Icons.Outlined.Science,
+        iconTextId = R.string.experimental
     ),
     TopLevelDestination(
         route = Route.PROGRAM,
