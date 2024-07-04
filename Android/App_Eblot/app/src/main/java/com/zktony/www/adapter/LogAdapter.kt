@@ -3,7 +3,6 @@ package com.zktony.www.adapter
 import android.annotation.SuppressLint
 import android.os.Build
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.*
@@ -11,7 +10,6 @@ import com.zktony.core.ext.*
 import com.zktony.www.R
 import com.zktony.www.databinding.ItemLogBinding
 import com.zktony.www.data.entities.LogRecord
-import com.zktony.www.data.entities.Program
 
 /**
  * @author: 刘贺贺
@@ -99,7 +97,7 @@ class LogViewHolder(
             str.append("MIN")
             parameter.text = str.toString()
             val zm = itemView.context.getString(R.string.transfer)
-            val rs = itemView.context.getString(R.string.dye)
+            val rs = itemView.context.getString(R.string.stain)
             model.text = when (item.model) {
                 0 -> "A-$zm"
                 1 -> "A-$rs"

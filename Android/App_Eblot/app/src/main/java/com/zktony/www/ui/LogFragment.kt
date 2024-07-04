@@ -53,6 +53,7 @@ class LogFragment :
                 viewModel.select(it)
                 lineChart.isEnabled =  adapter.selected.size == 1
                 delete.isEnabled =  adapter.selected.size > 0
+                selectAll.text = if (adapter.selected.size == adapter.itemCount) getString(R.string.unselect_all) else getString(R.string.select_all)
             }
             adapter.onDoubleClick = {
                 viewModel.select(adapter.selected)
@@ -73,13 +74,27 @@ class LogFragment :
             delete.clickNoRepeat {
                 messageDialog(
                     title = getString(R.string.delete_log),
-                    message = "您确定要删除选中的日志吗？",
+                    message = getString(R.string.delete_log_confirm),
                     block = {
                         viewModel.delete(adapter.selected)
                         adapter.selected = mutableListOf()
                         viewModel.select(emptyList())
                     },
                 )
+            }
+
+            selectAll.clickNoRepeat {
+                if (adapter.selected.size == adapter.itemCount) {
+                    adapter.selected = mutableListOf()
+                    adapter.notifyDataSetChanged()
+                } else {
+                    adapter.selected = adapter.currentList.toMutableList()
+                    adapter.notifyDataSetChanged()
+                }
+                viewModel.select(adapter.selected)
+                lineChart.isEnabled =  adapter.selected.size == 1
+                delete.isEnabled =  adapter.selected.size > 0
+                selectAll.text = if (adapter.selected.size == adapter.itemCount) getString(R.string.unselect_all) else getString(R.string.select_all)
             }
         }
     }

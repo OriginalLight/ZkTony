@@ -41,8 +41,9 @@
                 android:minHeight="42dp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:text="@string/cancel"
+                android:text="@string/return_e"
                 android:textColor="@color/white"
+                android:textAllCaps="false"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 

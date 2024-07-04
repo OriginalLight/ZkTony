@@ -47,7 +47,7 @@
         android:background="@drawable/bg_btn_orange_selector"
         android:insetTop="0dp"
         android:insetBottom="0dp"
-        android:text="@string/confirm"
+        android:text="@string/ok"
         android:textAllCaps="false"
         android:textSize="16sp"
         android:textStyle="bold"

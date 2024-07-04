@@ -280,13 +280,13 @@ class HomeViewModel constructor(
                 if ((i == totalTime / 3 || i == totalTime / 3 * 2 || i == 0) && state.value.model == 0) {
                     // 自动清洁
                     // 计算需要清洁的时间
-                    autoClean(30L)
+                    autoClean(60L)
                 }
 
                 if (i == 0) {
                     playAudio(R.raw.finish)
                     stop(xy)
-                    state.value = state.value.copy(currentTime = "已完成")
+                    state.value = state.value.copy(currentTime = Ext.ctx.getString(R.string.finished))
                 }
             }
         }

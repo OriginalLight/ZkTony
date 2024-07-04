@@ -216,11 +216,11 @@
 
                     <EditText
                         android:id="@+id/motor_speed"
-                        android:layout_width="120dp"
+                        android:layout_width="80dp"
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_et"
                         android:gravity="center"
-                        android:hint="输入转速"
+                        android:hint="@string/speed_e"
                         android:inputType="number"
                         android:minHeight="36dp"
                         android:padding="4dp"
@@ -314,7 +314,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="技术支持"
+                        android:text="@string/technical_support"
                         android:textColor="@color/white"
                         android:textSize="20sp"
                         tools:ignore="RelativeOverlap" />

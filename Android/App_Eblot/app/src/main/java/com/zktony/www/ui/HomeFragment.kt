@@ -77,8 +77,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     val tabLayout = bind.tabLayout
                     val tabItem1 = tabLayout.getTabAt(0)
                     val tabItem2 = tabLayout.getTabAt(1)
-                    tabItem1?.text = "转膜${'A' + i}"
-                    tabItem2?.text = "染色${'A' + i}"
+                    tabItem1?.text = "${getString(R.string.transfer)} ${'A' + i}"
+                    tabItem2?.text = "${getString(R.string.stain)} ${'A' + i}"
 
 
                     with(selector) {
@@ -188,7 +188,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         }
         // 实时信息显示部分
         bind.apply {
-            currentStatus.text = if (xy == 0) "模块A" else "模块B"
+            currentStatus.text = if (xy == 0) "${getString(R.string.channel)} A" else "${getString(R.string.channel)} B"
         }
 
         if (uiState.currentMotor == 0) {

@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:showIn="@layout/fragment_home">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data />
 
@@ -34,7 +33,7 @@
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/dye"
+                android:text="@string/stain"
                 android:textSize="16sp" />
 
         </com.google.android.material.tabs.TabLayout>
@@ -44,7 +43,7 @@
             android:layout_height="wrap_content"
             android:paddingTop="4dp"
             android:paddingBottom="4dp"
-            android:text="参数设置"
+            android:text="@string/parameter_setting"
             android:textColor="@color/white"
             android:textSize="16sp"
             tools:ignore="RelativeOverlap,VisualLintOverlap" />
@@ -72,7 +71,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingEnd="4dp"
-                        android:text="程序"
+                        android:text="@string/program"
                         android:textColor="@color/white"
                         android:textSize="16sp"
                         tools:ignore="RelativeOverlap,VisualLintOverlap" />
@@ -111,7 +110,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingEnd="4dp"
-                        android:text="转速"
+                        android:text="@string/speed_e"
                         android:textColor="@color/white"
                         android:textSize="16sp"
                         tools:ignore="RelativeOverlap,VisualLintOverlap" />
@@ -164,7 +163,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingEnd="4dp"
-                        android:text="电压"
+                        android:text="@string/voltage_e"
                         android:textColor="@color/white"
                         android:textSize="16sp"
                         tools:ignore="RelativeOverlap,VisualLintOverlap" />
@@ -210,7 +209,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingEnd="4dp"
-                        android:text="时间"
+                        android:text="@string/time_e"
                         android:textColor="@color/white"
                         android:textSize="16sp"
                         tools:ignore="RelativeOverlap,VisualLintOverlap" />
@@ -250,7 +249,7 @@
             android:layout_height="wrap_content"
             android:paddingTop="4dp"
             android:paddingBottom="4dp"
-            android:text="实时状态"
+            android:text="@string/in_progress"
             android:textColor="@color/white"
             android:textSize="16sp"
             tools:ignore="RelativeOverlap,VisualLintOverlap" />

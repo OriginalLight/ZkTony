@@ -77,7 +77,7 @@ class ProgramViewHolder(
             order.text = (layoutPosition + 1).toString()
             model.text =
                 if (item.model == 0) itemView.context.getString(R.string.transfer) else itemView.context.getString(
-                    R.string.dye
+                    R.string.stain
                 )
             val str = StringBuilder()
             if (item.model == 0) {

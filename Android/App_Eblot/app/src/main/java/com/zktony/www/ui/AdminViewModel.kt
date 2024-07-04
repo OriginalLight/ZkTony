@@ -74,7 +74,7 @@ class AdminViewModel constructor(
                 )
                 putExtra(
                     "extra_prefs_set_back_text",
-                    Ext.ctx.getString(R.string.cancel)
+                    Ext.ctx.getString(R.string.return_e)
                 )
             }
             Ext.ctx.startActivity(intent)

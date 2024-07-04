@@ -71,7 +71,7 @@ class ProgramFragment :
             delete.clickNoRepeat {
                 messageDialog(
                     title = getString(R.string.delete_program),
-                    message = "您确定要删除程序” ${adapter.selected?.name} “吗？",
+                    message = getString(R.string.confirm_delete),
                     block = {
                         viewModel.delete(adapter.selected!!)
                         adapter.selected = null
@@ -105,9 +105,9 @@ class ProgramFragment :
                     val btnCancel = v.findViewById<Button>(R.id.cancel)
 
                     if (program != null) {
-                        title.text = "修改程序"
+                        title.text = getString(R.string.edit_the_program)
                         etName.setText(program.name)
-                        btnMode.text = if (program.model == 0) "转膜" else "染色"
+                        btnMode.text = if (program.model == 0) getString(R.string.transfer) else getString(R.string.stain)
                         etVoltage.setText(program.voltage.format())
                         etTime.setText(program.time.format())
                         etSpeed.setText(program.motor.toString())
@@ -117,56 +117,56 @@ class ProgramFragment :
                             layoutSpeed.visibility = View.GONE
                         }
                     } else {
-                        title.text = "添加程序"
+                        title.text = getString(R.string.add_the_program)
                     }
 
                     btnMode.clickNoRepeat {
-                        spannerDialog(view = it, menu = listOf("转膜","染色")) { text, _ ->
+                        spannerDialog(view = it, menu = listOf(getString(R.string.transfer),getString(R.string.stain))) { text, _ ->
                             btnMode.text = text
-                            if (text == "转膜") {
+                            if (text == getString(R.string.transfer)) {
                                 layoutSpeed.visibility = View.VISIBLE
                                 etTime.imeOptions =  EditorInfo.IME_ACTION_NEXT
-                                tvVoltage.text = "转膜电压 (0-${Constants.MAX_VOLTAGE_ZM.format()})"
+                                tvVoltage.text = "${getString(R.string.transfer_voltage_e)} (0-${Constants.MAX_VOLTAGE_ZM.format()})"
                             } else {
                                 layoutSpeed.visibility = View.GONE
                                 etTime.imeOptions =  EditorInfo.IME_ACTION_DONE
-                                tvVoltage.text = "染色电压 (0-${Constants.MAX_VOLTAGE_RS.format()})"
+                                tvVoltage.text = "${getString(R.string.stain_voltage)} (0-${Constants.MAX_VOLTAGE_RS.format()})"
                             }
                         }
                     }
 
                     btnOk.clickNoRepeat {
                         val name = etName.text.toString()
-                        val mode = if (btnMode.text == "转膜") 0 else 1
+                        val mode = if (btnMode.text == getString(R.string.transfer)) 0 else 1
                         val voltage = etVoltage.text.toString().toFloatOrNull() ?: 0f
                         val time = etTime.text.toString().toFloatOrNull() ?: 0f
                         val speed = etSpeed.text.toString().toIntOrNull() ?: 0
                         if (name.isEmpty()) {
-                            PopTip.show("请输入程序名称")
+                            PopTip.show(getString(R.string.please_input_program_name))
                             return@clickNoRepeat
                         }
                         if (program == null && viewModel.uiState.value.list.any { it.name == name }) {
-                            PopTip.show("程序名称已存在")
+                            PopTip.show(getString(R.string.program_name_exist))
                             return@clickNoRepeat
                         }
 
                         if (voltage !in (0f..Constants.MAX_VOLTAGE_ZM) && mode == 0) {
-                            PopTip.show("请输入正确的电压")
+                            PopTip.show(getString(R.string.please_input_current_voltage))
                             return@clickNoRepeat
                         }
 
                         if (voltage !in (0f..Constants.MAX_VOLTAGE_RS) && mode == 1) {
-                            PopTip.show("请输入正确的电压")
+                            PopTip.show(getString(R.string.please_input_current_voltage))
                             return@clickNoRepeat
                         }
 
                         if (time !in (0f..99f)) {
-                            PopTip.show("请输入正确的时间")
+                            PopTip.show(getString(R.string.please_input_current_time))
                             return@clickNoRepeat
                         }
 
                         if (mode == 0 && speed !in (0..250)) {
-                            PopTip.show("请输入正确的蠕动泵速度")
+                            PopTip.show(getString(R.string.please_input_current_speed))
                             return@clickNoRepeat
                         }
 

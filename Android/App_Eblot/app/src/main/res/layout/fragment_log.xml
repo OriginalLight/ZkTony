@@ -35,16 +35,32 @@
                 android:layout_weight="1" />
 
             <Button
-                android:id="@+id/date_picker"
+                android:id="@+id/select_all"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_btn_orange_selector"
                 android:minHeight="42dp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:text="日期查询"
+                android:text="@string/select_all"
                 android:textColor="@color/white"
                 android:textSize="18sp"
+                android:textAllCaps="false"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/date_picker"
+                android:layout_width="115dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:background="@drawable/bg_btn_orange_selector"
+                android:minHeight="42dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/query"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textAllCaps="false"
                 android:textStyle="bold" />
 
             <Button
@@ -60,6 +76,7 @@
                 android:text="@string/title_log_chart"
                 android:textColor="@color/white"
                 android:textSize="18sp"
+                android:textAllCaps="false"
                 android:textStyle="bold" />
 
             <Button
@@ -72,9 +89,10 @@
                 android:minHeight="42dp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:text="删除日志"
+                android:text="@string/delete_log_e"
                 android:textColor="@color/white"
                 android:textSize="18sp"
+                android:textAllCaps="false"
                 android:textStyle="bold" />
 
         </LinearLayout>

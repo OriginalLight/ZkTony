@@ -48,9 +48,10 @@
             android:minHeight="42dp"
             android:paddingStart="32dp"
             android:paddingEnd="32dp"
-            android:text="@string/cancel"
+            android:text="@string/return_e"
             android:textColor="@color/white"
             android:textSize="16sp"
+            android:textAllCaps="false"
             android:textStyle="bold" />
 
         <Button
@@ -62,9 +63,10 @@
             android:minHeight="42dp"
             android:paddingStart="32dp"
             android:paddingEnd="32dp"
-            android:text="@string/confirm"
+            android:text="@string/ok"
             android:textColor="@color/white"
             android:textSize="16sp"
+            android:textAllCaps="false"
             android:textStyle="bold" />
 
     </LinearLayout>

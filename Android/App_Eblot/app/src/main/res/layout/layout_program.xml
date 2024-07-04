@@ -18,7 +18,7 @@
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="添加程序"
+            android:text="@string/add_the_program"
             android:textColor="@color/white"
             android:textSize="18sp" />
     </LinearLayout>
@@ -45,7 +45,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="实验程序名称"
+                android:text="@string/program_name_e"
                 android:textColor="@color/white"
                 android:textSize="16sp" />
 
@@ -60,7 +60,7 @@
                 android:layout_height="36dp"
                 android:background="@drawable/bg_et"
                 android:gravity="center"
-                android:hint="请输入程序名"
+                android:hint="@string/please_input_program_name"
                 android:imeOptions="actionNext"
                 android:inputType="text"
                 android:textColor="@color/white"
@@ -84,7 +84,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="实验程序模式"
+                android:text="@string/program_mode_e"
                 android:textColor="@color/white"
                 android:textSize="16sp" />
 
@@ -100,8 +100,8 @@
                 android:background="@drawable/bg_et"
                 android:gravity="center"
                 android:backgroundTint="@null"
-                android:text="转膜"
                 android:textAllCaps="false"
+                android:text="@string/transfer"
                 android:drawableEnd="@drawable/ic_arrow_drop_down"
                 android:drawableTint="@color/white"
                 android:textColor="@color/white"
@@ -124,7 +124,7 @@
                 android:id="@+id/voltage_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="转膜电压 (0-55)"
+                android:text="@string/transfer_voltage"
                 android:textColor="@color/white"
                 android:textSize="16sp" />
 
@@ -139,7 +139,7 @@
                 android:layout_height="36dp"
                 android:background="@drawable/bg_et"
                 android:gravity="center"
-                android:hint="请输入电压"
+                android:hint="@string/please_input_voltage"
                 android:imeOptions="actionNext"
                 android:inputType="numberDecimal"
                 android:textColor="@color/white"
@@ -172,7 +172,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="转膜/染色时间 (0-99)"
+                android:text="@string/transfer_stain_time"
                 android:textColor="@color/white"
                 android:textSize="16sp" />
 
@@ -187,7 +187,7 @@
                 android:layout_height="36dp"
                 android:background="@drawable/bg_et"
                 android:gravity="center"
-                android:hint="请输入时间"
+                android:hint="@string/please_input_time"
                 android:imeOptions="actionNext"
                 android:inputType="numberDecimal"
                 android:textColor="@color/white"
@@ -221,7 +221,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="蠕动泵转速 (0-250)"
+                android:text="@string/rotaional_speed"
                 android:textColor="@color/white"
                 android:textSize="16sp" />
 
@@ -236,7 +236,7 @@
                 android:layout_height="36dp"
                 android:background="@drawable/bg_et"
                 android:gravity="center"
-                android:hint="请输入转速"
+                android:hint="@string/please_input_speed"
                 android:imeOptions="actionDone"
                 android:inputType="number"
                 android:textColor="@color/white"
@@ -277,9 +277,10 @@
             android:minHeight="42dp"
             android:paddingStart="32dp"
             android:paddingEnd="32dp"
-            android:text="@string/cancel"
+            android:text="@string/return_e"
             android:textColor="@color/white"
             android:textSize="16sp"
+            android:textAllCaps="false"
             android:textStyle="bold" />
 
         <Button
@@ -291,7 +292,8 @@
             android:minHeight="42dp"
             android:paddingStart="32dp"
             android:paddingEnd="32dp"
-            android:text="@string/confirm"
+            android:text="@string/ok"
+            android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="bold" />
