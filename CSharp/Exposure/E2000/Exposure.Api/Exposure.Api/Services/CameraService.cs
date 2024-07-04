@@ -98,11 +98,6 @@ public class CameraService(
                 Log.Information("关闭自动曝光");
             else
                 throw new Exception(localizer.GetString("Error0005").Value);
-            // 设置彩色
-            if (_nncam.put_Chrome(true))
-                Log.Information("设置单色模式");
-            else
-                throw new Exception(localizer.GetString("Error0006").Value);
             // 设置增益
             if (_nncam.put_ExpoAGain(gain))
                 Log.Information("设置增益：" + gain);
@@ -340,23 +335,18 @@ public class CameraService(
 
     public async Task CancelTask()
     {
-        await InitAsync();
-        if (_nncam == null) throw new Exception(localizer.GetString("Error0011").Value);
-        // 关闭灯光
         serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
-
-        if (_album != null)
-        {
-            await album.DeleteByIds([_album.Id]);
-        }
-
-        if (!_nncam.Trigger(0)) throw new Exception(localizer.GetString("Error0010").Value);
-
+        await ClearAlbum();
         _photoList.Clear();
         _mat?.Dispose();
         _mat = null;
         _seq = 0;
-        _album = null;
+
+        await InitAsync();
+        if (_nncam == null) throw new Exception(localizer.GetString("Error0011").Value);
+        // 关闭灯光
+        if (!_nncam.Trigger(0)) throw new Exception(localizer.GetString("Error0010").Value);
+        
         Log.Information("取消拍照任务");
     }
 
@@ -629,7 +619,7 @@ public class CameraService(
                     {
                         // 保存图片
                         var filePath = Path.Combine(FileUtils.Collect, $"{_seq}_{expoTime}.png");
-                        Cv2.CvtColor(mat, gray, ColorConversionCodes.BGR2GRAY);
+                        gray = await CommonProcessAsync(mat);
                         gray.SaveImage(filePath);
                     }
                     finally
@@ -926,23 +916,15 @@ public class CameraService(
     {
         try
         {
-            // 目标灰度在直方图的占比
-            var threshold = await option.GetOptionValueAsync("Threshold") ?? "0.0001";
-            // 增强到目标灰度
-            var enhanceThreshold = await option.GetOptionValueAsync("EnhanceThreshold") ?? "65535";
-            // 计算直方图分布
-            var hist = OpenCvUtils.Histogram(mat, double.Parse(threshold));
-            // 计算比例
-            var scale = double.Parse(enhanceThreshold) / hist;
-            // 缩放
-            mat.ConvertTo(mat, MatType.CV_16UC1, scale);
+            // 左右灰阶忽略值
+            var threshold = await option.GetOptionValueAsync("Threshold") ?? "0.001";
+            mat = OpenCvUtils.AdjustLevelAuto(mat, double.Parse(threshold));
             // 反色
             Cv2.BitwiseNot(mat, mat);
-            // 降噪
-            var dstMat = new Mat();
-            Cv2.MedianBlur(mat, dstMat, 3);
+            // 降噪开运算
+            Cv2.MorphologyEx(mat, mat, MorphTypes.Open, Cv2.GetStructuringElement(MorphShapes.Rect, new Size(3, 3)));
             // 返回
-            return dstMat;
+            return mat;
         }
         catch (Exception e)
         {
@@ -954,82 +936,6 @@ public class CameraService(
     #endregion
 
     #region 计算曝光时间
-
-    // snr 方式
-    private async Task<long> ExpoWithSnr(double time, CancellationToken ctsToken)
-    {
-        if (_nncam == null) throw new Exception(localizer.GetString("Error0011").Value);
-        // 设置曝光时间
-        if (!_nncam.put_ExpoTime((uint)(time * 1000000))) throw new Exception(localizer.GetString("Error0009").Value);
-        // 计算曝光时间
-        if (!_nncam.Trigger(1)) throw new Exception(localizer.GetString("Error0010").Value);
-        // 延时1300ms
-        await Task.Delay((int)(time * 1000 + 1000), ctsToken);
-        // 获取图片
-        if (_mat == null) throw new Exception(localizer.GetString("Error0018").Value);
-        // 计算信噪比
-        var snr = OpenCvUtils.CalculateSnr(_mat, time);
-        // 计算白色区域占比
-        var percentage = OpenCvUtils.CalculatePercentage(_mat, 2550, 65535);
-        // 清空_mat
-        _mat?.Dispose();
-        _mat = null;
-
-        if (Math.Abs(time - 0.1) < 0.1)
-            return percentage switch
-            {
-                <= 0.05 => snr switch
-                {
-                    <= -10 => GetScale(-50, -10, 1_000_000, 3_000_000, snr),
-                    > -10 => await ExpoWithSnr(1, ctsToken),
-                    _ => 1_500_000
-                },
-                <= 0.1 => GetScale(0.05, 0.1, 5_000_000, 10_000_000, percentage),
-                <= 0.5 => GetScale(0.1, 0.5, 2_000_000, 5_000_000, percentage),
-                _ => GetScale(0.5, 1, 100_000, 2_000_000, percentage)
-            };
-
-
-        if (Math.Abs(time - 1) < 0.1)
-            return percentage switch
-            {
-                <= 0.05 => snr switch
-                {
-                    <= -15 => GetScale(-50, -15, 2_000_000, 3_000_000, snr),
-                    <= 0 => GetScale(-15, 0, 3_000_000, 10_000_000, snr),
-                    <= 1 => GetScale(0, 1, 10_000_000, 14_000_000, snr),
-                    <= 1.5 => GetScale(1, 1.5, 14_000_000, 20_000_000, snr),
-                    <= 2 => GetScale(1.5, 2, 20_000_000, 30_000_000, snr),
-                    > 2 => await ExpoWithSnr(5, ctsToken),
-                    _ => 2_000_000
-                },
-                <= 0.1 => GetScale(0.05, 0.1, 5_000_000, 10_000_000, percentage),
-                <= 0.5 => GetScale(0.1, 0.5, 2_000_000, 5_000_000, percentage),
-                _ => GetScale(0.5, 1, 100_000, 2_000_000, percentage)
-            };
-
-        if (Math.Abs(time - 5) < 0.1)
-            return percentage switch
-            {
-                <= 0.05 => snr switch
-                {
-                    <= 2 => GetScale(0, 2, 5_000_000, 10_000_000, snr),
-                    <= 5 => GetScale(2, 5, 10_000_000, 15_000_000, snr),
-                    <= 6 => GetScale(5, 6, 15_000_000, 30_000_000, snr),
-                    <= 7 => GetScale(6, 7, 30_000_000, 45_000_000, snr),
-                    <= 7.5 => GetScale(7, 7.5, 45_000_000, 60_000_000, snr),
-                    <= 8 => GetScale(7.5, 8, 60_000_000, 100_000_000, snr),
-                    <= 20 => GetScale(8, 20, 100_000_000, 200_000_000, snr),
-                    > 20 => 200_000_000,
-                    _ => 15_000_000
-                },
-                <= 0.1 => GetScale(0.05, 0.1, 5_000_000, 10_000_000, percentage),
-                <= 0.5 => GetScale(0.1, 0.5, 2_000_000, 5_000_000, percentage),
-                _ => GetScale(0.5, 1, 30_000, 2_000_000, percentage)
-            };
-
-        return 0;
-    }
 
     // 灰度方式
     private async Task<long> ExpoWithThreshold(CancellationToken ctsToken)
@@ -1043,7 +949,7 @@ public class CameraService(
         try
         {
             var threshold = await option.GetOptionValueAsync("Threshold") ?? "0.0001";
-            var targetThreshold = await option.GetOptionValueAsync("TargetThreshold") ?? "30000";
+            var targetThreshold = await option.GetOptionValueAsync("TargetThreshold") ?? "10000";
 
             // 拍摄1秒曝光
             _mat?.Dispose();
@@ -1065,12 +971,12 @@ public class CameraService(
             Cv2.CvtColor(_mat, gray2S, ColorConversionCodes.BGR2GRAY);
             gray2S.ConvertTo(gray2S, MatType.CV_16UC1, 4.0);
 
-            var thr1 = OpenCvUtils.Histogram(gray1S, double.Parse(threshold));
-            var thr2 = OpenCvUtils.Histogram(gray2S, double.Parse(threshold));
+            var thr1 = OpenCvUtils.FindMaxGrayscaleValue(gray1S, double.Parse(threshold));
+            var thr2 = OpenCvUtils.FindMaxGrayscaleValue(gray2S, double.Parse(threshold));
 
             if (thr1 == 0 || thr2 == 0)
             {
-                return 300_000_000;
+                return 600_000_000;
             }
 
             // x1 = 1, x2 = 2 => y1 = thr1, y2 = thr2
@@ -1085,7 +991,7 @@ public class CameraService(
             var end = DateTime.Now;
             Log.Information($"计算曝光时间：target = {target} k = {k} b= {b} 耗时 = {(end - start).TotalMilliseconds}ms");
 
-            return Math.Max(1000, Math.Min(300_000_000, (long)(target * 1_000_000)));
+            return Math.Max(1000, Math.Min(600_000_000, (long)(target * 100_000)));
         }
         finally
         {
@@ -1191,15 +1097,7 @@ public class CameraService(
     }
 
     #endregion
-
-    #region 比例缩放
-
-    private static long GetScale(double min, double max, double minTarget, double maxTarget, double value)
-    {
-        return (long)((maxTarget - minTarget) * (value - min) / (max - min) + minTarget);
-    }
-
-    #endregion
+    
 
     #region 清除相册
 

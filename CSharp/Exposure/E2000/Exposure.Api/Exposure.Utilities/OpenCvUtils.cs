@@ -262,32 +262,35 @@ public static class OpenCvUtils
 
     #region 统计灰度直方图
 
-    public static int Histogram(Mat src, double percentage)
+    public static int FindMaxGrayscaleValue(Mat src, double ignore)
     {
         // 计算灰度直方图
         var hist = new Mat();
+        
         try
         {
-            Cv2.CalcHist([src], [0], null, hist, 1, [65535], [new Rangef(0, 65535)]);
+            var histSize = 65536; // 16-bit 图像的灰度级数
+            var ranges = new Rangef(0, 65536);
+            Cv2.CalcHist([src], [0], null, hist, 1, [histSize], [ranges]);
 
-            var total = src.Rows * src.Cols;
-            var pixels = total * percentage;
-        
-            // 白底从前往后找，黑底从后往前找
-            var threshold = 65535;
-            float count = 0;
-            for (var i = 65535; i >= 0; i--)
+            // 计算累积分布函数 (CDF)
+            hist.GetArray(out float[] cdf);
+            for (var i = 1; i < histSize; i++)
             {
-                count += hist.At<float>(i);
-                if (count >= pixels)
-                {
-                    threshold = i;
-                    break;
-                }
+                cdf[i] += cdf[i - 1];
             }
 
-            Log.Information("计算灰度直方图成功: " + threshold);
-            return threshold;
+            // 归一化 CDF
+            for (var i = 0; i < histSize; i++)
+            {
+                cdf[i] /= cdf[histSize - 1];
+            }
+
+            // 寻最大像素值
+            var maxCdfIndex = histSize - 1;
+            while (cdf[maxCdfIndex] >= (1 - ignore)) maxCdfIndex--;
+
+            return maxCdfIndex;
         }
         finally
         {
@@ -295,7 +298,6 @@ public static class OpenCvUtils
         }
     }
     
-
     #endregion
     
     #region LUT线性变换
@@ -334,92 +336,72 @@ public static class OpenCvUtils
 
     #region 自动灰阶
 
-    public static Mat AdjustImageColorLevelAuto(Mat src, out int leftGrayLevel, out int rightGrayLevel)
+    public static Mat AdjustLevelAuto(Mat image, double ignore)
     {
-        // 统计灰度直方图
-        var grayHist = new Mat();
+        // 计算直方图
+        var histSize = 65536; // 16-bit 图像的灰度级数
+        float[] histRange = [0, 65536];
+        var hist = new Mat();
 
-        try
+        Cv2.CalcHist(
+            [image],
+            [0],
+            null,
+            hist,
+            1,
+            [histSize],
+            [new Rangef(histRange[0], histRange[1])]
+        );
+
+        // 计算累积分布函数 (CDF)
+        var cdf = new float[histSize];
+        hist.GetArray(out float[] histArray);
+        cdf[0] = histArray[0];
+        for (var i = 1; i < histSize; i++)
         {
-            Cv2.CalcHist([src], [0], null, grayHist, 1, [65535], [new Rangef(0, 65535)]);
-
-            // 设置LowCut和HighCut
-            var size = src.Rows * src.Cols;
-            var lowCut = 0.2f;
-            var highCut = 0.2f;
-
-            // 根据LowCut和HighCut查找最大值最小值
-            int bMax = 0, bMin = 0;
-            var lowTh = lowCut * 0.01f * size;
-            var highTh = highCut * 0.01f * size;
-
-            // B通道查找最小最大值
-            var sumTempB = 0;
-            for (var i = 0; i < 65536; i++)
-            {
-                sumTempB += grayHist.At<int>(i);
-                if (sumTempB >= lowTh)
-                {
-                    bMin = i;
-                    break;
-                }
-            }
-            sumTempB = 0;
-            for (var i = 65535; i >= 0; i--)
-            {
-                sumTempB += grayHist.At<int>(i);
-                if (sumTempB >= highTh)
-                {
-                    bMax = i;
-                    break;
-                }
-            }
-
-            // 让左右色阶至少相差1
-            if (bMin == bMax)
-            {
-                if (bMin > 1)
-                {
-                    bMin -= 1;
-                }
-                else
-                {
-                    bMax += 1;
-                }
-            }
-
-            // 建立分段线性查找表
-            leftGrayLevel = bMin;
-            rightGrayLevel = bMax;
-
-            // B分量查找表
-            var bTable = new int[65536];
-            for (var i = 0; i < 65536; i++)
-            {
-                if (i <= bMin)
-                    bTable[i] = 0;
-                else if (i > bMin && i < bMax)
-                    bTable[i] = (int)Math.Round((float)(i - bMin) / (bMax - bMin) * 65535);
-                else
-                    bTable[i] = 65535;
-            }
-
-            // 用相应的查找表进行分段线性拉伸
-            unsafe
-            {
-                var srcPtr = (ushort*)src.Data.ToPointer();
-                for (var i = 0; i < size; i++)
-                {
-                    srcPtr[i] = (ushort)bTable[srcPtr[i]];
-                }
-            }
-            
-            return src;
+            cdf[i] = cdf[i - 1] + histArray[i];
         }
-        finally
+
+        var cdfMax = cdf.Max();
+        for (var i = 0; i < histSize; i++)
         {
-            grayHist.Dispose();
+            cdf[i] /= cdfMax;
         }
+
+        // 寻找最小和最大像素值
+        var minCdfIndex = Array.FindIndex(cdf, value => value >= ignore);
+        var maxCdfIndex = Array.FindLastIndex(cdf, value => value <= 1 - ignore);
+
+        // 创建查找表 (LUT)
+        var lut = new ushort[histSize];
+        for (var i = 0; i < histSize; i++)
+        {
+            if (i < minCdfIndex)
+            {
+                lut[i] = 0;
+            }
+            else if (i > maxCdfIndex)
+            {
+                lut[i] = 65535;
+            }
+            else
+            {
+                lut[i] = (ushort)((i - minCdfIndex) * 65535 / (maxCdfIndex - minCdfIndex));
+            }
+        }
+
+        // 应用 LUT
+        var result = new Mat(image.Size(), image.Type());
+        for (var y = 0; y < image.Rows; y++)
+        {
+            for (var x = 0; x < image.Cols; x++)
+            {
+                var pixelValue = image.At<ushort>(y, x);
+                result.Set(y, x, lut[pixelValue]);
+            }
+        }
+
+        return result;
     }
 
     #endregion

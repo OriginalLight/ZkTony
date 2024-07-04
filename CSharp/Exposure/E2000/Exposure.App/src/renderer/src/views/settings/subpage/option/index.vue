@@ -104,27 +104,6 @@
               </template>
             </a-list-item>
             <a-list-item>
-              <a-list-item-meta :title="t('option.camera.enhanceThreshold')"></a-list-item-meta>
-              <template #actions>
-                <a-input-group>
-                  <a-input-number
-                    v-model="option.enhanceThreshold"
-                    style="width: 350px"
-                    :min="1000"
-                    :max="65535"
-                    mode="button"
-                    :step="1000"
-                  >
-                  </a-input-number>
-                  <a-button
-                    type="primary"
-                    @click="handleOption('EnhanceThreshold', String(option.enhanceThreshold))"
-                    >{{ t('option.set') }}</a-button
-                  >
-                </a-input-group>
-              </template>
-            </a-list-item>
-            <a-list-item>
               <a-list-item-meta :title="t('option.camera.expoTime')"></a-list-item-meta>
               <template #actions>
                 <a-input-group>
@@ -310,9 +289,8 @@ const option = ref({
   roi: '0,1,0,1',
   hatchStep: 256000,
   hatchOffset: 0,
-  threshold: 0.0001,
-  targetThreshold: 30000,
-  enhanceThreshold: 65535
+  threshold: 0.001,
+  targetThreshold: 10000
 })
 
 const loading = ref(false)
@@ -361,7 +339,6 @@ onMounted(async () => {
     if (ops.Roi) option.value.roi = ops.Roi
     if (ops.Threshold) option.value.threshold = Number(ops.Threshold)
     if (ops.TargetThreshold) option.value.targetThreshold = Number(ops.TargetThreshold)
-    if (ops.EnhanceThreshold) option.value.enhanceThreshold = Number(ops.EnhanceThreshold)
     const res = await getPorts()
     option.value.ports = res.data
   } catch (error) {

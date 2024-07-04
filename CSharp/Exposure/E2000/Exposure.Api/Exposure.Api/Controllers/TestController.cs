@@ -33,7 +33,7 @@ public class TestController(
         var start = DateTime.Now;
         var pic = Path.Combine(FileUtils.Exposure, "240514141712442.png");
         var mat = new Mat(pic, ImreadModes.AnyDepth);
-        var i = OpenCvUtils.Histogram(mat, 0.001);
+        var i = OpenCvUtils.FindMaxGrayscaleValue(mat, 0.001);
         var dst = OpenCvUtils.LutLinearTransform(mat, 0, i, 0, 65535);
         var path = Path.Combine(FileUtils.Exposure, "test1.png");
         dst.SaveImage(path);
