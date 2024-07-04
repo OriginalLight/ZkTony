@@ -29,14 +29,17 @@
     <string name="equipment_arguments">Equipment Arguments</string>
     <string name="runtime_arguments">Runtime Arguments</string>
     <string name="serial_number">Serial Number</string>
-    <string name="pruduct_number">Product Number</string>
+    <string name="product_number">Product Number</string>
     <string name="set">Set</string>
-    <string name="oneclick_export">One-click Export</string>
-    <string name="oneclick_import">One-click Import</string>
-    <string name="oneclick_clear">One-click Clear</string>
+    <string name="one_click_export">One-click Export</string>
+    <string name="one_click_import">One-click Import</string>
+    <string name="one_click_clear">One-click Clear</string>
     <string name="pump_arguments">Pump Arguments</string>
     <string name="voltage_arguments">Voltage Arguments</string>
     <string name="sensor_arguments">Sensor Arguments</string>
     <string name="wechat">WeChat</string>
     <string name="video">Video ID</string>
+    <string name="logout">Logout</string>
+    <string name="logout_confirm_content">Are you sure to log out?</string>
+    <string name="import_confirm_content">Will overwrite all current parameters and cannot be restored!!! Confirm import?</string>
 </resources>

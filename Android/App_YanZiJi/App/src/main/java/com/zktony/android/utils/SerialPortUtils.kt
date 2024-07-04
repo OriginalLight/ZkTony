@@ -43,7 +43,7 @@ object SerialPortUtils {
     }
 
     // 设置仪器SN号
-    suspend fun setSerialNumber(sn: String, target: Int) : Boolean {
+    suspend fun setSerialNumber(sn: String, target: Int): Boolean {
         val serialPort = SerialStoreUtils.get("A") ?: return false
         val callbackKey = "SetSerialNumber"
         var success = false
@@ -73,7 +73,7 @@ object SerialPortUtils {
             }
         } catch (e: Exception) {
             LogUtils.error(callbackKey, e.stackTraceToString(), true)
-        }finally {
+        } finally {
             serialPort.unregisterCallback(callbackKey)
         }
 
@@ -111,7 +111,7 @@ object SerialPortUtils {
             }
         } catch (e: Exception) {
             LogUtils.error(callbackKey, e.stackTraceToString(), true)
-        }finally {
+        } finally {
             serialPort.unregisterCallback(callbackKey)
 
         }
@@ -162,7 +162,7 @@ object SerialPortUtils {
             }
         } catch (e: Exception) {
             LogUtils.error(callbackKey, e.stackTraceToString(), true)
-        }finally {
+        } finally {
             serialPort.unregisterCallback(callbackKey)
         }
 

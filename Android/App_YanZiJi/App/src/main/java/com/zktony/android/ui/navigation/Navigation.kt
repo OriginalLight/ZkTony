@@ -28,7 +28,11 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,6 +57,7 @@ import com.zktony.android.ui.SettingsDebugView
 import com.zktony.android.ui.SettingsFqcView
 import com.zktony.android.ui.SettingsView
 import com.zktony.android.ui.components.BottomBar
+import com.zktony.android.ui.components.LogoutConfirmDialog
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.zktyBrush
@@ -113,6 +118,17 @@ fun AppNavigationDrawer(
     navigationActions: NavigationActions
 ) {
     val scope = rememberCoroutineScope()
+    var showDialog by remember { mutableStateOf(false) }
+
+    if (showDialog) {
+        LogoutConfirmDialog(onDismiss = { showDialog = false }) {
+            scope.launch {
+                showDialog = false
+                AuthUtils.logout()
+                navigationActions.navigate(Route.LOGIN)
+            }
+        }
+    }
 
     Box(
         modifier = modifier
@@ -145,12 +161,7 @@ fun AppNavigationDrawer(
                 .size(64.dp)
                 .align(Alignment.BottomCenter)
                 .clip(MaterialTheme.shapes.medium)
-                .clickable {
-                    scope.launch {
-                        AuthUtils.logout()
-                        navigationActions.navigate(Route.LOGIN)
-                    }
-                },
+                .clickable { showDialog = true },
             contentAlignment = Alignment.Center
         ) {
             Icon(

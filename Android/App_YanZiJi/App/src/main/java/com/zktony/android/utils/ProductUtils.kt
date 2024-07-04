@@ -2,8 +2,20 @@ package com.zktony.android.utils
 
 object ProductUtils {
 
-    val ProductNumberList = listOf("M-Blot T4000", "M-Blot T4100", "M-Blot T4200", "M-Blot T2000", "M-Blot T2100", "M-Blot T2200")
-    var ProductNumber: String = "M-Blot T4000"
+    private var ProductNumber: String = "M-Blot T4000"
+    val ProductNumberList = listOf(
+        "M-Blot T4000",
+        "M-Blot T4100",
+        "M-Blot T4200",
+        "M-Blot T2000",
+        "M-Blot T2100",
+        "M-Blot T2200"
+    )
+
+    // 设置产品型号
+    fun setProductNumber(productNumber: String) {
+        ProductNumber = productNumber
+    }
 
     // 根据产品型号获取模块数量
     fun getModuleCount(): Int {

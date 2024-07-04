@@ -12,5 +12,5 @@ abstract class UserDao: BaseDao<User> {
         SELECT * FROM users WHERE name = :name
         """
     )
-    abstract fun getByName(name: String): User?
+    abstract suspend fun getByName(name: String): User?
 }

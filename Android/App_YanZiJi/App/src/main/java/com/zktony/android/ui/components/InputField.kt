@@ -1,12 +1,21 @@
 package com.zktony.android.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Password
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,7 +28,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.zktony.android.R
@@ -37,11 +50,17 @@ fun ArgumentsInputField(
     Row(
         modifier = modifier
             .background(MaterialTheme.colorScheme.surface, CircleShape)
-            .padding(4.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         if (showClear && text.isNotEmpty()) {
-            IconButton(onClick = { text = "" }) {
+            Box(
+                modifier = Modifier.size(40.dp)
+                    .clip(CircleShape)
+                    .clickable { text = ""},
+                contentAlignment = Alignment.Center
+            ) {
                 Icon(
                     imageVector = Icons.Default.Clear,
                     contentDescription = "Clear"
@@ -50,9 +69,7 @@ fun ArgumentsInputField(
         }
 
         BasicTextField(
-            modifier = Modifier
-                .weight(1f)
-                .padding(start = if (text.isNotEmpty()) 0.dp else 8.dp, end = 8.dp),
+            modifier = Modifier.weight(1f),
             value = text,
             onValueChange = {
                 if (it.length <= maxLength) {
@@ -70,9 +87,148 @@ fun ArgumentsInputField(
     }
 }
 
+@Composable
+fun UserNameInputField(
+    modifier: Modifier = Modifier,
+    value: String,
+    maxLength: Int = 32,
+    onValueChange: (String) -> Unit
+) {
+    var text by remember { mutableStateOf(value) }
+
+    Row(
+        modifier = modifier
+            .background(MaterialTheme.colorScheme.surface, CircleShape)
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Box(
+            modifier = Modifier.size(40.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Person,
+                contentDescription = "Person"
+            )
+        }
+
+        BasicTextField(
+            modifier = Modifier.weight(1f),
+            value = text,
+            onValueChange = {
+                if (it.length <= maxLength) {
+                    text = it
+                    onValueChange(it)
+                }
+            },
+            singleLine = true,
+            textStyle = MaterialTheme.typography.titleLarge,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+        )
+
+        if (text.isNotEmpty()) {
+            Box(
+                modifier = Modifier.size(40.dp)
+                    .clip(CircleShape)
+                    .clickable { text = ""},
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Clear,
+                    contentDescription = "Clear"
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun PasswordInputField(
+    modifier: Modifier = Modifier,
+    value: String,
+    maxLength: Int = 32,
+    onValueChange: (String) -> Unit
+) {
+    var text by remember { mutableStateOf(value) }
+    var showPassword by remember { mutableStateOf(false) }
+
+    Row(
+        modifier = modifier
+            .background(MaterialTheme.colorScheme.surface, CircleShape)
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        if (text.isNotEmpty()) {
+            Box(
+                modifier = Modifier.size(40.dp)
+                    .clip(CircleShape)
+                    .clickable { showPassword = !showPassword },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.RemoveRedEye,
+                    contentDescription = "Show Password"
+                )
+            }
+        } else {
+            Box(
+                modifier = Modifier.size(40.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Password,
+                    contentDescription = "Password"
+                )
+            }
+        }
+
+        BasicTextField(
+            modifier = Modifier.weight(1f),
+            value = text,
+            onValueChange = {
+                if (it.length <= maxLength) {
+                    text = it
+                    onValueChange(it)
+                }
+            },
+            visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+            singleLine = true,
+            textStyle = MaterialTheme.typography.titleLarge
+        )
+
+        if (text.isNotEmpty()) {
+            Box(
+                modifier = Modifier.size(40.dp)
+                    .clip(CircleShape)
+                    .clickable { text = ""},
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Clear,
+                    contentDescription = "Clear"
+                )
+            }
+        }
+    }
+}
+
 
 @Preview
 @Composable
 fun ArgumentsInputGroupPreview() {
     ArgumentsInputField(value = "Hello", onValueChange = {})
+}
+
+@Preview
+@Composable
+fun UserNameInputFieldPreview() {
+    UserNameInputField(value = "Hello", onValueChange = {})
+}
+
+@Preview
+@Composable
+fun PasswordInputFieldPreview() {
+    PasswordInputField(value = "Hello", onValueChange = {})
 }

@@ -69,7 +69,7 @@ object ApplicationUtils {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             // Acquires the network capabilities of the current network through the ConnectivityManager.
-            val capabilities = cm.getNetworkCapabilities(cm.activeNetwork)?: return false
+            val capabilities = cm.getNetworkCapabilities(cm.activeNetwork) ?: return false
             // If the network ability contains mobile network transmission ability, it returns true, indicating that the network is available.
             if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
                 return true
@@ -84,7 +84,7 @@ object ApplicationUtils {
             // If the Android version is earlier than API level Q, use an older API that has been deprecated.
             @Suppress("DEPRECATION")
             // Gets the network status information of the currently active network connection and returns whether it is available through the isAvailable attribute.
-            return cm.activeNetworkInfo?.isAvailable?: false
+            return cm.activeNetworkInfo?.isAvailable ?: false
         }
         return false
     }

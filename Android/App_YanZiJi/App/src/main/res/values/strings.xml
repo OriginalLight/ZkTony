@@ -30,14 +30,17 @@
     <string name="equipment_arguments">设备参数</string>
     <string name="runtime_arguments">运行参数</string>
     <string name="serial_number">产品序列号</string>
-    <string name="pruduct_number">产品型号</string>
+    <string name="product_number">产品型号</string>
     <string name="set">设置</string>
-    <string name="oneclick_export">一键导出</string>
-    <string name="oneclick_import">一键导入</string>
-    <string name="oneclick_clear">一键清除</string>
+    <string name="one_click_export">一键导出</string>
+    <string name="one_click_import">一键导入</string>
+    <string name="one_click_clear">一键清除</string>
     <string name="pump_arguments">蠕动泵参数</string>
     <string name="voltage_arguments">电流电压参数</string>
     <string name="sensor_arguments">传感器参数</string>
     <string name="wechat">公众号</string>
     <string name="video">视频号</string>
+    <string name="logout">注销</string>
+    <string name="logout_confirm_content">确认退出登录吗？</string>
+    <string name="import_confirm_content">将覆盖当前所有参数，无法恢复！！！确认导入吗？</string>
 </resources>

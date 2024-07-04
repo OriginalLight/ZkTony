@@ -54,7 +54,7 @@ fun Presets(content: @Composable () -> Unit) {
 
     // P/N参数
     val pn = dataSaver.readData(Constants.PN, Constants.DEFAULT_PN)
-    ProductUtils.ProductNumber = pn
+    ProductUtils.setProductNumber(pn)
     LogUtils.info("Presets", "P/N: $pn")
 
     content()

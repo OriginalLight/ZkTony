@@ -29,7 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zktony.android.R
-import com.zktony.android.ui.components.ImportSecondConfirmationDialog
+import com.zktony.android.ui.components.ImportConfirmDialog
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
@@ -133,7 +133,7 @@ fun SettingsArgumentsTopBar(
     var showSecondConfirmation by remember { mutableStateOf(false) }
 
     if (showSecondConfirmation) {
-        ImportSecondConfirmationDialog(
+        ImportConfirmDialog(
             onDismiss = { showSecondConfirmation = false },
             onConfirm = {
                 viewModel.importArguments()
@@ -157,15 +157,15 @@ fun SettingsArgumentsTopBar(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Button(onClick = { /*TODO*/ }) {
-                    Text(text = stringResource(id = R.string.oneclick_clear))
+                    Text(text = stringResource(id = R.string.one_click_clear))
                 }
 
                 Button(onClick = { showSecondConfirmation = true }) {
-                    Text(text = stringResource(id = R.string.oneclick_import))
+                    Text(text = stringResource(id = R.string.one_click_import))
                 }
 
                 Button(onClick = { viewModel.exportArguments() }) {
-                    Text(text = stringResource(id = R.string.oneclick_export))
+                    Text(text = stringResource(id = R.string.one_click_export))
                 }
             }
         }

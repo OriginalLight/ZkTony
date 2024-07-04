@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.room.Room
 import com.zktony.room.AppDatabase
 import com.zktony.room.dao.FaultDao
+import com.zktony.room.dao.UserDao
 import com.zktony.room.repository.FaultRepository
+import com.zktony.room.repository.UserRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -40,4 +42,7 @@ object RoomModule {
     // Repository
     @Provides
     fun faultRepository(faultDao: FaultDao) = FaultRepository(faultDao)
+
+    @Provides
+    fun userRepository(userDao: UserDao) = UserRepository(userDao)
 }
