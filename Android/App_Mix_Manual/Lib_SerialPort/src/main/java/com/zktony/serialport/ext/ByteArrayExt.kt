@@ -6,6 +6,7 @@ import java.util.Locale
 
 // https://www.jianshu.com/p/8ee33de703e2
 
+@OptIn(ExperimentalStdlibApi::class)
 fun ByteArray.toHexString(hasSpace: Boolean = true) =
     this.joinToString(if (hasSpace) " " else "") { String.format("%02X", it) }
 

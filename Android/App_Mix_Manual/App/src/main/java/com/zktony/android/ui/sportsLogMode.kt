@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.storage.StorageManager
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -46,6 +48,7 @@ import com.zktony.android.ui.brogressbar.HorizontalProgressBar
 import com.zktony.android.ui.components.TableTextBody
 import com.zktony.android.ui.components.TableTextHead
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.getStoragePath
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.utils.extra.dateFormat
 import kotlinx.coroutines.delay
@@ -59,26 +62,31 @@ import java.lang.reflect.Method
 import kotlin.math.abs
 import kotlin.math.ceil
 
+@RequiresApi(Build.VERSION_CODES.N)
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun sportsLogMode(
     uiEvent: (SettingIntent) -> Unit,
-    sportsLogEntitiesDis: LazyPagingItems<SportsLog>,
-    entitiesListDis: List<SportsLog>,
-    entitiesList: List<SportsLog>,
 ) {
     val context = LocalContext.current
 
     val scope = rememberCoroutineScope()
 
-    var selectedIndex by remember { mutableStateOf(0) }
+    var txtList =
+        File("sdcard/Download").listFiles { _, name -> name.endsWith(".txt") }?.toList()
+            ?: emptyList()
+
+    var selectedName by remember { mutableStateOf("") }
     //	定义列宽
-    val cellWidthList = arrayListOf(70, 115, 300)
+    val cellWidthList = arrayListOf(500)
 
     /**
      * 导出弹窗
      */
     val exportDialog = remember { mutableStateOf(false) }
+
+
+    var selectedFile by remember { mutableStateOf<File?>(null) }
 
     /**
      * 导出进度
@@ -88,7 +96,7 @@ fun sportsLogMode(
     }
 
     var exportSweepStateCount by remember {
-        mutableIntStateOf(0)
+        mutableStateOf(0)
     }
 
 
@@ -136,35 +144,28 @@ fun sportsLogMode(
                 Row(
                     Modifier.background(Color(rgb(0, 105, 52)))
                 ) {
-                    TableTextHead(text = "序号", width = cellWidthList[0])
-                    TableTextHead(text = "时        间", width = cellWidthList[1])
-                    TableTextHead(text = "文件名称", width = cellWidthList[2])
+                    TableTextHead(text = "文件名称", width = cellWidthList[0])
                 }
             }
 
-            itemsIndexed(sportsLogEntitiesDis) { index, item ->
-                val selected = item == sportsLogEntitiesDis[selectedIndex]
+            items(txtList) { file ->
+                val selected = file.name == selectedName
                 Row(
                     modifier = Modifier
                         .background(
-                            if (index % 2 == 0) Color(
+                            if (txtList.size % 2 == 0) Color(
                                 rgb(
                                     229, 229, 229
                                 )
                             ) else Color.White
                         )
                         .clickable(onClick = {
-                            selectedIndex = index
+                            selectedFile = file
+                            selectedName = file.name
                         })
                 ) {
-                    TableTextBody(text = (index + 1).toString(), width = cellWidthList[0], selected)
                     TableTextBody(
-                        text = "" + item.createTime.dateFormat("yyyy-MM-dd"),
-                        width = cellWidthList[1],
-                        selected
-                    )
-                    TableTextBody(
-                        text = item.logName, width = cellWidthList[2], selected
+                        text = file.name, width = cellWidthList[0], selected
                     )
                 }
             }
@@ -185,37 +186,57 @@ fun sportsLogMode(
                 shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                 onClick = {
                     scope.launch {
-                        var path = getStoragePath(context, true)
-                        if ("" != path) {
-                            if (entitiesList.isNotEmpty()) {
-                                val entity = sportsLogEntitiesDis[selectedIndex]
-                                if (entity != null) {
-                                    try {
-                                        exportDialog.value = true
-
-                                        val release = Build.VERSION.RELEASE
-                                        if (release == "6.0.1") {
-                                            //Android6.0.1系统是迈冲
-                                            if (path != null) {
-                                                path = path.replace("storage", "/mnt/media_rw")
-                                            }
-                                        }
-                                        path += "/${entity.logName}.txt"
-
-                                        val file = File(path)
-                                        if (!file.exists()) {
-                                            if (file.createNewFile()) {
-                                                FileWriter(path, true).use { writer ->
-                                                    writer.write(entity.createTime.dateFormat("yyyy-MM-dd") + "\n")
-                                                    delay(500)
-                                                    exportSweepStateCount = entitiesList.size
-                                                    entitiesList.forEach {
-                                                        if (entity.logName == it.logName) {
-                                                            writer.append("使用模块：${it.startModel}\n")
-                                                            writer.append("运行数据：${it.detail}\n")
+                        try {
+                            var path = getStoragePath(context, true)
+                            if ("" != path) {
+                                if (selectedFile != null) {
+                                    exportDialog.value = true
+                                        val targetDir = File(path + "/${selectedFile!!.name}.txt")
+                                        if (!targetDir.exists()) {
+                                            if (targetDir.createNewFile()) {
+                                                selectedFile!!.bufferedReader().useLines {
+                                                    exportSweepStateCount = it.count()
+                                                }
+                                                selectedFile!!.bufferedReader().useLines { lines ->
+                                                    for (line in lines) {
+                                                        if (line.isNotEmpty()) {
+                                                            targetDir.bufferedWriter().use { writer ->
+                                                                writer.append(line + "\n")
+                                                                delay(500)
+                                                                exportSweepState += 1f
+                                                                writer.flush()  // Ensure all data is flushed to the file
+                                                            }
                                                         }
-                                                        delay(500)
-                                                        exportSweepState += 1f
+                                                    }
+                                                    exportSweepState = 0f
+                                                    exportDialog.value = false
+                                                    Toast.makeText(
+                                                        context,
+                                                        "导出完成",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+
+                                                }
+                                            } else {
+                                                Toast.makeText(
+                                                    context,
+                                                    "创建文件失败,请重试!",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+                                        } else {
+                                            selectedFile!!.bufferedReader().useLines {
+                                                exportSweepStateCount = it.count()
+                                            }
+                                            selectedFile!!.bufferedReader().useLines { lines ->
+                                                for (line in lines) {
+                                                    if (line.isNotEmpty()) {
+                                                        targetDir.bufferedWriter().use { writer ->
+                                                            writer.append(line + "\n")
+                                                            delay(500)
+                                                            exportSweepState += 1f
+                                                            writer.flush()  // Ensure all data is flushed to the file
+                                                        }
                                                     }
                                                 }
                                                 exportSweepState = 0f
@@ -225,53 +246,31 @@ fun sportsLogMode(
                                                     "导出完成",
                                                     Toast.LENGTH_SHORT
                                                 ).show()
-                                            }else{
-                                                Toast.makeText(
-                                                    context,
-                                                    "创建文件失败,请重试!",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
+
                                             }
-                                        }else{
-                                            FileWriter(path, true).use { writer ->
-                                                writer.write(entity.createTime.dateFormat("yyyy-MM-dd") + "\n")
-                                                delay(500)
-                                                exportSweepStateCount = entitiesList.size
-                                                entitiesList.forEach {
-                                                    if (entity.logName == it.logName) {
-                                                        writer.append("使用模块：${it.startModel}\n")
-                                                        writer.append("运行数据：${it.detail}\n")
-                                                    }
-                                                    delay(500)
-                                                    exportSweepState += 1f
-                                                }
-                                            }
-                                            exportSweepState = 0f
-                                            exportDialog.value = false
-                                            Toast.makeText(
-                                                context,
-                                                "导出完成!",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
                                         }
-                                    } catch (e: Exception) {
-                                        Toast.makeText(
-                                            context,
-                                            "导出异常,请重试!",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-
-
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "未选择文件!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "U盘不存在!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
-                        } else {
+                        } catch (e: IOException) {
                             Toast.makeText(
                                 context,
-                                "U盘不存在!",
+                                "日志导出异常:${e.printStackTrace()}!",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
+
                     }
                 }
             ) {
@@ -300,51 +299,4 @@ fun sportsLogMode(
     }
 
 
-}
-
-private fun <T, K> Iterable<T>.distinctBy(selector: (T) -> K): List<T> {
-    val set = HashSet<K>()
-    val list = ArrayList<T>()
-    for (e in this) {
-        val key = selector(e)
-        if (set.add(key))
-            list.add(e)
-    }
-    return list
-}
-
-private fun getStoragePath(context: Context, isUsb: Boolean): String? {
-    var path = ""
-    val mStorageManager: StorageManager =
-        context.getSystemService(Context.STORAGE_SERVICE) as StorageManager
-    val volumeInfoClazz: Class<*>
-    val diskInfoClaszz: Class<*>
-    try {
-        volumeInfoClazz = Class.forName("android.os.storage.VolumeInfo")
-        diskInfoClaszz = Class.forName("android.os.storage.DiskInfo")
-        val StorageManager_getVolumes: Method =
-            Class.forName("android.os.storage.StorageManager").getMethod("getVolumes")
-        val VolumeInfo_GetDisk: Method = volumeInfoClazz.getMethod("getDisk")
-        val VolumeInfo_GetPath: Method = volumeInfoClazz.getMethod("getPath")
-        val DiskInfo_IsUsb: Method = diskInfoClaszz.getMethod("isUsb")
-        val DiskInfo_IsSd: Method = diskInfoClaszz.getMethod("isSd")
-        val List_VolumeInfo = (StorageManager_getVolumes.invoke(mStorageManager) as List<Any>)
-        for (i in List_VolumeInfo.indices) {
-            val volumeInfo = List_VolumeInfo[i]
-            val diskInfo: Any = VolumeInfo_GetDisk.invoke(volumeInfo) ?: continue
-            val sd = DiskInfo_IsSd.invoke(diskInfo) as Boolean
-            val usb = DiskInfo_IsUsb.invoke(diskInfo) as Boolean
-            val file: File = VolumeInfo_GetPath.invoke(volumeInfo) as File
-            if (isUsb == usb) { //usb
-                assert(file != null)
-                path = file.getAbsolutePath()
-            } else if (!isUsb == sd) { //sd
-                assert(file != null)
-                path = file.getAbsolutePath()
-            }
-        }
-    } catch (e: Exception) {
-        e.printStackTrace()
-    }
-    return path
 }

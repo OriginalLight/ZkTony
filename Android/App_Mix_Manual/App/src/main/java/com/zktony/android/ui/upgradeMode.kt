@@ -246,7 +246,7 @@ fun upgradeMode(uiEvent: (SettingIntent) -> Unit, uiEventHome: (HomeIntent) -> U
                     painter = painterResource(id = R.mipmap.master_update),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(180.dp)
+                        .size(200.dp)
                         .clickable {
                             scope.launch {
                                 var path = getStoragePath(context, true)
@@ -633,10 +633,6 @@ fun FileItem(
         ) {
             Text(
                 text = "Name: ${file.name}",
-                color = if (isSelected) Color.Red else Color.Black
-            )
-            Text(
-                text = "Path: ${file.path}",
                 color = if (isSelected) Color.Red else Color.Black
             )
         }

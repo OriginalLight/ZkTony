@@ -1,22 +1,16 @@
 package com.zktony.android.utils
 
-import android.util.Log
-import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.utils.AppStateUtils.hpa
 import com.zktony.android.utils.AppStateUtils.hpd
 import com.zktony.android.utils.AppStateUtils.hpe
 import com.zktony.android.utils.AppStateUtils.hpg
-import com.zktony.android.utils.LogUtils.logD
 import com.zktony.android.utils.internal.ControlType
 import com.zktony.android.utils.internal.ExceptionPolicy
 import com.zktony.android.utils.internal.ExecuteType
-import com.zktony.android.utils.internal.GlueBuilder
 import com.zktony.android.utils.internal.StartBuilder
 import com.zktony.serialport.command.Protocol
 import com.zktony.serialport.ext.readInt16LE
 import com.zktony.serialport.ext.readInt8
-import com.zktony.serialport.ext.toAsciiString
-import com.zktony.serialport.ext.toHexString
 import com.zktony.serialport.ext.writeInt8
 import com.zktony.serialport.lifecycle.SerialStoreUtils
 import com.zktony.serialport.serialPortOf

@@ -1,6 +1,5 @@
 package com.zktony.android.utils.service
 
-import android.util.Log
 import com.zktony.android.data.dao.CalibrationDao
 import com.zktony.android.data.dao.ExpectedDao
 import com.zktony.android.data.dao.ExperimentRecordDao
@@ -16,7 +15,7 @@ import com.zktony.android.utils.AlgorithmUtils.calculateCalibrationFactor
 import com.zktony.android.utils.AlgorithmUtils.calculateCalibrationFactorNew
 import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.AppStateUtils.hpc
-import com.zktony.serialport.utils.log
+import com.zktony.serialport.utils.logInfo
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
@@ -64,30 +63,30 @@ class CalibrationService @Inject constructor(
 
             val currentTime = System.currentTimeMillis()
 
-            log(
+            logInfo(
                 "CalibrationService",
                 "判断删除命令日志文件的当前时间:$currentTime"
             )
 
             if (binList.size > 7) {
                 binList.forEach {
-                    log(
+                    logInfo(
                         "CalibrationService",
                         "Filename======${it.name}"
                     )
-                    log(
+                    logInfo(
                         "CalibrationService",
                         "命令日志文件名称:${it.name},文件最后修改的时间:${it.lastModified()}"
                     )
 
                     if (currentTime - it.lastModified() > TimeUnit.DAYS.toMillis(7)) {
                         it.delete()
-                        log(
+                        logInfo(
                             "CalibrationService",
                             "删除命令日志文件是否成功:${it.delete()},删除的文件名称:${it.name}"
                         )
                     } else {
-                        log(
+                        logInfo(
                             "CalibrationService",
                             "删除命令日志文件的时间不够,时间差是:${currentTime - it.lastModified()}"
                         )
@@ -95,7 +94,7 @@ class CalibrationService @Inject constructor(
 
                 }
             } else {
-                log(
+                logInfo(
                     "CalibrationService",
                     "命令日志文件小于7的具体文件数量:${binList.size}"
                 )
@@ -122,22 +121,22 @@ class CalibrationService @Inject constructor(
             newCalibrations.collect { newCalibration ->
 
                 if (newCalibration != null) {
-                    log(
+                    logInfo(
                         "CalibrationService",
                         "newCalibration.higeAvg=========" + newCalibration.higeAvg
                     )
 
-                    log(
+                    logInfo(
                         "CalibrationService",
                         "newCalibration.lowAvg=========" + newCalibration.lowAvg
                     )
 
-                    log(
+                    logInfo(
                         "CalibrationService",
                         "newCalibration.rinseAvg=========" + newCalibration.rinseAvg
                     )
 
-                    log(
+                    logInfo(
                         "CalibrationService",
                         "newCalibration.coagulantAvg=========" + newCalibration.coagulantAvg
                     )
@@ -172,7 +171,7 @@ class CalibrationService @Inject constructor(
 
 
                 } else {
-                    log(
+                    logInfo(
                         "CalibrationService",
                         "=========插入默认校准数据========"
                     )
@@ -184,7 +183,7 @@ class CalibrationService @Inject constructor(
                             1.0, 1.6, 1.6, 1.6, 1.6
                         )
                     )
-                    log(
+                    logInfo(
                         "CalibrationService",
                         "=========插入默认校准数据完成....插入默认设置数据开始========"
                     )
@@ -197,7 +196,7 @@ class CalibrationService @Inject constructor(
 
                     expectedDao.insert(Expected())
 
-                    log(
+                    logInfo(
                         "CalibrationService",
                         "=========插入默认设置数据完成========"
                     )

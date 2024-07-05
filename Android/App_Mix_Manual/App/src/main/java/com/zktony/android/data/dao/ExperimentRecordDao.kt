@@ -57,4 +57,12 @@ abstract class ExperimentRecordDao : BaseDao<ExperimentRecord> {
         """
     )
     abstract suspend fun deleteByAll()
+
+
+    @Query(
+        """
+        SELECT COUNT(*) FROM ExperimentRecord
+        """
+    )
+    abstract suspend fun count():Int
 }

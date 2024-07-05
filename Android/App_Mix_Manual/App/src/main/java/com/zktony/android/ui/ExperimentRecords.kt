@@ -288,7 +288,7 @@ fun experimentList(
                                                     path = path.replace("storage", "/mnt/media_rw")
                                                 }
                                             }
-                                            path += "/erlog.txt"
+                                            path += "/exp${System.currentTimeMillis()}.txt"
 
                                             val file = File(path)
                                             if (!file.exists()) {

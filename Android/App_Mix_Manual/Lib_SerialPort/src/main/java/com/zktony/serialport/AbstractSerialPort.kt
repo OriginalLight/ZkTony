@@ -1,10 +1,9 @@
 package com.zktony.serialport
 
-import android.util.Log
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.core.SerialPort
 import com.zktony.serialport.ext.toHexString
-import com.zktony.serialport.utils.log
+import com.zktony.serialport.utils.logInfo
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
@@ -100,7 +99,7 @@ abstract class AbstractSerialPort {
             if (buffer.size() > 0) {
                 try {
                     if (config.log) {
-                        log(
+                        logInfo(
                             config.device,
                             "RX: ${buffer.toByteArray().toHexString()}"
                         )
@@ -158,9 +157,8 @@ abstract class AbstractSerialPort {
                 try {
                     val message = byteArrayQueue.poll(config.delay, TimeUnit.MILLISECONDS)
                     if (message != null) {
-                        println("message====$message")
                         if (config.log) {
-                            log(config.device, "TX: ${message.toHexString()}")
+                            logInfo(config.device, "TX: ${message.toHexString()}")
                         }
                         send(message)
                     }

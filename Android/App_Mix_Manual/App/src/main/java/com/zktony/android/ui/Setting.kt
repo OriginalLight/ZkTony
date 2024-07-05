@@ -26,6 +26,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -98,6 +100,7 @@ import com.zktony.android.utils.SerialPortUtils.start
 import com.zktony.android.utils.SerialPortUtils.version
 import com.zktony.android.utils.extra.dateFormat
 import com.zktony.android.utils.extra.embeddedVersion
+import com.zktony.serialport.ext.readInt16LE
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 //import com.zktony.serialport.BuildConfig
@@ -141,11 +144,6 @@ fun SettingRoute(viewModel: SettingViewModel, homeViewModel: HomeViewModel) {
     val coagulantpulseFlow by viewModel.coagulantpulseFlow.collectAsStateWithLifecycle()
     val coagulantTimeFlow by viewModel.coagulantTimeFlow.collectAsStateWithLifecycle()
     val coagulantResetPulseFlow by viewModel.coagulantResetPulseFlow.collectAsStateWithLifecycle()
-
-    //去重后的数据
-    val sportsLogEntitiesDis = viewModel.sportsLogEntitiesDis.collectAsLazyPagingItems()
-
-    val sportsLogEntities = viewModel.sportsLogEntities.collectAsLazyPagingItems()
 
 
     val navigation: () -> Unit = {
@@ -208,9 +206,6 @@ fun SettingRoute(viewModel: SettingViewModel, homeViewModel: HomeViewModel) {
 
                     PageType.SPORTSLOG -> sportsLog(
                         viewModel::dispatch,
-                        sportsLogEntitiesDis,
-                        sportsLogEntitiesDis.toList(),
-                        sportsLogEntities.toList()
                     )
 
                     PageType.UPGRADE -> upgrade(
@@ -253,7 +248,7 @@ fun SettingLits(
 
     var navigation by rememberDataSaverState(key = Constants.NAVIGATION, default = false)
 
-    var selectRudio = rememberDataSaverState(key = "selectRudio", default = 2)
+    var selectRudio = rememberDataSaverState(key = "selectRudio", default = 1)
 
     val snackbarHostState = LocalSnackbarHostState.current
 
@@ -2228,6 +2223,10 @@ fun SettingLits(
 
             } else if (switchColum == 3) {
 
+                var modelsThickness =
+                    rememberDataSaverState(key = "modelsThickness", default = "G1520")
+
+
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -2252,378 +2251,282 @@ fun SettingLits(
                             }
                         }
                     } else {
-                        Row(
-                            modifier = Modifier
-                                .padding(top = 20.dp)
-                                .fillMaxWidth()
-                        ) {
-                            line(Color(rgb(240, 240, 240)), 0f, 400f)
-                        }
+                        val items = listOf(
+                            "运行日志",
+                            "网络设置",
+                            "操作系统设置",
+                            "系统更新",
+                            "配件寿命",
+                            "位置设置",
+                            "关于软件",
+                        )
+                        LazyColumn {
 
-                        Row {
-                            Text(
-                                modifier = Modifier.padding(top = 20.dp),
-                                text = "导航栏",
-                                fontSize = 30.sp
-                            )
-                            Switch(colors = SwitchDefaults.colors(
-                                checkedTrackColor = Color(rgb(0, 105, 52)),
-                            ),
-                                modifier = Modifier
-                                    .height(32.dp)
-                                    .padding(top = 40.dp, start = 220.dp),
-                                checked = navigation,
-                                onCheckedChange = {
-                                    scope.launch {
-                                        navigation = it
-                                        uiEvent(SettingIntent.Navigation(it))
-                                    }
-                                })
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .padding(top = 20.dp)
-                                .fillMaxWidth()
-                        ) {
-                            line(Color(rgb(240, 240, 240)), 0f, 400f)
-                        }
-
-                        if (factoryAdminPwd.value == currentpwd) {
-
-                            Row(modifier = Modifier.clickable {
-                                uiEvent(SettingIntent.NavTo(PageType.DEBUGMODE))
-                            }) {
-                                Text(
-                                    modifier = Modifier.padding(top = 20.dp),
-                                    text = "调试模式",
-                                    fontSize = 30.sp
-                                )
-
-                                Image(
+                            item {
+                                Row(
                                     modifier = Modifier
-                                        .padding(top = 20.dp, start = 200.dp)
-                                        .size(40.dp),
-                                    painter = painterResource(id = R.mipmap.rightarrow),
-                                    contentDescription = null
-                                )
-                            }
-
-                            Row(
-                                modifier = Modifier
-                                    .padding(top = 20.dp)
-                                    .fillMaxWidth()
-                            ) {
-                                line(Color(rgb(240, 240, 240)), 0f, 400f)
-                            }
-                        }
-
-                        Row(modifier = Modifier.clickable {
-                            uiEvent(SettingIntent.NavTo(PageType.SPORTSLOG))
-                        }) {
-                            Text(
-                                modifier = Modifier.padding(top = 20.dp),
-                                text = "运行日志",
-                                fontSize = 30.sp
-                            )
-
-                            Image(
-                                modifier = Modifier
-                                    .padding(top = 20.dp, start = 200.dp)
-                                    .size(40.dp),
-                                painter = painterResource(id = R.mipmap.rightarrow),
-                                contentDescription = null
-                            )
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .padding(top = 20.dp)
-                                .fillMaxWidth()
-                        ) {
-                            line(Color(rgb(240, 240, 240)), 0f, 400f)
-                        }
-
-                        Row(modifier = Modifier.clickable {
-                            uiEvent(SettingIntent.Network)
-                        }) {
-                            Text(
-                                modifier = Modifier.padding(top = 20.dp),
-                                text = "网络设置",
-                                fontSize = 30.sp
-                            )
-
-                            Image(
-                                modifier = Modifier
-                                    .padding(top = 20.dp, start = 200.dp)
-                                    .size(40.dp),
-                                painter = painterResource(id = R.mipmap.rightarrow),
-                                contentDescription = null
-                            )
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .padding(top = 20.dp)
-                                .fillMaxWidth()
-                        ) {
-                            line(Color(rgb(240, 240, 240)), 0f, 400f)
-                        }
-
-                        Row(modifier = Modifier.clickable {
-                            uiEvent(SettingIntent.exit)
-                        }) {
-                            Text(
-                                modifier = Modifier.padding(top = 20.dp),
-                                text = "操作系统设置",
-                                fontSize = 30.sp
-                            )
-
-                            Image(
-                                modifier = Modifier
-                                    .padding(top = 20.dp, start = 140.dp)
-                                    .size(40.dp),
-                                painter = painterResource(id = R.mipmap.rightarrow),
-                                contentDescription = null
-                            )
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .padding(top = 20.dp)
-                                .fillMaxWidth()
-                        ) {
-                            line(Color(rgb(240, 240, 240)), 0f, 400f)
-                        }
-
-                        Row(modifier = Modifier.clickable {
-
-                            uiEvent(SettingIntent.NavTo(PageType.UPGRADE))
-
-                            //获取usb地址
-//                            val path = getStoragePath(context, true)
-//                            if (!"".equals(path)) {
-//                                try {
-//                                    val apkPath = "$path/zktony/apk/update.apk"
-//                                    uiEvent(SettingIntent.UpdateApkU(context, apkPath))
-//                                } catch (e: Exception) {
-//                                    e.printStackTrace()
-//                                    Toast.makeText(
-//                                        context,
-//                                        "版本信息错误！",
-//                                        Toast.LENGTH_SHORT
-//                                    ).show()
-//                                }
-//
-//                            } else {
-//                                Toast.makeText(
-//                                    context,
-//                                    "U盘不存在！",
-//                                    Toast.LENGTH_SHORT
-//                                ).show()
-//                            }
-                        }) {
-                            Text(
-                                modifier = Modifier.padding(top = 20.dp),
-                                text = "系统更新",
-                                fontSize = 30.sp
-                            )
-
-                            Image(
-                                modifier = Modifier
-                                    .padding(top = 20.dp, start = 200.dp)
-                                    .size(40.dp),
-                                painter = painterResource(id = R.mipmap.rightarrow),
-                                contentDescription = null
-                            )
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .padding(top = 20.dp)
-                                .fillMaxWidth()
-                        ) {
-                            line(Color(rgb(240, 240, 240)), 0f, 400f)
-                        }
-
-                        if (superAdminPwd.value == currentpwd || deviceAdminPwd.value == currentpwd) {
-                            Row(modifier = Modifier.clickable {
-                                updatePwdDialog.value = true
-                            }) {
-                                Text(
-                                    modifier = Modifier.padding(top = 20.dp),
-                                    text = "修改密码",
-                                    fontSize = 30.sp
-                                )
-
-                                Image(
-                                    modifier = Modifier
-                                        .padding(top = 20.dp, start = 200.dp)
-                                        .size(40.dp),
-                                    painter = painterResource(id = R.mipmap.rightarrow),
-                                    contentDescription = null
-                                )
-                            }
-
-                            Row(
-                                modifier = Modifier
-                                    .padding(top = 20.dp)
-                                    .fillMaxWidth()
-                            ) {
-                                line(Color(rgb(240, 240, 240)), 0f, 400f)
-                            }
-                        }
-
-                        Row(modifier = Modifier.clickable {
-                            accessoriesDialog.value = true
-                        }) {
-                            Text(
-                                modifier = Modifier.padding(top = 20.dp),
-                                text = "配件寿命",
-                                fontSize = 30.sp
-                            )
-
-                            Image(
-                                modifier = Modifier
-                                    .padding(top = 20.dp, start = 200.dp)
-                                    .size(40.dp),
-                                painter = painterResource(id = R.mipmap.rightarrow),
-                                contentDescription = null
-                            )
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .padding(top = 20.dp)
-                                .fillMaxWidth()
-                        ) {
-                            line(Color(rgb(240, 240, 240)), 0f, 400f)
-                        }
-
-                        Row(modifier = Modifier.clickable {
-                            positionDialog.value = true
-                        }) {
-                            Text(
-                                modifier = Modifier.padding(top = 20.dp),
-                                text = "位置设置",
-                                fontSize = 30.sp
-                            )
-
-                            Image(
-                                modifier = Modifier
-                                    .padding(top = 20.dp, start = 200.dp)
-                                    .size(40.dp),
-                                painter = painterResource(id = R.mipmap.rightarrow),
-                                contentDescription = null
-                            )
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .padding(top = 20.dp)
-                                .fillMaxWidth()
-                        ) {
-                            line(Color(rgb(240, 240, 240)), 0f, 400f)
-                        }
-
-                        Row(modifier = Modifier.clickable {
-                            scope.launch {
-                                lowVersion = embeddedVersion()
-                                delay(100)
-                                softwareDialog.value = true
-                            }
-                        }) {
-                            Text(
-                                modifier = Modifier.padding(top = 20.dp),
-                                text = "关于软件",
-                                fontSize = 30.sp
-                            )
-
-                            Image(
-                                modifier = Modifier
-                                    .padding(top = 20.dp, start = 200.dp)
-                                    .size(40.dp),
-                                painter = painterResource(id = R.mipmap.rightarrow),
-                                contentDescription = null
-                            )
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .padding(top = 20.dp)
-                                .fillMaxWidth()
-                        ) {
-                            line(Color(rgb(240, 240, 240)), 0f, 400f)
-                        }
-
-                        Row {
-                            Text(
-                                modifier = Modifier.padding(top = 20.dp),
-                                text = "声音设置",
-                                fontSize = 30.sp
-                            )
-
-                            Row(
-                                modifier = Modifier
-                                    .padding(top = 20.dp)
-                                    .padding(horizontal = 16.dp, vertical = 4.dp)
-                                    .background(
-                                        color = Color(rgb(238, 238, 238)), shape = CircleShape
+                                        .padding(top = 20.dp)
+                                        .fillMaxWidth()
+                                ) {
+                                    line(Color(rgb(240, 240, 240)), 0f, 400f)
+                                }
+                                Row {
+                                    Text(
+                                        modifier = Modifier.padding(top = 20.dp),
+                                        text = "导航栏",
+                                        fontSize = 30.sp
                                     )
-                                    .padding(horizontal = 4.dp),
-                            ) {
-                                AUDIO_DESTINATION.forEach { destination ->
-                                    ElevatedButton(
-                                        modifier = Modifier.height(32.dp),
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = if (selectRudio.value == destination.id) Color(
-                                                rgb(
-                                                    0, 105, 52
-                                                )
-                                            ) else Color(rgb(238, 238, 238)),
-                                        ),
-                                        onClick = {
-                                            selectRudio.value = destination.id
-                                            uiEvent(SettingIntent.Sound(selectRudio.value))
-                                        },
+                                    Switch(colors = SwitchDefaults.colors(
+                                        checkedTrackColor = Color(rgb(0, 105, 52)),
+                                    ),
+                                        modifier = Modifier
+                                            .height(32.dp)
+                                            .padding(top = 40.dp, start = 220.dp),
+                                        checked = navigation,
+                                        onCheckedChange = {
+                                            scope.launch {
+                                                navigation = it
+                                                uiEvent(SettingIntent.Navigation(it))
+                                            }
+                                        })
+                                }
+
+
+
+                                if (factoryAdminPwd.value == currentpwd) {
+                                    Row(
+                                        modifier = Modifier
+                                            .padding(top = 20.dp)
+                                            .fillMaxWidth()
                                     ) {
+                                        line(Color(rgb(240, 240, 240)), 0f, 400f)
+                                    }
+
+                                    Row(modifier = Modifier.clickable {
+                                        uiEvent(SettingIntent.NavTo(PageType.DEBUGMODE))
+                                    }) {
                                         Text(
-                                            text = destination.name,
-                                            fontSize = 13.sp,
-                                            color = if (selectRudio.value == destination.id) Color.White else Color.Black
+                                            modifier = Modifier.padding(top = 20.dp),
+                                            text = "调试模式",
+                                            fontSize = 30.sp
                                         )
+
+                                        Image(
+                                            modifier = Modifier
+                                                .padding(top = 20.dp, start = 200.dp)
+                                                .size(40.dp),
+                                            painter = painterResource(id = R.mipmap.rightarrow),
+                                            contentDescription = null
+                                        )
+                                    }
+
+                                }
+
+                                if (superAdminPwd.value == currentpwd || deviceAdminPwd.value == currentpwd) {
+                                    Row(
+                                        modifier = Modifier
+                                            .padding(top = 20.dp)
+                                            .fillMaxWidth()
+                                    ) {
+                                        line(Color(rgb(240, 240, 240)), 0f, 400f)
+                                    }
+
+                                    Row(modifier = Modifier.clickable {
+                                        updatePwdDialog.value = true
+                                    }) {
+                                        Text(
+                                            modifier = Modifier.padding(top = 20.dp),
+                                            text = "修改密码",
+                                            fontSize = 30.sp
+                                        )
+
+                                        Image(
+                                            modifier = Modifier
+                                                .padding(top = 20.dp, start = 200.dp)
+                                                .size(40.dp),
+                                            painter = painterResource(id = R.mipmap.rightarrow),
+                                            contentDescription = null
+                                        )
+                                    }
+
+
+                                }
+
+                            }
+
+                            items(items) { item ->
+
+                                Row(
+                                    modifier = Modifier
+                                        .padding(top = 20.dp)
+                                        .fillMaxWidth()
+                                ) {
+                                    line(Color(rgb(240, 240, 240)), 0f, 400f)
+                                }
+
+                                Row(modifier = Modifier.clickable {
+
+                                    when (item) {
+                                        "运行日志" -> {
+                                            uiEvent(SettingIntent.NavTo(PageType.SPORTSLOG))
+                                        }
+
+                                        "网络设置" -> {
+                                            uiEvent(SettingIntent.Network)
+                                        }
+
+                                        "操作系统设置" -> {
+                                            uiEvent(SettingIntent.exit)
+                                        }
+
+                                        "系统更新" -> {
+                                            uiEvent(SettingIntent.NavTo(PageType.UPGRADE))
+                                        }
+
+                                        "配件寿命" -> {
+                                            accessoriesDialog.value = true
+                                        }
+
+                                        "位置设置" -> {
+                                            positionDialog.value = true
+                                        }
+
+                                        "关于软件" -> {
+                                            scope.launch {
+                                                lowVersion = embeddedVersion()
+                                                delay(100)
+                                                softwareDialog.value = true
+                                            }
+                                        }
+                                    }
+
+                                }) {
+                                    Text(
+                                        modifier = Modifier.padding(top = 20.dp),
+                                        text = item,
+                                        fontSize = 30.sp
+                                    )
+
+                                    Image(
+                                        modifier = Modifier
+                                            .padding(
+                                                top = 20.dp,
+                                                start = if (item == "操作系统设置") 140.dp else 200.dp
+                                            )
+                                            .size(40.dp),
+                                        painter = painterResource(id = R.mipmap.rightarrow),
+                                        contentDescription = null
+                                    )
+                                }
+                            }
+
+                            item {
+                                Row(
+                                    modifier = Modifier
+                                        .padding(top = 20.dp)
+                                        .fillMaxWidth()
+                                ) {
+                                    line(Color(rgb(240, 240, 240)), 0f, 400f)
+                                }
+                                Row {
+                                    Text(
+                                        modifier = Modifier.padding(top = 20.dp),
+                                        text = "声音设置",
+                                        fontSize = 30.sp
+                                    )
+
+                                    Row(
+                                        modifier = Modifier
+                                            .padding(top = 20.dp)
+                                            .padding(horizontal = 16.dp, vertical = 4.dp)
+                                            .background(
+                                                color = Color(rgb(238, 238, 238)),
+                                                shape = CircleShape
+                                            )
+                                            .padding(horizontal = 4.dp),
+                                    ) {
+                                        AUDIO_DESTINATION.forEach { destination ->
+                                            if (modelsThickness.value == "G1520") {
+                                                ElevatedButton(
+                                                    modifier = Modifier.height(32.dp),
+                                                    colors = ButtonDefaults.buttonColors(
+                                                        containerColor = if (selectRudio.value == destination.id) Color(
+                                                            rgb(
+                                                                0, 105, 52
+                                                            )
+                                                        ) else Color(rgb(238, 238, 238)),
+                                                    ),
+                                                    onClick = {
+                                                        selectRudio.value = destination.id
+                                                        uiEvent(SettingIntent.Sound(selectRudio.value))
+                                                    },
+                                                ) {
+                                                    Text(
+                                                        text = destination.name,
+                                                        fontSize = 13.sp,
+                                                        color = if (selectRudio.value == destination.id) Color.White else Color.Black
+                                                    )
+                                                }
+                                            } else {
+                                                if (destination.id != 2) {
+                                                    ElevatedButton(
+                                                        modifier = Modifier.height(32.dp),
+                                                        colors = ButtonDefaults.buttonColors(
+                                                            containerColor = if (selectRudio.value == destination.id) Color(
+                                                                rgb(
+                                                                    0, 105, 52
+                                                                )
+                                                            ) else Color(rgb(238, 238, 238)),
+                                                        ),
+                                                        onClick = {
+                                                            selectRudio.value = destination.id
+                                                            uiEvent(SettingIntent.Sound(selectRudio.value))
+                                                        },
+                                                    ) {
+                                                        Text(
+                                                            text = destination.name,
+                                                            fontSize = 13.sp,
+                                                            color = if (selectRudio.value == destination.id) Color.White else Color.Black
+                                                        )
+                                                    }
+                                                }
+                                            }
+
+                                        }
                                     }
                                 }
                             }
 
+                            item {
+                                Row(
+                                    modifier = Modifier
+                                        .padding(top = 20.dp)
+                                        .fillMaxWidth()
+                                ) {
+                                    line(Color(rgb(240, 240, 240)), 0f, 400f)
+                                }
+
+                                Button(modifier = Modifier
+                                    .padding(start = 141.dp, top = 40.dp)
+                                    .width(131.8.dp)
+                                    .height(41.5.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(rgb(0, 105, 52))
+                                    ),
+                                    shape = RoundedCornerShape(20.dp, 20.dp, 20.dp, 20.dp),
+                                    onClick = {
+                                        uiEvent(SettingIntent.Login(""))
+                                        switchColum = 0
+
+                                    }) {
+                                    Text(text = "登出", fontSize = 18.sp)
+                                }
+
+                                Spacer(modifier = Modifier.height(20.dp))
+                            }
+
 
                         }
-
-                        Row(
-                            modifier = Modifier
-                                .padding(top = 20.dp)
-                                .fillMaxWidth()
-                        ) {
-                            line(Color(rgb(240, 240, 240)), 0f, 400f)
-                        }
-
-                        Button(modifier = Modifier
-                            .padding(start = 141.dp, top = 60.dp)
-                            .width(131.8.dp)
-                            .height(41.5.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(rgb(0, 105, 52))
-                            ),
-                            shape = RoundedCornerShape(20.dp, 20.dp, 20.dp, 20.dp),
-                            onClick = {
-                                uiEvent(SettingIntent.Login(""))
-                                switchColum = 0
-
-                            }) {
-                            Text(text = "登出", fontSize = 18.sp)
-                        }
-
-
                     }
 
                 }
@@ -3490,12 +3393,12 @@ fun SettingLits(
                     ) {
 
                         Text(
-                            text = "上位机版本号:",
+                            text = "应用软件版本号:",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                         )
                         Text(
-                            text = "${BuildConfig.VERSION_NAME}",
+                            text = BuildConfig.VERSION_NAME,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                         )
@@ -3507,7 +3410,7 @@ fun SettingLits(
                         verticalAlignment = CenterVertically
                     ) {
                         Text(
-                            text = "下位机版本号:",
+                            text = "主控板固件版本号:",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                         )
@@ -3524,12 +3427,29 @@ fun SettingLits(
                         verticalAlignment = CenterVertically
                     ) {
                         Text(
+                            text = "状态指示板固件版本号:",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        Text(
+                            text = "",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.padding(top = 20.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalAlignment = CenterVertically
+                    ) {
+                        Text(
                             text = "SN码:",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                         )
                         Text(
-                            text = "${snNumber.value}",
+                            text = snNumber.value,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                         )
@@ -3587,14 +3507,11 @@ fun debug(
 @Composable
 fun sportsLog(
     uiEvent: (SettingIntent) -> Unit,
-    sportsLogEntitiesDis: LazyPagingItems<SportsLog>,
-    entitiesListDis: List<SportsLog>,
-    entitiesList: List<SportsLog>,
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        sportsLogMode(uiEvent, sportsLogEntitiesDis, entitiesListDis, entitiesList)
+        sportsLogMode(uiEvent)
     }
 }
 

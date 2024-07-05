@@ -1,21 +1,14 @@
 package com.zktony.android.utils.extra
 
-import android.util.Log
 import com.zktony.serialport.command.Protocol
-import com.zktony.serialport.ext.readInt16LE
 import com.zktony.serialport.ext.readInt8
 import com.zktony.serialport.ext.toAsciiString
 import com.zktony.serialport.ext.writeInt16LE
 import com.zktony.serialport.ext.writeInt32LE
 import com.zktony.serialport.lifecycle.SerialStoreUtils
-import com.zktony.serialport.utils.log
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import com.zktony.serialport.utils.logInfo
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import java.io.File
@@ -33,7 +26,7 @@ suspend fun embeddedUpgrade(hexFile: File,keyName:String,serialName:String) = ch
                 launch {
                     when(it.func) {
                         0xA0.toByte() -> {
-                            log("EmbeddedExt", "升级准备就绪")
+                            logInfo("EmbeddedExt", "升级准备就绪")
                             flag = if (it.data.readInt8() == 1) {
                                 -1
                             } else {
@@ -41,7 +34,7 @@ suspend fun embeddedUpgrade(hexFile: File,keyName:String,serialName:String) = ch
                             }
                         }
                         0xA1.toByte() -> {
-                            log("EmbeddedExt", "升级数据信息就绪")
+                            logInfo("EmbeddedExt", "升级数据信息就绪")
                             flag = if (it.data.readInt8() == 1) {
                                 -1
                             } else {
@@ -49,7 +42,7 @@ suspend fun embeddedUpgrade(hexFile: File,keyName:String,serialName:String) = ch
                             }
                         }
                         0xA2.toByte() -> {
-                            log("EmbeddedExt", "地址擦除就绪")
+                            logInfo("EmbeddedExt", "地址擦除就绪")
                             flag = if (it.data.readInt8() == 1) {
                                 -1
                             } else {
@@ -66,15 +59,15 @@ suspend fun embeddedUpgrade(hexFile: File,keyName:String,serialName:String) = ch
                             if (it.data.readInt8() == 1) {
                                 flag = -1
                                 send(UpgradeState.Err(Exception("升级失败")))
-                                Log.e("EmbeddedExt", "升级失败")
+                                logInfo("EmbeddedExt", "升级失败")
                             } else {
                                 send(UpgradeState.Success)
                                 flag = 3
-                                log("EmbeddedExt", "升级成功")
+                                logInfo("EmbeddedExt", "升级成功")
                             }
                         }
                         else -> {
-                            log("EmbeddedExt", "未知命令")
+                            logInfo("EmbeddedExt", "未知命令")
                         }
                     }
                 }
@@ -147,7 +140,7 @@ suspend fun embeddedUpgrade(hexFile: File,keyName:String,serialName:String) = ch
             }
         }
     } catch (e: Exception) {
-        Log.e("EmbeddedExt", e.message ?: "Unknown Error")
+        logInfo("EmbeddedExt", e.message ?: "Unknown Error")
         send(UpgradeState.Err(e))
     } finally {
         serialPort.unregisterCallback(key)
@@ -178,7 +171,7 @@ suspend fun embeddedVersion(): String {
             }
         }
     } catch (e: Exception) {
-        Log.e("EmbeddedExt", e.message ?: "Unknown")
+        logInfo("EmbeddedExt", e.message ?: "Unknown")
     } finally {
         // 取消注册
         serialPort.unregisterCallback(key)

@@ -325,6 +325,12 @@ fun debugMode(
      */
     val clearAllDialog = remember { mutableStateOf(false) }
 
+    /**
+     * 型号选择
+     */
+    val models = arrayListOf("G1520", "G1510", "G1500")
+    var modelsThickness = rememberDataSaverState(key = "modelsThickness", default = models[0])
+
 
     if (uiFlags is UiFlags.Objects && uiFlags.objects == 4) {
         uiEvent(SettingIntent.Start(1))
@@ -517,24 +523,6 @@ fun debugMode(
                                 })
                             )
 
-                            OutlinedTextField(
-                                modifier = Modifier
-                                    .padding(start = 10.dp)
-                                    .width(130.dp),
-                                value = snNumber.value,
-                                label = { Text(text = "SN码") },
-                                onValueChange = {
-                                    snNumber.value = it
-                                },
-                                keyboardOptions = KeyboardOptions(
-                                    keyboardType = KeyboardType.Number,
-                                    imeAction = ImeAction.Done,
-                                ),
-                                keyboardActions = KeyboardActions(onDone = {
-                                    keyboard?.hide()
-                                })
-                            )
-
                         }
 
 
@@ -543,7 +531,8 @@ fun debugMode(
                     Column(
                         modifier = Modifier.padding(top = 20.dp)
                     ) {
-                        Button(modifier = Modifier.padding(start = 50.dp)
+                        Button(modifier = Modifier
+                            .padding(start = 50.dp)
                             .width(100.dp)
                             .height(50.dp),
                             colors = ButtonDefaults.buttonColors(
@@ -558,7 +547,7 @@ fun debugMode(
                         }
 
                         Button(modifier = Modifier
-                            .padding(top = 20.dp,start = 50.dp)
+                            .padding(top = 20.dp, start = 50.dp)
                             .width(120.dp)
                             .height(50.dp),
                             colors = ButtonDefaults.buttonColors(
@@ -592,7 +581,7 @@ fun debugMode(
                         }
 
                         Button(modifier = Modifier
-                            .padding(top = 20.dp,start = 50.dp)
+                            .padding(top = 20.dp, start = 50.dp)
                             .width(120.dp)
                             .height(50.dp),
                             colors = ButtonDefaults.buttonColors(
@@ -606,7 +595,7 @@ fun debugMode(
                         }
 
                         Button(modifier = Modifier
-                            .padding(top = 20.dp,start = 10.dp)
+                            .padding(top = 20.dp, start = 10.dp)
                             .width(160.dp)
                             .height(50.dp),
                             colors = ButtonDefaults.buttonColors(
@@ -643,6 +632,70 @@ fun debugMode(
                     line(Color(0, 105, 5), 30f, 500f)
                 }
 
+            }
+
+            item {
+
+                Row(modifier = Modifier.padding(top = 20.dp)) {
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .padding(start = 20.dp)
+                            .width(130.dp),
+                        value = snNumber.value,
+                        label = { Text(text = "SN码") },
+                        onValueChange = {
+                            snNumber.value = it
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Done,
+                        ),
+                        keyboardActions = KeyboardActions(onDone = {
+                            if (snNumber.value.isNotEmpty() && snNumber.value != "" && snNumber.value.endsWith("\n")) {
+                                snNumber.value = snNumber.value.dropLast(1)
+                            }
+                            keyboard?.hide()
+                        })
+                    )
+
+                    models.forEach {
+                        Row {
+                            RadioButton(
+                                colors = RadioButtonDefaults.colors(
+                                    Color(
+                                        rgb(
+                                            0,
+                                            105,
+                                            52
+                                        )
+                                    )
+                                ),
+                                selected = it == modelsThickness.value,
+                                onClick = {
+                                    modelsThickness.value = it
+//                                    if (modelsThickness.value == "蜂鸣") {
+//                                        uiEvent(SettingIntent.Sound(1))
+//                                    } else if (modelsThickness.value == "语音") {
+//                                        uiEvent(SettingIntent.Sound(2))
+//                                    }
+                                })
+                            Text(text = it)
+                        }
+
+                    }
+
+
+
+                }
+
+
+                Row(
+                    modifier = Modifier
+                        .padding(top = 20.dp)
+                        .fillMaxWidth()
+                ) {
+                    line(Color(0, 105, 5), 30f, 500f)
+                }
             }
 
             item {

@@ -4,10 +4,6 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Date
 
-val date = Date(System.currentTimeMillis())
-val sdf = SimpleDateFormat("yyyyMMddHHmmss")
-val time = sdf.format(date)
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.hilt)
@@ -23,8 +19,8 @@ android {
         applicationId = "com.zktony.android"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 5
-        versionName = "3.0.0-"+time
+        versionCode = 6
+        versionName = "3.0.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

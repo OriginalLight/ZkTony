@@ -1,7 +1,6 @@
 package com.zktony.serialport.utils
 
 import android.os.Environment
-import android.util.Log
 import java.io.File
 import java.io.FileOutputStream
 import java.io.FileReader
@@ -24,7 +23,7 @@ fun writeThread(content: String) {
     val file = File("sdcard/Download/log_${currentDate.substringBefore(" ")}.txt")
     if (!file.exists()) {
         if (file.createNewFile()) {
-            log("创建日志", "创建${currentDate}日志成功")
+            logInfo("创建日志", "创建${currentDate}日志成功")
         }
     }
 
