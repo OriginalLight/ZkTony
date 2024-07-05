@@ -12,15 +12,13 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zktony.android.R
 import com.zktony.android.ui.utils.LocalNavigationActions
-import com.zktony.android.ui.viewmodel.SettingsArgumentsRuntimeViewModel
-import com.zktony.android.utils.AppStateUtils
+import com.zktony.android.ui.viewmodel.SettingsArgumentsPumpViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsArgumentsRuntimeView(viewModel: SettingsArgumentsRuntimeViewModel = hiltViewModel()) {
+fun SettingsArgumentsPumpView(viewModel: SettingsArgumentsPumpViewModel = hiltViewModel()) {
     val navigationActions = LocalNavigationActions.current
 
     BackHandler {
@@ -28,17 +26,16 @@ fun SettingsArgumentsRuntimeView(viewModel: SettingsArgumentsRuntimeViewModel = 
         navigationActions.navigateUp()
     }
 
-    val arguments = AppStateUtils.argumentsList.collectAsStateWithLifecycle()
-
     Column {
         // 顶部导航栏
         TopAppBar(
-            title = { Text(text = stringResource(id = R.string.runtime_arguments)) },
+            title = { Text(text = stringResource(id = R.string.pump_arguments)) },
             navigationIcon = {
                 IconButton(onClick = { navigationActions.navigateUp() }) {
                     Icon(imageVector = Icons.AutoMirrored.Default.Reply, contentDescription = "Back")
                 }
             }
         )
+
     }
 }

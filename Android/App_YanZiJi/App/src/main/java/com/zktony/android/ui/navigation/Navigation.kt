@@ -72,7 +72,9 @@ fun AppNavigation() {
     val selectedDestination = navigationActions.selectDestination()
 
     Row(
-        modifier = Modifier.padding(if (selectedDestination == Route.LOGIN) 0.dp else 8.dp),
+        modifier = Modifier
+            .background(color = MaterialTheme.colorScheme.surfaceVariant)
+            .padding(if (selectedDestination == Route.LOGIN) 0.dp else 8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         AnimatedVisibilityWithLogin(selectedDestination) {
@@ -83,7 +85,8 @@ fun AppNavigation() {
         }
         Scaffold(
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-            bottomBar = { AnimatedVisibilityWithLogin(selectedDestination) { BottomBar() } }
+            bottomBar = { AnimatedVisibilityWithLogin(selectedDestination) { BottomBar() } },
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
         ) { scaffoldPadding ->
             NavHost(
                 modifier = Modifier
@@ -165,7 +168,7 @@ fun AppNavigationDrawer(
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                modifier = Modifier.size(36.dp),
+                modifier = Modifier.size(48.dp),
                 imageVector = Icons.AutoMirrored.Filled.Logout,
                 contentDescription = "Logout",
                 tint = Color.White
@@ -209,14 +212,14 @@ fun NavigationItem(
             verticalArrangement = Arrangement.Center
         ) {
             Icon(
-                modifier = Modifier.size(36.dp),
+                modifier = Modifier.size(48.dp),
                 imageVector = icon,
                 contentDescription = text,
                 tint = contentColor
             )
             Text(
                 text = text,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyLarge,
                 color = contentColor
             )
         }

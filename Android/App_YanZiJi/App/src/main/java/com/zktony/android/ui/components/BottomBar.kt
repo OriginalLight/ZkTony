@@ -31,7 +31,7 @@ fun BottomBar(modifier: Modifier = Modifier) {
             .height(64.dp)
             .padding(top = 8.dp)
             .background(
-                color = MaterialTheme.colorScheme.surfaceDim,
+                color = MaterialTheme.colorScheme.surface,
                 shape = MaterialTheme.shapes.medium
             )
             .padding(horizontal = 8.dp)

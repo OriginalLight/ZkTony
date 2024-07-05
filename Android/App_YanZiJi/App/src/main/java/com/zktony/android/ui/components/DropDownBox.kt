@@ -44,12 +44,11 @@ fun DropDownBox(
         modifier = modifier
             .background(MaterialTheme.colorScheme.surface, CircleShape)
             .clip(CircleShape)
-            .clickable { expended = !expended }
-            .padding(4.dp),
+            .clickable { expended = !expended },
         contentAlignment = Alignment.Center
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 8.dp),
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {

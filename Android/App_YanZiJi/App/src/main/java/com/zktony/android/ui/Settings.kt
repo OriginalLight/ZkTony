@@ -58,7 +58,16 @@ fun SettingsView(viewModel: SettingsViewModel = hiltViewModel()) {
         navigationActions.navigateUp()
     }
 
-    LazyColumn {
+    LazyColumn(
+        modifier = Modifier
+            .background(
+                color = MaterialTheme.colorScheme.surface,
+                shape = MaterialTheme.shapes.medium
+            )
+            .padding(16.dp)
+            .clip(MaterialTheme.shapes.medium),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         item {
             SystemSettingsView(viewModel = viewModel)
         }
@@ -85,15 +94,31 @@ fun SystemSettingsView(
 
     val scope = rememberCoroutineScope()
     // 语言
-    var language by rememberDataSaverState(key = Constants.LANGUAGE, default = Constants.DEFAULT_LANGUAGE)
+    var language by rememberDataSaverState(
+        key = Constants.LANGUAGE,
+        default = Constants.DEFAULT_LANGUAGE
+    )
     // 提示音
-    var promptSound by rememberDataSaverState(key = Constants.PROMPT_SOUND, default = Constants.DEFAULT_PROMPT_SOUND)
+    var promptSound by rememberDataSaverState(
+        key = Constants.PROMPT_SOUND,
+        default = Constants.DEFAULT_PROMPT_SOUND
+    )
     // 导航栏
-    var navigationBar by rememberDataSaverState(key = Constants.NAVIGATION_BAR, default = Constants.DEFAULT_NAVIGATION_BAR)
+    var navigationBar by rememberDataSaverState(
+        key = Constants.NAVIGATION_BAR,
+        default = Constants.DEFAULT_NAVIGATION_BAR
+    )
     // 状态栏
-    var statusBar by rememberDataSaverState(key = Constants.STATUS_BAR, default = Constants.DEFAULT_STATUS_BAR)
+    var statusBar by rememberDataSaverState(
+        key = Constants.STATUS_BAR,
+        default = Constants.DEFAULT_STATUS_BAR
+    )
     // 主屏幕
-    var homePackage by remember { mutableStateOf(HzmctUtils.getHomePackage()?.contains(BuildConfig.APPLICATION_ID) ?: false) }
+    var homePackage by remember {
+        mutableStateOf(
+            HzmctUtils.getHomePackage()?.contains(BuildConfig.APPLICATION_ID) ?: false
+        )
+    }
     // 系统时间
     var systemTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
     var showDateTimePicker by remember { mutableStateOf(false) }
@@ -106,7 +131,7 @@ fun SystemSettingsView(
                 scope.launch {
                     systemTime = it
                     showDateTimePicker = false
-                    if (!viewModel.setSystemTime(it)){
+                    if (!viewModel.setSystemTime(it)) {
                         delay(500L)
                         systemTime = System.currentTimeMillis()
                     }
@@ -117,9 +142,7 @@ fun SystemSettingsView(
     }
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+        modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
@@ -233,9 +256,7 @@ fun FactorySettingsView(modifier: Modifier = Modifier) {
     val navigationActions = LocalNavigationActions.current
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+        modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
@@ -307,7 +328,7 @@ fun SettingsRow(
         modifier = modifier
             .fillMaxWidth()
             .height(64.dp)
-            .background(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.small)
+            .background(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.medium)
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween

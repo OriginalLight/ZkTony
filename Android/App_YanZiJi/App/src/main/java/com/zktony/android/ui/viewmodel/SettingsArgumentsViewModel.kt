@@ -9,6 +9,7 @@ import com.zktony.android.utils.ProductUtils
 import com.zktony.android.utils.SerialPortUtils
 import com.zktony.android.utils.TipsUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,15 +21,18 @@ class SettingsArgumentsViewModel @Inject constructor() : ViewModel() {
             if (!AppStateUtils.isArgumentsSync) {
                 val fail = mutableListOf<Int>()
                 // 同步参数
-                repeat(ProductUtils.getModuleCount()) { index ->
+                repeat(ProductUtils.getChannelCount()) { index ->
                     // 初始化参数
                     if (!SerialPortUtils.queryArguments(index + 2)) {
                         fail.add(index + 1)
                     }
+                    delay(10L)
                 }
                 AppStateUtils.isArgumentsSync = fail.isEmpty()
                 if (fail.isNotEmpty()) {
                     TipsUtils.showTips(Tips(TipsType.ERROR, "同步参数失败: ${fail.joinToString()}"))
+                } else {
+                    TipsUtils.showTips(Tips(TipsType.INFO, "同步参数成功"))
                 }
             }
         }

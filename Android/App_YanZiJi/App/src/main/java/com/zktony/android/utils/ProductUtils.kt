@@ -18,7 +18,7 @@ object ProductUtils {
     }
 
     // 根据产品型号获取模块数量
-    fun getModuleCount(): Int {
+    fun getChannelCount(): Int {
         return when (ProductNumber) {
             "M-Blot T2000" -> 2
             "M-Blot T2100" -> 2

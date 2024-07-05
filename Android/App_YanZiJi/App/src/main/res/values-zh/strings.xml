@@ -43,4 +43,5 @@
     <string name="logout">注销</string>
     <string name="logout_confirm_content">确认退出登录吗？</string>
     <string name="import_confirm_content">将覆盖当前所有参数，无法恢复！！！确认导入吗？</string>
+    <string name="channel">通道</string>
 </resources>
