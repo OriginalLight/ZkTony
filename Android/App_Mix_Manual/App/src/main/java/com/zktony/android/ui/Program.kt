@@ -111,6 +111,7 @@ fun ProgramRoute(viewModel: ProgramViewModel) {
     val page by viewModel.page.collectAsStateWithLifecycle()
     val selected by viewModel.selected.collectAsStateWithLifecycle()
     val uiFlags by viewModel.uiFlags.collectAsStateWithLifecycle()
+    val entityNum by viewModel.entityNum.collectAsStateWithLifecycle()
 
     val entities = viewModel.entities.collectAsLazyPagingItems()
     val navigation: () -> Unit = {
@@ -145,7 +146,8 @@ fun ProgramRoute(viewModel: ProgramViewModel) {
                     PageType.PROGRAM -> ProgramList(
                         entities,
                         entities.toList(),
-                        viewModel::dispatch
+                        viewModel::dispatch,
+                        entityNum
                     )
 
                     else -> {}
@@ -164,7 +166,8 @@ fun ProgramRoute(viewModel: ProgramViewModel) {
 fun ProgramList(
     entities: LazyPagingItems<Program>,
     entitiesList: List<Program>,
-    dispatch: (ProgramIntent) -> Unit
+    dispatch: (ProgramIntent) -> Unit,
+    entityNum: Int
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackbarHostState.current
@@ -268,6 +271,8 @@ fun ProgramList(
      */
     var programId = rememberDataSaverState(key = "programid", default = 1L)
 
+    val modelsThickness = rememberDataSaverState(key = "modelsThickness", "G1520")
+
 
     //	定义列宽
     val cellWidthList = arrayListOf(70, 100, 120, 70, 90, 120)
@@ -345,14 +350,45 @@ fun ProgramList(
                     ),
                     shape = RoundedCornerShape(8.dp),
                     onClick = {
-                        displayText = ""
-                        startRange_ex = "0"
-                        endRange_ex = "0"
-                        coagulant_ex = "0"
-                        volume_ex = "0.0"
-                        founder = ""
-                        showingDialog.value = true
-                        open.value = false
+                        scope.launch {
+                            displayText = ""
+                            startRange_ex = "0"
+                            endRange_ex = "0"
+                            coagulant_ex = "0"
+                            volume_ex = "0.0"
+                            founder = ""
+                            dispatch(ProgramIntent.count)
+                            delay(500)
+                            if (modelsThickness.value == "G1500") {
+                                if (entityNum < 11) {
+                                    showingDialog.value = true
+                                    open.value = false
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "制胶程序数量超过限制,不能新增!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            } else if (modelsThickness.value == "G1510") {
+                                if (entityNum < 101) {
+                                    showingDialog.value = true
+                                    open.value = false
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "制胶程序数量超过限制,不能新增!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            } else {
+                                showingDialog.value = true
+                                open.value = false
+                            }
+
+                        }
+
+
                     }
                 ) {
                     Text(text = "新 建", fontSize = 18.sp)
@@ -708,6 +744,19 @@ fun ProgramList(
 
 
             }, confirmButton = {
+
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = {
+                        thickness.value = "1.0"
+                        showingDialog.value = false
+                    }) {
+                    Text(text = "取消")
+                }
+
+            }, dismissButton = {
+
                 Button(
                     modifier = Modifier.width(100.dp),
                     enabled = !(open.value && selectedId in 1..3),
@@ -887,16 +936,7 @@ fun ProgramList(
                     }) {
                     Text(text = "确认")
                 }
-            }, dismissButton = {
-                Button(
-                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(rgb(0, 105, 52))
-                    ), onClick = {
-                        thickness.value = "1.0"
-                        showingDialog.value = false
-                    }) {
-                    Text(text = "取消")
-                }
+
             })
     }
 
@@ -911,6 +951,15 @@ fun ProgramList(
             text = {
 
             }, confirmButton = {
+
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = { deleteDialog.value = false }) {
+                    Text(text = "取消")
+                }
+
+            }, dismissButton = {
                 Button(
                     modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
                         containerColor = Color(rgb(0, 105, 52))
@@ -938,13 +987,7 @@ fun ProgramList(
                     }) {
                     Text(text = "确认")
                 }
-            }, dismissButton = {
-                Button(
-                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(rgb(0, 105, 52))
-                    ), onClick = { deleteDialog.value = false }) {
-                    Text(text = "取消")
-                }
+
             })
     }
 
@@ -979,10 +1022,17 @@ fun ProgramList(
                 }
             }, confirmButton = {
                 Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = { importDialog.value = false }) {
+                    Text(text = "取消")
+                }
+            }, dismissButton = {
+
+                Button(
                     modifier = Modifier.width(120.dp), colors = ButtonDefaults.buttonColors(
                         containerColor = Color(rgb(0, 105, 52))
                     ), onClick = {
-
                         //获取usb地址
                         var path = getStoragePath(context, true)
                         if (!"".equals(path)) {
@@ -1119,13 +1169,7 @@ fun ProgramList(
                     }) {
                     Text(text = "开始导入")
                 }
-            }, dismissButton = {
-                Button(
-                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(rgb(0, 105, 52))
-                    ), onClick = { importDialog.value = false }) {
-                    Text(text = "取消")
-                }
+
             })
     }
 

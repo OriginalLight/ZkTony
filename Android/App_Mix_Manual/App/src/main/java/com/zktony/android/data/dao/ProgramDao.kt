@@ -51,4 +51,11 @@ abstract class ProgramDao : BaseDao<Program> {
         """
     )
     abstract suspend fun deleteByAll()
+
+    @Query(
+        """
+        SELECT COUNT(*) FROM ExperimentRecord
+        """
+    )
+    abstract suspend fun count():Int
 }

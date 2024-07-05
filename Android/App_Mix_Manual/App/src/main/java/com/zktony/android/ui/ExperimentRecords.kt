@@ -60,6 +60,7 @@ import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
+import com.zktony.android.ui.utils.getStoragePath
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.toList
 import com.zktony.android.utils.extra.dateFormat
@@ -522,7 +523,15 @@ fun experimentList(
                 },
                 text = {
 
-                }, confirmButton = {
+                    Button(
+                        modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(rgb(0, 105, 52))
+                        ), onClick = { deleteDialog.value = false }) {
+                        Text(text = "取消")
+                    }
+
+                }, confirmButton = {}, dismissButton = {
+
                     Button(
                         modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
                             containerColor = Color(rgb(0, 105, 52))
@@ -548,13 +557,7 @@ fun experimentList(
                         }) {
                         Text(text = "确认")
                     }
-                }, dismissButton = {
-                    Button(
-                        modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(rgb(0, 105, 52))
-                        ), onClick = { deleteDialog.value = false }) {
-                        Text(text = "取消")
-                    }
+
                 })
         } else {
             deleteDialog.value = false
@@ -567,40 +570,5 @@ fun experimentList(
 }
 
 
-private fun getStoragePath(context: Context, isUsb: Boolean): String? {
-    var path = ""
-    val mStorageManager: StorageManager =
-        context.getSystemService(Context.STORAGE_SERVICE) as StorageManager
-    val volumeInfoClazz: Class<*>
-    val diskInfoClaszz: Class<*>
-    try {
-        volumeInfoClazz = Class.forName("android.os.storage.VolumeInfo")
-        diskInfoClaszz = Class.forName("android.os.storage.DiskInfo")
-        val StorageManager_getVolumes: Method =
-            Class.forName("android.os.storage.StorageManager").getMethod("getVolumes")
-        val VolumeInfo_GetDisk: Method = volumeInfoClazz.getMethod("getDisk")
-        val VolumeInfo_GetPath: Method = volumeInfoClazz.getMethod("getPath")
-        val DiskInfo_IsUsb: Method = diskInfoClaszz.getMethod("isUsb")
-        val DiskInfo_IsSd: Method = diskInfoClaszz.getMethod("isSd")
-        val List_VolumeInfo = (StorageManager_getVolumes.invoke(mStorageManager) as List<Any>)
-        for (i in List_VolumeInfo.indices) {
-            val volumeInfo = List_VolumeInfo[i]
-            val diskInfo: Any = VolumeInfo_GetDisk.invoke(volumeInfo) ?: continue
-            val sd = DiskInfo_IsSd.invoke(diskInfo) as Boolean
-            val usb = DiskInfo_IsUsb.invoke(diskInfo) as Boolean
-            val file: File = VolumeInfo_GetPath.invoke(volumeInfo) as File
-            if (isUsb == usb) { //usb
-                assert(file != null)
-                path = file.getAbsolutePath()
-            } else if (!isUsb == sd) { //sd
-                assert(file != null)
-                path = file.getAbsolutePath()
-            }
-        }
-    } catch (e: Exception) {
-        e.printStackTrace()
-    }
-    return path
-}
 
 

@@ -43,6 +43,11 @@ class ProgramViewModel @Inject constructor(
         config = PagingConfig(pageSize = 20, initialLoadSize = 40)
     ) { dao.getByPage() }.flow.cachedIn(viewModelScope)
 
+    private val _entityNum = MutableStateFlow(0)
+
+    val entityNum = _entityNum.asStateFlow()
+
+
     fun dispatch(intent: ProgramIntent) {
         when (intent) {
             is ProgramIntent.NavTo -> _page.value = intent.page
@@ -65,6 +70,10 @@ class ProgramViewModel @Inject constructor(
             is ProgramIntent.Update -> viewModelScope.launch { dao.update(intent.entity) }
             is ProgramIntent.Delete -> viewModelScope.launch { dao.deleteById(intent.id) }
             is ProgramIntent.Export -> export(intent.path, intent.name, intent.text)
+
+            is ProgramIntent.count -> viewModelScope.launch {
+                _entityNum.value = dao.count()
+            }
         }
     }
 
@@ -72,9 +81,6 @@ class ProgramViewModel @Inject constructor(
 }
 
 private fun export(path: String?, name: String, text: String) {
-
-
-
 
 
 }
@@ -97,4 +103,5 @@ sealed class ProgramIntent {
     data class Update(val entity: Program) : ProgramIntent()
     data class Delete(val id: Long) : ProgramIntent()
     data class Export(val path: String?, val name: String, val text: String) : ProgramIntent()
+    data object count : ProgramIntent()
 }

@@ -2150,6 +2150,16 @@ fun operate(
 
                         }
                     }, confirmButton = {
+
+                        Button(
+                            modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ), onClick = { programListDialog.value = false }) {
+                            Text(text = "取消")
+                        }
+
+                    }, dismissButton = {
+
                         Button(
                             modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(rgb(0, 105, 52))
@@ -2185,13 +2195,7 @@ fun operate(
                             }) {
                             Text(text = "确认")
                         }
-                    }, dismissButton = {
-                        Button(
-                            modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(rgb(0, 105, 52))
-                            ), onClick = { programListDialog.value = false }) {
-                            Text(text = "取消")
-                        }
+
                     })
             }
         }
