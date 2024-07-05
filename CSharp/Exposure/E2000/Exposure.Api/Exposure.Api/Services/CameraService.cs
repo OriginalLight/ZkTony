@@ -922,7 +922,7 @@ public class CameraService(
             // 反色
             Cv2.BitwiseNot(mat, mat);
             // 降噪开运算
-            Cv2.MorphologyEx(mat, mat, MorphTypes.Open, Cv2.GetStructuringElement(MorphShapes.Rect, new Size(3, 3)));
+            //Cv2.MorphologyEx(mat, mat, MorphTypes.Open, Cv2.GetStructuringElement(MorphShapes.Rect, new Size(3, 3)));
             // 返回
             return mat;
         }
@@ -958,7 +958,6 @@ public class CameraService(
             if (!_nncam.Trigger(1)) throw new Exception(localizer.GetString("Error0010").Value);
             await Task.Delay(1500, ctsToken);
             if (_mat == null) throw new Exception(localizer.GetString("Error0018").Value);
-            Cv2.CvtColor(_mat, gray1S, ColorConversionCodes.BGR2GRAY);
             gray1S.ConvertTo(gray1S, MatType.CV_16UC1, 4.0);
 
             // 拍摄2秒曝光
@@ -968,7 +967,6 @@ public class CameraService(
             if (!_nncam.Trigger(1)) throw new Exception(localizer.GetString("Error0010").Value);
             await Task.Delay(2500, ctsToken);
             if (_mat == null) throw new Exception(localizer.GetString("Error0018").Value);
-            Cv2.CvtColor(_mat, gray2S, ColorConversionCodes.BGR2GRAY);
             gray2S.ConvertTo(gray2S, MatType.CV_16UC1, 4.0);
 
             var thr1 = OpenCvUtils.FindMaxGrayscaleValue(gray1S, double.Parse(threshold));

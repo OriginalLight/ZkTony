@@ -264,38 +264,31 @@ public static class OpenCvUtils
 
     public static int FindMaxGrayscaleValue(Mat src, double ignore)
     {
-        // 计算灰度直方图
+        // 计算直方图
+        var histSize = 65536; // 16-bit 图像的灰度级数
+        float[] histRange = [0, 65536];
         var hist = new Mat();
-        
-        try
+
+        Cv2.CalcHist([src], [0], null, hist, 1, [histSize], [new Rangef(histRange[0], histRange[1])]);
+
+        // 计算累积分布函数 (CDF)
+        var cdf = new float[histSize];
+        hist.GetArray(out float[] histArray);
+        cdf[0] = histArray[0];
+        for (var i = 1; i < histSize; i++)
         {
-            var histSize = 65536; // 16-bit 图像的灰度级数
-            var ranges = new Rangef(0, 65536);
-            Cv2.CalcHist([src], [0], null, hist, 1, [histSize], [ranges]);
-
-            // 计算累积分布函数 (CDF)
-            hist.GetArray(out float[] cdf);
-            for (var i = 1; i < histSize; i++)
-            {
-                cdf[i] += cdf[i - 1];
-            }
-
-            // 归一化 CDF
-            for (var i = 0; i < histSize; i++)
-            {
-                cdf[i] /= cdf[histSize - 1];
-            }
-
-            // 寻最大像素值
-            var maxCdfIndex = histSize - 1;
-            while (cdf[maxCdfIndex] >= (1 - ignore)) maxCdfIndex--;
-
-            return maxCdfIndex;
+            cdf[i] = cdf[i - 1] + histArray[i];
         }
-        finally
+
+        var cdfMax = cdf.Max();
+        for (var i = 0; i < histSize; i++)
         {
-            hist.Dispose();
+            cdf[i] /= cdfMax;
         }
+
+        // 寻最大像素值
+        var maxCdfIndex = Array.FindLastIndex(cdf, value => value <= 1 - ignore);
+        return maxCdfIndex;
     }
     
     #endregion
@@ -343,15 +336,7 @@ public static class OpenCvUtils
         float[] histRange = [0, 65536];
         var hist = new Mat();
 
-        Cv2.CalcHist(
-            [image],
-            [0],
-            null,
-            hist,
-            1,
-            [histSize],
-            [new Rangef(histRange[0], histRange[1])]
-        );
+        Cv2.CalcHist([image], [0], null, hist, 1, [histSize], [new Rangef(histRange[0], histRange[1])]);
 
         // 计算累积分布函数 (CDF)
         var cdf = new float[histSize];
@@ -386,7 +371,7 @@ public static class OpenCvUtils
             }
             else
             {
-                lut[i] = (ushort)((i - minCdfIndex) * 65535 / (maxCdfIndex - minCdfIndex));
+                lut[i] = (ushort)((i - minCdfIndex) * 65535.0 / (maxCdfIndex - minCdfIndex));
             }
         }
 
