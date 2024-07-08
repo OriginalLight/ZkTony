@@ -22,7 +22,7 @@ class SettingsArgumentsEquipmentViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch {
             ProductUtils.setProductNumber(pn)
             val tipsMessage = "P/N ${ResourceUtils.stringResource(R.string.set_success)}"
-            TipsUtils.showTips(Tips(TipsType.INFO, tipsMessage))
+            TipsUtils.showTips(Tips.info(tipsMessage))
             LogUtils.info("$tipsMessage $pn")
             repeat(ProductUtils.getChannelCount()) { index ->
                 SerialPortUtils.setProductNumber(pn, index + 2)
@@ -34,7 +34,7 @@ class SettingsArgumentsEquipmentViewModel @Inject constructor() : ViewModel() {
     fun setSerialNumber(sn: String) {
         viewModelScope.launch {
             val tipsMessage = "S/N ${ResourceUtils.stringResource(R.string.set_success)}"
-            TipsUtils.showTips(Tips(TipsType.INFO, tipsMessage))
+            TipsUtils.showTips(Tips.info(tipsMessage))
             LogUtils.info("$tipsMessage $sn")
             repeat(ProductUtils.getChannelCount()) { index ->
                 SerialPortUtils.setSerialNumber(sn, index + 2)

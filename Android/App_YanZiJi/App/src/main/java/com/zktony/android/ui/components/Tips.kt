@@ -33,7 +33,13 @@ enum class TipsType {
 data class Tips(
     val type: TipsType,
     val message: String
-)
+) {
+    companion object {
+        fun info(message: String) = Tips(TipsType.INFO, message)
+        fun warning(message: String) = Tips(TipsType.WARNING, message)
+        fun error(message: String) = Tips(TipsType.ERROR, message)
+    }
+}
 
 @Composable
 fun Tips(modifier: Modifier = Modifier) {

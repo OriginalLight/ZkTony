@@ -43,4 +43,7 @@
     <string name="logout_confirm_content">Are you sure to log out?</string>
     <string name="import_confirm_content">Will overwrite all current parameters and cannot be restored!!! Confirm import?</string>
     <string name="channel">Channel</string>
+    <string name="transfer">Transfer</string>
+    <string name="clean">Clean</string>
+    <string name="save">Save</string>
 </resources>

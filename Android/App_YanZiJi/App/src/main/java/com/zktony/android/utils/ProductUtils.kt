@@ -2,7 +2,9 @@ package com.zktony.android.utils
 
 object ProductUtils {
 
+    const val MAX_CHANNEL_COUNT = 4
     private var ProductNumber: String = "M-Blot T4000"
+
     val ProductNumberList = listOf(
         "M-Blot T4000",
         "M-Blot T4100",

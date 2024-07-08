@@ -13,7 +13,7 @@ object AppStateUtils {
     var isArgumentsSync = false         // 是否同步参数
 
     // mutableStateFlow
-    private val _argumentsList = MutableStateFlow(List(4) { Arguments() })
+    private val _argumentsList = MutableStateFlow(List(ProductUtils.MAX_CHANNEL_COUNT) { Arguments() })
 
     // stateFlow
     val argumentsList = _argumentsList.asStateFlow()

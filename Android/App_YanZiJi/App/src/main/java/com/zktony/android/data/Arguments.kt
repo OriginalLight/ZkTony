@@ -1,6 +1,5 @@
 package com.zktony.android.data
 
-import com.zktony.serialport.ext.readInt16BE
 import com.zktony.serialport.ext.readInt16LE
 import com.zktony.serialport.ext.writeInt16LE
 
@@ -14,8 +13,8 @@ data class Arguments(
     val inFillTime: Int = 0,         // 进液蠕动泵填充时间(2byte)
     val outDrainTime: Int = 0,       // 出液蠕动泵排液时间(2byte)
     val inDrainTime: Int = 0,        // 进液蠕动泵排液时间(2byte)
-    val inEmptyTime: Int = 0,        // 进液蠕动泵排空时间(2byte)
-    val inOutScale: Double = 0.0,    // 进出液速度比值(2byte)
+    val emptyTime: Int = 0,        // 进液蠕动泵排空时间(2byte)
+    val scale: Double = 0.0,    // 进出液速度比值(2byte)
 
     // 清洗参数
     val cleanOutFillSpeed: Double = 0.0,       // 出液蠕动泵填充速度(2byte)
@@ -26,8 +25,8 @@ data class Arguments(
     val cleanInFillTime: Int = 0,         // 进液蠕动泵填充时间(2byte)
     val cleanOutDrainTime: Int = 0,       // 出液蠕动泵排液时间(2byte)
     val cleanInDrainTime: Int = 0,        // 进液蠕动泵排液时间(2byte)
-    val cleanInEmptyTime: Int = 0,        // 进液蠕动泵排空时间(2byte)
-    val cleanOutScale: Double = 0.0,      // 进出液速度比值(2byte)
+    val cleanEmptyTime: Int = 0,        // 进液蠕动泵排空时间(2byte)
+    val cleanScale: Double = 0.0,      // 进出液速度比值(2byte)
 
     // 补偿参数
     val tempComp: List<Double> = List(10) { 0.0 },            // 温度补偿值(2byte)*10
@@ -41,8 +40,8 @@ data class Arguments(
     val inBubbleThreshold: Double = 0.0      // 进液气泡光耦阈值(2byte)
 ) {
     // 实验参数
-    fun toExperimental(): ArgumentsExperimental {
-        return ArgumentsExperimental(
+    fun toTransfer(): ArgumentsTransfer {
+        return ArgumentsTransfer(
             outFillSpeed = outFillSpeed,
             inFillSpeed = inFillSpeed,
             outDrainSpeed = outDrainSpeed,
@@ -51,8 +50,8 @@ data class Arguments(
             inFillTime = inFillTime,
             outDrainTime = outDrainTime,
             inDrainTime = inDrainTime,
-            inEmptyTime = inEmptyTime,
-            inOutScale = inOutScale
+            emptyTime = emptyTime,
+            scale = scale
         )
     }
     // 清洗参数
@@ -66,8 +65,8 @@ data class Arguments(
             cleanInFillTime = cleanInFillTime,
             cleanOutDrainTime = cleanOutDrainTime,
             cleanInDrainTime = cleanInDrainTime,
-            cleanInEmptyTime = cleanInEmptyTime,
-            cleanOutScale = cleanOutScale
+            cleanEmptyTime = cleanEmptyTime,
+            cleanScale = cleanScale
         )
     }
     // 温度补偿参数
@@ -104,7 +103,7 @@ data class Arguments(
     }
 }
 
-data class ArgumentsExperimental(
+data class ArgumentsTransfer(
     // 实验参数
     val outFillSpeed: Double = 0.0,       // 出液蠕动泵填充速度(2byte)
     val inFillSpeed: Double = 0.0,        // 进液蠕动泵填充速度(2byte)
@@ -114,8 +113,8 @@ data class ArgumentsExperimental(
     val inFillTime: Int = 0,         // 进液蠕动泵填充时间(2byte)
     val outDrainTime: Int = 0,       // 出液蠕动泵排液时间(2byte)
     val inDrainTime: Int = 0,        // 进液蠕动泵排液时间(2byte)
-    val inEmptyTime: Int = 0,        // 进液蠕动泵排空时间(2byte)
-    val inOutScale: Double = 0.0     // 进出液速度比值(2byte)
+    val emptyTime: Int = 0,        // 进液蠕动泵排空时间(2byte)
+    val scale: Double = 0.0     // 进出液速度比值(2byte)
 ) {
     fun toByteArray(): ByteArray {
         val bytes = ByteArray(20)
@@ -123,12 +122,12 @@ data class ArgumentsExperimental(
         bytes.writeInt16LE((inFillSpeed * 100).toInt(), 2)
         bytes.writeInt16LE((outDrainSpeed * 100).toInt(), 4)
         bytes.writeInt16LE((inDrainSpeed * 100).toInt(), 6)
-        bytes.writeInt16LE(outFillTime, 8)
-        bytes.writeInt16LE(inFillTime, 10)
-        bytes.writeInt16LE(outDrainTime, 12)
-        bytes.writeInt16LE(inDrainTime, 14)
-        bytes.writeInt16LE(inEmptyTime, 16)
-        bytes.writeInt16LE((inOutScale * 100).toInt(), 18)
+        bytes.writeInt16LE(outFillTime  * 60, 8)
+        bytes.writeInt16LE(inFillTime * 60, 10)
+        bytes.writeInt16LE(outDrainTime * 60, 12)
+        bytes.writeInt16LE(inDrainTime * 60, 14)
+        bytes.writeInt16LE(emptyTime * 60, 16)
+        bytes.writeInt16LE((scale * 100).toInt(), 18)
         return bytes
     }
 }
@@ -143,8 +142,8 @@ data class ArgumentsClean(
     val cleanInFillTime: Int = 0,         // 进液蠕动泵填充时间(2byte)
     val cleanOutDrainTime: Int = 0,       // 出液蠕动泵排液时间(2byte)
     val cleanInDrainTime: Int = 0,        // 进液蠕动泵排液时间(2byte)
-    val cleanInEmptyTime: Int = 0,        // 进液蠕动泵排空时间(2byte)
-    val cleanOutScale: Double = 0.0       // 进出液速度比值(2byte)
+    val cleanEmptyTime: Int = 0,        // 进液蠕动泵排空时间(2byte)
+    val cleanScale: Double = 0.0       // 进出液速度比值(2byte)
 ) {
     fun toByteArray(): ByteArray {
         val bytes = ByteArray(20)
@@ -152,12 +151,12 @@ data class ArgumentsClean(
         bytes.writeInt16LE((cleanInFillSpeed * 100).toInt(), 2)
         bytes.writeInt16LE((cleanOutDrainSpeed * 100).toInt(), 4)
         bytes.writeInt16LE((cleanInDrainSpeed * 100).toInt(), 6)
-        bytes.writeInt16LE(cleanOutFillTime, 8)
-        bytes.writeInt16LE(cleanInFillTime, 10)
-        bytes.writeInt16LE(cleanOutDrainTime, 12)
-        bytes.writeInt16LE(cleanInDrainTime, 14)
-        bytes.writeInt16LE(cleanInEmptyTime, 16)
-        bytes.writeInt16LE((cleanOutScale * 100).toInt(), 18)
+        bytes.writeInt16LE(cleanOutFillTime * 60, 8)
+        bytes.writeInt16LE(cleanInFillTime * 60, 10)
+        bytes.writeInt16LE(cleanOutDrainTime * 60, 12)
+        bytes.writeInt16LE(cleanInDrainTime * 60, 14)
+        bytes.writeInt16LE(cleanEmptyTime * 60, 16)
+        bytes.writeInt16LE((cleanScale * 100).toInt(), 18)
         return bytes
     }
 }
@@ -239,22 +238,22 @@ fun toArguments(bytes: ByteArray): Arguments? {
         inFillSpeed = bytes.readInt16LE(2) / 100.0,
         outDrainSpeed = bytes.readInt16LE(4) / 100.0,
         inDrainSpeed = bytes.readInt16LE(6) / 100.0,
-        outFillTime = bytes.readInt16LE(8),
-        inFillTime = bytes.readInt16LE(10),
-        outDrainTime = bytes.readInt16LE(12),
-        inDrainTime = bytes.readInt16LE(14),
-        inEmptyTime = bytes.readInt16LE(16),
-        inOutScale = bytes.readInt16LE(18) / 100.0,
+        outFillTime = bytes.readInt16LE(8) / 60,
+        inFillTime = bytes.readInt16LE(10) / 60,
+        outDrainTime = bytes.readInt16LE(12) / 60,
+        inDrainTime = bytes.readInt16LE(14) / 60,
+        emptyTime = bytes.readInt16LE(16) / 60,
+        scale = bytes.readInt16LE(18) / 100.0,
         cleanOutFillSpeed = bytes.readInt16LE(20) / 100.0,
         cleanInFillSpeed = bytes.readInt16LE(22) / 100.0,
         cleanOutDrainSpeed = bytes.readInt16LE(24) / 100.0,
         cleanInDrainSpeed = bytes.readInt16LE(26) / 100.0,
-        cleanOutFillTime = bytes.readInt16LE(28),
-        cleanInFillTime =   bytes.readInt16LE(30),
-        cleanOutDrainTime = bytes.readInt16LE(32),
-        cleanInDrainTime = bytes.readInt16LE(34),
-        cleanInEmptyTime = bytes.readInt16LE(36),
-        cleanOutScale = bytes.readInt16LE(38) / 100.0,
+        cleanOutFillTime = bytes.readInt16LE(28) / 60,
+        cleanInFillTime =   bytes.readInt16LE(30) / 60,
+        cleanOutDrainTime = bytes.readInt16LE(32) / 60,
+        cleanInDrainTime = bytes.readInt16LE(34) / 60,
+        cleanEmptyTime = bytes.readInt16LE(36) / 60,
+        cleanScale = bytes.readInt16LE(38) / 100.0,
         tempComp = toDoubleList(bytes.copyOfRange(40, 60)),
         outSpeedComp = toDoubleList(bytes.copyOfRange(60, 80)),
         inSpeedComp = toDoubleList(bytes.copyOfRange(80, 100)),

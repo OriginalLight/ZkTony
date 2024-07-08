@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,7 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zktony.android.R
-import com.zktony.android.ui.components.ArgumentsInputField
+import com.zktony.android.ui.components.ArgumentsSetField
 import com.zktony.android.ui.components.DropDownBox
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.utils.LocalNavigationActions
@@ -75,7 +74,7 @@ fun SettingsArgumentsEquipmentView(viewModel: SettingsArgumentsEquipmentViewMode
             }
 
             SettingsRow(title = stringResource(id = R.string.serial_number)) {
-                ArgumentsInputField(
+                ArgumentsSetField(
                     modifier = Modifier.width(350.dp),
                     value = sn,
                 ) {

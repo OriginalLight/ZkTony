@@ -23,7 +23,7 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
     // 语言
     fun setLanguage(language: String) {
         val tipsMessage = "${ResourceUtils.stringResource(R.string.language)} ${ResourceUtils.stringResource(R.string.set_success)}"
-        TipsUtils.showTips(Tips(TipsType.INFO, tipsMessage))
+        TipsUtils.showTips(Tips.info(tipsMessage))
         LogUtils.info("$tipsMessage $language", true)
     }
 
@@ -31,7 +31,7 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
     fun setPromptSound(promptSound: String) {
         PromptSoundUtils.setPromptSound(promptSound)
         val tipsMessage = "${ResourceUtils.stringResource(R.string.prompt_sound)} ${ResourceUtils.stringResource(R.string.set_success)}"
-        TipsUtils.showTips(Tips(TipsType.INFO, tipsMessage))
+        TipsUtils.showTips(Tips.info(tipsMessage))
         LogUtils.info("$tipsMessage $promptSound", true)
     }
 
@@ -40,11 +40,11 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
         val bool = HzmctUtils.setNavigationBar(status)
         if (bool) {
             val tipsMessage = "${ResourceUtils.stringResource(R.string.navigation_bar)} ${ResourceUtils.stringResource(R.string.set_success)}"
-            TipsUtils.showTips(Tips(TipsType.INFO, tipsMessage))
+            TipsUtils.showTips(Tips.info(tipsMessage))
             LogUtils.info("$tipsMessage $status", true)
         } else {
             val tipsMessage = "${ResourceUtils.stringResource(R.string.navigation_bar)} ${ResourceUtils.stringResource(R.string.set_failed)}"
-            TipsUtils.showTips(Tips(TipsType.ERROR, tipsMessage))
+            TipsUtils.showTips(Tips.error(tipsMessage))
             LogUtils.error("$tipsMessage $status", true)
         }
         return bool
@@ -55,11 +55,11 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
         val bool = HzmctUtils.setStatusBar(status)
         if (bool) {
             val tipsMessage = "${ResourceUtils.stringResource(R.string.status_bar)} ${ResourceUtils.stringResource(R.string.set_success)}"
-            TipsUtils.showTips(Tips(TipsType.INFO, tipsMessage))
+            TipsUtils.showTips(Tips.info(tipsMessage))
             LogUtils.info("$tipsMessage $status", true)
         } else {
             val tipsMessage = "${ResourceUtils.stringResource(R.string.status_bar)} ${ResourceUtils.stringResource(R.string.set_failed)}"
-            TipsUtils.showTips(Tips(TipsType.ERROR, tipsMessage))
+            TipsUtils.showTips(Tips.error(tipsMessage))
             LogUtils.error("$tipsMessage $status", true)
         }
         return bool
@@ -70,11 +70,11 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
         val bool = HzmctUtils.setHomePackage(if (b) BuildConfig.APPLICATION_ID else "com.android.launcher3")
         if (bool) {
             val tipsMessage = "${ResourceUtils.stringResource(R.string.home_package)} ${ResourceUtils.stringResource(R.string.set_success)}"
-            TipsUtils.showTips(Tips(TipsType.INFO, tipsMessage))
+            TipsUtils.showTips(Tips.info(tipsMessage))
             LogUtils.info("$tipsMessage $b", true)
         } else {
             val tipsMessage = "${ResourceUtils.stringResource(R.string.home_package)} ${ResourceUtils.stringResource(R.string.set_failed)}"
-            TipsUtils.showTips(Tips(TipsType.ERROR, tipsMessage))
+            TipsUtils.showTips(Tips.error(tipsMessage))
             LogUtils.error("$tipsMessage $b", true)
         }
         return bool
@@ -85,11 +85,11 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
         val bool = HzmctUtils.setSystemTime(time)
         if (bool) {
             val tipsMessage = "${ResourceUtils.stringResource(R.string.system_time)} ${ResourceUtils.stringResource(R.string.set_success)}"
-            TipsUtils.showTips(Tips(TipsType.INFO, tipsMessage))
+            TipsUtils.showTips(Tips.info(tipsMessage))
             LogUtils.info("$tipsMessage $time", true)
         } else {
             val tipsMessage = "${ResourceUtils.stringResource(R.string.system_time)} ${ResourceUtils.stringResource(R.string.set_failed)}"
-            TipsUtils.showTips(Tips(TipsType.ERROR, tipsMessage))
+            TipsUtils.showTips(Tips.error(tipsMessage))
             LogUtils.error("$tipsMessage $time", true)
         }
         return bool

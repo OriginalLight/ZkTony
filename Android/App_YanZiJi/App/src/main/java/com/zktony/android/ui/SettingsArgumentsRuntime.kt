@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Reply
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +35,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zktony.android.R
 import com.zktony.android.data.Arguments
+import com.zktony.android.data.ArgumentsClean
+import com.zktony.android.data.ArgumentsTransfer
 import com.zktony.android.ui.components.ArgumentsInputField
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.utils.LocalNavigationActions
@@ -39,6 +44,7 @@ import com.zktony.android.ui.utils.zktyBrush
 import com.zktony.android.ui.viewmodel.SettingsArgumentsRuntimeViewModel
 import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.ProductUtils
+import kotlinx.coroutines.launch
 
 @Composable
 fun SettingsArgumentsRuntimeView(viewModel: SettingsArgumentsRuntimeViewModel = hiltViewModel()) {
@@ -50,88 +56,401 @@ fun SettingsArgumentsRuntimeView(viewModel: SettingsArgumentsRuntimeViewModel = 
     }
 
     val arguments by AppStateUtils.argumentsList.collectAsStateWithLifecycle()
-    var selected by remember { mutableIntStateOf(0) }
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         // 顶部导航栏
         SettingsArgumentsRuntimeTopBar(navigationActions = navigationActions)
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surface, shape = MaterialTheme.shapes.medium)
-                .padding(16.dp)
-                .clip(MaterialTheme.shapes.medium),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            ChannelTabRow(selected = selected) {
-                selected = it
-            }
-
-            ChannelContentRow(
-                channel = selected,
-                arguments = arguments
-            )
-        }
+        // 参数列表
+        RuntimeContentRow(arguments = arguments, viewModel = viewModel)
     }
 }
 
-@Composable
-fun ChannelTabRow(
-    modifier: Modifier = Modifier,
-    selected: Int,
-    onSelect: (Int) -> Unit
-) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        repeat(ProductUtils.getChannelCount()) { index ->
-            Box(
-                modifier = Modifier
-                    .background(
-                        color = if (selected == index) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                        shape = MaterialTheme.shapes.medium
-                    )
-                    .clip(MaterialTheme.shapes.medium)
-                    .clickable { onSelect(index) }
-                    .padding(horizontal = 32.dp, vertical = 16.dp)
-            ) {
-                Text(
-                    text = stringResource(id = R.string.channel) + (index + 1),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = if (selected == index) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
-                )
-            }
-        }
-    }
-}
 
 @Composable
-fun ChannelContentRow(
+fun RuntimeContentRow(
     modifier: Modifier = Modifier,
-    channel: Int,
     arguments: List<Arguments>,
+    viewModel: SettingsArgumentsRuntimeViewModel
 ) {
+
+    // args
+    val scope = rememberCoroutineScope()
+    var channel by remember { mutableIntStateOf(0) }
+    var loading by remember { mutableStateOf(false) }
+    var inFillSpeed by remember(channel, arguments) { mutableStateOf(arguments[channel].inFillSpeed.toString()) }
+    var inDrainSpeed by remember(channel, arguments) { mutableStateOf(arguments[channel].inDrainSpeed.toString()) }
+    var inFillTime by remember(channel, arguments) { mutableStateOf(arguments[channel].inFillTime.toString()) }
+    var inDrainTime by remember(channel, arguments) { mutableStateOf(arguments[channel].inDrainTime.toString()) }
+    var outFillSpeed by remember(channel, arguments) { mutableStateOf(arguments[channel].outFillSpeed.toString()) }
+    var outDrainSpeed by remember(channel, arguments) { mutableStateOf(arguments[channel].outDrainSpeed.toString()) }
+    var outFillTime by remember(channel, arguments) { mutableStateOf(arguments[channel].outFillTime.toString()) }
+    var outDrainTime by remember(channel, arguments) { mutableStateOf(arguments[channel].outDrainTime.toString()) }
+    var emptyTime by remember(channel, arguments) { mutableStateOf(arguments[channel].emptyTime.toString()) }
+    var scale by remember(channel, arguments) { mutableStateOf(arguments[channel].scale.toString()) }
+    var cleanInFillSpeed by remember(channel, arguments) { mutableStateOf(arguments[channel].cleanInFillSpeed.toString()) }
+    var cleanInDrainSpeed by remember(channel, arguments) { mutableStateOf(arguments[channel].cleanInDrainSpeed.toString()) }
+    var cleanInFillTime by remember(channel, arguments) { mutableStateOf(arguments[channel].cleanInFillTime.toString()) }
+    var cleanInDrainTime by remember(channel, arguments) { mutableStateOf(arguments[channel].cleanInDrainTime.toString()) }
+    var cleanOutFillSpeed by remember(channel, arguments) { mutableStateOf(arguments[channel].cleanOutFillSpeed.toString()) }
+    var cleanOutDrainSpeed by remember(channel, arguments) { mutableStateOf(arguments[channel].cleanOutDrainSpeed.toString()) }
+    var cleanOutFillTime by remember(channel, arguments) { mutableStateOf(arguments[channel].cleanOutFillTime.toString()) }
+    var cleanOutDrainTime by remember(channel, arguments) { mutableStateOf(arguments[channel].cleanOutDrainTime.toString()) }
+    var cleanEmptyTime by remember(channel, arguments) { mutableStateOf(arguments[channel].cleanEmptyTime.toString()) }
+    var cleanScale by remember(channel, arguments) { mutableStateOf(arguments[channel].cleanScale.toString()) }
+
     Column(
         modifier = modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface, shape = MaterialTheme.shapes.medium)
             .padding(16.dp)
             .clip(MaterialTheme.shapes.medium),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        var argument by remember { mutableStateOf(arguments[channel]) }
-        var inFillSped by remember(channel) { mutableStateOf(arguments[channel].inFillSpeed.toString()) }
-        var experimentalArguments by remember(channel) { mutableStateOf(arguments[channel].toExperimental()) }
-        var cleanArguments by remember(channel) { mutableStateOf(arguments[channel].toClean()) }
-
-        SettingsRow(title = stringResource(id = R.string.channel) + (channel + 1)) {
-            ArgumentsInputField(
-                modifier = Modifier.width(350.dp),
-                value = experimentalArguments.inFillSpeed.toString(),
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                modifier = Modifier,
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // TODO
+                repeat(ProductUtils.getChannelCount()) { index ->
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = if (channel == index) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                                shape = MaterialTheme.shapes.medium
+                            )
+                            .clip(MaterialTheme.shapes.medium)
+                            .clickable { channel = index }
+                            .padding(horizontal = 24.dp, vertical = 12.dp)
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.channel) + (index + 1),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = if (channel == index) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
+
+            Row(
+                modifier = Modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = MaterialTheme.shapes.medium
+                    )
+                    .clip(MaterialTheme.shapes.medium)
+                    .clickable {
+                        scope.launch {
+                            loading = true
+                            val transfer = ArgumentsTransfer(
+                                inFillSpeed = inFillSpeed.toDoubleOrNull() ?: 0.0,
+                                inDrainSpeed = inDrainSpeed.toDoubleOrNull() ?: 0.0,
+                                inFillTime = inFillTime.toIntOrNull() ?: 0,
+                                inDrainTime = inDrainTime.toIntOrNull() ?: 0,
+                                outFillSpeed = outFillSpeed.toDoubleOrNull() ?: 0.0,
+                                outDrainSpeed = outDrainSpeed.toDoubleOrNull() ?: 0.0,
+                                outFillTime = outFillTime.toIntOrNull() ?: 0,
+                                outDrainTime = outDrainTime.toIntOrNull() ?: 0,
+                                emptyTime = emptyTime.toIntOrNull() ?: 0,
+                                scale = scale.toDoubleOrNull() ?: 0.0,
+                            )
+                            val clean = ArgumentsClean(
+                                cleanInFillSpeed = cleanInFillSpeed.toDoubleOrNull() ?: 0.0,
+                                cleanInDrainSpeed = cleanInDrainSpeed.toDoubleOrNull() ?: 0.0,
+                                cleanInFillTime = cleanInFillTime.toIntOrNull() ?: 0,
+                                cleanInDrainTime = cleanInDrainTime.toIntOrNull() ?: 0,
+                                cleanOutFillSpeed = cleanOutFillSpeed.toDoubleOrNull() ?: 0.0,
+                                cleanOutDrainSpeed = cleanOutDrainSpeed.toDoubleOrNull() ?: 0.0,
+                                cleanOutFillTime = cleanOutFillTime.toIntOrNull() ?: 0,
+                                cleanOutDrainTime = cleanOutDrainTime.toIntOrNull() ?: 0,
+                                cleanEmptyTime = cleanEmptyTime.toIntOrNull() ?: 0,
+                                cleanScale = cleanScale.toDoubleOrNull() ?: 0.0,
+                            )
+                            viewModel.setArguments(channel, transfer, clean)
+                            loading = false
+                        }
+                    }
+                    .padding(horizontal = 24.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (loading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+                Text(
+                    text = stringResource(id = R.string.save),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
+        }
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface, shape = MaterialTheme.shapes.medium)
+                .padding(16.dp)
+                .clip(MaterialTheme.shapes.medium),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            item {
+                Text(
+                    modifier = Modifier.padding(start = 16.dp),
+                    text = stringResource(id = R.string.transfer),
+                    style = MaterialTheme.typography.titleLarge
+                )
+            }
+
+            item {
+                SettingsRow(title = "进液泵填充速度") {
+                    ArgumentsInputField(
+                        modifier = Modifier.size(width = 350.dp, height = 48.dp),
+                        value = inFillSpeed,
+                        suffix = "mL/min"
+                    ) {
+                        inFillSpeed = it
+
+                    }
+                }
+            }
+
+            item {
+                SettingsRow(title = "进液泵排液速度") {
+                    ArgumentsInputField(
+                        modifier = Modifier.size(width = 350.dp, height = 48.dp),
+                        value = inDrainSpeed,
+                        suffix = "mL/min"
+                    ) {
+                        inDrainSpeed = it
+                    }
+                }
+            }
+
+            item {
+                SettingsRow(title = "进液泵填充时间") {
+                    ArgumentsInputField(
+                        modifier = Modifier.size(width = 350.dp, height = 48.dp),
+                        value = inFillTime,
+                        suffix = "min"
+                    ) {
+                        inFillTime = it
+                    }
+                }
+            }
+
+            item {
+                SettingsRow(title = "进液泵排液时间") {
+                    ArgumentsInputField(
+                        modifier = Modifier.size(width = 350.dp, height = 48.dp),
+                        value = inDrainTime,
+                        suffix = "min"
+                    ) {
+                        inDrainTime = it
+                    }
+                }
+            }
+
+            item {
+                SettingsRow(title = "出液泵填充速度") {
+                    ArgumentsInputField(
+                        modifier = Modifier.size(width = 350.dp, height = 48.dp),
+                        value = outFillSpeed,
+                        suffix = "mL/min"
+                    ) {
+                        outFillSpeed = it
+                    }
+                }
+            }
+
+            item {
+                SettingsRow(title = "出液泵排液速度") {
+                    ArgumentsInputField(
+                        modifier = Modifier.size(width = 350.dp, height = 48.dp),
+                        value = outDrainSpeed,
+                        suffix = "mL/min"
+                    ) {
+                        outDrainSpeed = it
+                    }
+                }
+            }
+
+            item {
+                SettingsRow(title = "出液泵填充时间") {
+                    ArgumentsInputField(
+                        modifier = Modifier.size(width = 350.dp, height = 48.dp),
+                        value = outFillTime,
+                        suffix = "min"
+                    ) {
+                        outFillTime = it
+                    }
+                }
+            }
+
+            item {
+                SettingsRow(title = "出液泵排液时间") {
+                    ArgumentsInputField(
+                        modifier = Modifier.size(width = 350.dp, height = 48.dp),
+                        value = outDrainTime,
+                        suffix = "min"
+                    ) {
+                        outDrainTime = it
+                    }
+                }
+            }
+
+            item {
+                SettingsRow(title = "排空气时间") {
+                    ArgumentsInputField(
+                        modifier = Modifier.size(width = 350.dp, height = 48.dp),
+                        value = emptyTime,
+                        suffix = "min"
+                    ) {
+                        emptyTime = it
+                    }
+                }
+            }
+
+            item {
+                SettingsRow(title = "进出液速度比值") {
+                    ArgumentsInputField(
+                        modifier = Modifier.size(width = 350.dp, height = 48.dp),
+                        value = scale
+                    ) {
+                        scale = it
+                    }
+                }
+            }
+
+            item {
+                Text(
+                    modifier = Modifier.padding(start = 16.dp),
+                    text = stringResource(id = R.string.clean),
+                    style = MaterialTheme.typography.titleLarge
+                )
+            }
+
+            item {
+                SettingsRow(title = "进液泵填充速度") {
+                    ArgumentsInputField(
+                        modifier = Modifier.size(width = 350.dp, height = 48.dp),
+                        value = cleanInFillSpeed,
+                        suffix = "mL/min"
+                    ) {
+                        cleanInFillSpeed = it
+                    }
+                }
+            }
+
+            item {
+                SettingsRow(title = "进液泵排液速度") {
+                    ArgumentsInputField(
+                        modifier = Modifier.size(width = 350.dp, height = 48.dp),
+                        value = cleanInDrainSpeed,
+                        suffix = "mL/min"
+                    ) {
+                        cleanInDrainSpeed = it
+                    }
+                }
+            }
+
+            item {
+                SettingsRow(title = "进液泵填充时间") {
+                    ArgumentsInputField(
+                        modifier = Modifier.size(width = 350.dp, height = 48.dp),
+                        value = cleanInFillTime,
+                        suffix = "min"
+                    ) {
+                        cleanInFillTime = it
+                    }
+                }
+            }
+
+            item {
+                SettingsRow(title = "进液泵排液时间") {
+                    ArgumentsInputField(
+                        modifier = Modifier.size(width = 350.dp, height = 48.dp),
+                        value = cleanInDrainTime,
+                        suffix = "min"
+                    ) {
+                        cleanInDrainTime = it
+                    }
+                }
+            }
+
+            item {
+                SettingsRow(title = "出液泵填充速度") {
+                    ArgumentsInputField(
+                        modifier = Modifier.size(width = 350.dp, height = 48.dp),
+                        value = cleanOutFillSpeed,
+                        suffix = "mL/min"
+                    ) {
+                        cleanOutFillSpeed = it
+                    }
+                }
+            }
+
+            item {
+                SettingsRow(title = "出液泵排液速度") {
+                    ArgumentsInputField(
+                        modifier = Modifier.size(width = 350.dp, height = 48.dp),
+                        value = cleanOutDrainSpeed,
+                        suffix = "mL/min"
+                    ) {
+                        cleanOutDrainSpeed = it
+                    }
+                }
+            }
+
+            item {
+                SettingsRow(title = "出液泵填充时间") {
+                    ArgumentsInputField(
+                        modifier = Modifier.size(width = 350.dp, height = 48.dp),
+                        value = cleanOutFillTime,
+                        suffix = "min"
+                    ) {
+                        cleanOutFillTime = it
+                    }
+                }
+            }
+
+            item {
+                SettingsRow(title = "出液泵排液时间") {
+                    ArgumentsInputField(
+                        modifier = Modifier.size(width = 350.dp, height = 48.dp),
+                        value = cleanOutDrainTime,
+                        suffix = "min"
+                    ) {
+                        cleanOutDrainTime = it
+                    }
+                }
+            }
+
+            item {
+                SettingsRow(title = "排空气时间") {
+                    ArgumentsInputField(
+                        modifier = Modifier.size(width = 350.dp, height = 48.dp),
+                        value = cleanEmptyTime,
+                        suffix = "min"
+                    ) {
+                        cleanEmptyTime = it
+                    }
+                }
+            }
+
+            item {
+                SettingsRow(title = "进出液速度比值") {
+                    ArgumentsInputField(
+                        modifier = Modifier.size(width = 350.dp, height = 48.dp),
+                        value = cleanScale
+                    ) {
+                        cleanScale = it
+                    }
+                }
             }
         }
     }
@@ -142,7 +461,6 @@ fun SettingsArgumentsRuntimeTopBar(
     modifier: Modifier = Modifier,
     navigationActions: NavigationActions
 ) {
-
     Row(
         modifier = modifier
             .fillMaxWidth()

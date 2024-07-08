@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -14,13 +13,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.PermContactCalendar
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import com.zktony.android.R
 
 @Composable
-fun ArgumentsInputField(
+fun ArgumentsSetField(
     modifier: Modifier = Modifier,
     maxLength: Int = 64,
     showClear: Boolean = true,
@@ -87,6 +83,70 @@ fun ArgumentsInputField(
         Button(
             onClick = { onSetClick(text) }) {
             Text(text = stringResource(id = R.string.set))
+        }
+    }
+}
+
+@Composable
+fun ArgumentsInputField(
+    modifier: Modifier = Modifier,
+    maxLength: Int = 64,
+    showClear: Boolean = true,
+    prefix: String? = null,
+    suffix: String? = null,
+    value: String,
+    onValueChange: (String) -> Unit
+) {
+
+    Row(
+        modifier = modifier
+            .background(MaterialTheme.colorScheme.surface, CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (prefix != null) {
+            Text(
+                text = prefix,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+
+        BasicTextField(
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 8.dp),
+            value = value,
+            onValueChange = {
+                if (it.length <= maxLength) {
+                    onValueChange(it)
+                }
+            },
+            singleLine = true,
+            textStyle = MaterialTheme.typography.bodyLarge
+        )
+
+        if (suffix != null) {
+            Text(
+                text = suffix,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(end = 8.dp)
+            )
+        }
+
+        if (showClear && value.isNotEmpty()) {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .clickable { onValueChange("") },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Clear,
+                    contentDescription = "Clear"
+                )
+            }
         }
     }
 }
@@ -223,8 +283,14 @@ fun PasswordInputField(
 
 @Preview
 @Composable
-fun ArgumentsInputGroupPreview() {
-    ArgumentsInputField(value = "Hello", onSetClick = {})
+fun ArgumentsSetFieldPreview() {
+    ArgumentsSetField(value = "Hello", onSetClick = {})
+}
+
+@Preview
+@Composable
+fun ArgumentsInputFieldPreview() {
+    ArgumentsInputField(value = "Hello", onValueChange = {})
 }
 
 @Preview
