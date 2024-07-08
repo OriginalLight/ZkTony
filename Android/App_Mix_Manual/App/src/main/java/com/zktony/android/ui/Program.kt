@@ -175,13 +175,17 @@ fun ProgramList(
 
     val keyboard = LocalSoftwareKeyboardController.current
 
+    dispatch(ProgramIntent.count)
+
 
     /**
      * 权限的弹窗
      */
     val permissionsDialog = remember { mutableStateOf(false) }
 
-    val launcher = rememberLauncherForActivityResult(
+
+
+    rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
@@ -358,9 +362,9 @@ fun ProgramList(
                             volume_ex = "0.0"
                             founder = ""
                             dispatch(ProgramIntent.count)
-                            delay(500)
+                            delay(200)
                             if (modelsThickness.value == "G1500") {
-                                if (entityNum < 11) {
+                                if (entityNum < 10) {
                                     showingDialog.value = true
                                     open.value = false
                                 } else {
@@ -371,7 +375,7 @@ fun ProgramList(
                                     ).show()
                                 }
                             } else if (modelsThickness.value == "G1510") {
-                                if (entityNum < 101) {
+                                if (entityNum < 100) {
                                     showingDialog.value = true
                                     open.value = false
                                 } else {

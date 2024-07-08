@@ -54,7 +54,7 @@ abstract class ProgramDao : BaseDao<Program> {
 
     @Query(
         """
-        SELECT COUNT(*) FROM ExperimentRecord
+        SELECT COUNT(*) FROM program
         """
     )
     abstract suspend fun count():Int
