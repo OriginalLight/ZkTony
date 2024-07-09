@@ -1,5 +1,6 @@
 ﻿using Exposure.Api.Contracts.Services;
 using Exposure.Api.Models;
+using Exposure.Api.Models.Dto;
 using Exposure.Protocal.Default;
 using Exposure.Utilities;
 using Microsoft.Extensions.Localization;
@@ -7,7 +8,6 @@ using Newtonsoft.Json;
 using OpenCvSharp;
 using Serilog;
 using System.Runtime.InteropServices;
-using Exposure.Api.Models.Dto;
 using Size = OpenCvSharp.Size;
 
 namespace Exposure.Api.Services;
@@ -86,7 +86,7 @@ public class CameraService(
                 Log.Information("设置位深度 14");
             else
                 throw new Exception(localizer.GetString("Error0004").Value);
-            
+
             // 设置Binning
             if (_nncam.put_Option(Nncam.eOPTION.OPTION_BINNING, 1))
                 Log.Information("设置Binning 1");
@@ -346,7 +346,7 @@ public class CameraService(
         if (_nncam == null) throw new Exception(localizer.GetString("Error0011").Value);
         // 关闭灯光
         if (!_nncam.Trigger(0)) throw new Exception(localizer.GetString("Error0010").Value);
-        
+
         Log.Information("取消拍照任务");
     }
 
@@ -533,128 +533,128 @@ public class CameraService(
             switch (_flag)
             {
                 case "preview":
-                {
-                    // 关闭灯光
-                    serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
-                    _photoList.Add(await SavePreviewAsync(mat, info, (int)expoTime));
-                }
+                    {
+                        // 关闭灯光
+                        serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
+                        _photoList.Add(await SavePreviewAsync(mat, info, (int)expoTime));
+                    }
                     break;
                 case "auto":
-                {
-                    /*
-                     * 1. 保存白光图
-                     * 2. 保存曝光图和合成图
-                     */
-                    switch (_seq)
                     {
-                        // 暂存白光图
-                        case 1:
+                        /*
+                         * 1. 保存白光图
+                         * 2. 保存曝光图和合成图
+                         */
+                        switch (_seq)
                         {
-                            // 关闭灯光
-                            serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
-                            // 保存图片
-                            _photoList.Add(await SaveAsync(mat, info, (int)expoTime));
+                            // 暂存白光图
+                            case 1:
+                                {
+                                    // 关闭灯光
+                                    serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
+                                    // 保存图片
+                                    _photoList.Add(await SaveAsync(mat, info, (int)expoTime));
+                                }
+                                break;
+                            // 生成合成图
+                            case 2:
+                                {
+                                    // 保存图片
+                                    _photoList.Add(await SaveAsync(mat, info, (int)expoTime, true));
+                                    // 创建并保存合成图
+                                    var combine = await SaveCombineAsync();
+                                    if (combine != null) _photoList.Add(combine);
+                                }
+                                break;
                         }
-                            break;
-                        // 生成合成图
-                        case 2:
-                        {
-                            // 保存图片
-                            _photoList.Add(await SaveAsync(mat, info, (int)expoTime, true));
-                            // 创建并保存合成图
-                            var combine = await SaveCombineAsync();
-                            if (combine != null) _photoList.Add(combine);
-                        }
-                            break;
                     }
-                }
                     break;
                 case "manual":
-                {
-                    /*
-                     * 1. 保存白光图
-                     * 2. 保存黑光图
-                     * 其他. 多帧合成
-                     */
-                    switch (_seq)
                     {
-                        case 1:
-                            // 关闭灯光
-                            serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
-                            // 保存图片
-                            _photoList.Add(await SaveAsync(mat, info, (int)expoTime));
-                            break;
-                        case 2:
-                            _mat = mat.Clone();
-                            // 保存图片
-                            _photoList.Add(await SaveAsync(mat, info, (int)expoTime, true));
-                            break;
-                        default:
+                        /*
+                         * 1. 保存白光图
+                         * 2. 保存黑光图
+                         * 其他. 多帧合成
+                         */
+                        switch (_seq)
                         {
-                            var combine = new Mat(size.Height, size.Width, MatType.CV_16UC3, new Scalar(0));
-                            try
-                            {
-                                if (_mat != null) Cv2.Add(mat, _mat, combine);
-                                _mat?.Dispose();
-                                _mat = combine.Clone();
+                            case 1:
+                                // 关闭灯光
+                                serialPort.WritePort("Com2", DefaultProtocol.CloseLight().ToBytes());
                                 // 保存图片
-                                _photoList.Add(await SaveAsync(combine, info, (int)expoTime * (_seq - 1), true));
-                            }
-                            finally
-                            {
-                                combine.Dispose();
-                            }
+                                _photoList.Add(await SaveAsync(mat, info, (int)expoTime));
+                                break;
+                            case 2:
+                                _mat = mat.Clone();
+                                // 保存图片
+                                _photoList.Add(await SaveAsync(mat, info, (int)expoTime, true));
+                                break;
+                            default:
+                                {
+                                    var combine = new Mat(size.Height, size.Width, MatType.CV_16UC3, new Scalar(0));
+                                    try
+                                    {
+                                        if (_mat != null) Cv2.Add(mat, _mat, combine);
+                                        _mat?.Dispose();
+                                        _mat = combine.Clone();
+                                        // 保存图片
+                                        _photoList.Add(await SaveAsync(combine, info, (int)expoTime * (_seq - 1), true));
+                                    }
+                                    finally
+                                    {
+                                        combine.Dispose();
+                                    }
+                                }
+                                break;
                         }
-                            break;
                     }
-                }
                     break;
                 case "sampling":
                     _mat = mat.Clone();
                     break;
                 case "collect":
-                {
-                    var gray = new Mat();
-                    try
                     {
-                        // 保存图片
-                        var filePath = Path.Combine(FileUtils.Collect, $"{_seq}_{expoTime}.png");
-                        gray = await CommonProcessAsync(mat);
-                        gray.SaveImage(filePath);
+                        var gray = new Mat();
+                        try
+                        {
+                            // 保存图片
+                            var filePath = Path.Combine(FileUtils.Collect, $"{_seq}_{expoTime}.png");
+                            gray = await CommonProcessAsync(mat);
+                            gray.SaveImage(filePath);
+                        }
+                        finally
+                        {
+                            gray.Dispose();
+                        }
                     }
-                    finally
-                    {
-                        gray.Dispose();
-                    }
-                }
                     break;
                 case "lost":
                     _mat = mat.Clone();
                     break;
                 case "calibrate":
-                {
-                    var gray = new Mat();
-                    try
                     {
-                        var op = mat switch
+                        var gray = new Mat();
+                        try
                         {
-                            { Width: 2992, Height: 3000 } => "3000",
-                            { Width: 1496, Height: 1500 } => "1500",
-                            { Width: 996, Height: 1000 } => "1000",
-                            _ => "3000"
-                        };
+                            var op = mat switch
+                            {
+                                { Width: 2992, Height: 3000 } => "3000",
+                                { Width: 1496, Height: 1500 } => "1500",
+                                { Width: 996, Height: 1000 } => "1000",
+                                _ => "3000"
+                            };
 
-                        var savePath = Path.Combine(FileUtils.Calibration, op);
-                        if (!Directory.Exists(savePath)) Directory.CreateDirectory(savePath);
-                        Cv2.CvtColor(mat, gray, ColorConversionCodes.BGR2GRAY);
-                        Cv2.Normalize(gray, gray, 0, 65535.0, NormTypes.MinMax, MatType.CV_16UC1);
-                        gray.SaveImage(Path.Combine(savePath, "before.png"));
+                            var savePath = Path.Combine(FileUtils.Calibration, op);
+                            if (!Directory.Exists(savePath)) Directory.CreateDirectory(savePath);
+                            Cv2.CvtColor(mat, gray, ColorConversionCodes.BGR2GRAY);
+                            Cv2.Normalize(gray, gray, 0, 65535.0, NormTypes.MinMax, MatType.CV_16UC1);
+                            gray.SaveImage(Path.Combine(savePath, "before.png"));
+                        }
+                        finally
+                        {
+                            gray.Dispose();
+                        }
                     }
-                    finally
-                    {
-                        gray.Dispose();
-                    }
-                }
                     break;
             }
         }
@@ -874,7 +874,7 @@ public class CameraService(
         var cali = new Mat();
         var rotate = new Mat();
         var dst = new Mat();
-        
+
         try
         {
             var op = mat switch
@@ -888,7 +888,7 @@ public class CameraService(
             var rot = await option.GetOptionValueAsync("Rotate") ?? "0";
             var matrix = await option.GetOptionValueAsync($"Matrix{op}") ?? "[]";
             var dist = await option.GetOptionValueAsync($"Dist{op}") ?? "[]";
-            
+
             // 畸形校正
             cali = OpenCvUtils.Calibrate(mat, JsonConvert.DeserializeObject<double[,]>(matrix),
                 JsonConvert.DeserializeObject<double[]>(dist));
@@ -948,8 +948,8 @@ public class CameraService(
 
         try
         {
-            var threshold = await option.GetOptionValueAsync("Threshold") ?? "0.0001";
-            var targetThreshold = await option.GetOptionValueAsync("TargetThreshold") ?? "10000";
+            var threshold = await option.GetOptionValueAsync("Threshold") ?? "0.001";
+            var targetThreshold = await option.GetOptionValueAsync("TargetThreshold") ?? "30000";
 
             // 拍摄1秒曝光
             _mat?.Dispose();
@@ -958,15 +958,17 @@ public class CameraService(
             if (!_nncam.Trigger(1)) throw new Exception(localizer.GetString("Error0010").Value);
             await Task.Delay(1500, ctsToken);
             if (_mat == null) throw new Exception(localizer.GetString("Error0018").Value);
+            gray1S = _mat.Clone();
             gray1S.ConvertTo(gray1S, MatType.CV_16UC1, 4.0);
 
-            // 拍摄2秒曝光
+            // 拍摄2秒曝光.
             _mat?.Dispose();
             _mat = null;
             if (!_nncam.put_ExpoTime(2_000_000)) throw new Exception(localizer.GetString("Error0009").Value);
             if (!_nncam.Trigger(1)) throw new Exception(localizer.GetString("Error0010").Value);
             await Task.Delay(2500, ctsToken);
             if (_mat == null) throw new Exception(localizer.GetString("Error0018").Value);
+            gray2S = _mat.Clone();
             gray2S.ConvertTo(gray2S, MatType.CV_16UC1, 4.0);
 
             var thr1 = OpenCvUtils.FindMaxGrayscaleValue(gray1S, double.Parse(threshold));
@@ -989,7 +991,7 @@ public class CameraService(
             var end = DateTime.Now;
             Log.Information($"计算曝光时间：target = {target} k = {k} b= {b} 耗时 = {(end - start).TotalMilliseconds}ms");
 
-            return Math.Max(1000, Math.Min(600_000_000, (long)(target * 100_000)));
+            return Math.Clamp((long)(target * 1_000_000), 100_000, 600_000_1000);
         }
         finally
         {
@@ -1095,7 +1097,6 @@ public class CameraService(
     }
 
     #endregion
-    
 
     #region 清除相册
 

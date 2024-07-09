@@ -37,7 +37,7 @@ public static class OpenCvUtils
             newCameraMatrix.Dispose();
             roiMat.Dispose();
         }
-       
+
     }
 
     #endregion
@@ -220,12 +220,12 @@ public static class OpenCvUtils
             // 生成棋盘格角点的三维坐标
             var objectPoints = new Point3f[chessboardSize];
             for (var i = 0; i < chessboardHeight; i++)
-            for (var j = 0; j < chessboardWidth; j++)
-            {
-                objectPoints[i * chessboardWidth + j] = new Point3f(j, i, 0);
-                // 棋盘格每个方格的边长为 10mm
-                objectPoints[i * chessboardWidth + j] *= squareSize;
-            }
+                for (var j = 0; j < chessboardWidth; j++)
+                {
+                    objectPoints[i * chessboardWidth + j] = new Point3f(j, i, 0);
+                    // 棋盘格每个方格的边长为 10mm
+                    objectPoints[i * chessboardWidth + j] *= squareSize;
+                }
 
 
             // 读取图片
@@ -286,15 +286,14 @@ public static class OpenCvUtils
             cdf[i] /= cdfMax;
         }
 
-        // 寻最大像素值
-        var maxCdfIndex = Array.FindLastIndex(cdf, value => value <= 1 - ignore);
-        return maxCdfIndex;
+        // 寻找最小和最大像素值
+        return Array.FindLastIndex(cdf, value => value <= 1 - ignore);
     }
-    
+
     #endregion
-    
+
     #region LUT线性变换
-    
+
     public static Mat LutLinearTransform(Mat src, int inLow, int inHigh, int outLow, int outHigh)
     {
         // check if the input range is valid
@@ -324,7 +323,7 @@ public static class OpenCvUtils
 
         return enhancedImage;
     }
-    
+
     #endregion
 
     #region 自动灰阶
@@ -390,5 +389,5 @@ public static class OpenCvUtils
     }
 
     #endregion
-    
+
 }
