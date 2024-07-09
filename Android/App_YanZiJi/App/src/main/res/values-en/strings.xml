@@ -46,4 +46,6 @@
     <string name="transfer">Transfer</string>
     <string name="clean">Clean</string>
     <string name="save">Save</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
 </resources>

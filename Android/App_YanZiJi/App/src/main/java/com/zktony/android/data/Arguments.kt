@@ -55,6 +55,7 @@ data class Arguments(
             scale = scale
         )
     }
+
     // 清洗参数
     fun toClean(): ArgumentsClean {
         return ArgumentsClean(
@@ -70,12 +71,14 @@ data class Arguments(
             cleanScale = cleanScale
         )
     }
+
     // 温度补偿参数
     fun toTemperature(): ArgumentsTemperature {
         return ArgumentsTemperature(
             tempComp = tempComp
         )
     }
+
     // 速度补偿参数
     fun toSpeed(): ArgumentsSpeed {
         return ArgumentsSpeed(
@@ -83,18 +86,21 @@ data class Arguments(
             inSpeedComp = inSpeedComp
         )
     }
+
     // 电压补偿参数
     fun toVoltage(): ArgumentsVoltage {
         return ArgumentsVoltage(
             voltComp = voltComp
         )
     }
+
     // 电流补偿参数
     fun toCurrent(): ArgumentsCurrent {
         return ArgumentsCurrent(
             currComp = currComp
         )
     }
+
     // 光耦阈值
     fun toBubble(): ArgumentsBubble {
         return ArgumentsBubble(
@@ -123,7 +129,7 @@ data class ArgumentsTransfer(
         bytes.writeInt16LE((inFillSpeed * 100).toInt(), 2)
         bytes.writeInt16LE((outDrainSpeed * 100).toInt(), 4)
         bytes.writeInt16LE((inDrainSpeed * 100).toInt(), 6)
-        bytes.writeInt16LE(outFillTime  * 60, 8)
+        bytes.writeInt16LE(outFillTime * 60, 8)
         bytes.writeInt16LE(inFillTime * 60, 10)
         bytes.writeInt16LE(outDrainTime * 60, 12)
         bytes.writeInt16LE(inDrainTime * 60, 14)
@@ -251,7 +257,7 @@ fun toArguments(bytes: ByteArray): Arguments? {
             cleanOutDrainSpeed = bytes.readInt16LE(24) / 100.0,
             cleanInDrainSpeed = bytes.readInt16LE(26) / 100.0,
             cleanOutFillTime = bytes.readInt16LE(28) / 60,
-            cleanInFillTime =   bytes.readInt16LE(30) / 60,
+            cleanInFillTime = bytes.readInt16LE(30) / 60,
             cleanOutDrainTime = bytes.readInt16LE(32) / 60,
             cleanInDrainTime = bytes.readInt16LE(34) / 60,
             cleanEmptyTime = bytes.readInt16LE(36) / 60,

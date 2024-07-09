@@ -19,6 +19,11 @@ object ProductUtils {
         ProductNumber = productNumber
     }
 
+    // 获取产品型号
+    fun getProductNumber(): String {
+        return ProductNumber
+    }
+
     // 根据产品型号获取模块数量
     fun getChannelCount(): Int {
         return when (ProductNumber) {

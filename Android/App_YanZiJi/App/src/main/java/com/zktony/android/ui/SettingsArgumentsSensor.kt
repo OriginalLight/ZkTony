@@ -32,7 +32,10 @@ fun SettingsArgumentsSensorView(viewModel: SettingsArgumentsSensorViewModel = hi
             title = { Text(text = stringResource(id = R.string.sensor_arguments)) },
             navigationIcon = {
                 IconButton(onClick = { navigationActions.navigateUp() }) {
-                    Icon(imageVector = Icons.AutoMirrored.Default.Reply, contentDescription = "Back")
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Default.Reply,
+                        contentDescription = "Back"
+                    )
                 }
             }
         )

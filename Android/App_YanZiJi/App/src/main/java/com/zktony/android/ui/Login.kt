@@ -7,11 +7,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,6 +38,7 @@ import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.zktyBrush
 import com.zktony.android.ui.viewmodel.LoginViewModel
+import com.zktony.android.utils.ProductUtils
 import kotlinx.coroutines.launch
 
 
@@ -131,8 +135,13 @@ fun LoginForm(
         val navigationActions = LocalNavigationActions.current
         var userName by remember { mutableStateOf("") }
         var password by remember { mutableStateOf("") }
+        var loading by remember { mutableStateOf(false) }
 
-        Text(text = "四通道转膜仪器", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.surface)
+        Text(
+            text = ProductUtils.getProductNumber(),
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.surface
+        )
 
         UserNameInputField(
             modifier
@@ -153,13 +162,25 @@ fun LoginForm(
         Button(
             modifier = Modifier.width(450.dp),
             enabled = userName.isNotEmpty() && password.isNotEmpty(),
-            onClick = { scope.launch {
-                if (viewModel.login(userName, password)) {
-                    navigationActions.popBackStack()
-                    navigationActions.navigate(Route.EXPERIMENTAL)
+            onClick = {
+                scope.launch {
+                    loading = true
+                    if (viewModel.login(userName, password)) {
+                        navigationActions.popBackStack()
+                        navigationActions.navigate(Route.EXPERIMENTAL)
+                    }
+                    loading = false
                 }
-            } }
+            }
         ) {
+            if (loading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(16.dp),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    strokeWidth = 2.dp
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+            }
             Text(
                 text = stringResource(id = R.string.login),
                 style = MaterialTheme.typography.bodyLarge

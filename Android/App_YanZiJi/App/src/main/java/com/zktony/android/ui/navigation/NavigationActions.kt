@@ -1,7 +1,6 @@
 package com.zktony.android.ui.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.DonutSmall
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Science
 import androidx.compose.material.icons.outlined.Settings
@@ -70,7 +69,8 @@ class NavigationActions(private val navController: NavHostController) {
 
     // 当前选中的页面
     @Composable
-    fun selectDestination() = navController.currentBackStackEntryAsState().value?.destination?.route ?: Route.LOGIN
+    fun selectDestination() =
+        navController.currentBackStackEntryAsState().value?.destination?.route ?: Route.LOGIN
 }
 
 // 顶级目的地

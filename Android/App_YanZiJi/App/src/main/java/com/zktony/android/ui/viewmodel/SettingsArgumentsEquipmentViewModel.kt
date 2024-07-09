@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.R
 import com.zktony.android.ui.components.Tips
-import com.zktony.android.ui.components.TipsType
 import com.zktony.android.utils.ProductUtils
 import com.zktony.android.utils.ResourceUtils
 import com.zktony.android.utils.SerialPortUtils

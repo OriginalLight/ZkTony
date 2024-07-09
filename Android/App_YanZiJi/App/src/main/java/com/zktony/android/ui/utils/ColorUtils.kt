@@ -6,11 +6,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.LinearGradient
-import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
@@ -25,7 +22,9 @@ val zktyBrush = Brush.linearGradient(
 @Composable
 fun PreviewColorUtils() {
     MaterialTheme {
-        Box(modifier = Modifier.size(200.dp).background(brush = zktyBrush)) {
+        Box(modifier = Modifier
+            .size(200.dp)
+            .background(brush = zktyBrush)) {
         }
     }
 }

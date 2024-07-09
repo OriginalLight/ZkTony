@@ -17,12 +17,15 @@ import kotlinx.coroutines.launch
 object AppStateUtils {
 
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
     // flags
     var isArgumentsSync = false         // 是否同步参数
 
     // mutableStateFlow
-    private val _argumentsList = MutableStateFlow(List(ProductUtils.MAX_CHANNEL_COUNT) { Arguments() })
-    private val _channelStateList = MutableStateFlow(List(ProductUtils.MAX_CHANNEL_COUNT) { ChannelState() })
+    private val _argumentsList =
+        MutableStateFlow(List(ProductUtils.MAX_CHANNEL_COUNT) { Arguments() })
+    private val _channelStateList =
+        MutableStateFlow(List(ProductUtils.MAX_CHANNEL_COUNT) { ChannelState() })
 
     // stateFlow
     val argumentsList = _argumentsList.asStateFlow()

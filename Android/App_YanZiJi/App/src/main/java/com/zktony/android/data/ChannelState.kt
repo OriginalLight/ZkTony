@@ -39,7 +39,7 @@ data class ChannelState(
 
 fun toChannelState(byteArray: ByteArray): ChannelState? {
     try {
-        if (byteArray.size != 21)  throw Exception("ChannelState 长度不正确")
+        if (byteArray.size != 21) throw Exception("ChannelState 长度不正确")
         return ChannelState(
             runState = byteArray.readInt8(0),
             experimentType = byteArray.readInt8(1),

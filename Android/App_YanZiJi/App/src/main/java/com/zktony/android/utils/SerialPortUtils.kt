@@ -65,7 +65,11 @@ object SerialPortUtils {
             serialPort.sendByteArray(bytes)
             bytesList.add(bytes)
             // 等待设置结果
-            withTimeout(1000) { while (rx == -1) { delay(100) } }
+            withTimeout(1000) {
+                while (rx == -1) {
+                    delay(100)
+                }
+            }
             if (rx == 1) throw Exception("Set return failed")
         } catch (e: Exception) {
             bytesList.forEach { LogUtils.error(callbackKey, it.toHexString(), true) }
@@ -103,7 +107,11 @@ object SerialPortUtils {
             serialPort.sendByteArray(bytes)
             bytesList.add(bytes)
             // 等待设置结果
-            withTimeout(1000) { while (rx == -1) { delay(100) } }
+            withTimeout(1000) {
+                while (rx == -1) {
+                    delay(100)
+                }
+            }
             if (rx == 1) throw Exception("Set return failed")
         } catch (e: Exception) {
             bytesList.forEach { LogUtils.error(callbackKey, it.toHexString(), true) }
@@ -141,7 +149,11 @@ object SerialPortUtils {
             serialPort.sendByteArray(bytes)
             bytesList.add(bytes)
             // 等待设置结果
-            withTimeout(1000) { while (rx == -1) { delay(100) } }
+            withTimeout(1000) {
+                while (rx == -1) {
+                    delay(100)
+                }
+            }
             if (rx == 1) throw Exception("Set return failed")
         } catch (e: Exception) {
             bytesList.forEach { LogUtils.error(callbackKey, it.toHexString(), true) }
@@ -179,7 +191,11 @@ object SerialPortUtils {
             serialPort.sendByteArray(protocol)
             bytesList.add(protocol)
             // 等待设置结果
-            withTimeout(1000) { while (rx == -1) { delay(100) } }
+            withTimeout(1000) {
+                while (rx == -1) {
+                    delay(100)
+                }
+            }
         } catch (e: Exception) {
             bytesList.forEach { LogUtils.error(callbackKey, it.toHexString(), true) }
             LogUtils.error(callbackKey, e.stackTraceToString(), true)
@@ -224,7 +240,11 @@ object SerialPortUtils {
             serialPort.sendByteArray(bytes)
             bytesList.add(bytes)
             // 等待查询结果
-            withTimeout(200) { while (rx == -1) { delay(20) } }
+            withTimeout(200) {
+                while (rx == -1) {
+                    delay(20)
+                }
+            }
         } catch (e: Exception) {
             bytesList.forEach { LogUtils.error(callbackKey, it.toHexString(), true) }
             LogUtils.error(callbackKey, e.stackTraceToString(), true)
@@ -269,7 +289,11 @@ object SerialPortUtils {
             serialPort.sendByteArray(bytes)
             bytesList.add(bytes)
             // 等待查询结果
-            withTimeout(1000) { while (rx == -1) { delay(100) } }
+            withTimeout(1000) {
+                while (rx == -1) {
+                    delay(100)
+                }
+            }
             if (rx == 1) throw Exception("Query return failed")
         } catch (e: Exception) {
             bytesList.forEach { LogUtils.error(callbackKey, it.toHexString(), true) }
@@ -307,7 +331,11 @@ object SerialPortUtils {
             serialPort.sendByteArray(bytes)
             bytesList.add(bytes)
             // 等待设置结果
-            withTimeout(1000) { while (rx == -1) { delay(100) } }
+            withTimeout(1000) {
+                while (rx == -1) {
+                    delay(100)
+                }
+            }
             if (rx == 1) throw Exception("Set return failed")
         } catch (e: Exception) {
             bytesList.forEach { LogUtils.error(callbackKey, it.toHexString(), true) }
@@ -345,7 +373,11 @@ object SerialPortUtils {
             serialPort.sendByteArray(bytes)
             bytesList.add(bytes)
             // 等待设置结果
-            withTimeout(1000) { while (rx == -1) { delay(100) } }
+            withTimeout(1000) {
+                while (rx == -1) {
+                    delay(100)
+                }
+            }
             if (rx == 1) throw Exception("Set return failed")
         } catch (e: Exception) {
             bytesList.forEach { LogUtils.error(callbackKey, it.toHexString(), true) }
@@ -383,7 +415,11 @@ object SerialPortUtils {
             serialPort.sendByteArray(bytes)
             bytesList.add(bytes)
             // 等待设置结果
-            withTimeout(1000) { while (rx == -1) { delay(100) } }
+            withTimeout(1000) {
+                while (rx == -1) {
+                    delay(100)
+                }
+            }
             if (rx == 1) throw Exception("Set return failed")
         } catch (e: Exception) {
             bytesList.forEach { LogUtils.error(callbackKey, it.toHexString(), true) }

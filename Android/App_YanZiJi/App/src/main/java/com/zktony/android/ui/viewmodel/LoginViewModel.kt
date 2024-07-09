@@ -6,6 +6,7 @@ import com.zktony.android.utils.AuthUtils
 import com.zktony.android.utils.SnackbarUtils
 import com.zktony.room.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,6 +25,7 @@ class LoginViewModel @Inject constructor(
     suspend fun login(userName: String, password: String): Boolean {
         try {
             val res = userRepository.login(userName, password)
+            delay(500L)
             if (res.isSuccess) {
                 AuthUtils.login(res.getOrNull()!!)
                 return true

@@ -110,7 +110,10 @@ fun SettingsArgumentsEquipmentTopBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(imageVector = Icons.AutoMirrored.Default.Reply, contentDescription = "Back")
-            Text(text = stringResource(id = R.string.equipment_arguments), style = MaterialTheme.typography.titleLarge)
+            Text(
+                text = stringResource(id = R.string.equipment_arguments),
+                style = MaterialTheme.typography.titleLarge
+            )
         }
     }
 }
