@@ -39,7 +39,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zktony.android.R
@@ -49,6 +52,7 @@ import com.zktony.android.data.ArgumentsSpeed
 import com.zktony.android.data.ArgumentsTransfer
 import com.zktony.android.data.PumpControl
 import com.zktony.android.ui.components.ArgumentsInputField
+import com.zktony.android.ui.components.CircleTabRow
 import com.zktony.android.ui.components.RadioButtonGroup
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.utils.LocalNavigationActions
@@ -69,12 +73,21 @@ fun SettingsArgumentsPumpView(viewModel: SettingsArgumentsPumpViewModel = hiltVi
     }
 
     val arguments by AppStateUtils.argumentsList.collectAsStateWithLifecycle()
+    var channel by remember { mutableIntStateOf(0) }
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         // 顶部导航栏
-        SettingsArgumentsPumpTopBar(navigationActions = navigationActions)
+        SettingsArgumentsPumpTopBar(
+            channel = channel,
+            onChannelChange = { channel = it },
+            navigationActions = navigationActions
+        )
         // 内容
-        PumpContentRow(arguments = arguments, viewModel = viewModel)
+        PumpContentRow(
+            channel = channel,
+            arguments = arguments,
+            viewModel = viewModel
+        )
     }
 }
 
@@ -82,6 +95,8 @@ fun SettingsArgumentsPumpView(viewModel: SettingsArgumentsPumpViewModel = hiltVi
 @Composable
 fun SettingsArgumentsPumpTopBar(
     modifier: Modifier = Modifier,
+    channel: Int,
+    onChannelChange: (Int) -> Unit,
     navigationActions: NavigationActions
 ) {
     Row(
@@ -103,9 +118,17 @@ fun SettingsArgumentsPumpTopBar(
         ) {
             Icon(imageVector = Icons.AutoMirrored.Default.Reply, contentDescription = "Back")
             Text(
-                text = stringResource(id = R.string.pump_arguments),
+                text = stringResource(id = R.string.runtime_arguments),
                 style = MaterialTheme.typography.titleLarge
             )
+        }
+
+        CircleTabRow(
+            modifier = Modifier.size(400.dp, 48.dp),
+            tabItems = List(ProductUtils.getChannelCount()) { stringResource(id = R.string.channel) + (it + 1) },
+            selected = channel
+        ) { index ->
+            onChannelChange(index)
         }
     }
 }
@@ -114,12 +137,10 @@ fun SettingsArgumentsPumpTopBar(
 @Composable
 fun PumpContentRow(
     modifier: Modifier = Modifier,
+    channel: Int,
     arguments: List<Arguments>,
     viewModel: SettingsArgumentsPumpViewModel
 ) {
-
-    // args
-    var channel by remember { mutableIntStateOf(0) }
 
     Column(
         modifier = modifier
@@ -129,35 +150,6 @@ fun PumpContentRow(
             .clip(MaterialTheme.shapes.medium),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Row(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row(
-                modifier = Modifier,
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                repeat(ProductUtils.getChannelCount()) { index ->
-                    Box(
-                        modifier = Modifier
-                            .background(
-                                color = if (channel == index) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                                shape = MaterialTheme.shapes.medium
-                            )
-                            .clip(MaterialTheme.shapes.medium)
-                            .clickable { channel = index }
-                            .padding(horizontal = 24.dp, vertical = 12.dp)
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.channel) + (index + 1),
-                            style = MaterialTheme.typography.titleLarge,
-                            color = if (channel == index) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                }
-            }
-        }
-
         PumpControlRow(channel = channel, viewModel = viewModel)
 
         LazyColumn(
@@ -216,7 +208,7 @@ fun PumpControlRow(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = "蠕动泵控制", style = MaterialTheme.typography.titleLarge)
+        Text(text = "蠕动泵控制", fontSize = 20.sp)
 
         VerticalDivider(
             modifier = Modifier
@@ -388,7 +380,7 @@ fun InPumpCalibrationRow(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = "进液", style = MaterialTheme.typography.titleLarge)
+        Text(text = "进液", fontSize = 20.sp)
 
         VerticalDivider(
             modifier = Modifier
@@ -614,7 +606,7 @@ fun OutPumpCalibrationRow(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = "出液", style = MaterialTheme.typography.titleLarge)
+        Text(text = "出液", fontSize = 20.sp)
 
         VerticalDivider(
             modifier = Modifier

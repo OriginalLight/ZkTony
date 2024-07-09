@@ -14,25 +14,25 @@ import javax.inject.Inject
 class SettingsArgumentsPumpViewModel @Inject constructor() : ViewModel() {
 
     suspend fun startPump(channel: Int, control: PumpControl) {
-        if (!SerialPortUtils.startPump(channel + 2, control)) {
+        if (!SerialPortUtils.startPump(channel, control)) {
             TipsUtils.showTips(Tips.error("启动泵失败 通道：${channel + 1} 泵ID：${control.control}"))
         }
     }
 
     suspend fun stopPump(channel: Int, control: Int) {
-        if (!SerialPortUtils.stopPump(channel + 2, control)) {
+        if (!SerialPortUtils.stopPump(channel, control)) {
             TipsUtils.showTips(Tips.error("停止泵失败 通道：${channel + 1} 泵ID：${control}"))
         }
     }
 
     suspend fun setPumpArguments(channel: Int, args: ArgumentsSpeed) {
-        if (!SerialPortUtils.setSpeedArguments(channel + 2, args)) {
+        if (!SerialPortUtils.setSpeedArguments(channel, args)) {
             TipsUtils.showTips(Tips.error("设置泵参数失败 通道：${channel + 1}"))
             return
         }
         delay(100L)
         // 同步参数
-        if (!SerialPortUtils.queryArguments(channel + 2)) {
+        if (!SerialPortUtils.queryArguments(channel)) {
             TipsUtils.showTips(Tips.error("同步参数失败 通道：${channel + 1}"))
         }
         delay(100L)

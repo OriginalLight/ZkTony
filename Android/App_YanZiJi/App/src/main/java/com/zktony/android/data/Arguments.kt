@@ -1,5 +1,6 @@
 package com.zktony.android.data
 
+import com.zktony.log.LogUtils
 import com.zktony.serialport.ext.readInt16LE
 import com.zktony.serialport.ext.writeInt16LE
 
@@ -232,36 +233,41 @@ data class ArgumentsBubble(
 
 // bytes to Arguments
 fun toArguments(bytes: ByteArray): Arguments? {
-    if (bytes.size != 144) return null
-    return Arguments(
-        outFillSpeed = bytes.readInt16LE(0) / 100.0,
-        inFillSpeed = bytes.readInt16LE(2) / 100.0,
-        outDrainSpeed = bytes.readInt16LE(4) / 100.0,
-        inDrainSpeed = bytes.readInt16LE(6) / 100.0,
-        outFillTime = bytes.readInt16LE(8) / 60,
-        inFillTime = bytes.readInt16LE(10) / 60,
-        outDrainTime = bytes.readInt16LE(12) / 60,
-        inDrainTime = bytes.readInt16LE(14) / 60,
-        emptyTime = bytes.readInt16LE(16) / 60,
-        scale = bytes.readInt16LE(18) / 100.0,
-        cleanOutFillSpeed = bytes.readInt16LE(20) / 100.0,
-        cleanInFillSpeed = bytes.readInt16LE(22) / 100.0,
-        cleanOutDrainSpeed = bytes.readInt16LE(24) / 100.0,
-        cleanInDrainSpeed = bytes.readInt16LE(26) / 100.0,
-        cleanOutFillTime = bytes.readInt16LE(28) / 60,
-        cleanInFillTime =   bytes.readInt16LE(30) / 60,
-        cleanOutDrainTime = bytes.readInt16LE(32) / 60,
-        cleanInDrainTime = bytes.readInt16LE(34) / 60,
-        cleanEmptyTime = bytes.readInt16LE(36) / 60,
-        cleanScale = bytes.readInt16LE(38) / 100.0,
-        tempComp = toDoubleList(bytes.copyOfRange(40, 60)),
-        outSpeedComp = toDoubleList(bytes.copyOfRange(60, 80)),
-        inSpeedComp = toDoubleList(bytes.copyOfRange(80, 100)),
-        voltComp = toDoubleList(bytes.copyOfRange(100, 120)),
-        currComp = toDoubleList(bytes.copyOfRange(120, 140)),
-        outBubbleThreshold = bytes.readInt16LE(140) / 100.0,
-        inBubbleThreshold = bytes.readInt16LE(142) / 100.0
-    )
+    try {
+        if (bytes.size != 144) throw Exception("Arguments 长度不正确")
+        return Arguments(
+            outFillSpeed = bytes.readInt16LE(0) / 100.0,
+            inFillSpeed = bytes.readInt16LE(2) / 100.0,
+            outDrainSpeed = bytes.readInt16LE(4) / 100.0,
+            inDrainSpeed = bytes.readInt16LE(6) / 100.0,
+            outFillTime = bytes.readInt16LE(8) / 60,
+            inFillTime = bytes.readInt16LE(10) / 60,
+            outDrainTime = bytes.readInt16LE(12) / 60,
+            inDrainTime = bytes.readInt16LE(14) / 60,
+            emptyTime = bytes.readInt16LE(16) / 60,
+            scale = bytes.readInt16LE(18) / 100.0,
+            cleanOutFillSpeed = bytes.readInt16LE(20) / 100.0,
+            cleanInFillSpeed = bytes.readInt16LE(22) / 100.0,
+            cleanOutDrainSpeed = bytes.readInt16LE(24) / 100.0,
+            cleanInDrainSpeed = bytes.readInt16LE(26) / 100.0,
+            cleanOutFillTime = bytes.readInt16LE(28) / 60,
+            cleanInFillTime =   bytes.readInt16LE(30) / 60,
+            cleanOutDrainTime = bytes.readInt16LE(32) / 60,
+            cleanInDrainTime = bytes.readInt16LE(34) / 60,
+            cleanEmptyTime = bytes.readInt16LE(36) / 60,
+            cleanScale = bytes.readInt16LE(38) / 100.0,
+            tempComp = toDoubleList(bytes.copyOfRange(40, 60)),
+            outSpeedComp = toDoubleList(bytes.copyOfRange(60, 80)),
+            inSpeedComp = toDoubleList(bytes.copyOfRange(80, 100)),
+            voltComp = toDoubleList(bytes.copyOfRange(100, 120)),
+            currComp = toDoubleList(bytes.copyOfRange(120, 140)),
+            outBubbleThreshold = bytes.readInt16LE(140) / 100.0,
+            inBubbleThreshold = bytes.readInt16LE(142) / 100.0
+        )
+    } catch (e: Exception) {
+        LogUtils.error("Arguments 解析失败: ${e.printStackTrace()}", true)
+        return null
+    }
 }
 
 private fun toDoubleList(bytes: ByteArray): List<Double> {

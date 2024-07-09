@@ -3,6 +3,7 @@ package com.zktony.serialport.command
 import com.zktony.serialport.ext.crc16LE
 import com.zktony.serialport.ext.replaceByteArrayBE
 import com.zktony.serialport.ext.splitByteArray
+import com.zktony.serialport.ext.toHexString
 import com.zktony.serialport.ext.writeInt16LE
 
 /**
@@ -93,7 +94,7 @@ class Protocol : BaseProtocol {
         fun verifyProtocol(byteArray: ByteArray, block: (Protocol) -> Unit) {
             // 验证包长 >= 10
             if (byteArray.size < 10) {
-                throw Exception("RX Length Error")
+                throw Exception("Rx length error by ${byteArray.toHexString()}")
             }
 
             // 分包处理
@@ -101,18 +102,18 @@ class Protocol : BaseProtocol {
                 // 验证包头和包尾
                 val head = pkg.copyOfRange(0, 1)
                 if (!head.contentEquals(expectHead)) {
-                    throw Exception("RX Header Error")
+                    throw Exception("Rx header error by ${pkg.toHexString()}")
                 }
                 val end = pkg.copyOfRange(pkg.size - 2, pkg.size)
                 if (!end.contentEquals(expectEnd)) {
-                    throw Exception("RX End Error")
+                    throw Exception("Rx end error by ${pkg.toHexString()}")
                 }
 
                 // crc 校验
                 val crc = pkg.copyOfRange(pkg.size - 4, pkg.size - 2)
                 val bytes = pkg.copyOfRange(0, pkg.size - 4)
                 if (!bytes.crc16LE().contentEquals(crc)) {
-                    throw Exception("RX Crc Error")
+                    throw Exception("Rx crc error by ${pkg.toHexString()}")
                 }
 
                 // 解析协议

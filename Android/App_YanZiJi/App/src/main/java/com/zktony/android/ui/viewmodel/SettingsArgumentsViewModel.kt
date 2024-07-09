@@ -23,7 +23,7 @@ class SettingsArgumentsViewModel @Inject constructor() : ViewModel() {
                 // 同步参数
                 repeat(ProductUtils.getChannelCount()) { index ->
                     // 初始化参数
-                    if (!SerialPortUtils.queryArguments(index + 2)) {
+                    if (!SerialPortUtils.queryArguments(index)) {
                         fail.add(index + 1)
                     }
                     delay(10L)
