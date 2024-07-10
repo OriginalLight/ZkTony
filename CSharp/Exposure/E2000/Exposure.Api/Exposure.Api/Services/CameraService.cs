@@ -159,16 +159,28 @@ public class CameraService(
             await Task.Delay(100);
 
             // 设置曝光时间
-            var expoTime = uint.Parse(await option.GetOptionValueAsync("ExpoTime") ?? "30000");
-            if (_nncam.put_ExpoTime(expoTime))
+            var expoTime = uint.Parse(await option.GetOptionValueAsync("ExpoTime") ?? "1000");
+            if (!_nncam.get_Option(Nncam.eOPTION.OPTION_BINNING, out var binning))
+            {
+                throw new Exception(localizer.GetString("Error0011").Value);
+            }
+            if (_nncam.put_ExpoTime((uint)(expoTime * (9.0 / (binning * binning)))))
+            {
                 Log.Information("设置曝光时间：" + expoTime);
+            }
             else
+            {
                 throw new Exception(localizer.GetString("Error0009").Value);
+            }
             // 触发拍摄
             if (_nncam.Trigger(1))
+            {
                 Log.Information("触发拍摄");
+            }
             else
+            {
                 throw new Exception(localizer.GetString("Error0010").Value);
+            }
 
             var flag = 30;
             while (_photoList.Count != _target && flag > 0)
@@ -224,16 +236,28 @@ public class CameraService(
             await Task.Delay(100, ctsToken);
 
             // 设置曝光时间
-            var expoTime = uint.Parse(await option.GetOptionValueAsync("ExpoTime") ?? "30000");
-            if (_nncam.put_ExpoTime(expoTime))
+            var expoTime = uint.Parse(await option.GetOptionValueAsync("ExpoTime") ?? "1000");
+            if (!_nncam.get_Option(Nncam.eOPTION.OPTION_BINNING, out var binning))
+            {
+                throw new Exception(localizer.GetString("Error0011").Value);
+            }
+            if (_nncam.put_ExpoTime((uint)(expoTime * (9.0 / (binning * binning)))))
+            {
                 Log.Information("设置曝光时间：" + expoTime);
+            }
             else
+            {
                 throw new Exception(localizer.GetString("Error0009").Value);
+            }
             // 触发拍摄
             if (_nncam.Trigger(1))
+            {
                 Log.Information("触发拍摄");
+            }
             else
+            {
                 throw new Exception(localizer.GetString("Error0010").Value);
+            }
 
             // 延时
             await Task.Delay(2000, ctsToken);
@@ -248,14 +272,22 @@ public class CameraService(
 
         // 设置曝光时
         if (_nncam.put_ExpoTime((uint)targetExpoTime))
+        {
             Log.Information("设置曝光时间：" + targetExpoTime);
+        }
         else
+        {
             throw new Exception(localizer.GetString("Error0009").Value);
+        }
 
         if (_nncam.Trigger(1))
+        {
             Log.Information("触发拍摄");
+        }
         else
+        {
             throw new Exception(localizer.GetString("Error0010").Value);
+        }
 
         Log.Information("自动拍照成功！");
 
@@ -292,16 +324,28 @@ public class CameraService(
             await Task.Delay(100, ctsToken);
 
             // 设置曝光时间
-            var expoTime = uint.Parse(await option.GetOptionValueAsync("ExpoTime") ?? "30000");
-            if (_nncam.put_ExpoTime(expoTime))
+            var expoTime = uint.Parse(await option.GetOptionValueAsync("ExpoTime") ?? "1000");
+            if (!_nncam.get_Option(Nncam.eOPTION.OPTION_BINNING, out var binning))
+            {
+                throw new Exception(localizer.GetString("Error0011").Value);
+            }
+            if (_nncam.put_ExpoTime((uint)(expoTime * (9.0 / (binning * binning)))))
+            {
                 Log.Information("设置曝光时间：" + expoTime);
+            }
             else
+            {
                 throw new Exception(localizer.GetString("Error0009").Value);
+            }
             // 触发拍摄
             if (_nncam.Trigger(1))
+            {
                 Log.Information("触发拍摄");
+            }
             else
+            {
                 throw new Exception(localizer.GetString("Error0010").Value);
+            }
 
             // 延时
             await Task.Delay(2000, ctsToken);
@@ -314,17 +358,24 @@ public class CameraService(
             throw;
         }
 
-
         // 设置曝光时
-        if (_nncam.put_ExpoTime((uint)(exposure / frame)))
-            Log.Information("设置曝光时间：" + (int)(exposure / frame));
+        if (_nncam.put_ExpoTime(exposure))
+        {
+            Log.Information("设置曝光时间：" + (int)exposure);
+        }
         else
+        {
             throw new Exception(localizer.GetString("Error0009").Value);
+        }
 
         if (_nncam.Trigger((ushort)frame))
+        {
             Log.Information("触发拍摄：" + frame);
+        }
         else
+        {
             throw new Exception(localizer.GetString("Error0010").Value);
+        }
 
         Log.Information("手动拍照成功！");
     }
@@ -584,27 +635,10 @@ public class CameraService(
                                 // 保存图片
                                 _photoList.Add(await SaveAsync(mat, info, (int)expoTime));
                                 break;
-                            case 2:
+                            default:
                                 _mat = mat.Clone();
                                 // 保存图片
                                 _photoList.Add(await SaveAsync(mat, info, (int)expoTime, true));
-                                break;
-                            default:
-                                {
-                                    var combine = new Mat(size.Height, size.Width, MatType.CV_16UC3, new Scalar(0));
-                                    try
-                                    {
-                                        if (_mat != null) Cv2.Add(mat, _mat, combine);
-                                        _mat?.Dispose();
-                                        _mat = combine.Clone();
-                                        // 保存图片
-                                        _photoList.Add(await SaveAsync(combine, info, (int)expoTime * (_seq - 1), true));
-                                    }
-                                    finally
-                                    {
-                                        combine.Dispose();
-                                    }
-                                }
                                 break;
                         }
                     }
@@ -646,8 +680,8 @@ public class CameraService(
 
                             var savePath = Path.Combine(FileUtils.Calibration, op);
                             if (!Directory.Exists(savePath)) Directory.CreateDirectory(savePath);
-                            Cv2.CvtColor(mat, gray, ColorConversionCodes.BGR2GRAY);
-                            Cv2.Normalize(gray, gray, 0, 65535.0, NormTypes.MinMax, MatType.CV_16UC1);
+                            var threshold = await option.GetOptionValueAsync("Threshold") ?? "0.001";
+                            gray = OpenCvUtils.AdjustLevelAuto(mat, double.Parse(threshold));
                             gray.SaveImage(Path.Combine(savePath, "before.png"));
                         }
                         finally
@@ -991,7 +1025,7 @@ public class CameraService(
             var end = DateTime.Now;
             Log.Information($"计算曝光时间：target = {target} k = {k} b= {b} 耗时 = {(end - start).TotalMilliseconds}ms");
 
-            return Math.Clamp((long)(target * 1_000_000), 100_000, 600_000_1000);
+            return Math.Clamp((long)(target * 1_000_000), 100_000, 600_000_000);
         }
         finally
         {
@@ -1027,7 +1061,7 @@ public class CameraService(
             await Task.Delay(100);
 
             // 设置曝光时间
-            var expoTime = uint.Parse(await option.GetOptionValueAsync("ExpoTime") ?? "30000");
+            var expoTime = uint.Parse(await option.GetOptionValueAsync("ExpoTime") ?? "1000");
             if (_nncam.put_ExpoTime(expoTime))
                 Log.Information("设置曝光时间：" + expoTime);
             else
@@ -1043,11 +1077,28 @@ public class CameraService(
                 };
                 await SetPixel((uint)index);
                 await Task.Delay(1000);
+                // 设置曝光时间
+                if (!_nncam.get_Option(Nncam.eOPTION.OPTION_BINNING, out var binning))
+                {
+                    throw new Exception(localizer.GetString("Error0011").Value);
+                }
+                if (_nncam.put_ExpoTime((uint)(expoTime * (9.0 / (binning * binning)))))
+                {
+                    Log.Information("设置曝光时间：" + expoTime);
+                }
+                else
+                {
+                    throw new Exception(localizer.GetString("Error0009").Value);
+                }
                 // 触发拍摄
                 if (_nncam.Trigger(1))
+                {
                     Log.Information("触发拍摄");
+                }
                 else
+                {
                     throw new Exception(localizer.GetString("Error0010").Value);
+                }
                 await Task.Delay(2000);
                 Log.Information($"{op}校准拍摄完成！");
             }

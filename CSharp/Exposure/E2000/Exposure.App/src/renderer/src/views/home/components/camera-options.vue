@@ -137,7 +137,7 @@
             :placeholder="t('home.camera.options.frames')"
             mode="button"
             :min="1"
-            :max="maxFrams"
+            :max="100"
             :step="1"
             :input-attrs="{ style: { textAlign: 'center' } }"
             model-event="input"
@@ -267,33 +267,6 @@ const disabled = ref({
 // 是否可以取消
 const canCancel = ref(true)
 
-//根据曝光时间计算最大帧数不能超过曝光时间除以5秒
-const maxFrams = computed(() => {
-  const min = options.value.time.minute ? options.value.time.minute : 0
-  const sec = options.value.time.second ? options.value.time.second : 0
-  const max = Math.floor((min * 60 + sec) / 5)
-  if (max < 1) {
-    return 1
-  }
-  if (max > 100) {
-    return 100
-  }
-
-  return max
-})
-
-watch(
-  () => maxFrams.value,
-  (value) => {
-    if (options.value.frame > value) {
-      options.value.frame = value
-    }
-  },
-  {
-    immediate: true
-  }
-)
-
 watch(
   () => props.cycle,
   (value) => {
@@ -395,7 +368,7 @@ const handleShoot = async () => {
         exposure: exposureTime.value,
         frame: options.value.frame ? options.value.frame : 1
       })
-      progress.value.time = exposureTime.value / 1000 + 2000
+      progress.value.time = (exposureTime.value / 1000) * options.value.frame + 2000
       progress.value.message = t('home.camera.options.shooting')
       canCancel.value = true
     }

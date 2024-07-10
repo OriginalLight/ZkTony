@@ -389,5 +389,4 @@ public static class OpenCvUtils
     }
 
     #endregion
-
 }
