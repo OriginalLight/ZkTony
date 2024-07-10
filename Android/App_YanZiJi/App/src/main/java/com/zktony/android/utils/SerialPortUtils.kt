@@ -1,9 +1,14 @@
 package com.zktony.android.utils
 
+import com.zktony.android.data.ArgumentsBubble
 import com.zktony.android.data.ArgumentsClean
+import com.zktony.android.data.ArgumentsCurrent
 import com.zktony.android.data.ArgumentsSpeed
+import com.zktony.android.data.ArgumentsTemperature
 import com.zktony.android.data.ArgumentsTransfer
+import com.zktony.android.data.ArgumentsVoltage
 import com.zktony.android.data.PumpControl
+import com.zktony.android.data.VoltageControl
 import com.zktony.android.data.toArguments
 import com.zktony.android.data.toChannelState
 import com.zktony.log.LogUtils
@@ -206,6 +211,88 @@ object SerialPortUtils {
         return rx == 0
     }
 
+    // 电极控制
+    suspend fun startVoltage(target: Int, control: VoltageControl): Boolean {
+        val serialPort = SerialStoreUtils.get("A") ?: return false
+        val callbackKey = "StartVoltage"
+        val bytesList = mutableListOf<ByteArray>()
+        var rx = -1
+
+        try {
+            serialPort.registerCallback(callbackKey) { bytes ->
+                bytesList.add(bytes)
+                Protocol.verifyProtocol(bytes) {
+                    if (it.function == 0x25.toByte()) {
+                        rx = it.data.readInt8()
+                    }
+                }
+            }
+            // 电极控制
+            val bytes = Protocol().apply {
+                function = 0x25.toByte()
+                targetAddress = (target + 2).toByte()
+                data = control.toByteArray()
+            }.serialization()
+            // 发送电极控制命令
+            serialPort.sendByteArray(bytes)
+            bytesList.add(bytes)
+            // 等待设置结果
+            withTimeout(1000) {
+                while (rx == -1) {
+                    delay(100)
+                }
+            }
+            if (rx == 1) throw Exception("Set return failed")
+        } catch (e: Exception) {
+            bytesList.forEach { LogUtils.error(callbackKey, it.toHexString(), true) }
+            LogUtils.error(callbackKey, e.stackTraceToString(), true)
+        } finally {
+            serialPort.unregisterCallback(callbackKey)
+        }
+
+        return rx == 2
+    }
+
+    // 电极控制
+    suspend fun stopVoltage(target: Int): Boolean {
+        val serialPort = SerialStoreUtils.get("A") ?: return false
+        val callbackKey = "StopVoltage"
+        val bytesList = mutableListOf<ByteArray>()
+        var rx = -1
+
+        try {
+            serialPort.registerCallback(callbackKey) { bytes ->
+                bytesList.add(bytes)
+                Protocol.verifyProtocol(bytes) {
+                    if (it.function == 0x26.toByte()) {
+                        rx = it.data.readInt8()
+                    }
+                }
+            }
+            // 电极控制
+            val bytes = Protocol().apply {
+                function = 0x26.toByte()
+                targetAddress = (target + 2).toByte()
+            }.serialization()
+            // 发送电极控制命令
+            serialPort.sendByteArray(bytes)
+            bytesList.add(bytes)
+            // 等待设置结果
+            withTimeout(1000) {
+                while (rx == -1) {
+                    delay(100)
+                }
+            }
+        } catch (e: Exception) {
+            bytesList.forEach { LogUtils.error(callbackKey, it.toHexString(), true) }
+            LogUtils.error(callbackKey, e.stackTraceToString(), true)
+        } finally {
+            serialPort.unregisterCallback(callbackKey)
+        }
+
+        return rx == 0
+    }
+
     // 查询 ChannelState
     suspend fun queryChannelState(target: Int): Boolean {
         val serialPort = SerialStoreUtils.get("A") ?: return false
@@ -305,29 +392,28 @@ object SerialPortUtils {
         return rx == 0
     }
 
-    // 设置转膜参数
-    suspend fun setTransferArguments(transfer: ArgumentsTransfer, target: Int): Boolean {
+    // 设置温度参数
+    suspend fun setArguments(target: Int, key: String, func: Byte, byteArray: ByteArray): Boolean {
         val serialPort = SerialStoreUtils.get("A") ?: return false
-        val callbackKey = "SetTransferArguments"
         val bytesList = mutableListOf<ByteArray>()
         var rx = -1
 
         try {
-            serialPort.registerCallback(callbackKey) { bytes ->
+            serialPort.registerCallback(key) { bytes ->
                 bytesList.add(bytes)
                 Protocol.verifyProtocol(bytes) {
-                    if (it.function == 0x29.toByte()) {
+                    if (it.function == func) {
                         rx = it.data.readInt8()
                     }
                 }
             }
-            // 设置转膜参数
+            // 设置温度参数
             val bytes = Protocol().apply {
-                function = 0x29.toByte()
+                function = func
                 targetAddress = (target + 2).toByte()
-                data = transfer.toByteArray()
+                data = byteArray
             }.serialization()
-            // 发送设置转膜参数命令
+            // 发送设置温度参数命令
             serialPort.sendByteArray(bytes)
             bytesList.add(bytes)
             // 等待设置结果
@@ -338,96 +424,47 @@ object SerialPortUtils {
             }
             if (rx == 1) throw Exception("Set return failed")
         } catch (e: Exception) {
-            bytesList.forEach { LogUtils.error(callbackKey, it.toHexString(), true) }
-            LogUtils.error(callbackKey, e.stackTraceToString(), true)
+            bytesList.forEach { LogUtils.error(key, it.toHexString(), true) }
+            LogUtils.error(key, e.stackTraceToString(), true)
         } finally {
-            serialPort.unregisterCallback(callbackKey)
+            serialPort.unregisterCallback(key)
         }
 
         return rx == 0
+    }
+
+    // 设置转膜参数
+    suspend fun setTransferArguments(transfer: ArgumentsTransfer, target: Int): Boolean {
+        return setArguments(target, "SetTransferArguments", 0x29.toByte(), transfer.toByteArray())
     }
 
     // 设置清洗参数
     suspend fun setCleanArguments(clean: ArgumentsClean, target: Int): Boolean {
-        val serialPort = SerialStoreUtils.get("A") ?: return false
-        val callbackKey = "SetCleanArguments"
-        val bytesList = mutableListOf<ByteArray>()
-        var rx = -1
-
-        try {
-            serialPort.registerCallback(callbackKey) { bytes ->
-                bytesList.add(bytes)
-                Protocol.verifyProtocol(bytes) {
-                    if (it.function == 0x2A.toByte()) {
-                        rx = it.data.readInt8()
-                    }
-                }
-            }
-            // 设置清洗参数
-            val bytes = Protocol().apply {
-                function = 0x2A.toByte()
-                targetAddress = (target + 2).toByte()
-                data = clean.toByteArray()
-            }.serialization()
-            // 发送设置清洗参数命令
-            serialPort.sendByteArray(bytes)
-            bytesList.add(bytes)
-            // 等待设置结果
-            withTimeout(1000) {
-                while (rx == -1) {
-                    delay(100)
-                }
-            }
-            if (rx == 1) throw Exception("Set return failed")
-        } catch (e: Exception) {
-            bytesList.forEach { LogUtils.error(callbackKey, it.toHexString(), true) }
-            LogUtils.error(callbackKey, e.stackTraceToString(), true)
-        } finally {
-            serialPort.unregisterCallback(callbackKey)
-        }
-
-        return rx == 0
+        return setArguments(target, "SetCleanArguments", 0x2A.toByte(), clean.toByteArray())
     }
 
     // 设置电机参数
     suspend fun setSpeedArguments(target: Int, args: ArgumentsSpeed): Boolean {
-        val serialPort = SerialStoreUtils.get("A") ?: return false
-        val callbackKey = "SetSpeedArguments"
-        val bytesList = mutableListOf<ByteArray>()
-        var rx = -1
+        return setArguments(target, "SetSpeedArguments", 0x2B.toByte(), args.toByteArray())
+    }
 
-        try {
-            serialPort.registerCallback(callbackKey) { bytes ->
-                bytesList.add(bytes)
-                Protocol.verifyProtocol(bytes) {
-                    if (it.function == 0x2B.toByte()) {
-                        rx = it.data.readInt8()
-                    }
-                }
-            }
-            // 设置泵参数
-            val bytes = Protocol().apply {
-                function = 0x2B.toByte()
-                targetAddress = (target + 2).toByte()
-                data = args.toByteArray()
-            }.serialization()
-            // 发送设置泵参数命令
-            serialPort.sendByteArray(bytes)
-            bytesList.add(bytes)
-            // 等待设置结果
-            withTimeout(1000) {
-                while (rx == -1) {
-                    delay(100)
-                }
-            }
-            if (rx == 1) throw Exception("Set return failed")
-        } catch (e: Exception) {
-            bytesList.forEach { LogUtils.error(callbackKey, it.toHexString(), true) }
-            LogUtils.error(callbackKey, e.stackTraceToString(), true)
-        } finally {
-            serialPort.unregisterCallback(callbackKey)
-        }
+    // 设置电压参数
+    suspend fun setVoltageArguments(target: Int, args: ArgumentsVoltage): Boolean {
+        return setArguments(target, "SetVoltageArguments", 0x2C.toByte(), args.toByteArray())
+    }
 
-        return rx == 0
+    // 设置电流参数
+    suspend fun setCurrentArguments(target: Int, args: ArgumentsCurrent): Boolean {
+        return setArguments(target, "SetCurrentArguments", 0x2D.toByte(), args.toByteArray())
+    }
+
+    // 设置温度参数
+    suspend fun setTemperatureArguments(target: Int, args: ArgumentsTemperature): Boolean {
+        return setArguments(target, "SetTemperatureArguments", 0x2E.toByte(), args.toByteArray())
+    }
+
+    // 设置传感器参数
+    suspend fun setSensorArguments(target: Int, args: ArgumentsBubble): Boolean {
+        return setArguments(target, "SetSensorArguments", 0x2F.toByte(), args.toByteArray())
     }
 }

@@ -67,7 +67,7 @@ fun SettingsArgumentsRuntimeView(viewModel: SettingsArgumentsRuntimeViewModel = 
             navigationActions = navigationActions
         )
         // 参数列表
-        RuntimeContentRow(
+        RuntimeArgumentsListView(
             channel = channel,
             arguments = arguments,
             viewModel = viewModel
@@ -75,6 +75,7 @@ fun SettingsArgumentsRuntimeView(viewModel: SettingsArgumentsRuntimeViewModel = 
     }
 }
 
+// 顶部导航栏
 @Composable
 fun SettingsArgumentsRuntimeTopBar(
     modifier: Modifier = Modifier,
@@ -116,8 +117,9 @@ fun SettingsArgumentsRuntimeTopBar(
     }
 }
 
+// 参数列表
 @Composable
-fun RuntimeContentRow(
+fun RuntimeArgumentsListView(
     modifier: Modifier = Modifier,
     channel: Int,
     arguments: List<Arguments>,

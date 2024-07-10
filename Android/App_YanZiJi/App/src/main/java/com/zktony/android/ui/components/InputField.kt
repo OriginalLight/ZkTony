@@ -234,7 +234,8 @@ fun PasswordInputField(
                 IconButton(onClick = { showPassword = !showPassword}) {
                     Icon(
                         imageVector = Icons.Default.RemoveRedEye,
-                        contentDescription = "Show Password"
+                        contentDescription = "Show Password",
+                        tint = if (showPassword) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                     )
                 }
             } else {

@@ -29,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zktony.android.R
+import com.zktony.android.data.Arguments
 import com.zktony.android.ui.components.ImportConfirmDialog
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.Route
@@ -50,82 +51,11 @@ fun SettingsArgumentsView(viewModel: SettingsArgumentsViewModel = hiltViewModel(
         // 顶部导航栏
         SettingsArgumentsTopBar(navigationActions = navigationActions, viewModel = viewModel)
         // 参数列表
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surface, shape = MaterialTheme.shapes.medium)
-                .padding(16.dp)
-                .clip(MaterialTheme.shapes.medium),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            // 设备参数
-            SettingsRow(
-                modifier = Modifier
-                    .clip(MaterialTheme.shapes.small)
-                    .clickable { navigationActions.navigate(Route.SETTINGS_ARGUMENTS_EQUIPMENT) },
-                title = stringResource(id = R.string.equipment_arguments)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
-                    contentDescription = "ArrowForwardIos"
-                )
-            }
-
-            // 运行时参数
-            SettingsRow(
-                modifier = Modifier
-                    .clip(MaterialTheme.shapes.small)
-                    .clickable { navigationActions.navigate(Route.SETTINGS_ARGUMENTS_RUNTIME) },
-                title = stringResource(id = R.string.runtime_arguments)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
-                    contentDescription = "ArrowForwardIos"
-                )
-            }
-
-            // 蠕动泵参数
-            SettingsRow(
-                modifier = Modifier
-                    .clip(MaterialTheme.shapes.small)
-                    .clickable { navigationActions.navigate(Route.SETTINGS_ARGUMENTS_PUMP) },
-                title = stringResource(id = R.string.pump_arguments)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
-                    contentDescription = "ArrowForwardIos"
-                )
-            }
-
-            // 电压电流参数
-            SettingsRow(
-                modifier = Modifier
-                    .clip(MaterialTheme.shapes.small)
-                    .clickable { navigationActions.navigate(Route.SETTINGS_ARGUMENTS_VOLTAGE) },
-                title = stringResource(id = R.string.voltage_arguments)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
-                    contentDescription = "ArrowForwardIos"
-                )
-            }
-
-            // 传感器参数
-            SettingsRow(
-                modifier = Modifier
-                    .clip(MaterialTheme.shapes.small)
-                    .clickable { navigationActions.navigate(Route.SETTINGS_ARGUMENTS_SENSOR) },
-                title = stringResource(id = R.string.sensor_arguments)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
-                    contentDescription = "ArrowForwardIos"
-                )
-            }
-        }
+        ArgumentsListView(navigationActions = navigationActions)
     }
 }
 
+// 顶部导航栏
 @Composable
 fun SettingsArgumentsTopBar(
     modifier: Modifier = Modifier,
@@ -183,6 +113,87 @@ fun SettingsArgumentsTopBar(
             Button(onClick = { viewModel.exportArguments() }) {
                 Text(text = stringResource(id = R.string.one_click_export))
             }
+        }
+    }
+}
+
+// 参数列表
+@Composable
+fun ArgumentsListView(
+    modifier: Modifier = Modifier,
+    navigationActions: NavigationActions
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface, shape = MaterialTheme.shapes.medium)
+            .padding(16.dp)
+            .clip(MaterialTheme.shapes.medium),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        // 设备参数
+        SettingsRow(
+            modifier = Modifier
+                .clip(MaterialTheme.shapes.small)
+                .clickable { navigationActions.navigate(Route.SETTINGS_ARGUMENTS_EQUIPMENT) },
+            title = stringResource(id = R.string.equipment_arguments)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
+                contentDescription = "ArrowForwardIos"
+            )
+        }
+
+        // 运行时参数
+        SettingsRow(
+            modifier = Modifier
+                .clip(MaterialTheme.shapes.small)
+                .clickable { navigationActions.navigate(Route.SETTINGS_ARGUMENTS_RUNTIME) },
+            title = stringResource(id = R.string.runtime_arguments)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
+                contentDescription = "ArrowForwardIos"
+            )
+        }
+
+        // 蠕动泵参数
+        SettingsRow(
+            modifier = Modifier
+                .clip(MaterialTheme.shapes.small)
+                .clickable { navigationActions.navigate(Route.SETTINGS_ARGUMENTS_PUMP) },
+            title = stringResource(id = R.string.pump_arguments)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
+                contentDescription = "ArrowForwardIos"
+            )
+        }
+
+        // 电压电流参数
+        SettingsRow(
+            modifier = Modifier
+                .clip(MaterialTheme.shapes.small)
+                .clickable { navigationActions.navigate(Route.SETTINGS_ARGUMENTS_VOLTAGE) },
+            title = stringResource(id = R.string.voltage_arguments)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
+                contentDescription = "ArrowForwardIos"
+            )
+        }
+
+        // 传感器参数
+        SettingsRow(
+            modifier = Modifier
+                .clip(MaterialTheme.shapes.small)
+                .clickable { navigationActions.navigate(Route.SETTINGS_ARGUMENTS_SENSOR) },
+            title = stringResource(id = R.string.sensor_arguments)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
+                contentDescription = "ArrowForwardIos"
+            )
         }
     }
 }

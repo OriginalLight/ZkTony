@@ -71,7 +71,7 @@ fun SettingsArgumentsPumpView(viewModel: SettingsArgumentsPumpViewModel = hiltVi
             navigationActions = navigationActions
         )
         // 内容
-        PumpContentRow(
+        PumpArgumentsListView(
             channel = channel,
             arguments = arguments,
             viewModel = viewModel
@@ -123,7 +123,7 @@ fun SettingsArgumentsPumpTopBar(
 
 // 内容
 @Composable
-fun PumpContentRow(
+fun PumpArgumentsListView(
     modifier: Modifier = Modifier,
     channel: Int,
     arguments: List<Arguments>,
@@ -138,7 +138,7 @@ fun PumpContentRow(
             .clip(MaterialTheme.shapes.medium),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        PumpControlRow(channel = channel, viewModel = viewModel)
+        PumpControlView(channel = channel, viewModel = viewModel)
 
         LazyColumn(
             modifier = Modifier
@@ -148,7 +148,7 @@ fun PumpContentRow(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             item {
-                InPumpCalibrationRow(
+                InPumpCalibrationView(
                     channel = channel,
                     arguments = arguments,
                     viewModel = viewModel
@@ -156,7 +156,7 @@ fun PumpContentRow(
             }
 
             item {
-                OutPumpCalibrationRow(
+                OutPumpCalibrationView(
                     channel = channel,
                     arguments = arguments,
                     viewModel = viewModel
@@ -168,7 +168,7 @@ fun PumpContentRow(
 
 // 蠕动泵控制
 @Composable
-fun PumpControlRow(
+fun PumpControlView(
     modifier: Modifier = Modifier,
     channel: Int,
     viewModel: SettingsArgumentsPumpViewModel
@@ -193,14 +193,14 @@ fun PumpControlRow(
                 shape = MaterialTheme.shapes.medium
             )
             .padding(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(text = "蠕动泵控制", fontSize = 20.sp)
 
         VerticalDivider(
             modifier = Modifier
-                .height(128.dp),
+                .height(64.dp),
             thickness = 2.dp
         )
 
@@ -230,18 +230,14 @@ fun PumpControlRow(
 
         VerticalDivider(
             modifier = Modifier
-                .height(128.dp),
+                .height(64.dp),
             thickness = 2.dp
         )
 
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .height(128.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             ArgumentsInputField(
                 modifier = Modifier
+                    .width(350.dp)
                     .height(56.dp)
                     .fillMaxWidth(),
                 prefix = "转速",
@@ -252,6 +248,7 @@ fun PumpControlRow(
 
             ArgumentsInputField(
                 modifier = Modifier
+                    .width(350.dp)
                     .height(56.dp)
                     .fillMaxWidth(),
                 prefix = "时间",
@@ -263,53 +260,51 @@ fun PumpControlRow(
 
         VerticalDivider(
             modifier = Modifier
-                .height(128.dp),
+                .height(64.dp),
             thickness = 2.dp
         )
 
-        Column(verticalArrangement = Arrangement.SpaceAround) {
-            Button(
-                modifier = Modifier.width(120.dp),
-                onClick = {
+        Button(
+            modifier = Modifier.width(120.dp),
+            onClick = {
+                scope.launch {
                     scope.launch {
-                        scope.launch {
-                            viewModel.startPump(
-                                channel = channel,
-                                control = PumpControl(
-                                    control = inOrOut,
-                                    direction = direction,
-                                    speedUnit = speedUnit,
-                                    speed = speed.toDoubleOrNull() ?: 0.0,
-                                    time = time.toIntOrNull() ?: 0
-                                )
-                            )
-                        }
-                    }
-                }
-            ) {
-                Text(text = "开始", style = MaterialTheme.typography.bodyLarge)
-            }
-
-            OutlinedButton(
-                modifier = Modifier.width(120.dp),
-                onClick = {
-                    scope.launch {
-                        viewModel.stopPump(
+                        viewModel.startPump(
                             channel = channel,
-                            control = inOrOut
+                            control = PumpControl(
+                                control = inOrOut,
+                                direction = direction,
+                                speedUnit = speedUnit,
+                                speed = speed.toDoubleOrNull() ?: 0.0,
+                                time = time.toIntOrNull() ?: 0
+                            )
                         )
                     }
                 }
-            ) {
-                Text(text = "停止", style = MaterialTheme.typography.bodyLarge)
             }
+        ) {
+            Text(text = "开始", style = MaterialTheme.typography.bodyLarge)
+        }
+
+        OutlinedButton(
+            modifier = Modifier.width(120.dp),
+            onClick = {
+                scope.launch {
+                    viewModel.stopPump(
+                        channel = channel,
+                        control = inOrOut
+                    )
+                }
+            }
+        ) {
+            Text(text = "停止", style = MaterialTheme.typography.bodyLarge)
         }
     }
 }
 
 // 进液校准
 @Composable
-fun InPumpCalibrationRow(
+fun InPumpCalibrationView(
     modifier: Modifier = Modifier,
     channel: Int,
     arguments: List<Arguments>,
@@ -368,7 +363,7 @@ fun InPumpCalibrationRow(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = "进液", fontSize = 20.sp)
+        Text(text = "进液泵校准", fontSize = 20.sp)
 
         VerticalDivider(
             modifier = Modifier
@@ -535,7 +530,7 @@ fun InPumpCalibrationRow(
 
 // 出液校准
 @Composable
-fun OutPumpCalibrationRow(
+fun OutPumpCalibrationView(
     modifier: Modifier = Modifier,
     channel: Int,
     arguments: List<Arguments>,
@@ -594,7 +589,7 @@ fun OutPumpCalibrationRow(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = "出液", fontSize = 20.sp)
+        Text(text = "出液泵校准", fontSize = 20.sp)
 
         VerticalDivider(
             modifier = Modifier

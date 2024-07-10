@@ -44,48 +44,16 @@ fun SettingsArgumentsEquipmentView(viewModel: SettingsArgumentsEquipmentViewMode
         navigationActions.navigateUp()
     }
 
-    // P/N参数
-    var pn by rememberDataSaverState(key = Constants.PN, initialValue = Constants.DEFAULT_PN)
-    // S/N参数
-    var sn by rememberDataSaverState(key = Constants.SN, initialValue = Constants.DEFAULT_SN)
-
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        // 顶部导航栏
         SettingsArgumentsEquipmentTopBar(navigationActions = navigationActions)
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surface, shape = MaterialTheme.shapes.medium)
-                .padding(16.dp)
-                .clip(MaterialTheme.shapes.medium),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            SettingsRow(title = stringResource(id = R.string.product_number)) {
-                DropDownBox(
-                    modifier = Modifier
-                        .width(200.dp)
-                        .height(48.dp),
-                    selected = ProductUtils.ProductNumberList.indexOf(pn),
-                    options = ProductUtils.ProductNumberList
-                ) {
-                    pn = ProductUtils.ProductNumberList[it]
-                    viewModel.setProductNumber(pn)
-                }
-            }
-
-            SettingsRow(title = stringResource(id = R.string.serial_number)) {
-                ArgumentsSetField(
-                    modifier = Modifier.width(350.dp),
-                    value = sn,
-                ) {
-                    sn = it
-                    viewModel.setSerialNumber(sn)
-                }
-            }
-        }
+        // 参数列表
+        EquipmentArgumentsListView(viewModel = viewModel)
     }
 }
 
+// 顶部导航栏
 @Composable
 fun SettingsArgumentsEquipmentTopBar(
     modifier: Modifier = Modifier,
@@ -114,6 +82,50 @@ fun SettingsArgumentsEquipmentTopBar(
                 text = stringResource(id = R.string.equipment_arguments),
                 style = MaterialTheme.typography.titleLarge
             )
+        }
+    }
+}
+
+// 参数列表
+@Composable
+fun EquipmentArgumentsListView(
+    modifier: Modifier = Modifier,
+    viewModel: SettingsArgumentsEquipmentViewModel
+) {
+    // P/N参数
+    var pn by rememberDataSaverState(key = Constants.PN, initialValue = Constants.DEFAULT_PN)
+    // S/N参数
+    var sn by rememberDataSaverState(key = Constants.SN, initialValue = Constants.DEFAULT_SN)
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface, shape = MaterialTheme.shapes.medium)
+            .padding(16.dp)
+            .clip(MaterialTheme.shapes.medium),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        SettingsRow(title = stringResource(id = R.string.product_number)) {
+            DropDownBox(
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(48.dp),
+                selected = ProductUtils.ProductNumberList.indexOf(pn),
+                options = ProductUtils.ProductNumberList
+            ) {
+                pn = ProductUtils.ProductNumberList[it]
+                viewModel.setProductNumber(pn)
+            }
+        }
+
+        SettingsRow(title = stringResource(id = R.string.serial_number)) {
+            ArgumentsSetField(
+                modifier = Modifier.width(350.dp),
+                value = sn,
+            ) {
+                sn = it
+                viewModel.setSerialNumber(sn)
+            }
         }
     }
 }

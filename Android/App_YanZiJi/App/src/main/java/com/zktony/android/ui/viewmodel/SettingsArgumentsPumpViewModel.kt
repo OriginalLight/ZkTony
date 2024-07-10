@@ -16,12 +16,16 @@ class SettingsArgumentsPumpViewModel @Inject constructor() : ViewModel() {
     suspend fun startPump(channel: Int, control: PumpControl) {
         if (!SerialPortUtils.startPump(channel, control)) {
             TipsUtils.showTips(Tips.error("启动泵失败 通道：${channel + 1} 泵ID：${control.control}"))
+        } else {
+            TipsUtils.showTips(Tips.info("启动泵成功 通道：${channel + 1} 泵ID：${control.control}"))
         }
     }
 
     suspend fun stopPump(channel: Int, control: Int) {
         if (!SerialPortUtils.stopPump(channel, control)) {
             TipsUtils.showTips(Tips.error("停止泵失败 通道：${channel + 1} 泵ID：${control}"))
+        } else {
+            TipsUtils.showTips(Tips.info("停止泵成功 通道：${channel + 1} 泵ID：${control}"))
         }
     }
 

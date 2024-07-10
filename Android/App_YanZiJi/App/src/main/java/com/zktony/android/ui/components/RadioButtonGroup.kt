@@ -2,6 +2,7 @@ package com.zktony.android.ui.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectableGroup
@@ -47,10 +48,51 @@ fun RadioButtonGroup(
     }
 }
 
+@Composable
+fun VerticalRadioButtonGroup(
+    modifier: Modifier = Modifier,
+    selected: Int,
+    options: List<String>,
+    onSelectedChange: (Int) -> Unit
+) {
+    Column(
+        modifier = modifier.selectableGroup(),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        options.forEachIndexed { index, text ->
+            Row(
+                modifier = Modifier
+                    .clip(MaterialTheme.shapes.small)
+                    .clickable { onSelectedChange(index) }
+                    .padding(4.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(
+                    selected = index == selected,
+                    onClick = null
+                )
+
+                Text(text = text)
+            }
+        }
+    }
+}
+
 @Preview
 @Composable
 fun RadioButtonGroupPreview() {
     RadioButtonGroup(
+        selected = 0,
+        options = listOf("Option 1", "Option 2", "Option 3"),
+        onSelectedChange = { }
+    )
+}
+
+@Preview
+@Composable
+fun VerticalRadioButtonGroupPreview() {
+    VerticalRadioButtonGroup(
         selected = 0,
         options = listOf("Option 1", "Option 2", "Option 3"),
         onSelectedChange = { }
