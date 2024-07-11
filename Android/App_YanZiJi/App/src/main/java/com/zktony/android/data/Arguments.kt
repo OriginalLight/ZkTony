@@ -3,7 +3,9 @@ package com.zktony.android.data
 import com.zktony.log.LogUtils
 import com.zktony.serialport.ext.readInt16LE
 import com.zktony.serialport.ext.writeInt16LE
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Arguments(
     // 实验参数
     val outFillSpeed: Double = 0.0,       // 出液蠕动泵填充速度(2byte)
@@ -107,6 +109,51 @@ data class Arguments(
             outBubbleThreshold = outBubbleThreshold,
             inBubbleThreshold = inBubbleThreshold
         )
+    }
+
+    fun toByteArray(): ByteArray {
+        val bytes = ByteArray(144)
+        bytes.writeInt16LE((outFillSpeed * 100).toInt(), 0)
+        bytes.writeInt16LE((inFillSpeed * 100).toInt(), 2)
+        bytes.writeInt16LE((outDrainSpeed * 100).toInt(), 4)
+        bytes.writeInt16LE((inDrainSpeed * 100).toInt(), 6)
+        bytes.writeInt16LE(outFillTime * 60, 8)
+        bytes.writeInt16LE(inFillTime * 60, 10)
+        bytes.writeInt16LE(outDrainTime * 60, 12)
+        bytes.writeInt16LE(inDrainTime * 60, 14)
+        bytes.writeInt16LE(emptyTime * 60, 16)
+        bytes.writeInt16LE((scale * 100).toInt(), 18)
+        bytes.writeInt16LE((cleanOutFillSpeed * 100).toInt(), 20)
+        bytes.writeInt16LE((cleanInFillSpeed * 100).toInt(), 22)
+        bytes.writeInt16LE((cleanOutDrainSpeed * 100).toInt(), 24)
+        bytes.writeInt16LE((cleanInDrainSpeed * 100).toInt(), 26)
+        bytes.writeInt16LE(cleanOutFillTime * 60, 28)
+        bytes.writeInt16LE(cleanInFillTime * 60, 30)
+        bytes.writeInt16LE(cleanOutDrainTime * 60, 32)
+        bytes.writeInt16LE(cleanInDrainTime * 60, 34)
+        bytes.writeInt16LE(cleanEmptyTime * 60, 36)
+        bytes.writeInt16LE((cleanScale * 100).toInt(), 38)
+        for (i in tempComp.indices) {
+            bytes.writeInt16LE((tempComp[i] * 100).toInt(), i * 2 + 40)
+        }
+        for (i in outSpeedComp.indices) {
+            bytes.writeInt16LE((outSpeedComp[i] * 100).toInt(), i * 2 + 60)
+        }
+        for (i in inSpeedComp.indices) {
+            bytes.writeInt16LE((inSpeedComp[i] * 100).toInt(), i * 2 + 80)
+        }
+        for (i in voltComp.indices) {
+            bytes.writeInt16LE((voltComp[i] * 100).toInt(), i * 2 + 100)
+        }
+
+        for (i in currComp.indices) {
+            bytes.writeInt16LE((currComp[i] * 100).toInt(), i * 2 + 120)
+        }
+
+        bytes.writeInt16LE((outBubbleThreshold * 100).toInt(), 140)
+        bytes.writeInt16LE((inBubbleThreshold * 100).toInt(), 142)
+
+        return bytes
     }
 }
 

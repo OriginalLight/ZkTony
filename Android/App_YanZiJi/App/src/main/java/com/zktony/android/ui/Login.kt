@@ -30,6 +30,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
@@ -145,17 +146,13 @@ fun LoginForm(
         )
 
         UserNameInputField(
-            modifier
-                .height(56.dp)
-                .width(450.dp),
+            modifier.width(450.dp),
             value = userName,
             onValueChange = { userName = it }
         )
 
         PasswordInputField(
-            modifier
-                .height(56.dp)
-                .width(450.dp),
+            modifier.width(450.dp),
             value = password,
             onValueChange = { password = it }
         )
@@ -176,15 +173,15 @@ fun LoginForm(
         ) {
             if (loading) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(16.dp),
+                    modifier = Modifier.size(18.dp),
                     color = MaterialTheme.colorScheme.onPrimary,
                     strokeWidth = 2.dp
                 )
-                Spacer(modifier = Modifier.width(8.dp))
             }
             Text(
                 text = stringResource(id = R.string.login),
-                style = MaterialTheme.typography.bodyLarge
+                fontSize = 18.sp,
+                letterSpacing = 16.sp
             )
         }
     }

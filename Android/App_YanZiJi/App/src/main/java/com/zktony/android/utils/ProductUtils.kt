@@ -4,6 +4,7 @@ object ProductUtils {
 
     const val MAX_CHANNEL_COUNT = 4
     private var ProductNumber: String = "M-Blot T4000"
+    private var SerialNumber: String = "Unknown"
 
     val ProductNumberList = listOf(
         "M-Blot T4000",
@@ -19,9 +20,19 @@ object ProductUtils {
         ProductNumber = productNumber
     }
 
+    // 设置产品序列号
+    fun setSerialNumber(sn: String) {
+        SerialNumber = sn
+    }
+
     // 获取产品型号
     fun getProductNumber(): String {
         return ProductNumber
+    }
+
+    // 获取产品序列号
+    fun getSerialNumber(): String {
+        return SerialNumber
     }
 
     // 根据产品型号获取模块数量

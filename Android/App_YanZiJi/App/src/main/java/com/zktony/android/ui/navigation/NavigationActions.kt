@@ -25,6 +25,9 @@ object Route {
     const val SETTINGS_ARGUMENTS_VOLTAGE = "SettingsArgumentsVoltage"
     const val SETTINGS_ARGUMENTS_SENSOR = "SettingsArgumentsSensor"
     const val SETTINGS_DEBUG = "SettingsDebug"
+    const val SETTINGS_DEBUG_SOLENOID_VALVE = "SettingsDebugSolenoidValve"
+    const val SETTINGS_DEBUG_PIPELINE = "SettingsDebugPipeline"
+    const val SETTINGS_DEBUG_EXPERIMENTAL = "SettingsDebugExperimental"
     const val SETTINGS_FQC = "SettingsFqc"
     const val SETTINGS_AGING = "SettingsAging"
 }

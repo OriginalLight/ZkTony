@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import com.zktony.android.R
 
 @Composable
@@ -31,10 +32,37 @@ fun ImportConfirmDialog(
         modifier = modifier,
         onDismissRequest = { onDismiss() },
         dismissButton = {
-            OutlinedButton(onClick = { onDismiss() }) { Text(stringResource(id = R.string.cancel)) }
+            Button(onClick = { onConfirm() }) { Text(stringResource(id = R.string.ok), letterSpacing = 12.sp) }
         },
         confirmButton = {
-            Button(onClick = { onConfirm() }) { Text(stringResource(id = R.string.ok)) }
+            OutlinedButton(onClick = { onDismiss() }) { Text(stringResource(id = R.string.cancel), letterSpacing = 12.sp) }
+        }
+    )
+}
+
+@Composable
+fun ClearConfirmDialog(
+    modifier: Modifier = Modifier,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    AlertDialog(
+        title = { Text(stringResource(id = R.string.one_click_clear)) },
+        text = {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(id = R.string.clear_confirm_content),
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center
+            )
+        },
+        modifier = modifier,
+        onDismissRequest = { onDismiss() },
+        dismissButton = {
+            Button(onClick = { onConfirm() }) { Text(stringResource(id = R.string.ok), letterSpacing = 12.sp) }
+        },
+        confirmButton = {
+            OutlinedButton(onClick = { onDismiss() }) { Text(stringResource(id = R.string.cancel), letterSpacing = 12.sp) }
         }
     )
 }
@@ -58,10 +86,10 @@ fun LogoutConfirmDialog(
         modifier = modifier,
         onDismissRequest = { onDismiss() },
         dismissButton = {
-            OutlinedButton(onClick = { onDismiss() }) { Text(stringResource(id = R.string.cancel)) }
+            Button(onClick = { onConfirm() }) { Text(stringResource(id = R.string.ok), letterSpacing = 12.sp) }
         },
         confirmButton = {
-            Button(onClick = { onConfirm() }) { Text(stringResource(id = R.string.ok)) }
+            OutlinedButton(onClick = { onDismiss() }) { Text(stringResource(id = R.string.cancel), letterSpacing = 12.sp) }
         }
     )
 }

@@ -53,6 +53,10 @@ object AppStateUtils {
         _argumentsList.value = argumentsList
     }
 
+    fun getArgumentList(): List<Arguments> {
+        return _argumentsList.value
+    }
+
     fun setChannelStateList(channelStateList: List<ChannelState>) {
         _channelStateList.value = channelStateList
     }

@@ -10,10 +10,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.zktony.android.utils.Constants
+import com.zktony.android.utils.ProductUtils
 import com.zktony.datastore.rememberDataSaverState
 
 @Composable
@@ -24,6 +26,10 @@ fun BottomBar(modifier: Modifier = Modifier) {
         initialValue = Constants.DEFAULT_SN,
         senseExternalDataChange = true
     )
+
+    LaunchedEffect(sn) {
+        ProductUtils.setSerialNumber(sn)
+    }
 
     Box(
         modifier = modifier

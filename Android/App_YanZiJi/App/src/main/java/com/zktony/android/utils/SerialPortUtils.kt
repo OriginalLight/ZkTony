@@ -467,4 +467,10 @@ object SerialPortUtils {
     suspend fun setSensorArguments(target: Int, args: ArgumentsBubble): Boolean {
         return setArguments(target, "SetSensorArguments", 0x2F.toByte(), args.toByteArray())
     }
+
+    // 设置电磁阀参数
+    suspend fun setSolenoidValveArguments(target: Int, value: Int): Boolean {
+        val byteArray = byteArrayOf(0x00, value.toByte())
+        return setArguments(target, "SetSolenoidValveArguments", 0x30.toByte(), byteArray)
+    }
 }

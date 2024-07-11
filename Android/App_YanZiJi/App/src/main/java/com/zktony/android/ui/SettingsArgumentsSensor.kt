@@ -167,7 +167,7 @@ fun RealTimeSensorView(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.medium)
                 .padding(horizontal = 24.dp, vertical = 12.dp),
-            text = "出液气泡传感器：" + if (channelState.bubble1 == 0) "OFF" else "ON",
+            text = "出液气泡传感器：" + if (channelState.bubble1 == 0) "空气" else "液体",
             style = MaterialTheme.typography.bodyLarge
         )
 
@@ -175,7 +175,7 @@ fun RealTimeSensorView(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.medium)
                 .padding(horizontal = 24.dp, vertical = 12.dp),
-            text = "进液气泡传感器：" + if (channelState.bubble2 == 0) "OFF" else "ON",
+            text = "进液气泡传感器：" + if (channelState.bubble2 == 0) "空气" else "液体",
             style = MaterialTheme.typography.bodyLarge
         )
 
@@ -183,7 +183,7 @@ fun RealTimeSensorView(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.medium)
                 .padding(horizontal = 24.dp, vertical = 12.dp),
-            text = "转膜盒光耦：" + if (channelState.opto1 == 0) "OFF" else "ON",
+            text = "转膜盒光耦：" + if (channelState.opto1 == 0) "空闲" else "遮挡",
             style = MaterialTheme.typography.bodyLarge
         )
 
@@ -191,7 +191,7 @@ fun RealTimeSensorView(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.medium)
                 .padding(horizontal = 24.dp, vertical = 12.dp),
-            text = "染色盒光耦：" + if (channelState.opto2 == 0) "OFF" else "ON",
+            text = "染色盒光耦：" + if (channelState.opto2 == 0) "空闲" else "遮挡",
             style = MaterialTheme.typography.bodyLarge
         )
     }

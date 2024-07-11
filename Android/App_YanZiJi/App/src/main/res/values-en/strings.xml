@@ -48,4 +48,7 @@
     <string name="save">Save</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
+    <string name="solenoid_valve">Solenoid Valve</string>
+    <string name="pipeline">Pipeline</string>
+    <string name="clear_confirm_content">All parameters will be cleared and cannot be restored!!! Confirm clearing?</string>
 </resources>

@@ -49,6 +49,9 @@ import com.zktony.android.ui.SettingsArgumentsRuntimeView
 import com.zktony.android.ui.SettingsArgumentsSensorView
 import com.zktony.android.ui.SettingsArgumentsView
 import com.zktony.android.ui.SettingsArgumentsVoltageView
+import com.zktony.android.ui.SettingsDebugExperimentalView
+import com.zktony.android.ui.SettingsDebugPipelineView
+import com.zktony.android.ui.SettingsDebugSolenoidValveView
 import com.zktony.android.ui.SettingsDebugView
 import com.zktony.android.ui.SettingsFqcView
 import com.zktony.android.ui.SettingsView
@@ -103,6 +106,9 @@ fun AppNavigation() {
                 composable(Route.SETTINGS_ARGUMENTS_VOLTAGE) { SettingsArgumentsVoltageView() }
                 composable(Route.SETTINGS_ARGUMENTS_SENSOR) { SettingsArgumentsSensorView() }
                 composable(Route.SETTINGS_DEBUG) { SettingsDebugView() }
+                composable(Route.SETTINGS_DEBUG_SOLENOID_VALVE) { SettingsDebugSolenoidValveView() }
+                composable(Route.SETTINGS_DEBUG_PIPELINE) { SettingsDebugPipelineView() }
+                composable(Route.SETTINGS_DEBUG_EXPERIMENTAL) { SettingsDebugExperimentalView() }
                 composable(Route.SETTINGS_FQC) { SettingsFqcView() }
                 composable(Route.SETTINGS_AGING) { SettingsAgingView() }
             }

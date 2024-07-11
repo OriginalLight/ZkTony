@@ -6,14 +6,18 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -21,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,13 +34,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zktony.android.R
-import com.zktony.android.data.Arguments
+import com.zktony.android.ui.components.ClearConfirmDialog
 import com.zktony.android.ui.components.ImportConfirmDialog
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.zktyBrush
 import com.zktony.android.ui.viewmodel.SettingsArgumentsViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun SettingsArgumentsView(viewModel: SettingsArgumentsViewModel = hiltViewModel()) {
@@ -62,14 +68,28 @@ fun SettingsArgumentsTopBar(
     navigationActions: NavigationActions,
     viewModel: SettingsArgumentsViewModel
 ) {
-    var showSecondConfirmation by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    var importConformDialog by remember { mutableStateOf(false) }
+    var clearConfirmDialog by remember { mutableStateOf(false) }
+    var loadingExport by remember { mutableStateOf(false) }
+    var loadingClear by remember { mutableStateOf(false) }
 
-    if (showSecondConfirmation) {
+    if (importConformDialog) {
         ImportConfirmDialog(
-            onDismiss = { showSecondConfirmation = false },
+            onDismiss = { importConformDialog = false },
             onConfirm = {
                 viewModel.importArguments()
-                showSecondConfirmation = false
+                importConformDialog = false
+            }
+        )
+    }
+
+    if (clearConfirmDialog) {
+        ClearConfirmDialog(
+            onDismiss = { clearConfirmDialog = false },
+            onConfirm = {
+                viewModel.clearArguments()
+                clearConfirmDialog = false
             }
         )
     }
@@ -102,15 +122,29 @@ fun SettingsArgumentsTopBar(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Button(onClick = { /*TODO*/ }) {
+            Button(onClick = { clearConfirmDialog = true }) {
                 Text(text = stringResource(id = R.string.one_click_clear))
             }
 
-            Button(onClick = { showSecondConfirmation = true }) {
+            Button(onClick = { importConformDialog = true }) {
                 Text(text = stringResource(id = R.string.one_click_import))
             }
 
-            Button(onClick = { viewModel.exportArguments() }) {
+            Button(onClick = {
+                scope.launch {
+                    loadingExport = true
+                    viewModel.exportArguments()
+                    loadingExport = false
+                }
+            }) {
+                if (loadingExport) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 2.dp
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
                 Text(text = stringResource(id = R.string.one_click_export))
             }
         }
