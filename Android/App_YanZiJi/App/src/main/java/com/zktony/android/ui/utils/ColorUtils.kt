@@ -22,9 +22,11 @@ val zktyBrush = Brush.linearGradient(
 @Composable
 fun PreviewColorUtils() {
     MaterialTheme {
-        Box(modifier = Modifier
-            .size(200.dp)
-            .background(brush = zktyBrush)) {
+        Box(
+            modifier = Modifier
+                .size(200.dp)
+                .background(brush = zktyBrush)
+        ) {
         }
     }
 }

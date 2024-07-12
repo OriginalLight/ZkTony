@@ -7,10 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -40,7 +37,6 @@ import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.zktyBrush
 import com.zktony.android.ui.viewmodel.LoginViewModel
-import com.zktony.android.utils.ProductUtils
 import kotlinx.coroutines.launch
 
 
@@ -140,7 +136,7 @@ fun LoginForm(
         var loading by remember { mutableStateOf(false) }
 
         Text(
-            text = ProductUtils.getProductNumber(),
+            text = stringResource(id = R.string.product_name),
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.surface
         )

@@ -152,7 +152,7 @@ fun AppNavigationDrawer(
         ) {
             TOP_LEVEL_DESTINATIONS.forEach { destination ->
                 NavigationItem(
-                    selected = selectedDestination.contains(destination.route),
+                    selected = selectedDestination.startsWith(destination.route),
                     onClick = { navigationActions.navigate(destination.route) },
                     icon = destination.icon,
                     text = stringResource(id = destination.iconTextId)

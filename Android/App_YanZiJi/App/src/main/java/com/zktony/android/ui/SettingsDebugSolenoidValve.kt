@@ -12,16 +12,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.automirrored.filled.Reply
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -38,7 +35,6 @@ import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.zktyBrush
 import com.zktony.android.ui.viewmodel.SettingsDebugSolenoidValveViewModel
-import com.zktony.android.ui.viewmodel.SettingsDebugViewModel
 import com.zktony.android.utils.ProductUtils
 import kotlinx.coroutines.launch
 
@@ -120,22 +116,6 @@ fun SolenoidValveDebugListView(
                         if (!viewModel.setSolenoidValveState(index, it)) {
                             selected = if (selected == 0) 1 else 0
                         }
-                    }
-                }
-            }
-        }
-
-        SettingsRow(title = "所有通道") {
-            var selected by remember { mutableIntStateOf(0) }
-            CircleTabRow(
-                modifier = Modifier.width(200.dp),
-                tabItems = listOf("转膜液", "清洗液"),
-                selected = selected
-            ) {
-                scope.launch {
-                    selected = it
-                    if (!viewModel.setAllSolenoidValveState(it)) {
-                        selected = if (selected == 0) 1 else 0
                     }
                 }
             }

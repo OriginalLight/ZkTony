@@ -52,16 +52,16 @@ class SettingsArgumentsViewModel @Inject constructor() : ViewModel() {
     // 导出参数
     suspend fun exportArguments() {
         try {
-            val usb = StorageUtils.getUsbStorageDir()
-            if (usb.isEmpty()) {
+            val dir = StorageUtils.getArgumentDir()
+            if (dir == null) {
                 TipsUtils.showTips(Tips(TipsType.ERROR, "未检测到U盘"))
                 return
             }
+            val savePath = "${dir}/${ProductUtils.getSerialNumber()}.json"
             val arguments = AppStateUtils.getArgumentList()
             val argsJson = JsonUtils.toJson(arguments)
-            val savePath = "${usb.first()}/arguments/${ProductUtils.getSerialNumber()}.json"
             val file = File(savePath)
-            if(!file.exists()) {
+            if (!file.exists()) {
                 file.parentFile?.mkdirs()
                 withContext(Dispatchers.IO) {
                     file.createNewFile()
@@ -78,26 +78,92 @@ class SettingsArgumentsViewModel @Inject constructor() : ViewModel() {
     }
 
     // 导入参数
-    fun importArguments() {
-
-    }
-
-    // 清除参数
-    fun clearArguments() {
-        viewModelScope.launch {
-            val args = Arguments()
+    suspend fun importArguments(file: File?) {
+        try {
+            if (file == null) {
+                TipsUtils.showTips(Tips(TipsType.ERROR, "参数文件不存在"))
+                return
+            }
+            val argsJson = withContext(Dispatchers.IO) {
+                file.readText()
+            }
+            val arguments = JsonUtils.fromJson<List<Arguments>>(argsJson)
+            if (arguments.isEmpty()) {
+                TipsUtils.showTips(Tips(TipsType.ERROR, "参数文件格式错误"))
+                return
+            } else if (arguments.size != ProductUtils.getChannelCount()) {
+                TipsUtils.showTips(Tips(TipsType.ERROR, "参数文件通道数量错误"))
+                return
+            }
             val fail = mutableListOf<Int>()
-            repeat(ProductUtils.getChannelCount()) {
-                if (!SerialPortUtils.setArguments(it, "SetArguments", 0x12.toByte(), args.toByteArray())) {
-                    fail.add(it + 1)
+            repeat(ProductUtils.getChannelCount()) { index ->
+                if (!SerialPortUtils.setArguments(
+                        index,
+                        "SetArguments",
+                        0x12.toByte(),
+                        arguments[index].toByteArray()
+                    )
+                ) {
+                    fail.add(index + 1)
                 }
             }
             if (fail.isNotEmpty()) {
-                TipsUtils.showTips(Tips(TipsType.ERROR, "清除参数失败: ${fail.joinToString()}"))
+                TipsUtils.showTips(
+                    Tips(
+                        TipsType.ERROR,
+                        "导入参数失败: 通道 ${fail.joinToString()}"
+                    )
+                )
+                return
             } else {
-                AppStateUtils.setArgumentsList(List(ProductUtils.MAX_CHANNEL_COUNT) { Arguments() })
-                TipsUtils.showTips(Tips(TipsType.INFO, "清除参数成功"))
+                AppStateUtils.setArgumentsList(arguments)
+                TipsUtils.showTips(Tips(TipsType.INFO, "导入参数成功"))
             }
+        } catch (e: Exception) {
+            LogUtils.error("ImportArguments", e.stackTraceToString(), true)
+            TipsUtils.showTips(Tips(TipsType.ERROR, "导入参数失败"))
+        }
+    }
+
+    // 获取参数文件
+    fun getArgumentFiles(): List<File> {
+        val fileList = mutableListOf<File>()
+        val dir = StorageUtils.getArgumentDir()
+        if (dir == null) {
+            TipsUtils.showTips(Tips(TipsType.ERROR, "未检测到U盘"))
+            return fileList
+        }
+        val file = File(dir)
+        if (file.exists() && file.isDirectory) {
+            file.listFiles { f ->
+                f.isFile && f.name.endsWith(".json")
+            }?.let {
+                fileList.addAll(it)
+            }
+        }
+        return fileList
+    }
+
+    // 清除参数
+    suspend fun clearArguments() {
+        val args = Arguments()
+        val fail = mutableListOf<Int>()
+        repeat(ProductUtils.getChannelCount()) {
+            if (!SerialPortUtils.setArguments(
+                    it,
+                    "SetArguments",
+                    0x12.toByte(),
+                    args.toByteArray()
+                )
+            ) {
+                fail.add(it + 1)
+            }
+        }
+        if (fail.isNotEmpty()) {
+            TipsUtils.showTips(Tips(TipsType.ERROR, "清除参数失败: ${fail.joinToString()}"))
+        } else {
+            AppStateUtils.setArgumentsList(List(ProductUtils.MAX_CHANNEL_COUNT) { Arguments() })
+            TipsUtils.showTips(Tips(TipsType.INFO, "清除参数成功"))
         }
     }
 }

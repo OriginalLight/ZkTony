@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
@@ -35,8 +36,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
+import com.zktony.android.ui.components.CircleTabRow
 import com.zktony.android.ui.components.DateTimePicker
-import com.zktony.android.ui.components.RadioButtonGroup
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.viewmodel.SettingsViewModel
@@ -152,9 +153,10 @@ fun SystemSettingsView(
 
         // 语言
         SettingsRow(title = stringResource(id = R.string.language)) {
-            RadioButtonGroup(
-                selected = if (language == "zh") 0 else 1,
-                options = listOf("简体中文", "English")
+            CircleTabRow(
+                modifier = Modifier.width(300.dp),
+                tabItems = listOf("简体中文", "English"),
+                selected = if (language == "zh") 0 else 1
             ) {
                 scope.launch {
                     language = if (it == 0) "zh" else "en"
@@ -165,13 +167,14 @@ fun SystemSettingsView(
 
         // 提示音
         SettingsRow(title = stringResource(id = R.string.prompt_sound)) {
-            RadioButtonGroup(
-                selected = PromptSoundUtils.getPromptSoundId(promptSound),
-                options = listOf(
+            CircleTabRow(
+                modifier = Modifier.width(300.dp),
+                tabItems = listOf(
                     stringResource(id = R.string.mute),
                     stringResource(id = R.string.ring),
                     stringResource(id = R.string.voice)
-                )
+                ),
+                selected = PromptSoundUtils.getPromptSoundId(promptSound)
             ) {
                 scope.launch {
                     promptSound = PromptSoundUtils.getPromptSoundStr(it)

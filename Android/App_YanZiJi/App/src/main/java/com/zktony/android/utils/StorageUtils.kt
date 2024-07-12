@@ -5,6 +5,7 @@ import java.io.File
 
 
 object StorageUtils {
+    private const val ARGUMENTS_DIR = "Arguments"
 
     // 获取内部存储路径 /data/data/com.zktony.android/files
     fun getStorageDir(): String {
@@ -86,5 +87,15 @@ object StorageUtils {
         }
 
         return storageDirectories
+    }
+
+    // 获取参数存储路径
+    fun getArgumentDir(): String? {
+        val usbList = getUsbStorageDir()
+        return if (usbList.isNotEmpty()) {
+            "${usbList.first()}/$ARGUMENTS_DIR"
+        } else {
+            null
+        }
     }
 }

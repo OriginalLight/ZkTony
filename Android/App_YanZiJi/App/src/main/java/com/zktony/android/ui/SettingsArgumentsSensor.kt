@@ -12,16 +12,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -41,7 +37,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zktony.android.R
 import com.zktony.android.data.Arguments
 import com.zktony.android.data.ArgumentsBubble
-import com.zktony.android.data.ArgumentsVoltage
 import com.zktony.android.data.ChannelState
 import com.zktony.android.ui.components.ArgumentsInputField
 import com.zktony.android.ui.components.CircleTabRow
@@ -226,7 +221,7 @@ fun BubbleSensorThresholdView(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = "电压校准", fontSize = 20.sp)
+        Text(text = "阈值设置", fontSize = 20.sp)
 
         VerticalDivider(
             modifier = Modifier
@@ -240,7 +235,7 @@ fun BubbleSensorThresholdView(
                     .width(550.dp)
                     .height(56.dp)
                     .fillMaxWidth(),
-                prefix = "出液气泡阈值",
+                prefix = "出液",
                 value = outBobble,
                 onValueChange = { outBobble = it }
             )
@@ -250,7 +245,7 @@ fun BubbleSensorThresholdView(
                     .width(550.dp)
                     .height(56.dp)
                     .fillMaxWidth(),
-                prefix = "进液气泡阈值",
+                prefix = "进液",
                 value = inBobble,
                 onValueChange = { inBobble = it }
             )

@@ -72,25 +72,19 @@ fun SettingsArgumentsTopBar(
     var importConformDialog by remember { mutableStateOf(false) }
     var clearConfirmDialog by remember { mutableStateOf(false) }
     var loadingExport by remember { mutableStateOf(false) }
-    var loadingClear by remember { mutableStateOf(false) }
 
     if (importConformDialog) {
         ImportConfirmDialog(
+            items = viewModel.getArgumentFiles(),
             onDismiss = { importConformDialog = false },
-            onConfirm = {
-                viewModel.importArguments()
-                importConformDialog = false
-            }
+            viewModel = viewModel
         )
     }
 
     if (clearConfirmDialog) {
         ClearConfirmDialog(
             onDismiss = { clearConfirmDialog = false },
-            onConfirm = {
-                viewModel.clearArguments()
-                clearConfirmDialog = false
-            }
+            viewModel = viewModel
         )
     }
 

@@ -42,7 +42,7 @@ fun RadioButtonGroup(
                     onClick = null
                 )
 
-                Text(text = text)
+                Text(text = text, style = MaterialTheme.typography.bodyLarge)
             }
         }
     }
@@ -73,7 +73,7 @@ fun VerticalRadioButtonGroup(
                     onClick = null
                 )
 
-                Text(text = text)
+                Text(text = text, style = MaterialTheme.typography.bodyLarge)
             }
         }
     }
