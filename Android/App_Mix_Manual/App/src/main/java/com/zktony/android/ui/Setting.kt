@@ -144,6 +144,7 @@ fun SettingRoute(viewModel: SettingViewModel, homeViewModel: HomeViewModel) {
     val coagulantpulseFlow by viewModel.coagulantpulseFlow.collectAsStateWithLifecycle()
     val coagulantTimeFlow by viewModel.coagulantTimeFlow.collectAsStateWithLifecycle()
     val coagulantResetPulseFlow by viewModel.coagulantResetPulseFlow.collectAsStateWithLifecycle()
+    val updateMsg by viewModel.updateMsg.collectAsStateWithLifecycle()
 
 
     val navigation: () -> Unit = {
@@ -211,6 +212,7 @@ fun SettingRoute(viewModel: SettingViewModel, homeViewModel: HomeViewModel) {
                     PageType.UPGRADE -> upgrade(
                         viewModel::dispatch,
                         homeViewModel::dispatch,
+                        updateMsg,
                     )
 
                     else -> {}
@@ -3520,11 +3522,12 @@ fun sportsLog(
 fun upgrade(
     uiEvent: (SettingIntent) -> Unit,
     uiEventHome: (HomeIntent) -> Unit,
+    updateMsg:String,
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        upgradeMode(uiEvent, uiEventHome)
+        upgradeMode(uiEvent, uiEventHome,updateMsg)
 //        EmbeddedTest(uiEventHome)
     }
 }

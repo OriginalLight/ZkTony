@@ -158,6 +158,7 @@ class HomeViewModel @Inject constructor(
      */
     private val _initHintDialog = MutableStateFlow(false)
 
+    private val _erCount = MutableStateFlow(0)
 
     /**
      * 检测是否更换制胶架
@@ -193,6 +194,7 @@ class HomeViewModel @Inject constructor(
     val cleanDialogOpen = _cleanDialogOpen.asStateFlow()
     val heartbeatError = _heartbeatError.asStateFlow()
     val initHintDialog = _initHintDialog.asStateFlow()
+    val erCount = _erCount.asStateFlow()
 
 
     /**
@@ -208,6 +210,7 @@ class HomeViewModel @Inject constructor(
     val erEntities = Pager(
         config = PagingConfig(pageSize = 20, initialLoadSize = 40),
     ) { erDao.getByPage() }.flow.cachedIn(viewModelScope)
+
 
     init {
 
@@ -303,6 +306,11 @@ class HomeViewModel @Inject constructor(
             is HomeIntent.StopWaitTimeRinse -> viewModelScope.launch {
                 _waitTimeRinseJob.value?.cancel()
                 _waitTimeRinseJob.value = null
+            }
+
+            is HomeIntent.erCount -> viewModelScope.launch {
+                _erCount.value = erDao.count()
+                delay(500)
             }
 
 
@@ -2636,6 +2644,8 @@ class HomeViewModel @Inject constructor(
             val countER = erDao.count()
 
             val modelsThickness = dataStore.readData("modelsThickness", "G1520")
+            println("modelsThickness====$modelsThickness")
+            println("countER====$countER")
 
             if (status == 0) {
                 _stautsNum.value = 1
@@ -2663,7 +2673,7 @@ class HomeViewModel @Inject constructor(
                         )
                     }
                 } else if (modelsThickness == "G1510") {
-                    if (countER < 100) {
+                    if (countER < 20) {
                         _selectedER.value = erDao.insert(
                             ExperimentRecord(
                                 startRange = selected.startRange,
@@ -2678,18 +2688,20 @@ class HomeViewModel @Inject constructor(
                         )
                     }
                 } else {
-                    _selectedER.value = erDao.insert(
-                        ExperimentRecord(
-                            startRange = selected.startRange,
-                            endRange = selected.endRange,
-                            thickness = selected.thickness,
-                            coagulant = selected.coagulant,
-                            volume = selected.volume,
-                            number = 0,
-                            status = EPStatus.RUNNING,
-                            detail = "",
+                    if (countER < 30) {
+                        _selectedER.value = erDao.insert(
+                            ExperimentRecord(
+                                startRange = selected.startRange,
+                                endRange = selected.endRange,
+                                thickness = selected.thickness,
+                                coagulant = selected.coagulant,
+                                volume = selected.volume,
+                                number = 0,
+                                status = EPStatus.RUNNING,
+                                detail = "",
+                            )
                         )
-                    )
+                    }
                 }
 
 
@@ -2703,17 +2715,20 @@ class HomeViewModel @Inject constructor(
                         }
                     }
                 } else if (modelsThickness == "G1510") {
-                    if (countER < 100) {
+                    if (countER < 20) {
                         if (selectedER != null) {
                             selectedER.number = _complate.value
                             erDao.update(selectedER)
                         }
                     }
                 } else {
-                    if (selectedER != null) {
-                        selectedER.number = _complate.value
-                        erDao.update(selectedER)
+                    if (countER < 30) {
+                        if (selectedER != null) {
+                            selectedER.number = _complate.value
+                            erDao.update(selectedER)
+                        }
                     }
+
                 }
 
 
@@ -2796,6 +2811,8 @@ class HomeViewModel @Inject constructor(
                                     erDao.getById(_selectedER.value).firstOrNull()
                                 val countER = erDao.count()
                                 val modelsThickness = dataStore.readData("modelsThickness", "G1520")
+                                println("modelsThickness====$modelsThickness")
+                                println("countER====$countER")
                                 if (modelsThickness == "G1500") {
                                     if (countER < 10) {
                                         if (experimentRecord != null) {
@@ -2805,7 +2822,7 @@ class HomeViewModel @Inject constructor(
                                         }
                                     }
                                 } else if (modelsThickness == "G1510") {
-                                    if (countER < 100) {
+                                    if (countER < 20) {
                                         if (experimentRecord != null) {
                                             experimentRecord.status = EPStatus.FAULT
                                             experimentRecord.detail = "上下位机断开连接"
@@ -2813,11 +2830,14 @@ class HomeViewModel @Inject constructor(
                                         }
                                     }
                                 } else {
-                                    if (experimentRecord != null) {
-                                        experimentRecord.status = EPStatus.FAULT
-                                        experimentRecord.detail = "上下位机断开连接"
-                                        erDao.update(experimentRecord)
+                                    if (countER < 30) {
+                                        if (experimentRecord != null) {
+                                            experimentRecord.status = EPStatus.FAULT
+                                            experimentRecord.detail = "上下位机断开连接"
+                                            erDao.update(experimentRecord)
+                                        }
                                     }
+
                                 }
 
                                 delay(100)
@@ -3114,25 +3134,6 @@ class HomeViewModel @Inject constructor(
 
                             )
                     }
-                    start {
-                        timeOut = 1000L * 30
-                        with(
-                            index = 0,
-                            pdv = 3200L,
-                            ads = Triple(1600, 1600, 1600),
-
-                            )
-                    }
-
-                    start {
-                        timeOut = 1000L * 30
-                        with(
-                            index = 0,
-                            pdv = -3300L,
-                            ads = Triple(1600, 1600, 1600),
-                        )
-                    }
-
                     logInfo(
                         "HomeViewModel_startJob",
                         "x轴复位，防止x轴运动偏移位置，复位结束"
@@ -3227,6 +3228,8 @@ class HomeViewModel @Inject constructor(
                     var experimentRecord = erDao.getById(_selectedER.value).firstOrNull()
                     val countER = erDao.count()
                     val modelsThickness = dataStore.readData("modelsThickness", "G1520")
+                    println("modelsThickness====$modelsThickness")
+                    println("countER====$countER")
                     if (modelsThickness == "G1500") {
                         if (countER < 10) {
                             if (experimentRecord != null) {
@@ -3236,7 +3239,7 @@ class HomeViewModel @Inject constructor(
                             }
                         }
                     } else if (modelsThickness == "G1510") {
-                        if (countER < 100) {
+                        if (countER < 20) {
                             if (experimentRecord != null) {
                                 experimentRecord.status = EPStatus.FAULT
                                 experimentRecord.detail = "系统故障"
@@ -3244,11 +3247,14 @@ class HomeViewModel @Inject constructor(
                             }
                         }
                     } else {
-                        if (experimentRecord != null) {
-                            experimentRecord.status = EPStatus.FAULT
-                            experimentRecord.detail = "系统故障"
-                            HomeIntent.Update(experimentRecord)
+                        if (countER < 30) {
+                            if (experimentRecord != null) {
+                                experimentRecord.status = EPStatus.FAULT
+                                experimentRecord.detail = "系统故障"
+                                HomeIntent.Update(experimentRecord)
+                            }
                         }
+
                     }
 
                     delay(100)
@@ -3290,6 +3296,8 @@ class HomeViewModel @Inject constructor(
             val selectRudio = dataStore.readData("selectRudio", 1)
             val countER = erDao.count()
             val modelsThickness = dataStore.readData("modelsThickness", "G1520")
+            println("modelsThickness====$modelsThickness")
+            println("countER====$countER")
             if (selectedER != null) {
                 if (startNum == 1) {
                     if (modelsThickness == "G1500") {
@@ -3299,15 +3307,17 @@ class HomeViewModel @Inject constructor(
                             erDao.update(selectedER)
                         }
                     } else if (modelsThickness == "G1510") {
-                        if (countER < 100) {
+                        if (countER < 20) {
                             selectedER.number = _complate.value
                             selectedER.status = EPStatus.COMPLETED
                             erDao.update(selectedER)
                         }
                     } else {
-                        selectedER.number = _complate.value
-                        selectedER.status = EPStatus.COMPLETED
-                        erDao.update(selectedER)
+                        if (countER < 30) {
+                            selectedER.number = _complate.value
+                            selectedER.status = EPStatus.COMPLETED
+                            erDao.update(selectedER)
+                        }
                     }
 
                 } else {
@@ -3319,17 +3329,19 @@ class HomeViewModel @Inject constructor(
                             erDao.update(selectedER)
                         }
                     } else if (modelsThickness == "G1510") {
-                        if (countER < 100) {
+                        if (countER < 20) {
                             selectedER.number = _complate.value
                             selectedER.status = EPStatus.ABORT
                             selectedER.detail = "手动停止制胶"
                             erDao.update(selectedER)
                         }
                     } else {
-                        selectedER.number = _complate.value
-                        selectedER.status = EPStatus.ABORT
-                        selectedER.detail = "手动停止制胶"
-                        erDao.update(selectedER)
+                        if (countER < 30) {
+                            selectedER.number = _complate.value
+                            selectedER.status = EPStatus.ABORT
+                            selectedER.detail = "手动停止制胶"
+                            erDao.update(selectedER)
+                        }
                     }
 
 
@@ -3401,6 +3413,8 @@ class HomeViewModel @Inject constructor(
             val selectedER = erDao.getById(_selectedER.value).firstOrNull()
             val countER = erDao.count()
             val modelsThickness = dataStore.readData("modelsThickness", "G1520")
+            println("modelsThickness====$modelsThickness")
+            println("countER====$countER")
             if (modelsThickness == "G1500") {
                 if (countER < 10) {
                     if (selectedER != null) {
@@ -3411,7 +3425,7 @@ class HomeViewModel @Inject constructor(
                     }
                 }
             } else if (modelsThickness == "G1510") {
-                if (countER < 100) {
+                if (countER < 20) {
                     if (selectedER != null) {
                         selectedER.number = _complate.value
                         selectedER.status = EPStatus.ABORT
@@ -3420,12 +3434,15 @@ class HomeViewModel @Inject constructor(
                     }
                 }
             } else {
-                if (selectedER != null) {
-                    selectedER.number = _complate.value
-                    selectedER.status = EPStatus.ABORT
-                    selectedER.detail = "手动停止制胶"
-                    erDao.update(selectedER)
+                if (countER < 30) {
+                    if (selectedER != null) {
+                        selectedER.number = _complate.value
+                        selectedER.status = EPStatus.ABORT
+                        selectedER.detail = "手动停止制胶"
+                        erDao.update(selectedER)
+                    }
                 }
+
             }
 
 
@@ -4751,6 +4768,8 @@ sealed class HomeIntent {
     data object StopHeartbeat : HomeIntent()
     data object WaitTimeRinse : HomeIntent()
     data object StopWaitTimeRinse : HomeIntent()
+
+    data object erCount : HomeIntent()
 
 
 }

@@ -101,7 +101,11 @@ import kotlin.math.ceil
     ExperimentalLayoutApi::class
 )
 @Composable
-fun upgradeMode(uiEvent: (SettingIntent) -> Unit, uiEventHome: (HomeIntent) -> Unit) {
+fun upgradeMode(
+    uiEvent: (SettingIntent) -> Unit,
+    uiEventHome: (HomeIntent) -> Unit,
+    updateMsg: String
+) {
     val context = LocalContext.current
 
     val scope = rememberCoroutineScope()
@@ -576,6 +580,13 @@ fun upgradeMode(uiEvent: (SettingIntent) -> Unit, uiEventHome: (HomeIntent) -> U
                                                         selectedFile!!.path
                                                     )
                                                 )
+                                                if (updateMsg.isNotEmpty()) {
+                                                    Toast.makeText(
+                                                        context,
+                                                        updateMsg,
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                }
                                             } else {
                                                 Toast.makeText(
                                                     context,

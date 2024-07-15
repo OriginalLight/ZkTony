@@ -120,7 +120,7 @@ fun HomeRoute(viewModel: HomeViewModel) {
     val hint by viewModel.hint.collectAsStateWithLifecycle()
 
     val heartbeatError by viewModel.heartbeatError.collectAsStateWithLifecycle()
-
+    val erCount by viewModel.erCount.collectAsStateWithLifecycle()
 
     val navigation: () -> Unit = {
         scope.launch {
@@ -176,6 +176,7 @@ fun HomeRoute(viewModel: HomeViewModel) {
                 watermother,
                 coagulantmother,
                 heartbeatError,
+                erCount,
             )
         }
     }
@@ -208,6 +209,7 @@ fun operate(
     watermother: Float,
     coagulantmother: Float,
     heartbeatErrorHome: Boolean,
+    erCount: Int,
 ) {
 
     val scope = rememberCoroutineScope()
@@ -247,6 +249,7 @@ fun operate(
 
     uiEvent(HomeIntent.Selected(program.id))
 
+    uiEvent(HomeIntent.erCount)
 
     /**
      * 纯水弹窗
@@ -341,6 +344,8 @@ fun operate(
     val guleDialog = remember { mutableStateOf(false) }
 
 
+    val erCountDialog = remember { mutableStateOf(false) }
+
     /**
      * 复位失败弹窗
      */
@@ -379,6 +384,9 @@ fun operate(
      * 复位按钮是否点击
      */
     var isResetButton1Enabled by remember { mutableStateOf(true) }
+
+
+    val modelsThickness = rememberDataSaverState(key = "modelsThickness", "G1520")
 
 
     /**
@@ -842,25 +850,53 @@ fun operate(
                         modifier = Modifier
                             .size(63.dp, 63.dp)
                             .clickable {
-                                if (isResetButton1Enabled) {
-                                    if (job == null) {
-                                        if (uiFlags is UiFlags.None) {
-                                            if (wasteprogress >= 0.9f) {
-                                                uiEvent(HomeIntent.CleanWaste)
-                                                wasteDialog.value = true
-                                            } else {
-                                                if (expectedMakeNum.value > 0) {
-                                                    uiEvent(HomeIntent.Calculate)
-                                                    guleDialog.value = true
+                                scope.launch {
+                                    if (isResetButton1Enabled) {
+                                        if (job == null) {
+                                            if (uiFlags is UiFlags.None) {
+                                                if (wasteprogress >= 0.9f) {
+                                                    uiEvent(HomeIntent.CleanWaste)
+                                                    wasteDialog.value = true
                                                 } else {
-                                                    Toast
-                                                        .makeText(
-                                                            context,
-                                                            "预计制胶数量不能为0!",
-                                                            Toast.LENGTH_SHORT
-                                                        )
-                                                        .show()
-                                                }
+                                                    if (expectedMakeNum.value > 0) {
+                                                        uiEvent(HomeIntent.Calculate)
+                                                        uiEvent(HomeIntent.erCount)
+                                                        println("modelsThickness.value====${modelsThickness.value}")
+                                                        println("erCount====${erCount}")
+                                                        if (modelsThickness.value == "G1500") {
+                                                            if (erCount < 10) {
+                                                                guleDialog.value = true
+                                                            } else {
+                                                                erCountDialog.value = true
+                                                            }
+                                                        } else if (modelsThickness.value == "G1510") {
+                                                            if (erCount < 20) {
+                                                                uiEvent(HomeIntent.Calculate)
+                                                                guleDialog.value = true
+                                                            } else {
+
+                                                                erCountDialog.value = true
+                                                            }
+                                                        } else {
+                                                            if (erCount < 30) {
+                                                                uiEvent(HomeIntent.Calculate)
+                                                                guleDialog.value = true
+                                                            } else {
+
+                                                                erCountDialog.value = true
+                                                            }
+                                                        }
+
+
+                                                    } else {
+                                                        Toast
+                                                            .makeText(
+                                                                context,
+                                                                "预计制胶数量不能为0!",
+                                                                Toast.LENGTH_SHORT
+                                                            )
+                                                            .show()
+                                                    }
 //                                            if (AppStateUtils.hpe[1] == null) {
 //                                                Toast
 //                                                    .makeText(
@@ -883,18 +919,19 @@ fun operate(
 //                                                        .show()
 //                                                }
 //                                            }
+                                                }
+                                            } else {
+                                                Toast
+                                                    .makeText(
+                                                        context,
+                                                        "正在运行中,请稍后再操作！",
+                                                        Toast.LENGTH_SHORT
+                                                    )
+                                                    .show()
                                             }
                                         } else {
-                                            Toast
-                                                .makeText(
-                                                    context,
-                                                    "正在运行中,请稍后再操作！",
-                                                    Toast.LENGTH_SHORT
-                                                )
-                                                .show()
+                                            stopGlueDialog.value = true
                                         }
-                                    } else {
-                                        stopGlueDialog.value = true
                                     }
                                 }
 
@@ -1460,9 +1497,12 @@ fun operate(
                                             coagulantSweepState = coagulantmother
                                             lowCoagulantSweepState = lowmother
                                             highCoagulantSweepState = higemother
-
                                             startMake = "停止制胶"
                                             uiEvent(HomeIntent.Start(0))
+
+
+
+
                                             guleDialog.value = false
                                         } else {
                                             Toast.makeText(
@@ -2280,6 +2320,63 @@ fun operate(
         }
     }
 
+
+
+    if (erCountDialog.value) {
+        Dialog(onDismissRequest = {}) {
+            ElevatedCard {
+                Column(
+                    modifier = Modifier
+                        .padding(30.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        fontSize = 20.sp,
+                        text = "实验记录已达上限，请及时清理。"
+                    )
+                    Text(
+                            fontSize = 20.sp,
+                    text = "若继续实验，则当前实验记录不被保存，"
+                    )
+                    Text(
+                        fontSize = 20.sp,
+                        text = "请确认是否继续？"
+                    )
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Button(
+                            modifier = Modifier
+                                .width(100.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ),
+                            onClick = {
+                                guleDialog.value = true
+                                erCountDialog.value = false
+                            }) {
+                            Text(fontSize = 18.sp, text = "确认")
+                        }
+
+                        Button(
+                            modifier = Modifier
+                                .padding(start = 40.dp)
+                                .width(100.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ),
+                            onClick = {
+                                erCountDialog.value = false
+                            }) {
+                            Text(fontSize = 18.sp, text = "取消")
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 }
 

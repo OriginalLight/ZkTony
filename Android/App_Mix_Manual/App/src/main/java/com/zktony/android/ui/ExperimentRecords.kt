@@ -158,6 +158,9 @@ fun experimentList(
 
     var selectedIndex by remember { mutableStateOf(0) }
 
+//    for (i in 1..11) {
+//        dispatch(ExperimentRecordsIntent.Insert(0.0, 0.0, "", 0, 0.0, 0, "", ""))
+//    }
 
     //	定义列宽
     val cellWidthList = arrayListOf(70, 100, 70, 130, 120, 120)

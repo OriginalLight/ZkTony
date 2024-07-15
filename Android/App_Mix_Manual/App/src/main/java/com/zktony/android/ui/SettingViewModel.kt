@@ -86,6 +86,9 @@ class SettingViewModel @Inject constructor(
 
     private val _currentpwd = MutableStateFlow("")
 
+
+    private val _updateMsg = MutableStateFlow("")
+
     /**
      * 加液次数
      */
@@ -121,7 +124,7 @@ class SettingViewModel @Inject constructor(
     val progress = _progress.asStateFlow()
     val page = _page.asStateFlow()
     val currentpwd = _currentpwd.asStateFlow()
-
+    val updateMsg = _updateMsg.asStateFlow()
 
     val uiFlags = _uiFlags.asStateFlow()
     val entities = Pager(
@@ -368,14 +371,15 @@ class SettingViewModel @Inject constructor(
                 val versionCode = getApkCode(context, apkPath)
                 var currentCode = BuildConfig.VERSION_CODE
                 if (versionCode > currentCode) {
+                    _updateMsg.value =""
                     val apkFile = File(apkPath)
                     ApplicationUtils.installApp(apkFile)
                 } else {
-                    _uiFlags.value = UiFlags.message("安装程序版本错误")
+                    _updateMsg.value ="更新文件版本过低！"
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                _uiFlags.value = UiFlags.message("数据错误！")
+                _updateMsg.value ="更新数据错误！"
                 return@launch
             } finally {
                 _uiFlags.value = UiFlags.none()
