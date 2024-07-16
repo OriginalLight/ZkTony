@@ -1,7 +1,7 @@
 package com.zktony.android.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.zktony.android.data.Experimental
+import com.zktony.android.data.ExperimentalControl
 import com.zktony.android.ui.components.Tips
 import com.zktony.android.utils.SerialPortUtils
 import com.zktony.android.utils.TipsUtils
@@ -25,7 +25,7 @@ class SettingsDebugExperimentalViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    suspend fun startExperiment(channel: Int, experimental: Experimental): Boolean {
+    suspend fun startExperiment(channel: Int, experimental: ExperimentalControl): Boolean {
         if (!SerialPortUtils.setExperimentalArguments(channel, experimental)) {
             TipsUtils.showTips(Tips.error("实验开始失败 通道：${channel + 1}"))
             return false

@@ -1,10 +1,8 @@
 package com.zktony.android
 
-import androidx.core.app.Person
 import com.zktony.android.utils.JsonUtils
 import com.zktony.serialport.ext.toHexString
 import com.zktony.serialport.ext.writeInt16BE
-import kotlinx.serialization.builtins.serializer
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.concurrent.CopyOnWriteArrayList

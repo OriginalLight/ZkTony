@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -102,6 +103,7 @@ fun ArgumentsInputField(
     prefix: String? = null,
     suffix: String? = null,
     value: String,
+    keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
     onValueChange: (String) -> Unit
 ) {
 
@@ -130,7 +132,8 @@ fun ArgumentsInputField(
                 }
             },
             singleLine = true,
-            textStyle = MaterialTheme.typography.bodyLarge
+            textStyle = MaterialTheme.typography.bodyLarge,
+            keyboardOptions = keyboardOptions
         )
 
         if (suffix != null) {
@@ -229,7 +232,10 @@ fun PasswordInputField(
                 contentDescription = "Password"
             )
         },
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+        keyboardOptions = KeyboardOptions(
+            imeAction = ImeAction.Done,
+            keyboardType = KeyboardType.Password
+        ),
         shape = CircleShape,
         visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
         colors = TextFieldDefaults.colors(

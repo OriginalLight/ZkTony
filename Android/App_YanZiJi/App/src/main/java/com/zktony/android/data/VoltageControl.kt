@@ -5,16 +5,16 @@ import com.zktony.serialport.ext.writeInt8
 
 data class VoltageControl(
     val mode: Int = 0,
-    val voltage: Double = 0.0,
-    val current: Double = 0.0,
-    val power: Double = 0.0
+    val voltage: String = "0",
+    val current: String = "0",
+    val power: String = "0"
 ) {
     fun toByteArray(): ByteArray {
         val byteArray = ByteArray(7)
         byteArray.writeInt8(mode + 1, 0)
-        byteArray.writeInt16LE((voltage * 100).toInt(), 1)
-        byteArray.writeInt16LE((current * 100).toInt(), 3)
-        byteArray.writeInt16LE((power * 100).toInt(), 5)
+        byteArray.writeInt16LE(voltage.toBigDecimal().multiply(100.toBigDecimal()).toInt(), 1)
+        byteArray.writeInt16LE(current.toBigDecimal().multiply(100.toBigDecimal()).toInt(), 3)
+        byteArray.writeInt16LE(power.toBigDecimal().multiply(100.toBigDecimal()).toInt(), 5)
         return byteArray
     }
 }

@@ -7,7 +7,7 @@ import com.zktony.android.data.ArgumentsSpeed
 import com.zktony.android.data.ArgumentsTemperature
 import com.zktony.android.data.ArgumentsTransfer
 import com.zktony.android.data.ArgumentsVoltage
-import com.zktony.android.data.Experimental
+import com.zktony.android.data.ExperimentalControl
 import com.zktony.android.data.PumpControl
 import com.zktony.android.data.VoltageControl
 import com.zktony.android.data.toArguments
@@ -52,7 +52,7 @@ object SerialPortUtils {
     }
 
     // 实验运行参数设置
-    suspend fun setExperimentalArguments(target: Int, experimental: Experimental): Boolean {
+    suspend fun setExperimentalArguments(target: Int, experimental: ExperimentalControl): Boolean {
         return setArguments(
             target,
             "SetExperimentalArguments",
@@ -236,7 +236,7 @@ object SerialPortUtils {
             serialPort.unregisterCallback(callbackKey)
         }
 
-        return rx == 2
+        return rx == 0
     }
 
     // 电机控制
@@ -319,7 +319,7 @@ object SerialPortUtils {
             serialPort.unregisterCallback(callbackKey)
         }
 
-        return rx == 2
+        return rx == 0
     }
 
     // 电极控制
@@ -413,24 +413,24 @@ object SerialPortUtils {
         return setArguments(target, "SetCleanArguments", 0x2A.toByte(), clean.toByteArray())
     }
 
+    // 设置温度参数
+    suspend fun setTemperatureArguments(target: Int, args: ArgumentsTemperature): Boolean {
+        return setArguments(target, "SetTemperatureArguments", 0x2B.toByte(), args.toByteArray())
+    }
+
     // 设置电机参数
     suspend fun setSpeedArguments(target: Int, args: ArgumentsSpeed): Boolean {
-        return setArguments(target, "SetSpeedArguments", 0x2B.toByte(), args.toByteArray())
+        return setArguments(target, "SetSpeedArguments", 0x2C.toByte(), args.toByteArray())
     }
 
     // 设置电压参数
     suspend fun setVoltageArguments(target: Int, args: ArgumentsVoltage): Boolean {
-        return setArguments(target, "SetVoltageArguments", 0x2C.toByte(), args.toByteArray())
+        return setArguments(target, "SetVoltageArguments", 0x2D.toByte(), args.toByteArray())
     }
 
     // 设置电流参数
     suspend fun setCurrentArguments(target: Int, args: ArgumentsCurrent): Boolean {
-        return setArguments(target, "SetCurrentArguments", 0x2D.toByte(), args.toByteArray())
-    }
-
-    // 设置温度参数
-    suspend fun setTemperatureArguments(target: Int, args: ArgumentsTemperature): Boolean {
-        return setArguments(target, "SetTemperatureArguments", 0x2E.toByte(), args.toByteArray())
+        return setArguments(target, "SetCurrentArguments", 0x2E.toByte(), args.toByteArray())
     }
 
     // 设置传感器参数

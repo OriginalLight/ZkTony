@@ -43,6 +43,8 @@ import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.zktyBrush
 import com.zktony.android.ui.viewmodel.SettingsDebugPipelineViewModel
 import com.zktony.android.utils.ProductUtils
+import com.zktony.android.utils.extra.toDoubleOrDefault
+import com.zktony.android.utils.extra.toIntOrDefault
 import kotlinx.coroutines.launch
 
 @Composable
@@ -161,9 +163,40 @@ fun PipelineDebugListView(
             }
         }
 
+        SettingsRow(title = "管路排空") {
+            var selected by remember { mutableIntStateOf(0) }
+            var loading by remember { mutableStateOf(false) }
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                CircleTabRow(
+                    modifier = Modifier.width(200.dp),
+                    tabItems = listOf("转膜液", "清洗液"),
+                    selected = selected
+                ) {
+                    selected = it
+                }
+                Button(onClick = {
+                    scope.launch {
+                        loading = true
+                        viewModel.pipelineDrain(channel, selected)
+                        loading = false
+                    }
+                }) {
+                    if (loading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                        Spacer(modifier = Modifier.size(8.dp))
+                    }
+                    Text(text = "开始", letterSpacing = 10.sp)
+                }
+            }
+        }
+
         SettingsRow(title = "管路清洗") {
-            var speed by remember { mutableStateOf("0.0") }
-            var time by remember { mutableStateOf("0") }
+            var speed by remember { mutableStateOf("100") }
+            var time by remember { mutableStateOf("60") }
             var loading by remember { mutableStateOf(false) }
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 ArgumentsInputField(
@@ -182,7 +215,7 @@ fun PipelineDebugListView(
                         .height(48.dp),
                     value = time,
                     prefix = "时间",
-                    suffix = "min",
+                    suffix = "s",
                 ) {
                     time = it
                 }
@@ -192,40 +225,9 @@ fun PipelineDebugListView(
                         loading = true
                         viewModel.pipelineClean(
                             channel,
-                            speed.toDoubleOrNull() ?: 0.0,
-                            time.toIntOrNull() ?: 0
+                            speed.toDoubleOrDefault(),
+                            time.toIntOrDefault()
                         )
-                        loading = false
-                    }
-                }) {
-                    if (loading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(16.dp),
-                            strokeWidth = 2.dp,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                        Spacer(modifier = Modifier.size(8.dp))
-                    }
-                    Text(text = "开始", letterSpacing = 10.sp)
-                }
-            }
-        }
-
-        SettingsRow(title = "管路排空") {
-            var selected by remember { mutableIntStateOf(0) }
-            var loading by remember { mutableStateOf(false) }
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                CircleTabRow(
-                    modifier = Modifier.width(200.dp),
-                    tabItems = listOf("转膜液", "清洗液"),
-                    selected = selected
-                ) {
-                    selected = it
-                }
-                Button(onClick = {
-                    scope.launch {
-                        loading = true
-                        viewModel.pipelineDrain(channel, selected)
                         loading = false
                     }
                 }) {

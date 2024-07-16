@@ -39,7 +39,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zktony.android.R
 import com.zktony.android.data.ChannelState
-import com.zktony.android.data.Experimental
+import com.zktony.android.data.ExperimentalControl
 import com.zktony.android.ui.components.ArgumentsInputField
 import com.zktony.android.ui.components.CircleTabRow
 import com.zktony.android.ui.navigation.NavigationActions
@@ -49,6 +49,8 @@ import com.zktony.android.ui.utils.zktyBrush
 import com.zktony.android.ui.viewmodel.SettingsDebugExperimentalViewModel
 import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.ProductUtils
+import com.zktony.android.utils.extra.toDoubleOrDefault
+import com.zktony.android.utils.extra.toIntOrDefault
 import kotlinx.coroutines.launch
 
 @Composable
@@ -132,10 +134,10 @@ fun ExperimentalDebugListView(
     val scope = rememberCoroutineScope()
     var type by remember { mutableIntStateOf(0) }
     var mode by remember { mutableIntStateOf(0) }
-    var value by remember { mutableStateOf("0.0") }
-    var speed by remember { mutableStateOf("0.0") }
+    var value by remember { mutableStateOf("0") }
+    var speed by remember { mutableStateOf("0") }
     var time by remember { mutableStateOf("0") }
-    var temperature by remember { mutableStateOf("0.0") }
+    var temperature by remember { mutableStateOf("0") }
 
     Column(
         modifier = modifier
@@ -214,7 +216,7 @@ fun ExperimentalDebugListView(
                     ArgumentsInputField(
                         modifier = Modifier.size(350.dp, 48.dp),
                         value = time,
-                        suffix = "min",
+                        suffix = "s",
                         onValueChange = { time = it }
                     )
                 }
@@ -244,19 +246,15 @@ fun ExperimentalDebugListView(
                                     loadingStart = true
                                     viewModel.startExperiment(
                                         channel,
-                                        Experimental(
+                                        ExperimentalControl(
                                             type = type,
                                             mode = mode,
-                                            speed = if (type == 0) speed.toDoubleOrNull()
-                                                ?: 0.0 else 0.0,
-                                            time = time.toIntOrNull() ?: 0,
-                                            voltage = if (mode == 0) value.toDoubleOrNull()
-                                                ?: 0.0 else 0.0,
-                                            current = if (mode == 1) value.toDoubleOrNull()
-                                                ?: 0.0 else 0.0,
-                                            power = if (mode == 2) value.toDoubleOrNull()
-                                                ?: 0.0 else 0.0,
-                                            temperature = temperature.toDoubleOrNull() ?: 0.0
+                                            speed = if (type == 0) speed else "0",
+                                            time = time,
+                                            voltage = if (mode == 0) value else "0",
+                                            current = if (mode == 1) value else "0",
+                                            power = if (mode == 2) value else "0",
+                                            temperature = temperature
                                         )
                                     )
                                     loadingStart = false
@@ -300,8 +298,8 @@ fun ExperimentalDebugListView(
             // 管路清洗
             item {
                 SettingsRow(title = "管路清洗") {
-                    var speed1 by remember { mutableStateOf("0.0") }
-                    var time1 by remember { mutableStateOf("0") }
+                    var speed1 by remember { mutableStateOf("100") }
+                    var time1 by remember { mutableStateOf("60") }
                     var loading by remember { mutableStateOf(false) }
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         ArgumentsInputField(
@@ -320,7 +318,7 @@ fun ExperimentalDebugListView(
                                 .height(48.dp),
                             value = time1,
                             prefix = "时间",
-                            suffix = "min",
+                            suffix = "s",
                         ) {
                             time1 = it
                         }
@@ -330,8 +328,8 @@ fun ExperimentalDebugListView(
                                 loading = true
                                 viewModel.pipelineClean(
                                     channel,
-                                    speed1.toDoubleOrNull() ?: 0.0,
-                                    time1.toIntOrNull() ?: 0
+                                    speed1.toDoubleOrDefault(),
+                                    time1.toIntOrDefault()
                                 )
                                 loading = false
                             }
@@ -374,7 +372,7 @@ fun RealTimeExperimentalView(
                         MaterialTheme.shapes.medium
                     )
                     .padding(horizontal = 24.dp, vertical = 12.dp),
-                text = "电压：" + channelState.voltage.toString() + " V",
+                text = "电压：" + channelState.voltage + " V",
                 style = MaterialTheme.typography.bodyLarge
             )
 
@@ -385,7 +383,7 @@ fun RealTimeExperimentalView(
                         MaterialTheme.shapes.medium
                     )
                     .padding(horizontal = 24.dp, vertical = 12.dp),
-                text = "电流：" + channelState.current.toString() + " A",
+                text = "电流：" + channelState.current + " A",
                 style = MaterialTheme.typography.bodyLarge
             )
 
@@ -396,7 +394,7 @@ fun RealTimeExperimentalView(
                         MaterialTheme.shapes.medium
                     )
                     .padding(horizontal = 24.dp, vertical = 12.dp),
-                text = "功率：" + channelState.power.toString() + " W",
+                text = "功率：" + channelState.power + " W",
                 style = MaterialTheme.typography.bodyLarge
             )
 
@@ -407,7 +405,7 @@ fun RealTimeExperimentalView(
                         MaterialTheme.shapes.medium
                     )
                     .padding(horizontal = 24.dp, vertical = 12.dp),
-                text = "温度：" + channelState.temperature.toString() + " ℃",
+                text = "温度：" + channelState.temperature + " ℃",
                 style = MaterialTheme.typography.bodyLarge
             )
         }
@@ -424,7 +422,7 @@ fun RealTimeExperimentalView(
                         MaterialTheme.shapes.medium
                     )
                     .padding(horizontal = 24.dp, vertical = 12.dp),
-                text = "出液气泡传感器：" + if (channelState.bubble1 == 0) "空气" else "液体",
+                text = "进液气泡传感器：" + if (channelState.bubble1 == 0) "空气" else "液体",
                 style = MaterialTheme.typography.bodyLarge
             )
 
@@ -435,7 +433,7 @@ fun RealTimeExperimentalView(
                         MaterialTheme.shapes.medium
                     )
                     .padding(horizontal = 24.dp, vertical = 12.dp),
-                text = "进液气泡传感器：" + if (channelState.bubble2 == 0) "空气" else "液体",
+                text = "出液气泡传感器：" + if (channelState.bubble2 == 0) "空气" else "液体",
                 style = MaterialTheme.typography.bodyLarge
             )
 
@@ -446,7 +444,7 @@ fun RealTimeExperimentalView(
                         MaterialTheme.shapes.medium
                     )
                     .padding(horizontal = 24.dp, vertical = 12.dp),
-                text = "转膜盒光耦：" + if (channelState.opto1 == 0) "空闲" else "遮挡",
+                text = "染色盒光耦：" + if (channelState.opto1 == 0) "空闲" else "遮挡",
                 style = MaterialTheme.typography.bodyLarge
             )
 
@@ -457,7 +455,7 @@ fun RealTimeExperimentalView(
                         MaterialTheme.shapes.medium
                     )
                     .padding(horizontal = 24.dp, vertical = 12.dp),
-                text = "染色盒光耦：" + if (channelState.opto2 == 0) "空闲" else "遮挡",
+                text = "转膜盒光耦：" + if (channelState.opto2 == 0) "空闲" else "遮挡",
                 style = MaterialTheme.typography.bodyLarge
             )
         }

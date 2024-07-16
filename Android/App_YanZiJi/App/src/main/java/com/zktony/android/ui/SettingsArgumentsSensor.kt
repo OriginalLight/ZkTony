@@ -18,7 +18,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -162,7 +161,7 @@ fun RealTimeSensorView(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.medium)
                 .padding(horizontal = 24.dp, vertical = 12.dp),
-            text = "出液气泡传感器：" + if (channelState.bubble1 == 0) "空气" else "液体",
+            text = "进液气泡传感器：" + if (channelState.bubble1 == 0) "空气" else "液体",
             style = MaterialTheme.typography.bodyLarge
         )
 
@@ -170,7 +169,7 @@ fun RealTimeSensorView(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.medium)
                 .padding(horizontal = 24.dp, vertical = 12.dp),
-            text = "进液气泡传感器：" + if (channelState.bubble2 == 0) "空气" else "液体",
+            text = "出液气泡传感器：" + if (channelState.bubble2 == 0) "空气" else "液体",
             style = MaterialTheme.typography.bodyLarge
         )
 
@@ -178,7 +177,7 @@ fun RealTimeSensorView(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.medium)
                 .padding(horizontal = 24.dp, vertical = 12.dp),
-            text = "转膜盒光耦：" + if (channelState.opto1 == 0) "空闲" else "遮挡",
+            text = "染色盒光耦：" + if (channelState.opto1 == 0) "空闲" else "遮挡",
             style = MaterialTheme.typography.bodyLarge
         )
 
@@ -186,7 +185,7 @@ fun RealTimeSensorView(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.medium)
                 .padding(horizontal = 24.dp, vertical = 12.dp),
-            text = "染色盒光耦：" + if (channelState.opto2 == 0) "空闲" else "遮挡",
+            text = "转膜盒光耦：" + if (channelState.opto2 == 0) "空闲" else "遮挡",
             style = MaterialTheme.typography.bodyLarge
         )
     }
@@ -204,11 +203,11 @@ fun BubbleSensorThresholdView(
     var inBobble by remember(
         channel,
         arguments
-    ) { mutableStateOf(arguments[channel].inBubbleThreshold.toString()) }
+    ) { mutableStateOf(arguments[channel].inBubbleThreshold) }
     var outBobble by remember(
         channel,
         arguments
-    ) { mutableStateOf(arguments[channel].outBubbleThreshold.toString()) }
+    ) { mutableStateOf(arguments[channel].outBubbleThreshold) }
 
     Row(
         modifier = modifier
@@ -218,16 +217,10 @@ fun BubbleSensorThresholdView(
                 shape = MaterialTheme.shapes.medium
             )
             .padding(16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(text = "阈值设置", fontSize = 20.sp)
-
-        VerticalDivider(
-            modifier = Modifier
-                .height(64.dp),
-            thickness = 2.dp
-        )
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             ArgumentsInputField(
@@ -251,12 +244,6 @@ fun BubbleSensorThresholdView(
             )
         }
 
-        VerticalDivider(
-            modifier = Modifier
-                .height(64.dp),
-            thickness = 2.dp
-        )
-
         Button(
             modifier = Modifier.width(120.dp),
             onClick = {
@@ -264,8 +251,8 @@ fun BubbleSensorThresholdView(
                     viewModel.setSensorArguments(
                         channel = channel,
                         args = ArgumentsBubble(
-                            inBubbleThreshold = inBobble.toDoubleOrNull() ?: 0.0,
-                            outBubbleThreshold = outBobble.toDoubleOrNull() ?: 0.0
+                            inBubbleThreshold = inBobble,
+                            outBubbleThreshold = outBobble
                         )
                     )
                 }

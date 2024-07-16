@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,11 +17,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -174,6 +175,8 @@ fun PumpControlView(
     viewModel: SettingsArgumentsPumpViewModel
 ) {
     val scope = rememberCoroutineScope()
+    var loadingStart by remember { mutableStateOf(false) }
+    var loadingStop by remember { mutableStateOf(false) }
     // 进液/出液
     var inOrOut by remember { mutableIntStateOf(0) }
     // 正反转
@@ -181,9 +184,9 @@ fun PumpControlView(
     // 转速单位
     var speedUnit by remember { mutableIntStateOf(0) }
     // 转速
-    var speed by remember { mutableStateOf("0.0") }
+    var speed by remember { mutableStateOf("50") }
     // 时间
-    var time by remember { mutableStateOf("1") }
+    var time by remember { mutableStateOf("60") }
 
     Row(
         modifier = modifier
@@ -193,16 +196,10 @@ fun PumpControlView(
                 shape = MaterialTheme.shapes.medium
             )
             .padding(16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(text = "蠕动泵控制", fontSize = 20.sp)
-
-        VerticalDivider(
-            modifier = Modifier
-                .height(64.dp),
-            thickness = 2.dp
-        )
 
         Column(
             modifier = Modifier.height(128.dp),
@@ -222,17 +219,11 @@ fun PumpControlView(
 
             RadioButtonGroup(
                 selected = speedUnit,
-                options = listOf("r/min", "mL/min")
+                options = listOf("rpm", "mL/min")
             ) {
                 speedUnit = it
             }
         }
-
-        VerticalDivider(
-            modifier = Modifier
-                .height(64.dp),
-            thickness = 2.dp
-        )
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             ArgumentsInputField(
@@ -241,7 +232,7 @@ fun PumpControlView(
                     .height(56.dp)
                     .fillMaxWidth(),
                 prefix = "转速",
-                suffix = if (speedUnit == 0) "r/min" else "mL/min",
+                suffix = if (speedUnit == 0) "rpm" else "mL/min",
                 value = speed,
                 onValueChange = { speed = it }
             )
@@ -252,37 +243,42 @@ fun PumpControlView(
                     .height(56.dp)
                     .fillMaxWidth(),
                 prefix = "时间",
-                suffix = "min",
+                suffix = "s",
                 value = time,
                 onValueChange = { time = it }
             )
         }
 
-        VerticalDivider(
-            modifier = Modifier
-                .height(64.dp),
-            thickness = 2.dp
-        )
-
         Button(
             modifier = Modifier.width(120.dp),
             onClick = {
                 scope.launch {
-                    scope.launch {
+                    try {
+                        loadingStart = true
                         viewModel.startPump(
                             channel = channel,
                             control = PumpControl(
                                 control = inOrOut,
                                 direction = direction,
                                 speedUnit = speedUnit,
-                                speed = speed.toDoubleOrNull() ?: 0.0,
-                                time = time.toIntOrNull() ?: 0
+                                speed = speed,
+                                time = time
                             )
                         )
+                    } finally {
+                        loadingStart = false
                     }
                 }
             }
         ) {
+            if (loadingStart) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(16.dp),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    strokeWidth = 2.dp
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+            }
             Text(text = "开始", style = MaterialTheme.typography.bodyLarge)
         }
 
@@ -290,13 +286,26 @@ fun PumpControlView(
             modifier = Modifier.width(120.dp),
             onClick = {
                 scope.launch {
-                    viewModel.stopPump(
-                        channel = channel,
-                        control = inOrOut
-                    )
+                    try {
+                        loadingStop = true
+                        viewModel.stopPump(
+                            channel = channel,
+                            control = inOrOut
+                        )
+                    } finally {
+                        loadingStop = false
+                    }
                 }
             }
         ) {
+            if (loadingStop) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(16.dp),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    strokeWidth = 2.dp
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+            }
             Text(text = "停止", style = MaterialTheme.typography.bodyLarge)
         }
     }
@@ -311,46 +320,47 @@ fun InPumpCalibrationView(
     viewModel: SettingsArgumentsPumpViewModel
 ) {
     val scope = rememberCoroutineScope()
+    var loading by remember { mutableStateOf(false) }
     var s50 by remember(
         channel,
         arguments
-    ) { mutableStateOf(arguments[channel].inSpeedComp[0].toString()) }
+    ) { mutableStateOf(arguments[channel].inSpeedComp[0]) }
     var s100 by remember(
         channel,
         arguments
-    ) { mutableStateOf(arguments[channel].inSpeedComp[1].toString()) }
+    ) { mutableStateOf(arguments[channel].inSpeedComp[1]) }
     var s150 by remember(
         channel,
         arguments
-    ) { mutableStateOf(arguments[channel].inSpeedComp[2].toString()) }
+    ) { mutableStateOf(arguments[channel].inSpeedComp[2]) }
     var s200 by remember(
         channel,
         arguments
-    ) { mutableStateOf(arguments[channel].inSpeedComp[3].toString()) }
+    ) { mutableStateOf(arguments[channel].inSpeedComp[3]) }
     var s250 by remember(
         channel,
         arguments
-    ) { mutableStateOf(arguments[channel].inSpeedComp[4].toString()) }
+    ) { mutableStateOf(arguments[channel].inSpeedComp[4]) }
     var s300 by remember(
         channel,
         arguments
-    ) { mutableStateOf(arguments[channel].inSpeedComp[5].toString()) }
+    ) { mutableStateOf(arguments[channel].inSpeedComp[5]) }
     var s350 by remember(
         channel,
         arguments
-    ) { mutableStateOf(arguments[channel].inSpeedComp[6].toString()) }
+    ) { mutableStateOf(arguments[channel].inSpeedComp[6]) }
     var s400 by remember(
         channel,
         arguments
-    ) { mutableStateOf(arguments[channel].inSpeedComp[7].toString()) }
+    ) { mutableStateOf(arguments[channel].inSpeedComp[7]) }
     var s450 by remember(
         channel,
         arguments
-    ) { mutableStateOf(arguments[channel].inSpeedComp[8].toString()) }
+    ) { mutableStateOf(arguments[channel].inSpeedComp[8]) }
     var s500 by remember(
         channel,
         arguments
-    ) { mutableStateOf(arguments[channel].inSpeedComp[9].toString()) }
+    ) { mutableStateOf(arguments[channel].inSpeedComp[9]) }
 
     Row(
         modifier = modifier
@@ -360,26 +370,15 @@ fun InPumpCalibrationView(
                 shape = MaterialTheme.shapes.medium
             )
             .padding(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(text = "进液泵校准", fontSize = 20.sp)
 
-        VerticalDivider(
-            modifier = Modifier
-                .height(300.dp),
-            thickness = 2.dp
-        )
-
-        Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            Column(
-                modifier = Modifier.fillMaxWidth(0.5f),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 ArgumentsInputField(
-                    modifier = Modifier
-                        .height(48.dp)
-                        .fillMaxWidth(),
+                    modifier = Modifier.size(350.dp, 48.dp),
                     prefix = "50",
                     suffix = "mL",
                     value = s50
@@ -387,9 +386,7 @@ fun InPumpCalibrationView(
                     s50 = it
                 }
                 ArgumentsInputField(
-                    modifier = Modifier
-                        .height(48.dp)
-                        .fillMaxWidth(),
+                    modifier = Modifier.size(350.dp, 48.dp),
                     prefix = "150",
                     suffix = "mL",
                     value = s150
@@ -397,9 +394,7 @@ fun InPumpCalibrationView(
                     s150 = it
                 }
                 ArgumentsInputField(
-                    modifier = Modifier
-                        .height(48.dp)
-                        .fillMaxWidth(),
+                    modifier = Modifier.size(350.dp, 48.dp),
                     prefix = "250",
                     suffix = "mL",
                     value = s250
@@ -408,9 +403,7 @@ fun InPumpCalibrationView(
                 }
 
                 ArgumentsInputField(
-                    modifier = Modifier
-                        .height(48.dp)
-                        .fillMaxWidth(),
+                    modifier = Modifier.size(350.dp, 48.dp),
                     prefix = "350",
                     suffix = "mL",
                     value = s350
@@ -419,9 +412,7 @@ fun InPumpCalibrationView(
                 }
 
                 ArgumentsInputField(
-                    modifier = Modifier
-                        .height(48.dp)
-                        .fillMaxWidth(),
+                    modifier = Modifier.size(350.dp, 48.dp),
                     prefix = "450",
                     suffix = "mL",
                     value = s450
@@ -430,14 +421,9 @@ fun InPumpCalibrationView(
                 }
             }
 
-            Column(
-                modifier = Modifier.fillMaxWidth(1f),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 ArgumentsInputField(
-                    modifier = Modifier
-                        .height(48.dp)
-                        .fillMaxWidth(),
+                    modifier = Modifier.size(350.dp, 48.dp),
                     prefix = "100",
                     suffix = "mL",
                     value = s100
@@ -446,9 +432,7 @@ fun InPumpCalibrationView(
                 }
 
                 ArgumentsInputField(
-                    modifier = Modifier
-                        .height(48.dp)
-                        .fillMaxWidth(),
+                    modifier = Modifier.size(350.dp, 48.dp),
                     prefix = "200",
                     suffix = "mL",
                     value = s200
@@ -457,9 +441,7 @@ fun InPumpCalibrationView(
                 }
 
                 ArgumentsInputField(
-                    modifier = Modifier
-                        .height(48.dp)
-                        .fillMaxWidth(),
+                    modifier = Modifier.size(350.dp, 48.dp),
                     prefix = "300",
                     suffix = "mL",
                     value = s300
@@ -468,9 +450,7 @@ fun InPumpCalibrationView(
                 }
 
                 ArgumentsInputField(
-                    modifier = Modifier
-                        .height(48.dp)
-                        .fillMaxWidth(),
+                    modifier = Modifier.size(350.dp, 48.dp),
                     prefix = "400",
                     suffix = "mL",
                     value = s400
@@ -479,9 +459,7 @@ fun InPumpCalibrationView(
                 }
 
                 ArgumentsInputField(
-                    modifier = Modifier
-                        .height(48.dp)
-                        .fillMaxWidth(),
+                    modifier = Modifier.size(350.dp, 48.dp),
                     prefix = "500",
                     suffix = "mL",
                     value = s500
@@ -491,38 +469,32 @@ fun InPumpCalibrationView(
             }
         }
 
-        VerticalDivider(
-            modifier = Modifier
-                .height(300.dp),
-            thickness = 2.dp
-        )
-
         Button(
             modifier = Modifier.width(120.dp),
             onClick = {
                 scope.launch {
-                    val inArgs = listOf(
-                        s50.toDoubleOrNull() ?: 0.0,
-                        s100.toDoubleOrNull() ?: 0.0,
-                        s150.toDoubleOrNull() ?: 0.0,
-                        s200.toDoubleOrNull() ?: 0.0,
-                        s250.toDoubleOrNull() ?: 0.0,
-                        s300.toDoubleOrNull() ?: 0.0,
-                        s350.toDoubleOrNull() ?: 0.0,
-                        s400.toDoubleOrNull() ?: 0.0,
-                        s450.toDoubleOrNull() ?: 0.0,
-                        s500.toDoubleOrNull() ?: 0.0
-                    )
-                    viewModel.setPumpArguments(
-                        channel = channel,
-                        args = ArgumentsSpeed(
-                            inSpeedComp = inArgs,
-                            outSpeedComp = arguments[channel].outSpeedComp
+                    try {
+                        loading = true
+                        val inArgs =
+                            listOf(s50, s100, s150, s200, s250, s300, s350, s400, s450, s500)
+                        viewModel.setPumpArguments(
+                            channel = channel,
+                            args = ArgumentsSpeed(speedComp = inArgs)
                         )
-                    )
+                    } finally {
+                        loading = false
+                    }
                 }
             }
         ) {
+            if (loading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(16.dp),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    strokeWidth = 2.dp
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+            }
             Text(text = "设置", style = MaterialTheme.typography.bodyLarge)
         }
     }
@@ -537,46 +509,47 @@ fun OutPumpCalibrationView(
     viewModel: SettingsArgumentsPumpViewModel
 ) {
     val scope = rememberCoroutineScope()
+    var loading by remember { mutableStateOf(false) }
     var s50 by remember(
         channel,
         arguments
-    ) { mutableStateOf(arguments[channel].outSpeedComp[0].toString()) }
+    ) { mutableStateOf(arguments[channel].outSpeedComp[0]) }
     var s100 by remember(
         channel,
         arguments
-    ) { mutableStateOf(arguments[channel].outSpeedComp[1].toString()) }
+    ) { mutableStateOf(arguments[channel].outSpeedComp[1]) }
     var s150 by remember(
         channel,
         arguments
-    ) { mutableStateOf(arguments[channel].outSpeedComp[2].toString()) }
+    ) { mutableStateOf(arguments[channel].outSpeedComp[2]) }
     var s200 by remember(
         channel,
         arguments
-    ) { mutableStateOf(arguments[channel].outSpeedComp[3].toString()) }
+    ) { mutableStateOf(arguments[channel].outSpeedComp[3]) }
     var s250 by remember(
         channel,
         arguments
-    ) { mutableStateOf(arguments[channel].outSpeedComp[4].toString()) }
+    ) { mutableStateOf(arguments[channel].outSpeedComp[4]) }
     var s300 by remember(
         channel,
         arguments
-    ) { mutableStateOf(arguments[channel].outSpeedComp[5].toString()) }
+    ) { mutableStateOf(arguments[channel].outSpeedComp[5]) }
     var s350 by remember(
         channel,
         arguments
-    ) { mutableStateOf(arguments[channel].outSpeedComp[6].toString()) }
+    ) { mutableStateOf(arguments[channel].outSpeedComp[6]) }
     var s400 by remember(
         channel,
         arguments
-    ) { mutableStateOf(arguments[channel].outSpeedComp[7].toString()) }
+    ) { mutableStateOf(arguments[channel].outSpeedComp[7]) }
     var s450 by remember(
         channel,
         arguments
-    ) { mutableStateOf(arguments[channel].outSpeedComp[8].toString()) }
+    ) { mutableStateOf(arguments[channel].outSpeedComp[8]) }
     var s500 by remember(
         channel,
         arguments
-    ) { mutableStateOf(arguments[channel].outSpeedComp[9].toString()) }
+    ) { mutableStateOf(arguments[channel].outSpeedComp[9]) }
 
     Row(
         modifier = modifier
@@ -586,26 +559,15 @@ fun OutPumpCalibrationView(
                 shape = MaterialTheme.shapes.medium
             )
             .padding(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(text = "出液泵校准", fontSize = 20.sp)
 
-        VerticalDivider(
-            modifier = Modifier
-                .height(300.dp),
-            thickness = 2.dp
-        )
-
-        Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            Column(
-                modifier = Modifier.fillMaxWidth(0.5f),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 ArgumentsInputField(
-                    modifier = Modifier
-                        .height(48.dp)
-                        .fillMaxWidth(),
+                    modifier = Modifier.size(350.dp, 48.dp),
                     prefix = "50",
                     suffix = "mL",
                     value = s50
@@ -613,9 +575,7 @@ fun OutPumpCalibrationView(
                     s50 = it
                 }
                 ArgumentsInputField(
-                    modifier = Modifier
-                        .height(48.dp)
-                        .fillMaxWidth(),
+                    modifier = Modifier.size(350.dp, 48.dp),
                     prefix = "150",
                     suffix = "mL",
                     value = s150
@@ -623,9 +583,7 @@ fun OutPumpCalibrationView(
                     s150 = it
                 }
                 ArgumentsInputField(
-                    modifier = Modifier
-                        .height(48.dp)
-                        .fillMaxWidth(),
+                    modifier = Modifier.size(350.dp, 48.dp),
                     prefix = "250",
                     suffix = "mL",
                     value = s250
@@ -634,9 +592,7 @@ fun OutPumpCalibrationView(
                 }
 
                 ArgumentsInputField(
-                    modifier = Modifier
-                        .height(48.dp)
-                        .fillMaxWidth(),
+                    modifier = Modifier.size(350.dp, 48.dp),
                     prefix = "350",
                     suffix = "mL",
                     value = s350
@@ -645,9 +601,7 @@ fun OutPumpCalibrationView(
                 }
 
                 ArgumentsInputField(
-                    modifier = Modifier
-                        .height(48.dp)
-                        .fillMaxWidth(),
+                    modifier = Modifier.size(350.dp, 48.dp),
                     prefix = "450",
                     suffix = "mL",
                     value = s450
@@ -656,14 +610,9 @@ fun OutPumpCalibrationView(
                 }
             }
 
-            Column(
-                modifier = Modifier.fillMaxWidth(1f),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 ArgumentsInputField(
-                    modifier = Modifier
-                        .height(48.dp)
-                        .fillMaxWidth(),
+                    modifier = Modifier.size(350.dp, 48.dp),
                     prefix = "100",
                     suffix = "mL",
                     value = s100
@@ -672,9 +621,7 @@ fun OutPumpCalibrationView(
                 }
 
                 ArgumentsInputField(
-                    modifier = Modifier
-                        .height(48.dp)
-                        .fillMaxWidth(),
+                    modifier = Modifier.size(350.dp, 48.dp),
                     prefix = "200",
                     suffix = "mL",
                     value = s200
@@ -683,9 +630,7 @@ fun OutPumpCalibrationView(
                 }
 
                 ArgumentsInputField(
-                    modifier = Modifier
-                        .height(48.dp)
-                        .fillMaxWidth(),
+                    modifier = Modifier.size(350.dp, 48.dp),
                     prefix = "300",
                     suffix = "mL",
                     value = s300
@@ -694,9 +639,7 @@ fun OutPumpCalibrationView(
                 }
 
                 ArgumentsInputField(
-                    modifier = Modifier
-                        .height(48.dp)
-                        .fillMaxWidth(),
+                    modifier = Modifier.size(350.dp, 48.dp),
                     prefix = "400",
                     suffix = "mL",
                     value = s400
@@ -705,9 +648,7 @@ fun OutPumpCalibrationView(
                 }
 
                 ArgumentsInputField(
-                    modifier = Modifier
-                        .height(48.dp)
-                        .fillMaxWidth(),
+                    modifier = Modifier.size(350.dp, 48.dp),
                     prefix = "500",
                     suffix = "mL",
                     value = s500
@@ -717,38 +658,32 @@ fun OutPumpCalibrationView(
             }
         }
 
-        VerticalDivider(
-            modifier = Modifier
-                .height(300.dp),
-            thickness = 2.dp
-        )
-
         Button(
             modifier = Modifier.width(120.dp),
             onClick = {
                 scope.launch {
-                    val outArgs = listOf(
-                        s50.toDoubleOrNull() ?: 0.0,
-                        s100.toDoubleOrNull() ?: 0.0,
-                        s150.toDoubleOrNull() ?: 0.0,
-                        s200.toDoubleOrNull() ?: 0.0,
-                        s250.toDoubleOrNull() ?: 0.0,
-                        s300.toDoubleOrNull() ?: 0.0,
-                        s350.toDoubleOrNull() ?: 0.0,
-                        s400.toDoubleOrNull() ?: 0.0,
-                        s450.toDoubleOrNull() ?: 0.0,
-                        s500.toDoubleOrNull() ?: 0.0
-                    )
-                    viewModel.setPumpArguments(
-                        channel = channel,
-                        args = ArgumentsSpeed(
-                            inSpeedComp = arguments[channel].outSpeedComp,
-                            outSpeedComp = outArgs
+                    loading = true
+                    try {
+                        val outArgs =
+                            listOf(s50, s100, s150, s200, s250, s300, s350, s400, s450, s500)
+                        viewModel.setPumpArguments(
+                            channel = channel,
+                            args = ArgumentsSpeed(inOrOut = 1, speedComp = outArgs)
                         )
-                    )
+                    } finally {
+                        loading = false
+                    }
                 }
             }
         ) {
+            if (loading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(16.dp),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    strokeWidth = 2.dp
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+            }
             Text(text = "设置", style = MaterialTheme.typography.bodyLarge)
         }
     }

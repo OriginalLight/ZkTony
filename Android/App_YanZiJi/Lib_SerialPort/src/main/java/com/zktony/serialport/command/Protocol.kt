@@ -51,7 +51,7 @@ class Protocol : BaseProtocol {
     var crc: ByteArray = byteArrayOf(0x00.toByte(), 0x00.toByte())
 
     // End 4byte 0xFF 0xFC 0xFF 0xFF
-    private var frameEnd: ByteArray = byteArrayOf(0xFF.toByte(), 0xFC.toByte())
+    private var frameEnd: ByteArray = byteArrayOf(0xFC.toByte(), 0xFF.toByte())
 
     override fun serialization(): ByteArray {
         val byteArray = byteArrayOf(frameHeader, sourceAddress, targetAddress, function)
@@ -82,7 +82,7 @@ class Protocol : BaseProtocol {
     companion object {
         // 协议包头和包尾
         private val expectHead = byteArrayOf(0xEE.toByte())
-        private val expectEnd = byteArrayOf(0xFF.toByte(), 0xFC.toByte())
+        private val expectEnd = byteArrayOf(0xFC.toByte(), 0xFF.toByte())
 
         /**
          * Verify the protocol
