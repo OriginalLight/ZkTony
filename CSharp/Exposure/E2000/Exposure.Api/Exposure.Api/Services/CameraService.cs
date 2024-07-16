@@ -1008,6 +1008,8 @@ public class CameraService(
             var thr1 = OpenCvUtils.FindMaxGrayscaleValue(gray1S, double.Parse(threshold));
             var thr2 = OpenCvUtils.FindMaxGrayscaleValue(gray2S, double.Parse(threshold));
 
+            Log.Information($"计算曝光时间：thr1 = {thr1} thr2 = {thr2}");
+            
             if (thr1 == 0 || thr2 == 0)
             {
                 return 600_000_000;
@@ -1025,7 +1027,12 @@ public class CameraService(
             var end = DateTime.Now;
             Log.Information($"计算曝光时间：target = {target} k = {k} b= {b} 耗时 = {(end - start).TotalMilliseconds}ms");
 
-            return Math.Clamp((long)(target * 1_000_000), 100_000, 600_000_000);
+            return target switch
+            {
+                <= 0.1 => 1_00_000,
+                > 600 => 600_000_000,
+                _ => (long)(target * 1_000_000)
+            };
         }
         finally
         {

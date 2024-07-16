@@ -21,7 +21,7 @@ export default {
   'home.camera.options.3000.title': '2992 x 3000',
   'home.camera.options.1500.title': '1488 x 1500',
   'home.camera.options.1000.title': '992 x 998',
-  'home.camera.options.exposure': 'Exposure Time Min:Sec:MilliSec',
+  'home.camera.options.exposure': 'Exposure Time min:s:ms',
   'home.camera.options.minute': 'Minute',
   'home.camera.options.second': 'Second',
   'home.camera.options.millisecond': 'MilliSecond',

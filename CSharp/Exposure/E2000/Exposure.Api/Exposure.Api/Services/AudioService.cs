@@ -36,10 +36,10 @@ public class AudioService(IOptionService option) : IAudioService
                 case null or "0":
                     return;
                 case "1":
-                    key = "Assets/Ringtones/" + key + ".wav";
+                    key = "Assets/Ringtones/" + key + ".mp3";
                     break;
                 default:
-                    key = "Assets/Voices/" + key + ".wav";
+                    key = "Assets/Voices/" + key + ".mp3";
                     break;
             }
 

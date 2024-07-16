@@ -12,7 +12,7 @@ export default {
   'gallery.detail.user': 'User',
   'gallery.detail.time': 'Date',
   'gallery.detail.expo': 'Expo',
-  'gallery.detail.unit': 'ms',
+  'gallery.detail.unit': 'min:s:ms',
   'gallery.detail.brightness': 'Brightness',
   'gallery.detail.contrast': 'Contrast',
   'gallery.detail.invert': 'Invert',

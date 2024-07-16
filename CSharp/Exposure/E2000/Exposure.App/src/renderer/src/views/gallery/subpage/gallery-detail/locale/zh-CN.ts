@@ -12,7 +12,7 @@ export default {
   'gallery.detail.user': '拍摄用户',
   'gallery.detail.time': '拍摄时间',
   'gallery.detail.expo': '曝光时间',
-  'gallery.detail.unit': '毫秒',
+  'gallery.detail.unit': 'min:s:ms',
   'gallery.detail.brightness': '亮\u2002\u2002度',
   'gallery.detail.contrast': '对比度',
   'gallery.detail.invert': '反\u2002\u2002色',

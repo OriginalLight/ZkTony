@@ -110,6 +110,9 @@
       <a-tag color="#006934">{{ props.image.width + ' x ' + props.image.height }}</a-tag>
     </a-space>
   </div>
+  <div class="image-info-time">
+    <a-tag color="#006934">{{ getExposureTime(props.image.exposureTime / 1000) }}</a-tag>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -176,6 +179,14 @@ const handleSave = async () => {
 // 循环预览
 const handleCycle = () => {
   emit('cycle')
+}
+
+const getExposureTime = (time: number) => {
+  // 返回 分钟：秒：毫秒
+  const min = Math.floor(time / 60000)
+  const sec = Math.floor((time % 60000) / 1000)
+  const ms = Math.floor(time % 1000)
+  return `${min} : ${sec} : ${ms}`
 }
 
 watch(
@@ -248,6 +259,13 @@ onMounted(() => {
   position: absolute;
   top: 8px;
   left: 8px;
+  padding: 12px;
+}
+
+.image-info-time {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
   padding: 12px;
 }
 

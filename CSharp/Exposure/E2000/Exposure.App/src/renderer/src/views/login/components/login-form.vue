@@ -69,7 +69,7 @@ import { Message } from '@arco-design/web-vue'
 import { useI18n } from 'vue-i18n'
 import useLoading from '@renderer/hooks/loading'
 import type { LoginData } from '@renderer/api/user'
-import { useUserStore } from '@renderer/store'
+import { useUserStore, useAppStore } from '@renderer/store'
 import useHomeState from '@renderer/states/home'
 import useGalleryState from '@renderer/states/gallery'
 
@@ -78,6 +78,7 @@ const { t } = useI18n()
 const errorMessage = ref('')
 const { loading, setLoading } = useLoading()
 const userStore = useUserStore()
+const appStore = useAppStore()
 const { homeInit } = useHomeState()
 const { galleryInit } = useGalleryState()
 
@@ -101,6 +102,7 @@ const handleSubmit = async ({
       await userStore.login(values as LoginData)
       homeInit()
       galleryInit()
+      appStore.toggleTemperature(-1000)
       router.push('/home')
       Message.success(t('login.form.login.success'))
     } catch (err) {

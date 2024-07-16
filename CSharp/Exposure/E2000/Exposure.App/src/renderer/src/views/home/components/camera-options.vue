@@ -91,41 +91,50 @@
         </div>
       </a-card>
       <a-card v-if="switchIndex === '2'">
-        <div class="card-div">
+        <div class="card-div-input">
           <a-input-group>
             <a-input-number
               v-model="options.time.minute"
-              size="large"
-              :placeholder="t('home.camera.options.minute')"
+              size="medium"
               mode="button"
               :min="0"
               :max="59"
               :step="1"
               :input-attrs="{ style: { textAlign: 'center' } }"
               model-event="input"
-            />
+            >
+              <template #suffix>
+                {{ 'min' }}
+              </template>
+            </a-input-number>
             <a-input-number
               v-model="options.time.second"
-              size="large"
-              :placeholder="t('home.camera.options.second')"
+              size="medium"
               mode="button"
               :min="0"
               :max="59"
               :step="1"
               :input-attrs="{ style: { textAlign: 'center' } }"
               model-event="input"
-            />
+            >
+              <template #suffix>
+                {{ 's' }}
+              </template>
+            </a-input-number>
             <a-input-number
               v-model="options.time.millisecond"
-              size="large"
-              :placeholder="t('home.camera.options.millisecond')"
+              size="medium"
               mode="button"
               :min="0"
               :max="999"
               :step="100"
               :input-attrs="{ style: { textAlign: 'center' } }"
               model-event="input"
-            />
+            >
+              <template #suffix>
+                {{ 'ms' }}
+              </template>
+            </a-input-number>
           </a-input-group>
         </div>
       </a-card>
@@ -137,7 +146,7 @@
             :placeholder="t('home.camera.options.frames')"
             mode="button"
             :min="1"
-            :max="100"
+            :max="20"
             :step="1"
             :input-attrs="{ style: { textAlign: 'center' } }"
             model-event="input"
@@ -368,7 +377,9 @@ const handleShoot = async () => {
         exposure: exposureTime.value,
         frame: options.value.frame ? options.value.frame : 1
       })
-      progress.value.time = (exposureTime.value / 1000) * options.value.frame + 2000
+      progress.value.time =
+        Math.max((exposureTime.value / 1000) * options.value.frame, 2500 * options.value.frame) +
+        2000
       progress.value.message = t('home.camera.options.shooting')
       canCancel.value = true
     }
@@ -466,5 +477,13 @@ const delay = (ms: number) => {
   display: flex;
   direction: column;
   justify-content: center;
+}
+
+.card-div-input {
+  display: flex;
+  direction: column;
+  justify-content: center;
+  margin-top: 2px;
+  margin-bottom: 2px;
 }
 </style>
