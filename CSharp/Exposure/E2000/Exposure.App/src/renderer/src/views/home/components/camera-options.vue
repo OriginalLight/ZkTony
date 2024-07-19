@@ -379,7 +379,7 @@ const handleShoot = async () => {
       })
       progress.value.time =
         Math.max((exposureTime.value / 1000) * options.value.frame, 2500 * options.value.frame) +
-        2000
+        3000
       progress.value.message = t('home.camera.options.shooting')
       canCancel.value = true
     }

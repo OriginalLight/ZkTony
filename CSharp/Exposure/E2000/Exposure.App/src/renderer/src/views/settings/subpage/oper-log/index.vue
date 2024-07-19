@@ -23,7 +23,13 @@
           </template>
           <template #default>{{ t('operlog.bar.delete') }}</template>
         </a-button>
-        <a-button type="primary" shape="round" :disabled="isNoSelectedKeys" @click="handleExport">
+        <a-button
+          type="primary"
+          shape="round"
+          :loading="loadingExport"
+          :disabled="isNoSelectedKeys || loadingExport"
+          @click="handleExport"
+        >
           <template #icon>
             <icon-export />
           </template>
@@ -73,6 +79,8 @@ const { t } = useI18n()
 // 加载
 const { loading, setLoading } = useLoading()
 
+// 导出加载
+const loadingExport = ref(false)
 // 删除弹窗
 const visible = ref(false)
 
@@ -186,10 +194,13 @@ const handleDelete = async () => {
 // 导出
 const handleExport = async () => {
   try {
+    loadingExport.value = true
     await exportOperLog(selectedKeys.value)
     Message.success(t('operlog.bar.export.success'))
   } catch (error) {
     Message.error((error as Error).message)
+  } finally {
+    loadingExport.value = false
   }
 }
 

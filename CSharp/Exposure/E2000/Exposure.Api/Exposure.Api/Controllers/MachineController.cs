@@ -223,11 +223,13 @@ public class MachineController(
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
             ?.InformationalVersion.Split("+")[0];
         var ver2 = serialPort.GetVer();
+        var ver3 = camera.Camera?.FpgaVersion ?? "Unknown";
 
         var dict = new Dictionary<string, string?>
         {
             { "Ver1", ver1 },
-            { "Ver2", ver2 }
+            { "Ver2", ver2 },
+            { "Ver3", ver3 }
         };
 
         return Ok(dict);

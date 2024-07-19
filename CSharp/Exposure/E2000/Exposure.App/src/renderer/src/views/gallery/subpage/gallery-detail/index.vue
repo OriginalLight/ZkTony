@@ -103,7 +103,7 @@
           <a-input :model-value="subpage.preview.width + ' x ' + subpage.preview.height" readonly>
             <template #prepend> {{ t('gallery.detail.size') }} </template>
           </a-input>
-          <a-input :model-value="getExposureTime(subpage.preview.exposureTime / 1000)" readonly>
+          <a-input :model-value="getExposureTime(subpage.preview.exposureTime)" readonly>
             <template #prepend> {{ t('gallery.detail.expo') }} </template>
             <template #append>
               {{ t('gallery.detail.unit') }}
@@ -369,12 +369,18 @@ const handleSave = async () => {
   }
 }
 
-const getExposureTime = (time: number) => {
+const getExposureTime = (time) => {
   // 返回 分钟：秒：毫秒
   const min = Math.floor(time / 60000)
   const sec = Math.floor((time % 60000) / 1000)
   const ms = Math.floor(time % 1000)
-  return `${min} : ${sec} : ${ms}`
+
+  // 使用 padStart 来确保格式正确
+  const formattedMin = String(min).padStart(2, '0')
+  const formattedSec = String(sec).padStart(2, '0')
+  const formattedMs = String(ms).padStart(3, '0')
+
+  return `${formattedMin} : ${formattedSec} : ${formattedMs}`
 }
 
 const handleHistogram = (src: string) => {

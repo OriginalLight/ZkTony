@@ -578,6 +578,8 @@ public class CameraService(
 
         // 序列
         _seq++;
+        // 微秒 -> 毫秒
+        expoTime /= 1000;
         try
         {
             Log.Information($"获取图片：Seq {_seq} Flag {_flag}");

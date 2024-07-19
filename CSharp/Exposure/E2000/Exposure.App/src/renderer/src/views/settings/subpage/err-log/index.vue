@@ -23,7 +23,13 @@
           </template>
           <template #default>{{ t('errlog.bar.delete') }}</template>
         </a-button>
-        <a-button shape="round" type="primary" :disabled="isNoSelectedKeys" @click="handleExport">
+        <a-button
+          shape="round"
+          type="primary"
+          :loading="loadingExport"
+          :disabled="isNoSelectedKeys || loadingExport"
+          @click="handleExport"
+        >
           <template #icon>
             <icon-export />
           </template>
@@ -75,6 +81,9 @@ const { loading, setLoading } = useLoading()
 
 // 弹窗
 const visible = ref(false)
+
+// 导出加载
+const loadingExport = ref(false)
 
 // 搜索日期
 const searchDate = ref<Date | undefined>(undefined)
@@ -179,10 +188,13 @@ const handleDelete = async () => {
 // 导出
 const handleExport = async () => {
   try {
+    loadingExport.value = true
     await exportErrLog(selectedKeys.value)
     Message.success(t('errlog.bar.export.success'))
   } catch (error) {
     Message.error((error as Error).message)
+  } finally {
+    loadingExport.value = false
   }
 }
 

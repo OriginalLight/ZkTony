@@ -111,7 +111,7 @@
                     v-model="option.expoTime"
                     style="width: 350px"
                     :min="1000"
-                    :max="10000000"
+                    :max="1000000"
                     mode="button"
                     :step="500"
                   >

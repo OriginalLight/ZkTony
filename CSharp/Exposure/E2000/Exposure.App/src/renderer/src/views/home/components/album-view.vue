@@ -19,27 +19,42 @@
           <div style="width: 100%; text-align: center">{{ albumList.length }}</div>
         </a-tag>
       </a-space>
-      <a-popover position="br" trigger="click">
+      <a-space>
         <a-button
           type="primary"
-          style="width: 120px"
           shape="round"
-          :disabled="disableExport"
-          :loading="loading.export"
+          style="width: 120px"
+          :loading="loading.update"
+          :disabled="disableUpdate"
+          @click="showUpdate"
         >
           <template #icon>
-            <icon-export />
+            <icon-edit />
           </template>
-          {{ t('home.album.view.export') }}</a-button
-        >
-        <template #content>
-          <a-space size="large">
-            <a-button shape="round" @click="handleExport('png')">PNG</a-button>
-            <a-button shape="round" @click="handleExport('tiff')">TIFF</a-button>
-            <a-button shape="round" @click="handleExport('jpg')">JPG</a-button>
-          </a-space>
-        </template>
-      </a-popover>
+          <template #default>{{ t('gallery.bar.rename') }}</template>
+        </a-button>
+        <a-popover position="br" trigger="click">
+          <a-button
+            type="primary"
+            style="width: 120px"
+            shape="round"
+            :disabled="disableExport"
+            :loading="loading.export"
+          >
+            <template #icon>
+              <icon-export />
+            </template>
+            {{ t('home.album.view.export') }}</a-button
+          >
+          <template #content>
+            <a-space size="large">
+              <a-button shape="round" @click="handleExport('png')">PNG</a-button>
+              <a-button shape="round" @click="handleExport('tiff')">TIFF</a-button>
+              <a-button shape="round" @click="handleExport('jpg')">JPG</a-button>
+            </a-space>
+          </template>
+        </a-popover>
+      </a-space>
     </div>
     <a-space id="scroll-albums" class="scroll-wrapper">
       <div
@@ -109,12 +124,16 @@
       </div>
     </a-space>
   </a-card>
+  <a-modal v-model:visible="visible" draggable @ok="handleUpdate" @cancel="visible = false">
+    <template #title> {{ t('gallery.bar.rename') }} </template>
+    <a-input v-model="update.name" allow-clear :max-length="32"> </a-input>
+  </a-modal>
 </template>
 
 <script lang="ts" setup>
 import { computed, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Album, Photo, combinePhoto, exportAlbum } from '@renderer/api/album'
+import { Album, Photo, combinePhoto, exportAlbum, updateAlbum } from '@renderer/api/album'
 import { Message } from '@arco-design/web-vue'
 
 const props = defineProps({
@@ -145,8 +164,17 @@ const { t } = useI18n()
 // 加载
 const loading = ref({
   combine: false,
-  export: false
+  export: false,
+  update: false
 })
+
+// 更新
+const update = ref({
+  id: 0,
+  name: ''
+})
+
+const visible = ref(false)
 
 const albumList = computed(() => {
   // 返回album并按时间倒着排序
@@ -228,6 +256,45 @@ const mouseWhell = (id: string) => {
       e.preventDefault()
       div.scrollLeft += e.deltaY / 2
     })
+  }
+}
+
+// 是否禁用更新
+const disableUpdate = computed(() => {
+  return props.selectedAlbums.length != 1 || loading.value.update
+})
+
+// 显示更新
+const showUpdate = () => {
+  if (props.selectedAlbums.length === 0) {
+    return
+  }
+  const item = props.selectedAlbums[0]
+  update.value = {
+    id: item.id,
+    name: item.name
+  }
+  visible.value = true
+}
+
+// 更新
+const handleUpdate = async () => {
+  try {
+    loading.value.update = true
+    visible.value = false
+    await updateAlbum(update.value)
+    const album = props.selectedAlbums.find((item) => item.id === update.value.id)
+    if (album) {
+      album.name = update.value.name
+    }
+    const album1 = props.albums.find((item) => item.id === update.value.id)
+    if (album1) {
+      album1.name = update.value.name
+    }
+  } catch (error) {
+    Message.error((error as Error).message)
+  } finally {
+    loading.value.update = false
   }
 }
 

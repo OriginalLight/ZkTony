@@ -158,23 +158,23 @@ const ports = [
 ]
 
 const rings = [
-  { key: 'Assets\\Ringtones\\Start.wav', label: t('debug.sound.ring1') },
-  { key: 'Assets\\Ringtones\\Error.wav', label: t('debug.sound.ring2') },
-  { key: 'Assets\\Ringtones\\Shot.wav', label: t('debug.sound.ring3') },
-  { key: 'Assets\\Ringtones\\CancelShot.wav', label: t('debug.sound.ring4') },
-  { key: 'Assets\\Ringtones\\Save.wav', label: t('debug.sound.ring5') },
-  { key: 'Assets\\Ringtones\\Export.wav', label: t('debug.sound.ring6') },
-  { key: 'Assets\\Ringtones\\Ringtone.wav', label: t('debug.sound.ring7') }
+  { key: 'Assets\\Ringtones\\Start.mp3', label: t('debug.sound.ring1') },
+  { key: 'Assets\\Ringtones\\Error.mp3', label: t('debug.sound.ring2') },
+  { key: 'Assets\\Ringtones\\Shot.mp3', label: t('debug.sound.ring3') },
+  { key: 'Assets\\Ringtones\\CancelShot.mp3', label: t('debug.sound.ring4') },
+  { key: 'Assets\\Ringtones\\Save.mp3', label: t('debug.sound.ring5') },
+  { key: 'Assets\\Ringtones\\Export.mp3', label: t('debug.sound.ring6') },
+  { key: 'Assets\\Ringtones\\Ringtone.mp3', label: t('debug.sound.ring7') }
 ]
 
 const voices = [
-  { key: 'Assets\\Voices\\Start.wav', label: t('debug.sound.voice1') },
-  { key: 'Assets\\Voices\\Error.wav', label: t('debug.sound.voice2') },
-  { key: 'Assets\\Voices\\Shot.wav', label: t('debug.sound.voice3') },
-  { key: 'Assets\\Voices\\CancelShot.wav', label: t('debug.sound.voice4') },
-  { key: 'Assets\\Voices\\Save.wav', label: t('debug.sound.voice5') },
-  { key: 'Assets\\Voices\\Export.wav', label: t('debug.sound.voice6') },
-  { key: 'Assets\\Voices\\Voice.wav', label: t('debug.sound.voice7') }
+  { key: 'Assets\\Voices\\Start.mp3', label: t('debug.sound.voice1') },
+  { key: 'Assets\\Voices\\Error.mp3', label: t('debug.sound.voice2') },
+  { key: 'Assets\\Voices\\Shot.mp3', label: t('debug.sound.voice3') },
+  { key: 'Assets\\Voices\\CancelShot.mp3', label: t('debug.sound.voice4') },
+  { key: 'Assets\\Voices\\Save.mp3', label: t('debug.sound.voice5') },
+  { key: 'Assets\\Voices\\Export.mp3', label: t('debug.sound.voice6') },
+  { key: 'Assets\\Voices\\Voice.mp3', label: t('debug.sound.voice7') }
 ]
 
 const serialOptions = ref({

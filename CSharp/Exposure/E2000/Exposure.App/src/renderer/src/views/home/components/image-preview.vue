@@ -73,7 +73,9 @@
           :disabled="
             imageOptions.brightness == 100 &&
             imageOptions.contrast == 100 &&
-            imageOptions.scale == 1.2
+            imageOptions.scale == 1.2 &&
+            imageOptions.offsetX == 0 &&
+            imageOptions.offsetY == 0
           "
           @click="handleRedo"
         >
@@ -111,7 +113,7 @@
     </a-space>
   </div>
   <div class="image-info-time">
-    <a-tag color="#006934">{{ getExposureTime(props.image.exposureTime / 1000) }}</a-tag>
+    <a-tag color="#006934">{{ getExposureTime(props.image.exposureTime) }}</a-tag>
   </div>
 </template>
 
@@ -144,7 +146,9 @@ const loading = ref(false)
 const imageOptions = ref({
   brightness: 100,
   contrast: 100,
-  scale: 1.2
+  scale: 1.2,
+  offsetX: 0,
+  offsetY: 0
 })
 
 // 恢复
@@ -155,6 +159,8 @@ const handleRedo = () => {
   const img = document.getElementById('img-preview') as HTMLImageElement
   img.style.left = '0px'
   img.style.top = '0px'
+  imageOptions.value.offsetX = 0
+  imageOptions.value.offsetY = 0
 }
 
 // 保存
@@ -181,12 +187,18 @@ const handleCycle = () => {
   emit('cycle')
 }
 
-const getExposureTime = (time: number) => {
+const getExposureTime = (time) => {
   // 返回 分钟：秒：毫秒
   const min = Math.floor(time / 60000)
   const sec = Math.floor((time % 60000) / 1000)
   const ms = Math.floor(time % 1000)
-  return `${min} : ${sec} : ${ms}`
+
+  // 使用 padStart 来确保格式正确
+  const formattedMin = String(min).padStart(2, '0')
+  const formattedSec = String(sec).padStart(2, '0')
+  const formattedMs = String(ms).padStart(3, '0')
+
+  return `${formattedMin} : ${formattedSec} : ${formattedMs}`
 }
 
 watch(
@@ -237,6 +249,44 @@ const handleTouch = () => {
     } else {
       imageOptions.value.scale -= 0.1
     }
+  })
+
+  //img可以拖动
+  const img = document.getElementById('img-preview') as HTMLImageElement
+  let isDown = false
+  let disX, disY
+  img.addEventListener('mousedown', (e) => {
+    isDown = true
+    disX = e.clientX - img.offsetLeft
+    disY = e.clientY - img.offsetTop
+  })
+  img.addEventListener('mousemove', (e) => {
+    if (isDown) {
+      img.style.left = e.clientX - disX + 'px'
+      img.style.top = e.clientY - disY + 'px'
+      imageOptions.value.offsetX = e.clientX - disX
+      imageOptions.value.offsetY = e.clientY - disY
+    }
+  })
+  img.addEventListener('mouseup', () => {
+    isDown = false
+  })
+  //触屏拖动
+  img.addEventListener('touchstart', (e) => {
+    isDown = true
+    disX = e.touches[0].clientX - img.offsetLeft
+    disY = e.touches[0].clientY - img.offsetTop
+  })
+  img.addEventListener('touchmove', (e) => {
+    if (isDown) {
+      img.style.left = e.touches[0].clientX - disX + 'px'
+      img.style.top = e.touches[0].clientY - disY + 'px'
+      imageOptions.value.offsetX = e.touches[0].clientX - disX
+      imageOptions.value.offsetY = e.touches[0].clientY - disY
+    }
+  })
+  img.addEventListener('touchend', () => {
+    isDown = false
   })
 }
 

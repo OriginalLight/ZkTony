@@ -67,7 +67,7 @@
           </a-button>
         </template>
       </a-list-item>
-      <a-list-item v-if="userStore.role < 2">
+      <!-- <a-list-item v-if="userStore.role < 2">
         <a-list-item-meta :title="t('settings.system.update')">
           <template #avatar>
             <UpdateRotation size="20" />
@@ -81,7 +81,7 @@
             {{ t('settings.system.update.check') }}
           </a-button>
         </template>
-      </a-list-item>
+      </a-list-item> -->
       <a-list-item>
         <a-list-item-meta :title="t('settings.system.machine.title')">
           <template #avatar>
@@ -90,6 +90,26 @@
         </a-list-item-meta>
         <template #actions>
           <a-tag> {{ machine.id }} </a-tag>
+        </template>
+      </a-list-item>
+      <a-list-item>
+        <a-list-item-meta :title="t('settings.system.version.title')">
+          <template #avatar>
+            <icon-question-circle size="20" />
+          </template>
+        </a-list-item-meta>
+        <template #actions>
+          <a-space>
+            <a-tag v-if="version.ver2 != ''">
+              {{ t('settings.system.version.framework') + version.ver2 }}
+            </a-tag>
+            <a-tag v-if="version.ver1 != ''">
+              {{ t('settings.system.version.software') + version.ver1 }}
+            </a-tag>
+            <a-tag v-if="version.ver3 != ''">
+              {{ t('settings.system.version.camera') + version.ver3 }}
+            </a-tag>
+          </a-space>
         </template>
       </a-list-item>
     </a-list>
@@ -103,14 +123,15 @@ import { useRouter } from 'vue-router'
 import { LOCALE_OPTIONS } from '@renderer/locale'
 import useLocale from '@renderer/hooks/locale'
 import useTheme from '@renderer/hooks/themes'
-import { update } from '@renderer/api/machine'
+//import { update } from '@renderer/api/machine'
 import { getOption, setOption } from '@renderer/api/option'
-import { Message } from '@arco-design/web-vue'
-import { UpdateRotation } from '@icon-park/vue-next'
-import { useUserStore } from '@renderer/store'
+import { varsion } from '@renderer/api/machine'
+// import { Message } from '@arco-design/web-vue'
+// import { UpdateRotation } from '@icon-park/vue-next'
+// import { useUserStore } from '@renderer/store'
 
 const { t } = useI18n()
-const userStore = useUserStore()
+// const userStore = useUserStore()
 const locales = [...LOCALE_OPTIONS]
 const { changeLocale, currentLocale } = useLocale()
 const { changeTheme, currentTheme } = useTheme()
@@ -120,23 +141,29 @@ const machine = ref({
   sound: localStorage.getItem('sound') || '0'
 })
 
-const loading = ref(false)
+const version = ref({
+  ver1: '',
+  ver2: '',
+  ver3: ''
+})
+
+// const loading = ref(false)
 
 // 查看错误日志
 const handleErrlog = () => {
   router.push('/errlog')
 }
 
-const handleUpdate = async () => {
-  try {
-    loading.value = true
-    await update()
-    loading.value = false
-  } catch (error) {
-    Message.error((error as Error).message)
-    loading.value = false
-  }
-}
+// const handleUpdate = async () => {
+//   try {
+//     loading.value = true
+//     await update()
+//     loading.value = false
+//   } catch (error) {
+//     Message.error((error as Error).message)
+//     loading.value = false
+//   }
+// }
 
 const changeSound = async (va) => {
   try {
@@ -155,6 +182,17 @@ onMounted(async () => {
     machine.value.id = res1.data
     const res2 = await getOption({ key: 'Sound' })
     machine.value.sound = t(`settings.system.sound.${res2.data}`)
+    const res = await varsion()
+    const ver = res.data
+    if (ver.Ver1) {
+      version.value.ver1 = ver.Ver1
+    }
+    if (ver.Ver2) {
+      version.value.ver2 = ver.Ver2
+    }
+    if (ver.Ver3) {
+      version.value.ver3 = ver.Ver3
+    }
   } catch (error) {
     console.error(error)
   }

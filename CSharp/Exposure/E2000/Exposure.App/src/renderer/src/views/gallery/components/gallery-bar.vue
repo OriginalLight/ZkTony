@@ -107,7 +107,7 @@ import { deleteAlbum, exportAlbum, updateAlbum } from '@renderer/api/album'
 
 const { selected, options, subpage } = useGalleryState()
 
-const { selectedAlbums, albums, albumPreview, preview } = useHomeState()
+const { selectedAlbums, albums, albumPreview, preview, selectedPhotos } = useHomeState()
 
 const emit = defineEmits(['search', 'update'])
 
@@ -177,28 +177,17 @@ const handleDelete = async () => {
     emit('search')
     selectedAlbums.value = selectedAlbums.value.filter((item) => !ids.includes(item.id))
     albums.value = albums.value.filter((item) => !ids.includes(item.id))
+    selectedPhotos.value = []
     if (ids.includes(albumPreview.value.id)) {
-      albumPreview.value = {
+      albumPreview.value = albums.value[0] ?? {
         id: 0,
         name: 'None',
-        createTime: '',
-        updateTime: '',
-        user: null,
-        photos: [],
-        original: []
+        photos: []
       }
-      preview.value = {
-        id: 0,
-        name: 'None',
-        albumId: 0,
-        path: '',
-        width: 1000,
-        height: 1000,
-        type: 0,
-        thumbnail: '',
-        exposureTime: 0,
-        Gain: 0,
-        createTime: ''
+      if (albumPreview.value.photos.length > 0) {
+        preview.value =
+          albumPreview.value.photos.find((photo) => photo.type === 1) ??
+          albumPreview.value.photos[0]
       }
     }
   } catch (error) {

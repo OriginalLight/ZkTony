@@ -27,6 +27,7 @@ export default {
   'settings.system.version.title': '版本信息',
   'settings.system.version.software': '软件\u2002',
   'settings.system.version.framework': '固件\u2002',
+  'settings.system.version.camera': '相机\u2002',
   'settings.system.machine.title': '设备序列号',
   'settings.system.update': '检查更新',
   'settings.system.update.check': '检查更新',

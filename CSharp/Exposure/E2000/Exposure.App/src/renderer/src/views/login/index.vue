@@ -40,7 +40,7 @@ onMounted(async () => {
   try {
     if (!isInit.value) {
       // 延时3秒
-      await new Promise((resolve) => setTimeout(resolve, 3000))
+      await new Promise((resolve) => setTimeout(resolve, 5000))
       await selfCheck()
       const res = await storage()
       if (res.data < 0.1) {
