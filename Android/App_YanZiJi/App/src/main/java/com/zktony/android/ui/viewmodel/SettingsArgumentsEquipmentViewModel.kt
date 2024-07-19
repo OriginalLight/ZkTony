@@ -24,7 +24,7 @@ class SettingsArgumentsEquipmentViewModel @Inject constructor() : ViewModel() {
             TipsUtils.showTips(Tips.info(tipsMessage))
             LogUtils.info("$tipsMessage $pn")
             repeat(ProductUtils.getChannelCount()) { index ->
-                SerialPortUtils.setProductNumber(pn, index)
+                SerialPortUtils.setProductNumber(index, pn)
             }
         }
     }
@@ -36,7 +36,7 @@ class SettingsArgumentsEquipmentViewModel @Inject constructor() : ViewModel() {
             TipsUtils.showTips(Tips.info(tipsMessage))
             LogUtils.info("$tipsMessage $sn")
             repeat(ProductUtils.getChannelCount()) { index ->
-                SerialPortUtils.setSerialNumber(sn, index)
+                SerialPortUtils.setSerialNumber(index, sn)
             }
         }
     }

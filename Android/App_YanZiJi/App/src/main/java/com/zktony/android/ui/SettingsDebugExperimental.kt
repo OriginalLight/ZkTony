@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,7 +16,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -40,7 +38,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zktony.android.R
 import com.zktony.android.data.ChannelState
 import com.zktony.android.data.ExperimentalControl
+import com.zktony.android.data.PipelineControl
 import com.zktony.android.ui.components.ArgumentsInputField
+import com.zktony.android.ui.components.ButtonLoading
 import com.zktony.android.ui.components.CircleTabRow
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.Route
@@ -49,8 +49,6 @@ import com.zktony.android.ui.utils.zktyBrush
 import com.zktony.android.ui.viewmodel.SettingsDebugExperimentalViewModel
 import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.ProductUtils
-import com.zktony.android.utils.extra.toDoubleOrDefault
-import com.zktony.android.utils.extra.toIntOrDefault
 import kotlinx.coroutines.launch
 
 @Composable
@@ -261,14 +259,7 @@ fun ExperimentalDebugListView(
                                 }
                             }
                         ) {
-                            if (loadingStart) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(16.dp),
-                                    strokeWidth = 2.dp,
-                                    color = MaterialTheme.colorScheme.onPrimary
-                                )
-                                Spacer(modifier = Modifier.size(8.dp))
-                            }
+                            ButtonLoading(loading = loadingStart)
                             Text(text = "开始实验")
                         }
 
@@ -281,14 +272,7 @@ fun ExperimentalDebugListView(
                                 }
                             }
                         ) {
-                            if (loadingStop) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(16.dp),
-                                    strokeWidth = 2.dp,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                                Spacer(modifier = Modifier.size(8.dp))
-                            }
+                            ButtonLoading(loading = loadingStop)
                             Text(text = "停止实验")
                         }
                     }
@@ -326,22 +310,11 @@ fun ExperimentalDebugListView(
                         Button(onClick = {
                             scope.launch {
                                 loading = true
-                                viewModel.pipelineClean(
-                                    channel,
-                                    speed1.toDoubleOrDefault(),
-                                    time1.toIntOrDefault()
-                                )
+                                viewModel.pipelineClean(channel, PipelineControl(speed1, time1))
                                 loading = false
                             }
                         }) {
-                            if (loading) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(16.dp),
-                                    strokeWidth = 2.dp,
-                                    color = MaterialTheme.colorScheme.onPrimary
-                                )
-                                Spacer(modifier = Modifier.size(8.dp))
-                            }
+                            ButtonLoading(loading = loading)
                             Text(text = "开始", letterSpacing = 10.sp)
                         }
                     }
@@ -406,6 +379,17 @@ fun RealTimeExperimentalView(
                     )
                     .padding(horizontal = 24.dp, vertical = 12.dp),
                 text = "温度：" + channelState.temperature + " ℃",
+                style = MaterialTheme.typography.bodyLarge
+            )
+
+            Text(
+                modifier = Modifier
+                    .background(
+                        MaterialTheme.colorScheme.surfaceVariant,
+                        MaterialTheme.shapes.medium
+                    )
+                    .padding(horizontal = 24.dp, vertical = 12.dp),
+                text = "时间：" + channelState.timing + " s",
                 style = MaterialTheme.typography.bodyLarge
             )
         }

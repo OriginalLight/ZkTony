@@ -1,10 +1,12 @@
 package com.zktony.android.utils
 
+import com.zktony.android.data.enums.Product
+
 object ProductUtils {
 
     const val MAX_CHANNEL_COUNT = 4
-    private var ProductNumber: String = "M-Blot T4000"
-    private var SerialNumber: String = "Unknown"
+    private var product: Product = Product.M_BLOT_T4000
+    private var serialNumber: String = "Unknown"
 
     val ProductNumberList = listOf(
         "M-Blot T4000",
@@ -17,34 +19,31 @@ object ProductUtils {
 
     // 设置产品型号
     fun setProductNumber(productNumber: String) {
-        ProductNumber = productNumber
+        product = Product.fromNumber(productNumber)
     }
 
     // 设置产品序列号
     fun setSerialNumber(sn: String) {
-        SerialNumber = sn
+        serialNumber = sn
     }
 
     // 获取产品型号
     fun getProductNumber(): String {
-        return ProductNumber
+        return product.number
+    }
+
+    // 获取产品名
+    fun getProductResId(): Int {
+        return product.resId
     }
 
     // 获取产品序列号
     fun getSerialNumber(): String {
-        return SerialNumber
+        return serialNumber
     }
 
     // 根据产品型号获取模块数量
     fun getChannelCount(): Int {
-        return when (ProductNumber) {
-            "M-Blot T2000" -> 2
-            "M-Blot T2100" -> 2
-            "M-Blot T2200" -> 2
-            "M-Blot T4000" -> 4
-            "M-Blot T4100" -> 4
-            "M-Blot T4200" -> 4
-            else -> 4
-        }
+        return product.count
     }
 }

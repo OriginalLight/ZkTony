@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,7 +16,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -45,6 +43,7 @@ import com.zktony.android.data.ArgumentsVoltage
 import com.zktony.android.data.ChannelState
 import com.zktony.android.data.VoltageControl
 import com.zktony.android.ui.components.ArgumentsInputField
+import com.zktony.android.ui.components.ButtonLoading
 import com.zktony.android.ui.components.CircleTabRow
 import com.zktony.android.ui.components.VerticalRadioButtonGroup
 import com.zktony.android.ui.navigation.NavigationActions
@@ -286,29 +285,19 @@ fun VoltageControlView(
             modifier = Modifier.width(120.dp),
             onClick = {
                 scope.launch {
-                    try {
-                        loadingStart = true
-                        val control = VoltageControl(
-                            mode = mode,
-                            voltage = if (mode == 0) value else "0",
-                            current = if (mode == 1) value else "0",
-                            power = if (mode == 2) value else "0"
-                        )
-                        viewModel.startVoltage(channel, control)
-                    } finally {
-                        loadingStart = false
-                    }
+                    loadingStart = true
+                    val control = VoltageControl(
+                        mode = mode,
+                        voltage = if (mode == 0) value else "0",
+                        current = if (mode == 1) value else "0",
+                        power = if (mode == 2) value else "0"
+                    )
+                    viewModel.startVoltage(channel, control)
+                    loadingStart = false
                 }
             }
         ) {
-            if (loadingStart) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(16.dp),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    strokeWidth = 2.dp
-                )
-                Spacer(modifier = Modifier.size(8.dp))
-            }
+            ButtonLoading(loading = loadingStart)
             Text(text = "开始", style = MaterialTheme.typography.bodyLarge)
         }
 
@@ -316,23 +305,13 @@ fun VoltageControlView(
             modifier = Modifier.width(120.dp),
             onClick = {
                 scope.launch {
-                    try {
-                        loadingStop = true
-                        viewModel.stopVoltage(channel)
-                    } finally {
-                        loadingStop = false
-                    }
+                    loadingStop = true
+                    viewModel.stopVoltage(channel)
+                    loadingStop = false
                 }
             }
         ) {
-            if (loadingStop) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(16.dp),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    strokeWidth = 2.dp
-                )
-                Spacer(modifier = Modifier.size(8.dp))
-            }
+            ButtonLoading(loading = loadingStop)
             Text(text = "停止", style = MaterialTheme.typography.bodyLarge)
         }
     }
@@ -499,29 +478,19 @@ fun VoltageCalibrationView(
             modifier = Modifier.width(120.dp),
             onClick = {
                 scope.launch {
-                    try {
-                        loading = true
-                        val args = listOf(s50, s100, s150, s200, s250, s300, s350, s400, s450, s500)
-                        viewModel.setVoltageArguments(
-                            channel = channel,
-                            args = ArgumentsVoltage(
-                                voltComp = args
-                            )
+                    loading = true
+                    val args = listOf(s50, s100, s150, s200, s250, s300, s350, s400, s450, s500)
+                    viewModel.setVoltageArguments(
+                        channel = channel,
+                        args = ArgumentsVoltage(
+                            voltComp = args
                         )
-                    } finally {
-                        loading = false
-                    }
+                    )
+                    loading = false
                 }
             }
         ) {
-            if (loading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(16.dp),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    strokeWidth = 2.dp
-                )
-                Spacer(modifier = Modifier.size(8.dp))
-            }
+            ButtonLoading(loading = loading)
             Text(text = "设置", style = MaterialTheme.typography.bodyLarge)
         }
     }
@@ -689,29 +658,19 @@ fun CurrentCalibrationView(
             modifier = Modifier.width(120.dp),
             onClick = {
                 scope.launch {
-                    try {
-                        loading = true
-                        val args = listOf(s50, s100, s150, s200, s250, s300, s350, s400, s450, s500)
-                        viewModel.setCurrentArguments(
-                            channel = channel,
-                            args = ArgumentsCurrent(
-                                currComp = args
-                            )
+                    loading = true
+                    val args = listOf(s50, s100, s150, s200, s250, s300, s350, s400, s450, s500)
+                    viewModel.setCurrentArguments(
+                        channel = channel,
+                        args = ArgumentsCurrent(
+                            currComp = args
                         )
-                    } finally {
-                        loading = false
-                    }
+                    )
+                    loading = false
                 }
             }
         ) {
-            if (loading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(16.dp),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    strokeWidth = 2.dp
-                )
-                Spacer(modifier = Modifier.size(8.dp))
-            }
+            ButtonLoading(loading = loading)
             Text(text = "设置", style = MaterialTheme.typography.bodyLarge)
         }
     }
@@ -879,29 +838,19 @@ fun TemperatureCalibrationView(
             modifier = Modifier.width(120.dp),
             onClick = {
                 scope.launch {
-                    try {
-                        loading = true
-                        val args = listOf(s50, s100, s150, s200, s250, s300, s350, s400, s450, s500)
-                        viewModel.setTemperatureArguments(
-                            channel = channel,
-                            args = ArgumentsTemperature(
-                                tempComp = args
-                            )
+                    loading = true
+                    val args = listOf(s50, s100, s150, s200, s250, s300, s350, s400, s450, s500)
+                    viewModel.setTemperatureArguments(
+                        channel = channel,
+                        args = ArgumentsTemperature(
+                            tempComp = args
                         )
-                    } finally {
-                        loading = false
-                    }
+                    )
+                    loading = false
                 }
             }
         ) {
-            if (loading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(16.dp),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    strokeWidth = 2.dp
-                )
-                Spacer(modifier = Modifier.size(8.dp))
-            }
+            ButtonLoading(loading = loading)
             Text(text = "设置", style = MaterialTheme.typography.bodyLarge)
         }
     }

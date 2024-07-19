@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,7 +15,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -40,6 +38,7 @@ import com.zktony.android.data.Arguments
 import com.zktony.android.data.ArgumentsClean
 import com.zktony.android.data.ArgumentsTransfer
 import com.zktony.android.ui.components.ArgumentsInputField
+import com.zktony.android.ui.components.ButtonLoading
 import com.zktony.android.ui.components.CircleTabRow
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.utils.LocalNavigationActions
@@ -309,34 +308,27 @@ fun TransferRuntimeArgumentsView(
             onClick = {
                 scope.launch {
                     loading = true
-                    try {
-                        val transfer = ArgumentsTransfer(
-                            inFillSpeed = inFillSpeed,
-                            inDrainSpeed = inDrainSpeed,
-                            inFillTime = inFillTime,
-                            inDrainTime = inDrainTime,
-                            outFillSpeed = outFillSpeed,
-                            outDrainSpeed = outDrainSpeed,
-                            outFillTime = outFillTime,
-                            outDrainTime = outDrainTime,
-                            emptyTime = emptyTime,
-                            scale = scale
-                        )
-                        viewModel.setTransferArguments(channel, transfer)
-                    } finally {
-                        loading = false
-                    }
+                    val transfer = ArgumentsTransfer(
+                        inFillSpeed = inFillSpeed,
+                        inDrainSpeed = inDrainSpeed,
+                        inFillTime = inFillTime,
+                        inDrainTime = inDrainTime,
+                        outFillSpeed = outFillSpeed,
+                        outDrainSpeed = outDrainSpeed,
+                        outFillTime = outFillTime,
+                        outDrainTime = outDrainTime,
+                        emptyTime = emptyTime,
+                        scale = scale
+                    )
+                    viewModel.setTransferArguments(channel, transfer)
+                    loading = false
                 }
             }) {
-            if (loading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(16.dp),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    strokeWidth = 2.dp
-                )
-                Spacer(modifier = Modifier.size(8.dp))
-            }
-            Text(text = stringResource(id = R.string.set))
+            ButtonLoading(loading = loading)
+            Text(
+                text = stringResource(id = R.string.set),
+                style = MaterialTheme.typography.bodyLarge
+            )
         }
     }
 }
@@ -497,34 +489,27 @@ fun CleanRuntimeArgumentsView(
             onClick = {
                 scope.launch {
                     loading = true
-                    try {
-                        val clean = ArgumentsClean(
-                            cleanInFillSpeed = cleanInFillSpeed,
-                            cleanInDrainSpeed = cleanInDrainSpeed,
-                            cleanInFillTime = cleanInFillTime,
-                            cleanInDrainTime = cleanInDrainTime,
-                            cleanOutFillSpeed = cleanOutFillSpeed,
-                            cleanOutDrainSpeed = cleanOutDrainSpeed,
-                            cleanOutFillTime = cleanOutFillTime,
-                            cleanOutDrainTime = cleanOutDrainTime,
-                            cleanEmptyTime = cleanEmptyTime,
-                            cleanScale = cleanScale,
-                        )
-                        viewModel.setCleanArguments(channel, clean)
-                    } finally {
-                        loading = false
-                    }
+                    val clean = ArgumentsClean(
+                        cleanInFillSpeed = cleanInFillSpeed,
+                        cleanInDrainSpeed = cleanInDrainSpeed,
+                        cleanInFillTime = cleanInFillTime,
+                        cleanInDrainTime = cleanInDrainTime,
+                        cleanOutFillSpeed = cleanOutFillSpeed,
+                        cleanOutDrainSpeed = cleanOutDrainSpeed,
+                        cleanOutFillTime = cleanOutFillTime,
+                        cleanOutDrainTime = cleanOutDrainTime,
+                        cleanEmptyTime = cleanEmptyTime,
+                        cleanScale = cleanScale,
+                    )
+                    viewModel.setCleanArguments(channel, clean)
+                    loading = false
                 }
             }) {
-            if (loading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(16.dp),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    strokeWidth = 2.dp
-                )
-                Spacer(modifier = Modifier.size(8.dp))
-            }
-            Text(text = stringResource(id = R.string.set))
+            ButtonLoading(loading = loading)
+            Text(
+                text = stringResource(id = R.string.set),
+                style = MaterialTheme.typography.bodyLarge
+            )
         }
     }
 }

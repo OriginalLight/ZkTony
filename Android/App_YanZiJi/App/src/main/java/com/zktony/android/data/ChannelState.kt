@@ -49,8 +49,10 @@ fun toChannelState(byteArray: ByteArray): ChannelState? {
             faultInfo = byteArray.readInt32LE(3),
             voltage = voltage.stripTrailingZeros().toPlainString(),
             current = current.stripTrailingZeros().toPlainString(),
-            power = voltage.multiply(current).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString(),
-            temperature = byteArray.readInt16LE(11).toBigDecimal().divide(100.toBigDecimal()).stripTrailingZeros().toPlainString(),
+            power = voltage.multiply(current).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros()
+                .toPlainString(),
+            temperature = byteArray.readInt16LE(11).toBigDecimal().divide(100.toBigDecimal())
+                .stripTrailingZeros().toPlainString(),
             timing = byteArray.readInt16LE(13),
             step = byteArray.readInt16LE(15),
             opto1 = byteArray.readInt8(17),

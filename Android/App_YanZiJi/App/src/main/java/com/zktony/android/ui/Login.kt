@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,12 +30,14 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
+import com.zktony.android.ui.components.ButtonLoading
 import com.zktony.android.ui.components.PasswordInputField
 import com.zktony.android.ui.components.UserNameInputField
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.zktyBrush
 import com.zktony.android.ui.viewmodel.LoginViewModel
+import com.zktony.android.utils.ProductUtils
 import kotlinx.coroutines.launch
 
 
@@ -127,7 +128,8 @@ fun LoginForm(
 ) {
     Column(
         modifier = modifier.padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val scope = rememberCoroutineScope()
         val navigationActions = LocalNavigationActions.current
@@ -136,8 +138,9 @@ fun LoginForm(
         var loading by remember { mutableStateOf(false) }
 
         Text(
-            text = stringResource(id = R.string.product_name),
-            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(bottom = 16.dp),
+            text = stringResource(id = ProductUtils.getProductResId()),
+            style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.surface
         )
 
@@ -167,16 +170,10 @@ fun LoginForm(
                 }
             }
         ) {
-            if (loading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(18.dp),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    strokeWidth = 2.dp
-                )
-            }
+            ButtonLoading(loading = loading)
             Text(
                 text = stringResource(id = R.string.login),
-                fontSize = 18.sp,
+                fontSize = 20.sp,
                 letterSpacing = 16.sp
             )
         }

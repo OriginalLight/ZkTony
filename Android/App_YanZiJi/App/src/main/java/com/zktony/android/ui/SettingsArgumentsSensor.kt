@@ -38,6 +38,7 @@ import com.zktony.android.data.Arguments
 import com.zktony.android.data.ArgumentsBubble
 import com.zktony.android.data.ChannelState
 import com.zktony.android.ui.components.ArgumentsInputField
+import com.zktony.android.ui.components.ButtonLoading
 import com.zktony.android.ui.components.CircleTabRow
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.utils.LocalNavigationActions
@@ -200,6 +201,7 @@ fun BubbleSensorThresholdView(
     viewModel: SettingsArgumentsSensorViewModel
 ) {
     val scope = rememberCoroutineScope()
+    var loading by remember { mutableStateOf(false) }
     var inBobble by remember(
         channel,
         arguments
@@ -248,6 +250,7 @@ fun BubbleSensorThresholdView(
             modifier = Modifier.width(120.dp),
             onClick = {
                 scope.launch {
+                    loading = true
                     viewModel.setSensorArguments(
                         channel = channel,
                         args = ArgumentsBubble(
@@ -255,9 +258,11 @@ fun BubbleSensorThresholdView(
                             outBubbleThreshold = outBobble
                         )
                     )
+                    loading = false
                 }
             }
         ) {
+            ButtonLoading(loading = loading)
             Text(text = "设置", style = MaterialTheme.typography.bodyLarge)
         }
     }

@@ -97,28 +97,27 @@ class Protocol : BaseProtocol {
                 throw Exception("Rx length error by ${byteArray.toHexString()}")
             }
 
-            // 分包处理
-            byteArray.splitByteArray().forEach { pkg ->
-                // 验证包头和包尾
-                val head = pkg.copyOfRange(0, 1)
-                if (!head.contentEquals(expectHead)) {
-                    throw Exception("Rx header error by ${pkg.toHexString()}")
-                }
-                val end = pkg.copyOfRange(pkg.size - 2, pkg.size)
-                if (!end.contentEquals(expectEnd)) {
-                    throw Exception("Rx end error by ${pkg.toHexString()}")
-                }
-
-                // crc 校验
-                val crc = pkg.copyOfRange(pkg.size - 4, pkg.size - 2)
-                val bytes = pkg.copyOfRange(0, pkg.size - 4)
-                if (!bytes.crc16LE().contentEquals(crc)) {
-                    throw Exception("Rx crc error by ${pkg.toHexString()}")
-                }
-
-                // 解析协议
-                block(Protocol().apply { deserialization(pkg) })
+            // 验证包头
+            val head = byteArray.copyOfRange(0, 1)
+            if (!head.contentEquals(expectHead)) {
+                throw Exception("Rx header error by ${byteArray.toHexString()}")
             }
+
+            // 验证包尾
+            val end = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
+            if (!end.contentEquals(expectEnd)) {
+                throw Exception("Rx end error by ${byteArray.toHexString()}")
+            }
+
+            // crc 校验
+            val crc = byteArray.copyOfRange(byteArray.size - 4, byteArray.size - 2)
+            val bytes = byteArray.copyOfRange(0, byteArray.size - 4)
+            if (!bytes.crc16LE().contentEquals(crc)) {
+                throw Exception("Rx crc error by ${byteArray.toHexString()}")
+            }
+
+            // 解析协议
+            block(Protocol().apply { deserialization(byteArray) })
         }
     }
 }

@@ -2,6 +2,7 @@ package com.zktony.android.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.zktony.android.data.ExperimentalControl
+import com.zktony.android.data.PipelineControl
 import com.zktony.android.ui.components.Tips
 import com.zktony.android.utils.SerialPortUtils
 import com.zktony.android.utils.TipsUtils
@@ -11,11 +12,8 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsDebugExperimentalViewModel @Inject constructor() : ViewModel() {
 
-    suspend fun pipelineClean(channel: Int, speed: Double, time: Int): Boolean {
-        if (!SerialPortUtils.pipelineClean(
-                channel,
-                byteArrayOf((speed * 100).toInt().toByte(), (time * 60).toByte())
-            )
+    suspend fun pipelineClean(channel: Int, control: PipelineControl): Boolean {
+        if (!SerialPortUtils.pipelineClean(channel, control)
         ) {
             TipsUtils.showTips(Tips.error("管路清洗失败 通道：${channel + 1}"))
             return false
@@ -27,11 +25,12 @@ class SettingsDebugExperimentalViewModel @Inject constructor() : ViewModel() {
 
     suspend fun startExperiment(channel: Int, experimental: ExperimentalControl): Boolean {
         if (!SerialPortUtils.setExperimentalArguments(channel, experimental)) {
-            TipsUtils.showTips(Tips.error("实验开始失败 通道：${channel + 1}"))
+            TipsUtils.showTips(Tips.error("实验参数设置失败 通道：${channel + 1}"))
             return false
         } else {
-            TipsUtils.showTips(Tips.info("实验开始成功 通道：${channel + 1}"))
+            TipsUtils.showTips(Tips.info("实验参数设置成功 通道：${channel + 1}"))
         }
+
         if (!SerialPortUtils.setExperimentalState(channel, 1)) {
             TipsUtils.showTips(Tips.error("实验开始失败 通道：${channel + 1}"))
             return false

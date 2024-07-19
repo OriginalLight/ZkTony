@@ -1,6 +1,7 @@
 package com.zktony.android.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.zktony.android.data.PipelineControl
 import com.zktony.android.ui.components.Tips
 import com.zktony.android.utils.SerialPortUtils
 import com.zktony.android.utils.TipsUtils
@@ -11,7 +12,7 @@ import javax.inject.Inject
 class SettingsDebugPipelineViewModel @Inject constructor() : ViewModel() {
 
     suspend fun pipelineFill(channel: Int, value: Int): Boolean {
-        if (!SerialPortUtils.pipelineFill(channel, byteArrayOf(value.toByte()))) {
+        if (!SerialPortUtils.pipelineFill(channel, value)) {
             TipsUtils.showTips(Tips.error("管路填充失败 通道：${channel + 1}"))
             return false
         } else {
@@ -21,7 +22,7 @@ class SettingsDebugPipelineViewModel @Inject constructor() : ViewModel() {
     }
 
     suspend fun pipelineDrain(channel: Int, value: Int): Boolean {
-        if (!SerialPortUtils.pipelineDrain(channel, byteArrayOf(value.toByte()))) {
+        if (!SerialPortUtils.pipelineDrain(channel, value)) {
             TipsUtils.showTips(Tips.error("管路排空失败 通道：${channel + 1}"))
             return false
         } else {
@@ -30,11 +31,8 @@ class SettingsDebugPipelineViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    suspend fun pipelineClean(channel: Int, speed: Double, time: Int): Boolean {
-        if (!SerialPortUtils.pipelineClean(
-                channel,
-                byteArrayOf((speed * 100).toInt().toByte(), (time * 60).toByte())
-            )
+    suspend fun pipelineClean(channel: Int, control: PipelineControl): Boolean {
+        if (!SerialPortUtils.pipelineClean(channel, control)
         ) {
             TipsUtils.showTips(Tips.error("管路清洗失败 通道：${channel + 1}"))
             return false

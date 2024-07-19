@@ -97,12 +97,7 @@ class SettingsArgumentsViewModel @Inject constructor() : ViewModel() {
             }
             val fail = mutableListOf<Int>()
             repeat(ProductUtils.getChannelCount()) { index ->
-                if (!SerialPortUtils.setArguments(
-                        index,
-                        "SetArguments",
-                        0x12.toByte(),
-                        arguments[index].toByteArray()
-                    )
+                if (!SerialPortUtils.setArguments(index, arguments[index])
                 ) {
                     fail.add(index + 1)
                 }
@@ -148,15 +143,9 @@ class SettingsArgumentsViewModel @Inject constructor() : ViewModel() {
     suspend fun clearArguments() {
         val args = Arguments()
         val fail = mutableListOf<Int>()
-        repeat(ProductUtils.getChannelCount()) {
-            if (!SerialPortUtils.setArguments(
-                    it,
-                    "SetArguments",
-                    0x12.toByte(),
-                    args.toByteArray()
-                )
-            ) {
-                fail.add(it + 1)
+        repeat(ProductUtils.getChannelCount()) { index ->
+            if (!SerialPortUtils.setArguments(index, args)) {
+                fail.add(index + 1)
             }
         }
         if (fail.isNotEmpty()) {

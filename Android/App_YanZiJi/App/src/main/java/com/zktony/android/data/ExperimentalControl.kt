@@ -23,13 +23,13 @@ data class ExperimentalControl(
 ) {
     fun toByteArray(): ByteArray {
         val byteArray = ByteArray(14)
-        byteArray.writeInt8(type, 0)
-        byteArray.writeInt8(mode, 1)
+        byteArray.writeInt8(type + 1, 0)
+        byteArray.writeInt8(mode + 1, 1)
         byteArray.writeInt16LE(speed.toBigDecimal().multiply(100.toBigDecimal()).toInt(), 2)
-        byteArray.writeInt16LE(time.toBigDecimal().toInt(), 4)
-        byteArray.writeInt16LE(voltage.toBigDecimal().multiply(100.toBigDecimal()).toInt(), 6)
-        byteArray.writeInt16LE(current.toBigDecimal().multiply(100.toBigDecimal()).toInt(), 8)
-        byteArray.writeInt16LE(power.toBigDecimal().multiply(100.toBigDecimal()).toInt(), 10)
+        byteArray.writeInt16LE(voltage.toBigDecimal().multiply(100.toBigDecimal()).toInt(), 4)
+        byteArray.writeInt16LE(current.toBigDecimal().multiply(100.toBigDecimal()).toInt(), 6)
+        byteArray.writeInt16LE(power.toBigDecimal().multiply(100.toBigDecimal()).toInt(), 8)
+        byteArray.writeInt16LE(time.toBigDecimal().toInt(), 10)
         byteArray.writeInt16LE(temperature.toBigDecimal().multiply(100.toBigDecimal()).toInt(), 12)
         return byteArray
     }

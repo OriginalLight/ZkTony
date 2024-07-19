@@ -15,7 +15,7 @@ class SettingsArgumentsRuntimeViewModel @Inject constructor() : ViewModel() {
 
     suspend fun setTransferArguments(channel: Int, transfer: ArgumentsTransfer) {
         // 设置转膜参数
-        if (!SerialPortUtils.setTransferArguments(transfer, channel)) {
+        if (!SerialPortUtils.setTransferArguments(channel, transfer)) {
             // 设置失败
             TipsUtils.showTips(Tips.error("设置转膜参数失败 通道：${channel + 1}"))
             return
@@ -31,7 +31,7 @@ class SettingsArgumentsRuntimeViewModel @Inject constructor() : ViewModel() {
 
     suspend fun setCleanArguments(channel: Int, clean: ArgumentsClean) {
         // 设置清洗参数
-        if (!SerialPortUtils.setCleanArguments(clean, channel)) {
+        if (!SerialPortUtils.setCleanArguments(channel, clean)) {
             // 设置失败
             TipsUtils.showTips(Tips.error("设置清洗参数失败 通道：${channel + 1}"))
             return

@@ -51,5 +51,7 @@
     <string name="solenoid_valve">Solenoid Valve</string>
     <string name="pipeline">Pipeline</string>
     <string name="clear_confirm_content">All parameters will be cleared and cannot be restored!!! Confirm clearing?</string>
-    <string name="product_name">Fast film transfer instrument</string>
+    <string name="t100">Fast film transfer instrument</string>
+    <string name="t000">Multifunctional film transfer instrument</string>
+    <string name="t200">Rapid staining instrument</string>
 </resources>

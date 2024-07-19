@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,7 +16,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -42,6 +40,7 @@ import com.zktony.android.data.Arguments
 import com.zktony.android.data.ArgumentsSpeed
 import com.zktony.android.data.PumpControl
 import com.zktony.android.ui.components.ArgumentsInputField
+import com.zktony.android.ui.components.ButtonLoading
 import com.zktony.android.ui.components.CircleTabRow
 import com.zktony.android.ui.components.RadioButtonGroup
 import com.zktony.android.ui.navigation.NavigationActions
@@ -253,32 +252,22 @@ fun PumpControlView(
             modifier = Modifier.width(120.dp),
             onClick = {
                 scope.launch {
-                    try {
-                        loadingStart = true
-                        viewModel.startPump(
-                            channel = channel,
-                            control = PumpControl(
-                                control = inOrOut,
-                                direction = direction,
-                                speedUnit = speedUnit,
-                                speed = speed,
-                                time = time
-                            )
+                    loadingStart = true
+                    viewModel.startPump(
+                        channel = channel,
+                        control = PumpControl(
+                            control = inOrOut,
+                            direction = direction,
+                            speedUnit = speedUnit,
+                            speed = speed,
+                            time = time
                         )
-                    } finally {
-                        loadingStart = false
-                    }
+                    )
+                    loadingStart = false
                 }
             }
         ) {
-            if (loadingStart) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(16.dp),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    strokeWidth = 2.dp
-                )
-                Spacer(modifier = Modifier.size(8.dp))
-            }
+            ButtonLoading(loading = loadingStart)
             Text(text = "开始", style = MaterialTheme.typography.bodyLarge)
         }
 
@@ -286,26 +275,16 @@ fun PumpControlView(
             modifier = Modifier.width(120.dp),
             onClick = {
                 scope.launch {
-                    try {
-                        loadingStop = true
-                        viewModel.stopPump(
-                            channel = channel,
-                            control = inOrOut
-                        )
-                    } finally {
-                        loadingStop = false
-                    }
+                    loadingStop = true
+                    viewModel.stopPump(
+                        channel = channel,
+                        control = inOrOut
+                    )
+                    loadingStop = false
                 }
             }
         ) {
-            if (loadingStop) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(16.dp),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    strokeWidth = 2.dp
-                )
-                Spacer(modifier = Modifier.size(8.dp))
-            }
+            ButtonLoading(loading = loadingStop)
             Text(text = "停止", style = MaterialTheme.typography.bodyLarge)
         }
     }
@@ -473,28 +452,18 @@ fun InPumpCalibrationView(
             modifier = Modifier.width(120.dp),
             onClick = {
                 scope.launch {
-                    try {
-                        loading = true
-                        val inArgs =
-                            listOf(s50, s100, s150, s200, s250, s300, s350, s400, s450, s500)
-                        viewModel.setPumpArguments(
-                            channel = channel,
-                            args = ArgumentsSpeed(speedComp = inArgs)
-                        )
-                    } finally {
-                        loading = false
-                    }
+                    loading = true
+                    val inArgs =
+                        listOf(s50, s100, s150, s200, s250, s300, s350, s400, s450, s500)
+                    viewModel.setPumpArguments(
+                        channel = channel,
+                        args = ArgumentsSpeed(speedComp = inArgs)
+                    )
+                    loading = false
                 }
             }
         ) {
-            if (loading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(16.dp),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    strokeWidth = 2.dp
-                )
-                Spacer(modifier = Modifier.size(8.dp))
-            }
+            ButtonLoading(loading = loading)
             Text(text = "设置", style = MaterialTheme.typography.bodyLarge)
         }
     }
@@ -663,27 +632,17 @@ fun OutPumpCalibrationView(
             onClick = {
                 scope.launch {
                     loading = true
-                    try {
-                        val outArgs =
-                            listOf(s50, s100, s150, s200, s250, s300, s350, s400, s450, s500)
-                        viewModel.setPumpArguments(
-                            channel = channel,
-                            args = ArgumentsSpeed(inOrOut = 1, speedComp = outArgs)
-                        )
-                    } finally {
-                        loading = false
-                    }
+                    val outArgs =
+                        listOf(s50, s100, s150, s200, s250, s300, s350, s400, s450, s500)
+                    viewModel.setPumpArguments(
+                        channel = channel,
+                        args = ArgumentsSpeed(inOrOut = 1, speedComp = outArgs)
+                    )
+                    loading = false
                 }
             }
         ) {
-            if (loading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(16.dp),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    strokeWidth = 2.dp
-                )
-                Spacer(modifier = Modifier.size(8.dp))
-            }
+            ButtonLoading(loading = loading)
             Text(text = "设置", style = MaterialTheme.typography.bodyLarge)
         }
     }

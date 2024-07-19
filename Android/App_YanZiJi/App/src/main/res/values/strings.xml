@@ -52,5 +52,7 @@
     <string name="solenoid_valve">电磁阀</string>
     <string name="pipeline">管路操作</string>
     <string name="clear_confirm_content">将清除所有参数，无法恢复！！！确认清除吗？</string>
-    <string name="product_name">快速转膜仪</string>
+    <string name="t100">快速转膜仪</string>
+    <string name="t000">多功能转膜仪</string>
+    <string name="t200">快速染色仪</string>
 </resources>

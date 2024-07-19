@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,7 +15,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -35,7 +33,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zktony.android.R
+import com.zktony.android.data.PipelineControl
 import com.zktony.android.ui.components.ArgumentsInputField
+import com.zktony.android.ui.components.ButtonLoading
 import com.zktony.android.ui.components.CircleTabRow
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.Route
@@ -43,8 +43,6 @@ import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.zktyBrush
 import com.zktony.android.ui.viewmodel.SettingsDebugPipelineViewModel
 import com.zktony.android.utils.ProductUtils
-import com.zktony.android.utils.extra.toDoubleOrDefault
-import com.zktony.android.utils.extra.toIntOrDefault
 import kotlinx.coroutines.launch
 
 @Composable
@@ -150,14 +148,7 @@ fun PipelineDebugListView(
                         loading = false
                     }
                 }) {
-                    if (loading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(16.dp),
-                            strokeWidth = 2.dp,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                        Spacer(modifier = Modifier.size(8.dp))
-                    }
+                    ButtonLoading(loading = loading)
                     Text(text = "开始", letterSpacing = 10.sp)
                 }
             }
@@ -181,14 +172,7 @@ fun PipelineDebugListView(
                         loading = false
                     }
                 }) {
-                    if (loading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(16.dp),
-                            strokeWidth = 2.dp,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                        Spacer(modifier = Modifier.size(8.dp))
-                    }
+                    ButtonLoading(loading = loading)
                     Text(text = "开始", letterSpacing = 10.sp)
                 }
             }
@@ -223,22 +207,11 @@ fun PipelineDebugListView(
                 Button(onClick = {
                     scope.launch {
                         loading = true
-                        viewModel.pipelineClean(
-                            channel,
-                            speed.toDoubleOrDefault(),
-                            time.toIntOrDefault()
-                        )
+                        viewModel.pipelineClean(channel, PipelineControl(speed, time))
                         loading = false
                     }
                 }) {
-                    if (loading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(16.dp),
-                            strokeWidth = 2.dp,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                        Spacer(modifier = Modifier.size(8.dp))
-                    }
+                    ButtonLoading(loading = loading)
                     Text(text = "开始", letterSpacing = 10.sp)
                 }
             }
