@@ -12,6 +12,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -59,6 +60,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -586,13 +588,15 @@ fun ProgramList(
 
                     item {
                         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                            OutlinedTextField(value = displayText,
+                            OutlinedTextField(
+                                value = displayText,
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = Color(rgb(0, 105, 52)),
                                     focusedLabelColor = Color(rgb(0, 105, 52)),
                                     cursorColor = Color(rgb(0, 105, 52))
                                 ),
-                                label = { Text(text = "制胶名称") },
+                                label = { Text( fontSize = 20.sp,text = "制胶名称") },
+                                textStyle = TextStyle(fontSize = 20.sp),
                                 onValueChange = {
                                     if (it.length > 7) {
                                         Toast.makeText(
@@ -614,13 +618,14 @@ fun ProgramList(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                fontSize = 16.sp,
+                                fontSize = 20.sp,
                                 text = "浓度范围："
                             )
                             OutlinedTextField(
                                 modifier = Modifier.width(100.dp),
                                 value = startRange_ex,
-                                label = { Text(text = "%") },
+                                label = { Text(fontSize = 20.sp,text = "%") },
+                                textStyle = TextStyle(fontSize = 20.sp),
                                 onValueChange = { startRange_ex = it },
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = Color(rgb(0, 105, 52)),
@@ -638,7 +643,7 @@ fun ProgramList(
                                 )
                             )
                             Text(
-                                fontSize = 16.sp,
+                                fontSize = 20.sp,
                                 text = "~"
                             )
                             OutlinedTextField(
@@ -649,7 +654,8 @@ fun ProgramList(
                                     cursorColor = Color(rgb(0, 105, 52))
                                 ),
                                 value = endRange_ex,
-                                label = { Text(text = "%") },
+                                label = { Text(fontSize = 20.sp,text = "%") },
+                                textStyle = TextStyle(fontSize = 20.sp),
                                 onValueChange = { endRange_ex = it },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -669,7 +675,7 @@ fun ProgramList(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                fontSize = 16.sp,
+                                fontSize = 20.sp,
                                 text = "厚度："
                             )
                             tags.forEach {
@@ -689,7 +695,7 @@ fun ProgramList(
                                             thickness.value = it
                                         }
                                     )
-                                    Text(modifier = Modifier.padding(top = 15.dp), text = it)
+                                    Text(modifier = Modifier.padding(top = 15.dp),fontSize = 18.sp, text = it)
                                 }
 
                                 Spacer(modifier = Modifier.width(20.dp))
@@ -700,7 +706,8 @@ fun ProgramList(
                     item {
                         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                             OutlinedTextField(value = volume_ex,
-                                label = { Text(text = "胶液体积/mL") },
+                                label = { Text(fontSize = 20.sp,text = "胶液体积/mL") },
+                                textStyle = TextStyle(fontSize = 20.sp),
                                 onValueChange = { volume_ex = it },
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = Color(rgb(0, 105, 52)),
@@ -723,7 +730,8 @@ fun ProgramList(
                     item {
                         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                             OutlinedTextField(value = coagulant_ex,
-                                label = { Text(text = "促凝剂体积/μL") },
+                                label = { Text(fontSize = 20.sp,text = "促凝剂体积/μL") },
+                                textStyle = TextStyle(fontSize = 20.sp),
                                 onValueChange = { coagulant_ex = it },
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = Color(rgb(0, 105, 52)),
@@ -746,7 +754,8 @@ fun ProgramList(
                     item {
                         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                             OutlinedTextField(value = founder,
-                                label = { Text(text = "创建人") },
+                                label = { Text(fontSize = 20.sp,text = "创建人") },
+                                textStyle = TextStyle(fontSize = 20.sp),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = Color(rgb(0, 105, 52)),
                                     focusedLabelColor = Color(rgb(0, 105, 52)),
@@ -764,13 +773,16 @@ fun ProgramList(
             }, confirmButton = {
 
                 Button(
-                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(rgb(0, 105, 52))
-                    ), onClick = {
+                    modifier = Modifier.width(100.dp),
+                    border = BorderStroke(1.dp, Color.Gray),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent
+                    ),
+                    onClick = {
                         thickness.value = "1.0"
                         showingDialog.value = false
                     }) {
-                    Text(text = "取消")
+                    Text(fontSize = 18.sp,text = "取   消", color = Color.Black)
                 }
 
             }, dismissButton = {
@@ -952,7 +964,7 @@ fun ProgramList(
 
 
                     }) {
-                    Text(text = "确认")
+                    Text(fontSize = 18.sp,text = "确   认")
                 }
 
             })
@@ -971,10 +983,12 @@ fun ProgramList(
             }, confirmButton = {
 
                 Button(
-                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(rgb(0, 105, 52))
+                    modifier = Modifier.width(100.dp),
+                    border = BorderStroke(1.dp, Color.Gray),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent
                     ), onClick = { deleteDialog.value = false }) {
-                    Text(text = "取消")
+                    Text(text = "取   消")
                 }
 
             }, dismissButton = {
@@ -1003,7 +1017,7 @@ fun ProgramList(
 
                         }
                     }) {
-                    Text(text = "确认")
+                    Text(text = "确   认")
                 }
 
             })
@@ -1040,10 +1054,12 @@ fun ProgramList(
                 }
             }, confirmButton = {
                 Button(
-                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(rgb(0, 105, 52))
-                    ), onClick = { importDialog.value = false }) {
-                    Text(text = "取消")
+                    modifier = Modifier.width(100.dp),
+                    border = BorderStroke(1.dp, Color.Gray),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent
+                    ),onClick = { importDialog.value = false }) {
+                    Text(text = "取   消")
                 }
             }, dismissButton = {
 

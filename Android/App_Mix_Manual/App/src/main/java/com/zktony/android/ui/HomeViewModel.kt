@@ -426,6 +426,7 @@ class HomeViewModel @Inject constructor(
                     val slEnetity = slDao.getById(1L).firstOrNull()
                     if (slEnetity != null) {
                         val rinseCleanVolume = slEnetity.rinseCleanVolume
+                        val rinseCleanVolume2 = slEnetity.rinseCleanVolume2
                         _wasteprogress.value += (rinseCleanVolume / 150).toFloat()
 
                         /**
@@ -480,13 +481,22 @@ class HomeViewModel @Inject constructor(
                                     pdv = rinse1 * 2 * 1000
                                 )
                             }
-                        } else {
+                        } else if (_waitTimeRinseNum.value == 1) {
                             start {
                                 timeOut = 1000L * 60L * 10
                                 with(
                                     index = 4,
                                     ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
                                     pdv = rinseCleanVolume * 1000
+                                )
+                            }
+                        } else {
+                            start {
+                                timeOut = 1000L * 60L * 10
+                                with(
+                                    index = 4,
+                                    ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
+                                    pdv = rinseCleanVolume2 * 1000
                                 )
                             }
                         }
@@ -2890,6 +2900,7 @@ class HomeViewModel @Inject constructor(
 
 
                     //===================废液槽运动开始=====================
+                    _uiFlags.value = UiFlags.objects(101)
                     logInfo(
                         "HomeViewModel_startJob",
                         "===废液槽运动开始==="
@@ -3014,6 +3025,7 @@ class HomeViewModel @Inject constructor(
                         "===制胶位置移动开始==="
                     )
                     //制胶位置
+                    _uiFlags.value = UiFlags.objects(102)
                     start {
                         timeOut = 1000L * 60L
 //                        with(index = 0, pdv = glueBoardPosition)
@@ -3125,6 +3137,7 @@ class HomeViewModel @Inject constructor(
                         "HomeViewModel_startJob",
                         "x轴复位，防止x轴运动偏移位置，复位开始"
                     )
+                    _uiFlags.value = UiFlags.objects(103)
                     start {
                         timeOut = 1000L * 30
                         with(

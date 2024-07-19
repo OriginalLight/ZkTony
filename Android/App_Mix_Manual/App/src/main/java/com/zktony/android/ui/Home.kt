@@ -5,6 +5,7 @@ import android.media.ImageReader.OnImageAvailableListener
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -351,6 +352,8 @@ fun operate(
      */
     val resetError = remember { mutableStateOf(false) }
 
+    var scheduleState by remember { mutableStateOf("") }
+
 
     /**
      * 纯水进度
@@ -411,11 +414,13 @@ fun operate(
 
 //    println("heartbeatErrorHome====$heartbeatErrorHome")
     if (uiFlags is UiFlags.Objects && uiFlags.objects == 4) {
+        scheduleState = ""
         continueGlueDialog.value = true
         if (wasteprogress > 0.9) {
             wasteDialog.value = true
         }
     } else if (uiFlags is UiFlags.Objects && uiFlags.objects == 6) {
+        scheduleState = ""
         expectedMakeNum.value = 0
         expectedMakeNum_ex = "0"
         uiEvent(HomeIntent.MotherVolZero)
@@ -424,6 +429,12 @@ fun operate(
     } else if (uiFlags is UiFlags.Objects && uiFlags.objects == 14) {
         //复位失败弹窗
         resetError.value = true
+    } else if (uiFlags is UiFlags.Objects && uiFlags.objects == 101) {//制胶预排液
+        scheduleState = "预排中"
+    } else if (uiFlags is UiFlags.Objects && uiFlags.objects == 102) {//制胶预排液
+        scheduleState = "制胶中"
+    } else if (uiFlags is UiFlags.Objects && uiFlags.objects == 103) {//制胶预排液
+        scheduleState = "冲洗中"
     }
 //    else if (uiFlags is UiFlags.Objects && uiFlags.objects == 15) {
 //        //上下位机失联弹窗
@@ -786,17 +797,32 @@ fun operate(
             line(Color(0, 105, 5), 48.25f, 528.5f)
         }
 
-        Text(
-            modifier = Modifier.padding(start = 48.92.dp, top = 21.4.dp),
-            text = "制胶进度",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(
-                0,
-                105,
-                52
+        Row {
+            Text(
+                modifier = Modifier.padding(start = 48.92.dp, top = 21.4.dp),
+                text = "制胶进度",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(
+                    0,
+                    105,
+                    52
+                )
             )
-        )
+
+            Text(
+                modifier = Modifier.padding(start = 160.dp, top = 21.4.dp),
+//                text = if (job == null) "" else "",
+                text = scheduleState,
+//                fontSize = 20.sp,
+//                fontWeight = FontWeight.Bold,
+                color = Color(
+                    18, 95, 202
+                )
+            )
+        }
+
+
         Row(modifier = Modifier.padding(start = 48.92.dp, top = 21.4.dp)) {
 
             Row(
@@ -1189,21 +1215,22 @@ fun operate(
                                     }
                                 }
                             }) {
-                            Text(fontSize = 18.sp, text = "确认")
+                            Text(fontSize = 18.sp, text = "确   认")
                         }
 
                         Button(
                             modifier = Modifier
                                 .padding(start = 40.dp)
                                 .width(100.dp),
+                            border = BorderStroke(1.dp, Color.Gray),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(rgb(0, 105, 52))
+                                containerColor = Color.Transparent
                             ),
                             onClick = {
                                 uiEvent(HomeIntent.CleanDialog(false))
                                 cleanDialog.value = false
                             }) {
-                            Text(fontSize = 18.sp, text = "取消")
+                            Text(fontSize = 18.sp, text = "取   消", color = Color.Black)
                         }
                     }
                 }
@@ -1269,21 +1296,22 @@ fun operate(
                                     }
                                 }
                             }) {
-                            Text(fontSize = 18.sp, text = "确认")
+                            Text(fontSize = 18.sp, text = "确   认")
                         }
 
                         Button(
                             modifier = Modifier
                                 .padding(start = 40.dp)
                                 .width(100.dp),
+                            border = BorderStroke(1.dp, Color.Gray),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(rgb(0, 105, 52))
+                                containerColor = Color.Transparent
                             ),
                             onClick = {
                                 uiEvent(HomeIntent.PipelineDialog(false))
                                 pipelineDialog.value = false
                             }) {
-                            Text(fontSize = 18.sp, text = "取消")
+                            Text(fontSize = 18.sp, text = "取   消", color = Color.Black)
                         }
                     }
                 }
@@ -1326,20 +1354,21 @@ fun operate(
                                 uiEvent(HomeIntent.Stop)
                                 stopGlueDialog.value = false
                             }) {
-                            Text(fontSize = 18.sp, text = "停止")
+                            Text(fontSize = 18.sp, text = "停   止")
                         }
 
                         Button(
                             modifier = Modifier
                                 .padding(start = 40.dp)
                                 .width(100.dp),
+                            border = BorderStroke(1.dp, Color.Gray),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(rgb(0, 105, 52))
+                                containerColor = Color.Transparent
                             ),
                             onClick = {
                                 stopGlueDialog.value = false
                             }) {
-                            Text(fontSize = 18.sp, text = "取消")
+                            Text(fontSize = 18.sp, text = "取   消", color = Color.Black)
                         }
                     }
                 }
@@ -1390,7 +1419,7 @@ fun operate(
                                     continueGlueDialog.value = false
                                 }
                             }) {
-                            Text(fontSize = 18.sp, text = "停止")
+                            Text(fontSize = 18.sp, text = "停   止")
                         }
 
                         Button(
@@ -1415,7 +1444,7 @@ fun operate(
                                     uiEvent(HomeIntent.Start(complate))
                                 }
                             }) {
-                            Text(fontSize = 18.sp, text = "继续")
+                            Text(fontSize = 18.sp, text = "继   续")
                         }
 
 
@@ -1455,7 +1484,7 @@ fun operate(
                                 uiEvent(HomeIntent.CleanWasteState)
                                 wasteDialog.value = false
                             }) {
-                            Text(fontSize = 18.sp, text = "确认")
+                            Text(fontSize = 18.sp, text = "确   认")
                         }
                     }
                 }
@@ -1514,20 +1543,21 @@ fun operate(
                                     }
                                 }
                             }) {
-                            Text(fontSize = 18.sp, text = "确认")
+                            Text(fontSize = 18.sp, text = "确   认")
                         }
 
                         Button(
                             modifier = Modifier
                                 .padding(start = 40.dp)
                                 .width(100.dp),
+                            border = BorderStroke(1.dp, Color.Gray),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(rgb(0, 105, 52))
+                                containerColor = Color.Transparent
                             ),
                             onClick = {
                                 guleDialog.value = false
                             }) {
-                            Text(fontSize = 18.sp, text = "取消")
+                            Text(fontSize = 18.sp, text = "取   消", color = Color.Black)
                         }
                     }
                 }
@@ -1598,20 +1628,21 @@ fun operate(
                                     onClick = {
                                         waterDialog.value = false
                                     }) {
-                                    Text(fontSize = 18.sp, text = "确认")
+                                    Text(fontSize = 18.sp, text = "确   认")
                                 }
 
                                 Button(
                                     modifier = Modifier
                                         .padding(start = 40.dp)
                                         .width(100.dp),
+                                    border = BorderStroke(1.dp, Color.Gray),
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color(rgb(0, 105, 52))
+                                        containerColor = Color.Transparent
                                     ),
                                     onClick = {
                                         waterDialog.value = false
                                     }) {
-                                    Text(fontSize = 18.sp, text = "取消")
+                                    Text(fontSize = 18.sp, text = "取   消", color = Color.Black)
                                 }
                             }
                         }
@@ -1735,20 +1766,21 @@ fun operate(
                                         concentration_ex = concentration.value.toString()
                                         coagulantDialog.value = false
                                     }) {
-                                    Text(fontSize = 18.sp, text = "确认")
+                                    Text(fontSize = 18.sp, text = "确   认")
                                 }
 
                                 Button(
                                     modifier = Modifier
                                         .padding(start = 40.dp)
                                         .width(100.dp),
+                                    border = BorderStroke(1.dp, Color.Gray),
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color(rgb(0, 105, 52))
+                                        containerColor = Color.Transparent
                                     ),
                                     onClick = {
                                         coagulantDialog.value = false
                                     }) {
-                                    Text(fontSize = 18.sp, text = "取消")
+                                    Text(fontSize = 18.sp, text = "取   消", color = Color.Black)
                                 }
                             }
                         }
@@ -1898,21 +1930,22 @@ fun operate(
                                             }
                                         }
                                     }) {
-                                    Text(fontSize = 18.sp, text = "确认")
+                                    Text(fontSize = 18.sp, text = "确   认")
                                 }
 
                                 Button(
                                     modifier = Modifier
                                         .padding(start = 40.dp)
                                         .width(100.dp),
+                                    border = BorderStroke(1.dp, Color.Gray),
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color(rgb(0, 105, 52))
+                                        containerColor = Color.Transparent
                                     ),
                                     onClick = {
                                         lowCoagulant_ex = lowCoagulant.value.toString()
                                         lowDialog.value = false
                                     }) {
-                                    Text(fontSize = 18.sp, text = "取消")
+                                    Text(fontSize = 18.sp, text = "取   消", color = Color.Black)
                                 }
                             }
                         }
@@ -2054,21 +2087,22 @@ fun operate(
                                             ).show()
                                         }
                                     }) {
-                                    Text(fontSize = 18.sp, text = "确认")
+                                    Text(fontSize = 18.sp, text = "确   认")
                                 }
 
                                 Button(
                                     modifier = Modifier
                                         .padding(start = 40.dp)
                                         .width(100.dp),
+                                    border = BorderStroke(1.dp, Color.Gray),
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color(rgb(0, 105, 52))
+                                        containerColor = Color.Transparent
                                     ),
                                     onClick = {
                                         highCoagulant_ex = highCoagulant.value.toString()
                                         highDialog.value = false
                                     }) {
-                                    Text(fontSize = 18.sp, text = "取消")
+                                    Text(fontSize = 18.sp, text = "取   消", color = Color.Black)
                                 }
                             }
                         }
@@ -2192,10 +2226,12 @@ fun operate(
                     }, confirmButton = {
 
                         Button(
-                            modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(rgb(0, 105, 52))
+                            modifier = Modifier.width(100.dp),
+                            border = BorderStroke(1.dp, Color.Gray),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Transparent
                             ), onClick = { programListDialog.value = false }) {
-                            Text(text = "取消")
+                            Text(text = "取   消")
                         }
 
                     }, dismissButton = {
@@ -2233,7 +2269,7 @@ fun operate(
                                     programListDialog.value = false
                                 }
                             }) {
-                            Text(text = "确认")
+                            Text(text = "确   认")
                         }
 
                     })
@@ -2273,7 +2309,7 @@ fun operate(
                                 resetError.value = false
                                 uiEvent(HomeIntent.Reset)
                             }) {
-                            Text(fontSize = 18.sp, text = "复位")
+                            Text(fontSize = 18.sp, text = "复   位")
                         }
 
                     }
@@ -2311,7 +2347,7 @@ fun operate(
                             onClick = {
                                 uiEvent(HomeIntent.Heartbeat)
                             }) {
-                            Text(fontSize = 18.sp, text = "确定")
+                            Text(fontSize = 18.sp, text = "确   定")
                         }
 
                     }
@@ -2336,8 +2372,8 @@ fun operate(
                         text = "实验记录已达上限，请及时清理。"
                     )
                     Text(
-                            fontSize = 20.sp,
-                    text = "若继续实验，则当前实验记录不被保存，"
+                        fontSize = 20.sp,
+                        text = "若继续实验，则当前实验记录不被保存，"
                     )
                     Text(
                         fontSize = 20.sp,
@@ -2357,20 +2393,21 @@ fun operate(
                                 guleDialog.value = true
                                 erCountDialog.value = false
                             }) {
-                            Text(fontSize = 18.sp, text = "确认")
+                            Text(fontSize = 18.sp, text = "确   认")
                         }
 
                         Button(
                             modifier = Modifier
                                 .padding(start = 40.dp)
                                 .width(100.dp),
+                            border = BorderStroke(1.dp, Color.Gray),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(rgb(0, 105, 52))
+                                containerColor = Color.Transparent
                             ),
                             onClick = {
                                 erCountDialog.value = false
                             }) {
-                            Text(fontSize = 18.sp, text = "取消")
+                            Text(fontSize = 18.sp, text = "取   消", color = Color.Black)
                         }
                     }
                 }

@@ -19,8 +19,8 @@ android {
         applicationId = "com.zktony.android"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 6
-        versionName = "3.0.1"
+        versionCode = 7
+        versionName = "3.0.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

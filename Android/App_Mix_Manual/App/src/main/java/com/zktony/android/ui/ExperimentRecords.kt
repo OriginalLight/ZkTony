@@ -8,6 +8,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -527,10 +528,12 @@ fun experimentList(
                 text = {
 
                     Button(
-                        modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(rgb(0, 105, 52))
+                        modifier = Modifier.width(100.dp),
+                        border = BorderStroke(1.dp, Color.Gray),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Transparent
                         ), onClick = { deleteDialog.value = false }) {
-                        Text(text = "取消")
+                        Text(fontSize = 18.sp, text = "取   消", color = Color.Black)
                     }
 
                 }, confirmButton = {}, dismissButton = {
@@ -558,7 +561,7 @@ fun experimentList(
                             }
 
                         }) {
-                        Text(text = "确认")
+                        Text(fontSize = 18.sp,text = "确   认")
                     }
 
                 })
