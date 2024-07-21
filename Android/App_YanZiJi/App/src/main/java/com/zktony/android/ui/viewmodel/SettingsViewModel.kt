@@ -28,12 +28,12 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
     }
 
     // 提示音
-    fun setPromptSound(promptSound: String) {
-        PromptSoundUtils.setPromptSound(promptSound)
+    fun setPromptSound(name: String) {
+        PromptSoundUtils.with(name)
         val tipsMessage =
             "${ResourceUtils.stringResource(R.string.prompt_sound)} ${ResourceUtils.stringResource(R.string.set_success)}"
         TipsUtils.showTips(Tips.info(tipsMessage))
-        LogUtils.info("$tipsMessage $promptSound", true)
+        LogUtils.info("$tipsMessage $name", true)
     }
 
     // 导航栏

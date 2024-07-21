@@ -30,7 +30,7 @@ object Constants {
      * 提示音 mute ring voice
      */
     const val PROMPT_SOUND = "PROMPT_SOUND"
-    const val DEFAULT_PROMPT_SOUND = "voice"
+    const val DEFAULT_PROMPT_SOUND = "VOICE"
 
     /**
      * S/N
@@ -42,5 +42,5 @@ object Constants {
      * P/N
      */
     const val PN = "PN"
-    const val DEFAULT_PN = "M-Blot T4000"
+    const val DEFAULT_PN = "M_BLOT_T4000"
 }

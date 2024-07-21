@@ -36,7 +36,7 @@ import com.zktony.android.R
 import com.zktony.android.data.PipelineControl
 import com.zktony.android.ui.components.ArgumentsInputField
 import com.zktony.android.ui.components.ButtonLoading
-import com.zktony.android.ui.components.CircleTabRow
+import com.zktony.android.ui.components.SegmentedButtonTabRow
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
@@ -103,7 +103,7 @@ fun SettingsDebugPipelineTopBar(
             )
         }
 
-        CircleTabRow(
+        SegmentedButtonTabRow(
             modifier = Modifier.size(400.dp, 48.dp),
             tabItems = List(ProductUtils.getChannelCount()) { stringResource(id = R.string.channel) + (it + 1) },
             selected = channel
@@ -134,7 +134,7 @@ fun PipelineDebugListView(
             var selected by remember { mutableIntStateOf(0) }
             var loading by remember { mutableStateOf(false) }
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                CircleTabRow(
+                SegmentedButtonTabRow(
                     modifier = Modifier.width(200.dp),
                     tabItems = listOf("转膜液", "清洗液"),
                     selected = selected
@@ -158,7 +158,7 @@ fun PipelineDebugListView(
             var selected by remember { mutableIntStateOf(0) }
             var loading by remember { mutableStateOf(false) }
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                CircleTabRow(
+                SegmentedButtonTabRow(
                     modifier = Modifier.width(200.dp),
                     tabItems = listOf("转膜液", "清洗液"),
                     selected = selected

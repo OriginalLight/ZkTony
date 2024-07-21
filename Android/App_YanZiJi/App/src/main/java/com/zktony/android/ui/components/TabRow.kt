@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
  * @date 2023/8/9 8:49
  */
 @Composable
-fun CircleTabRow(
+fun SegmentedButtonTabRow(
     modifier: Modifier = Modifier,
     tabItems: List<String>,
     selected: Int,
@@ -54,8 +54,8 @@ fun CircleTabRow(
 
 @Preview
 @Composable
-fun CircleTabRowPreview() {
-    CircleTabRow(
+fun SegmentedButtonTabRowPreview() {
+    SegmentedButtonTabRow(
         tabItems = listOf("1", "2", "3", "4", "5"),
         selected = 0,
         onClick = {}

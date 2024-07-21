@@ -187,6 +187,7 @@ fun UserNameInputField(
         },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         shape = CircleShape,
+        singleLine = true,
         colors = TextFieldDefaults.colors(
             unfocusedIndicatorColor = Color.Transparent,
             focusedIndicatorColor = Color.Transparent,
@@ -237,6 +238,7 @@ fun PasswordInputField(
             keyboardType = KeyboardType.Password
         ),
         shape = CircleShape,
+        singleLine = true,
         visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
         colors = TextFieldDefaults.colors(
             unfocusedIndicatorColor = Color.Transparent,

@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zktony.android.R
+import com.zktony.android.data.Product
 import com.zktony.android.ui.components.ArgumentsSetField
 import com.zktony.android.ui.components.DropDownBox
 import com.zktony.android.ui.navigation.NavigationActions
@@ -31,7 +32,6 @@ import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.zktyBrush
 import com.zktony.android.ui.viewmodel.SettingsArgumentsEquipmentViewModel
 import com.zktony.android.utils.Constants
-import com.zktony.android.utils.ProductUtils
 import com.zktony.datastore.rememberDataSaverState
 
 @Composable
@@ -110,11 +110,11 @@ fun EquipmentArgumentsListView(
                 modifier = Modifier
                     .width(200.dp)
                     .height(48.dp),
-                selected = ProductUtils.ProductNumberList.indexOf(pn),
-                options = ProductUtils.ProductNumberList
+                selected = Product.indexFromName(pn),
+                options = Product.getTextList(),
             ) {
-                pn = ProductUtils.ProductNumberList[it]
-                viewModel.setProductNumber(pn)
+                pn = Product.getNameByIndex(it)
+                viewModel.setProductNumber(Product.getNameByIndex(it))
             }
         }
 

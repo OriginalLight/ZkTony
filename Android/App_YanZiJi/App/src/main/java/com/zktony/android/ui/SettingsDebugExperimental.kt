@@ -41,7 +41,7 @@ import com.zktony.android.data.ExperimentalControl
 import com.zktony.android.data.PipelineControl
 import com.zktony.android.ui.components.ArgumentsInputField
 import com.zktony.android.ui.components.ButtonLoading
-import com.zktony.android.ui.components.CircleTabRow
+import com.zktony.android.ui.components.SegmentedButtonTabRow
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
@@ -111,7 +111,7 @@ fun SettingsDebugExperimentalTopBar(
             )
         }
 
-        CircleTabRow(
+        SegmentedButtonTabRow(
             modifier = Modifier.size(400.dp, 48.dp),
             tabItems = List(ProductUtils.getChannelCount()) { stringResource(id = R.string.channel) + (it + 1) },
             selected = channel
@@ -156,7 +156,7 @@ fun ExperimentalDebugListView(
             item {
                 SettingsRow(title = "实验类型") {
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        CircleTabRow(
+                        SegmentedButtonTabRow(
                             modifier = Modifier.width(200.dp),
                             tabItems = listOf("转膜", "染色"),
                             selected = type
@@ -171,7 +171,7 @@ fun ExperimentalDebugListView(
             item {
                 SettingsRow(title = "运行模式") {
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        CircleTabRow(
+                        SegmentedButtonTabRow(
                             modifier = Modifier.width(450.dp),
                             tabItems = listOf("恒压模式", "恒流模式", "恒功率模式"),
                             selected = mode

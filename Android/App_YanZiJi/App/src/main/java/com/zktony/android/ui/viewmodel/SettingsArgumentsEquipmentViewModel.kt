@@ -3,6 +3,7 @@ package com.zktony.android.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.R
+import com.zktony.android.data.Product
 import com.zktony.android.ui.components.Tips
 import com.zktony.android.utils.ProductUtils
 import com.zktony.android.utils.ResourceUtils
@@ -19,12 +20,12 @@ class SettingsArgumentsEquipmentViewModel @Inject constructor() : ViewModel() {
     // 设置P/N参数
     fun setProductNumber(pn: String) {
         viewModelScope.launch {
-            ProductUtils.setProductNumber(pn)
+            ProductUtils.with(pn)
             val tipsMessage = "P/N ${ResourceUtils.stringResource(R.string.set_success)}"
             TipsUtils.showTips(Tips.info(tipsMessage))
             LogUtils.info("$tipsMessage $pn")
             repeat(ProductUtils.getChannelCount()) { index ->
-                SerialPortUtils.setProductNumber(index, pn)
+                SerialPortUtils.setProductNumber(index, Product.fromName(pn).text)
             }
         }
     }

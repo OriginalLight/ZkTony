@@ -36,14 +36,14 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
-import com.zktony.android.ui.components.CircleTabRow
+import com.zktony.android.data.PromptSound
 import com.zktony.android.ui.components.DateTimePicker
+import com.zktony.android.ui.components.SegmentedButtonTabRow
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.viewmodel.SettingsViewModel
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.HzmctUtils
-import com.zktony.android.utils.PromptSoundUtils
 import com.zktony.android.utils.extra.dateFormat
 import com.zktony.datastore.rememberDataSaverState
 import kotlinx.coroutines.delay
@@ -153,7 +153,7 @@ fun SystemSettingsView(
 
         // 语言
         SettingsRow(title = stringResource(id = R.string.language)) {
-            CircleTabRow(
+            SegmentedButtonTabRow(
                 modifier = Modifier.width(300.dp),
                 tabItems = listOf("简体中文", "English"),
                 selected = if (language == "zh") 0 else 1
@@ -167,18 +167,14 @@ fun SystemSettingsView(
 
         // 提示音
         SettingsRow(title = stringResource(id = R.string.prompt_sound)) {
-            CircleTabRow(
+            SegmentedButtonTabRow(
                 modifier = Modifier.width(300.dp),
-                tabItems = listOf(
-                    stringResource(id = R.string.mute),
-                    stringResource(id = R.string.ring),
-                    stringResource(id = R.string.voice)
-                ),
-                selected = PromptSoundUtils.getPromptSoundId(promptSound)
+                tabItems = PromptSound.getResIdList().map { stringResource(id = it) },
+                selected = PromptSound.indexFromName(promptSound)
             ) {
                 scope.launch {
-                    promptSound = PromptSoundUtils.getPromptSoundStr(it)
-                    viewModel.setPromptSound(PromptSoundUtils.getPromptSoundStr(it))
+                    promptSound = PromptSound.getNameByIndex(it)
+                    viewModel.setPromptSound(PromptSound.getNameByIndex(it))
                 }
             }
         }

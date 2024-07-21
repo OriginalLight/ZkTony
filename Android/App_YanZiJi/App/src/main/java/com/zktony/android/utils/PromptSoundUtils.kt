@@ -1,12 +1,12 @@
 package com.zktony.android.utils
 
 import android.media.AudioAttributes
-import android.media.MediaPlayer
 import android.media.SoundPool
+import com.zktony.android.data.PromptSound
 
 object PromptSoundUtils {
     private var soundPool: SoundPool? = null
-    private var code: Int = 0
+    private var promptSound: PromptSound = PromptSound.MUTE
 
     init {
         val audioAttributes = AudioAttributes.Builder()
@@ -22,44 +22,8 @@ object PromptSoundUtils {
     }
 
     // Set the audio
-    fun setPromptSound(id: Int) {
-        this.code = id
-    }
-
-    // Get the audio
-    fun setPromptSound(str: String) {
-        this.code = getPromptSoundId(str)
-    }
-
-    // Get the audio string
-    fun getPromptSoundStr(resId: Int): String {
-        return when (resId) {
-            0 -> "mute"
-            1 -> "ring"
-            2 -> "voice"
-            else -> "mute"
-        }
-    }
-
-    // Get the audio code
-    fun getPromptSoundId(audio: String): Int {
-        return when (audio) {
-            "mute" -> 0
-            "ring" -> 1
-            "voice" -> 2
-            else -> 0
-        }
-    }
-
-    // Play the audio
-    fun playAudio(resId: Int) {
-        // Play audio
-        val mediaPlayer = MediaPlayer.create(ApplicationUtils.ctx, resId)
-        mediaPlayer.setVolume(1f, 1f)
-        mediaPlayer.start()
-        mediaPlayer.setOnCompletionListener {
-            mediaPlayer.release()
-        }
+    fun with(name: String) {
+        promptSound = PromptSound.fromName(name)
     }
 
     fun playSound(resId: Int) {
@@ -71,10 +35,16 @@ object PromptSoundUtils {
 
     // Play the switch prompt audio
     fun playSwitchPromptSound() {
-        when (code) {
-            0 -> {} // mute do nothing
-            1 -> {} // TODO: Play the ring audio
-            2 -> {} // TODO: Play the voice audio
+        when (promptSound) {
+            PromptSound.RING -> {
+            }
+
+            PromptSound.VOICE -> {
+            }
+
+            PromptSound.MUTE -> {
+                // Do nothing
+            }
         }
     }
 }

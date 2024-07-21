@@ -39,7 +39,7 @@ import com.zktony.android.data.ArgumentsClean
 import com.zktony.android.data.ArgumentsTransfer
 import com.zktony.android.ui.components.ArgumentsInputField
 import com.zktony.android.ui.components.ButtonLoading
-import com.zktony.android.ui.components.CircleTabRow
+import com.zktony.android.ui.components.SegmentedButtonTabRow
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.zktyBrush
@@ -108,7 +108,7 @@ fun SettingsArgumentsRuntimeTopBar(
             )
         }
 
-        CircleTabRow(
+        SegmentedButtonTabRow(
             modifier = Modifier.size(350.dp, 48.dp),
             tabItems = List(ProductUtils.getChannelCount()) { stringResource(id = R.string.channel) + (it + 1) },
             selected = channel

@@ -29,7 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zktony.android.R
-import com.zktony.android.ui.components.CircleTabRow
+import com.zktony.android.ui.components.SegmentedButtonTabRow
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
@@ -106,7 +106,7 @@ fun SolenoidValveDebugListView(
         repeat(ProductUtils.getChannelCount()) { index ->
             SettingsRow(title = stringResource(id = R.string.channel) + (index + 1)) {
                 var selected by remember { mutableIntStateOf(0) }
-                CircleTabRow(
+                SegmentedButtonTabRow(
                     modifier = Modifier.width(200.dp),
                     tabItems = listOf("转膜液", "清洗液"),
                     selected = selected

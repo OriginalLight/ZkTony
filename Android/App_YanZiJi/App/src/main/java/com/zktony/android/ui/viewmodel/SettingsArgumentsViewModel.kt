@@ -6,11 +6,13 @@ import com.zktony.android.data.Arguments
 import com.zktony.android.ui.components.Tips
 import com.zktony.android.ui.components.TipsType
 import com.zktony.android.utils.AppStateUtils
+import com.zktony.android.utils.Constants
 import com.zktony.android.utils.JsonUtils
 import com.zktony.android.utils.ProductUtils
 import com.zktony.android.utils.SerialPortUtils
 import com.zktony.android.utils.StorageUtils
 import com.zktony.android.utils.TipsUtils
+import com.zktony.datastore.DataSaverDataStore
 import com.zktony.log.LogUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +23,9 @@ import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
-class SettingsArgumentsViewModel @Inject constructor() : ViewModel() {
+class SettingsArgumentsViewModel @Inject constructor(
+    private val dataStore: DataSaverDataStore
+) : ViewModel() {
 
     init {
         viewModelScope.launch {
@@ -57,7 +61,8 @@ class SettingsArgumentsViewModel @Inject constructor() : ViewModel() {
                 TipsUtils.showTips(Tips(TipsType.ERROR, "未检测到U盘"))
                 return
             }
-            val savePath = "${dir}/${ProductUtils.getSerialNumber()}.json"
+            val sn = dataStore.readData(Constants.SN, Constants.DEFAULT_SN)
+            val savePath = "$dir/$sn.json"
             val arguments = AppStateUtils.getArgumentList()
             val argsJson = JsonUtils.toJson(arguments)
             val file = File(savePath)
