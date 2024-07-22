@@ -256,12 +256,12 @@ fun ConfirmDialog(
             ) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleLarge
                 )
 
                 Text(
                     text = message,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyLarge
                 )
 
                 Row(
@@ -285,6 +285,35 @@ fun ConfirmDialog(
                     ) {
                         Text(text = stringResource(id = R.string.confirm))
                     }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun HomeDialog(onConfirm: () -> Unit){
+    Dialog(onDismissRequest = onConfirm) {
+        ElevatedCard {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "实验结束后需及时清洗管路，避免管路残液变质!!!",
+                    style = MaterialTheme.typography.titleLarge
+                )
+
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    onClick = { onConfirm() }
+                ) {
+                    Text(text = stringResource(id = R.string.confirm))
                 }
             }
         }

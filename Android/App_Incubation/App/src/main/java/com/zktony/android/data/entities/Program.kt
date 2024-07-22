@@ -21,4 +21,34 @@ data class Program(
     val displayText: String = "None",
     val stages: List<IncubationStage> = emptyList(),
     val createTime: Date = Date(System.currentTimeMillis())
-)
+)  {
+
+    fun getCleanVolume(): List<String> {
+        var s1 = 0.0
+        var s2 = 0.0
+        var s3 = 0.0
+        var s4 = 0.0
+        stages.forEach {
+            when(it.type) {
+                0 -> {s1 += it.dosage / 1000.0}
+                1 -> {
+                    s2 += it.dosage / 1000.0
+                    s4 += 5.0
+                }
+                2 -> {
+                    s3 += it.dosage / 1000.0
+                    s4 += 5.0
+                }
+                3 -> s4 += it.dosage / 1000.0 * it.times
+                4 -> s4 += it.dosage / 1000.0
+            }
+        }
+        s4 += 20.0
+        return listOf(
+            s1.toBigDecimal().stripTrailingZeros().toPlainString(),
+            s2.toBigDecimal().stripTrailingZeros().toPlainString(),
+            s3.toBigDecimal().stripTrailingZeros().toPlainString(),
+            s4.toBigDecimal().stripTrailingZeros().toPlainString()
+        )
+    }
+}

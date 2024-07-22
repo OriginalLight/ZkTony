@@ -54,6 +54,7 @@ import com.zktony.android.ui.components.CleanDialog
 import com.zktony.android.ui.components.ConfirmDialog
 import com.zktony.android.ui.components.ErrorDialog
 import com.zktony.android.ui.components.HomeAppBar
+import com.zktony.android.ui.components.HomeDialog
 import com.zktony.android.ui.components.IncubationStageItem
 import com.zktony.android.ui.components.ModuleItem
 import com.zktony.android.ui.navigation.Route
@@ -64,8 +65,10 @@ import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.toList
+import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.extra.dateFormat
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -170,6 +173,14 @@ fun HomeContent(
     var clean by remember { mutableStateOf(false) }
     var confirm by remember { mutableIntStateOf(0) }
 
+    var dialog by remember { mutableStateOf(false) }
+    if (dialog) {
+        HomeDialog {
+            dialog = false
+            AppStateUtils.dialog = false
+        }
+    }
+
     if (uiFlags is UiFlags.Error) {
         ErrorDialog(
             message = uiFlags.message,
@@ -184,9 +195,10 @@ fun HomeContent(
     }
 
     if (confirm > 0) {
+        val vs = (entities.find { it.id == state.id } ?: Program()).getCleanVolume()
         ConfirmDialog(
-            title = "确认",
-            message = if (confirm == 1) "确认开始执行 ${'A' + selected} 模块程序？" else "确认中止 ${'A' + selected} 模块程序？",
+            title = "程序确认",
+            message = if (confirm == 1) "${'A' + selected}模块本轮实验预计使用\n封闭液${vs[0]}mL\n一抗${vs[1]}mL\n二抗${vs[2]}mL\n洗涤液${vs[3]}mL\n请检查试剂瓶中试剂余量" else "确认中止 ${'A' + selected} 模块程序？",
             onConfirm = {
                 scope.launch {
                     if (confirm == 1) {
@@ -198,6 +210,11 @@ fun HomeContent(
                 } },
             onCancel = { confirm = 0 }
         )
+    }
+
+    LaunchedEffect(true) {
+        delay(500L)
+        dialog = AppStateUtils.dialog
     }
 
     Row(

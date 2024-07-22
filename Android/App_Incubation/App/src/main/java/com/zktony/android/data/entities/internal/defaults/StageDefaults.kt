@@ -18,7 +18,8 @@ object StageDefaults {
         recycle = false,
         origin = 0,
         times = 0,
-        flags = 2
+        flags = 2,
+        speed = 120
     )
 
     fun defaultPrimaryAntibody() = IncubationStage(
@@ -30,7 +31,8 @@ object StageDefaults {
         recycle = true,
         origin = 0,
         times = 0,
-        flags = 2
+        flags = 2,
+        speed = 120
     )
 
     fun defaultSecondaryAntibody() = IncubationStage(
@@ -42,7 +44,8 @@ object StageDefaults {
         recycle = false,
         origin = 0,
         times = 0,
-        flags = 2
+        flags = 2,
+        speed = 120
     )
 
     fun defaultWashing() = IncubationStage(
@@ -54,7 +57,8 @@ object StageDefaults {
         recycle = false,
         origin = 0,
         times = 3,
-        flags = 2
+        flags = 2,
+        speed = 120
     )
 
     fun defaultPhosphateBufferedSaline() = IncubationStage(
@@ -66,7 +70,8 @@ object StageDefaults {
         recycle = false,
         origin = 0,
         times = 0,
-        flags = 2
+        flags = 2,
+        speed = 120
     )
 
     fun defaultByType(type: Int) = when (type) {

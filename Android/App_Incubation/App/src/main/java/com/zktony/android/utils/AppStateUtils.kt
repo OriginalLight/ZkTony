@@ -21,4 +21,9 @@ object AppStateUtils {
      * 校准函数
      */
     val hpc: MutableMap<Int, (Double) -> Double> = ConcurrentHashMap()
+
+    /**
+     * 提示窗
+     */
+    var dialog = true
 }

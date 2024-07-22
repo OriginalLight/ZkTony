@@ -263,6 +263,7 @@ fun ProgramInput(
     var origin by remember(stage.uuid) { mutableIntStateOf(stage.origin) }
     var recycle by remember(stage.uuid) { mutableStateOf(stage.recycle) }
     var times by remember(stage.uuid) { mutableStateOf(stage.times.toString()) }
+    var speed by remember(stage.uuid) { mutableStateOf(stage.speed.toString()) }
 
     LazyColumn(
         modifier = modifier.imePadding(),
@@ -330,6 +331,38 @@ fun ProgramInput(
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     Icon(imageVector = Icons.AutoMirrored.Filled.ArrowRight, contentDescription = null)
+                }
+            }
+        }
+
+        item {
+            SquareTextField(
+                title = "速度",
+                value = speed,
+                trailingIcon = {
+                    Text(
+                        modifier = Modifier.padding(end = 16.dp),
+                        text = "rpm",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+            ) {
+                scope.launch {
+                    speed = it
+                    val s = it.toIntOrNull() ?: 0
+                    if (s != stage.speed) {
+                        if (s < 0) {
+                            speed = "0"
+                            onProcessChange(stage.copy(speed = s))
+                        }
+                        if (s > 2000) {
+                            speed = "2000"
+                            onProcessChange(stage.copy(speed = 2000))
+                        }
+                        if (s in 0..2000) {
+                            onProcessChange(stage.copy(speed = s))
+                        }
+                    }
                 }
             }
         }
@@ -418,7 +451,18 @@ fun ProgramInput(
                     dosage = it
                     val volume = it.toDoubleOrNull() ?: 0.0
                     if (volume != stage.dosage) {
-                        onProcessChange(stage.copy(dosage = volume))
+                        if (volume < 0.0) {
+                            dosage = "0"
+                            onProcessChange(stage.copy(dosage = 0.0))
+                        }
+                        if (volume > 20000.0) {
+                            dosage = "20000"
+                            onProcessChange(stage.copy(dosage = 20000.0))
+                        }
+
+                        if (volume in 0.0..20000.0) {
+                            onProcessChange(stage.copy(dosage = volume))
+                        }
                     }
                 }
             }

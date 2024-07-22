@@ -217,6 +217,7 @@ class HomeViewModel @Inject constructor(
      */
     private suspend fun interpreter(index: Int, state: IncubationState) {
         try {
+            _shaker.value = 2
             state.stages.forEach { stage ->
                 when (stage.type) {
                     0 -> blocking(index, stage)
@@ -614,6 +615,14 @@ class HomeViewModel @Inject constructor(
                 writeWithPulse(group + 1, -(rx * 6400 * 3).toLong())
             }
         }
+
+        if (_shaker.value == 2) {
+            // 打开摇床
+            writeRegister(slaveAddr = 0, 154, stage.speed)
+            delay(500L)
+            writeRegister(slaveAddr = 0, startAddr = 200, value = 1)
+            _shaker.value = 0
+        }
     }
 
     private suspend fun clean(
@@ -669,6 +678,8 @@ class HomeViewModel @Inject constructor(
             }
         }
         // 打开摇床
+        writeRegister(slaveAddr = 0, 154, stage.speed)
+        delay(500L)
         writeRegister(slaveAddr = 0, startAddr = 200, value = 1)
         _shaker.value = 0
     }
