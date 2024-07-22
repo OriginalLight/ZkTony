@@ -46,9 +46,9 @@ public class UserService(IDbContext dbContext) : BaseService<User>(dbContext), I
             // 创建管理员
             await _context.db.Insertable(new User
             {
-                Name = "user",
-                Sha = BCrypt.Net.BCrypt.HashPassword("user"),
-                Role = 1,
+                Name = "public",
+                Sha = BCrypt.Net.BCrypt.HashPassword("public"),
+                Role = 2,
                 Enabled = true,
                 CreateTime = DateTime.Now,
                 UpdateTime = DateTime.Now,

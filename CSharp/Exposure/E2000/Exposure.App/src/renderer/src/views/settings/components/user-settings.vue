@@ -8,12 +8,14 @@
           </template>
         </a-list-item-meta>
         <template #actions>
-          <a-button shape="round" style="width: 120px" @click="visible = true">
-            <template #icon>
-              <icon-edit />
-            </template>
-            <template #default>{{ t('settings.user.mofify.password') }}</template>
-          </a-button>
+          <div v-if="userStore.name !== 'public'">
+            <a-button shape="round" style="width: 120px" @click="handleModifyPassword">
+              <template #icon>
+                <icon-edit />
+              </template>
+              <template #default>{{ t('settings.user.mofify.password') }}</template>
+            </a-button>
+          </div>
         </template>
       </a-list-item>
       <a-list-item v-if="userStore.role < 2" class="nav" @click="handleOperlog">

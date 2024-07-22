@@ -83,8 +83,8 @@ const { homeInit } = useHomeState()
 const { galleryInit } = useGalleryState()
 
 const userInfo = reactive({
-  username: '',
-  password: ''
+  username: 'public',
+  password: 'public'
 })
 
 const handleSubmit = async ({
