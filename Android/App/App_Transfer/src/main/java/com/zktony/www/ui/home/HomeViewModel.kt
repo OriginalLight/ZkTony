@@ -288,10 +288,11 @@ class HomeViewModel constructor(
                     })
                 }
                 if (i == 0) {
-                    repeat(3) {
+                    repeat(2) {
+                        startOrStop(false, xy)
                         delay(100L)
-                        stop(xy)
                     }
+                    stop(xy)
                     state.value = state.value.copy(currentTime = "已完成")
                     playAudio(R.raw.finish)
                 }

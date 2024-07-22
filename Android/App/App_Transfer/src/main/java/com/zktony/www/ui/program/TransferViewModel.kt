@@ -35,15 +35,6 @@ class TransferViewModel constructor(
                 _uiState.value = _uiState.value.copy(
                     program = it,
                     name = it.name,
-                    proteinName = it.proteinName,
-                    proteinMax = it.proteinMaxSize,
-                    proteinMin = it.proteinMinSize,
-                    glueType = it.glueType,
-                    glueNormalSize = it.glueConcentration,
-                    glueMax = it.glueMaxConcentration,
-                    glueMin = it.glueMinConcentration,
-                    glueThickness = it.thickness,
-                    bufferType = it.bufferType,
                     voltage = it.voltage,
                     motor = it.motor,
                     time = it.time
@@ -63,15 +54,6 @@ class TransferViewModel constructor(
                 PD.insert(
                     Program(
                         name = _uiState.value.name,
-                        proteinName = _uiState.value.proteinName,
-                        proteinMaxSize = _uiState.value.proteinMax,
-                        proteinMinSize = _uiState.value.proteinMin,
-                        glueType = _uiState.value.glueType,
-                        glueConcentration = _uiState.value.glueNormalSize,
-                        glueMaxConcentration = _uiState.value.glueMax,
-                        glueMinConcentration = _uiState.value.glueMin,
-                        thickness = _uiState.value.glueThickness,
-                        bufferType = _uiState.value.bufferType,
                         voltage = _uiState.value.voltage,
                         motor = _uiState.value.motor,
                         time = _uiState.value.time,
@@ -85,15 +67,6 @@ class TransferViewModel constructor(
                 PD.update(
                     _uiState.value.program!!.copy(
                         name = _uiState.value.name,
-                        proteinName = _uiState.value.proteinName,
-                        proteinMaxSize = _uiState.value.proteinMax,
-                        proteinMinSize = _uiState.value.proteinMin,
-                        glueType = _uiState.value.glueType,
-                        glueConcentration = _uiState.value.glueNormalSize,
-                        glueMaxConcentration = _uiState.value.glueMax,
-                        glueMinConcentration = _uiState.value.glueMin,
-                        thickness = _uiState.value.glueThickness,
-                        bufferType = _uiState.value.bufferType,
                         voltage = _uiState.value.voltage,
                         motor = _uiState.value.motor,
                         time = _uiState.value.time,
@@ -109,33 +82,6 @@ class TransferViewModel constructor(
         _uiState.value = _uiState.value.copy(name = it)
     }
 
-    fun setProteinMin(it: String) {
-        _uiState.value = _uiState.value.copy(proteinName = it)
-    }
-
-    fun setProteinMin(fl: Float) {
-        _uiState.value = _uiState.value.copy(proteinMin = fl)
-    }
-
-    fun setProteinMax(fl: Float) {
-        _uiState.value = _uiState.value.copy(proteinMax = fl)
-    }
-
-    fun setGlueNormalSize(fl: Float) {
-        _uiState.value = _uiState.value.copy(glueNormalSize = fl)
-    }
-
-    fun setGlueMax(fl: Float) {
-        _uiState.value = _uiState.value.copy(glueMax = fl)
-    }
-
-    fun setGlueMin(fl: Float) {
-        _uiState.value = _uiState.value.copy(glueMin = fl)
-    }
-
-    fun setBufferInfo(it: String) {
-        _uiState.value = _uiState.value.copy(bufferType = it)
-    }
 
     fun setVoltage(voltage: Float, block: () -> Unit) {
         _uiState.value = _uiState.value.copy(voltage = minOf(voltage, MAX_VOLTAGE_ZM))
@@ -157,29 +103,12 @@ class TransferViewModel constructor(
             block()
         }
     }
-
-    fun setGlueType(i: Int) {
-        _uiState.value = _uiState.value.copy(glueType = i)
-    }
-
-    fun setGlueThickness(s: String) {
-        _uiState.value = _uiState.value.copy(glueThickness = s)
-    }
 }
 
 data class TransferUiState(
     val programList: List<Program> = emptyList(),
     val program: Program? = null,
     val name: String = "",
-    val proteinName: String = "",
-    val proteinMin: Float = 0f,
-    val proteinMax: Float = 0f,
-    val glueType: Int = 0,
-    val glueNormalSize: Float = 0f,
-    val glueMax: Float = 0f,
-    val glueMin: Float = 0f,
-    val glueThickness: String = "0.75",
-    val bufferType: String = Ext.ctx.getString(R.string.factory),
     val voltage: Float = 0f,
     val motor: Int = 0,
     val time: Float = 0f,
