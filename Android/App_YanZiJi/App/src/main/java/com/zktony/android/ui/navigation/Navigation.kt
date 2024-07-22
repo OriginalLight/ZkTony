@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationRailItemColors
@@ -57,6 +55,7 @@ import com.zktony.android.ui.SettingsFqcView
 import com.zktony.android.ui.SettingsView
 import com.zktony.android.ui.components.BottomBar
 import com.zktony.android.ui.components.LogoutConfirmDialog
+import com.zktony.android.ui.icons.Logout
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.zktyBrush
@@ -171,7 +170,7 @@ fun AppNavigationDrawer(
         ) {
             Icon(
                 modifier = Modifier.size(48.dp),
-                imageVector = Icons.AutoMirrored.Filled.Logout,
+                imageVector = Logout,
                 contentDescription = "Logout",
                 tint = Color.White
             )

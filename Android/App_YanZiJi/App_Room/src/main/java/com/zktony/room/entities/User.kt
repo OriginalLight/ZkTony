@@ -10,7 +10,7 @@ data class User(
     val id: Long = 0L,
     val name: String = "",
     val password: String = "",
-    val role: Int = 0,
+    val role: String = "USER",
     val enable: Boolean = true,
     val createTime: Date = Date(System.currentTimeMillis()),
     val lastLoginTime: Date = Date(System.currentTimeMillis())

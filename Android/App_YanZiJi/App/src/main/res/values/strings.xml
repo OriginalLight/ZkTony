@@ -55,4 +55,6 @@
     <string name="t100">快速转膜仪</string>
     <string name="t000">多功能转膜仪</string>
     <string name="t200">快速染色仪</string>
+    <string name="user_management">用户管理</string>
+    <string name="user_operation_log">操作日志</string>
 </resources>

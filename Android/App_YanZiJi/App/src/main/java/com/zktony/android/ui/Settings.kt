@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -37,11 +39,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
 import com.zktony.android.data.PromptSound
+import com.zktony.android.data.Role
 import com.zktony.android.ui.components.DateTimePicker
+import com.zktony.android.ui.components.RequirePermission
 import com.zktony.android.ui.components.SegmentedButtonTabRow
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.viewmodel.SettingsViewModel
+import com.zktony.android.utils.AuthUtils
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.HzmctUtils
 import com.zktony.android.utils.extra.dateFormat
@@ -61,6 +66,7 @@ fun SettingsView(viewModel: SettingsViewModel = hiltViewModel()) {
 
     LazyColumn(
         modifier = Modifier
+            .fillMaxSize()
             .background(
                 color = MaterialTheme.colorScheme.surface,
                 shape = MaterialTheme.shapes.medium
@@ -72,17 +78,90 @@ fun SettingsView(viewModel: SettingsViewModel = hiltViewModel()) {
         item {
             SystemSettingsView(viewModel = viewModel)
         }
+
         item {
-            FactorySettingsView()
+            UserSettingsView(viewModel = viewModel)
+        }
+
+        item {
+           RequirePermission(role = Role.CUSTOMER_SERVICE) {
+               FactorySettingsView()
+           }
         }
     }
 }
 
 // 用户设置
 @Composable
-fun UserSettingsView() {
-    Column {
-        Text(text = stringResource(id = R.string.user_settings))
+fun UserSettingsView(
+    modifier: Modifier = Modifier,
+    viewModel: SettingsViewModel
+) {
+    val navigationActions = LocalNavigationActions.current
+
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            modifier = Modifier.padding(top = 16.dp),
+            text = stringResource(id = R.string.user_settings),
+            style = MaterialTheme.typography.headlineMedium
+        )
+
+        // 当前用户
+        AuthUtils.getLoggedUser()?.let {
+            Row(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .background(
+                        MaterialTheme.colorScheme.surfaceVariant,
+                        MaterialTheme.shapes.medium
+                    )
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text(text = it.name, style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Normal))
+                    Text(text = it.role, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Light))
+                    Text(text = it.lastLoginTime.dateFormat("yyyy-MM-dd HH:mm"), style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Light))
+
+                }
+
+                Button(onClick = { /*TODO*/ }) {
+                    Text(text = "修改密码")
+                }
+            }
+        }
+
+        RequirePermission(role = Role.ADMIN) {
+            // 用户管理
+            SettingsRow(
+                modifier = Modifier
+                    .clip(MaterialTheme.shapes.small)
+                    .clickable { navigationActions.navigate(Route.SETTINGS_DEBUG) },
+                title = stringResource(id = R.string.user_management)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
+                    contentDescription = "ArrowForwardIos"
+                )
+            }
+
+            // 用户管理
+            SettingsRow(
+                modifier = Modifier
+                    .clip(MaterialTheme.shapes.small)
+                    .clickable { navigationActions.navigate(Route.SETTINGS_DEBUG) },
+                title = stringResource(id = R.string.user_operation_log)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
+                    contentDescription = "ArrowForwardIos"
+                )
+            }
+        }
     }
 }
 
@@ -259,6 +338,7 @@ fun FactorySettingsView(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
+            modifier = Modifier.padding(top = 16.dp),
             text = stringResource(id = R.string.factory_settings),
             style = MaterialTheme.typography.headlineMedium
         )
@@ -289,30 +369,32 @@ fun FactorySettingsView(modifier: Modifier = Modifier) {
             )
         }
 
-        // Fqc
-        SettingsRow(
-            modifier = Modifier
-                .clip(MaterialTheme.shapes.small)
-                .clickable { navigationActions.navigate(Route.SETTINGS_FQC) },
-            title = stringResource(id = R.string.fqc)
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
-                contentDescription = "ArrowForwardIos"
-            )
-        }
+        RequirePermission(role = Role.FACTORY) {
+            // Fqc
+            SettingsRow(
+                modifier = Modifier
+                    .clip(MaterialTheme.shapes.small)
+                    .clickable { navigationActions.navigate(Route.SETTINGS_FQC) },
+                title = stringResource(id = R.string.fqc)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
+                    contentDescription = "ArrowForwardIos"
+                )
+            }
 
-        // Aging
-        SettingsRow(
-            modifier = Modifier
-                .clip(MaterialTheme.shapes.small)
-                .clickable { navigationActions.navigate(Route.SETTINGS_AGING) },
-            title = stringResource(id = R.string.aging)
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
-                contentDescription = "ArrowForwardIos"
-            )
+            // Aging
+            SettingsRow(
+                modifier = Modifier
+                    .clip(MaterialTheme.shapes.small)
+                    .clickable { navigationActions.navigate(Route.SETTINGS_AGING) },
+                title = stringResource(id = R.string.aging)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
+                    contentDescription = "ArrowForwardIos"
+                )
+            }
         }
     }
 }
@@ -335,28 +417,4 @@ fun SettingsRow(
         Text(text = title, style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Normal))
         content()
     }
-}
-
-@Preview
-@Composable
-fun PreviewSettingsView() {
-    SettingsView()
-}
-
-@Preview
-@Composable
-fun PreviewUserSettingsView() {
-    UserSettingsView()
-}
-
-@Preview
-@Composable
-fun PreviewSystemSettingsView() {
-    SystemSettingsView(viewModel = hiltViewModel())
-}
-
-@Preview(device = "spec:width=1280px,height=800px,dpi=440,orientation=portrait")
-@Composable
-fun PreviewFactorySettingsView() {
-    FactorySettingsView()
 }

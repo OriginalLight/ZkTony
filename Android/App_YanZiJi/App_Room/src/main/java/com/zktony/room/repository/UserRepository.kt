@@ -1,6 +1,7 @@
 package com.zktony.room.repository
 
 import com.zktony.room.dao.UserDao
+import com.zktony.room.defaults.defaultUsers
 import com.zktony.room.entities.User
 import java.security.MessageDigest
 import java.util.Date
@@ -16,17 +17,13 @@ class UserRepository @Inject constructor(
      * Create default factory and admin user.
      */
     suspend fun init() {
-        userDao.getByName("zkty") ?: run {
-            val digest = MessageDigest.getInstance("SHA-256")
-            val hash = digest.digest("zkty".toByteArray())
-            val passwordHash = hash.fold("") { str, it -> str + "%02x".format(it) }
-            userDao.insert(User(name = "zkty", password = passwordHash, role = 0))
-        }
-        userDao.getByName("admin") ?: run {
-            val digest = MessageDigest.getInstance("SHA-256")
-            val hash = digest.digest("admin".toByteArray())
-            val passwordHash = hash.fold("") { str, it -> str + "%02x".format(it) }
-            userDao.insert(User(name = "admin", password = passwordHash, role = 1))
+        defaultUsers().forEach {
+            userDao.getByName(it.name) ?: run {
+                val digest = MessageDigest.getInstance("SHA-256")
+                val hash = digest.digest(it.password.toByteArray())
+                val passwordHash = hash.fold("") { str, it -> str + "%02x".format(it) }
+                userDao.insert(it.copy(password = passwordHash))
+            }
         }
     }
 
@@ -44,9 +41,10 @@ class UserRepository @Inject constructor(
         val passwordHash = hash.fold("") { str, it -> str + "%02x".format(it) }
         if (user.password != passwordHash) return Result.failure(Exception("002"))
         if (!user.enable) return Result.failure(Exception("003"))
-        val effect = userDao.update(user.copy(lastLoginTime = Date(System.currentTimeMillis())))
+        val updateUser = user.copy(lastLoginTime = Date(System.currentTimeMillis()))
+        val effect = userDao.update(updateUser)
         if (effect == 0) return Result.failure(Exception("004"))
-        return Result.success(user)
+        return Result.success(updateUser)
     }
 
     /**

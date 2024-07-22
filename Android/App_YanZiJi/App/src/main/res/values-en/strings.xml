@@ -54,4 +54,6 @@
     <string name="t100">Fast film transfer instrument</string>
     <string name="t000">Multifunctional film transfer instrument</string>
     <string name="t200">Rapid staining instrument</string>
+    <string name="user_management">User Management</string>
+    <string name="user_operation_log">Operation Log</string>
 </resources>

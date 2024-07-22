@@ -1,16 +1,15 @@
 package com.zktony.android.ui.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.History
-import androidx.compose.material.icons.outlined.Science
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.Terminal
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.zktony.android.R
+import com.zktony.android.ui.icons.Experimental
+import com.zktony.android.ui.icons.History
+import com.zktony.android.ui.icons.Program
+import com.zktony.android.ui.icons.Settings
 
 object Route {
     const val LOGIN = "Login"
@@ -87,22 +86,22 @@ data class TopLevelDestination(
 val TOP_LEVEL_DESTINATIONS = listOf(
     TopLevelDestination(
         route = Route.EXPERIMENTAL,
-        icon = Icons.Outlined.Science,
+        icon = Experimental,
         iconTextId = R.string.experimental
     ),
     TopLevelDestination(
         route = Route.PROGRAM,
-        icon = Icons.Outlined.Terminal,
+        icon = Program,
         iconTextId = R.string.program
     ),
     TopLevelDestination(
         route = Route.HISTORY,
-        icon = Icons.Outlined.History,
+        icon = History,
         iconTextId = R.string.history
     ),
     TopLevelDestination(
         route = Route.SETTINGS,
-        icon = Icons.Outlined.Settings,
+        icon = Settings,
         iconTextId = R.string.settings
     )
 )

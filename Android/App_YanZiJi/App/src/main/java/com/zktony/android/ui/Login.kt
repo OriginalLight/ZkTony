@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -136,6 +137,7 @@ fun LoginForm(
         var userName by remember { mutableStateOf("") }
         var password by remember { mutableStateOf("") }
         var loading by remember { mutableStateOf(false) }
+        var errorText by remember { mutableStateOf<String?>(null) }
 
         Text(
             modifier = Modifier.padding(bottom = 16.dp),
@@ -147,35 +149,59 @@ fun LoginForm(
         UserNameInputField(
             modifier.width(450.dp),
             value = userName,
-            onValueChange = { userName = it }
+            onValueChange = {
+                errorText = null
+                userName = it
+            }
         )
 
         PasswordInputField(
             modifier.width(450.dp),
             value = password,
-            onValueChange = { password = it }
+            onValueChange = {
+                errorText = null
+                password = it
+            }
         )
 
         Button(
             modifier = Modifier.width(450.dp),
             enabled = userName.isNotEmpty() && password.isNotEmpty(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (errorText != null) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                contentColor = if (errorText != null) MaterialTheme.colorScheme.onError else MaterialTheme.colorScheme.onPrimary
+            ),
             onClick = {
                 scope.launch {
                     loading = true
-                    if (viewModel.login(userName, password)) {
-                        navigationActions.popBackStack()
-                        navigationActions.navigate(Route.EXPERIMENTAL)
+                    when(viewModel.login(userName, password)) {
+                        0 -> {
+                            navigationActions.popBackStack()
+                            navigationActions.navigate(Route.EXPERIMENTAL)
+                        }
+                        1 -> errorText = "用户不存在"
+                        2 -> errorText = "密码错误"
+                        3 -> errorText = "用户已禁用"
+                        4 -> errorText = "更新用户信息失败"
+                        else -> errorText = "未知错误"
                     }
                     loading = false
                 }
             }
         ) {
-            ButtonLoading(loading = loading)
-            Text(
-                text = stringResource(id = R.string.login),
-                fontSize = 20.sp,
-                letterSpacing = 16.sp
-            )
+            if (errorText != null) {
+                Text(
+                    text = errorText!!,
+                    fontSize = 20.sp
+                )
+            } else {
+                ButtonLoading(loading = loading)
+                Text(
+                    text = stringResource(id = R.string.login),
+                    fontSize = 20.sp,
+                    letterSpacing = 16.sp
+                )
+            }
         }
     }
 }
