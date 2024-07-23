@@ -440,6 +440,7 @@ class HomeViewModel @Inject constructor(
                         val xSpeed = dataStore.readData("xSpeed", 100L)
 
                         val rinse1 = rinseCleanVolume / 3
+                        lightYellow()
                         start {
                             timeOut = 1000L * 60L * 10
                             with(
@@ -503,6 +504,7 @@ class HomeViewModel @Inject constructor(
 
                         _waitTimeRinseNum.value += 1
                     }
+                    lightGreed()
                     _waitTimeRinseJob.value?.cancel()
                     _waitTimeRinseJob.value = null
                     waitTimeRinse()
@@ -2341,6 +2343,8 @@ class HomeViewModel @Inject constructor(
                 "HomeViewModel_startJob",
                 "===制胶前期准备数据开始==="
             )
+
+
             //01胶液总步数=制胶体积（mL）×1000×高低浓度平均校准因子（步/μL）
             //1.1   获取高低浓度的平均校准因子
             val p1jz = (AppStateUtils.hpc[1] ?: { x -> x * 100 }).invoke(1.0)
@@ -2351,6 +2355,10 @@ class HomeViewModel @Inject constructor(
                 "HomeViewModel_startJob",
                 "===获取高低浓度的平均校准因子===$highLowAvg"
             )
+
+            //3.0.2新增测试促凝剂预排增加5微升
+            val p1jz5 = (p1jz * 5).toLong()
+
             //1.2   胶液总步数
             val volumePulseCount = selected.volume * 1000 * highLowAvg
             logInfo(
@@ -2662,7 +2670,7 @@ class HomeViewModel @Inject constructor(
                 _complate.value = 0
 
                 coagulantStart.value =
-                    (coagulantExpectedPulse.toLong() + coagulantPulseCount.toLong()) * _stautsNum.value
+                    (coagulantExpectedPulse.toLong() + coagulantPulseCount.toLong() + p1jz5) * _stautsNum.value
                 logInfo(
                     "HomeViewModel_startJob",
                     "===已经运动${_stautsNum.value}次的柱塞泵步数===${coagulantStart.value}"
@@ -2762,7 +2770,7 @@ class HomeViewModel @Inject constructor(
                     "===柱塞泵剩余步数===$coagulantSy"
                 )
 
-                if (coagulantSy < coagulantExpectedPulse.toLong() + coagulantPulseCount.toLong()) {
+                if (coagulantSy < coagulantExpectedPulse.toLong() + coagulantPulseCount.toLong() + p1jz5) {
                     /**
                      * 柱塞泵剩余步数不够加液
                      */
@@ -2778,7 +2786,7 @@ class HomeViewModel @Inject constructor(
                      * 已经运动的柱塞泵步数
                      */
                     coagulantStart.value =
-                        (coagulantExpectedPulse.toLong() + coagulantPulseCount.toLong()) * _stautsNum.value
+                        (coagulantExpectedPulse.toLong() + coagulantPulseCount.toLong() + p1jz5) * _stautsNum.value
 
                 }
 
@@ -2894,7 +2902,7 @@ class HomeViewModel @Inject constructor(
 
 
                         coagulantStart.value =
-                            (coagulantExpectedPulse.toLong() + coagulantPulseCount.toLong()) * _stautsNum.value
+                            (coagulantExpectedPulse.toLong() + coagulantPulseCount.toLong() + p1jz5) * _stautsNum.value
 
                     }
 
@@ -2938,7 +2946,7 @@ class HomeViewModel @Inject constructor(
 
                     logInfo(
                         "HomeViewModel_startJob",
-                        "===柱塞泵的加液步数===${coagulantExpectedPulse.toLong()}====启动速度===$coagulantExpectedSpeed===结束速度===$coagulantExpectedSpeed"
+                        "===柱塞泵的加液步数===${coagulantExpectedPulse.toLong() + p1jz5}====启动速度===$coagulantExpectedSpeed===结束速度===$coagulantExpectedSpeed"
                     )
 
 
@@ -2958,7 +2966,7 @@ class HomeViewModel @Inject constructor(
                         timeOut = 1000L * 60 * 1
                         with(
                             index = 1,
-                            pdv = coagulantExpectedPulse.toLong(),
+                            pdv = coagulantExpectedPulse.toLong() + p1jz5,
                             ads = Triple(
                                 0L,
                                 (coagulantExpectedSpeed * 1193).toLong(),

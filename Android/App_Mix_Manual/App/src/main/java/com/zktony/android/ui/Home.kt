@@ -352,6 +352,9 @@ fun operate(
      */
     val resetError = remember { mutableStateOf(false) }
 
+    /**
+     * 制胶运动状态
+     */
     var scheduleState by remember { mutableStateOf("") }
 
 
@@ -392,6 +395,21 @@ fun operate(
     val modelsThickness = rememberDataSaverState(key = "modelsThickness", "G1520")
 
 
+    var dots by remember { mutableStateOf("") }
+
+
+    LaunchedEffect(uiFlags is UiFlags.Objects && uiFlags.objects == 101 || uiFlags is UiFlags.Objects && uiFlags.objects == 102 || uiFlags is UiFlags.Objects && uiFlags.objects == 103) {
+        while (uiFlags is UiFlags.Objects && uiFlags.objects == 101 || uiFlags is UiFlags.Objects && uiFlags.objects == 102 || uiFlags is UiFlags.Objects && uiFlags.objects == 103) {
+            delay(500) // 每500毫秒更新一次
+            dots = when (dots) {
+                "." -> ".."
+                ".." -> "..."
+                "..." -> "."
+                else -> "."
+            }
+        }
+    }
+
     /**
      * 同步LazyRow滑动
      */
@@ -415,12 +433,14 @@ fun operate(
 //    println("heartbeatErrorHome====$heartbeatErrorHome")
     if (uiFlags is UiFlags.Objects && uiFlags.objects == 4) {
         scheduleState = ""
+        dots = ""
         continueGlueDialog.value = true
         if (wasteprogress > 0.9) {
             wasteDialog.value = true
         }
     } else if (uiFlags is UiFlags.Objects && uiFlags.objects == 6) {
         scheduleState = ""
+        dots = ""
         expectedMakeNum.value = 0
         expectedMakeNum_ex = "0"
         uiEvent(HomeIntent.MotherVolZero)
@@ -452,7 +472,7 @@ fun operate(
         Text(
             modifier = Modifier.padding(start = 48.92.dp, top = 21.4.dp),
             text = "母液设置",
-            fontSize = 20.sp,
+            fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
             color = Color(
                 0,
@@ -584,7 +604,7 @@ fun operate(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = program.displayText,
-                        fontSize = 20.sp,
+                        fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(
                             0,
@@ -606,23 +626,23 @@ fun operate(
                 Text(
                     modifier = Modifier.padding(top = 14.dp),
                     text = "浓 度:" + program.startRange + "%~" + program.endRange + "%",
-                    fontSize = 18.sp
+                    fontSize = 20.sp
                 )
                 Text(
                     modifier = Modifier.padding(top = 14.dp),
                     text = "厚 度:" + program.thickness + "mm",
-                    fontSize = 18.sp
+                    fontSize = 20.sp
                 )
 
                 Text(
                     modifier = Modifier.padding(top = 14.dp),
                     text = "胶液体积:" + program.volume + "mL",
-                    fontSize = 18.sp
+                    fontSize = 20.sp
                 )
                 Text(
                     modifier = Modifier.padding(top = 14.dp),
                     text = "促凝剂体积:" + program.coagulant + "μL",
-                    fontSize = 18.sp
+                    fontSize = 20.sp
                 )
 
             }
@@ -630,7 +650,7 @@ fun operate(
             Column(modifier = Modifier.padding(start = 120.dp)) {
                 Text(
                     text = "制胶数量",
-                    fontSize = 20.sp,
+                    fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(
                         0,
@@ -641,7 +661,7 @@ fun operate(
 
                 Text(
                     modifier = Modifier.padding(top = 21.2.dp),
-                    fontSize = 18.sp,
+                    fontSize = 20.sp,
                     text = "预计制胶数量"
                 )
                 Row(
@@ -782,7 +802,7 @@ fun operate(
                 }
                 Text(
                     modifier = Modifier.padding(top = 14.0.dp),
-                    fontSize = 18.sp,
+                    fontSize = 20.sp,
                     text = "已制胶数量:$complate"
                 )
             }
@@ -801,7 +821,7 @@ fun operate(
             Text(
                 modifier = Modifier.padding(start = 48.92.dp, top = 21.4.dp),
                 text = "制胶进度",
-                fontSize = 20.sp,
+                fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(
                     0,
@@ -813,8 +833,8 @@ fun operate(
             Text(
                 modifier = Modifier.padding(start = 160.dp, top = 21.4.dp),
 //                text = if (job == null) "" else "",
-                text = scheduleState,
-//                fontSize = 20.sp,
+                text = scheduleState + dots,
+                fontSize = 20.sp,
 //                fontWeight = FontWeight.Bold,
                 color = Color(
                     18, 95, 202
