@@ -22,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.zktony.android.ui.ExperimentalView
@@ -60,6 +62,7 @@ import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.zktyBrush
 import com.zktony.android.utils.AuthUtils
+import com.zktony.android.utils.SnackbarUtils
 import kotlinx.coroutines.launch
 
 @Composable
@@ -68,6 +71,13 @@ fun AppNavigation() {
     val navigationActions = LocalNavigationActions.current
     val snackbarHostState = LocalSnackbarHostState.current
     val selectedDestination = navigationActions.selectDestination()
+    val snackbar by SnackbarUtils.snackbar.collectAsStateWithLifecycle()
+    LaunchedEffect(key1 = snackbar) {
+        snackbar?.let {
+            snackbarHostState.showSnackbar(it)
+            SnackbarUtils.clearSnackbar()
+        }
+    }
 
     Row(
         modifier = Modifier

@@ -57,4 +57,7 @@
     <string name="t200">快速染色仪</string>
     <string name="user_management">用户管理</string>
     <string name="user_operation_log">操作日志</string>
+    <string name="accessory_life">配件寿命</string>
+    <string name="maintenance_record">维护记录</string>
+    <string name="error_log">故障日志</string>
 </resources>

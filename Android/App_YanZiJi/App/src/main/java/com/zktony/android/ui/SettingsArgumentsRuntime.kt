@@ -305,6 +305,7 @@ fun TransferRuntimeArgumentsView(
 
         Button(
             modifier = Modifier.width(120.dp),
+            enabled = !loading,
             onClick = {
                 scope.launch {
                     loading = true
@@ -324,11 +325,12 @@ fun TransferRuntimeArgumentsView(
                     loading = false
                 }
             }) {
-            ButtonLoading(loading = loading)
-            Text(
-                text = stringResource(id = R.string.set),
-                style = MaterialTheme.typography.bodyLarge
-            )
+            ButtonLoading(loading = loading) {
+                Text(
+                    text = stringResource(id = R.string.set),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
         }
     }
 }
@@ -486,6 +488,7 @@ fun CleanRuntimeArgumentsView(
 
         Button(
             modifier = Modifier.width(120.dp),
+            enabled = !loading,
             onClick = {
                 scope.launch {
                     loading = true
@@ -505,11 +508,12 @@ fun CleanRuntimeArgumentsView(
                     loading = false
                 }
             }) {
-            ButtonLoading(loading = loading)
-            Text(
-                text = stringResource(id = R.string.set),
-                style = MaterialTheme.typography.bodyLarge
-            )
+            ButtonLoading(loading = loading) {
+                Text(
+                    text = stringResource(id = R.string.set),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
         }
     }
 }

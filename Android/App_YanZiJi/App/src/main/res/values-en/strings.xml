@@ -56,4 +56,7 @@
     <string name="t200">Rapid staining instrument</string>
     <string name="user_management">User Management</string>
     <string name="user_operation_log">Operation Log</string>
+    <string name="accessory_life">Accessory Life</string>
+    <string name="maintenance_record">Maintenance Record</string>
+    <string name="error_log">Error Log</string>
 </resources>

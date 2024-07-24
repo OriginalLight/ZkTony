@@ -141,15 +141,18 @@ fun PipelineDebugListView(
                 ) {
                     selected = it
                 }
-                Button(onClick = {
-                    scope.launch {
-                        loading = true
-                        viewModel.pipelineFill(channel, selected)
-                        loading = false
+                Button(
+                    enabled = !loading,
+                    onClick = {
+                        scope.launch {
+                            loading = true
+                            viewModel.pipelineFill(channel, selected)
+                            loading = false
+                        }
+                    }) {
+                    ButtonLoading(loading = loading) {
+                        Text(text = "开始", letterSpacing = 10.sp)
                     }
-                }) {
-                    ButtonLoading(loading = loading)
-                    Text(text = "开始", letterSpacing = 10.sp)
                 }
             }
         }
@@ -165,15 +168,18 @@ fun PipelineDebugListView(
                 ) {
                     selected = it
                 }
-                Button(onClick = {
-                    scope.launch {
-                        loading = true
-                        viewModel.pipelineDrain(channel, selected)
-                        loading = false
+                Button(
+                    enabled = !loading,
+                    onClick = {
+                        scope.launch {
+                            loading = true
+                            viewModel.pipelineDrain(channel, selected)
+                            loading = false
+                        }
+                    }) {
+                    ButtonLoading(loading = loading) {
+                        Text(text = "开始", letterSpacing = 10.sp)
                     }
-                }) {
-                    ButtonLoading(loading = loading)
-                    Text(text = "开始", letterSpacing = 10.sp)
                 }
             }
         }
@@ -204,15 +210,18 @@ fun PipelineDebugListView(
                     time = it
                 }
 
-                Button(onClick = {
-                    scope.launch {
-                        loading = true
-                        viewModel.pipelineClean(channel, PipelineControl(speed, time))
-                        loading = false
+                Button(
+                    enabled = !loading,
+                    onClick = {
+                        scope.launch {
+                            loading = true
+                            viewModel.pipelineClean(channel, PipelineControl(speed, time))
+                            loading = false
+                        }
+                    }) {
+                    ButtonLoading(loading = loading) {
+                        Text(text = "开始", letterSpacing = 10.sp)
                     }
-                }) {
-                    ButtonLoading(loading = loading)
-                    Text(text = "开始", letterSpacing = 10.sp)
                 }
             }
         }

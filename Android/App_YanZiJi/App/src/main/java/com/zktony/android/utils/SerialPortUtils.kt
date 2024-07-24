@@ -22,6 +22,7 @@ import com.zktony.serialport.ext.toHexString
 import com.zktony.serialport.lifecycle.SerialStoreUtils
 import com.zktony.serialport.serialPortOf
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeout
 
 object SerialPortUtils {
@@ -141,17 +142,47 @@ object SerialPortUtils {
         return ba
     }
 
+    // 写入同时暂停轮询
+    private suspend fun writeAndPausePolling(
+        target: Int,
+        key: String,
+        func: Byte,
+        byteArray: ByteArray = byteArrayOf(),
+        timeOut: Long = 1000
+    ): Boolean {
+        AppStateUtils.isPolling.withLock {
+            delay(100L)
+            val result = write(target, key, func, byteArray, timeOut)
+            return result
+        }
+    }
+
+    // 查询同时暂停轮询
+    private suspend fun queryAndPausePolling(
+        target: Int,
+        key: String,
+        func: Byte,
+        byteArray: ByteArray = byteArrayOf(),
+        timeOut: Long = 1000
+    ): ByteArray? {
+        AppStateUtils.isPolling.withLock {
+            delay(100L)
+            val result = query(target, key, func, byteArray, timeOut)
+            return result
+        }
+    }
+
     // 设置电磁阀参数
     suspend fun setSolenoidValveArguments(target: Int, value: Int): Boolean {
         val byteArray = byteArrayOf(0x00, value.toByte())
-        return write(target, "SetSolenoidValveArguments", 0x05.toByte(), byteArray)
+        return writeAndPausePolling(target, "SetSolenoidValveArguments", 0x05.toByte(), byteArray)
     }
 
     // 设置参数
     suspend fun setArguments(target: Int, args: Arguments): Boolean {
         try {
             val byteArray = args.toByteArray()
-            return write(target, "SetArguments", 0x12.toByte(), byteArray)
+            return writeAndPausePolling(target, "SetArguments", 0x12.toByte(), byteArray)
         } catch (e: Exception) {
             LogUtils.error("SetArguments", e.stackTraceToString(), true)
             return false
@@ -162,7 +193,7 @@ object SerialPortUtils {
     suspend fun setExperimentalArguments(target: Int, control: ExperimentalControl): Boolean {
         try {
             val byteArray = control.toByteArray()
-            return write(
+            return writeAndPausePolling(
                 target,
                 "SetExperimentalArguments",
                 0x13.toByte(),
@@ -178,7 +209,7 @@ object SerialPortUtils {
     suspend fun setExperimentalState(target: Int, state: Int): Boolean {
         try {
             val byteArray = byteArrayOf(state.toByte())
-            return write(
+            return writeAndPausePolling(
                 target,
                 "SetExperimentalState",
                 0x14.toByte(),
@@ -194,7 +225,7 @@ object SerialPortUtils {
     suspend fun pipelineClean(target: Int, control: PipelineControl): Boolean {
         try {
             val byteArray = control.toByteArray()
-            return write(
+            return writeAndPausePolling(
                 target,
                 "PipelineClear",
                 0x15.toByte(),
@@ -210,7 +241,7 @@ object SerialPortUtils {
     suspend fun pipelineFill(target: Int, value: Int): Boolean {
         try {
             val byteArray = byteArrayOf(value.toByte())
-            return write(
+            return writeAndPausePolling(
                 target,
                 "PipelineFill",
                 0x21.toByte(),
@@ -226,7 +257,7 @@ object SerialPortUtils {
     suspend fun pipelineDrain(target: Int, value: Int): Boolean {
         try {
             val byteArray = byteArrayOf(value.toByte())
-            return write(
+            return writeAndPausePolling(
                 target,
                 "PipelineDrain",
                 0x22.toByte(),
@@ -242,7 +273,7 @@ object SerialPortUtils {
     suspend fun startPump(target: Int, control: PumpControl): Boolean {
         try {
             val byteArray = control.toByteArray()
-            return write(
+            return writeAndPausePolling(
                 target,
                 "StartPump",
                 0x23.toByte(),
@@ -258,7 +289,7 @@ object SerialPortUtils {
     suspend fun stopPump(target: Int, value: Int): Boolean {
         try {
             val byteArray = byteArrayOf(value.toByte())
-            return write(
+            return writeAndPausePolling(
                 target,
                 "StopPump",
                 0x24.toByte(),
@@ -274,7 +305,7 @@ object SerialPortUtils {
     suspend fun startVoltage(target: Int, control: VoltageControl): Boolean {
         try {
             val byteArray = control.toByteArray()
-            return write(
+            return writeAndPausePolling(
                 target,
                 "StartVoltage",
                 0x25.toByte(),
@@ -289,7 +320,7 @@ object SerialPortUtils {
     // 电极控制
     suspend fun stopVoltage(target: Int): Boolean {
         try {
-            return write(
+            return writeAndPausePolling(
                 target,
                 "StopVoltage",
                 0x26.toByte(),
@@ -305,7 +336,7 @@ object SerialPortUtils {
     suspend fun setTransferArguments(target: Int, args: ArgumentsTransfer): Boolean {
         try {
             val byteArray = args.toByteArray()
-            return write(target, "SetTransferArguments", 0x29.toByte(), byteArray)
+            return writeAndPausePolling(target, "SetTransferArguments", 0x29.toByte(), byteArray)
         } catch (e: Exception) {
             LogUtils.error("SetTransferArguments", e.stackTraceToString(), true)
             return false
@@ -316,7 +347,7 @@ object SerialPortUtils {
     suspend fun setCleanArguments(target: Int, args: ArgumentsClean): Boolean {
         try {
             val byteArray = args.toByteArray()
-            return write(target, "SetCleanArguments", 0x2A.toByte(), byteArray)
+            return writeAndPausePolling(target, "SetCleanArguments", 0x2A.toByte(), byteArray)
         } catch (e: Exception) {
             LogUtils.error("SetCleanArguments", e.stackTraceToString(), true)
             return false
@@ -327,7 +358,7 @@ object SerialPortUtils {
     suspend fun setTemperatureArguments(target: Int, args: ArgumentsTemperature): Boolean {
         try {
             val byteArray = args.toByteArray()
-            return write(target, "SetTemperatureArguments", 0x2B.toByte(), byteArray)
+            return writeAndPausePolling(target, "SetTemperatureArguments", 0x2B.toByte(), byteArray)
         } catch (e: Exception) {
             LogUtils.error("SetTemperatureArguments", e.stackTraceToString(), true)
             return false
@@ -338,7 +369,7 @@ object SerialPortUtils {
     suspend fun setSpeedArguments(target: Int, args: ArgumentsSpeed): Boolean {
         try {
             val byteArray = args.toByteArray()
-            return write(target, "SetSpeedArguments", 0x2C.toByte(), byteArray)
+            return writeAndPausePolling(target, "SetSpeedArguments", 0x2C.toByte(), byteArray)
         } catch (e: Exception) {
             LogUtils.error("SetSpeedArguments", e.stackTraceToString(), true)
             return false
@@ -349,7 +380,7 @@ object SerialPortUtils {
     suspend fun setVoltageArguments(target: Int, args: ArgumentsVoltage): Boolean {
         try {
             val byteArray = args.toByteArray()
-            return write(target, "SetVoltageArguments", 0x2D.toByte(), byteArray)
+            return writeAndPausePolling(target, "SetVoltageArguments", 0x2D.toByte(), byteArray)
         } catch (e: Exception) {
             LogUtils.error("SetVoltageArguments", e.stackTraceToString(), true)
             return false
@@ -360,7 +391,7 @@ object SerialPortUtils {
     suspend fun setCurrentArguments(target: Int, args: ArgumentsCurrent): Boolean {
         try {
             val byteArray = args.toByteArray()
-            return write(target, "SetCurrentArguments", 0x2E.toByte(), byteArray)
+            return writeAndPausePolling(target, "SetCurrentArguments", 0x2E.toByte(), byteArray)
         } catch (e: Exception) {
             LogUtils.error("SetCurrentArguments", e.stackTraceToString(), true)
             return false
@@ -371,7 +402,7 @@ object SerialPortUtils {
     suspend fun setSensorArguments(target: Int, args: ArgumentsBubble): Boolean {
         try {
             val byteArray = args.toByteArray()
-            return write(target, "SetSensorArguments", 0x2F.toByte(), byteArray)
+            return writeAndPausePolling(target, "SetSensorArguments", 0x2F.toByte(), byteArray)
         } catch (e: Exception) {
             LogUtils.error("SetSensorArguments", e.stackTraceToString(), true)
             return false
@@ -382,7 +413,7 @@ object SerialPortUtils {
     suspend fun setProductNumber(target: Int, pn: String): Boolean {
         try {
             val byteArray = pn.ascii2ByteArray(true)
-            return write(target, "SetProductNumber", 0x30.toByte(), byteArray)
+            return writeAndPausePolling(target, "SetProductNumber", 0x30.toByte(), byteArray)
         } catch (e: Exception) {
             LogUtils.error("SetProductNumber", e.stackTraceToString(), true)
             return false
@@ -393,7 +424,7 @@ object SerialPortUtils {
     suspend fun setSerialNumber(target: Int, sn: String): Boolean {
         try {
             val byteArray = sn.ascii2ByteArray(true)
-            return write(target, "SetSerialNumber", 0x31.toByte(), byteArray)
+            return writeAndPausePolling(target, "SetSerialNumber", 0x31.toByte(), byteArray)
         } catch (e: Exception) {
             LogUtils.error("SetSerialNumber", e.stackTraceToString(), true)
             return false
@@ -403,7 +434,7 @@ object SerialPortUtils {
     // 查询 ChannelState
     suspend fun queryChannelState(target: Int): Boolean {
         try {
-            val ba = query(target, "QueryChannelState", 0x40.toByte(), byteArrayOf(), 200)
+            val ba = query(target, "QueryChannelState", 0x40.toByte(), byteArrayOf(), 100)
             if (ba != null) {
                 toChannelState(ba)?.let { channelState ->
                     AppStateUtils.setChannelStateList(AppStateUtils.channelStateList.value.mapIndexed { index, state ->
@@ -427,7 +458,7 @@ object SerialPortUtils {
     // 查询Arguments
     suspend fun queryArguments(target: Int): Boolean {
         try {
-            val ba = query(target, "QueryArguments", 0x41.toByte(), byteArrayOf(), 1000)
+            val ba = queryAndPausePolling(target, "QueryArguments", 0x41.toByte(), byteArrayOf(), 1000)
             if (ba != null) {
                 toArguments(ba)?.let { arguments ->
                     AppStateUtils.setArgumentsList(AppStateUtils.argumentsList.value.mapIndexed { index, arg ->

@@ -121,15 +121,18 @@ fun SettingsArgumentsTopBar(
                 Text(text = stringResource(id = R.string.one_click_import))
             }
 
-            Button(onClick = {
-                scope.launch {
-                    loadingExport = true
-                    viewModel.exportArguments()
-                    loadingExport = false
+            Button(
+                enabled = !loadingExport,
+                onClick = {
+                    scope.launch {
+                        loadingExport = true
+                        viewModel.exportArguments()
+                        loadingExport = false
+                    }
+                }) {
+                ButtonLoading(loading = loadingExport) {
+                    Text(text = stringResource(id = R.string.one_click_export))
                 }
-            }) {
-                ButtonLoading(loading = loadingExport)
-                Text(text = stringResource(id = R.string.one_click_export))
             }
         }
     }

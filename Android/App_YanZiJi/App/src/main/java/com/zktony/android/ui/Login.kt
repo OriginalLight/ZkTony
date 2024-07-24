@@ -166,7 +166,7 @@ fun LoginForm(
 
         Button(
             modifier = Modifier.width(450.dp),
-            enabled = userName.isNotEmpty() && password.isNotEmpty(),
+            enabled = userName.isNotEmpty() && password.isNotEmpty() && !loading,
             colors = ButtonDefaults.buttonColors(
                 containerColor = if (errorText != null) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
                 contentColor = if (errorText != null) MaterialTheme.colorScheme.onError else MaterialTheme.colorScheme.onPrimary
@@ -174,11 +174,12 @@ fun LoginForm(
             onClick = {
                 scope.launch {
                     loading = true
-                    when(viewModel.login(userName, password)) {
+                    when (viewModel.login(userName, password)) {
                         0 -> {
                             navigationActions.popBackStack()
                             navigationActions.navigate(Route.EXPERIMENTAL)
                         }
+
                         1 -> errorText = "用户不存在"
                         2 -> errorText = "密码错误"
                         3 -> errorText = "用户已禁用"
@@ -195,12 +196,12 @@ fun LoginForm(
                     fontSize = 20.sp
                 )
             } else {
-                ButtonLoading(loading = loading)
-                Text(
-                    text = stringResource(id = R.string.login),
-                    fontSize = 20.sp,
-                    letterSpacing = 16.sp
-                )
+                ButtonLoading(loading = loading, size = 20.dp) {
+                    Text(
+                        text = stringResource(id = R.string.login),
+                        fontSize = 20.sp
+                    )
+                }
             }
         }
     }

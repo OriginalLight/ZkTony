@@ -32,33 +32,56 @@ class UserRepository @Inject constructor(
      *
      * @param username Username.
      * @param password Password.
-     * @return user if success, 001 if user not found, 002 if password incorrect，003 if user disabled, 004 if update failed.
+     * @return user if success, 1 if user not found, 2 if password incorrect，3 if user disabled, 4 if update failed.
      */
     suspend fun login(username: String, password: String): Result<User> {
-        val user = userDao.getByName(username) ?: return Result.failure(Exception("001"))
+        val user = userDao.getByName(username) ?: return Result.failure(Exception("1"))
         val digest = MessageDigest.getInstance("SHA-256")
         val hash = digest.digest(password.toByteArray())
         val passwordHash = hash.fold("") { str, it -> str + "%02x".format(it) }
-        if (user.password != passwordHash) return Result.failure(Exception("002"))
-        if (!user.enable) return Result.failure(Exception("003"))
+        if (user.password != passwordHash) return Result.failure(Exception("2"))
+        if (!user.enable) return Result.failure(Exception("3"))
         val updateUser = user.copy(lastLoginTime = Date(System.currentTimeMillis()))
         val effect = userDao.update(updateUser)
-        if (effect == 0) return Result.failure(Exception("004"))
+        if (effect == 0) return Result.failure(Exception("4"))
         return Result.success(updateUser)
     }
 
     /**
-     * Register.
+     * Add.
      *
      * @param user User.
-     * @return user with id if success, 001 if user exists. 002 if failed.
+     * @return user with id if success, 1 if user exists. 2 if failed.
      */
-    suspend fun register(user: User): Result<User> {
-        userDao.getByName(user.name)?.let { return Result.failure(Exception("001")) }
+    suspend fun insert(user: User): Result<User> {
+        userDao.getByName(user.name)?.let { return Result.failure(Exception("1")) }
         val digest = MessageDigest.getInstance("SHA-256")
         val hash = digest.digest(user.password.toByteArray())
         val passwordHash = hash.fold("") { str, it -> str + "%02x".format(it) }
         val id = userDao.insert(user.copy(password = passwordHash))
-        return if (id > 0)  Result.success(user.copy(id = id)) else Result.failure(Exception("002"))
+        return if (id > 0)  Result.success(user.copy(id = id)) else Result.failure(Exception("2"))
+    }
+
+    /**
+     * Update.
+     *
+     * @param user User.
+     * @return user if success, 1 if user not found, 2 if failed.
+     */
+    suspend fun update(user: User): Result<User> {
+        userDao.getById(user.id)?.let { return Result.failure(Exception("1")) }
+        val effect = userDao.update(user)
+        return if (effect > 0) Result.success(user) else Result.failure(Exception("2"))
+    }
+
+    /**
+     * Delete.
+     *
+     * @param users List<User>.
+     * @return List<Long> if success, 1 if failed.
+     */
+    suspend fun delete(users: List<User>): Result<List<Long>> {
+        val effect = userDao.deleteAll(users)
+        return if (effect > 0) Result.success(users.map { it.id }) else Result.failure(Exception("1"))
     }
 }

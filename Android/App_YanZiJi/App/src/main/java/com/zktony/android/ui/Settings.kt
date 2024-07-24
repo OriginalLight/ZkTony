@@ -32,7 +32,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -84,9 +83,9 @@ fun SettingsView(viewModel: SettingsViewModel = hiltViewModel()) {
         }
 
         item {
-           RequirePermission(role = Role.CUSTOMER_SERVICE) {
-               FactorySettingsView()
-           }
+            RequirePermission(role = Role.CUSTOMER_SERVICE) {
+                FactorySettingsView()
+            }
         }
     }
 }
@@ -123,9 +122,18 @@ fun UserSettingsView(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    Text(text = it.name, style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Normal))
-                    Text(text = it.role, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Light))
-                    Text(text = it.lastLoginTime.dateFormat("yyyy-MM-dd HH:mm"), style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Light))
+                    Text(
+                        text = it.name,
+                        style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Normal)
+                    )
+                    Text(
+                        text = it.role,
+                        style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Light)
+                    )
+                    Text(
+                        text = it.lastLoginTime.dateFormat("yyyy-MM-dd HH:mm"),
+                        style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Light)
+                    )
 
                 }
 
@@ -140,7 +148,7 @@ fun UserSettingsView(
             SettingsRow(
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.small)
-                    .clickable { navigationActions.navigate(Route.SETTINGS_DEBUG) },
+                    .clickable {  },
                 title = stringResource(id = R.string.user_management)
             ) {
                 Icon(
@@ -153,7 +161,7 @@ fun UserSettingsView(
             SettingsRow(
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.small)
-                    .clickable { navigationActions.navigate(Route.SETTINGS_DEBUG) },
+                    .clickable {  },
                 title = stringResource(id = R.string.user_operation_log)
             ) {
                 Icon(
@@ -301,6 +309,45 @@ fun SystemSettingsView(
                     }
                 }
             })
+        }
+
+        // 配件寿命
+        SettingsRow(
+            modifier = Modifier
+                .clip(MaterialTheme.shapes.small)
+                .clickable {  },
+            title = stringResource(id = R.string.accessory_life)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
+                contentDescription = "ArrowForwardIos"
+            )
+        }
+
+        // 维护记录
+        SettingsRow(
+            modifier = Modifier
+                .clip(MaterialTheme.shapes.small)
+                .clickable {  },
+            title = stringResource(id = R.string.maintenance_record)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
+                contentDescription = "ArrowForwardIos"
+            )
+        }
+
+        // 故障日志
+        SettingsRow(
+            modifier = Modifier
+                .clip(MaterialTheme.shapes.small)
+                .clickable {  },
+            title = stringResource(id = R.string.error_log)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
+                contentDescription = "ArrowForwardIos"
+            )
         }
 
         // 系统时间

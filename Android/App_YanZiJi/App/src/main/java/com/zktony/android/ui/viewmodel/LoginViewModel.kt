@@ -3,7 +3,6 @@ package com.zktony.android.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.utils.AuthUtils
-import com.zktony.android.utils.SnackbarUtils
 import com.zktony.log.LogUtils
 import com.zktony.room.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,13 +30,7 @@ class LoginViewModel @Inject constructor(
                 AuthUtils.login(res.getOrNull()!!)
                 return 0
             } else {
-                return when (res.exceptionOrNull()?.message) {
-                    "001" -> 1
-                    "002" -> 2
-                    "003" -> 3
-                    "004" -> 4
-                    else -> -1
-                }
+                return res.exceptionOrNull()?.message?.toIntOrNull() ?: -1
             }
         } catch (e: Exception) {
             LogUtils.error("LoginViewModel", e.stackTraceToString(), true)

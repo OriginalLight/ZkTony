@@ -239,6 +239,7 @@ fun ExperimentalDebugListView(
                         var loadingStart by remember { mutableStateOf(false) }
                         var loadingStop by remember { mutableStateOf(false) }
                         Button(
+                            enabled = !loadingStart,
                             onClick = {
                                 scope.launch {
                                     loadingStart = true
@@ -259,11 +260,13 @@ fun ExperimentalDebugListView(
                                 }
                             }
                         ) {
-                            ButtonLoading(loading = loadingStart)
-                            Text(text = "开始实验")
+                            ButtonLoading(loading = loadingStart) {
+                                Text(text = "开始实验", style = MaterialTheme.typography.bodyLarge)
+                            }
                         }
 
                         OutlinedButton(
+                            enabled = !loadingStop,
                             onClick = {
                                 scope.launch {
                                     loadingStop = true
@@ -272,8 +275,29 @@ fun ExperimentalDebugListView(
                                 }
                             }
                         ) {
-                            ButtonLoading(loading = loadingStop)
-                            Text(text = "停止实验")
+                            ButtonLoading(loading = loadingStop) {
+                                Text(text = "停止实验", style = MaterialTheme.typography.bodyLarge)
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 数据导出
+            item {
+                SettingsRow(title = "数据导出") {
+                    var loading by remember { mutableStateOf(false) }
+                    Button(
+                        enabled = !loading,
+                        onClick = {
+                            scope.launch {
+                                loading = true
+                                viewModel.exportCollecting()
+                                loading = false
+                            }
+                        }) {
+                        ButtonLoading(loading = loading) {
+                            Text(text = "导出", style = MaterialTheme.typography.bodyLarge)
                         }
                     }
                 }
@@ -296,6 +320,7 @@ fun ExperimentalDebugListView(
                         ) {
                             speed1 = it
                         }
+
                         ArgumentsInputField(
                             modifier = Modifier
                                 .width(350.dp)
@@ -307,15 +332,18 @@ fun ExperimentalDebugListView(
                             time1 = it
                         }
 
-                        Button(onClick = {
-                            scope.launch {
-                                loading = true
-                                viewModel.pipelineClean(channel, PipelineControl(speed1, time1))
-                                loading = false
+                        Button(
+                            enabled = !loading,
+                            onClick = {
+                                scope.launch {
+                                    loading = true
+                                    viewModel.pipelineClean(channel, PipelineControl(speed1, time1))
+                                    loading = false
+                                }
+                            }) {
+                            ButtonLoading(loading = loading) {
+                                Text(text = "开始", style = MaterialTheme.typography.bodyLarge)
                             }
-                        }) {
-                            ButtonLoading(loading = loading)
-                            Text(text = "开始", letterSpacing = 10.sp)
                         }
                     }
                 }

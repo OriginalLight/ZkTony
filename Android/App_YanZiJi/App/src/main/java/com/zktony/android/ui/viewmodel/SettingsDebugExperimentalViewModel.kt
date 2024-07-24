@@ -1,16 +1,30 @@
 package com.zktony.android.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.zktony.android.data.ExperimentalControl
 import com.zktony.android.data.PipelineControl
 import com.zktony.android.ui.components.Tips
+import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.SerialPortUtils
+import com.zktony.android.utils.StorageUtils
 import com.zktony.android.utils.TipsUtils
+import com.zktony.android.utils.extra.dateFormat
+import com.zktony.android.utils.extra.timeFormat
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import java.io.File
+import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingsDebugExperimentalViewModel @Inject constructor() : ViewModel() {
+
+    // 数据采集任务列表
+    private val collectingJobList: MutableList<Job?> = MutableList(4) { null }
 
     suspend fun pipelineClean(channel: Int, control: PipelineControl): Boolean {
         if (!SerialPortUtils.pipelineClean(channel, control)
@@ -24,6 +38,7 @@ class SettingsDebugExperimentalViewModel @Inject constructor() : ViewModel() {
     }
 
     suspend fun startExperiment(channel: Int, experimental: ExperimentalControl): Boolean {
+        startCollecting(channel)
         if (!SerialPortUtils.setExperimentalArguments(channel, experimental)) {
             TipsUtils.showTips(Tips.error("实验参数设置失败 通道：${channel + 1}"))
             return false
@@ -41,6 +56,7 @@ class SettingsDebugExperimentalViewModel @Inject constructor() : ViewModel() {
     }
 
     suspend fun stopExperiment(channel: Int): Boolean {
+        stopCollecting(channel)
         if (!SerialPortUtils.setExperimentalState(channel, 3)) {
             TipsUtils.showTips(Tips.error("实验停止失败 通道：${channel + 1}"))
             return false
@@ -48,5 +64,64 @@ class SettingsDebugExperimentalViewModel @Inject constructor() : ViewModel() {
             TipsUtils.showTips(Tips.info("实验停止成功 通道：${channel + 1}"))
             return true
         }
+    }
+
+    private fun startCollecting(channel: Int)  {
+        collectingJobList[channel]?.cancel()
+        collectingJobList[channel] = viewModelScope.launch {
+            val dir = StorageUtils.getCacheDir() + "/experimental"
+            if (!File(dir).exists()) {
+                File(dir).mkdirs()
+            }
+            val files = File("$dir/channel$channel ${Date(System.currentTimeMillis()).dateFormat("yyyyMMddHHmmss")}.txt")
+            if (!files.exists()) {
+                files.createNewFile()
+            }
+            while (true) {
+                val state = AppStateUtils.channelStateList.value[channel]
+                if (state.timing > 0) {
+                    var content = ""
+                    content += "${state.voltage},${state.current},${state.power},${state.temperature},${state.timing}\n"
+                    files.appendText(content)
+                }
+                delay(1000L)
+            }
+        }
+    }
+
+    private fun stopCollecting(channel: Int) {
+        collectingJobList[channel]?.cancel()
+    }
+
+    fun exportCollecting() {
+        val usb = StorageUtils.getUsbStorageDir()
+        if (usb.isEmpty()) {
+            TipsUtils.showTips(Tips.error("未检测到U盘"))
+            return
+        }
+
+        val srcDir = StorageUtils.getCacheDir() + "/experimental"
+        if (!File(srcDir).exists()) {
+            TipsUtils.showTips(Tips.error("未检测到实验数据"))
+            return
+        }
+
+        val srcFiles = File(srcDir).listFiles()
+        if (srcFiles.isNullOrEmpty()) {
+            TipsUtils.showTips(Tips.error("未检测到实验数据"))
+            return
+        }
+
+        val dstDir = usb.first() + "/experimental"
+        if (!File(dstDir).exists()) {
+            File(dstDir).mkdirs()
+        }
+
+        srcFiles.forEach { file ->
+            file.copyTo(File(dstDir + "/" + file.name), true)
+            file.delete()
+        }
+
+        TipsUtils.showTips(Tips.info("导出成功"))
     }
 }

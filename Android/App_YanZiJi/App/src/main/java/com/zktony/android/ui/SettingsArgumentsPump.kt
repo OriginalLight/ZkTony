@@ -250,6 +250,7 @@ fun PumpControlView(
 
         Button(
             modifier = Modifier.width(120.dp),
+            enabled = !loadingStart,
             onClick = {
                 scope.launch {
                     loadingStart = true
@@ -267,12 +268,15 @@ fun PumpControlView(
                 }
             }
         ) {
-            ButtonLoading(loading = loadingStart)
-            Text(text = "开始", style = MaterialTheme.typography.bodyLarge)
+            ButtonLoading(loading = loadingStart) {
+                Text(text = "开始", style = MaterialTheme.typography.bodyLarge)
+            }
+
         }
 
         OutlinedButton(
             modifier = Modifier.width(120.dp),
+            enabled = !loadingStop,
             onClick = {
                 scope.launch {
                     loadingStop = true
@@ -284,8 +288,9 @@ fun PumpControlView(
                 }
             }
         ) {
-            ButtonLoading(loading = loadingStop)
-            Text(text = "停止", style = MaterialTheme.typography.bodyLarge)
+            ButtonLoading(loading = loadingStop) {
+                Text(text = "停止", style = MaterialTheme.typography.bodyLarge)
+            }
         }
     }
 }
@@ -300,46 +305,10 @@ fun InPumpCalibrationView(
 ) {
     val scope = rememberCoroutineScope()
     var loading by remember { mutableStateOf(false) }
-    var s50 by remember(
+    var speedComp by remember(
         channel,
         arguments
-    ) { mutableStateOf(arguments[channel].inSpeedComp[0]) }
-    var s100 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].inSpeedComp[1]) }
-    var s150 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].inSpeedComp[2]) }
-    var s200 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].inSpeedComp[3]) }
-    var s250 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].inSpeedComp[4]) }
-    var s300 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].inSpeedComp[5]) }
-    var s350 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].inSpeedComp[6]) }
-    var s400 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].inSpeedComp[7]) }
-    var s450 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].inSpeedComp[8]) }
-    var s500 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].inSpeedComp[9]) }
+    ) { mutableStateOf(arguments[channel].inSpeedComp) }
 
     Row(
         modifier = modifier
@@ -355,116 +324,41 @@ fun InPumpCalibrationView(
         Text(text = "进液泵校准", fontSize = 20.sp)
 
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "50",
-                    suffix = "mL",
-                    value = s50
-                ) {
-                    s50 = it
-                }
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "150",
-                    suffix = "mL",
-                    value = s150
-                ) {
-                    s150 = it
-                }
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "250",
-                    suffix = "mL",
-                    value = s250
-                ) {
-                    s250 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "350",
-                    suffix = "mL",
-                    value = s350
-                ) {
-                    s350 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "450",
-                    suffix = "mL",
-                    value = s450
-                ) {
-                    s450 = it
-                }
-            }
-
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "100",
-                    suffix = "mL",
-                    value = s100
-                ) {
-                    s100 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "200",
-                    suffix = "mL",
-                    value = s200
-                ) {
-                    s200 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "300",
-                    suffix = "mL",
-                    value = s300
-                ) {
-                    s300 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "400",
-                    suffix = "mL",
-                    value = s400
-                ) {
-                    s400 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "500",
-                    suffix = "mL",
-                    value = s500
-                ) {
-                    s500 = it
+            for (list in listOf(listOf(1, 3, 5, 7, 9), listOf(2, 4, 6, 8, 10))) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    for (i in list) {
+                        ArgumentsInputField(
+                            modifier = Modifier.size(350.dp, 48.dp),
+                            prefix = "${i * 50}",
+                            suffix = "mL",
+                            value = speedComp[i - 1]
+                        ) {
+                            speedComp = speedComp.toMutableList().also { list ->
+                                list[i - 1] = it
+                            }
+                        }
+                    }
                 }
             }
         }
 
         Button(
             modifier = Modifier.width(120.dp),
+            enabled = !loading,
             onClick = {
                 scope.launch {
                     loading = true
-                    val inArgs =
-                        listOf(s50, s100, s150, s200, s250, s300, s350, s400, s450, s500)
                     viewModel.setPumpArguments(
                         channel = channel,
-                        args = ArgumentsSpeed(speedComp = inArgs)
+                        args = ArgumentsSpeed(speedComp = speedComp)
                     )
                     loading = false
                 }
             }
         ) {
-            ButtonLoading(loading = loading)
-            Text(text = "设置", style = MaterialTheme.typography.bodyLarge)
+            ButtonLoading(loading = loading) {
+                Text(text = "设置", style = MaterialTheme.typography.bodyLarge)
+            }
         }
     }
 }
@@ -479,46 +373,10 @@ fun OutPumpCalibrationView(
 ) {
     val scope = rememberCoroutineScope()
     var loading by remember { mutableStateOf(false) }
-    var s50 by remember(
+    var speedComp by remember(
         channel,
         arguments
-    ) { mutableStateOf(arguments[channel].outSpeedComp[0]) }
-    var s100 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].outSpeedComp[1]) }
-    var s150 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].outSpeedComp[2]) }
-    var s200 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].outSpeedComp[3]) }
-    var s250 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].outSpeedComp[4]) }
-    var s300 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].outSpeedComp[5]) }
-    var s350 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].outSpeedComp[6]) }
-    var s400 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].outSpeedComp[7]) }
-    var s450 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].outSpeedComp[8]) }
-    var s500 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].outSpeedComp[9]) }
+    ) { mutableStateOf(arguments[channel].inSpeedComp) }
 
     Row(
         modifier = modifier
@@ -533,117 +391,40 @@ fun OutPumpCalibrationView(
     ) {
         Text(text = "出液泵校准", fontSize = 20.sp)
 
-        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+        for (list in listOf(listOf(1, 3, 5, 7, 9), listOf(2, 4, 6, 8, 10))) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "50",
-                    suffix = "mL",
-                    value = s50
-                ) {
-                    s50 = it
-                }
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "150",
-                    suffix = "mL",
-                    value = s150
-                ) {
-                    s150 = it
-                }
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "250",
-                    suffix = "mL",
-                    value = s250
-                ) {
-                    s250 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "350",
-                    suffix = "mL",
-                    value = s350
-                ) {
-                    s350 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "450",
-                    suffix = "mL",
-                    value = s450
-                ) {
-                    s450 = it
-                }
-            }
-
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "100",
-                    suffix = "mL",
-                    value = s100
-                ) {
-                    s100 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "200",
-                    suffix = "mL",
-                    value = s200
-                ) {
-                    s200 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "300",
-                    suffix = "mL",
-                    value = s300
-                ) {
-                    s300 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "400",
-                    suffix = "mL",
-                    value = s400
-                ) {
-                    s400 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "500",
-                    suffix = "mL",
-                    value = s500
-                ) {
-                    s500 = it
+                for (i in list) {
+                    ArgumentsInputField(
+                        modifier = Modifier.size(350.dp, 48.dp),
+                        prefix = "${i * 50}",
+                        suffix = "mL",
+                        value = speedComp[i - 1]
+                    ) {
+                        speedComp = speedComp.toMutableList().also { list ->
+                            list[i - 1] = it
+                        }
+                    }
                 }
             }
         }
 
         Button(
             modifier = Modifier.width(120.dp),
+            enabled = !loading,
             onClick = {
                 scope.launch {
                     loading = true
-                    val outArgs =
-                        listOf(s50, s100, s150, s200, s250, s300, s350, s400, s450, s500)
                     viewModel.setPumpArguments(
                         channel = channel,
-                        args = ArgumentsSpeed(inOrOut = 1, speedComp = outArgs)
+                        args = ArgumentsSpeed(inOrOut = 1, speedComp = speedComp)
                     )
                     loading = false
                 }
             }
         ) {
-            ButtonLoading(loading = loading)
-            Text(text = "设置", style = MaterialTheme.typography.bodyLarge)
+            ButtonLoading(loading = loading) {
+                Text(text = "设置", style = MaterialTheme.typography.bodyLarge)
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ import java.io.File
 
 object StorageUtils {
     private const val ARGUMENTS_DIR = "Arguments"
+    private const val EXPERIMENTAL_DIR = "Experimental"
 
     // 获取内部存储路径 /data/data/com.zktony.android/files
     fun getStorageDir(): String {

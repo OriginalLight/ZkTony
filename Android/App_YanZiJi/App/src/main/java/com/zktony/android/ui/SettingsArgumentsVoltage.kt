@@ -283,6 +283,7 @@ fun VoltageControlView(
 
         Button(
             modifier = Modifier.width(120.dp),
+            enabled = !loadingStart,
             onClick = {
                 scope.launch {
                     loadingStart = true
@@ -297,11 +298,13 @@ fun VoltageControlView(
                 }
             }
         ) {
-            ButtonLoading(loading = loadingStart)
-            Text(text = "开始", style = MaterialTheme.typography.bodyLarge)
+            ButtonLoading(loading = loadingStart) {
+                Text(text = "开始", style = MaterialTheme.typography.bodyLarge)
+            }
         }
 
         OutlinedButton(
+            enabled = !loadingStop,
             modifier = Modifier.width(120.dp),
             onClick = {
                 scope.launch {
@@ -311,8 +314,9 @@ fun VoltageControlView(
                 }
             }
         ) {
-            ButtonLoading(loading = loadingStop)
-            Text(text = "停止", style = MaterialTheme.typography.bodyLarge)
+            ButtonLoading(loading = loadingStop) {
+                Text(text = "停止", style = MaterialTheme.typography.bodyLarge)
+            }
         }
     }
 }
@@ -327,46 +331,10 @@ fun VoltageCalibrationView(
 ) {
     val scope = rememberCoroutineScope()
     var loading by remember { mutableStateOf(false) }
-    var s50 by remember(
+    var voltComp by remember(
         channel,
         arguments
-    ) { mutableStateOf(arguments[channel].voltComp[0]) }
-    var s100 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].voltComp[1]) }
-    var s150 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].voltComp[2]) }
-    var s200 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].voltComp[3]) }
-    var s250 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].voltComp[4]) }
-    var s300 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].voltComp[5]) }
-    var s350 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].voltComp[6]) }
-    var s400 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].voltComp[7]) }
-    var s450 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].voltComp[8]) }
-    var s500 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].voltComp[9]) }
+    ) { mutableStateOf(arguments[channel].voltComp) }
 
     Row(
         modifier = modifier
@@ -382,116 +350,41 @@ fun VoltageCalibrationView(
         Text(text = "电压校准", fontSize = 20.sp)
 
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "5",
-                    suffix = "V",
-                    value = s50
-                ) {
-                    s50 = it
-                }
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "15",
-                    suffix = "V",
-                    value = s150
-                ) {
-                    s150 = it
-                }
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "25",
-                    suffix = "V",
-                    value = s250
-                ) {
-                    s250 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "35",
-                    suffix = "V",
-                    value = s350
-                ) {
-                    s350 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "45",
-                    suffix = "V",
-                    value = s450
-                ) {
-                    s450 = it
-                }
-            }
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "10",
-                    suffix = "V",
-                    value = s100
-                ) {
-                    s100 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "20",
-                    suffix = "V",
-                    value = s200
-                ) {
-                    s200 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "30",
-                    suffix = "V",
-                    value = s300
-                ) {
-                    s300 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "40",
-                    suffix = "V",
-                    value = s400
-                ) {
-                    s400 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "50",
-                    suffix = "V",
-                    value = s500
-                ) {
-                    s500 = it
+            for (list in listOf(listOf(1, 3, 5, 7, 9), listOf(2, 4, 6, 8, 10))) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    for (i in list) {
+                        ArgumentsInputField(
+                            modifier = Modifier.size(350.dp, 48.dp),
+                            prefix = "${i * 5}",
+                            suffix = "V",
+                            value = voltComp[i - 1]
+                        ) {
+                            voltComp = voltComp.toMutableList().also { list ->
+                                list[i - 1] = it
+                            }
+                        }
+                    }
                 }
             }
         }
 
         Button(
             modifier = Modifier.width(120.dp),
+            enabled = !loading,
             onClick = {
                 scope.launch {
                     loading = true
-                    val args = listOf(s50, s100, s150, s200, s250, s300, s350, s400, s450, s500)
                     viewModel.setVoltageArguments(
                         channel = channel,
-                        args = ArgumentsVoltage(
-                            voltComp = args
-                        )
+                        args = ArgumentsVoltage(voltComp)
                     )
                     loading = false
                 }
             }
         ) {
-            ButtonLoading(loading = loading)
-            Text(text = "设置", style = MaterialTheme.typography.bodyLarge)
+            ButtonLoading(loading = loading) {
+                Text(text = "设置", style = MaterialTheme.typography.bodyLarge)
+            }
         }
     }
 }
@@ -506,46 +399,10 @@ fun CurrentCalibrationView(
 ) {
     val scope = rememberCoroutineScope()
     var loading by remember { mutableStateOf(false) }
-    var s50 by remember(
+    var currComp by remember(
         channel,
         arguments
-    ) { mutableStateOf(arguments[channel].currComp[0]) }
-    var s100 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].currComp[1]) }
-    var s150 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].currComp[2]) }
-    var s200 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].currComp[3]) }
-    var s250 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].currComp[4]) }
-    var s300 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].currComp[5]) }
-    var s350 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].currComp[6]) }
-    var s400 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].currComp[7]) }
-    var s450 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].currComp[8]) }
-    var s500 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].currComp[9]) }
+    ) { mutableStateOf(arguments[channel].currComp) }
 
     Row(
         modifier = modifier
@@ -561,117 +418,41 @@ fun CurrentCalibrationView(
         Text(text = "电流校准", fontSize = 20.sp)
 
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "0.5",
-                    suffix = "A",
-                    value = s50
-                ) {
-                    s50 = it
-                }
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "1.5",
-                    suffix = "A",
-                    value = s150
-                ) {
-                    s150 = it
-                }
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "2.5",
-                    suffix = "A",
-                    value = s250
-                ) {
-                    s250 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "3.5",
-                    suffix = "A",
-                    value = s350
-                ) {
-                    s350 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "4.5",
-                    suffix = "A",
-                    value = s450
-                ) {
-                    s450 = it
-                }
-            }
-
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "1",
-                    suffix = "A",
-                    value = s100
-                ) {
-                    s100 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "2",
-                    suffix = "A",
-                    value = s200
-                ) {
-                    s200 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "3",
-                    suffix = "A",
-                    value = s300
-                ) {
-                    s300 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "4",
-                    suffix = "A",
-                    value = s400
-                ) {
-                    s400 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "5",
-                    suffix = "A",
-                    value = s500
-                ) {
-                    s500 = it
+            for (list in listOf(listOf(1, 3, 5, 7, 9), listOf(2, 4, 6, 8, 10))) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    for (i in list) {
+                        ArgumentsInputField(
+                            modifier = Modifier.size(350.dp, 48.dp),
+                            prefix = "${i * 0.5}",
+                            suffix = "A",
+                            value = currComp[i - 1]
+                        ) {
+                            currComp = currComp.toMutableList().also { list ->
+                                list[i - 1] = it
+                            }
+                        }
+                    }
                 }
             }
         }
 
         Button(
             modifier = Modifier.width(120.dp),
+            enabled = !loading,
             onClick = {
                 scope.launch {
                     loading = true
-                    val args = listOf(s50, s100, s150, s200, s250, s300, s350, s400, s450, s500)
                     viewModel.setCurrentArguments(
                         channel = channel,
-                        args = ArgumentsCurrent(
-                            currComp = args
-                        )
+                        args = ArgumentsCurrent(currComp)
                     )
                     loading = false
                 }
             }
         ) {
-            ButtonLoading(loading = loading)
-            Text(text = "设置", style = MaterialTheme.typography.bodyLarge)
+            ButtonLoading(loading = loading) {
+                Text(text = "设置", style = MaterialTheme.typography.bodyLarge)
+            }
         }
     }
 }
@@ -686,46 +467,10 @@ fun TemperatureCalibrationView(
 ) {
     val scope = rememberCoroutineScope()
     var loading by remember { mutableStateOf(false) }
-    var s50 by remember(
+    var tempComp by remember(
         channel,
         arguments
-    ) { mutableStateOf(arguments[channel].tempComp[0]) }
-    var s100 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].tempComp[1]) }
-    var s150 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].tempComp[2]) }
-    var s200 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].tempComp[3]) }
-    var s250 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].tempComp[4]) }
-    var s300 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].tempComp[5]) }
-    var s350 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].tempComp[6]) }
-    var s400 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].tempComp[7]) }
-    var s450 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].tempComp[8]) }
-    var s500 by remember(
-        channel,
-        arguments
-    ) { mutableStateOf(arguments[channel].tempComp[9]) }
+    ) { mutableStateOf(arguments[channel].tempComp) }
 
     Row(
         modifier = modifier
@@ -741,117 +486,41 @@ fun TemperatureCalibrationView(
         Text(text = "温度校准", fontSize = 20.sp)
 
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "10",
-                    suffix = "℃",
-                    value = s50
-                ) {
-                    s50 = it
-                }
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "30",
-                    suffix = "℃",
-                    value = s150
-                ) {
-                    s150 = it
-                }
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "50",
-                    suffix = "℃",
-                    value = s250
-                ) {
-                    s250 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "70",
-                    suffix = "℃",
-                    value = s350
-                ) {
-                    s350 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "90",
-                    suffix = "℃",
-                    value = s450
-                ) {
-                    s450 = it
-                }
-            }
-
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "20",
-                    suffix = "℃",
-                    value = s100
-                ) {
-                    s100 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "40",
-                    suffix = "℃",
-                    value = s200
-                ) {
-                    s200 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "60",
-                    suffix = "℃",
-                    value = s300
-                ) {
-                    s300 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "80",
-                    suffix = "℃",
-                    value = s400
-                ) {
-                    s400 = it
-                }
-
-                ArgumentsInputField(
-                    modifier = Modifier.size(350.dp, 48.dp),
-                    prefix = "100",
-                    suffix = "℃",
-                    value = s500
-                ) {
-                    s500 = it
+            for (list in listOf(listOf(1, 3, 5, 7, 9), listOf(2, 4, 6, 8, 10))) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    for (i in list) {
+                        ArgumentsInputField(
+                            modifier = Modifier.size(350.dp, 48.dp),
+                            prefix = "${i * 10}",
+                            suffix = "℃",
+                            value = tempComp[i - 1]
+                        ) {
+                            tempComp = tempComp.toMutableList().also { list ->
+                                list[i - 1] = it
+                            }
+                        }
+                    }
                 }
             }
         }
 
         Button(
             modifier = Modifier.width(120.dp),
+            enabled = !loading,
             onClick = {
                 scope.launch {
                     loading = true
-                    val args = listOf(s50, s100, s150, s200, s250, s300, s350, s400, s450, s500)
                     viewModel.setTemperatureArguments(
                         channel = channel,
-                        args = ArgumentsTemperature(
-                            tempComp = args
-                        )
+                        args = ArgumentsTemperature(tempComp)
                     )
                     loading = false
                 }
             }
         ) {
-            ButtonLoading(loading = loading)
-            Text(text = "设置", style = MaterialTheme.typography.bodyLarge)
+            ButtonLoading(loading = loading) {
+                Text(text = "设置", style = MaterialTheme.typography.bodyLarge)
+            }
         }
     }
 }

@@ -9,6 +9,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 
 /**
  * @author 刘贺贺
@@ -20,6 +21,9 @@ object AppStateUtils {
 
     // flags
     var isArgumentsSync = false         // 是否同步参数
+
+    // 轮询
+    val isPolling = Mutex(false)
 
     // mutableStateFlow
     private val _argumentsList =
@@ -37,10 +41,15 @@ object AppStateUtils {
             while (true) {
                 if (_channelStateList.subscriptionCount.value > 0) {
                     // 获取通道状态
+                    val start = System.currentTimeMillis()
                     repeat(ProductUtils.getChannelCount()) {
-                        SerialPortUtils.queryChannelState(it)
-                        delay(200L)
+                        if (!isPolling.isLocked) {
+                            SerialPortUtils.queryChannelState(it)
+                        }
                     }
+                    val end = System.currentTimeMillis()
+                    // 间隔时间
+                    delay(1000L - (end - start))
                 } else {
                     delay(1000L)
                 }

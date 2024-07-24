@@ -13,4 +13,11 @@ abstract class UserDao: BaseDao<User> {
         """
     )
     abstract suspend fun getByName(name: String): User?
+
+    @Query(
+        """
+        SELECT * FROM users WHERE id = :id
+        """
+    )
+    abstract suspend fun getById(id: Long): User?
 }

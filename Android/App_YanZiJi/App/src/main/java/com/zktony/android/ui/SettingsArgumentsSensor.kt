@@ -248,6 +248,7 @@ fun BubbleSensorThresholdView(
 
         Button(
             modifier = Modifier.width(120.dp),
+            enabled = !loading,
             onClick = {
                 scope.launch {
                     loading = true
@@ -262,8 +263,9 @@ fun BubbleSensorThresholdView(
                 }
             }
         ) {
-            ButtonLoading(loading = loading)
-            Text(text = "设置", style = MaterialTheme.typography.bodyLarge)
+            ButtonLoading(loading = loading) {
+                Text(text = "设置", style = MaterialTheme.typography.bodyLarge)
+            }
         }
     }
 }
