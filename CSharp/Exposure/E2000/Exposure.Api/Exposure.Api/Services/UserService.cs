@@ -18,32 +18,40 @@ public class UserService(IDbContext dbContext) : BaseService<User>(dbContext), I
     public async Task InitializeAsync()
     {
         // 查询超级管理员是否存在
-        var su = await _context.db.Queryable<User>().Where(it => it.Role == 0).FirstAsync();
-        if (su == null)
+        var fac = await _context.db.Queryable<User>().Where(it => it.Role == 0).FirstAsync();
+        if (fac == null)
         {
             // 创建工厂管理员
             await _context.db.Insertable(new User
             {
                 Name = "zkty",
-                Sha = BCrypt.Net.BCrypt.HashPassword("zkty"),
+                Sha = BCrypt.Net.BCrypt.HashPassword("zktye2000"),
                 Role = 0,
                 Enabled = true,
                 CreateTime = DateTime.Now,
                 UpdateTime = DateTime.Now,
                 LastLoginTime = DateTime.Now
             }).ExecuteReturnIdentityAsync();
+        }
+        var admin = await _context.db.Queryable<User>().Where(it => it.Name == "admin").FirstAsync();
+        if (admin == null)
+        {
             // 创建管理员
             await _context.db.Insertable(new User
             {
                 Name = "admin",
-                Sha = BCrypt.Net.BCrypt.HashPassword("admin"),
+                Sha = BCrypt.Net.BCrypt.HashPassword("zkty"),
                 Role = 1,
                 Enabled = true,
                 CreateTime = DateTime.Now,
                 UpdateTime = DateTime.Now,
                 LastLoginTime = DateTime.Now
             }).ExecuteReturnIdentityAsync();
-            // 创建管理员
+        }
+        var pub = await _context.db.Queryable<User>().Where(it => it.Name == "public").FirstAsync();
+        if (pub == null)
+        {
+            // 创建公共用户
             await _context.db.Insertable(new User
             {
                 Name = "public",
