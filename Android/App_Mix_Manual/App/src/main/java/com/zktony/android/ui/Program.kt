@@ -595,7 +595,7 @@ fun ProgramList(
                                     focusedLabelColor = Color(rgb(0, 105, 52)),
                                     cursorColor = Color(rgb(0, 105, 52))
                                 ),
-                                label = { Text( fontSize = 20.sp,text = "制胶名称") },
+                                label = { Text(fontSize = 20.sp, text = "制胶名称") },
                                 textStyle = TextStyle(fontSize = 20.sp),
                                 onValueChange = {
                                     if (it.length > 7) {
@@ -624,7 +624,7 @@ fun ProgramList(
                             OutlinedTextField(
                                 modifier = Modifier.width(100.dp),
                                 value = startRange_ex,
-                                label = { Text(fontSize = 20.sp,text = "%") },
+                                label = { Text(fontSize = 20.sp, text = "%") },
                                 textStyle = TextStyle(fontSize = 20.sp),
                                 onValueChange = { startRange_ex = it },
                                 colors = OutlinedTextFieldDefaults.colors(
@@ -654,7 +654,7 @@ fun ProgramList(
                                     cursorColor = Color(rgb(0, 105, 52))
                                 ),
                                 value = endRange_ex,
-                                label = { Text(fontSize = 20.sp,text = "%") },
+                                label = { Text(fontSize = 20.sp, text = "%") },
                                 textStyle = TextStyle(fontSize = 20.sp),
                                 onValueChange = { endRange_ex = it },
                                 keyboardOptions = KeyboardOptions(
@@ -695,7 +695,11 @@ fun ProgramList(
                                             thickness.value = it
                                         }
                                     )
-                                    Text(modifier = Modifier.padding(top = 15.dp),fontSize = 18.sp, text = it)
+                                    Text(
+                                        modifier = Modifier.padding(top = 15.dp),
+                                        fontSize = 18.sp,
+                                        text = it
+                                    )
                                 }
 
                                 Spacer(modifier = Modifier.width(20.dp))
@@ -706,7 +710,7 @@ fun ProgramList(
                     item {
                         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                             OutlinedTextField(value = volume_ex,
-                                label = { Text(fontSize = 20.sp,text = "胶液体积/mL") },
+                                label = { Text(fontSize = 20.sp, text = "胶液体积/mL") },
                                 textStyle = TextStyle(fontSize = 20.sp),
                                 onValueChange = { volume_ex = it },
                                 colors = OutlinedTextFieldDefaults.colors(
@@ -730,7 +734,7 @@ fun ProgramList(
                     item {
                         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                             OutlinedTextField(value = coagulant_ex,
-                                label = { Text(fontSize = 20.sp,text = "促凝剂体积/μL") },
+                                label = { Text(fontSize = 20.sp, text = "促凝剂体积/μL") },
                                 textStyle = TextStyle(fontSize = 20.sp),
                                 onValueChange = { coagulant_ex = it },
                                 colors = OutlinedTextFieldDefaults.colors(
@@ -754,7 +758,7 @@ fun ProgramList(
                     item {
                         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                             OutlinedTextField(value = founder,
-                                label = { Text(fontSize = 20.sp,text = "创建人") },
+                                label = { Text(fontSize = 20.sp, text = "创建人") },
                                 textStyle = TextStyle(fontSize = 20.sp),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = Color(rgb(0, 105, 52)),
@@ -782,7 +786,7 @@ fun ProgramList(
                         thickness.value = "1.0"
                         showingDialog.value = false
                     }) {
-                    Text(fontSize = 18.sp,text = "取   消", color = Color.Black)
+                    Text(fontSize = 18.sp, text = "取   消", color = Color.Black)
                 }
 
             }, dismissButton = {
@@ -964,7 +968,7 @@ fun ProgramList(
 
 
                     }) {
-                    Text(fontSize = 18.sp,text = "确   认")
+                    Text(fontSize = 18.sp, text = "确   认")
                 }
 
             })
@@ -1058,7 +1062,7 @@ fun ProgramList(
                     border = BorderStroke(1.dp, Color.Gray),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.Transparent
-                    ),onClick = { importDialog.value = false }) {
+                    ), onClick = { importDialog.value = false }) {
                     Text(text = "取   消")
                 }
             }, dismissButton = {
@@ -1076,339 +1080,377 @@ fun ProgramList(
                                     "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~!@#￥%……&*（）——+|{}【】‘；：”“’。，、？\\s]"
 
                                 var nameRepeat = false
-
+                                var programCount = 0
+                                File("$path/zktony/program.txt").bufferedReader()
+                                    .useLines {
+                                        programCount = it.count()
+                                    }
 
                                 File("$path/zktony/program.txt").bufferedReader()
                                     .useLines { lines ->
                                         for (line in lines) {
                                             if (line.isNotEmpty()) {
-
                                                 if (modelsThickness.value == "G1500") {
                                                     if (entityNum < 10) {
-
-                                                        var textList = ArrayList<String>()
-                                                        var contents = line.split(",")
-                                                        contents.forEach {
-                                                            val byte = it.split(":").get(1)
-                                                            textList.add(byte)
-                                                        }
-
-                                                        entitiesList.forEach {
-                                                            if (textList.get(0) == it.displayText) {
-                                                                nameRepeat = true
-                                                            }
-                                                        }
-
-                                                        if (nameRepeat) {
+                                                        if (programCount + entityNum > 10) {
                                                             Toast.makeText(
                                                                 context,
-                                                                "文件名不能重复!",
+                                                                "要导入的程序数量超出限制",
                                                                 Toast.LENGTH_SHORT
                                                             ).show()
                                                         } else {
-                                                            if (Pattern.compile(speChat)
-                                                                    .matcher(textList.get(0)).find()
-                                                            ) {
-                                                                Toast.makeText(
-                                                                    context,
-                                                                    "文件名不能包含特殊字符!",
-                                                                    Toast.LENGTH_SHORT
-                                                                ).show()
 
-                                                            } else {
 
-                                                                if (textList.get(1)
-                                                                        .toInt() > textList.get(2)
-                                                                        .toInt()
-                                                                ) {
-                                                                    Toast.makeText(
-                                                                        context,
-                                                                        "浓度范围不能由大到小",
-                                                                        Toast.LENGTH_SHORT
-                                                                    ).show()
-                                                                } else if (textList.get(1)
-                                                                        .toInt() < 3 || textList.get(
-                                                                        1
-                                                                    )
-                                                                        .toInt() > 30
-                                                                ) {
-                                                                    Toast.makeText(
-                                                                        context,
-                                                                        "低浓度不能小于3或大于30",
-                                                                        Toast.LENGTH_SHORT
-                                                                    ).show()
-                                                                } else if (textList.get(2)
-                                                                        .toInt() < 3 || textList.get(
-                                                                        2
-                                                                    )
-                                                                        .toInt() > 30
-                                                                ) {
-                                                                    Toast.makeText(
-                                                                        context,
-                                                                        "高浓度不能小于3或大于30",
-                                                                        Toast.LENGTH_SHORT
-                                                                    ).show()
-                                                                } else if (textList.get(4)
-                                                                        .toInt() <= 0 || textList.get(
-                                                                        4
-                                                                    )
-                                                                        .toInt() > 800
-                                                                ) {
-                                                                    Toast.makeText(
-                                                                        context,
-                                                                        "促凝剂体积不能小于1或大于800",
-                                                                        Toast.LENGTH_SHORT
-                                                                    ).show()
-                                                                } else if (textList.get(5)
-                                                                        .toDouble() <= 0 || textList.get(
-                                                                        5
-                                                                    ).toDouble() > 20
-                                                                ) {
-                                                                    Toast.makeText(
-                                                                        context,
-                                                                        "胶液体积不能小于1或大于20",
-                                                                        Toast.LENGTH_SHORT
-                                                                    ).show()
-                                                                } else {
-                                                                    dispatch(
-                                                                        ProgramIntent.Insert(
-                                                                            textList.get(0),
-                                                                            textList.get(1)
-                                                                                .toDouble(),
-                                                                            textList.get(2)
-                                                                                .toDouble(),
-                                                                            textList.get(3),
-                                                                            textList.get(4).toInt(),
-                                                                            textList.get(5)
-                                                                                .toDouble(),
-                                                                            textList.get(6)
-                                                                        )
-                                                                    )
-                                                                    showingDialog.value = false
+                                                            var textList = ArrayList<String>()
+                                                            var contents = line.split(",")
+                                                            contents.forEach {
+                                                                val byte = it.split(":").get(1)
+                                                                textList.add(byte)
+                                                            }
+
+                                                            entitiesList.forEach {
+                                                                if (textList.get(0) == it.displayText) {
+                                                                    nameRepeat = true
                                                                 }
                                                             }
 
+                                                            if (nameRepeat) {
+                                                                Toast.makeText(
+                                                                    context,
+                                                                    "文件名不能重复!",
+                                                                    Toast.LENGTH_SHORT
+                                                                ).show()
+                                                            } else {
+                                                                if (Pattern.compile(speChat)
+                                                                        .matcher(textList.get(0))
+                                                                        .find()
+                                                                ) {
+                                                                    Toast.makeText(
+                                                                        context,
+                                                                        "文件名不能包含特殊字符!",
+                                                                        Toast.LENGTH_SHORT
+                                                                    ).show()
+
+                                                                } else {
+
+                                                                    if (textList.get(1)
+                                                                            .toInt() > textList.get(
+                                                                            2
+                                                                        )
+                                                                            .toInt()
+                                                                    ) {
+                                                                        Toast.makeText(
+                                                                            context,
+                                                                            "浓度范围不能由大到小",
+                                                                            Toast.LENGTH_SHORT
+                                                                        ).show()
+                                                                    } else if (textList.get(1)
+                                                                            .toInt() < 3 || textList.get(
+                                                                            1
+                                                                        )
+                                                                            .toInt() > 30
+                                                                    ) {
+                                                                        Toast.makeText(
+                                                                            context,
+                                                                            "低浓度不能小于3或大于30",
+                                                                            Toast.LENGTH_SHORT
+                                                                        ).show()
+                                                                    } else if (textList.get(2)
+                                                                            .toInt() < 3 || textList.get(
+                                                                            2
+                                                                        )
+                                                                            .toInt() > 30
+                                                                    ) {
+                                                                        Toast.makeText(
+                                                                            context,
+                                                                            "高浓度不能小于3或大于30",
+                                                                            Toast.LENGTH_SHORT
+                                                                        ).show()
+                                                                    } else if (textList.get(4)
+                                                                            .toInt() <= 0 || textList.get(
+                                                                            4
+                                                                        )
+                                                                            .toInt() > 800
+                                                                    ) {
+                                                                        Toast.makeText(
+                                                                            context,
+                                                                            "促凝剂体积不能小于1或大于800",
+                                                                            Toast.LENGTH_SHORT
+                                                                        ).show()
+                                                                    } else if (textList.get(5)
+                                                                            .toDouble() <= 0 || textList.get(
+                                                                            5
+                                                                        ).toDouble() > 20
+                                                                    ) {
+                                                                        Toast.makeText(
+                                                                            context,
+                                                                            "胶液体积不能小于1或大于20",
+                                                                            Toast.LENGTH_SHORT
+                                                                        ).show()
+                                                                    } else {
+                                                                        dispatch(
+                                                                            ProgramIntent.Insert(
+                                                                                textList.get(0),
+                                                                                textList.get(1)
+                                                                                    .toDouble(),
+                                                                                textList.get(2)
+                                                                                    .toDouble(),
+                                                                                textList.get(3),
+                                                                                textList.get(4)
+                                                                                    .toInt(),
+                                                                                textList.get(5)
+                                                                                    .toDouble(),
+                                                                                textList.get(6)
+                                                                            )
+                                                                        )
+                                                                        showingDialog.value = false
+                                                                    }
+                                                                }
+
+                                                            }
+
+
                                                         }
-
-
                                                     }
                                                 } else if (modelsThickness.value == "G1510") {
                                                     if (entityNum < 100) {
-
-                                                        var textList = ArrayList<String>()
-                                                        var contents = line.split(",")
-                                                        contents.forEach {
-                                                            val byte = it.split(":").get(1)
-                                                            textList.add(byte)
-                                                        }
-
-                                                        entitiesList.forEach {
-                                                            if (textList.get(0) == it.displayText) {
-                                                                nameRepeat = true
-                                                            }
-                                                        }
-
-                                                        if (nameRepeat) {
+                                                        if (programCount + entityNum > 100) {
                                                             Toast.makeText(
                                                                 context,
-                                                                "文件名不能重复!",
+                                                                "要导入的程序数量超出限制",
                                                                 Toast.LENGTH_SHORT
                                                             ).show()
                                                         } else {
-                                                            if (Pattern.compile(speChat)
-                                                                    .matcher(textList.get(0)).find()
-                                                            ) {
-                                                                Toast.makeText(
-                                                                    context,
-                                                                    "文件名不能包含特殊字符!",
-                                                                    Toast.LENGTH_SHORT
-                                                                ).show()
+                                                            var textList = ArrayList<String>()
+                                                            var contents = line.split(",")
+                                                            contents.forEach {
+                                                                val byte = it.split(":").get(1)
+                                                                textList.add(byte)
+                                                            }
 
-                                                            } else {
-
-                                                                if (textList.get(1)
-                                                                        .toInt() > textList.get(2)
-                                                                        .toInt()
-                                                                ) {
-                                                                    Toast.makeText(
-                                                                        context,
-                                                                        "浓度范围不能由大到小",
-                                                                        Toast.LENGTH_SHORT
-                                                                    ).show()
-                                                                } else if (textList.get(1)
-                                                                        .toInt() < 3 || textList.get(
-                                                                        1
-                                                                    )
-                                                                        .toInt() > 30
-                                                                ) {
-                                                                    Toast.makeText(
-                                                                        context,
-                                                                        "低浓度不能小于3或大于30",
-                                                                        Toast.LENGTH_SHORT
-                                                                    ).show()
-                                                                } else if (textList.get(2)
-                                                                        .toInt() < 3 || textList.get(
-                                                                        2
-                                                                    )
-                                                                        .toInt() > 30
-                                                                ) {
-                                                                    Toast.makeText(
-                                                                        context,
-                                                                        "高浓度不能小于3或大于30",
-                                                                        Toast.LENGTH_SHORT
-                                                                    ).show()
-                                                                } else if (textList.get(4)
-                                                                        .toInt() <= 0 || textList.get(
-                                                                        4
-                                                                    )
-                                                                        .toInt() > 800
-                                                                ) {
-                                                                    Toast.makeText(
-                                                                        context,
-                                                                        "促凝剂体积不能小于1或大于800",
-                                                                        Toast.LENGTH_SHORT
-                                                                    ).show()
-                                                                } else if (textList.get(5)
-                                                                        .toDouble() <= 0 || textList.get(
-                                                                        5
-                                                                    ).toDouble() > 20
-                                                                ) {
-                                                                    Toast.makeText(
-                                                                        context,
-                                                                        "胶液体积不能小于1或大于20",
-                                                                        Toast.LENGTH_SHORT
-                                                                    ).show()
-                                                                } else {
-                                                                    dispatch(
-                                                                        ProgramIntent.Insert(
-                                                                            textList.get(0),
-                                                                            textList.get(1)
-                                                                                .toDouble(),
-                                                                            textList.get(2)
-                                                                                .toDouble(),
-                                                                            textList.get(3),
-                                                                            textList.get(4).toInt(),
-                                                                            textList.get(5)
-                                                                                .toDouble(),
-                                                                            textList.get(6)
-                                                                        )
-                                                                    )
-                                                                    showingDialog.value = false
+                                                            entitiesList.forEach {
+                                                                if (textList.get(0) == it.displayText) {
+                                                                    nameRepeat = true
                                                                 }
                                                             }
 
+                                                            if (nameRepeat) {
+                                                                Toast.makeText(
+                                                                    context,
+                                                                    "文件名不能重复!",
+                                                                    Toast.LENGTH_SHORT
+                                                                ).show()
+                                                            } else {
+                                                                if (Pattern.compile(speChat)
+                                                                        .matcher(textList.get(0))
+                                                                        .find()
+                                                                ) {
+                                                                    Toast.makeText(
+                                                                        context,
+                                                                        "文件名不能包含特殊字符!",
+                                                                        Toast.LENGTH_SHORT
+                                                                    ).show()
+
+                                                                } else {
+
+                                                                    if (textList.get(1)
+                                                                            .toInt() > textList.get(
+                                                                            2
+                                                                        )
+                                                                            .toInt()
+                                                                    ) {
+                                                                        Toast.makeText(
+                                                                            context,
+                                                                            "浓度范围不能由大到小",
+                                                                            Toast.LENGTH_SHORT
+                                                                        ).show()
+                                                                    } else if (textList.get(1)
+                                                                            .toInt() < 3 || textList.get(
+                                                                            1
+                                                                        )
+                                                                            .toInt() > 30
+                                                                    ) {
+                                                                        Toast.makeText(
+                                                                            context,
+                                                                            "低浓度不能小于3或大于30",
+                                                                            Toast.LENGTH_SHORT
+                                                                        ).show()
+                                                                    } else if (textList.get(2)
+                                                                            .toInt() < 3 || textList.get(
+                                                                            2
+                                                                        )
+                                                                            .toInt() > 30
+                                                                    ) {
+                                                                        Toast.makeText(
+                                                                            context,
+                                                                            "高浓度不能小于3或大于30",
+                                                                            Toast.LENGTH_SHORT
+                                                                        ).show()
+                                                                    } else if (textList.get(4)
+                                                                            .toInt() <= 0 || textList.get(
+                                                                            4
+                                                                        )
+                                                                            .toInt() > 800
+                                                                    ) {
+                                                                        Toast.makeText(
+                                                                            context,
+                                                                            "促凝剂体积不能小于1或大于800",
+                                                                            Toast.LENGTH_SHORT
+                                                                        ).show()
+                                                                    } else if (textList.get(5)
+                                                                            .toDouble() <= 0 || textList.get(
+                                                                            5
+                                                                        ).toDouble() > 20
+                                                                    ) {
+                                                                        Toast.makeText(
+                                                                            context,
+                                                                            "胶液体积不能小于1或大于20",
+                                                                            Toast.LENGTH_SHORT
+                                                                        ).show()
+                                                                    } else {
+                                                                        dispatch(
+                                                                            ProgramIntent.Insert(
+                                                                                textList.get(0),
+                                                                                textList.get(1)
+                                                                                    .toDouble(),
+                                                                                textList.get(2)
+                                                                                    .toDouble(),
+                                                                                textList.get(3),
+                                                                                textList.get(4)
+                                                                                    .toInt(),
+                                                                                textList.get(5)
+                                                                                    .toDouble(),
+                                                                                textList.get(6)
+                                                                            )
+                                                                        )
+                                                                        showingDialog.value = false
+                                                                    }
+                                                                }
+
+                                                            }
+
+
                                                         }
-
-
                                                     }
                                                 } else {
                                                     if (entityNum < 500) {
-
-                                                        var textList = ArrayList<String>()
-                                                        var contents = line.split(",")
-                                                        contents.forEach {
-                                                            val byte = it.split(":").get(1)
-                                                            textList.add(byte)
-                                                        }
-
-                                                        entitiesList.forEach {
-                                                            if (textList.get(0) == it.displayText) {
-                                                                nameRepeat = true
-                                                            }
-                                                        }
-
-                                                        if (nameRepeat) {
+                                                        if (programCount + entityNum > 500) {
                                                             Toast.makeText(
                                                                 context,
-                                                                "文件名不能重复!",
+                                                                "要导入的程序数量超出限制",
                                                                 Toast.LENGTH_SHORT
                                                             ).show()
                                                         } else {
-                                                            if (Pattern.compile(speChat)
-                                                                    .matcher(textList.get(0)).find()
-                                                            ) {
-                                                                Toast.makeText(
-                                                                    context,
-                                                                    "文件名不能包含特殊字符!",
-                                                                    Toast.LENGTH_SHORT
-                                                                ).show()
+                                                            var textList = ArrayList<String>()
+                                                            var contents = line.split(",")
+                                                            contents.forEach {
+                                                                val byte = it.split(":").get(1)
+                                                                textList.add(byte)
+                                                            }
 
-                                                            } else {
-
-                                                                if (textList.get(1)
-                                                                        .toInt() > textList.get(2)
-                                                                        .toInt()
-                                                                ) {
-                                                                    Toast.makeText(
-                                                                        context,
-                                                                        "浓度范围不能由大到小",
-                                                                        Toast.LENGTH_SHORT
-                                                                    ).show()
-                                                                } else if (textList.get(1)
-                                                                        .toInt() < 3 || textList.get(
-                                                                        1
-                                                                    )
-                                                                        .toInt() > 30
-                                                                ) {
-                                                                    Toast.makeText(
-                                                                        context,
-                                                                        "低浓度不能小于3或大于30",
-                                                                        Toast.LENGTH_SHORT
-                                                                    ).show()
-                                                                } else if (textList.get(2)
-                                                                        .toInt() < 3 || textList.get(
-                                                                        2
-                                                                    )
-                                                                        .toInt() > 30
-                                                                ) {
-                                                                    Toast.makeText(
-                                                                        context,
-                                                                        "高浓度不能小于3或大于30",
-                                                                        Toast.LENGTH_SHORT
-                                                                    ).show()
-                                                                } else if (textList.get(4)
-                                                                        .toInt() <= 0 || textList.get(
-                                                                        4
-                                                                    )
-                                                                        .toInt() > 800
-                                                                ) {
-                                                                    Toast.makeText(
-                                                                        context,
-                                                                        "促凝剂体积不能小于1或大于800",
-                                                                        Toast.LENGTH_SHORT
-                                                                    ).show()
-                                                                } else if (textList.get(5)
-                                                                        .toDouble() <= 0 || textList.get(
-                                                                        5
-                                                                    ).toDouble() > 20
-                                                                ) {
-                                                                    Toast.makeText(
-                                                                        context,
-                                                                        "胶液体积不能小于1或大于20",
-                                                                        Toast.LENGTH_SHORT
-                                                                    ).show()
-                                                                } else {
-                                                                    dispatch(
-                                                                        ProgramIntent.Insert(
-                                                                            textList.get(0),
-                                                                            textList.get(1)
-                                                                                .toDouble(),
-                                                                            textList.get(2)
-                                                                                .toDouble(),
-                                                                            textList.get(3),
-                                                                            textList.get(4).toInt(),
-                                                                            textList.get(5)
-                                                                                .toDouble(),
-                                                                            textList.get(6)
-                                                                        )
-                                                                    )
-                                                                    showingDialog.value = false
+                                                            entitiesList.forEach {
+                                                                if (textList.get(0) == it.displayText) {
+                                                                    nameRepeat = true
                                                                 }
                                                             }
 
+                                                            if (nameRepeat) {
+                                                                Toast.makeText(
+                                                                    context,
+                                                                    "文件名不能重复!",
+                                                                    Toast.LENGTH_SHORT
+                                                                ).show()
+                                                            } else {
+                                                                if (Pattern.compile(speChat)
+                                                                        .matcher(textList.get(0))
+                                                                        .find()
+                                                                ) {
+                                                                    Toast.makeText(
+                                                                        context,
+                                                                        "文件名不能包含特殊字符!",
+                                                                        Toast.LENGTH_SHORT
+                                                                    ).show()
+
+                                                                } else {
+
+                                                                    if (textList.get(1)
+                                                                            .toInt() > textList.get(
+                                                                            2
+                                                                        )
+                                                                            .toInt()
+                                                                    ) {
+                                                                        Toast.makeText(
+                                                                            context,
+                                                                            "浓度范围不能由大到小",
+                                                                            Toast.LENGTH_SHORT
+                                                                        ).show()
+                                                                    } else if (textList.get(1)
+                                                                            .toInt() < 3 || textList.get(
+                                                                            1
+                                                                        )
+                                                                            .toInt() > 30
+                                                                    ) {
+                                                                        Toast.makeText(
+                                                                            context,
+                                                                            "低浓度不能小于3或大于30",
+                                                                            Toast.LENGTH_SHORT
+                                                                        ).show()
+                                                                    } else if (textList.get(2)
+                                                                            .toInt() < 3 || textList.get(
+                                                                            2
+                                                                        )
+                                                                            .toInt() > 30
+                                                                    ) {
+                                                                        Toast.makeText(
+                                                                            context,
+                                                                            "高浓度不能小于3或大于30",
+                                                                            Toast.LENGTH_SHORT
+                                                                        ).show()
+                                                                    } else if (textList.get(4)
+                                                                            .toInt() <= 0 || textList.get(
+                                                                            4
+                                                                        )
+                                                                            .toInt() > 800
+                                                                    ) {
+                                                                        Toast.makeText(
+                                                                            context,
+                                                                            "促凝剂体积不能小于1或大于800",
+                                                                            Toast.LENGTH_SHORT
+                                                                        ).show()
+                                                                    } else if (textList.get(5)
+                                                                            .toDouble() <= 0 || textList.get(
+                                                                            5
+                                                                        ).toDouble() > 20
+                                                                    ) {
+                                                                        Toast.makeText(
+                                                                            context,
+                                                                            "胶液体积不能小于1或大于20",
+                                                                            Toast.LENGTH_SHORT
+                                                                        ).show()
+                                                                    } else {
+                                                                        dispatch(
+                                                                            ProgramIntent.Insert(
+                                                                                textList.get(0),
+                                                                                textList.get(1)
+                                                                                    .toDouble(),
+                                                                                textList.get(2)
+                                                                                    .toDouble(),
+                                                                                textList.get(3),
+                                                                                textList.get(4)
+                                                                                    .toInt(),
+                                                                                textList.get(5)
+                                                                                    .toDouble(),
+                                                                                textList.get(6)
+                                                                            )
+                                                                        )
+                                                                        showingDialog.value = false
+                                                                    }
+                                                                }
+
+                                                            }
+
+
                                                         }
-
-
                                                     }
                                                 }
 

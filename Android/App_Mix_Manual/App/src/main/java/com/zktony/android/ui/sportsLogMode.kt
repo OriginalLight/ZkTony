@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -50,14 +51,18 @@ import com.zktony.android.ui.components.TableTextHead
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.getStoragePath
 import com.zktony.android.ui.utils.itemsIndexed
+import com.zktony.android.utils.extra.DownloadState
+import com.zktony.android.utils.extra.copyTo
 import com.zktony.android.utils.extra.dateFormat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.FileWriter
 import java.io.IOException
+import java.io.InputStreamReader
 import java.lang.reflect.Method
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -76,30 +81,17 @@ fun sportsLogMode(
         File("sdcard/Download").listFiles { _, name -> name.endsWith(".txt") }?.toList()
             ?: emptyList()
 
+
     var selectedName by remember { mutableStateOf("") }
     //	定义列宽
-    val cellWidthList = arrayListOf(500)
-
-    /**
-     * 导出弹窗
-     */
-    val exportDialog = remember { mutableStateOf(false) }
+    val cellWidthList = arrayListOf(100, 400)
 
 
     var selectedFile by remember { mutableStateOf<File?>(null) }
 
-    /**
-     * 导出进度
-     */
-    var exportSweepState by remember {
-        mutableFloatStateOf(0f)
-    }
-
-    var exportSweepStateCount by remember {
-        mutableStateOf(0)
-    }
-
-
+    var index = 0
+    println("index===$index")
+//    var index by remember { mutableStateOf(0) }
 
     Column(
         modifier = Modifier
@@ -144,12 +136,15 @@ fun sportsLogMode(
                 Row(
                     Modifier.background(Color(rgb(0, 105, 52)))
                 ) {
-                    TableTextHead(text = "文件名称", width = cellWidthList[0])
+                    TableTextHead(text = "序号", width = cellWidthList[0])
+                    TableTextHead(text = "文件名称", width = cellWidthList[1])
                 }
             }
 
-            items(txtList) { file ->
+            itemsIndexed(txtList) { index, file ->
+
                 val selected = file.name == selectedName
+
                 Row(
                     modifier = Modifier
                         .background(
@@ -165,7 +160,10 @@ fun sportsLogMode(
                         })
                 ) {
                     TableTextBody(
-                        text = file.name, width = cellWidthList[0], selected
+                        text = (index + 1).toString(), width = cellWidthList[0], selected
+                    )
+                    TableTextBody(
+                        text = file.name, width = cellWidthList[1], selected
                     )
                 }
             }
@@ -190,65 +188,38 @@ fun sportsLogMode(
                             var path = getStoragePath(context, true)
                             if ("" != path) {
                                 if (selectedFile != null) {
-                                    exportDialog.value = true
-                                        val targetDir = File(path + "/${selectedFile!!.name}.txt")
-                                        if (!targetDir.exists()) {
-                                            if (targetDir.createNewFile()) {
-                                                selectedFile!!.bufferedReader().useLines {
-                                                    exportSweepStateCount = it.count()
-                                                }
-                                                selectedFile!!.bufferedReader().useLines { lines ->
-                                                    for (line in lines) {
-                                                        if (line.isNotEmpty()) {
-                                                            targetDir.bufferedWriter().use { writer ->
-                                                                writer.append(line + "\n")
-                                                                delay(500)
-                                                                exportSweepState += 1f
-                                                                writer.flush()  // Ensure all data is flushed to the file
-                                                            }
-                                                        }
-                                                    }
-                                                    exportSweepState = 0f
-                                                    exportDialog.value = false
-                                                    Toast.makeText(
-                                                        context,
-                                                        "导出完成",
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
+                                    val targetDir = File(path + "/${selectedFile!!.name}")
+                                    if (!targetDir.exists()) {
+                                        if (targetDir.createNewFile()) {
 
+                                            FileInputStream(selectedFile).use { input ->
+                                                input.copyTo(FileOutputStream(targetDir)) {
                                                 }
-                                            } else {
-                                                Toast.makeText(
-                                                    context,
-                                                    "创建文件失败,请重试!",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
                                             }
+                                            Toast.makeText(
+                                                context,
+                                                "导出完成",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
                                         } else {
-                                            selectedFile!!.bufferedReader().useLines {
-                                                exportSweepStateCount = it.count()
-                                            }
-                                            selectedFile!!.bufferedReader().useLines { lines ->
-                                                for (line in lines) {
-                                                    if (line.isNotEmpty()) {
-                                                        targetDir.bufferedWriter().use { writer ->
-                                                            writer.append(line + "\n")
-                                                            delay(500)
-                                                            exportSweepState += 1f
-                                                            writer.flush()  // Ensure all data is flushed to the file
-                                                        }
-                                                    }
-                                                }
-                                                exportSweepState = 0f
-                                                exportDialog.value = false
-                                                Toast.makeText(
-                                                    context,
-                                                    "导出完成",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-
+                                            Toast.makeText(
+                                                context,
+                                                "创建文件失败,请重试!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    } else {
+                                        FileInputStream(selectedFile).use { input ->
+                                            input.copyTo(FileOutputStream(targetDir)) {
                                             }
                                         }
+                                        Toast.makeText(
+                                            context,
+                                            "导出完成",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+
+                                    }
                                 } else {
                                     Toast.makeText(
                                         context,
@@ -280,23 +251,5 @@ fun sportsLogMode(
 
 
     }
-
-
-
-    if (exportDialog.value) {
-        AlertDialog(
-            onDismissRequest = {},
-            title = {
-                Text(text = "导出进度", fontSize = 18.sp)
-            },
-            text = {
-                HorizontalProgressBar(exportSweepState / exportSweepStateCount)
-            }, confirmButton = {
-
-            }, dismissButton = {
-
-            })
-    }
-
 
 }
