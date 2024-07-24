@@ -17,7 +17,6 @@ data class IncubationStage(
     val recycle: Boolean,
     val origin: Int,
     val times: Int,
-    val speed: Int,
     // 0: finished, 1: running, 2: upcoming
     val flags: Int
 )

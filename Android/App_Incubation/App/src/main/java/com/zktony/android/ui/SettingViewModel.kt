@@ -21,6 +21,7 @@ import com.zktony.android.utils.extra.httpCall
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
@@ -51,6 +52,7 @@ class SettingViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            initMotor()
             if (ApplicationUtils.isNetworkAvailable()) {
                 httpCall { _application.value = it }
             }
@@ -68,6 +70,16 @@ class SettingViewModel @Inject constructor(
             is SettingIntent.Network -> network()
             is SettingIntent.Selected -> _selected.value = intent.id
             is SettingIntent.Update -> viewModelScope.launch { dao.update(intent.entity) }
+        }
+    }
+
+    private fun initMotor() {
+        viewModelScope.launch {
+            val motors = dao.getAll().first()
+            if (motors.isEmpty()) {
+                dao.insert(Motor(displayText = "摇床", index = 0))
+                dao.insert(Motor(displayText = "泵", index = 1))
+            }
         }
     }
 

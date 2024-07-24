@@ -46,6 +46,7 @@ import androidx.compose.material.icons.outlined.Grade
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Navigation
 import androidx.compose.material.icons.outlined.Security
+import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material.icons.outlined.Sync
 import androidx.compose.material.icons.outlined.Verified
 import androidx.compose.material.icons.outlined.Wifi
@@ -81,7 +82,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -92,6 +92,7 @@ import com.zktony.android.R
 import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.Motor
 import com.zktony.android.ui.components.CircleTextField
+import com.zktony.android.ui.components.InputDialog
 import com.zktony.android.ui.components.MotorItem
 import com.zktony.android.ui.components.SettingsAppBar
 import com.zktony.android.ui.components.VerificationCodeField
@@ -149,7 +150,13 @@ fun SettingRoute(viewModel: SettingViewModel) {
         SettingsAppBar(page, viewModel::dispatch) { navigation() }
         AnimatedContent(targetState = page) {
             when (page) {
-                PageType.SETTINGS -> SettingContent(application, progress, viewModel::dispatch)
+                PageType.SETTINGS -> SettingContent(
+                    application,
+                    progress,
+                    entities.toList(),
+                    viewModel::dispatch
+                )
+
                 PageType.AUTH -> Authentication(viewModel::dispatch)
                 PageType.MOTOR_LIST -> MotorList(entities, viewModel::dispatch)
                 PageType.MOTOR_DETAIL -> MotorDetail(
@@ -169,6 +176,7 @@ fun SettingRoute(viewModel: SettingViewModel) {
 fun SettingContent(
     application: Application?,
     progress: Int,
+    entities: List<Motor>,
     dispatch: (SettingIntent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -176,6 +184,28 @@ fun SettingContent(
     val navigationActions = LocalNavigationActions.current
     var navigation by rememberDataSaverState(key = Constants.NAVIGATION, default = false)
     var helpInfo by remember { mutableStateOf(false) }
+    val shaker = entities.find { it.index == 0 } ?: Motor(displayText = "None")
+    var showDialog by remember { mutableStateOf(false) }
+
+    if (showDialog) {
+        InputDialog(
+            title = "摇床速度",
+            value = shaker.speed.toString(),
+            onConfirm = {
+                scope.launch {
+                    showDialog = false
+                    val speed = it.toIntOrNull() ?: 0
+                    dispatch(SettingIntent.Update(shaker.copy(speed = speed.toLong())))
+                    writeRegister(shaker.index, 154, speed)
+                    delay(500L)
+                    writeRegister(shaker.index, 220, 1)
+                    snackbarHostState.showSnackbar(message = "已下载摇床速度")
+                }
+            }
+        ) {
+            showDialog = false
+        }
+    }
 
     Row(
         modifier = Modifier
@@ -223,6 +253,51 @@ fun SettingContent(
             }
 
             item {
+                SettingsCard(icon = Icons.Outlined.Security,
+                    text = stringResource(id = R.string.parameters),
+                    onClick = { dispatch(SettingIntent.NavTo(PageType.AUTH)) }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                        contentDescription = null
+                    )
+                }
+            }
+
+            item {
+                SettingsCard(icon = Icons.Outlined.Speed,
+                    text = "摇床速度",
+                    onClick = {
+                        showDialog = true
+                    }) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            text = shaker.speed.toString(),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontStyle = FontStyle.Italic
+                        )
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                            contentDescription = null
+                        )
+                    }
+                }
+            }
+        }
+
+        LazyColumn(
+            modifier = Modifier
+                .weight(1f)
+                .border(
+                    width = 1.dp,
+                    color = Color.LightGray,
+                    shape = MaterialTheme.shapes.small
+                )
+                .animateContentSize(),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item {
                 SettingsCard(
                     icon = Icons.Outlined.Navigation,
                     text = stringResource(id = R.string.navigation)
@@ -250,30 +325,6 @@ fun SettingContent(
             }
 
             item {
-                SettingsCard(icon = Icons.Outlined.Security,
-                    text = stringResource(id = R.string.parameters),
-                    onClick = { dispatch(SettingIntent.NavTo(PageType.AUTH)) }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowRight,
-                        contentDescription = null
-                    )
-                }
-            }
-        }
-
-        LazyColumn(
-            modifier = Modifier
-                .weight(1f)
-                .border(
-                    width = 1.dp,
-                    color = Color.LightGray,
-                    shape = MaterialTheme.shapes.small
-                )
-                .animateContentSize(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            item {
                 SettingsCard(
                     icon = Icons.Outlined.Info, text = stringResource(id = R.string.version)
                 ) {
@@ -299,7 +350,8 @@ fun SettingContent(
                         )
                     } else {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowRight, contentDescription = null
+                            imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                            contentDescription = null
                         )
                     }
                 }
@@ -879,7 +931,11 @@ fun ConfigList() {
                             delay(300L)
                             writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
                             delay(3500L)
-                            writeRegister(startAddr = 222, slaveAddr = 0, value = (value * 6400).toLong())
+                            writeRegister(
+                                startAddr = 222,
+                                slaveAddr = 0,
+                                value = (value * 6400).toLong()
+                            )
                         }
                     }) {
                         Icon(imageVector = Icons.Default.Start, contentDescription = null)
@@ -908,7 +964,11 @@ fun ConfigList() {
                             delay(300L)
                             writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
                             delay(3500L)
-                            writeRegister(startAddr = 222, slaveAddr = 0, value = (value * 6400).toLong())
+                            writeRegister(
+                                startAddr = 222,
+                                slaveAddr = 0,
+                                value = (value * 6400).toLong()
+                            )
                         }
                     }) {
                         Icon(imageVector = Icons.Default.Start, contentDescription = null)
@@ -922,10 +982,4 @@ fun ConfigList() {
             }
         }
     }
-}
-
-@Composable
-@Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun SettingsPreview() {
-    SettingContent(null, 0) {}
 }

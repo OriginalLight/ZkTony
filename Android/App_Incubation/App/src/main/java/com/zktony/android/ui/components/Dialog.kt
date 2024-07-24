@@ -111,6 +111,74 @@ fun InputDialog(
 }
 
 @Composable
+fun InputDialog(
+    title: String = "添加",
+    value: String,
+    onConfirm: (String) -> Unit,
+    onCancel: () -> Unit
+) {
+    var text by remember { mutableStateOf(value) }
+
+    Dialog(onDismissRequest = onCancel) {
+        ElevatedCard {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = text,
+                    onValueChange = { text = it },
+                    textStyle = TextStyle(
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    ),
+                    singleLine = true,
+                    shape = CircleShape,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = {
+                        onConfirm(text)
+                    })
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    OutlinedButton(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 16.dp),
+                        onClick = { onCancel() }
+                    ) {
+                        Text(text = stringResource(id = R.string.cancel))
+                    }
+
+                    Button(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 16.dp),
+                        onClick = { onConfirm(text) },
+                        enabled = text.isNotBlank()
+                    ) {
+                        Text(text = stringResource(id = R.string.confirm))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun ErrorDialog(
     message: String,
     onConfirm: () -> Unit

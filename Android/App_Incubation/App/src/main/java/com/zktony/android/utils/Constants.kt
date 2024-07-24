@@ -48,4 +48,9 @@ object Constants {
      * 摇床复位到低点补偿
      */
     const val ZT_0006 = "ZT_0006"
+
+    /**
+     * 摇床速度
+     */
+    const val ZT_0007 = "ZT_0007"
 }
