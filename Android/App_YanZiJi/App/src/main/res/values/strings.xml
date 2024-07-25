@@ -60,4 +60,5 @@
     <string name="accessory_life">配件寿命</string>
     <string name="maintenance_record">维护记录</string>
     <string name="error_log">故障日志</string>
+    <string name="runtime_log">运行日志</string>
 </resources>

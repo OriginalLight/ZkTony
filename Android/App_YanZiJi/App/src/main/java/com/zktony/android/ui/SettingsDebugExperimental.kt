@@ -32,7 +32,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zktony.android.R
@@ -154,7 +153,7 @@ fun ExperimentalDebugListView(
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             // 实验类型
             item {
-                SettingsRow(title = "实验类型") {
+                SettingsItem(title = "实验类型") {
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         SegmentedButtonTabRow(
                             modifier = Modifier.width(200.dp),
@@ -169,7 +168,7 @@ fun ExperimentalDebugListView(
 
             // 运行模式
             item {
-                SettingsRow(title = "运行模式") {
+                SettingsItem(title = "运行模式") {
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         SegmentedButtonTabRow(
                             modifier = Modifier.width(450.dp),
@@ -184,7 +183,7 @@ fun ExperimentalDebugListView(
 
             // 模式数值
             item {
-                SettingsRow(title = if (mode == 0) "电压" else if (mode == 1) "电流" else "功率") {
+                SettingsItem(title = if (mode == 0) "电压" else if (mode == 1) "电流" else "功率") {
                     ArgumentsInputField(
                         modifier = Modifier.size(350.dp, 48.dp),
                         value = value,
@@ -197,7 +196,7 @@ fun ExperimentalDebugListView(
             // 补液速度
             if (type == 0) {
                 item {
-                    SettingsRow(title = "补液速度") {
+                    SettingsItem(title = "补液速度") {
                         ArgumentsInputField(
                             modifier = Modifier.size(350.dp, 48.dp),
                             value = speed,
@@ -210,7 +209,7 @@ fun ExperimentalDebugListView(
 
             // 运行时间
             item {
-                SettingsRow(title = "运行时间") {
+                SettingsItem(title = "运行时间") {
                     ArgumentsInputField(
                         modifier = Modifier.size(350.dp, 48.dp),
                         value = time,
@@ -222,7 +221,7 @@ fun ExperimentalDebugListView(
 
             // 最高温度
             item {
-                SettingsRow(title = "最高温度") {
+                SettingsItem(title = "最高温度") {
                     ArgumentsInputField(
                         modifier = Modifier.size(350.dp, 48.dp),
                         value = temperature,
@@ -234,11 +233,12 @@ fun ExperimentalDebugListView(
 
             // 开始实验
             item {
-                SettingsRow(title = "实验操作") {
+                SettingsItem(title = "实验操作") {
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         var loadingStart by remember { mutableStateOf(false) }
                         var loadingStop by remember { mutableStateOf(false) }
                         Button(
+                            modifier = Modifier.width(150.dp),
                             enabled = !loadingStart,
                             onClick = {
                                 scope.launch {
@@ -266,6 +266,7 @@ fun ExperimentalDebugListView(
                         }
 
                         OutlinedButton(
+                            modifier = Modifier.width(150.dp),
                             enabled = !loadingStop,
                             onClick = {
                                 scope.launch {
@@ -285,9 +286,10 @@ fun ExperimentalDebugListView(
 
             // 数据导出
             item {
-                SettingsRow(title = "数据导出") {
+                SettingsItem(title = "数据导出") {
                     var loading by remember { mutableStateOf(false) }
                     Button(
+                        modifier = Modifier.width(120.dp),
                         enabled = !loading,
                         onClick = {
                             scope.launch {
@@ -305,7 +307,7 @@ fun ExperimentalDebugListView(
 
             // 管路清洗
             item {
-                SettingsRow(title = "管路清洗") {
+                SettingsItem(title = "管路清洗") {
                     var speed1 by remember { mutableStateOf("100") }
                     var time1 by remember { mutableStateOf("60") }
                     var loading by remember { mutableStateOf(false) }
@@ -333,6 +335,7 @@ fun ExperimentalDebugListView(
                         }
 
                         Button(
+                            modifier = Modifier.width(120.dp),
                             enabled = !loading,
                             onClick = {
                                 scope.launch {

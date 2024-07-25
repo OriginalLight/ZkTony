@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.material3.Icon
@@ -23,43 +23,43 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.R
-import com.zktony.android.data.Product
-import com.zktony.android.ui.components.ArgumentsSetField
-import com.zktony.android.ui.components.DropDownBox
 import com.zktony.android.ui.navigation.NavigationActions
+import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
+import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.zktyBrush
-import com.zktony.android.ui.viewmodel.SettingsArgumentsEquipmentViewModel
-import com.zktony.android.utils.Constants
-import com.zktony.datastore.rememberDataSaverState
+import com.zktony.android.ui.viewmodel.SettingsFqcViewModel
+import com.zktony.android.ui.viewmodel.SettingsUserManagementViewModel
+import com.zktony.room.entities.User
 
 @Composable
-fun SettingsArgumentsEquipmentView(viewModel: SettingsArgumentsEquipmentViewModel = hiltViewModel()) {
-
+fun SettingsUserManagementView(viewModel: SettingsUserManagementViewModel = hiltViewModel()) {
     val navigationActions = LocalNavigationActions.current
 
     BackHandler {
-        // 拦截返回键
-        navigationActions.navigateUp()
+        navigationActions.navigate(Route.SETTINGS)
     }
+
+    val entities = viewModel.entities.collectAsLazyPagingItems()
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         // 顶部导航栏
-        SettingsArgumentsEquipmentTopBar(navigationActions = navigationActions)
+        SettingsUserManagementTopBar(navigationActions = navigationActions)
 
-        // 参数列表
-        EquipmentArgumentsListView(viewModel = viewModel)
+        // 用户列表
+        SettingsUserListView(entities = entities, viewModel = viewModel)
     }
 }
 
 // 顶部导航栏
 @Composable
-fun SettingsArgumentsEquipmentTopBar(
+fun SettingsUserManagementTopBar(
     modifier: Modifier = Modifier,
     navigationActions: NavigationActions
 ) {
-
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -79,53 +79,31 @@ fun SettingsArgumentsEquipmentTopBar(
         ) {
             Icon(imageVector = Icons.AutoMirrored.Default.Reply, contentDescription = "Back")
             Text(
-                text = stringResource(id = R.string.equipment_arguments),
+                text = stringResource(id = R.string.user_management),
                 style = MaterialTheme.typography.titleLarge
             )
         }
     }
 }
 
-// 参数列表
 @Composable
-fun EquipmentArgumentsListView(
+fun SettingsUserListView(
     modifier: Modifier = Modifier,
-    viewModel: SettingsArgumentsEquipmentViewModel
+    entities: LazyPagingItems<User>,
+    viewModel: SettingsUserManagementViewModel
 ) {
-    // P/N参数
-    var pn by rememberDataSaverState(key = Constants.PN, initialValue = Constants.DEFAULT_PN)
-    // S/N参数
-    var sn by rememberDataSaverState(key = Constants.SN, initialValue = Constants.DEFAULT_SN)
-
-    Column(
+    LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface, shape = MaterialTheme.shapes.medium)
-            .padding(16.dp)
-            .clip(MaterialTheme.shapes.medium),
+            .background(
+                color = MaterialTheme.colorScheme.surface,
+                shape = MaterialTheme.shapes.medium
+            )
+            .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        SettingsItem(title = stringResource(id = R.string.product_number)) {
-            DropDownBox(
-                modifier = Modifier
-                    .width(200.dp)
-                    .height(48.dp),
-                selected = Product.indexFromName(pn),
-                options = Product.getTextList(),
-            ) {
-                pn = Product.getNameByIndex(it)
-                viewModel.setProductNumber(Product.getNameByIndex(it))
-            }
-        }
-
-        SettingsItem(title = stringResource(id = R.string.serial_number)) {
-            ArgumentsSetField(
-                modifier = Modifier.width(350.dp),
-                value = sn,
-            ) {
-                sn = it
-                viewModel.setSerialNumber(sn)
-            }
+        itemsIndexed(entities) { index, item ->
+            Text(text = item.name)
         }
     }
 }

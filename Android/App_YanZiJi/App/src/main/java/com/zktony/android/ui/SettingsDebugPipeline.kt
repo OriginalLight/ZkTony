@@ -130,7 +130,7 @@ fun PipelineDebugListView(
             .clip(MaterialTheme.shapes.medium),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        SettingsRow(title = "管路填充") {
+        SettingsItem(title = "管路填充") {
             var selected by remember { mutableIntStateOf(0) }
             var loading by remember { mutableStateOf(false) }
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -157,7 +157,7 @@ fun PipelineDebugListView(
             }
         }
 
-        SettingsRow(title = "管路排空") {
+        SettingsItem(title = "管路排空") {
             var selected by remember { mutableIntStateOf(0) }
             var loading by remember { mutableStateOf(false) }
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -184,7 +184,7 @@ fun PipelineDebugListView(
             }
         }
 
-        SettingsRow(title = "管路清洗") {
+        SettingsItem(title = "管路清洗") {
             var speed by remember { mutableStateOf("100") }
             var time by remember { mutableStateOf("60") }
             var loading by remember { mutableStateOf(false) }

@@ -1,4 +1,4 @@
-package com.zktony.log.storage
+package com.zktony.log
 
 import android.content.Context
 import java.io.File
@@ -8,8 +8,8 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.Executors
 
-class LogStorage(ctx: Context) {
-    private val logDir: File = File(ctx.filesDir, "logs")
+class LogStorageService(ctx: Context) {
+    private val logDir: File = File(ctx.cacheDir, "logs")
     private val logFileName: String = "${SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())}.log"
     private val executor = Executors.newSingleThreadExecutor()
 
@@ -37,7 +37,7 @@ class LogStorage(ctx: Context) {
         }
     }
 
-    fun exportLogs(): List<File> {
+    fun getLogs(): List<File> {
         return logDir.listFiles()?.toList() ?: emptyList()
     }
 

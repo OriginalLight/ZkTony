@@ -20,5 +20,14 @@ enum class Role(val permission: Int) {
                 else -> throw IllegalArgumentException("Unknown Role: $name")
             }
         }
+
+        fun getLowerRole(role: Role): List<String> {
+            return when (role) {
+                FACTORY -> listOf("CUSTOMER_SERVICE", "ADMIN", "USER")
+                CUSTOMER_SERVICE -> listOf("ADMIN", "USER")
+                ADMIN -> listOf("USER")
+                USER -> listOf("NONE")
+            }
+        }
     }
 }

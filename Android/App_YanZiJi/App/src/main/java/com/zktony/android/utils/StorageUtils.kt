@@ -5,11 +5,13 @@ import java.io.File
 
 
 object StorageUtils {
-    private const val ARGUMENTS_DIR = "Arguments"
-    private const val EXPERIMENTAL_DIR = "Experimental"
+    const val LOG_DIR = "logs"
+    const val ARGUMENTS_DIR = "arguments"
+    const val EXPERIMENTAL_DIR = "experimental"
+    const val RUNTIME_DIR = "runtime"
 
     // 获取内部存储路径 /data/data/com.zktony.android/files
-    fun getStorageDir(): String {
+    fun getFileDir(): String {
         return ApplicationUtils.ctx.filesDir.absolutePath
     }
 
@@ -88,15 +90,5 @@ object StorageUtils {
         }
 
         return storageDirectories
-    }
-
-    // 获取参数存储路径
-    fun getArgumentDir(): String? {
-        val usbList = getUsbStorageDir()
-        return if (usbList.isNotEmpty()) {
-            "${usbList.first()}/$ARGUMENTS_DIR"
-        } else {
-            null
-        }
     }
 }

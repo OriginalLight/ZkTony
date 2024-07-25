@@ -1,7 +1,6 @@
 ﻿using Exposure.Api.Contracts.Services;
 using Exposure.Api.Models.Dto;
 using Exposure.Protocal.Default;
-using Exposure.Utilities;
 
 namespace Exposure.Api.Services;
 
@@ -10,6 +9,7 @@ public class TestService(ICameraService cameraService, ISerialPortService serial
 {
     private TestAgingDto _agingDto = new TestAgingDto();
     private Task? _agingTask;
+    private int _lastHatch = -1;
 
     #region 老化测试
 
@@ -18,6 +18,7 @@ public class TestService(ICameraService cameraService, ISerialPortService serial
         _agingDto = dto;
         if (dto.IsAnyTrue())
         {
+            _lastHatch = -1;
             _agingTask ??= Task.Run(AgingTask);
         }
         else
@@ -42,6 +43,20 @@ public class TestService(ICameraService cameraService, ISerialPortService serial
             if (_agingDto.Hatch)
             {
                 var hatch = serialPort.GetFlag("hatch");
+                if (_lastHatch == hatch)
+                {
+                    await SaveAgingLogAsync("舱门状态切换失败");
+                    _agingDto = new TestAgingDto
+                    {
+                        Hatch = false,
+                        Led = false,
+                        Light = false,
+                        Camera = false,
+                        Cycle = 0,
+                        Interval = 0,
+                    };
+                }
+
                 if (hatch == 0)
                 {
                     await SaveAgingLogAsync("当前舱门状态: 关闭, 下发打开舱门指令");
@@ -52,6 +67,8 @@ public class TestService(ICameraService cameraService, ISerialPortService serial
                     await SaveAgingLogAsync("当前舱门状态: 打开, 下发关闭舱门指令");
                     serialPort.WritePort("Com2", DefaultProtocol.CloseHatch().ToBytes());
                 }
+
+                _lastHatch = hatch;
             }
 
             if (_agingDto.Light)
@@ -111,6 +128,15 @@ public class TestService(ICameraService cameraService, ISerialPortService serial
                 catch (Exception e)
                 {
                     await SaveAgingLogAsync("摄像头老化测试异常: " + e.Message);
+                    _agingDto = new TestAgingDto
+                    {
+                        Hatch = false,
+                        Led = false,
+                        Light = false,
+                        Camera = false,
+                        Cycle = 0,
+                        Interval = 0,
+                    };
                 }
 
             await SaveAgingLogAsync($"等待{_agingDto.Interval}秒后进行下一次老化测试");
@@ -122,7 +148,6 @@ public class TestService(ICameraService cameraService, ISerialPortService serial
     }
 
     #endregion
-
 
     #region 存储老化测试日志
 

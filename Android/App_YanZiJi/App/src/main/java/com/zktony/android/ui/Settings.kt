@@ -145,10 +145,10 @@ fun UserSettingsView(
 
         RequirePermission(role = Role.ADMIN) {
             // 用户管理
-            SettingsRow(
+            SettingsItem(
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.small)
-                    .clickable {  },
+                    .clickable { navigationActions.navigate(Route.SETTINGS_USER_MANAGEMENT) },
                 title = stringResource(id = R.string.user_management)
             ) {
                 Icon(
@@ -158,7 +158,7 @@ fun UserSettingsView(
             }
 
             // 用户管理
-            SettingsRow(
+            SettingsItem(
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.small)
                     .clickable {  },
@@ -239,7 +239,7 @@ fun SystemSettingsView(
         )
 
         // 语言
-        SettingsRow(title = stringResource(id = R.string.language)) {
+        SettingsItem(title = stringResource(id = R.string.language)) {
             SegmentedButtonTabRow(
                 modifier = Modifier.width(300.dp),
                 tabItems = listOf("简体中文", "English"),
@@ -253,7 +253,7 @@ fun SystemSettingsView(
         }
 
         // 提示音
-        SettingsRow(title = stringResource(id = R.string.prompt_sound)) {
+        SettingsItem(title = stringResource(id = R.string.prompt_sound)) {
             SegmentedButtonTabRow(
                 modifier = Modifier.width(300.dp),
                 tabItems = PromptSound.getResIdList().map { stringResource(id = it) },
@@ -267,7 +267,7 @@ fun SystemSettingsView(
         }
 
         // 导航栏
-        SettingsRow(title = stringResource(id = R.string.navigation_bar)) {
+        SettingsItem(title = stringResource(id = R.string.navigation_bar)) {
             Switch(
                 checked = navigationBar,
                 onCheckedChange = {
@@ -283,7 +283,7 @@ fun SystemSettingsView(
         }
 
         // 状态栏
-        SettingsRow(title = stringResource(id = R.string.status_bar)) {
+        SettingsItem(title = stringResource(id = R.string.status_bar)) {
             Switch(
                 checked = statusBar,
                 onCheckedChange = {
@@ -299,7 +299,7 @@ fun SystemSettingsView(
         }
 
         // 主屏幕
-        SettingsRow(title = stringResource(id = R.string.home_package)) {
+        SettingsItem(title = stringResource(id = R.string.home_package)) {
             Switch(checked = homePackage, onCheckedChange = {
                 scope.launch {
                     homePackage = it
@@ -312,7 +312,7 @@ fun SystemSettingsView(
         }
 
         // 配件寿命
-        SettingsRow(
+        SettingsItem(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable {  },
@@ -325,7 +325,7 @@ fun SystemSettingsView(
         }
 
         // 维护记录
-        SettingsRow(
+        SettingsItem(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable {  },
@@ -338,7 +338,7 @@ fun SystemSettingsView(
         }
 
         // 故障日志
-        SettingsRow(
+        SettingsItem(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable {  },
@@ -351,7 +351,7 @@ fun SystemSettingsView(
         }
 
         // 系统时间
-        SettingsRow(
+        SettingsItem(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable { showDateTimePicker = true },
@@ -391,7 +391,7 @@ fun FactorySettingsView(modifier: Modifier = Modifier) {
         )
 
         // 参数
-        SettingsRow(
+        SettingsItem(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable { navigationActions.navigate(Route.SETTINGS_ARGUMENTS) },
@@ -404,7 +404,7 @@ fun FactorySettingsView(modifier: Modifier = Modifier) {
         }
 
         // 调试
-        SettingsRow(
+        SettingsItem(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable { navigationActions.navigate(Route.SETTINGS_DEBUG) },
@@ -418,7 +418,7 @@ fun FactorySettingsView(modifier: Modifier = Modifier) {
 
         RequirePermission(role = Role.FACTORY) {
             // Fqc
-            SettingsRow(
+            SettingsItem(
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.small)
                     .clickable { navigationActions.navigate(Route.SETTINGS_FQC) },
@@ -431,7 +431,7 @@ fun FactorySettingsView(modifier: Modifier = Modifier) {
             }
 
             // Aging
-            SettingsRow(
+            SettingsItem(
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.small)
                     .clickable { navigationActions.navigate(Route.SETTINGS_AGING) },
@@ -443,11 +443,24 @@ fun FactorySettingsView(modifier: Modifier = Modifier) {
                 )
             }
         }
+
+        // 运行日志
+        SettingsItem(
+            modifier = Modifier
+                .clip(MaterialTheme.shapes.small)
+                .clickable { navigationActions.navigate(Route.SETTINGS_RUNTIME_LOG) },
+            title = stringResource(id = R.string.runtime_log)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
+                contentDescription = "ArrowForwardIos"
+            )
+        }
     }
 }
 
 @Composable
-fun SettingsRow(
+fun SettingsItem(
     modifier: Modifier = Modifier,
     title: String,
     content: @Composable () -> Unit

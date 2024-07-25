@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -165,7 +166,9 @@ fun LoginForm(
         )
 
         Button(
-            modifier = Modifier.width(450.dp),
+            modifier = Modifier
+                .width(450.dp)
+                .height(48.dp),
             enabled = userName.isNotEmpty() && password.isNotEmpty() && !loading,
             colors = ButtonDefaults.buttonColors(
                 containerColor = if (errorText != null) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
@@ -196,7 +199,7 @@ fun LoginForm(
                     fontSize = 20.sp
                 )
             } else {
-                ButtonLoading(loading = loading, size = 20.dp) {
+                ButtonLoading(loading = loading) {
                     Text(
                         text = stringResource(id = R.string.login),
                         fontSize = 20.sp

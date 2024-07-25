@@ -54,6 +54,8 @@ import com.zktony.android.ui.SettingsDebugPipelineView
 import com.zktony.android.ui.SettingsDebugSolenoidValveView
 import com.zktony.android.ui.SettingsDebugView
 import com.zktony.android.ui.SettingsFqcView
+import com.zktony.android.ui.SettingsRuntimeLogView
+import com.zktony.android.ui.SettingsUserManagementView
 import com.zktony.android.ui.SettingsView
 import com.zktony.android.ui.components.BottomBar
 import com.zktony.android.ui.components.LogoutConfirmDialog
@@ -108,6 +110,7 @@ fun AppNavigation() {
                 composable(Route.EXPERIMENTAL) { ExperimentalView() }
                 composable(Route.HISTORY) { HistoryView() }
                 composable(Route.SETTINGS) { SettingsView() }
+                composable(Route.SETTINGS_USER_MANAGEMENT) { SettingsUserManagementView() }
                 composable(Route.SETTINGS_ARGUMENTS) { SettingsArgumentsView() }
                 composable(Route.SETTINGS_ARGUMENTS_EQUIPMENT) { SettingsArgumentsEquipmentView() }
                 composable(Route.SETTINGS_ARGUMENTS_RUNTIME) { SettingsArgumentsRuntimeView() }
@@ -120,6 +123,7 @@ fun AppNavigation() {
                 composable(Route.SETTINGS_DEBUG_EXPERIMENTAL) { SettingsDebugExperimentalView() }
                 composable(Route.SETTINGS_FQC) { SettingsFqcView() }
                 composable(Route.SETTINGS_AGING) { SettingsAgingView() }
+                composable(Route.SETTINGS_RUNTIME_LOG) { SettingsRuntimeLogView() }
             }
         }
     }

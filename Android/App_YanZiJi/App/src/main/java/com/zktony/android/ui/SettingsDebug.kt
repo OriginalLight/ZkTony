@@ -95,7 +95,7 @@ fun DebugListView(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             // 电磁阀
-            SettingsRow(
+            SettingsItem(
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.small)
                     .clickable { navigationActions.navigate(Route.SETTINGS_DEBUG_SOLENOID_VALVE) },
@@ -108,7 +108,7 @@ fun DebugListView(
             }
 
             // 管路
-            SettingsRow(
+            SettingsItem(
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.small)
                     .clickable { navigationActions.navigate(Route.SETTINGS_DEBUG_PIPELINE) },
@@ -121,7 +121,7 @@ fun DebugListView(
             }
 
             // 实验
-            SettingsRow(
+            SettingsItem(
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.small)
                     .clickable { navigationActions.navigate(Route.SETTINGS_DEBUG_EXPERIMENTAL) },

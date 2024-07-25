@@ -47,20 +47,21 @@ class SettingsArgumentsViewModel @Inject constructor(
         }
         AppStateUtils.isArgumentsSync = fail.isEmpty()
         if (fail.isNotEmpty()) {
-            TipsUtils.showTips(Tips(TipsType.ERROR, "同步参数失败: ${fail.joinToString()}"))
+            TipsUtils.showTips(Tips.error( "同步参数失败: ${fail.joinToString()}"))
         } else {
-            TipsUtils.showTips(Tips(TipsType.INFO, "同步参数成功"))
+            TipsUtils.showTips(Tips.info("同步参数成功"))
         }
     }
 
     // 导出参数
     suspend fun exportArguments() {
         try {
-            val dir = StorageUtils.getArgumentDir()
-            if (dir == null) {
-                TipsUtils.showTips(Tips(TipsType.ERROR, "未检测到U盘"))
+            val usbList = StorageUtils.getUsbStorageDir()
+            if (usbList.isEmpty()) {
+                TipsUtils.showTips(Tips.error("未检测到U盘"))
                 return
             }
+            val dir = usbList.first() + "/${StorageUtils.ARGUMENTS_DIR}"
             val sn = dataStore.readData(Constants.SN, Constants.DEFAULT_SN)
             val savePath = "$dir/$sn.json"
             val arguments = AppStateUtils.getArgumentList()
@@ -75,10 +76,10 @@ class SettingsArgumentsViewModel @Inject constructor(
             withContext(Dispatchers.IO) {
                 file.writeText(argsJson)
             }
-            TipsUtils.showTips(Tips(TipsType.INFO, "导出参数成功"))
+            TipsUtils.showTips(Tips.info("导出参数成功"))
         } catch (e: Exception) {
             LogUtils.error("ExportArguments", e.stackTraceToString(), true)
-            TipsUtils.showTips(Tips(TipsType.ERROR, "导出参数失败"))
+            TipsUtils.showTips(Tips.error("导出参数失败"))
         }
     }
 
@@ -86,7 +87,7 @@ class SettingsArgumentsViewModel @Inject constructor(
     suspend fun importArguments(file: File?) {
         try {
             if (file == null) {
-                TipsUtils.showTips(Tips(TipsType.ERROR, "参数文件不存在"))
+                TipsUtils.showTips(Tips.error("参数文件不存在"))
                 return
             }
             val argsJson = withContext(Dispatchers.IO) {
@@ -94,10 +95,10 @@ class SettingsArgumentsViewModel @Inject constructor(
             }
             val arguments = JsonUtils.fromJson<List<Arguments>>(argsJson)
             if (arguments.isEmpty()) {
-                TipsUtils.showTips(Tips(TipsType.ERROR, "参数文件格式错误"))
+                TipsUtils.showTips(Tips.error("参数文件格式错误"))
                 return
             } else if (arguments.size != ProductUtils.getChannelCount()) {
-                TipsUtils.showTips(Tips(TipsType.ERROR, "参数文件通道数量错误"))
+                TipsUtils.showTips(Tips.error("参数文件通道数量错误"))
                 return
             }
             val fail = mutableListOf<Int>()
@@ -117,22 +118,23 @@ class SettingsArgumentsViewModel @Inject constructor(
                 return
             } else {
                 AppStateUtils.setArgumentsList(arguments)
-                TipsUtils.showTips(Tips(TipsType.INFO, "导入参数成功"))
+                TipsUtils.showTips(Tips.info("导入参数成功"))
             }
         } catch (e: Exception) {
             LogUtils.error("ImportArguments", e.stackTraceToString(), true)
-            TipsUtils.showTips(Tips(TipsType.ERROR, "导入参数失败"))
+            TipsUtils.showTips(Tips.error("导入参数失败"))
         }
     }
 
     // 获取参数文件
     fun getArgumentFiles(): List<File> {
         val fileList = mutableListOf<File>()
-        val dir = StorageUtils.getArgumentDir()
-        if (dir == null) {
-            TipsUtils.showTips(Tips(TipsType.ERROR, "未检测到U盘"))
+        val usbList = StorageUtils.getUsbStorageDir()
+        if (usbList.isEmpty()) {
+            TipsUtils.showTips(Tips.error("未检测到U盘"))
             return fileList
         }
+        val dir = usbList.first() + "/${StorageUtils.ARGUMENTS_DIR}"
         val file = File(dir)
         if (file.exists() && file.isDirectory) {
             file.listFiles { f ->
@@ -154,10 +156,10 @@ class SettingsArgumentsViewModel @Inject constructor(
             }
         }
         if (fail.isNotEmpty()) {
-            TipsUtils.showTips(Tips(TipsType.ERROR, "清除参数失败: ${fail.joinToString()}"))
+            TipsUtils.showTips(Tips.error("清除参数失败: ${fail.joinToString()}"))
         } else {
             AppStateUtils.setArgumentsList(List(ProductUtils.MAX_CHANNEL_COUNT) { Arguments() })
-            TipsUtils.showTips(Tips(TipsType.INFO, "清除参数成功"))
+            TipsUtils.showTips(Tips.info( "清除参数成功"))
         }
     }
 }

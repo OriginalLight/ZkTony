@@ -59,4 +59,5 @@
     <string name="accessory_life">Accessory Life</string>
     <string name="maintenance_record">Maintenance Record</string>
     <string name="error_log">Error Log</string>
+    <string name="runtime_log">Runtime Log</string>
 </resources>

@@ -104,7 +104,7 @@ fun SolenoidValveDebugListView(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         repeat(ProductUtils.getChannelCount()) { index ->
-            SettingsRow(title = stringResource(id = R.string.channel) + (index + 1)) {
+            SettingsItem(title = stringResource(id = R.string.channel) + (index + 1)) {
                 var selected by remember { mutableIntStateOf(0) }
                 SegmentedButtonTabRow(
                     modifier = Modifier.width(200.dp),

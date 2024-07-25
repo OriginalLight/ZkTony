@@ -1,31 +1,27 @@
 package com.zktony.log
 
-import android.annotation.SuppressLint
 import android.app.Application
 import android.util.Log
-import com.zktony.log.storage.LogStorage
 import java.io.File
 
-@SuppressLint("StaticFieldLeak")
 object LogUtils {
     private const val TAG = "AppLog"
-    private lateinit var ctx: Application
-    private lateinit var logStorage: LogStorage
+    private lateinit var service: LogStorageService
 
     fun with(app: Application) {
-        logStorage = LogStorage(app)
+        service = LogStorageService(app)
     }
 
     // 导出
-    fun export() : List<File> {
-        return logStorage.exportLogs()
+    fun getLogs() : List<File> {
+        return service.getLogs()
     }
 
     // Error日志级别
     fun error(msg: String, storage: Boolean = false) {
         Log.e(TAG, msg)
         if (storage) {
-            logStorage.writeLog("[E/$TAG] $msg")
+            service.writeLog("[E/$TAG] $msg")
         }
     }
 
@@ -33,7 +29,7 @@ object LogUtils {
     fun info(msg: String, storage: Boolean = false) {
         Log.i(TAG, msg)
         if (storage) {
-            logStorage.writeLog("[I/$TAG] $msg")
+            service.writeLog("[I/$TAG] $msg")
         }
     }
 
@@ -41,7 +37,7 @@ object LogUtils {
     fun debug(msg: String, storage: Boolean = false) {
         Log.d(TAG, msg)
         if (storage) {
-            logStorage.writeLog("[D/$TAG] $msg")
+            service.writeLog("[D/$TAG] $msg")
         }
     }
 
@@ -49,7 +45,7 @@ object LogUtils {
     fun warn(msg: String, storage: Boolean = false) {
         Log.w(TAG, msg)
         if (storage) {
-            logStorage.writeLog("[W/$TAG] $msg")
+            service.writeLog("[W/$TAG] $msg")
         }
     }
 
@@ -57,7 +53,7 @@ object LogUtils {
     fun verbose(msg: String, storage: Boolean = false) {
         Log.v(TAG, msg)
         if (storage) {
-            logStorage.writeLog("[V/$TAG] $msg")
+            service.writeLog("[V/$TAG] $msg")
         }
     }
 
@@ -65,7 +61,7 @@ object LogUtils {
     fun wtf(msg: String, storage: Boolean = false) {
         Log.wtf(TAG, msg)
         if (storage) {
-            logStorage.writeLog("[WTF/$TAG] $msg")
+            service.writeLog("[WTF/$TAG] $msg")
         }
     }
 
@@ -73,7 +69,7 @@ object LogUtils {
     fun error(tag: String, msg: String, storage: Boolean = false) {
         Log.e(tag, msg)
         if (storage) {
-            logStorage.writeLog("[E/$tag] $msg")
+            service.writeLog("[E/$tag] $msg")
         }
     }
 
@@ -81,7 +77,7 @@ object LogUtils {
     fun info(tag: String, msg: String, storage: Boolean = false) {
         Log.i(tag, msg)
         if (storage) {
-            logStorage.writeLog("[I/$tag] $msg")
+            service.writeLog("[I/$tag] $msg")
         }
     }
 
@@ -89,7 +85,7 @@ object LogUtils {
     fun debug(tag: String, msg: String, storage: Boolean = false) {
         Log.d(tag, msg)
         if (storage) {
-            logStorage.writeLog("[D/$tag] $msg")
+            service.writeLog("[D/$tag] $msg")
         }
     }
 
@@ -97,7 +93,7 @@ object LogUtils {
     fun warn(tag: String, msg: String, storage: Boolean = false) {
         Log.w(tag, msg)
         if (storage) {
-            logStorage.writeLog("[W/$tag] $msg")
+            service.writeLog("[W/$tag] $msg")
         }
     }
 
@@ -105,7 +101,7 @@ object LogUtils {
     fun verbose(tag: String, msg: String, storage: Boolean = false) {
         Log.v(tag, msg)
         if (storage) {
-            logStorage.writeLog("[V/$tag] $msg")
+            service.writeLog("[V/$tag] $msg")
         }
     }
 
@@ -113,7 +109,7 @@ object LogUtils {
     fun wtf(tag: String, msg: String, storage: Boolean = false) {
         Log.wtf(tag, msg)
         if (storage) {
-            logStorage.writeLog("[WTF/$tag] $msg")
+            service.writeLog("[WTF/$tag] $msg")
         }
     }
 }

@@ -153,7 +153,7 @@ fun ArgumentsListView(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         // 设备参数
-        SettingsRow(
+        SettingsItem(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable { navigationActions.navigate(Route.SETTINGS_ARGUMENTS_EQUIPMENT) },
@@ -166,7 +166,7 @@ fun ArgumentsListView(
         }
 
         // 运行时参数
-        SettingsRow(
+        SettingsItem(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable { navigationActions.navigate(Route.SETTINGS_ARGUMENTS_RUNTIME) },
@@ -179,7 +179,7 @@ fun ArgumentsListView(
         }
 
         // 蠕动泵参数
-        SettingsRow(
+        SettingsItem(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable { navigationActions.navigate(Route.SETTINGS_ARGUMENTS_PUMP) },
@@ -192,7 +192,7 @@ fun ArgumentsListView(
         }
 
         // 电压电流参数
-        SettingsRow(
+        SettingsItem(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable { navigationActions.navigate(Route.SETTINGS_ARGUMENTS_VOLTAGE) },
@@ -205,7 +205,7 @@ fun ArgumentsListView(
         }
 
         // 传感器参数
-        SettingsRow(
+        SettingsItem(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable { navigationActions.navigate(Route.SETTINGS_ARGUMENTS_SENSOR) },

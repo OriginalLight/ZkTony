@@ -84,4 +84,9 @@ class UserRepository @Inject constructor(
         val effect = userDao.deleteAll(users)
         return if (effect > 0) Result.success(users.map { it.id }) else Result.failure(Exception("1"))
     }
+
+    /**
+     * Get by page.
+     */
+    fun getByPage(roles: List<String>) = userDao.getByPage(roles)
 }

@@ -37,6 +37,7 @@ object SerialPortUtils {
         } ?: {
             LogUtils.error("下位机串口初始化化失败: ID = A, Device = ttyS2", true)
         }
+
         // 初始化tec串口
         serialPortOf {
             device = "/dev/ttyS0"
@@ -53,8 +54,8 @@ object SerialPortUtils {
         target: Int,
         key: String,
         func: Byte,
-        byteArray: ByteArray = byteArrayOf(),
-        timeOut: Long = 1000
+        byteArray: ByteArray,
+        timeOut: Long
     ): Boolean {
         val serialPort = SerialStoreUtils.get("A") ?: return false
         val bytesList = mutableListOf<ByteArray>()
@@ -100,8 +101,8 @@ object SerialPortUtils {
         target: Int,
         key: String,
         func: Byte,
-        byteArray: ByteArray = byteArrayOf(),
-        timeOut: Long = 1000
+        byteArray: ByteArray,
+        timeOut: Long
     ): ByteArray? {
         val serialPort = SerialStoreUtils.get("A") ?: return null
         val bytesList = mutableListOf<ByteArray>()
