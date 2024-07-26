@@ -61,4 +61,6 @@
     <string name="maintenance_record">维护记录</string>
     <string name="error_log">故障日志</string>
     <string name="runtime_log">运行日志</string>
+    <string name="password_modify">密码修改</string>
+    <string name="version_info">版本信息</string>
 </resources>

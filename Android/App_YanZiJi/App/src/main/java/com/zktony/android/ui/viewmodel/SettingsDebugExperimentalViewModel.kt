@@ -53,7 +53,7 @@ class SettingsDebugExperimentalViewModel @Inject constructor() : ViewModel() {
             return false
         } else {
             TipsUtils.showTips(Tips.info("实验开始成功 通道：${channel + 1}"))
-            startCollecting(channel)
+            startCollecting(channel, experimental)
             return true
         }
     }
@@ -69,7 +69,7 @@ class SettingsDebugExperimentalViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    private fun startCollecting(channel: Int)  {
+    private fun startCollecting(channel: Int, control: ExperimentalControl)  {
         collectingJobList[channel]?.cancel()
         collectingJobList[channel] = viewModelScope.launch {
             val dir = StorageUtils.getCacheDir() + "/${StorageUtils.EXPERIMENTAL_DIR}"
@@ -80,6 +80,7 @@ class SettingsDebugExperimentalViewModel @Inject constructor() : ViewModel() {
             if (!files.exists()) {
                 files.createNewFile()
             }
+            files.appendText("电压(V): ${control.voltage},电流(A): ${control.current},功率(W): ${control.power},温度(℃): ${control.temperature},时间(s): ${control.time},流量(mL/min): ${control.speed}\n")
             while (true) {
                 val state = AppStateUtils.channelStateList.value[channel]
                 if (state.timing > 0) {

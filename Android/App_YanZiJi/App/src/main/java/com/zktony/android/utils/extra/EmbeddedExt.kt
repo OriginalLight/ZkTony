@@ -1,6 +1,7 @@
 package com.zktony.android.utils.extra
 
 import android.util.Log
+import com.zktony.android.data.UpgradeState
 import com.zktony.serialport.command.Protocol
 import com.zktony.serialport.ext.readInt8
 import com.zktony.serialport.ext.toAsciiString
@@ -163,44 +164,4 @@ suspend fun embeddedUpgrade(hexFile: File) = channelFlow {
     } finally {
         serialPort.unregisterCallback(key)
     }
-}
-
-suspend fun embeddedVersion(): String {
-    var version = "Unknown"
-    val key = "embeddedVersion"
-    val serialPort = SerialStoreUtils.get("A") ?: return version
-    try {
-        // 注册回调
-        serialPort.registerCallback(key) { bytes ->
-            Protocol.verifyProtocol(bytes) {
-                if (it.function == 0x0A.toByte()) {
-                    version = it.data.toAsciiString()
-                }
-            }
-        }
-        // 发送版本查询命令
-        serialPort.sendByteArray(Protocol().apply {
-            function = 0x0A.toByte()
-        }.serialization())
-        // 等待版本响应
-        withTimeout(2000L) {
-            while (version == "Unknown") {
-                delay(30)
-            }
-        }
-    } catch (e: Exception) {
-        Log.e("EmbeddedExt", e.message ?: "Unknown")
-    } finally {
-        // 取消注册
-        serialPort.unregisterCallback(key)
-    }
-    // 返回版本号
-    return version
-}
-
-sealed class UpgradeState {
-    data class Message(val message: String) : UpgradeState()
-    data class Progress(val progress: Double) : UpgradeState()
-    data class Err(val t: Throwable) : UpgradeState()
-    data object Success : UpgradeState()
 }

@@ -14,6 +14,10 @@ object AuthUtils {
         return loggedUser
     }
 
+    fun getIdentity(): Long {
+        return loggedUser?.id ?: -1
+    }
+
     fun login(user: User) {
         loggedUser = user
     }

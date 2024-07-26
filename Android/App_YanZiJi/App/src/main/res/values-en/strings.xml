@@ -60,4 +60,6 @@
     <string name="maintenance_record">Maintenance Record</string>
     <string name="error_log">Error Log</string>
     <string name="runtime_log">Runtime Log</string>
+    <string name="password_modify">Password Modify</string>
+    <string name="version_info">Version Info</string>
 </resources>

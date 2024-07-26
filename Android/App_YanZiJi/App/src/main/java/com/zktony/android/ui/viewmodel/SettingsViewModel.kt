@@ -4,12 +4,15 @@ import androidx.lifecycle.ViewModel
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
 import com.zktony.android.ui.components.Tips
+import com.zktony.android.utils.AuthUtils
 import com.zktony.android.utils.HzmctUtils
 import com.zktony.android.utils.PromptSoundUtils
 import com.zktony.android.utils.ResourceUtils
 import com.zktony.android.utils.TipsUtils
 import com.zktony.log.LogUtils
+import com.zktony.room.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 /**
@@ -17,7 +20,9 @@ import javax.inject.Inject
  * @date 2023/5/15 14:51
  */
 @HiltViewModel
-class SettingsViewModel @Inject constructor() : ViewModel() {
+class SettingsViewModel @Inject constructor(
+    private val userRepository: UserRepository
+) : ViewModel() {
 
     // 语言
     fun setLanguage(language: String) {
@@ -111,5 +116,29 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
             LogUtils.error("$tipsMessage $time", true)
         }
         return bool
+    }
+
+    // 密码验证
+    suspend fun verifyPassword(oldPassword: String): Boolean {
+        val res = userRepository.verifyPassword(AuthUtils.getIdentity(), oldPassword)
+        delay(300L)
+        if(res.isSuccess) {
+            return res.getOrNull() ?: false
+        }
+        return false
+    }
+
+    // 修改密码
+    suspend fun modifyPassword(newPassword: String): Boolean {
+        val res = userRepository.modifyPassword(AuthUtils.getIdentity(), newPassword)
+        delay(300L)
+        if(res.isSuccess) {
+            TipsUtils.showTips(Tips.info("密码修改成功"))
+            LogUtils.info("密码修改成功", true)
+            return res.getOrNull() != null
+        }
+        TipsUtils.showTips(Tips.error("密码修改失败"))
+        LogUtils.error("密码修改失败", true)
+        return false
     }
 }

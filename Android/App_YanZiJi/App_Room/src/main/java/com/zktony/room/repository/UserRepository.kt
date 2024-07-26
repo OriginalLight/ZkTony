@@ -89,4 +89,27 @@ class UserRepository @Inject constructor(
      * Get by page.
      */
     fun getByPage(roles: List<String>) = userDao.getByPage(roles)
+
+    /**
+     *  Verify password.
+     */
+    suspend fun verifyPassword(identity: Long, password: String): Result<Boolean> {
+        val user = userDao.getById(identity) ?: return Result.failure(Exception("1"))
+        val digest = MessageDigest.getInstance("SHA-256")
+        val hash = digest.digest(password.toByteArray())
+        val passwordHash = hash.fold("") { str, it -> str + "%02x".format(it) }
+        return Result.success(user.password == passwordHash)
+    }
+
+    /**
+     * Modify password.
+     */
+    suspend fun modifyPassword(identity: Long, newPassword: String): Result<Boolean> {
+        val user = userDao.getById(identity) ?: return Result.failure(Exception("1"))
+        val digest = MessageDigest.getInstance("SHA-256")
+        val hash = digest.digest(newPassword.toByteArray())
+        val passwordHash = hash.fold("") { str, it -> str + "%02x".format(it) }
+        val effect = userDao.update(user.copy(password = passwordHash))
+        return if (effect > 0) Result.success(true) else Result.failure(Exception("2"))
+    }
 }

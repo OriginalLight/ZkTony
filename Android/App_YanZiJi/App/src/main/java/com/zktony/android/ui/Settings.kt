@@ -40,6 +40,7 @@ import com.zktony.android.R
 import com.zktony.android.data.PromptSound
 import com.zktony.android.data.Role
 import com.zktony.android.ui.components.DateTimePicker
+import com.zktony.android.ui.components.PasswordModifyDialog
 import com.zktony.android.ui.components.RequirePermission
 import com.zktony.android.ui.components.SegmentedButtonTabRow
 import com.zktony.android.ui.navigation.Route
@@ -97,6 +98,15 @@ fun UserSettingsView(
     viewModel: SettingsViewModel
 ) {
     val navigationActions = LocalNavigationActions.current
+    var showPasswordModify by remember { mutableStateOf(false) }
+
+    if (showPasswordModify) {
+        PasswordModifyDialog(
+            onDismiss = { showPasswordModify = false},
+            onVerifyPassword = viewModel::verifyPassword,
+            onModifyPassword = viewModel::modifyPassword
+        )
+    }
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -137,7 +147,7 @@ fun UserSettingsView(
 
                 }
 
-                Button(onClick = { /*TODO*/ }) {
+                Button(onClick = { showPasswordModify = true }) {
                     Text(text = "修改密码")
                 }
             }
@@ -156,19 +166,6 @@ fun UserSettingsView(
                     contentDescription = "ArrowForwardIos"
                 )
             }
-
-            // 用户管理
-            SettingsItem(
-                modifier = Modifier
-                    .clip(MaterialTheme.shapes.small)
-                    .clickable {  },
-                title = stringResource(id = R.string.user_operation_log)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
-                    contentDescription = "ArrowForwardIos"
-                )
-            }
         }
     }
 }
@@ -181,6 +178,7 @@ fun SystemSettingsView(
 ) {
 
     val scope = rememberCoroutineScope()
+    val navigationActions = LocalNavigationActions.current
     // 语言
     var language by rememberDataSaverState(
         key = Constants.LANGUAGE,
@@ -315,7 +313,7 @@ fun SystemSettingsView(
         SettingsItem(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
-                .clickable {  },
+                .clickable { },
             title = stringResource(id = R.string.accessory_life)
         ) {
             Icon(
@@ -328,7 +326,7 @@ fun SystemSettingsView(
         SettingsItem(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
-                .clickable {  },
+                .clickable { },
             title = stringResource(id = R.string.maintenance_record)
         ) {
             Icon(
@@ -341,8 +339,21 @@ fun SystemSettingsView(
         SettingsItem(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
-                .clickable {  },
+                .clickable { },
             title = stringResource(id = R.string.error_log)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
+                contentDescription = "ArrowForwardIos"
+            )
+        }
+
+        // 版本信息
+        SettingsItem(
+            modifier = Modifier
+                .clip(MaterialTheme.shapes.small)
+                .clickable { navigationActions.navigate(Route.SETTINGS_VERSION_INFO) },
+            title = stringResource(id = R.string.version_info)
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,

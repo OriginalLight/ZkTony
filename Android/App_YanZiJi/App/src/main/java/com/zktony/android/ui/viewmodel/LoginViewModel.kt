@@ -28,8 +28,10 @@ class LoginViewModel @Inject constructor(
             delay(500L)
             if (res.isSuccess) {
                 AuthUtils.login(res.getOrNull()!!)
+                LogUtils.info("登录成功：$userName", true)
                 return 0
             } else {
+                LogUtils.info("登录失败：$userName", true)
                 return res.exceptionOrNull()?.message?.toIntOrNull() ?: -1
             }
         } catch (e: Exception) {

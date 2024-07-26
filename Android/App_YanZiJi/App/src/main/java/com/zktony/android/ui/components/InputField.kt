@@ -194,7 +194,8 @@ fun UserNameInputField(
         colors = TextFieldDefaults.colors(
             unfocusedIndicatorColor = Color.Transparent,
             focusedIndicatorColor = Color.Transparent,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+            focusedContainerColor = MaterialTheme.colorScheme.surface
         ),
         textStyle = TextStyle(fontSize = 20.sp),
         trailingIcon = {
@@ -246,15 +247,13 @@ fun PasswordInputField(
         colors = TextFieldDefaults.colors(
             unfocusedIndicatorColor = Color.Transparent,
             focusedIndicatorColor = Color.Transparent,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+            focusedContainerColor = MaterialTheme.colorScheme.surface
         ),
         textStyle = TextStyle(fontSize = 20.sp),
         trailingIcon = {
             if (value.isNotEmpty()) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
+                Row {
                     IconButton(onClick = { showPassword = !showPassword }) {
                         Icon(
                             imageVector = Icons.Default.RemoveRedEye,
