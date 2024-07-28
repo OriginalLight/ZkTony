@@ -28,7 +28,7 @@ android {
         }
 
         release {
-            isMinifyEnabled = true
+            isMinifyEnabled = false
             signingConfig = signingConfigs.getByName("debug")
             applicationIdSuffix = ".yzj.release"
             proguardFiles(

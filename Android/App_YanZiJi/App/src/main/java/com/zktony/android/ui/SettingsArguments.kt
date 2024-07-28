@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.automirrored.filled.Reply
@@ -31,14 +32,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zktony.android.R
 import com.zktony.android.ui.components.ButtonLoading
-import com.zktony.android.ui.components.ClearConfirmDialog
-import com.zktony.android.ui.components.ImportConfirmDialog
+import com.zktony.android.ui.components.FileChoiceDialog
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.zktyBrush
 import com.zktony.android.ui.viewmodel.SettingsArgumentsViewModel
 import kotlinx.coroutines.launch
+import java.io.File
 
 @Composable
 fun SettingsArgumentsView(viewModel: SettingsArgumentsViewModel = hiltViewModel()) {
@@ -66,23 +67,19 @@ fun SettingsArgumentsTopBar(
     viewModel: SettingsArgumentsViewModel
 ) {
     val scope = rememberCoroutineScope()
-    var importConformDialog by remember { mutableStateOf(false) }
-    var clearConfirmDialog by remember { mutableStateOf(false) }
+    var showFileChoice by remember { mutableStateOf(false) }
+    var fileObjectList by remember { mutableStateOf(listOf<File>()) }
     var loadingExport by remember { mutableStateOf(false) }
+    var loadingImport by remember { mutableStateOf(false) }
 
-    if (importConformDialog) {
-        ImportConfirmDialog(
-            items = viewModel.getArgumentFiles(),
-            onDismiss = { importConformDialog = false },
-            viewModel = viewModel
-        )
-    }
-
-    if (clearConfirmDialog) {
-        ClearConfirmDialog(
-            onDismiss = { clearConfirmDialog = false },
-            viewModel = viewModel
-        )
+    if (showFileChoice) {
+        FileChoiceDialog(files = fileObjectList, onDismiss = { showFileChoice = false }) { file ->
+            scope.launch {
+                loadingImport = true
+                viewModel.importArguments(file)
+                loadingImport = false
+            }
+        }
     }
 
     Row(
@@ -113,15 +110,24 @@ fun SettingsArgumentsTopBar(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Button(onClick = { clearConfirmDialog = true }) {
-                Text(text = stringResource(id = R.string.one_click_clear))
-            }
-
-            Button(onClick = { importConformDialog = true }) {
-                Text(text = stringResource(id = R.string.one_click_import))
+            Button(
+                modifier = Modifier.width(150.dp),
+                enabled = !loadingImport,
+                onClick = {
+                    scope.launch {
+                        viewModel.getArgumentFiles()?.let {
+                            fileObjectList = it
+                            showFileChoice = true
+                        }
+                    }
+                }) {
+                ButtonLoading(loading = loadingImport) {
+                    Text(text = stringResource(id = R.string.one_click_import))
+                }
             }
 
             Button(
+                modifier = Modifier.width(150.dp),
                 enabled = !loadingExport,
                 onClick = {
                     scope.launch {

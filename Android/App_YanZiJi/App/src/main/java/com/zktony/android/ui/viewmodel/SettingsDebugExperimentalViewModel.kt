@@ -15,9 +15,12 @@ import com.zktony.log.LogUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.Date
@@ -121,12 +124,13 @@ class SettingsDebugExperimentalViewModel @Inject constructor() : ViewModel() {
                 return
             }
 
-            srcFiles.forEach { file ->
-                withContext(Dispatchers.IO) {
-                    file.copyTo(File(dstDir + "/" + file.name), true)
-                    file.delete()
-                }
-                delay(100L)
+            runBlocking {
+                awaitAll(*srcFiles.map { file ->
+                    async(Dispatchers.IO) {
+                        File(file.absolutePath).copyTo(File(dstDir + "/" + file.name), true)
+                        file.delete()
+                    }
+                }.toTypedArray())
             }
 
             TipsUtils.showTips(Tips.info("导出成功"))

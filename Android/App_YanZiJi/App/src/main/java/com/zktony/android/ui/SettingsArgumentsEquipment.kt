@@ -105,6 +105,7 @@ fun EquipmentArgumentsListView(
             .clip(MaterialTheme.shapes.medium),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+
         SettingsItem(title = stringResource(id = R.string.product_number)) {
             DropDownBox(
                 modifier = Modifier

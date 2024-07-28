@@ -23,12 +23,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.zktony.android.R
@@ -140,28 +138,6 @@ fun DateTimePicker(
                     }
                 }
             }
-        }
-    }
-}
-
-@Preview
-@Composable
-fun DateTimePickerPreview() {
-    var dateMillis by remember { mutableLongStateOf(System.currentTimeMillis()) }
-    var showDialog by remember { mutableStateOf(false) }
-    if (showDialog) {
-        DateTimePicker(
-            dateMillis = dateMillis,
-            onDateChange = {
-                dateMillis = it
-                showDialog = false
-            },
-            onDismissRequest = { showDialog = false }
-        )
-    }
-    Column {
-        Button(onClick = { showDialog = true }) {
-            Text(text = "Show Dialog")
         }
     }
 }

@@ -196,13 +196,13 @@ fun LoginForm(
             if (errorText != null) {
                 Text(
                     text = errorText!!,
-                    fontSize = 20.sp
+                    fontSize = 18.sp
                 )
             } else {
                 ButtonLoading(loading = loading) {
                     Text(
-                        text = stringResource(id = R.string.login),
-                        fontSize = 20.sp
+                        text = "登 录",
+                        fontSize = 18.sp
                     )
                 }
             }

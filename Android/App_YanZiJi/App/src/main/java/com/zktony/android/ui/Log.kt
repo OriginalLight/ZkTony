@@ -5,14 +5,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zktony.android.ui.utils.LocalNavigationActions
-import com.zktony.android.ui.viewmodel.HistoryViewModel
+import com.zktony.android.ui.viewmodel.LogViewModel
 
 /**
  * @author 刘贺贺
  * @date 2023/8/31 9:57
  */
 @Composable
-fun HistoryView(viewModel: HistoryViewModel = hiltViewModel()) {
+fun LogView(viewModel: LogViewModel = hiltViewModel()) {
 
     val navigationActions = LocalNavigationActions.current
 
@@ -20,5 +20,5 @@ fun HistoryView(viewModel: HistoryViewModel = hiltViewModel()) {
         navigationActions.navigateUp()
     }
 
-    Text(text = "History View")
+    Text(text = "Log View")
 }

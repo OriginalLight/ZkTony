@@ -9,5 +9,5 @@ import javax.inject.Inject
  * @date: 2023-02-14 15:37
  */
 @HiltViewModel
-class HistoryViewModel @Inject constructor() : ViewModel()
+class LogViewModel @Inject constructor() : ViewModel()
 

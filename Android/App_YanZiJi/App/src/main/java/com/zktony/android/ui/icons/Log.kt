@@ -16,17 +16,17 @@ import androidx.compose.ui.unit.dp
 @Preview
 @Composable
 private fun VectorPreview() {
-    Image(History, null)
+    Image(Log, null)
 }
 
-private var _History: ImageVector? = null
+private var _Log: ImageVector? = null
 
-val History: ImageVector
+val Log: ImageVector
     get() {
-        if (_History != null) {
-            return _History!!
+        if (_Log != null) {
+            return _Log!!
         }
-        _History = ImageVector.Builder(
+        _Log = ImageVector.Builder(
             name = "History",
             defaultWidth = 256.dp,
             defaultHeight = 256.dp,
@@ -220,7 +220,7 @@ val History: ImageVector
                 close()
             }
         }.build()
-        return _History!!
+        return _Log!!
     }
 
 

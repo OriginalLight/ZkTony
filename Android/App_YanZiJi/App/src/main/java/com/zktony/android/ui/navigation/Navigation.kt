@@ -39,7 +39,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.zktony.android.ui.ExperimentalView
-import com.zktony.android.ui.HistoryView
+import com.zktony.android.ui.LogView
 import com.zktony.android.ui.LoginView
 import com.zktony.android.ui.ProgramView
 import com.zktony.android.ui.SettingsAgingView
@@ -59,7 +59,7 @@ import com.zktony.android.ui.SettingsUserManagementView
 import com.zktony.android.ui.SettingsVersionInfoView
 import com.zktony.android.ui.SettingsView
 import com.zktony.android.ui.components.BottomBar
-import com.zktony.android.ui.components.LogoutConfirmDialog
+import com.zktony.android.ui.components.LogoutDialog
 import com.zktony.android.ui.icons.Logout
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
@@ -109,7 +109,7 @@ fun AppNavigation() {
                 composable(Route.LOGIN) { LoginView() }
                 composable(Route.PROGRAM) { ProgramView() }
                 composable(Route.EXPERIMENTAL) { ExperimentalView() }
-                composable(Route.HISTORY) { HistoryView() }
+                composable(Route.LOG) { LogView() }
                 composable(Route.SETTINGS) { SettingsView() }
                 composable(Route.SETTINGS_VERSION_INFO) { SettingsVersionInfoView() }
                 composable(Route.SETTINGS_USER_MANAGEMENT) { SettingsUserManagementView() }
@@ -141,9 +141,8 @@ fun AppNavigationDrawer(
     var showDialog by remember { mutableStateOf(false) }
 
     if (showDialog) {
-        LogoutConfirmDialog(onDismiss = { showDialog = false }) {
+        LogoutDialog(onDismiss = { showDialog = false }) {
             scope.launch {
-                showDialog = false
                 AuthUtils.logout()
                 navigationActions.navigate(Route.LOGIN)
             }

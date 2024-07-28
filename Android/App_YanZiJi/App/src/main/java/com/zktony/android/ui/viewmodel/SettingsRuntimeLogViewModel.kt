@@ -2,48 +2,41 @@ package com.zktony.android.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zktony.android.data.RuntimeLog
 import com.zktony.android.ui.components.Tips
 import com.zktony.android.utils.StorageUtils
 import com.zktony.android.utils.TipsUtils
-import com.zktony.android.utils.extra.size
 import com.zktony.log.LogUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingsRuntimeLogViewModel @Inject constructor() : ViewModel() {
 
-    private val _list = MutableStateFlow(listOf<RuntimeLog>())
-    private val _selected = MutableStateFlow(listOf<RuntimeLog>())
+    private val _fileList = MutableStateFlow(listOf<File>())
+    private val _selected = MutableStateFlow(listOf<File>())
 
-    val list = _list.asStateFlow()
+    val fileList = _fileList.asStateFlow()
     val selected = _selected.asStateFlow()
 
     init {
         viewModelScope.launch {
-            val logFiles = LogUtils.getLogs()
-            val logs = logFiles.map { file ->
-                RuntimeLog(
-                    name = file.name,
-                    size = file.size(),
-                    createTime = Date(file.lastModified()),
-                    absolutePath = file.absolutePath
-                )
-            }
-            _list.value = logs
+            _fileList.value = LogUtils.getLogs()
         }
     }
 
-    fun select(log: RuntimeLog) {
+    fun select(log: File) {
         _selected.value = if (_selected.value.contains(log)) {
             _selected.value - log
         } else {
@@ -69,11 +62,12 @@ class SettingsRuntimeLogViewModel @Inject constructor() : ViewModel() {
                 File(dstDir).mkdirs()
             }
 
-            selected.forEach { log ->
-                withContext(Dispatchers.IO) {
-                    File(log.absolutePath).copyTo(File(dstDir + "/" + log.name), true)
-                }
-                delay(100L)
+            runBlocking {
+                awaitAll(*selected.map { log ->
+                    async(Dispatchers.IO) {
+                        File(log.absolutePath).copyTo(File(dstDir + "/" + log.name), true)
+                    }
+                }.toTypedArray())
             }
 
             TipsUtils.showTips(Tips.info("导出成功"))

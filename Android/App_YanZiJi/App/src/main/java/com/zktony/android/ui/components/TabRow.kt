@@ -2,6 +2,7 @@ package com.zktony.android.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
@@ -27,7 +28,7 @@ fun SegmentedButtonTabRow(
 ) {
     TabRow(
         modifier = modifier
-            .padding(vertical = 4.dp, horizontal = 8.dp)
+            .height(40.dp)
             .clip(CircleShape),
         selectedTabIndex = selected,
         containerColor = MaterialTheme.colorScheme.primaryContainer,

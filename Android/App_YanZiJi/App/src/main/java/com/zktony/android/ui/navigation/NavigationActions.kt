@@ -7,7 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.zktony.android.R
 import com.zktony.android.ui.icons.Experimental
-import com.zktony.android.ui.icons.History
+import com.zktony.android.ui.icons.Log
 import com.zktony.android.ui.icons.Program
 import com.zktony.android.ui.icons.Settings
 
@@ -15,7 +15,7 @@ object Route {
     const val LOGIN = "Login"
     const val EXPERIMENTAL = "Experimental"
     const val PROGRAM = "Program"
-    const val HISTORY = "History"
+    const val LOG = "Log"
     const val SETTINGS = "Settings"
     const val SETTINGS_ACCESSORY_LIFE = "SettingsAccessoryLife"
     const val SETTINGS_MAINTENANCE_RECORD = "SettingsMaintenanceRecord"
@@ -101,9 +101,9 @@ val TOP_LEVEL_DESTINATIONS = listOf(
         iconTextId = R.string.program
     ),
     TopLevelDestination(
-        route = Route.HISTORY,
-        icon = History,
-        iconTextId = R.string.history
+        route = Route.LOG,
+        icon = Log,
+        iconTextId = R.string.log
     ),
     TopLevelDestination(
         route = Route.SETTINGS,

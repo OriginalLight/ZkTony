@@ -1,6 +1,5 @@
-package com.zktony.serialport.command.runze
+package com.zktony.serialport.protocol
 
-import com.zktony.serialport.command.BaseProtocol
 import com.zktony.serialport.ext.checkSumLE
 import com.zktony.serialport.ext.toHexString
 
@@ -88,31 +87,67 @@ import com.zktony.serialport.ext.toHexString
  * 0xFF      未知错误       参数=0x00 0x00
  *
  */
-class RunzeProtocol : BaseProtocol {
-    var head: Byte = 0xCC.toByte()
-    var slaveAddr: Byte = 0x00.toByte()
-    var funcCode: Byte = 0x00.toByte()
-    var data: ByteArray = byteArrayOf()
-    var end: Byte = 0xDD.toByte()
-    var checksum: ByteArray = byteArrayOf(0x00.toByte(), 0x00.toByte())
+data class RunzeProtocol(
+    val header: Byte = 0xCC.toByte(),
+    var target: Byte = 0x00.toByte(),
+    var func: Byte = 0x00.toByte(),
+    var data: ByteArray = byteArrayOf(),
+    val end: Byte = 0xDD.toByte(),
+    val checksum: ByteArray = byteArrayOf(0x00.toByte(), 0x00.toByte())
+) {
 
-    override fun serialization(): ByteArray {
-        val byteArray = byteArrayOf(head, slaveAddr, funcCode)
+    // 协议转换为 ByteArray
+    fun toByteArray(): ByteArray {
+        val byteArray = byteArrayOf(header, target, func)
             .plus(data)
             .plus(end)
         return byteArray.plus(byteArray.checkSumLE())
     }
 
-    override fun deserialization(byteArray: ByteArray) {
-        head = byteArray[0]
-        slaveAddr = byteArray[1]
-        funcCode = byteArray[2]
-        data = byteArray.copyOfRange(3, byteArray.size - 3)
-        end = byteArray[byteArray.size - 3]
-        checksum = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as RunzeProtocol
+
+        if (header != other.header) return false
+        if (target != other.target) return false
+        if (func != other.func) return false
+        if (!data.contentEquals(other.data)) return false
+        if (end != other.end) return false
+        if (!checksum.contentEquals(other.checksum)) return false
+
+        return true
     }
 
+    override fun hashCode(): Int {
+        var result = header.hashCode()
+        result = 31 * result + target.hashCode()
+        result = 31 * result + func.hashCode()
+        result = 31 * result + data.contentHashCode()
+        result = 31 * result + end.hashCode()
+        result = 31 * result + checksum.contentHashCode()
+        return result
+    }
+
+
     companion object {
+
+        // 解析协议
+        fun toObject(byteArray: ByteArray): RunzeProtocol {
+            try {
+                return RunzeProtocol(
+                    header = byteArray[0],
+                    target = byteArray[1],
+                    func = byteArray[2],
+                    data = byteArray.copyOfRange(3, byteArray.size - 3),
+                    end = byteArray[byteArray.size - 3],
+                    checksum = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
+                )
+            } catch (e: Exception) {
+                throw Exception("to RunzeProtocol error by ${byteArray.toHexString()}")
+            }
+        }
 
         /**
          * Verify the protocol
@@ -126,10 +161,10 @@ class RunzeProtocol : BaseProtocol {
             val crc = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
             val bytes = byteArray.copyOfRange(0, byteArray.size - 2)
             if (!bytes.checkSumLE().contentEquals(crc)) {
-                throw Exception("RX Crc Error with byteArray: ${byteArray.toHexString()}")
+                throw Exception("rx crc error by ${byteArray.toHexString()}")
             }
 
-            block(RunzeProtocol().apply { deserialization(byteArray) })
+            block(toObject(byteArray))
         }
     }
 }

@@ -102,7 +102,7 @@ fun UserSettingsView(
 
     if (showPasswordModify) {
         PasswordModifyDialog(
-            onDismiss = { showPasswordModify = false},
+            onDismiss = { showPasswordModify = false },
             onVerifyPassword = viewModel::verifyPassword,
             onModifyPassword = viewModel::modifyPassword
         )
@@ -131,20 +131,24 @@ fun UserSettingsView(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Column {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
                     Text(
                         text = it.name,
-                        style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Normal)
+                        style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold)
                     )
-                    Text(
-                        text = it.role,
-                        style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Light)
-                    )
-                    Text(
-                        text = it.lastLoginTime.dateFormat("yyyy-MM-dd HH:mm"),
-                        style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Light)
-                    )
-
+                    Column {
+                        Text(
+                            text = it.role,
+                            style = TextStyle(fontSize = 12.sp)
+                        )
+                        Text(
+                            text = it.lastLoginTime.dateFormat("yyyy-MM-dd HH:mm"),
+                            style = TextStyle(fontSize = 12.sp)
+                        )
+                    }
                 }
 
                 Button(onClick = { showPasswordModify = true }) {

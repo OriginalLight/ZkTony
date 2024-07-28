@@ -2,7 +2,7 @@
     <string name="app_name">YanZiJi</string>
     <string name="experimental">Experimental</string>
     <string name="factory_settings">Factory Settings</string>
-    <string name="history">History</string>
+    <string name="log">History</string>
     <string name="home_package">Home Screen</string>
     <string name="language">Language</string>
     <string name="login">Login</string>
@@ -18,7 +18,6 @@
     <string name="voice">Voice</string>
     <string name="system_time">System Time</string>
     <string name="cancel">Cancel</string>
-    <string name="ok">Ok</string>
     <string name="next">Next</string>
     <string name="set_success">Set Success</string>
     <string name="set_failed">Set Failed</string>
@@ -45,7 +44,6 @@
     <string name="channel">Channel</string>
     <string name="transfer">Transfer</string>
     <string name="clean">Clean</string>
-    <string name="save">Save</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="solenoid_valve">Solenoid Valve</string>
@@ -55,11 +53,11 @@
     <string name="t000">Multifunctional film transfer instrument</string>
     <string name="t200">Rapid staining instrument</string>
     <string name="user_management">User Management</string>
-    <string name="user_operation_log">Operation Log</string>
     <string name="accessory_life">Accessory Life</string>
     <string name="maintenance_record">Maintenance Record</string>
     <string name="error_log">Error Log</string>
     <string name="runtime_log">Runtime Log</string>
     <string name="password_modify">Password Modify</string>
     <string name="version_info">Version Info</string>
+    <string name="ok">OK</string>
 </resources>

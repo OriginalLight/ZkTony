@@ -36,14 +36,15 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zktony.android.R
-import com.zktony.android.data.RuntimeLog
 import com.zktony.android.ui.components.ButtonLoading
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.zktyBrush
 import com.zktony.android.ui.viewmodel.SettingsRuntimeLogViewModel
+import com.zktony.android.utils.extra.size
 import kotlinx.coroutines.launch
+import java.io.File
 
 @Composable
 fun SettingsRuntimeLogView(viewModel: SettingsRuntimeLogViewModel = hiltViewModel()) {
@@ -53,7 +54,7 @@ fun SettingsRuntimeLogView(viewModel: SettingsRuntimeLogViewModel = hiltViewMode
         navigationActions.navigate(Route.SETTINGS)
     }
 
-    val list by viewModel.list.collectAsStateWithLifecycle()
+    val fileList by viewModel.fileList.collectAsStateWithLifecycle()
     val selected by viewModel.selected.collectAsStateWithLifecycle()
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -66,7 +67,7 @@ fun SettingsRuntimeLogView(viewModel: SettingsRuntimeLogViewModel = hiltViewMode
 
         // 运行日志列表
         SettingsRuntimeLogListView(
-            list = list,
+            fileList = fileList,
             selected = selected,
             viewModel = viewModel
         )
@@ -77,7 +78,7 @@ fun SettingsRuntimeLogView(viewModel: SettingsRuntimeLogViewModel = hiltViewMode
 @Composable
 fun SettingsRuntimeLogTopBar(
     modifier: Modifier = Modifier,
-    selected: List<RuntimeLog>,
+    selected: List<File>,
     viewModel: SettingsRuntimeLogViewModel,
     navigationActions: NavigationActions,
 ) {
@@ -129,8 +130,8 @@ fun SettingsRuntimeLogTopBar(
 @Composable
 fun SettingsRuntimeLogListView(
     modifier: Modifier = Modifier,
-    list: List<RuntimeLog>,
-    selected: List<RuntimeLog>,
+    fileList: List<File>,
+    selected: List<File>,
     viewModel: SettingsRuntimeLogViewModel
 ) {
     LazyColumn(
@@ -143,13 +144,13 @@ fun SettingsRuntimeLogListView(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        list.forEach { log ->
+        fileList.forEach { file ->
             item {
                 RuntimeLogItem(
-                    log = log,
-                    selected = selected.contains(log),
+                    file = file,
+                    selected = selected.contains(file),
                     onClick = {
-                        viewModel.select(log)
+                        viewModel.select(file)
                     }
                 )
             }
@@ -162,7 +163,7 @@ fun SettingsRuntimeLogListView(
 @Composable
 fun RuntimeLogItem(
     modifier: Modifier = Modifier,
-    log: RuntimeLog,
+    file: File,
     selected: Boolean,
     onClick: () -> Unit
 ) {
@@ -182,9 +183,9 @@ fun RuntimeLogItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = log.name, style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Normal))
+        Text(text = file.name, style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Normal))
         Text(
-            text = log.size,
+            text = file.size(),
             style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Normal)
         )
     }

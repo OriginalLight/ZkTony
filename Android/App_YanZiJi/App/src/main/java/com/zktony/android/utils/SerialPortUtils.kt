@@ -1,6 +1,5 @@
 package com.zktony.android.utils
 
-import android.util.Log
 import com.zktony.android.data.Arguments
 import com.zktony.android.data.ArgumentsBubble
 import com.zktony.android.data.ArgumentsClean
@@ -17,7 +16,8 @@ import com.zktony.android.data.VoltageControl
 import com.zktony.android.data.toArguments
 import com.zktony.android.data.toChannelState
 import com.zktony.log.LogUtils
-import com.zktony.serialport.command.Protocol
+import com.zktony.serialport.protocol.ZktyProtocol
+import com.zktony.serialport.protocol.zktyProtocolOf
 import com.zktony.serialport.ext.ascii2ByteArray
 import com.zktony.serialport.ext.readInt8
 import com.zktony.serialport.ext.toAsciiString
@@ -73,18 +73,18 @@ object SerialPortUtils {
         try {
             serialPort.registerCallback(key) { bytes ->
                 bytesList.add(bytes)
-                Protocol.verifyProtocol(bytes) {
-                    if (it.function == func) {
+                ZktyProtocol.verifyProtocol(bytes) {
+                    if (it.func == func) {
                         rx = it.data.readInt8()
                     }
                 }
             }
             // 设置参数
-            val bytes = Protocol().apply {
-                function = func
-                targetAddress = (target + 2).toByte()
+            val bytes = zktyProtocolOf {
+                this.func = func
+                this.target = (target + 2).toByte()
                 data = byteArray
-            }.serialization()
+            }
             // 发送命令
             serialPort.sendByteArray(bytes)
             bytesList.add(bytes)
@@ -121,18 +121,18 @@ object SerialPortUtils {
         try {
             serialPort.registerCallback(key) { bytes ->
                 bytesList.add(bytes)
-                Protocol.verifyProtocol(bytes) {
-                    if (it.function == func) {
+                ZktyProtocol.verifyProtocol(bytes) {
+                    if (it.func == func) {
                         ba = it.data
                     }
                 }
             }
             // 设置参数
-            val bytes = Protocol().apply {
-                function = func
-                targetAddress = (target + 2).toByte()
+            val bytes = zktyProtocolOf {
+                this.func = func
+                this.target = (target + 2).toByte()
                 data = byteArray
-            }.serialization()
+            }
             // 发送命令
             serialPort.sendByteArray(bytes)
             bytesList.add(bytes)
@@ -469,7 +469,8 @@ object SerialPortUtils {
     // 查询Arguments
     suspend fun queryArguments(target: Int): Boolean {
         try {
-            val ba = queryAndPausePolling(target, "QueryArguments", 0x41.toByte(), byteArrayOf(), 1000)
+            val ba =
+                queryAndPausePolling(target, "QueryArguments", 0x41.toByte(), byteArrayOf(), 1000)
             if (ba != null) {
                 toArguments(ba)?.let { arguments ->
                     AppStateUtils.setArgumentsList(AppStateUtils.argumentsList.value.mapIndexed { index, arg ->
@@ -493,7 +494,14 @@ object SerialPortUtils {
     // 查询版本
     suspend fun queryVersion(target: Int, device: String = "A"): String {
         try {
-            val ba = query(target, "QueryVersion", 0x50.toByte(), byteArrayOf(0x00.toByte(), 0x00.toByte()), 200, device)
+            val ba = query(
+                target,
+                "QueryVersion",
+                0x50.toByte(),
+                byteArrayOf(0x00.toByte(), 0x00.toByte()),
+                200,
+                device
+            )
             LogUtils.info("QueryVersion", ba?.toHexString() ?: "Unknown", true)
             return ba?.toAsciiString() ?: "Unknown"
         } catch (e: Exception) {
@@ -503,22 +511,23 @@ object SerialPortUtils {
     }
 
     // 升级
-    suspend fun upgrade(hexFile: File, device: String) = channelFlow {
+    suspend fun upgrade(hexFile: File, device: String, target: Int) = channelFlow {
         AppStateUtils.isPolling.withLock {
             delay(100L)
             val key = "upgrade"
             val byteLength = 1024
             val serialPort = SerialStoreUtils.get(device) ?: return@channelFlow
+            val bytesList = mutableListOf<ByteArray>()
+            var flag = -1
+
             try {
-                var flag = -1
-                var rx: Boolean
                 // 注册回调
                 serialPort.registerCallback(key) { bytes ->
-                    Protocol.verifyProtocol(bytes) {
+                    ZktyProtocol.verifyProtocol(bytes) {
                         launch {
-                            when (it.function) {
+                            when (it.func) {
                                 0xA0.toByte() -> {
-                                    Log.d("EmbeddedExt", "升级准备就绪")
+                                    LogUtils.info(key, "升级准备就绪")
                                     flag = if (it.data.readInt8() == 1) {
                                         -1
                                     } else {
@@ -527,7 +536,7 @@ object SerialPortUtils {
                                 }
 
                                 0xA1.toByte() -> {
-                                    Log.d("EmbeddedExt", "升级数据信息就绪")
+                                    LogUtils.info(key, "升级数据信息就绪")
                                     flag = if (it.data.readInt8() == 1) {
                                         -1
                                     } else {
@@ -536,7 +545,7 @@ object SerialPortUtils {
                                 }
 
                                 0xA2.toByte() -> {
-                                    Log.d("EmbeddedExt", "地址擦除就绪")
+                                    LogUtils.info(key, "地址擦除就绪")
                                     flag = if (it.data.readInt8() == 1) {
                                         -1
                                     } else {
@@ -545,26 +554,27 @@ object SerialPortUtils {
                                 }
 
                                 0xA3.toByte() -> {
-                                    if (it.data.readInt8() == 1) {
-                                        flag = -1
+                                    flag = if (it.data.readInt8() == 1) {
+                                        -1
+                                    } else {
+                                        3
                                     }
-                                    rx = true
                                 }
 
                                 0xA4.toByte() -> {
                                     if (it.data.readInt8() == 1) {
                                         flag = -1
                                         send(UpgradeState.Err(Exception("升级失败")))
-                                        Log.e("EmbeddedExt", "升级失败")
+                                        LogUtils.error(key, "升级失败", true)
                                     } else {
                                         send(UpgradeState.Success)
-                                        flag = 3
-                                        Log.d("EmbeddedExt", "升级成功")
+                                        flag = 4
+                                        LogUtils.info(key, "升级成功", true)
                                     }
                                 }
 
                                 else -> {
-                                    Log.d("EmbeddedExt", "未知命令")
+                                    LogUtils.error(key, "未知命令", true)
                                 }
                             }
                         }
@@ -574,23 +584,32 @@ object SerialPortUtils {
                 // 读取文件
                 val byteArray = hexFile.readBytes()
                 val totalLength = byteArray.size
-                val totalPackage = totalLength / byteLength + if (totalLength % byteLength == 0) 0 else 1
+                val totalPackage =
+                    totalLength / byteLength + if (totalLength % byteLength == 0) 0 else 1
 
                 // 发送升级准备命令
                 send(UpgradeState.Message("升级准备中"))
-                serialPort.sendByteArray(Protocol().apply { function = 0xA0.toByte() }.serialization())
+                val b1 = zktyProtocolOf {
+                    this.target = (target + 2).toByte()
+                    func = 0xA0.toByte()
+                }
+                serialPort.sendByteArray(b1)
+                bytesList.add(b1)
                 delay(300)
                 if (flag != 0) error("升级准备响应失败")
 
                 // 发送升级数据信息
                 send(UpgradeState.Message("升级数据信息中"))
-                serialPort.sendByteArray(Protocol().apply {
-                    function = 0xA1.toByte()
+                val b2 = zktyProtocolOf {
+                    this.target = (target + 2).toByte()
+                    func = 0xA1.toByte()
                     data = byteArrayOf(0x00, 0x00).writeInt16LE(totalPackage) + byteArrayOf(
                         0x00,
                         0x00
                     ).writeInt16LE(totalLength)
-                }.serialization())
+                }
+                serialPort.sendByteArray(b2)
+                bytesList.add(b2)
                 delay(300)
                 if (flag != 1) error("升级数据信息响应失败")
 
@@ -598,39 +617,37 @@ object SerialPortUtils {
                 send(UpgradeState.Message("地址擦除中"))
                 val startAddress = 0x8020000
                 val endAddress = 0x8020000 + totalLength
-                serialPort.sendByteArray(Protocol().apply {
-                    function = 0xA2.toByte()
-                    data = byteArrayOf(
-                        0x00,
-                        0x00,
-                        0x00,
-                        0x00
-                    ).writeInt32LE(startAddress.toLong()) + byteArrayOf(
-                        0x00,
-                        0x00,
-                        0x00,
-                        0x00
-                    ).writeInt32LE(endAddress.toLong())
-                }.serialization())
+                val b3 = zktyProtocolOf {
+                    this.target = (target + 2).toByte()
+                    func = 0xA2.toByte()
+                    data = byteArrayOf(0x00, 0x00, 0x00, 0x00).writeInt32LE(startAddress.toLong()) +
+                            byteArrayOf(0x00, 0x00, 0x00, 0x00).writeInt32LE(endAddress.toLong())
+                }
+                serialPort.sendByteArray(b3)
+                bytesList.add(b3)
                 delay(2000)
                 if (flag != 2) error("地址擦除响应失败")
 
                 // 发送升级数据
                 for (i in 0 until totalPackage) {
                     // 擦除失败或者超时
-                    rx = false
+                    flag = -1
                     val start = i * byteLength
-                    val end = if (start + byteLength > totalLength) totalLength else start + byteLength
+                    val end =
+                        if (start + byteLength > totalLength) totalLength else start + byteLength
                     val bytes = byteArray.copyOfRange(start, end)
                     // 发送升级数据
-                    serialPort.sendByteArray(Protocol().apply {
-                        function = 0xA3.toByte()
+                    val b4 = zktyProtocolOf {
+                        this.target = (target + 2).toByte()
+                        func = 0xA3.toByte()
                         data = byteArrayOf(0x00, 0x00).writeInt16LE(i) + bytes
-                    }.serialization())
+                    }
+                    serialPort.sendByteArray(b4)
+                    bytesList.add(b4)
                     // 等待升级数据响应
                     try {
                         withTimeout(1000) {
-                            while (!rx) {
+                            while (flag != 3) {
                                 delay(30)
                             }
                         }
@@ -642,16 +659,26 @@ object SerialPortUtils {
 
                 // 发送升级完成命令
                 send(UpgradeState.Message("等待升级完成"))
-                serialPort.sendByteArray(Protocol().apply { function = 0xA4.toByte() }.serialization())
+                val b5 = zktyProtocolOf {
+                    this.target = (target + 2).toByte()
+                    func = 0xA4.toByte()
+                }
+                serialPort.sendByteArray(b5)
+                bytesList.add(b5)
                 // 等待升级完成响应
-                withTimeout(2000L) {
-                    while (flag != 3) {
-                        delay(30)
+                try {
+                    withTimeout(2000L) {
+                        while (flag != 4) {
+                            delay(30)
+                        }
                     }
+                } catch (e: Exception) {
+                    error("升级完成响应超时")
                 }
             } catch (e: Exception) {
-                LogUtils.error(key, e.message ?: "Unknown Error")
                 send(UpgradeState.Err(e))
+                bytesList.forEach { LogUtils.error(key, it.toHexString(), true) }
+                LogUtils.error(key, e.stackTraceToString(), true)
             } finally {
                 serialPort.unregisterCallback(key)
             }

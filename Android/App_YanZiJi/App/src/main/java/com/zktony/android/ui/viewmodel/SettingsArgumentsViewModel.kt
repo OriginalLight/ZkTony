@@ -127,39 +127,35 @@ class SettingsArgumentsViewModel @Inject constructor(
     }
 
     // 获取参数文件
-    fun getArgumentFiles(): List<File> {
-        val fileList = mutableListOf<File>()
+    fun getArgumentFiles(): List<File>? {
         val usbList = StorageUtils.getUsbStorageDir()
         if (usbList.isEmpty()) {
             TipsUtils.showTips(Tips.error("未检测到U盘"))
-            return fileList
+            return null
         }
-        val dir = usbList.first() + "/${StorageUtils.ARGUMENTS_DIR}"
-        val file = File(dir)
-        if (file.exists() && file.isDirectory) {
-            file.listFiles { f ->
-                f.isFile && f.name.endsWith(".json")
-            }?.let {
-                fileList.addAll(it)
-            }
-        }
-        return fileList
-    }
 
-    // 清除参数
-    suspend fun clearArguments() {
-        val args = Arguments()
-        val fail = mutableListOf<Int>()
-        repeat(ProductUtils.getChannelCount()) { index ->
-            if (!SerialPortUtils.setArguments(index, args)) {
-                fail.add(index + 1)
+        try {
+            val fileList = mutableListOf<File>()
+            val dir = usbList.first() + "/${StorageUtils.ARGUMENTS_DIR}"
+            val file = File(dir)
+
+            if (file.exists() && file.isDirectory) {
+                file.listFiles()?.forEach {
+                    if (it.isFile && it.name.endsWith(".json")) {
+                        fileList.add(it)
+                    }
+                }
             }
-        }
-        if (fail.isNotEmpty()) {
-            TipsUtils.showTips(Tips.error("清除参数失败: ${fail.joinToString()}"))
-        } else {
-            AppStateUtils.setArgumentsList(List(ProductUtils.MAX_CHANNEL_COUNT) { Arguments() })
-            TipsUtils.showTips(Tips.info( "清除参数成功"))
+
+            if (fileList.isEmpty()) {
+                TipsUtils.showTips(Tips.error("未检测到参数文件"))
+                return null
+            }
+            return fileList
+        } catch (e: Exception) {
+            LogUtils.error(e.stackTraceToString(), true)
+            TipsUtils.showTips(Tips.error("未知错误"))
+            return null
         }
     }
 }

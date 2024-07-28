@@ -111,7 +111,7 @@ fun SettingsDebugExperimentalTopBar(
         }
 
         SegmentedButtonTabRow(
-            modifier = Modifier.size(400.dp, 48.dp),
+            modifier = Modifier.width(400.dp),
             tabItems = List(ProductUtils.getChannelCount()) { stringResource(id = R.string.channel) + (it + 1) },
             selected = channel
         ) { index ->
