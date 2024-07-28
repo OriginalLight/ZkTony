@@ -10,7 +10,7 @@
     <string name="mute">静音</string>
     <string name="navigation_bar">导航栏</string>
     <string name="program">实验程序</string>
-    <string name="prompt_sound">提示音</string>
+    <string name="sound">提示音</string>
     <string name="ring">铃声</string>
     <string name="settings">系统设置</string>
     <string name="status_bar">状态栏</string>

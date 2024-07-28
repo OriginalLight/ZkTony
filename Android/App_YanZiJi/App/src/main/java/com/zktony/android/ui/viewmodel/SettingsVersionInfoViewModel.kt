@@ -103,13 +103,16 @@ class SettingsVersionInfoViewModel @Inject constructor() : ViewModel() {
                 is UpgradeState.Message -> {
                     TipsUtils.showTips(Tips.info(it.message))
                 }
+
                 is UpgradeState.Err -> {
                     LogUtils.error(it.t.stackTraceToString(), true)
                     TipsUtils.showTips(Tips.error(it.t.message ?: "未知错误"))
                 }
+
                 is UpgradeState.Success -> {
                     TipsUtils.showTips(Tips.info("升级成功"))
                 }
+
                 is UpgradeState.Progress -> {
                     LogUtils.info("${(it.progress * 100).toInt()}%")
                 }

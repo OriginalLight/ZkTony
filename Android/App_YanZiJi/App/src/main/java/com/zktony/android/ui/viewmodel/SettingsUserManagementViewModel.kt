@@ -18,7 +18,9 @@ class SettingsUserManagementViewModel @Inject constructor(
 
     val entities = Pager(
         config = PagingConfig(pageSize = 20, initialLoadSize = 40),
-    ) { userRepository.getByPage(Role.getLowerRole(AuthUtils.getRole())) }.flow.cachedIn(viewModelScope)
+    ) { userRepository.getByPage(Role.getLowerRole(AuthUtils.getRole())) }.flow.cachedIn(
+        viewModelScope
+    )
 
 
 }

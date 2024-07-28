@@ -10,7 +10,6 @@ import com.zktony.android.utils.SerialPortUtils
 import com.zktony.android.utils.StorageUtils
 import com.zktony.android.utils.TipsUtils
 import com.zktony.android.utils.extra.dateFormat
-import com.zktony.android.utils.extra.timeFormat
 import com.zktony.log.LogUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -18,10 +17,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.Date
 import javax.inject.Inject
@@ -72,14 +69,15 @@ class SettingsDebugExperimentalViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    private fun startCollecting(channel: Int, control: ExperimentalControl)  {
+    private fun startCollecting(channel: Int, control: ExperimentalControl) {
         collectingJobList[channel]?.cancel()
         collectingJobList[channel] = viewModelScope.launch {
             val dir = StorageUtils.getCacheDir() + "/${StorageUtils.EXPERIMENTAL_DIR}"
             if (!File(dir).exists()) {
                 File(dir).mkdirs()
             }
-            val files = File("$dir/channel$channel ${Date(System.currentTimeMillis()).dateFormat("yyyyMMddHHmmss")}.csv")
+            val files =
+                File("$dir/channel$channel ${Date(System.currentTimeMillis()).dateFormat("yyyyMMddHHmmss")}.csv")
             if (!files.exists()) {
                 files.createNewFile()
             }
@@ -107,7 +105,8 @@ class SettingsDebugExperimentalViewModel @Inject constructor() : ViewModel() {
                 TipsUtils.showTips(Tips.error("未检测到U盘"))
                 return
             }
-            val dstDir = usbList.first() + "/${StorageUtils.LOG_DIR}/${StorageUtils.EXPERIMENTAL_DIR}"
+            val dstDir =
+                usbList.first() + "/${StorageUtils.LOG_DIR}/${StorageUtils.EXPERIMENTAL_DIR}"
             if (!File(dstDir).exists()) {
                 File(dstDir).mkdirs()
             }

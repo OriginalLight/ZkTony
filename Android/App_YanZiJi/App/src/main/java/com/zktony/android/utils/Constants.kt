@@ -29,8 +29,8 @@ object Constants {
     /**
      * 提示音 mute ring voice
      */
-    const val PROMPT_SOUND = "PROMPT_SOUND"
-    const val DEFAULT_PROMPT_SOUND = "VOICE"
+    const val SOUND = "PROMPT_SOUND"
+    const val DEFAULT_SOUND = "VOICE"
 
     /**
      * S/N

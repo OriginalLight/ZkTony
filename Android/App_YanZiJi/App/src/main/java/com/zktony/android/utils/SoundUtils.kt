@@ -2,11 +2,11 @@ package com.zktony.android.utils
 
 import android.media.AudioAttributes
 import android.media.SoundPool
-import com.zktony.android.data.PromptSound
+import com.zktony.android.data.Sound
 
-object PromptSoundUtils {
+object SoundUtils {
     private var soundPool: SoundPool? = null
-    private var promptSound: PromptSound = PromptSound.MUTE
+    private var sound: Sound = Sound.MUTE
 
     init {
         val audioAttributes = AudioAttributes.Builder()
@@ -23,7 +23,7 @@ object PromptSoundUtils {
 
     // Set the audio
     fun with(name: String) {
-        promptSound = PromptSound.fromName(name)
+        sound = Sound.fromName(name)
     }
 
     fun playSound(resId: Int) {
@@ -35,14 +35,14 @@ object PromptSoundUtils {
 
     // Play the switch prompt audio
     fun playSwitchPromptSound() {
-        when (promptSound) {
-            PromptSound.RING -> {
+        when (sound) {
+            Sound.RING -> {
             }
 
-            PromptSound.VOICE -> {
+            Sound.VOICE -> {
             }
 
-            PromptSound.MUTE -> {
+            Sound.MUTE -> {
                 // Do nothing
             }
         }

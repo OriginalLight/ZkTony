@@ -47,7 +47,7 @@ class SettingsArgumentsViewModel @Inject constructor(
         }
         AppStateUtils.isArgumentsSync = fail.isEmpty()
         if (fail.isNotEmpty()) {
-            TipsUtils.showTips(Tips.error( "同步参数失败: ${fail.joinToString()}"))
+            TipsUtils.showTips(Tips.error("同步参数失败: ${fail.joinToString()}"))
         } else {
             TipsUtils.showTips(Tips.info("同步参数成功"))
         }

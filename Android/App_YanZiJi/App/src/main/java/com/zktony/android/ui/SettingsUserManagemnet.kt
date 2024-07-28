@@ -31,7 +31,6 @@ import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.zktyBrush
-import com.zktony.android.ui.viewmodel.SettingsFqcViewModel
 import com.zktony.android.ui.viewmodel.SettingsUserManagementViewModel
 import com.zktony.room.entities.User
 

@@ -3,10 +3,13 @@ package com.zktony.android.data
 enum class Role(val permission: Int) {
     // 工厂
     FACTORY(0),
+
     // 用服
     CUSTOMER_SERVICE(1),
+
     // 管理员
     ADMIN(2),
+
     // 用户
     USER(3);
 

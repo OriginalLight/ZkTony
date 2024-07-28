@@ -16,8 +16,6 @@ import com.zktony.android.data.VoltageControl
 import com.zktony.android.data.toArguments
 import com.zktony.android.data.toChannelState
 import com.zktony.log.LogUtils
-import com.zktony.serialport.protocol.ZktyProtocol
-import com.zktony.serialport.protocol.zktyProtocolOf
 import com.zktony.serialport.ext.ascii2ByteArray
 import com.zktony.serialport.ext.readInt8
 import com.zktony.serialport.ext.toAsciiString
@@ -25,6 +23,8 @@ import com.zktony.serialport.ext.toHexString
 import com.zktony.serialport.ext.writeInt16LE
 import com.zktony.serialport.ext.writeInt32LE
 import com.zktony.serialport.lifecycle.SerialStoreUtils
+import com.zktony.serialport.protocol.ZktyProtocol
+import com.zktony.serialport.protocol.zktyProtocolOf
 import com.zktony.serialport.serialPortOf
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.channelFlow

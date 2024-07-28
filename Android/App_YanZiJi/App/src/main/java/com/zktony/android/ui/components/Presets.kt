@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.ProductUtils
-import com.zktony.android.utils.PromptSoundUtils
+import com.zktony.android.utils.SoundUtils
 import com.zktony.android.utils.ResourceUtils
 import com.zktony.android.utils.extra.setLanguage
 import com.zktony.datastore.LocalDataSaver
@@ -24,10 +24,10 @@ fun Presets(content: @Composable () -> Unit) {
     context.setLanguage(dataSaver.readData(Constants.LANGUAGE, Constants.DEFAULT_LANGUAGE))
 
     // 提示音
-    PromptSoundUtils.with(
+    SoundUtils.with(
         dataSaver.readData(
-            Constants.PROMPT_SOUND,
-            Constants.DEFAULT_PROMPT_SOUND
+            Constants.SOUND,
+            Constants.DEFAULT_SOUND
         )
     )
 

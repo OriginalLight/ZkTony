@@ -2,13 +2,13 @@ package com.zktony.android.data
 
 import com.zktony.android.R
 
-enum class PromptSound(val resId: Int) {
+enum class Sound(val resId: Int) {
     MUTE(R.string.mute),
     RING(R.string.ring),
     VOICE(R.string.voice);
 
     companion object {
-        fun fromName(name: String): PromptSound {
+        fun fromName(name: String): Sound {
             return entries.first { it.name == name }
         }
 

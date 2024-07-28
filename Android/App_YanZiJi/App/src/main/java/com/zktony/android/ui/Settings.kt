@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
-import com.zktony.android.data.PromptSound
+import com.zktony.android.data.Sound
 import com.zktony.android.data.Role
 import com.zktony.android.ui.components.DateTimePicker
 import com.zktony.android.ui.components.PasswordModifyDialog
@@ -189,9 +189,9 @@ fun SystemSettingsView(
         default = Constants.DEFAULT_LANGUAGE
     )
     // 提示音
-    var promptSound by rememberDataSaverState(
-        key = Constants.PROMPT_SOUND,
-        default = Constants.DEFAULT_PROMPT_SOUND
+    var sound by rememberDataSaverState(
+        key = Constants.SOUND,
+        default = Constants.DEFAULT_SOUND
     )
     // 导航栏
     var navigationBar by rememberDataSaverState(
@@ -255,15 +255,15 @@ fun SystemSettingsView(
         }
 
         // 提示音
-        SettingsItem(title = stringResource(id = R.string.prompt_sound)) {
+        SettingsItem(title = stringResource(id = R.string.sound)) {
             SegmentedButtonTabRow(
                 modifier = Modifier.width(300.dp),
-                tabItems = PromptSound.getResIdList().map { stringResource(id = it) },
-                selected = PromptSound.indexFromName(promptSound)
+                tabItems = Sound.getResIdList().map { stringResource(id = it) },
+                selected = Sound.indexFromName(sound)
             ) {
                 scope.launch {
-                    promptSound = PromptSound.getNameByIndex(it)
-                    viewModel.setPromptSound(PromptSound.getNameByIndex(it))
+                    sound = Sound.getNameByIndex(it)
+                    viewModel.setSound(Sound.getNameByIndex(it))
                 }
             }
         }

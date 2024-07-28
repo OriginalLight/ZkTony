@@ -6,7 +6,7 @@ import com.zktony.android.R
 import com.zktony.android.ui.components.Tips
 import com.zktony.android.utils.AuthUtils
 import com.zktony.android.utils.HzmctUtils
-import com.zktony.android.utils.PromptSoundUtils
+import com.zktony.android.utils.SoundUtils
 import com.zktony.android.utils.ResourceUtils
 import com.zktony.android.utils.TipsUtils
 import com.zktony.log.LogUtils
@@ -33,10 +33,10 @@ class SettingsViewModel @Inject constructor(
     }
 
     // 提示音
-    fun setPromptSound(name: String) {
-        PromptSoundUtils.with(name)
+    fun setSound(name: String) {
+        SoundUtils.with(name)
         val tipsMessage =
-            "${ResourceUtils.stringResource(R.string.prompt_sound)} ${ResourceUtils.stringResource(R.string.set_success)}"
+            "${ResourceUtils.stringResource(R.string.sound)} ${ResourceUtils.stringResource(R.string.set_success)}"
         TipsUtils.showTips(Tips.info(tipsMessage))
         LogUtils.info("$tipsMessage $name", true)
     }
@@ -122,7 +122,7 @@ class SettingsViewModel @Inject constructor(
     suspend fun verifyPassword(oldPassword: String): Boolean {
         val res = userRepository.verifyPassword(AuthUtils.getIdentity(), oldPassword)
         delay(300L)
-        if(res.isSuccess) {
+        if (res.isSuccess) {
             return res.getOrNull() ?: false
         }
         return false
@@ -132,7 +132,7 @@ class SettingsViewModel @Inject constructor(
     suspend fun modifyPassword(newPassword: String): Boolean {
         val res = userRepository.modifyPassword(AuthUtils.getIdentity(), newPassword)
         delay(300L)
-        if(res.isSuccess) {
+        if (res.isSuccess) {
             TipsUtils.showTips(Tips.info("密码修改成功"))
             LogUtils.info("密码修改成功", true)
             return res.getOrNull() != null
