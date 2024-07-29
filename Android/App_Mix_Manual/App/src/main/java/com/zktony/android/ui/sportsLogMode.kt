@@ -65,7 +65,6 @@ import java.lang.reflect.Method
 import kotlin.math.abs
 import kotlin.math.ceil
 
-@RequiresApi(Build.VERSION_CODES.N)
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun sportsLogMode(
