@@ -51,7 +51,6 @@ import com.zktony.android.ui.components.TableTextHead
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.getStoragePath
 import com.zktony.android.ui.utils.itemsIndexed
-import com.zktony.android.utils.extra.DownloadState
 import com.zktony.android.utils.extra.copyTo
 import com.zktony.android.utils.extra.dateFormat
 import kotlinx.coroutines.delay
@@ -62,7 +61,6 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.FileWriter
 import java.io.IOException
-import java.io.InputStreamReader
 import java.lang.reflect.Method
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -81,17 +79,18 @@ fun sportsLogMode(
         File("sdcard/Download").listFiles { _, name -> name.endsWith(".txt") }?.toList()
             ?: emptyList()
 
-
     var selectedName by remember { mutableStateOf("") }
     //	定义列宽
     val cellWidthList = arrayListOf(100, 400)
 
 
+    /**
+     *  导出按钮
+     */
+    var export by remember { mutableStateOf(true) }
+
     var selectedFile by remember { mutableStateOf<File?>(null) }
 
-    var index = 0
-    println("index===$index")
-//    var index by remember { mutableStateOf(0) }
 
     Column(
         modifier = Modifier
@@ -142,9 +141,7 @@ fun sportsLogMode(
             }
 
             itemsIndexed(txtList) { index, file ->
-
                 val selected = file.name == selectedName
-
                 Row(
                     modifier = Modifier
                         .background(
@@ -178,7 +175,9 @@ fun sportsLogMode(
                 modifier = Modifier
                     .padding(start = 400.dp)
                     .width(100.dp)
-                    .height(50.dp), colors = ButtonDefaults.buttonColors(
+                    .height(50.dp),
+                enabled = export,
+                colors = ButtonDefaults.buttonColors(
                     containerColor = Color(rgb(0, 105, 52))
                 ),
                 shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
@@ -188,10 +187,28 @@ fun sportsLogMode(
                             var path = getStoragePath(context, true)
                             if ("" != path) {
                                 if (selectedFile != null) {
-                                    val targetDir = File(path + "/${selectedFile!!.name}")
-                                    if (!targetDir.exists()) {
-                                        if (targetDir.createNewFile()) {
-
+                                    try {
+                                        export = false
+                                        val targetDir = File(path + "/${selectedFile!!.name}.txt")
+                                        if (!targetDir.exists()) {
+                                            if (targetDir.createNewFile()) {
+                                                FileInputStream(selectedFile).use { input ->
+                                                    input.copyTo(FileOutputStream(targetDir)) {
+                                                    }
+                                                }
+                                                Toast.makeText(
+                                                    context,
+                                                    "导出完成",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            } else {
+                                                Toast.makeText(
+                                                    context,
+                                                    "创建文件失败,请重试!",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+                                        } else {
                                             FileInputStream(selectedFile).use { input ->
                                                 input.copyTo(FileOutputStream(targetDir)) {
                                                 }
@@ -201,24 +218,15 @@ fun sportsLogMode(
                                                 "导出完成",
                                                 Toast.LENGTH_SHORT
                                             ).show()
-                                        } else {
-                                            Toast.makeText(
-                                                context,
-                                                "创建文件失败,请重试!",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
                                         }
-                                    } else {
-                                        FileInputStream(selectedFile).use { input ->
-                                            input.copyTo(FileOutputStream(targetDir)) {
-                                            }
-                                        }
+                                    } catch (e: Exception) {
                                         Toast.makeText(
                                             context,
-                                            "导出完成",
+                                            "导出异常,请重试!",
                                             Toast.LENGTH_SHORT
                                         ).show()
-
+                                    } finally {
+                                        export = true
                                     }
                                 } else {
                                     Toast.makeText(
@@ -248,7 +256,6 @@ fun sportsLogMode(
                 Text(text = "导    出", fontSize = 18.sp)
             }
         }
-
 
     }
 

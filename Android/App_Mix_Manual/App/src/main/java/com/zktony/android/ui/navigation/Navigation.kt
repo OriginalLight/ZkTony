@@ -16,8 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.zktony.android.ui.*
 
-@RequiresApi(Build.VERSION_CODES.P)
-@OptIn(ExperimentalLayoutApi::class)
+
 @Composable
 fun AppNavigation(
     navController: NavHostController,

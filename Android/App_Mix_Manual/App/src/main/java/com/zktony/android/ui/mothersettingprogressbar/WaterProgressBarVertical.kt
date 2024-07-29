@@ -40,13 +40,13 @@ fun WaterVerticalProgressBar(
     val textDesc = "冲洗液"
     val textDescLayoutResult = rememberTextMeasurer().measure(
         AnnotatedString(textDesc),
-        TextStyle(color = Color(18, 95, 202), fontSize = 20.sp)
+        TextStyle(color = Color(18, 95, 202), fontSize = 13.sp)
     )
 
 
     val waterDescLayoutResult = rememberTextMeasurer().measure(
         AnnotatedString("${water}mL"),
-        TextStyle(color = Color(18, 95, 202), fontSize = 20.sp)
+        TextStyle(color = Color(18, 95, 202), fontSize = 16.sp)
     )
 
     Canvas(
@@ -83,7 +83,7 @@ fun WaterVerticalProgressBar(
         drawText(
             textLayoutResult = waterDescLayoutResult,
             topLeft = Offset(
-                canvasWidth / 2 - textDescWidth / 2,
+                canvasWidth / 2 - textDescWidth / 1.5f,
                 canvasHeight / 2
             ),
         )

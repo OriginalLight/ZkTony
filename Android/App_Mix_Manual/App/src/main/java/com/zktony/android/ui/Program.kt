@@ -12,7 +12,6 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -60,7 +59,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -279,6 +277,21 @@ fun ProgramList(
 
     val modelsThickness = rememberDataSaverState(key = "modelsThickness", "G1520")
 
+    var importError by remember { mutableStateOf("") }
+
+    /**
+     *  导出按钮
+     */
+    var export by remember { mutableStateOf(true) }
+
+    if (importError.isNotEmpty()){
+        Toast.makeText(
+            context,
+            importError,
+            Toast.LENGTH_SHORT
+        ).show()
+        importError=""
+    }
 
     //	定义列宽
     val cellWidthList = arrayListOf(70, 100, 120, 70, 90, 120)
@@ -487,7 +500,9 @@ fun ProgramList(
                     modifier = Modifier
                         .padding(start = 15.dp)
                         .width(90.dp)
-                        .height(50.dp), colors = ButtonDefaults.buttonColors(
+                        .height(50.dp),
+                    enabled = export,
+                    colors = ButtonDefaults.buttonColors(
                         containerColor = Color(rgb(0, 105, 52))
                     ),
                     shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
@@ -499,13 +514,7 @@ fun ProgramList(
                                     val entity = entities[selectedIndex]
                                     if (entity != null) {
                                         try {
-                                            val release = Build.VERSION.RELEASE
-                                            if (release == "6.0.1") {
-                                                //Android6.0.1系统是迈冲
-                                                if (path != null) {
-                                                    path = path.replace("storage", "/mnt/media_rw")
-                                                }
-                                            }
+                                            export=false
                                             path += "/${entity.displayText}.txt"
                                             val text =
                                                 "制胶程序:" + entity.displayText + ",开始浓度:" + entity.startRange.toString() + ",结束浓度:" + entity.endRange.toString() + ",常用厚度:" + entity.thickness + ",促凝剂体积:" + entity.coagulant.toString() + ",胶液体积:" + entity.volume.toString() + ",创建人:" + entity.founder + ",日期：" + entity.createTime.dateFormat(
@@ -548,6 +557,8 @@ fun ProgramList(
                                                 "导出异常,请重试!",
                                                 Toast.LENGTH_SHORT
                                             ).show()
+                                        }finally {
+                                            export=true
                                         }
 
                                     }
@@ -588,15 +599,13 @@ fun ProgramList(
 
                     item {
                         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                            OutlinedTextField(
-                                value = displayText,
+                            OutlinedTextField(value = displayText,
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = Color(rgb(0, 105, 52)),
                                     focusedLabelColor = Color(rgb(0, 105, 52)),
                                     cursorColor = Color(rgb(0, 105, 52))
                                 ),
-                                label = { Text(fontSize = 20.sp, text = "制胶名称") },
-                                textStyle = TextStyle(fontSize = 20.sp),
+                                label = { Text(text = "制胶名称") },
                                 onValueChange = {
                                     if (it.length > 7) {
                                         Toast.makeText(
@@ -618,14 +627,13 @@ fun ProgramList(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                fontSize = 20.sp,
+                                fontSize = 16.sp,
                                 text = "浓度范围："
                             )
                             OutlinedTextField(
                                 modifier = Modifier.width(100.dp),
                                 value = startRange_ex,
-                                label = { Text(fontSize = 20.sp, text = "%") },
-                                textStyle = TextStyle(fontSize = 20.sp),
+                                label = { Text(text = "%") },
                                 onValueChange = { startRange_ex = it },
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = Color(rgb(0, 105, 52)),
@@ -643,7 +651,7 @@ fun ProgramList(
                                 )
                             )
                             Text(
-                                fontSize = 20.sp,
+                                fontSize = 16.sp,
                                 text = "~"
                             )
                             OutlinedTextField(
@@ -654,8 +662,7 @@ fun ProgramList(
                                     cursorColor = Color(rgb(0, 105, 52))
                                 ),
                                 value = endRange_ex,
-                                label = { Text(fontSize = 20.sp, text = "%") },
-                                textStyle = TextStyle(fontSize = 20.sp),
+                                label = { Text(text = "%") },
                                 onValueChange = { endRange_ex = it },
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -675,7 +682,7 @@ fun ProgramList(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                fontSize = 20.sp,
+                                fontSize = 16.sp,
                                 text = "厚度："
                             )
                             tags.forEach {
@@ -695,11 +702,7 @@ fun ProgramList(
                                             thickness.value = it
                                         }
                                     )
-                                    Text(
-                                        modifier = Modifier.padding(top = 15.dp),
-                                        fontSize = 18.sp,
-                                        text = it
-                                    )
+                                    Text(modifier = Modifier.padding(top = 15.dp), text = it)
                                 }
 
                                 Spacer(modifier = Modifier.width(20.dp))
@@ -710,8 +713,7 @@ fun ProgramList(
                     item {
                         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                             OutlinedTextField(value = volume_ex,
-                                label = { Text(fontSize = 20.sp, text = "胶液体积/mL") },
-                                textStyle = TextStyle(fontSize = 20.sp),
+                                label = { Text(text = "胶液体积/mL") },
                                 onValueChange = { volume_ex = it },
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = Color(rgb(0, 105, 52)),
@@ -734,8 +736,7 @@ fun ProgramList(
                     item {
                         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                             OutlinedTextField(value = coagulant_ex,
-                                label = { Text(fontSize = 20.sp, text = "促凝剂体积/μL") },
-                                textStyle = TextStyle(fontSize = 20.sp),
+                                label = { Text(text = "促凝剂体积/μL") },
                                 onValueChange = { coagulant_ex = it },
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = Color(rgb(0, 105, 52)),
@@ -758,8 +759,7 @@ fun ProgramList(
                     item {
                         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                             OutlinedTextField(value = founder,
-                                label = { Text(fontSize = 20.sp, text = "创建人") },
-                                textStyle = TextStyle(fontSize = 20.sp),
+                                label = { Text(text = "创建人") },
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = Color(rgb(0, 105, 52)),
                                     focusedLabelColor = Color(rgb(0, 105, 52)),
@@ -777,16 +777,13 @@ fun ProgramList(
             }, confirmButton = {
 
                 Button(
-                    modifier = Modifier.width(100.dp),
-                    border = BorderStroke(1.dp, Color.Gray),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Transparent
-                    ),
-                    onClick = {
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = {
                         thickness.value = "1.0"
                         showingDialog.value = false
                     }) {
-                    Text(fontSize = 18.sp, text = "取   消", color = Color.Black)
+                    Text(text = "取消")
                 }
 
             }, dismissButton = {
@@ -968,7 +965,7 @@ fun ProgramList(
 
 
                     }) {
-                    Text(fontSize = 18.sp, text = "确   认")
+                    Text(text = "确认")
                 }
 
             })
@@ -987,12 +984,10 @@ fun ProgramList(
             }, confirmButton = {
 
                 Button(
-                    modifier = Modifier.width(100.dp),
-                    border = BorderStroke(1.dp, Color.Gray),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Transparent
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
                     ), onClick = { deleteDialog.value = false }) {
-                    Text(text = "取   消")
+                    Text(text = "取消")
                 }
 
             }, dismissButton = {
@@ -1021,7 +1016,7 @@ fun ProgramList(
 
                         }
                     }) {
-                    Text(text = "确   认")
+                    Text(text = "确认")
                 }
 
             })
@@ -1058,12 +1053,10 @@ fun ProgramList(
                 }
             }, confirmButton = {
                 Button(
-                    modifier = Modifier.width(100.dp),
-                    border = BorderStroke(1.dp, Color.Gray),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Transparent
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
                     ), onClick = { importDialog.value = false }) {
-                    Text(text = "取   消")
+                    Text(text = "取消")
                 }
             }, dismissButton = {
 
@@ -1086,18 +1079,16 @@ fun ProgramList(
                                         programCount = it.count()
                                     }
 
+
                                 File("$path/zktony/program.txt").bufferedReader()
                                     .useLines { lines ->
                                         for (line in lines) {
                                             if (line.isNotEmpty()) {
+
                                                 if (modelsThickness.value == "G1500") {
                                                     if (entityNum < 10) {
                                                         if (programCount + entityNum > 10) {
-                                                            Toast.makeText(
-                                                                context,
-                                                                "要导入的程序数量超出限制",
-                                                                Toast.LENGTH_SHORT
-                                                            ).show()
+                                                            importError="要导入的程序数量超出限制！"
                                                         } else {
 
 
@@ -1211,15 +1202,13 @@ fun ProgramList(
 
 
                                                         }
+                                                    }else{
+                                                        importError="要导入的程序数量超出限制！"
                                                     }
                                                 } else if (modelsThickness.value == "G1510") {
                                                     if (entityNum < 100) {
                                                         if (programCount + entityNum > 100) {
-                                                            Toast.makeText(
-                                                                context,
-                                                                "要导入的程序数量超出限制",
-                                                                Toast.LENGTH_SHORT
-                                                            ).show()
+                                                            importError="要导入的程序数量超出限制！"
                                                         } else {
                                                             var textList = ArrayList<String>()
                                                             var contents = line.split(",")
@@ -1331,15 +1320,13 @@ fun ProgramList(
 
 
                                                         }
+                                                    }else{
+                                                        importError="要导入的程序数量超出限制！"
                                                     }
                                                 } else {
                                                     if (entityNum < 500) {
                                                         if (programCount + entityNum > 500) {
-                                                            Toast.makeText(
-                                                                context,
-                                                                "要导入的程序数量超出限制",
-                                                                Toast.LENGTH_SHORT
-                                                            ).show()
+                                                            importError="要导入的程序数量超出限制！"
                                                         } else {
                                                             var textList = ArrayList<String>()
                                                             var contents = line.split(",")
@@ -1451,8 +1438,11 @@ fun ProgramList(
 
 
                                                         }
+                                                    }else{
+                                                        importError="要导入的程序数量超出限制！"
                                                     }
                                                 }
+
 
 
                                             }

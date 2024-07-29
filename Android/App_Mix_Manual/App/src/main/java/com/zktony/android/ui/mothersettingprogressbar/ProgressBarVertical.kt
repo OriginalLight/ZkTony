@@ -50,17 +50,17 @@ fun VerticalProgressBar(
 
     val zhiDescLayoutResult = rememberTextMeasurer().measure(
         AnnotatedString("制"),
-        TextStyle(color = Color(18, 95, 202), fontSize = 20.sp)
+        TextStyle(color = Color(18, 95, 202), fontSize = 16.sp)
     )
 
     val jiaoDescLayoutResult = rememberTextMeasurer().measure(
         AnnotatedString("胶"),
-        TextStyle(color = Color(18, 95, 202), fontSize = 20.sp)
+        TextStyle(color = Color(18, 95, 202), fontSize = 16.sp)
     )
 
     val jiaDescLayoutResult = rememberTextMeasurer().measure(
         AnnotatedString("架"),
-        TextStyle(color = Color(18, 95, 202), fontSize = 20.sp)
+        TextStyle(color = Color(18, 95, 202), fontSize = 16.sp)
     )
 
     Canvas(

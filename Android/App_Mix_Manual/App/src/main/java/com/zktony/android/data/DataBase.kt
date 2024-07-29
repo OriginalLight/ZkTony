@@ -39,7 +39,7 @@ import com.zktony.android.data.entities.SportsLog
         NewCalibration::class,
         Expected::class,
     ],
-    version = 4,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(DateConverters::class)
@@ -147,15 +147,6 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
         database.execSQL("ALTER TABLE setting ADD COLUMN coagulantRinse REAL NOT NULL DEFAULT 10.0")
 
         database.execSQL("ALTER TABLE expected ADD COLUMN coagulantRinseDefault REAL NOT NULL DEFAULT 10.0")
-
-    }
-}
-
-val MIGRATION_3_4 = object : Migration(3, 4) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-
-        // 执行 SQL 语句，添加新列
-        database.execSQL("ALTER TABLE setting ADD COLUMN rinseCleanVolume2 REAL NOT NULL DEFAULT 3.0")
 
     }
 }

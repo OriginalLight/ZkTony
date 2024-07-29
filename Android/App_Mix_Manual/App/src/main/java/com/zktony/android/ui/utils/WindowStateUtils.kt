@@ -11,8 +11,6 @@ object PageType {
     const val DEBUGMODE = 12
     const val SPORTSLOG = 13
     const val UPGRADE = 14
-    const val REHEARSAL = 15
-    const val CALIBRATION = 16
 
 
 

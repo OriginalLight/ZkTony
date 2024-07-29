@@ -9,7 +9,6 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -110,7 +109,6 @@ import java.io.File
 import java.lang.reflect.Method
 import java.util.regex.Pattern
 
-@RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun SettingRoute(viewModel: SettingViewModel, homeViewModel: HomeViewModel) {
@@ -216,17 +214,6 @@ fun SettingRoute(viewModel: SettingViewModel, homeViewModel: HomeViewModel) {
                         updateMsg,
                     )
 
-                    PageType.REHEARSAL -> rehearsal(
-                        slEntitiy,
-                        expected,
-                        viewModel::dispatch,
-                    )
-
-                    PageType.CALIBRATION -> calibration(
-                        ncEntitiy,
-                        viewModel::dispatch,
-                    )
-
                     else -> {}
                 }
             }
@@ -248,11 +235,15 @@ fun SettingLits(
     var setting = s1 ?: Setting()
 
 
+    var newCalibration = c1 ?: NewCalibration()
+
+    val expected = ex1 ?: Expected()
+
     val context = LocalContext.current
 
     val keyboard = LocalSoftwareKeyboardController.current
 
-    var switchColum by remember { mutableStateOf(1) }
+    var switchColum by remember { mutableStateOf(0) }
 
     val scope = rememberCoroutineScope()
 
@@ -260,8 +251,10 @@ fun SettingLits(
 
     var selectRudio = rememberDataSaverState(key = "selectRudio", default = 1)
 
+    val snackbarHostState = LocalSnackbarHostState.current
 
-    var speChat = "[`~!@#$%^&*()+=\\-|{}':;',\\[\\]<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]"
+    var speChat =
+        "[`~!@#$%^&*()+=\\-|{}':;',\\[\\]<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]"
 
 
     //================密码相关=============================
@@ -326,19 +319,6 @@ fun SettingLits(
 
     //===============配件寿命==============================
 
-    //===============填充设置==============================
-
-    var higeFilling = rememberDataSaverState(key = "hige_Filling", default = 0.0)
-    var higeFilling_ex by remember { mutableStateOf(higeFilling.value.toString()) }
-
-    var lowFilling = rememberDataSaverState(key = "low_Filling", default = 0.0)
-    var lowFilling_ex by remember { mutableStateOf(lowFilling.value.toString()) }
-
-    var coagulantFilling = rememberDataSaverState(key = "coagulant_Filling", default = 0.0)
-    var coagulantFilling_ex by remember { mutableStateOf(coagulantFilling.value.toString()) }
-
-    //===============填充设置==============================
-
 
     //===============位置设置==============================
     /**
@@ -364,15 +344,182 @@ fun SettingLits(
     //===============位置设置==============================
 
 
+    //================预排设置=============================
+    //高浓度
+    /**
+     * 高浓度清洗液量
+     */
+
+    var higeCleanVolume_ex by remember(setting) { mutableStateOf(setting.higeCleanVolume.toString()) }
+
+    /**
+     * 高浓度预排液量
+     */
+    var higeRehearsalVolume_ex by remember(setting) { mutableStateOf(setting.higeRehearsalVolume.toString()) }
+
+    /**
+     * 高浓度管路填充
+     */
+    var higeFilling_ex by remember(setting) { mutableStateOf(setting.higeFilling.toString()) }
+
+    //高浓度
+
+    //低浓度
+    /**
+     * 低浓度清洗液量
+     */
+    var lowCleanVolume_ex by remember(setting) { mutableStateOf(setting.lowCleanVolume.toString()) }
+
+
+    /**
+     * 低浓度管路填充
+     */
+    var lowFilling_ex by remember(setting) { mutableStateOf(setting.lowFilling.toString()) }
+    //低浓度
+
+    //冲洗液泵
+    /**
+     * 冲洗液泵清洗液量
+     */
+    var rinseCleanVolume_ex by remember(setting) { mutableStateOf(setting.rinseCleanVolume.toString()) }
+
+
+    /**
+     * 冲洗液泵管路填充
+     */
+    var rinseFilling_ex by remember(setting) { mutableStateOf(setting.rinseFilling.toString()) }
+    //冲洗液泵
+
+    //促凝剂泵
+    /**
+     * 促凝剂泵清洗液量
+     */
+    var coagulantCleanVolume_ex by remember(setting) { mutableStateOf(setting.coagulantCleanVolume.toString()) }
+
+    /**
+     * 促凝剂泵管路填充
+     */
+    var coagulantFilling_ex by remember(setting) { mutableStateOf(setting.coagulantFilling.toString()) }
+
+    /**
+     * 促凝剂泵冲洗液量/μL
+     */
+    var coagulantRinse_ex by remember(setting) { mutableStateOf(setting.coagulantRinse.toString()) }
+    //促凝剂泵
+
+    /**
+     * 预排恢复默认弹窗
+     */
+    val expectedResetDialog = remember(setting) { mutableStateOf(false) }
+
+
+    //================预排设置=============================
+
+
+    //================校准设置=============================
+    //高浓度
+    /**
+     * 加液量1
+     */
+    var higeLiquidVolume1_ex by remember(newCalibration) { mutableStateOf(newCalibration.higeLiquidVolume1.toString()) }
+
+    /**
+     * 加液量2
+     */
+    var higeLiquidVolume2_ex by remember(newCalibration) { mutableStateOf(newCalibration.higeLiquidVolume2.toString()) }
+
+
+    /**
+     * 加液量3
+     */
+    var higeLiquidVolume3_ex by remember(newCalibration) { mutableStateOf(newCalibration.higeLiquidVolume3.toString()) }
+    //高浓度
+
+
+    //低浓度
+
+    /**
+     * 加液量1
+     */
+    var lowLiquidVolume1_ex by remember(newCalibration) { mutableStateOf(newCalibration.lowLiquidVolume1.toString()) }
+
+    /**
+     * 加液量2
+     */
+    var lowLiquidVolume2_ex by remember(newCalibration) { mutableStateOf(newCalibration.lowLiquidVolume2.toString()) }
+
+
+    /**
+     * 加液量3
+     */
+    var lowLiquidVolume3_ex by remember(newCalibration) { mutableStateOf(newCalibration.lowLiquidVolume3.toString()) }
+    //低浓度
+
+    //冲洗液泵
+
+    /**
+     * 加液量1
+     */
+    var rinseLiquidVolume1_ex by remember(newCalibration) { mutableStateOf(newCalibration.rinseLiquidVolume1.toString()) }
+
+    /**
+     * 加液量2
+     */
+    var rinseLiquidVolume2_ex by remember(newCalibration) { mutableStateOf(newCalibration.rinseLiquidVolume2.toString()) }
+
+
+    /**
+     * 加液量3
+     */
+    var rinseLiquidVolume3_ex by remember(newCalibration) { mutableStateOf(newCalibration.rinseLiquidVolume3.toString()) }
+    //冲洗液泵
+
+    //促凝剂泵
+
+    /**
+     * 加液量1
+     */
+    var coagulantLiquidVolume1_ex by remember(newCalibration) { mutableStateOf(newCalibration.coagulantLiquidVolume1.toString()) }
+
+    /**
+     * 加液量2
+     */
+
+    var coagulantLiquidVolume2_ex by remember(newCalibration) { mutableStateOf(newCalibration.coagulantLiquidVolume2.toString()) }
+
+
+    /**
+     * 加液量3
+     */
+
+    var coagulantLiquidVolume3_ex by remember(newCalibration) { mutableStateOf(newCalibration.coagulantLiquidVolume3.toString()) }
+    //促凝剂泵
+
+
+    /**
+     * 校准恢复默认弹窗
+     */
+    val calibrationResetDialog = remember(newCalibration) { mutableStateOf(false) }
+    //================校准设置=============================
+
+
+    //================校准数据=============================
+
+    /**
+     * 促凝剂步数
+     */
+    val coagulantpulse = rememberDataSaverState(key = "coagulantpulse", default = 550000)
+
+
+    //================校准数据=============================
+
+
     var selectedIndex by remember { mutableStateOf(0) }
     //	定义列宽
     val cellWidthList = arrayListOf(70, 115, 241)
 
     //下位机版本号
     var lowVersion by remember { mutableStateOf("Unknown") }
-
-
-    var rinseSpeed = rememberDataSaverState(key = "rinseSpeed", default = 600L)
 
 
     Column(
@@ -399,6 +546,61 @@ fun SettingLits(
                         .height(142.1.dp)
                         .clip(RoundedCornerShape(10.dp))
                         .background(
+                            if (switchColum == 0) Color(
+                                0, 105, 52
+                            ) else Color.White
+                        )
+                        .clickable {
+                            switchColum = 0
+                        }, contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .padding(top = 20.dp),
+                        color = if (switchColum == 0) Color.White else Color(rgb(112, 112, 112)),
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        text = "预"
+                    )
+
+                    Text(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .padding(top = 45.dp),
+                        color = if (switchColum == 0) Color.White else Color(rgb(112, 112, 112)),
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        text = "排"
+                    )
+
+                    Text(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .padding(top = 68.dp),
+                        color = if (switchColum == 0) Color.White else Color(rgb(112, 112, 112)),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 22.sp,
+                        text = "设"
+                    )
+                    Text(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .padding(top = 90.dp),
+                        color = if (switchColum == 0) Color.White else Color(rgb(112, 112, 112)),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 22.sp,
+                        text = "置"
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .padding(top = 36.2.dp)
+                        .width(39.2.dp)
+                        .height(142.1.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(
                             if (switchColum == 1) Color(
                                 0, 105, 52
                             ) else Color.White
@@ -412,9 +614,9 @@ fun SettingLits(
                             .align(Alignment.TopCenter)
                             .padding(top = 20.dp),
                         color = if (switchColum == 1) Color.White else Color(rgb(112, 112, 112)),
-                        fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
-                        text = "填"
+                        fontSize = 22.sp,
+                        text = "校"
                     )
 
                     Text(
@@ -422,9 +624,9 @@ fun SettingLits(
                             .align(Alignment.TopCenter)
                             .padding(top = 45.dp),
                         color = if (switchColum == 1) Color.White else Color(rgb(112, 112, 112)),
-                        fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
-                        text = "充"
+                        fontSize = 22.sp,
+                        text = "准"
                     )
 
                     Text(
@@ -447,10 +649,9 @@ fun SettingLits(
                     )
                 }
 
-
                 Box(
                     modifier = Modifier
-                        .padding(top = 126.2.dp)
+                        .padding(top = 36.2.dp)
                         .width(39.2.dp)
                         .height(142.1.dp)
                         .clip(RoundedCornerShape(10.dp))
@@ -505,7 +706,7 @@ fun SettingLits(
 
                 Box(
                     modifier = Modifier
-                        .padding(top = 126.2.dp)
+                        .padding(top = 36.2.dp)
                         .width(39.2.dp)
                         .height(142.1.dp)
                         .clip(RoundedCornerShape(10.dp))
@@ -561,7 +762,7 @@ fun SettingLits(
 
             }
 
-            if (switchColum == 1) {
+            if (switchColum == 0) {
 
                 LazyColumn(
                     modifier = Modifier
@@ -572,7 +773,7 @@ fun SettingLits(
                         Column(
                             modifier = Modifier
                                 .width(400.dp)
-                                .height(200.dp)
+                                .height(370.dp)
                                 .clip(RoundedCornerShape(10.dp))
                                 .background(
                                     color = Color(rgb(229, 229, 229)),
@@ -580,21 +781,23 @@ fun SettingLits(
                         ) {
                             Text(
                                 modifier = Modifier.padding(top = 10.dp, start = 24.7.dp),
-                                text = "高浓度泵",
-                                fontSize = 22.sp,
+                                text = "管路填充",
+                                fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold
                             )
 
                             OutlinedTextField(
-                                modifier = Modifier.padding(top = 14.8.dp, start = 47.7.dp),
+                                modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
                                 value = higeFilling_ex,
+                                textStyle = TextStyle.Default.copy(
+                                    fontSize = 18.sp,
+                                ),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = Color(rgb(0, 105, 52)),
                                     focusedLabelColor = Color(rgb(0, 105, 52)),
                                     cursorColor = Color(rgb(0, 105, 52))
                                 ),
-                                label = { Text(text = "填充液量/mL", fontSize = 20.sp) },
-                                textStyle = TextStyle(fontSize = 20.sp),
+                                label = { Text(text = "高浓度泵/mL", fontSize = 14.sp) },
                                 onValueChange = {
                                     if (Pattern.compile(speChat).matcher(it).find()) {
                                         Toast.makeText(
@@ -605,10 +808,10 @@ fun SettingLits(
                                     } else {
                                         higeFilling_ex = it
                                         val temp = higeFilling_ex.toDoubleOrNull() ?: 0.0
-                                        higeFilling.value = temp
                                         if (temp < 0) {
                                             higeFilling_ex = "0"
-                                            higeFilling.value = 0.0
+                                        } else if (temp > 20) {
+                                            higeFilling_ex = "20"
                                         }
                                     }
 
@@ -621,73 +824,19 @@ fun SettingLits(
                                     keyboard?.hide()
                                 })
                             )
-                            Row(modifier = Modifier.padding(top = 10.dp, start = 230.dp)) {
-                                Button(
-                                    modifier = Modifier
-                                        .width(100.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color(rgb(0, 105, 52))
-                                    ),
-                                    onClick = {
-                                        scope.launch {
-                                            start {
-                                                timeOut = 1000L * 30
-                                                with(
-                                                    index = 2,
-                                                    pdv = higeFilling.value * 1000,
-                                                    ads = Triple(
-                                                        rinseSpeed.value * 13,
-                                                        rinseSpeed.value * 1193,
-                                                        rinseSpeed.value * 1193
-                                                    ),
-
-                                                    )
-                                            }
-
-                                            start {
-                                                timeOut = 1000L * 30
-                                                with(
-                                                    index = 4,
-                                                    ads = Triple(rinseSpeed.value * 30, rinseSpeed.value * 30, rinseSpeed.value * 30),
-                                                    pdv = setting.rinseCleanVolume * 1000
-                                                )
-                                            }
-                                        }
-                                    }) {
-                                    Text(fontSize = 18.sp, text = "填   充")
-                                }
-                            }
-                        }
-                    }
-
-                    item {
-                        Column(
-                            modifier = Modifier
-                                .width(400.dp)
-                                .height(200.dp)
-                                .padding(top = 20.3.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(
-                                    color = Color(rgb(229, 229, 229)),
-                                )
-                        ) {
-                            Text(
-                                modifier = Modifier.padding(top = 10.dp, start = 24.7.dp),
-                                text = "低浓度泵",
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.Bold
-                            )
 
                             OutlinedTextField(
                                 modifier = Modifier.padding(top = 14.8.dp, start = 47.7.dp),
                                 value = lowFilling_ex,
-                                textStyle = TextStyle(fontSize = 20.sp),
+                                textStyle = TextStyle.Default.copy(
+                                    fontSize = 18.sp,
+                                ),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = Color(rgb(0, 105, 52)),
                                     focusedLabelColor = Color(rgb(0, 105, 52)),
                                     cursorColor = Color(rgb(0, 105, 52))
                                 ),
-                                label = { Text(text = "填充液量/mL", fontSize = 20.sp) },
+                                label = { Text(text = "低浓度泵/mL", fontSize = 14.sp) },
                                 onValueChange = {
                                     if (Pattern.compile(speChat).matcher(it).find()) {
                                         Toast.makeText(
@@ -697,11 +846,12 @@ fun SettingLits(
                                         ).show()
                                     } else {
                                         lowFilling_ex = it
+
                                         val temp = lowFilling_ex.toDoubleOrNull() ?: 0.0
-                                        lowFilling.value = temp
                                         if (temp < 0) {
                                             lowFilling_ex = "0"
-                                            lowFilling.value = 0.0
+                                        } else if (temp > 20) {
+                                            lowFilling_ex = "20"
                                         }
                                     }
 
@@ -715,42 +865,146 @@ fun SettingLits(
                                 })
                             )
 
-                            Row(modifier = Modifier.padding(top = 10.dp, start = 230.dp)) {
-                                Button(
-                                    modifier = Modifier
-                                        .width(100.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color(rgb(0, 105, 52))
-                                    ),
-                                    onClick = {
-                                        scope.launch {
-                                            start {
-                                                timeOut = 1000L * 30
-                                                with(
-                                                    index = 3,
-                                                    pdv = lowFilling.value * 1000,
-                                                    ads = Triple(
-                                                        rinseSpeed.value * 13,
-                                                        rinseSpeed.value * 1193,
-                                                        rinseSpeed.value * 1193
-                                                    ),
+                            OutlinedTextField(
+                                modifier = Modifier.padding(top = 14.8.dp, start = 47.7.dp),
+                                value = rinseFilling_ex,
+                                textStyle = TextStyle.Default.copy(
+                                    fontSize = 18.sp,
+                                ),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(rgb(0, 105, 52)),
+                                    focusedLabelColor = Color(rgb(0, 105, 52)),
+                                    cursorColor = Color(rgb(0, 105, 52))
+                                ),
+                                label = { Text(text = "冲洗液泵/mL", fontSize = 14.sp) },
+                                onValueChange = {
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        rinseFilling_ex = it
 
-                                                    )
-                                            }
-
-                                            start {
-                                                timeOut = 1000L * 30
-                                                with(
-                                                    index = 4,
-                                                    ads = Triple(rinseSpeed.value * 30, rinseSpeed.value * 30, rinseSpeed.value * 30),
-                                                    pdv = setting.rinseCleanVolume * 1000
-                                                )
-                                            }
+                                        val temp = rinseFilling_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            rinseFilling_ex = "0"
+                                        } else if (temp > 20) {
+                                            rinseFilling_ex = "20"
                                         }
-                                    }) {
-                                    Text(fontSize = 18.sp, text = "填   充")
-                                }
-                            }
+                                    }
+
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(onDone = {
+                                    keyboard?.hide()
+                                })
+                            )
+
+
+                            OutlinedTextField(
+                                modifier = Modifier.padding(top = 14.8.dp, start = 47.7.dp),
+                                value = coagulantFilling_ex,
+                                textStyle = TextStyle.Default.copy(
+                                    fontSize = 18.sp,
+                                ),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(rgb(0, 105, 52)),
+                                    focusedLabelColor = Color(rgb(0, 105, 52)),
+                                    cursorColor = Color(rgb(0, 105, 52))
+                                ),
+                                label = { Text(text = "促凝剂泵/mL", fontSize = 14.sp) },
+                                onValueChange = {
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        coagulantFilling_ex = it
+
+                                        val temp = coagulantFilling_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            coagulantFilling_ex = "0"
+                                        } else if (temp > 20) {
+                                            coagulantFilling_ex = "20"
+                                        }
+                                    }
+
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(onDone = {
+                                    keyboard?.hide()
+                                })
+                            )
+
+                        }
+                    }
+
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .width(400.dp)
+                                .height(150.dp)
+                                .padding(top = 20.3.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(
+                                    color = Color(rgb(229, 229, 229)),
+                                )
+                        ) {
+                            Text(
+                                modifier = Modifier.padding(top = 10.dp, start = 24.7.dp),
+                                text = "预排液量",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+
+                            OutlinedTextField(
+                                modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
+                                value = higeRehearsalVolume_ex,
+                                textStyle = TextStyle.Default.copy(
+                                    fontSize = 18.sp,
+                                ),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(rgb(0, 105, 52)),
+                                    focusedLabelColor = Color(rgb(0, 105, 52)),
+                                    cursorColor = Color(rgb(0, 105, 52))
+                                ),
+                                label = { Text(text = "预排液量/mL", fontSize = 14.sp) },
+                                onValueChange = {
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        higeRehearsalVolume_ex = it
+                                        val temp = higeRehearsalVolume_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            higeRehearsalVolume_ex = "0"
+                                        } else if (temp > 20) {
+                                            higeRehearsalVolume_ex = "20"
+                                        }
+                                    }
+
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(onDone = {
+                                    keyboard?.hide()
+                                })
+                            )
 
 
                         }
@@ -761,7 +1015,7 @@ fun SettingLits(
                         Column(
                             modifier = Modifier
                                 .width(400.dp)
-                                .height(200.dp)
+                                .height(390.dp)
                                 .padding(top = 20.3.dp)
                                 .clip(RoundedCornerShape(10.dp))
                                 .background(
@@ -770,21 +1024,24 @@ fun SettingLits(
                         ) {
                             Text(
                                 modifier = Modifier.padding(top = 10.dp, start = 24.7.dp),
-                                text = "促凝剂泵",
-                                fontSize = 22.sp,
+                                text = "清洗液量",
+                                fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold
                             )
 
+
                             OutlinedTextField(
-                                modifier = Modifier.padding(top = 14.8.dp, start = 47.7.dp),
-                                value = coagulantFilling_ex,
-                                textStyle = TextStyle(fontSize = 20.sp),
+                                modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
+                                value = higeCleanVolume_ex,
+                                textStyle = TextStyle.Default.copy(
+                                    fontSize = 18.sp,
+                                ),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = Color(rgb(0, 105, 52)),
                                     focusedLabelColor = Color(rgb(0, 105, 52)),
                                     cursorColor = Color(rgb(0, 105, 52))
                                 ),
-                                label = { Text(text = "填充液量/mL", fontSize = 20.sp) },
+                                label = { Text(text = "高浓度泵/mL", fontSize = 14.sp) },
                                 onValueChange = {
                                     if (Pattern.compile(speChat).matcher(it).find()) {
                                         Toast.makeText(
@@ -793,12 +1050,51 @@ fun SettingLits(
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     } else {
-                                        coagulantFilling_ex = it
-                                        val temp = coagulantFilling_ex.toDoubleOrNull() ?: 0.0
-                                        coagulantFilling.value = temp
+                                        higeCleanVolume_ex = it
+                                        val temp = higeCleanVolume_ex.toDoubleOrNull() ?: 0.0
                                         if (temp < 0) {
-                                            coagulantFilling_ex = "0"
-                                            coagulantFilling.value = 0.0
+                                            higeCleanVolume_ex = "0"
+                                        } else if (temp > 20) {
+                                            higeCleanVolume_ex = "20"
+                                        }
+                                    }
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(onDone = {
+                                    keyboard?.hide()
+                                })
+                            )
+
+                            OutlinedTextField(
+                                modifier = Modifier.padding(top = 14.8.dp, start = 47.7.dp),
+                                value = lowCleanVolume_ex,
+                                textStyle = TextStyle.Default.copy(
+                                    fontSize = 18.sp,
+                                ),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(rgb(0, 105, 52)),
+                                    focusedLabelColor = Color(rgb(0, 105, 52)),
+                                    cursorColor = Color(rgb(0, 105, 52))
+                                ),
+                                label = { Text(text = "低浓度泵/mL", fontSize = 14.sp) },
+                                onValueChange = {
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        lowCleanVolume_ex = it
+
+                                        val temp = lowCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            lowCleanVolume_ex = "0"
+                                        } else if (temp > 20) {
+                                            lowCleanVolume_ex = "20"
                                         }
                                     }
 
@@ -812,20 +1108,292 @@ fun SettingLits(
                                 })
                             )
 
-                            Row(modifier = Modifier.padding(top = 10.dp, start = 230.dp)) {
-                                Button(
-                                    modifier = Modifier
-                                        .width(100.dp),
+
+                            OutlinedTextField(
+                                modifier = Modifier.padding(top = 14.8.dp, start = 47.7.dp),
+                                value = rinseCleanVolume_ex,
+                                textStyle = TextStyle.Default.copy(
+                                    fontSize = 18.sp,
+                                ),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(rgb(0, 105, 52)),
+                                    focusedLabelColor = Color(rgb(0, 105, 52)),
+                                    cursorColor = Color(rgb(0, 105, 52))
+                                ),
+                                label = { Text(text = "冲洗液泵/mL", fontSize = 14.sp) },
+                                onValueChange = {
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        rinseCleanVolume_ex = it
+
+                                        val temp = rinseCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            rinseCleanVolume_ex = "0"
+                                        } else if (temp > 20) {
+                                            rinseCleanVolume_ex = "20"
+                                        }
+                                    }
+
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(onDone = {
+                                    keyboard?.hide()
+                                })
+                            )
+
+                            OutlinedTextField(
+                                modifier = Modifier.padding(top = 14.8.dp, start = 47.7.dp),
+                                value = coagulantCleanVolume_ex,
+                                textStyle = TextStyle.Default.copy(
+                                    fontSize = 18.sp,
+                                ),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(rgb(0, 105, 52)),
+                                    focusedLabelColor = Color(rgb(0, 105, 52)),
+                                    cursorColor = Color(rgb(0, 105, 52))
+                                ),
+                                label = { Text(text = "促凝剂泵/mL", fontSize = 14.sp) },
+                                onValueChange = {
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        coagulantCleanVolume_ex = it
+
+                                        val temp = coagulantCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            coagulantCleanVolume_ex = "0"
+                                        } else if (temp > 20) {
+                                            coagulantCleanVolume_ex = "20"
+                                        }
+                                    }
+
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(onDone = {
+                                    keyboard?.hide()
+                                })
+                            )
+
+                        }
+                    }
+
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .width(400.dp)
+                                .height(230.dp)
+                                .padding(top = 20.3.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(
+                                    color = Color(rgb(229, 229, 229)),
+                                )
+                        ) {
+                            Text(
+                                modifier = Modifier.padding(top = 10.dp, start = 24.7.dp),
+                                text = "冲洗液量",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+
+                            OutlinedTextField(
+                                modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
+                                value = rinseCleanVolume_ex,
+                                textStyle = TextStyle.Default.copy(
+                                    fontSize = 18.sp,
+                                ),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(rgb(0, 105, 52)),
+                                    focusedLabelColor = Color(rgb(0, 105, 52)),
+                                    cursorColor = Color(rgb(0, 105, 52))
+                                ),
+                                label = { Text(text = "冲洗液泵/mL", fontSize = 14.sp) },
+                                onValueChange = {
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        rinseCleanVolume_ex = it
+
+                                        val temp = rinseCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            rinseCleanVolume_ex = "0"
+                                        } else if (temp > 20) {
+                                            rinseCleanVolume_ex = "20"
+                                        }
+                                    }
+
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(onDone = {
+                                    keyboard?.hide()
+                                })
+                            )
+
+
+                            OutlinedTextField(
+                                modifier = Modifier.padding(top = 14.8.dp, start = 47.7.dp),
+                                value = coagulantRinse_ex,
+                                textStyle = TextStyle.Default.copy(
+                                    fontSize = 18.sp,
+                                ),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(rgb(0, 105, 52)),
+                                    focusedLabelColor = Color(rgb(0, 105, 52)),
+                                    cursorColor = Color(rgb(0, 105, 52))
+                                ),
+                                label = { Text(text = "促凝剂泵/μL", fontSize = 14.sp) },
+                                onValueChange = {
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        coagulantRinse_ex = it
+
+                                        val temp = coagulantRinse_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            coagulantRinse_ex = "0"
+                                        }
+                                    }
+
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(onDone = {
+                                    keyboard?.hide()
+                                })
+                            )
+
+
+                        }
+
+
+                    }
+
+
+                    item {
+                        Row(
+                            modifier = Modifier.padding(top = 20.dp)
+                        ) {
+
+                            Button(modifier = Modifier
+                                .padding(start = 60.dp)
+                                .width(112.0.dp)
+                                .height(41.5.dp), colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ), shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp), onClick = {
+                                setting.higeCleanVolume =
+                                    higeCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                setting.higeRehearsalVolume =
+                                    higeRehearsalVolume_ex.toDoubleOrNull() ?: 0.0
+                                setting.higeFilling = higeFilling_ex.toDoubleOrNull() ?: 0.0
+                                setting.lowCleanVolume =
+                                    lowCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                setting.lowFilling = lowFilling_ex.toDoubleOrNull() ?: 0.0
+                                setting.rinseCleanVolume =
+                                    rinseCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                setting.rinseFilling = rinseFilling_ex.toDoubleOrNull() ?: 0.0
+                                setting.coagulantCleanVolume =
+                                    coagulantCleanVolume_ex.toDoubleOrNull() ?: 0.0
+                                setting.coagulantFilling =
+                                    coagulantFilling_ex.toDoubleOrNull() ?: 0.0
+                                setting.coagulantRinse =
+                                    coagulantRinse_ex.toDoubleOrNull() ?: 0.0
+                                uiEvent(SettingIntent.UpdateSet(setting))
+
+                                Toast.makeText(
+                                    context, "保存成功！", Toast.LENGTH_SHORT
+                                ).show()
+
+
+                            }) {
+                                Text(text = "保    存", fontSize = 18.sp)
+                            }
+
+
+                            Button(modifier = Modifier
+                                .padding(start = 40.dp)
+                                .width(120.0.dp)
+                                .height(41.5.dp), colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ), shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp), onClick = {
+                                expectedResetDialog.value = true
+                            }) {
+                                Text(text = "恢复默认", fontSize = 18.sp)
+                            }
+
+                        }
+                        Spacer(modifier = Modifier.height(30.dp))
+                    }
+                }
+
+
+            } else if (switchColum == 1) {
+                var rinseSpeed = rememberDataSaverState(key = "rinseSpeed", default = 600L)
+                var coagulantSpeed = rememberDataSaverState(key = "coagulantSpeed", default = 200L)
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 20.dp, start = 50.dp),
+                ) {
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .width(400.dp)
+                                .height(290.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(
+                                    color = Color(rgb(229, 229, 229)),
+                                )
+                        ) {
+                            Row {
+                                Text(
+                                    modifier = Modifier.padding(top = 10.dp, start = 24.7.dp),
+                                    text = "高浓度泵",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Button(modifier = Modifier
+                                    .padding(top = 10.dp, start = 150.dp)
+                                    .width(100.dp)
+                                    .height(40.dp),
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = Color(rgb(0, 105, 52))
                                     ),
+                                    shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                                     onClick = {
                                         scope.launch {
+                                            lightYellow()
                                             start {
                                                 timeOut = 1000L * 30
                                                 with(
-                                                    index = 1,
-                                                    pdv = coagulantFilling.value * 1000,
+                                                    index = 2,
+                                                    pdv = 51200L * 50,
                                                     ads = Triple(
                                                         rinseSpeed.value * 13,
                                                         rinseSpeed.value * 1193,
@@ -834,27 +1402,774 @@ fun SettingLits(
 
                                                     )
                                             }
-
-                                            start {
-                                                timeOut = 1000L * 30
-                                                with(
-                                                    index = 4,
-                                                    ads = Triple(rinseSpeed.value * 30, rinseSpeed.value * 30, rinseSpeed.value * 30),
-                                                    pdv = setting.rinseCleanVolume * 1000
-                                                )
-                                            }
+                                            lightGreed()
                                         }
+
                                     }) {
-                                    Text(fontSize = 18.sp, text = "填   充")
+                                    Text(text = "加    液", fontSize = 16.sp)
                                 }
                             }
+
+                            OutlinedTextField(
+                                modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
+                                value = higeLiquidVolume1_ex,
+                                textStyle = TextStyle.Default.copy(
+                                    fontSize = 18.sp,
+                                ),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(rgb(0, 105, 52)),
+                                    focusedLabelColor = Color(rgb(0, 105, 52)),
+                                    cursorColor = Color(rgb(0, 105, 52))
+                                ),
+                                label = { Text(text = "加液量1/g", fontSize = 14.sp) },
+                                onValueChange = {
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        higeLiquidVolume1_ex = it
+
+                                        val temp = higeLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            higeLiquidVolume1_ex = "0"
+                                        } else if (temp > 50) {
+                                            higeLiquidVolume1_ex = "50"
+                                        }
+                                    }
+
+
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(onDone = {
+                                    keyboard?.hide()
+                                })
+                            )
+
+                            OutlinedTextField(
+                                modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
+                                value = higeLiquidVolume2_ex,
+                                textStyle = TextStyle.Default.copy(
+                                    fontSize = 18.sp,
+                                ),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(rgb(0, 105, 52)),
+                                    focusedLabelColor = Color(rgb(0, 105, 52)),
+                                    cursorColor = Color(rgb(0, 105, 52))
+                                ),
+                                label = { Text(text = "加液量2/g", fontSize = 14.sp) },
+                                onValueChange = {
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        higeLiquidVolume2_ex = it
+
+                                        val temp = higeLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            higeLiquidVolume2_ex = "0"
+                                        } else if (temp > 50) {
+                                            higeLiquidVolume2_ex = "50"
+                                        }
+                                    }
+
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(onDone = {
+                                    keyboard?.hide()
+                                })
+                            )
+
+                            OutlinedTextField(
+                                modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
+                                value = higeLiquidVolume3_ex,
+                                textStyle = TextStyle.Default.copy(
+                                    fontSize = 18.sp,
+                                ),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(rgb(0, 105, 52)),
+                                    focusedLabelColor = Color(rgb(0, 105, 52)),
+                                    cursorColor = Color(rgb(0, 105, 52))
+                                ),
+                                label = { Text(text = "加液量3/g", fontSize = 14.sp) },
+                                onValueChange = {
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        higeLiquidVolume3_ex = it
+
+                                        val temp = higeLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            higeLiquidVolume3_ex = "0"
+                                        } else if (temp > 50) {
+                                            higeLiquidVolume3_ex = "50"
+                                        }
+                                    }
+
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(onDone = {
+                                    keyboard?.hide()
+                                })
+                            )
 
 
                         }
                     }
 
-                }
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .width(400.dp)
+                                .height(310.dp)
+                                .padding(top = 20.3.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(
+                                    color = Color(rgb(229, 229, 229)),
+                                )
+                        ) {
 
+                            Row {
+                                Text(
+                                    modifier = Modifier.padding(top = 10.dp, start = 24.7.dp),
+                                    text = "低浓度泵",
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Button(modifier = Modifier
+                                    .padding(top = 10.dp, start = 150.dp)
+                                    .width(100.dp)
+                                    .height(40.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(rgb(0, 105, 52))
+                                    ),
+                                    shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
+                                    onClick = {
+                                        scope.launch {
+                                            lightYellow()
+                                            start {
+                                                timeOut = 1000L * 30
+                                                with(
+                                                    index = 3,
+                                                    pdv = 51200L * 50,
+                                                    ads = Triple(
+                                                        rinseSpeed.value * 13,
+                                                        rinseSpeed.value * 1193,
+                                                        rinseSpeed.value * 1193
+                                                    ),
+
+                                                    )
+                                            }
+                                            lightGreed()
+                                        }
+
+                                    }) {
+                                    Text(text = "加    液", fontSize = 16.sp)
+                                }
+                            }
+
+                            OutlinedTextField(
+                                modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
+                                value = lowLiquidVolume1_ex,
+                                textStyle = TextStyle.Default.copy(
+                                    fontSize = 18.sp,
+                                ),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(rgb(0, 105, 52)),
+                                    focusedLabelColor = Color(rgb(0, 105, 52)),
+                                    cursorColor = Color(rgb(0, 105, 52))
+                                ),
+                                label = { Text(text = "加液量1/g", fontSize = 14.sp) },
+                                onValueChange = {
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        lowLiquidVolume1_ex = it
+
+                                        val temp = lowLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            lowLiquidVolume1_ex = "0"
+                                        } else if (temp > 50) {
+                                            lowLiquidVolume1_ex = "50"
+                                        }
+                                    }
+
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(onDone = {
+                                    keyboard?.hide()
+                                })
+                            )
+
+                            OutlinedTextField(
+                                modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
+                                value = lowLiquidVolume2_ex,
+                                textStyle = TextStyle.Default.copy(
+                                    fontSize = 18.sp,
+                                ),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(rgb(0, 105, 52)),
+                                    focusedLabelColor = Color(rgb(0, 105, 52)),
+                                    cursorColor = Color(rgb(0, 105, 52))
+                                ),
+                                label = { Text(text = "加液量2/g", fontSize = 14.sp) },
+                                onValueChange = {
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        lowLiquidVolume2_ex = it
+
+                                        val temp = lowLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            lowLiquidVolume2_ex = "0"
+                                        } else if (temp > 50) {
+                                            lowLiquidVolume2_ex = "50"
+                                        }
+                                    }
+
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(onDone = {
+                                    keyboard?.hide()
+                                })
+                            )
+
+                            OutlinedTextField(
+                                modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
+                                value = lowLiquidVolume3_ex,
+                                textStyle = TextStyle.Default.copy(
+                                    fontSize = 18.sp,
+                                ),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(rgb(0, 105, 52)),
+                                    focusedLabelColor = Color(rgb(0, 105, 52)),
+                                    cursorColor = Color(rgb(0, 105, 52))
+                                ),
+                                label = { Text(text = "加液量3/g", fontSize = 14.sp) },
+                                onValueChange = {
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        lowLiquidVolume3_ex = it
+
+                                        val temp = lowLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            lowLiquidVolume3_ex = "0"
+                                        } else if (temp > 50) {
+                                            lowLiquidVolume3_ex = "50"
+                                        }
+                                    }
+
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(onDone = {
+                                    keyboard?.hide()
+                                })
+                            )
+
+                        }
+                    }
+
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .width(400.dp)
+                                .height(310.dp)
+                                .padding(top = 20.3.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(
+                                    color = Color(rgb(229, 229, 229)),
+                                )
+                        ) {
+
+                            Row {
+                                Text(
+                                    modifier = Modifier.padding(top = 10.dp, start = 24.7.dp),
+                                    text = "冲洗液泵",
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Button(modifier = Modifier
+                                    .padding(top = 10.dp, start = 150.dp)
+                                    .width(100.dp)
+                                    .height(40.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(rgb(0, 105, 52))
+                                    ),
+                                    shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
+                                    onClick = {
+
+                                        scope.launch {
+                                            lightYellow()
+                                            start {
+                                                timeOut = 1000L * 30
+                                                with(
+                                                    index = 4,
+                                                    pdv = 3200L * 50,
+                                                    ads = Triple(
+                                                        rinseSpeed.value * 20,
+                                                        rinseSpeed.value * 20,
+                                                        rinseSpeed.value * 20
+                                                    ),
+
+                                                    )
+                                            }
+                                            lightGreed()
+                                        }
+
+                                    }) {
+                                    Text(text = "加    液", fontSize = 16.sp)
+                                }
+                            }
+
+                            OutlinedTextField(
+                                modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
+                                value = rinseLiquidVolume1_ex,
+                                textStyle = TextStyle.Default.copy(
+                                    fontSize = 18.sp,
+                                ),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(rgb(0, 105, 52)),
+                                    focusedLabelColor = Color(rgb(0, 105, 52)),
+                                    cursorColor = Color(rgb(0, 105, 52))
+                                ),
+                                label = { Text(text = "加液量1/g", fontSize = 14.sp) },
+                                onValueChange = {
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        rinseLiquidVolume1_ex = it
+
+                                        val temp = rinseLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            rinseLiquidVolume1_ex = "0"
+                                        } else if (temp > 50) {
+                                            rinseLiquidVolume1_ex = "50"
+                                        }
+                                    }
+
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(onDone = {
+                                    keyboard?.hide()
+                                })
+                            )
+
+                            OutlinedTextField(
+                                modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
+                                value = rinseLiquidVolume2_ex,
+                                textStyle = TextStyle.Default.copy(
+                                    fontSize = 18.sp,
+                                ),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(rgb(0, 105, 52)),
+                                    focusedLabelColor = Color(rgb(0, 105, 52)),
+                                    cursorColor = Color(rgb(0, 105, 52))
+                                ),
+                                label = { Text(text = "加液量2/g", fontSize = 14.sp) },
+                                onValueChange = {
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        rinseLiquidVolume2_ex = it
+
+                                        val temp = rinseLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            rinseLiquidVolume2_ex = "0"
+                                        } else if (temp > 50) {
+                                            rinseLiquidVolume2_ex = "50"
+                                        }
+                                    }
+
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(onDone = {
+                                    keyboard?.hide()
+                                })
+                            )
+
+                            OutlinedTextField(
+                                modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
+                                value = rinseLiquidVolume3_ex,
+                                textStyle = TextStyle.Default.copy(
+                                    fontSize = 18.sp,
+                                ),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(rgb(0, 105, 52)),
+                                    focusedLabelColor = Color(rgb(0, 105, 52)),
+                                    cursorColor = Color(rgb(0, 105, 52))
+                                ),
+                                label = { Text(text = "加液量3/g", fontSize = 14.sp) },
+                                onValueChange = {
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        rinseLiquidVolume3_ex = it
+
+                                        val temp = rinseLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            rinseLiquidVolume3_ex = "0"
+                                        } else if (temp > 50) {
+                                            rinseLiquidVolume3_ex = "50"
+                                        }
+                                    }
+
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(onDone = {
+                                    keyboard?.hide()
+                                })
+                            )
+                        }
+                    }
+
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .width(400.dp)
+                                .height(310.dp)
+                                .padding(top = 20.3.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(
+                                    color = Color(rgb(229, 229, 229)),
+                                )
+                        ) {
+
+                            Row {
+                                Text(
+                                    modifier = Modifier.padding(top = 10.dp, start = 24.7.dp),
+                                    text = "促凝剂泵",
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Button(modifier = Modifier
+                                    .padding(top = 10.dp, start = 150.dp)
+                                    .width(100.dp)
+                                    .height(40.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(rgb(0, 105, 52))
+                                    ),
+                                    shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
+                                    onClick = {
+                                        scope.launch {
+                                            lightYellow()
+                                            start {
+                                                timeOut = 1000L * 30
+                                                with(
+                                                    index = 1,
+                                                    pdv = coagulantpulse.value.toLong(),
+                                                    ads = Triple(
+                                                        rinseSpeed.value * 13,
+                                                        rinseSpeed.value * 1193,
+                                                        rinseSpeed.value * 1193
+                                                    ),
+
+                                                    )
+                                            }
+                                            delay(1000)
+                                            start {
+                                                timeOut = 1000L * 30
+                                                with(
+                                                    index = 1,
+                                                    pdv = -coagulantpulse.value.toLong(),
+                                                    ads = Triple(
+                                                        rinseSpeed.value * 13,
+                                                        rinseSpeed.value * 1193,
+                                                        rinseSpeed.value * 1193
+                                                    ),
+
+                                                    )
+                                            }
+                                            lightGreed()
+                                        }
+
+                                    }) {
+                                    Text(text = "加    液", fontSize = 16.sp)
+                                }
+                            }
+
+                            OutlinedTextField(
+                                modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
+                                value = coagulantLiquidVolume1_ex,
+                                textStyle = TextStyle.Default.copy(
+                                    fontSize = 18.sp,
+                                ),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(rgb(0, 105, 52)),
+                                    focusedLabelColor = Color(rgb(0, 105, 52)),
+                                    cursorColor = Color(rgb(0, 105, 52))
+                                ),
+                                label = { Text(text = "加液量1/g", fontSize = 14.sp) },
+                                onValueChange = {
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        coagulantLiquidVolume1_ex = it
+
+                                        val temp = coagulantLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            coagulantLiquidVolume1_ex = "0"
+                                        } else if (temp > 50) {
+                                            coagulantLiquidVolume1_ex = "50"
+                                        }
+                                    }
+
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(onDone = {
+                                    keyboard?.hide()
+                                })
+                            )
+
+                            OutlinedTextField(
+                                modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
+                                value = coagulantLiquidVolume2_ex,
+                                textStyle = TextStyle.Default.copy(
+                                    fontSize = 18.sp,
+                                ),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(rgb(0, 105, 52)),
+                                    focusedLabelColor = Color(rgb(0, 105, 52)),
+                                    cursorColor = Color(rgb(0, 105, 52))
+                                ),
+                                label = { Text(text = "加液量2/g", fontSize = 14.sp) },
+                                onValueChange = {
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        coagulantLiquidVolume2_ex = it
+
+                                        val temp = coagulantLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            coagulantLiquidVolume2_ex = "0"
+                                        } else if (temp > 50) {
+                                            coagulantLiquidVolume2_ex = "50"
+                                        }
+                                    }
+
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(onDone = {
+                                    keyboard?.hide()
+                                })
+                            )
+
+                            OutlinedTextField(
+                                modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
+                                value = coagulantLiquidVolume3_ex,
+                                textStyle = TextStyle.Default.copy(
+                                    fontSize = 18.sp,
+                                ),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color(rgb(0, 105, 52)),
+                                    focusedLabelColor = Color(rgb(0, 105, 52)),
+                                    cursorColor = Color(rgb(0, 105, 52))
+                                ),
+                                label = { Text(text = "加液量3/g", fontSize = 14.sp) },
+                                onValueChange = {
+                                    if (Pattern.compile(speChat).matcher(it).find()) {
+                                        Toast.makeText(
+                                            context,
+                                            "数据不能包含特殊字符！",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        coagulantLiquidVolume3_ex = it
+
+                                        val temp = coagulantLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
+                                        if (temp < 0) {
+                                            coagulantLiquidVolume3_ex = "0"
+                                        } else if (temp > 50) {
+                                            coagulantLiquidVolume3_ex = "50"
+                                        }
+                                    }
+
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(onDone = {
+                                    keyboard?.hide()
+                                })
+                            )
+
+
+                        }
+                    }
+
+                    item {
+                        Row(
+                            modifier = Modifier.padding(top = 20.dp)
+                        ) {
+
+                            Button(modifier = Modifier
+                                .padding(start = 60.dp)
+                                .width(112.0.dp)
+                                .height(41.5.dp), colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ), shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp), onClick = {
+                                newCalibration.higeLiquidVolume1 =
+                                    higeLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.higeLiquidVolume2 =
+                                    higeLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.higeLiquidVolume3 =
+                                    higeLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
+
+                                newCalibration.lowLiquidVolume1 =
+                                    lowLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.lowLiquidVolume2 =
+                                    lowLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.lowLiquidVolume3 =
+                                    lowLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
+
+                                newCalibration.rinseLiquidVolume1 =
+                                    rinseLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.rinseLiquidVolume2 =
+                                    rinseLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.rinseLiquidVolume3 =
+                                    rinseLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
+
+                                newCalibration.coagulantLiquidVolume1 =
+                                    coagulantLiquidVolume1_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.coagulantLiquidVolume2 =
+                                    coagulantLiquidVolume2_ex.toDoubleOrNull() ?: 0.0
+                                newCalibration.coagulantLiquidVolume3 =
+                                    coagulantLiquidVolume3_ex.toDoubleOrNull() ?: 0.0
+
+                                newCalibration.higeAvg =
+                                    (newCalibration.higeLiquidVolume1 + newCalibration.higeLiquidVolume2 + newCalibration.higeLiquidVolume3) / 3
+                                newCalibration.lowAvg =
+                                    (newCalibration.lowLiquidVolume1 + newCalibration.lowLiquidVolume2 + newCalibration.lowLiquidVolume3) / 3
+                                newCalibration.rinseAvg =
+                                    (newCalibration.rinseLiquidVolume1 + newCalibration.rinseLiquidVolume2 + newCalibration.rinseLiquidVolume3) / 3
+                                newCalibration.coagulantAvg =
+                                    (newCalibration.coagulantLiquidVolume1 + newCalibration.coagulantLiquidVolume1 + newCalibration.coagulantLiquidVolume1) / 3
+
+
+                                AppStateUtils.hpc[0] =
+                                    calculateCalibrationFactorNew(64000, 120.0)
+
+                                AppStateUtils.hpc[1] = calculateCalibrationFactorNew(
+                                    coagulantpulse.value, newCalibration.coagulantAvg * 1000
+                                )
+
+                                AppStateUtils.hpc[2] = calculateCalibrationFactorNew(
+                                    51200 * 50, newCalibration.higeAvg * 1000
+                                )
+
+                                AppStateUtils.hpc[3] = calculateCalibrationFactorNew(
+                                    51200 * 50, newCalibration.lowAvg * 1000
+                                )
+
+                                AppStateUtils.hpc[4] = calculateCalibrationFactorNew(
+                                    3200 * 50, newCalibration.rinseAvg * 1000
+                                )
+
+
+
+                                uiEvent(SettingIntent.UpdateNC(newCalibration))
+
+                                Toast.makeText(
+                                    context, "保存成功！", Toast.LENGTH_SHORT
+                                ).show()
+
+
+                            }) {
+                                Text(text = "保    存", fontSize = 18.sp)
+                            }
+
+
+                            Button(modifier = Modifier
+                                .padding(start = 40.dp)
+                                .width(120.0.dp)
+                                .height(41.5.dp), colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ), shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp), onClick = {
+                                calibrationResetDialog.value = true
+                            }) {
+                                Text(text = "恢复默认", fontSize = 18.sp)
+                            }
+
+                        }
+                        Spacer(modifier = Modifier.height(30.dp))
+                    }
+
+                }
             } else if (switchColum == 2) {
                 LazyColumn(
                     modifier = Modifier
@@ -887,7 +2202,9 @@ fun SettingLits(
                                 })
                         ) {
                             TableTextBody(
-                                text = (index + 1).toString(), width = cellWidthList[0], selected
+                                text = (index + 1).toString(),
+                                width = cellWidthList[0],
+                                selected
                             )
                             TableTextBody(
                                 text = "" + item.createTime.dateFormat("yyyy-MM-dd"),
@@ -936,8 +2253,6 @@ fun SettingLits(
                         }
                     } else {
                         val items = listOf(
-                            "预排设置",
-                            "校准设置",
                             "运行日志",
                             "网络设置",
                             "操作系统设置",
@@ -1053,14 +2368,6 @@ fun SettingLits(
                                 Row(modifier = Modifier.clickable {
 
                                     when (item) {
-                                        "预排设置" -> {
-                                            uiEvent(SettingIntent.NavTo(PageType.REHEARSAL))
-                                        }
-
-                                        "校准设置" -> {
-                                            uiEvent(SettingIntent.NavTo(PageType.CALIBRATION))
-                                        }
-
                                         "运行日志" -> {
                                             uiEvent(SettingIntent.NavTo(PageType.SPORTSLOG))
                                         }
@@ -1213,7 +2520,7 @@ fun SettingLits(
                                         switchColum = 0
 
                                     }) {
-                                    Text(text = "登   出", fontSize = 18.sp)
+                                    Text(text = "登出", fontSize = 18.sp)
                                 }
 
                                 Spacer(modifier = Modifier.height(20.dp))
@@ -1228,6 +2535,154 @@ fun SettingLits(
             }
 
 
+        }
+
+        //校准恢复默认弹窗
+        if (calibrationResetDialog.value) {
+            AlertDialog(onDismissRequest = { }, title = {
+                Text(text = "是否恢复默认设置！")
+            }, text = {
+
+            }, confirmButton = {
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = {
+                        newCalibration.higeLiquidVolume1 = 1.6
+                        newCalibration.higeLiquidVolume2 = 1.6
+                        newCalibration.higeLiquidVolume3 = 1.6
+                        newCalibration.higeAvg = 1.6
+                        newCalibration.lowLiquidVolume1 = 1.6
+                        newCalibration.lowLiquidVolume2 = 1.6
+                        newCalibration.lowLiquidVolume3 = 1.6
+                        newCalibration.lowAvg = 1.6
+
+                        newCalibration.rinseLiquidVolume1 = 1.6
+                        newCalibration.rinseLiquidVolume2 = 1.6
+                        newCalibration.rinseLiquidVolume3 = 1.6
+                        newCalibration.rinseAvg = 1.6
+
+                        newCalibration.coagulantLiquidVolume1 = 1.0
+                        newCalibration.coagulantLiquidVolume2 = 1.0
+                        newCalibration.coagulantLiquidVolume3 = 1.0
+                        newCalibration.coagulantAvg = 1.0
+
+                        uiEvent(SettingIntent.UpdateNC(newCalibration))
+                        higeLiquidVolume1_ex = "1.6"
+                        higeLiquidVolume2_ex = "1.6"
+                        higeLiquidVolume3_ex = "1.6"
+
+                        lowLiquidVolume1_ex = "1.6"
+                        lowLiquidVolume2_ex = "1.6"
+                        lowLiquidVolume3_ex = "1.6"
+
+                        rinseLiquidVolume1_ex = "1.6"
+                        rinseLiquidVolume2_ex = "1.6"
+                        rinseLiquidVolume3_ex = "1.6"
+
+                        coagulantLiquidVolume1_ex = "1.0"
+                        coagulantLiquidVolume2_ex = "1.0"
+                        coagulantLiquidVolume3_ex = "1.0"
+
+                        AppStateUtils.hpc[1] = calculateCalibrationFactorNew(
+                            coagulantpulse.value, newCalibration.coagulantAvg * 1000
+                        )
+
+                        AppStateUtils.hpc[2] = calculateCalibrationFactorNew(
+                            51200 * 50, newCalibration.higeAvg * 1000
+                        )
+
+                        AppStateUtils.hpc[3] = calculateCalibrationFactorNew(
+                            51200 * 50, newCalibration.lowAvg * 1000
+                        )
+
+                        AppStateUtils.hpc[4] = calculateCalibrationFactorNew(
+                            3200 * 50, newCalibration.rinseAvg * 1000
+                        )
+
+                        calibrationResetDialog.value = false
+                    }) {
+                    Text(text = "确认")
+                }
+            }, dismissButton = {
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = { calibrationResetDialog.value = false }) {
+                    Text(text = "取消")
+                }
+            })
+        }
+
+        //预排恢复默认弹窗
+        if (expectedResetDialog.value) {
+            AlertDialog(onDismissRequest = { }, title = {
+                Text(text = "是否恢复默认设置！")
+            }, text = {
+
+            }, confirmButton = {
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = {
+
+                        if (expected.higeCleanDefault == 0.0) {
+                            setting.higeCleanVolume = 5.0
+                            setting.higeRehearsalVolume = 1.0
+                            setting.higeFilling = 3.0
+                            setting.lowCleanVolume = 5.0
+                            setting.lowFilling = 3.0
+                            setting.rinseCleanVolume = 5.0
+                            setting.rinseFilling = 3.0
+                            setting.coagulantCleanVolume = 5.0
+                            setting.coagulantFilling = 3.0
+                            uiEvent(SettingIntent.UpdateSet(setting))
+
+                            higeCleanVolume_ex = "5.0"
+                            higeRehearsalVolume_ex = "1.0"
+                            higeFilling_ex = "3.0"
+                            lowCleanVolume_ex = "5.0"
+                            lowFilling_ex = "3.0"
+                            rinseCleanVolume_ex = "5.0"
+                            rinseFilling_ex = "3.0"
+                            coagulantCleanVolume_ex = "5.0"
+                            coagulantFilling_ex = "3.0"
+                        } else {
+                            setting.higeCleanVolume = expected.higeCleanDefault
+                            setting.higeRehearsalVolume = expected.higeRehearsalDefault
+                            setting.higeFilling = expected.higeFillingDefault
+                            setting.lowCleanVolume = expected.lowCleanDefault
+                            setting.lowFilling = expected.lowFillingDefault
+                            setting.rinseCleanVolume = expected.rinseCleanDefault
+                            setting.rinseFilling = expected.rinseFillingDefault
+                            setting.coagulantCleanVolume = expected.coagulantCleanDefault
+                            setting.coagulantFilling = expected.coagulantFillingDefault
+                            uiEvent(SettingIntent.UpdateSet(setting))
+
+                            higeCleanVolume_ex = expected.higeCleanDefault.toString()
+                            higeRehearsalVolume_ex = expected.higeRehearsalDefault.toString()
+                            higeFilling_ex = expected.higeFillingDefault.toString()
+                            lowCleanVolume_ex = expected.lowCleanDefault.toString()
+                            lowFilling_ex = expected.lowFillingDefault.toString()
+                            rinseCleanVolume_ex = expected.rinseCleanDefault.toString()
+                            rinseFilling_ex = expected.rinseFillingDefault.toString()
+                            coagulantCleanVolume_ex = expected.coagulantCleanDefault.toString()
+                            coagulantFilling_ex = expected.coagulantFillingDefault.toString()
+                        }
+
+
+                        expectedResetDialog.value = false
+                    }) {
+                    Text(text = "确认")
+                }
+            }, dismissButton = {
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = { expectedResetDialog.value = false }) {
+                    Text(text = "取消")
+                }
+            })
         }
 
         //修改密码弹窗
@@ -1248,12 +2703,16 @@ fun SettingLits(
                         onValueChange = {
                             if (Pattern.compile(speChat).matcher(it).find()) {
                                 Toast.makeText(
-                                    context, "数据不能包含特殊字符！", Toast.LENGTH_SHORT
+                                    context,
+                                    "数据不能包含特殊字符！",
+                                    Toast.LENGTH_SHORT
                                 ).show()
                             } else {
                                 if (it.length > 6) {
                                     Toast.makeText(
-                                        context, "长度不能大于6！", Toast.LENGTH_SHORT
+                                        context,
+                                        "长度不能大于6！",
+                                        Toast.LENGTH_SHORT
                                     ).show()
                                 } else {
                                     oldPwd.value = it
@@ -1280,7 +2739,9 @@ fun SettingLits(
                         onValueChange = {
                             if (Pattern.compile(speChat).matcher(it).find()) {
                                 Toast.makeText(
-                                    context, "数据不能包含特殊字符！", Toast.LENGTH_SHORT
+                                    context,
+                                    "数据不能包含特殊字符！",
+                                    Toast.LENGTH_SHORT
                                 ).show()
                             } else {
                                 newPwd.value = it
@@ -1306,7 +2767,9 @@ fun SettingLits(
                         onValueChange = {
                             if (Pattern.compile(speChat).matcher(it).find()) {
                                 Toast.makeText(
-                                    context, "数据不能包含特殊字符！", Toast.LENGTH_SHORT
+                                    context,
+                                    "数据不能包含特殊字符！",
+                                    Toast.LENGTH_SHORT
                                 ).show()
                             } else {
                                 newPwd2.value = it
@@ -1325,45 +2788,45 @@ fun SettingLits(
 
 
             }, confirmButton = {
-                Button(modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = {
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = {
 
-                    if (oldPwd.value == deviceAdminPwd.value) {
-                        if (newPwd.value == newPwd2.value) {
-                            if (newPwd.value.length != 6) {
-                                Toast.makeText(
-                                    context, "新密码要6位数字！", Toast.LENGTH_SHORT
-                                ).show()
+                        if (oldPwd.value == deviceAdminPwd.value) {
+                            if (newPwd.value == newPwd2.value) {
+                                if (newPwd.value.length != 6) {
+                                    Toast.makeText(
+                                        context, "新密码要6位数字！", Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    deviceAdminPwd.value = newPwd.value
+                                    updatePwdDialog.value = false
+                                    uiEvent(SettingIntent.Login(""))
+                                    switchColum = 0
+                                }
+
                             } else {
-                                deviceAdminPwd.value = newPwd.value
-                                updatePwdDialog.value = false
-                                uiEvent(SettingIntent.Login(""))
-                                switchColum = 0
+                                Toast.makeText(
+                                    context, "新密码不一致！", Toast.LENGTH_SHORT
+                                ).show()
                             }
-
                         } else {
                             Toast.makeText(
-                                context, "新密码不一致！", Toast.LENGTH_SHORT
+                                context, "原密码错误！", Toast.LENGTH_SHORT
                             ).show()
                         }
-                    } else {
-                        Toast.makeText(
-                            context, "原密码错误！", Toast.LENGTH_SHORT
-                        ).show()
-                    }
 
 
-                }) {
-                    Text(fontSize = 18.sp, text = "确   认")
+                    }) {
+                    Text(text = "确认")
                 }
             }, dismissButton = {
-                Button(modifier = Modifier.width(100.dp),
-                    border = BorderStroke(1.dp, Color.Gray),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Transparent
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
                     ), onClick = { updatePwdDialog.value = false }) {
-                    Text(fontSize = 18.sp, text = "取   消", color = Color.Black)
+                    Text(text = "取消")
                 }
             })
         }
@@ -1382,7 +2845,8 @@ fun SettingLits(
                             Text(text = "高浓度泵", fontSize = 25.sp)
                             Text(modifier = Modifier.padding(start = 10.dp), text = "已使用:")
                             Text(
-                                modifier = Modifier.padding(start = 10.dp), text = useHighTime
+                                modifier = Modifier.padding(start = 10.dp),
+                                text = useHighTime
                             )
                             Text(modifier = Modifier.padding(start = 10.dp), text = "小时")
                         }
@@ -1422,7 +2886,9 @@ fun SettingLits(
                                     onValueChange = {
                                         if (Pattern.compile(speChat).matcher(it).find()) {
                                             Toast.makeText(
-                                                context, "数据不能包含特殊字符！", Toast.LENGTH_SHORT
+                                                context,
+                                                "数据不能包含特殊字符！",
+                                                Toast.LENGTH_SHORT
                                             ).show()
                                         } else {
                                             highTimeExpected_ex = it
@@ -1482,7 +2948,8 @@ fun SettingLits(
                             Text(text = "低浓度泵", fontSize = 25.sp)
                             Text(modifier = Modifier.padding(start = 10.dp), text = "已使用:")
                             Text(
-                                modifier = Modifier.padding(start = 10.dp), text = useLowTime
+                                modifier = Modifier.padding(start = 10.dp),
+                                text = useLowTime
                             )
                             Text(modifier = Modifier.padding(start = 10.dp), text = "小时")
                         }
@@ -1524,7 +2991,9 @@ fun SettingLits(
                                     onValueChange = {
                                         if (Pattern.compile(speChat).matcher(it).find()) {
                                             Toast.makeText(
-                                                context, "数据不能包含特殊字符！", Toast.LENGTH_SHORT
+                                                context,
+                                                "数据不能包含特殊字符！",
+                                                Toast.LENGTH_SHORT
                                             ).show()
                                         } else {
                                             lowTimeExpected_ex = it
@@ -1587,7 +3056,8 @@ fun SettingLits(
                             Text(modifier = Modifier.padding(start = 10.dp), text = "已使用:")
 
                             Text(
-                                modifier = Modifier.padding(start = 10.dp), text = useRinseTime
+                                modifier = Modifier.padding(start = 10.dp),
+                                text = useRinseTime
                             )
                             Text(modifier = Modifier.padding(start = 10.dp), text = "小时")
                         }
@@ -1628,7 +3098,9 @@ fun SettingLits(
                                     onValueChange = {
                                         if (Pattern.compile(speChat).matcher(it).find()) {
                                             Toast.makeText(
-                                                context, "数据不能包含特殊字符！", Toast.LENGTH_SHORT
+                                                context,
+                                                "数据不能包含特殊字符！",
+                                                Toast.LENGTH_SHORT
                                             ).show()
                                         } else {
                                             rinseTimeExpected_ex = it
@@ -1687,38 +3159,41 @@ fun SettingLits(
 
             }, confirmButton = {
                 if (factoryAdminPwd.value == currentpwd) {
-                    Button(modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(rgb(0, 105, 52))
-                    ), onClick = {
-                        setting.lowTimeExpected = lowTimeExpected_ex.toDoubleOrNull() ?: 0.0
-                        setting.highTimeExpected = highTimeExpected_ex.toDoubleOrNull() ?: 0.0
-                        setting.rinseTimeExpected = rinseTimeExpected_ex.toDoubleOrNull() ?: 0.0
-                        uiEvent(SettingIntent.UpdateSet(setting))
-                        accessoriesDialog.value = false
-                    }) {
-                        Text(fontSize = 18.sp, text = "保   存")
+                    Button(
+                        modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(rgb(0, 105, 52))
+                        ), onClick = {
+                            setting.lowTimeExpected = lowTimeExpected_ex.toDoubleOrNull() ?: 0.0
+                            setting.highTimeExpected = highTimeExpected_ex.toDoubleOrNull() ?: 0.0
+                            setting.rinseTimeExpected = rinseTimeExpected_ex.toDoubleOrNull() ?: 0.0
+                            uiEvent(SettingIntent.UpdateSet(setting))
+                            accessoriesDialog.value = false
+                        }) {
+                        Text(text = "保存")
                     }
                 } else {
-                    Button(modifier = Modifier.width(120.dp), colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(rgb(0, 105, 52))
-                    ), onClick = {
-                        useHighTime = "0.0"
-                        useLowTime = "0.0"
-                        useRinseTime = "0.0"
-                        setting.highTime = 0.0
-                        setting.lowLife = 0.0
-                        setting.rinseTime = 0.0
-                        uiEvent(SettingIntent.UpdateSet(setting))
-                    }) {
-                        Text(fontSize = 18.sp, text = "全部重置")
+                    Button(
+                        modifier = Modifier.width(120.dp), colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(rgb(0, 105, 52))
+                        ), onClick = {
+                            useHighTime = "0.0"
+                            useLowTime = "0.0"
+                            useRinseTime = "0.0"
+                            setting.highTime = 0.0
+                            setting.lowLife = 0.0
+                            setting.rinseTime = 0.0
+                            uiEvent(SettingIntent.UpdateSet(setting))
+                        }) {
+                        Text(text = "全部重置")
                     }
                 }
 
             }, dismissButton = {
-                Button(modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = { accessoriesDialog.value = false }) {
-                    Text(fontSize = 18.sp, text = "返   回")
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = { accessoriesDialog.value = false }) {
+                    Text(text = "返回")
                 }
             })
         }
@@ -1745,7 +3220,9 @@ fun SettingLits(
                             onValueChange = {
                                 if (Pattern.compile(speChat).matcher(it).find()) {
                                     Toast.makeText(
-                                        context, "数据不能包含特殊字符！", Toast.LENGTH_SHORT
+                                        context,
+                                        "数据不能包含特殊字符！",
+                                        Toast.LENGTH_SHORT
                                     ).show()
                                 } else {
                                     glueBoardPosition_ex = it
@@ -1807,7 +3284,9 @@ fun SettingLits(
                             onValueChange = {
                                 if (Pattern.compile(speChat).matcher(it).find()) {
                                     Toast.makeText(
-                                        context, "数据不能包含特殊字符！", Toast.LENGTH_SHORT
+                                        context,
+                                        "数据不能包含特殊字符！",
+                                        Toast.LENGTH_SHORT
                                     ).show()
                                 } else {
                                     wastePosition_ex = it
@@ -1879,23 +3358,23 @@ fun SettingLits(
 
 
             }, confirmButton = {
-                Button(modifier = Modifier.width(100.dp),
-                    border = BorderStroke(1.dp, Color.Gray),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Transparent
-                    ), onClick = { positionDialog.value = false }) {
-                    Text(fontSize = 18.sp, text = "取   消", color = Color.Black)
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = {
+                        setting.wastePosition = wastePosition_ex.toDoubleOrNull() ?: 0.0
+                        setting.glueBoardPosition = glueBoardPosition_ex.toDoubleOrNull() ?: 0.0
+                        uiEvent(SettingIntent.UpdateSet(setting))
+                        positionDialog.value = false
+                    }) {
+                    Text(text = "保存")
                 }
             }, dismissButton = {
-                Button(modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = {
-                    setting.wastePosition = wastePosition_ex.toDoubleOrNull() ?: 0.0
-                    setting.glueBoardPosition = glueBoardPosition_ex.toDoubleOrNull() ?: 0.0
-                    uiEvent(SettingIntent.UpdateSet(setting))
-                    positionDialog.value = false
-                }) {
-                    Text(text = "保   存")
+                Button(
+                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(rgb(0, 105, 52))
+                    ), onClick = { positionDialog.value = false }) {
+                    Text(text = "取消")
                 }
             })
         }
@@ -1980,7 +3459,9 @@ fun SettingLits(
                 }
 
 
-            }, confirmButton = {}, dismissButton = {})
+            }, confirmButton = {
+            }, dismissButton = {
+            })
         }
 
     }
@@ -2024,7 +3505,6 @@ fun debug(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.N)
 @Composable
 fun sportsLog(
     uiEvent: (SettingIntent) -> Unit,
@@ -2041,38 +3521,13 @@ fun sportsLog(
 fun upgrade(
     uiEvent: (SettingIntent) -> Unit,
     uiEventHome: (HomeIntent) -> Unit,
-    updateMsg: String,
+    updateMsg:String,
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        upgradeMode(uiEvent, uiEventHome, updateMsg)
+        upgradeMode(uiEvent, uiEventHome,updateMsg)
 //        EmbeddedTest(uiEventHome)
-    }
-}
-
-@Composable
-fun rehearsal(
-    s1: Setting?,
-    ex1: Expected?,
-    uiEvent: (SettingIntent) -> Unit,
-) {
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        rehearsalMode(s1, ex1, uiEvent)
-    }
-}
-
-@Composable
-fun calibration(
-    c1: NewCalibration?,
-    uiEvent: (SettingIntent) -> Unit,
-) {
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        calibrationMode(c1, uiEvent)
     }
 }
 

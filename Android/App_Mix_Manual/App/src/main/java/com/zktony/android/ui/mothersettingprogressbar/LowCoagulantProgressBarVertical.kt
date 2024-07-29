@@ -41,18 +41,18 @@ fun LowCoagulantProgressBarVertical(
     val textDesc = "低浓度"
     val textDescLayoutResult = rememberTextMeasurer().measure(
         AnnotatedString(textDesc),
-        TextStyle(color = Color(18, 95, 202), fontSize = 20.sp)
+        TextStyle(color = Color(18, 95, 202), fontSize = 13.sp)
     )
 
 
     val volumeDescLayoutResult = rememberTextMeasurer().measure(
         AnnotatedString("${volume}mL"),
-        TextStyle(color = Color(18, 95, 202), fontSize = 20.sp)
+        TextStyle(color = Color(18, 95, 202), fontSize = 16.sp)
     )
 
     val concentrationDescLayoutResult = rememberTextMeasurer().measure(
         AnnotatedString("$concentration%"),
-        TextStyle(color = Color(18, 95, 202), fontSize = 20.sp)
+        TextStyle(color = Color(18, 95, 202), fontSize = 16.sp)
     )
 
     Canvas(
@@ -88,7 +88,7 @@ fun LowCoagulantProgressBarVertical(
         drawText(
             textLayoutResult = concentrationDescLayoutResult,
             topLeft = Offset(
-                canvasWidth / 2 - textDescWidth /2,
+                canvasWidth / 2 - textDescWidth / 1.5f,
                 canvasHeight / 2 - 20
             ),
         )
@@ -96,7 +96,7 @@ fun LowCoagulantProgressBarVertical(
         drawText(
             textLayoutResult = volumeDescLayoutResult,
             topLeft = Offset(
-                canvasWidth / 2 - textDescWidth / 2,
+                canvasWidth / 2 - textDescWidth / 1.5f,
                 canvasHeight / 2
             ),
         )

@@ -119,11 +119,6 @@ data class Setting(
      */
     var coagulantRinse: Double = 10.0,
 
-    /**
-     *  冲洗液泵清洗液量2
-     */
-    var rinseCleanVolume2: Double = 3.0,
-
     //================预排设置=============================
 
 )
