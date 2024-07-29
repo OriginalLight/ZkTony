@@ -8,12 +8,11 @@ import com.zktony.android.utils.TipsUtils
 import com.zktony.log.LogUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
 
@@ -28,7 +27,7 @@ class SettingsRuntimeLogViewModel @Inject constructor() : ViewModel() {
 
     init {
         viewModelScope.launch {
-            _fileList.value = LogUtils.getLogs()
+            _fileList.value = LogUtils.getLogs().sorted()
         }
     }
 
@@ -53,17 +52,17 @@ class SettingsRuntimeLogViewModel @Inject constructor() : ViewModel() {
                 return
             }
 
-            val dstDir = usbList.first() + "/${StorageUtils.LOG_DIR}/${StorageUtils.RUNTIME_DIR}"
+            val dstDir =
+                usbList.first() + "/${StorageUtils.ROOT_DIR}/${StorageUtils.LOG_DIR}/${StorageUtils.RUNTIME_LOG_DIR}"
             if (!File(dstDir).exists()) {
                 File(dstDir).mkdirs()
             }
 
-            runBlocking {
-                awaitAll(*selected.map { log ->
-                    async(Dispatchers.IO) {
-                        File(log.absolutePath).copyTo(File(dstDir + "/" + log.name), true)
-                    }
-                }.toTypedArray())
+            selected.forEach { log ->
+                withContext(Dispatchers.IO) {
+                    File(log.absolutePath).copyTo(File(dstDir + "/" + log.name), true)
+                }
+                delay(100L)
             }
 
             TipsUtils.showTips(Tips.info("导出成功"))

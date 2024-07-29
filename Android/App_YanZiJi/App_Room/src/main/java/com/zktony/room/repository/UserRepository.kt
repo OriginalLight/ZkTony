@@ -4,7 +4,6 @@ import com.zktony.room.dao.UserDao
 import com.zktony.room.defaults.defaultUsers
 import com.zktony.room.entities.User
 import java.security.MessageDigest
-import java.util.Date
 import javax.inject.Inject
 
 class UserRepository @Inject constructor(
@@ -41,7 +40,7 @@ class UserRepository @Inject constructor(
         val passwordHash = hash.fold("") { str, it -> str + "%02x".format(it) }
         if (user.password != passwordHash) return Result.failure(Exception("2"))
         if (!user.enable) return Result.failure(Exception("3"))
-        val updateUser = user.copy(lastLoginTime = Date(System.currentTimeMillis()))
+        val updateUser = user.copy(lastLoginTime = System.currentTimeMillis())
         val effect = userDao.update(updateUser)
         if (effect == 0) return Result.failure(Exception("4"))
         return Result.success(updateUser)
@@ -59,7 +58,7 @@ class UserRepository @Inject constructor(
         val hash = digest.digest(user.password.toByteArray())
         val passwordHash = hash.fold("") { str, it -> str + "%02x".format(it) }
         val id = userDao.insert(user.copy(password = passwordHash))
-        return if (id > 0)  Result.success(user.copy(id = id)) else Result.failure(Exception("2"))
+        return if (id > 0) Result.success(user.copy(id = id)) else Result.failure(Exception("2"))
     }
 
     /**

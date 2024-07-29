@@ -1,7 +1,8 @@
 package com.zktony.room.dao
 
 import androidx.paging.PagingSource
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Query
 import com.zktony.room.entities.History
 import kotlinx.coroutines.flow.Flow
 

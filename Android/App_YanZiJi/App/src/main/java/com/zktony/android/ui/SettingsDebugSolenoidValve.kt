@@ -80,7 +80,7 @@ fun SettingsDebugSolenoidValveTopBar(
         ) {
             Icon(imageVector = Icons.AutoMirrored.Default.Reply, contentDescription = "Back")
             Text(
-                text = stringResource(id = R.string.solenoid_valve),
+                text = stringResource(id = R.string.app_solenoid_valve),
                 style = MaterialTheme.typography.titleLarge
             )
         }
@@ -104,7 +104,7 @@ fun SolenoidValveDebugListView(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         repeat(ProductUtils.getChannelCount()) { index ->
-            SettingsItem(title = stringResource(id = R.string.channel) + (index + 1)) {
+            SettingsItem(title = stringResource(id = R.string.`app_channel`) + (index + 1)) {
                 var selected by remember { mutableIntStateOf(0) }
                 SegmentedButtonTabRow(
                     modifier = Modifier.width(200.dp),

@@ -62,16 +62,18 @@ fun LogoutDialog(
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.medium)
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = stringResource(id = R.string.logout),
+                text = stringResource(id = R.string.app_logout),
                 style = MaterialTheme.typography.titleLarge
             )
 
             Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = stringResource(id = R.string.logout_confirm_content),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                text = stringResource(id = R.string.app_logout_content),
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center
             )
@@ -133,16 +135,17 @@ fun PasswordModifyDialog(
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.medium)
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = stringResource(id = R.string.password_modify),
+                text = stringResource(id = R.string.app_password_modify),
                 style = MaterialTheme.typography.titleLarge
             )
 
             when (step) {
                 0 -> {
                     Column(
+                        modifier = Modifier.padding(8.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
@@ -240,6 +243,7 @@ fun PasswordModifyDialog(
 
                 1 -> {
                     Column(
+                        modifier = Modifier.padding(8.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
@@ -250,6 +254,10 @@ fun PasswordModifyDialog(
                             placeholder = { Text("新密码") },
                             shape = CircleShape,
                             singleLine = true,
+                            keyboardOptions = KeyboardOptions(
+                                imeAction = ImeAction.Next,
+                                keyboardType = KeyboardType.Password
+                            ),
                             visualTransformation = if (showNewPassword) VisualTransformation.None else PasswordVisualTransformation(),
                             textStyle = TextStyle(fontSize = 20.sp),
                             leadingIcon = {
@@ -295,7 +303,7 @@ fun PasswordModifyDialog(
                             shape = CircleShape,
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(
-                                imeAction = ImeAction.Next,
+                                imeAction = ImeAction.Done,
                                 keyboardType = KeyboardType.Password
                             ),
                             visualTransformation = if (showConfirmPassword) VisualTransformation.None else PasswordVisualTransformation(),
@@ -402,7 +410,7 @@ fun FileChoiceDialog(
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.medium)
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
                 text = "请选择文件",
@@ -412,6 +420,7 @@ fun FileChoiceDialog(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(8.dp)
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
@@ -419,16 +428,17 @@ fun FileChoiceDialog(
                     Row(
                         modifier = modifier
                             .fillMaxWidth()
-                            .height(64.dp)
+                            .height(48.dp)
                             .background(
-                                color = if (selected != it) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.primary.copy(
+                                color = if (selected == it) MaterialTheme.colorScheme.inversePrimary
+                                else MaterialTheme.colorScheme.primary.copy(
                                     alpha = 0.1f
                                 ),
-                                shape = MaterialTheme.shapes.medium
+                                shape = MaterialTheme.shapes.small
                             )
-                            .clip(MaterialTheme.shapes.medium)
+                            .clip(MaterialTheme.shapes.small)
                             .clickable(onClick = { selected = it })
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
@@ -461,7 +471,6 @@ fun FileChoiceDialog(
                     enabled = selected != null,
                     onClick = {
                         selected?.let { onSelected(it) }
-                        onDismiss()
                     }) {
                     Text(
                         "确认",

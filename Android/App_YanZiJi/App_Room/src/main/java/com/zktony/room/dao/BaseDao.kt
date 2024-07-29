@@ -13,27 +13,27 @@ interface BaseDao<T> {
     suspend fun insert(entity: T): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(vararg entity: T) : List<Long>
+    suspend fun insertAll(vararg entity: T): List<Long>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(entities: Collection<T>) : List<Long>
+    suspend fun insertAll(entities: Collection<T>): List<Long>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun update(entity: T) : Int
+    suspend fun update(entity: T): Int
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun updateAll(vararg entity: T) : Int
+    suspend fun updateAll(vararg entity: T): Int
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun updateAll(entities: Collection<T>) : Int
+    suspend fun updateAll(entities: Collection<T>): Int
 
     @Delete
     suspend fun delete(entity: T): Int
 
     @Delete
-    suspend fun deleteAll(vararg entity: T) : Int
+    suspend fun deleteAll(vararg entity: T): Int
 
     @Delete
-    suspend fun deleteAll(entities: Collection<T>) : Int
+    suspend fun deleteAll(entities: Collection<T>): Int
 
 }

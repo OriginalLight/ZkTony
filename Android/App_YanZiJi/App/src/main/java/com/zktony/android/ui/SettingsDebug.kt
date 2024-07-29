@@ -72,7 +72,7 @@ fun SettingsDebugTopBar(
         ) {
             Icon(imageVector = Icons.AutoMirrored.Default.Reply, contentDescription = "Back")
             Text(
-                text = stringResource(id = R.string.debug),
+                text = stringResource(id = R.string.app_debug),
                 style = MaterialTheme.typography.titleLarge
             )
         }
@@ -99,7 +99,7 @@ fun DebugListView(
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.small)
                     .clickable { navigationActions.navigate(Route.SETTINGS_DEBUG_SOLENOID_VALVE) },
-                title = stringResource(id = R.string.solenoid_valve)
+                title = stringResource(id = R.string.app_solenoid_valve)
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
@@ -112,7 +112,7 @@ fun DebugListView(
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.small)
                     .clickable { navigationActions.navigate(Route.SETTINGS_DEBUG_PIPELINE) },
-                title = stringResource(id = R.string.pipeline)
+                title = stringResource(id = R.string.app_pipeline)
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
@@ -125,7 +125,7 @@ fun DebugListView(
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.small)
                     .clickable { navigationActions.navigate(Route.SETTINGS_DEBUG_EXPERIMENTAL) },
-                title = stringResource(id = R.string.experimental)
+                title = stringResource(id = R.string.app_experimental)
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,

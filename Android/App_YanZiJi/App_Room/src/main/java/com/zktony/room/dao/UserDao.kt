@@ -3,11 +3,10 @@ package com.zktony.room.dao
 import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Query
-import com.zktony.room.entities.Program
 import com.zktony.room.entities.User
 
 @Dao
-abstract class UserDao: BaseDao<User> {
+abstract class UserDao : BaseDao<User> {
 
     @Query(
         """

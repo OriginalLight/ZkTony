@@ -1,8 +1,16 @@
 package com.zktony.room
 
-import androidx.room.*
-import com.zktony.room.dao.*
-import com.zktony.room.entities.*
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import com.zktony.room.dao.FaultDao
+import com.zktony.room.dao.HistoryDao
+import com.zktony.room.dao.ProgramDao
+import com.zktony.room.dao.UserDao
+import com.zktony.room.entities.Fault
+import com.zktony.room.entities.History
+import com.zktony.room.entities.Program
+import com.zktony.room.entities.User
 
 /**
  * @author 刘贺贺

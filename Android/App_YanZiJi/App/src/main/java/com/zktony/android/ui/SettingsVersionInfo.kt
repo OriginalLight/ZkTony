@@ -89,7 +89,7 @@ fun SettingsVersionInfoTopBar(
         ) {
             Icon(imageVector = Icons.AutoMirrored.Default.Reply, contentDescription = "Back")
             Text(
-                text = stringResource(id = R.string.version_info),
+                text = stringResource(id = R.string.app_version_info),
                 style = MaterialTheme.typography.titleLarge
             )
         }
@@ -112,20 +112,26 @@ fun SettingsVersionInfoList(
     if (showFileChoice) {
         FileChoiceDialog(
             files = fileObjectList,
-            onDismiss = { showFileChoice = false }) { file ->
+            onDismiss = {
+                showFileChoice = false
+                flag = -1
+            }) { file ->
             scope.launch {
                 when (flag) {
                     0 -> {
                         flag = -1
+                        showFileChoice = false
                         context.installApp(file)
                     }
 
                     1 -> {
+                        showFileChoice = false
                         viewModel.upgrade(file, "B")
                         flag = -1
                     }
 
                     else -> {
+                        showFileChoice = false
                         viewModel.upgrade(file, channel = flag - 2)
                         flag = -1
                     }

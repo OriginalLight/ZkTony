@@ -14,11 +14,9 @@ import com.zktony.log.LogUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.Date
 import javax.inject.Inject
@@ -72,7 +70,7 @@ class SettingsDebugExperimentalViewModel @Inject constructor() : ViewModel() {
     private fun startCollecting(channel: Int, control: ExperimentalControl) {
         collectingJobList[channel]?.cancel()
         collectingJobList[channel] = viewModelScope.launch {
-            val dir = StorageUtils.getCacheDir() + "/${StorageUtils.EXPERIMENTAL_DIR}"
+            val dir = StorageUtils.getCacheDir() + "/${StorageUtils.EXPERIMENTAL_LOG_DIR}"
             if (!File(dir).exists()) {
                 File(dir).mkdirs()
             }
@@ -106,12 +104,12 @@ class SettingsDebugExperimentalViewModel @Inject constructor() : ViewModel() {
                 return
             }
             val dstDir =
-                usbList.first() + "/${StorageUtils.LOG_DIR}/${StorageUtils.EXPERIMENTAL_DIR}"
+                usbList.first() + "/${StorageUtils.ROOT_DIR}/${StorageUtils.LOG_DIR}/${StorageUtils.EXPERIMENTAL_LOG_DIR}"
             if (!File(dstDir).exists()) {
                 File(dstDir).mkdirs()
             }
 
-            val srcDir = StorageUtils.getCacheDir() + "/${StorageUtils.EXPERIMENTAL_DIR}"
+            val srcDir = StorageUtils.getCacheDir() + "/${StorageUtils.EXPERIMENTAL_LOG_DIR}"
             if (!File(srcDir).exists()) {
                 TipsUtils.showTips(Tips.error("未检测到实验数据"))
                 return
@@ -123,13 +121,12 @@ class SettingsDebugExperimentalViewModel @Inject constructor() : ViewModel() {
                 return
             }
 
-            runBlocking {
-                awaitAll(*srcFiles.map { file ->
-                    async(Dispatchers.IO) {
-                        File(file.absolutePath).copyTo(File(dstDir + "/" + file.name), true)
-                        file.delete()
-                    }
-                }.toTypedArray())
+            srcFiles.forEach { file ->
+                withContext(Dispatchers.IO) {
+                    file.copyTo(File(dstDir + "/" + file.name), true)
+                    file.delete()
+                }
+                delay(100L)
             }
 
             TipsUtils.showTips(Tips.info("导出成功"))
@@ -138,5 +135,4 @@ class SettingsDebugExperimentalViewModel @Inject constructor() : ViewModel() {
             TipsUtils.showTips(Tips.error("导出失败"))
         }
     }
-
 }

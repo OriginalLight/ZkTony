@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.data.Arguments
 import com.zktony.android.ui.components.Tips
-import com.zktony.android.ui.components.TipsType
 import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.JsonUtils
@@ -29,9 +28,7 @@ class SettingsArgumentsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            if (!AppStateUtils.isArgumentsSync) {
-                syncArguments()
-            }
+            syncArguments()
         }
     }
 
@@ -45,7 +42,6 @@ class SettingsArgumentsViewModel @Inject constructor(
             }
             delay(10L)
         }
-        AppStateUtils.isArgumentsSync = fail.isEmpty()
         if (fail.isNotEmpty()) {
             TipsUtils.showTips(Tips.error("同步参数失败: ${fail.joinToString()}"))
         } else {
@@ -54,14 +50,14 @@ class SettingsArgumentsViewModel @Inject constructor(
     }
 
     // 导出参数
-    suspend fun exportArguments() {
+    suspend fun export() {
         try {
             val usbList = StorageUtils.getUsbStorageDir()
             if (usbList.isEmpty()) {
                 TipsUtils.showTips(Tips.error("未检测到U盘"))
                 return
             }
-            val dir = usbList.first() + "/${StorageUtils.ARGUMENTS_DIR}"
+            val dir = usbList.first() + "/${StorageUtils.ROOT_DIR}/${StorageUtils.ARGUMENTS_DIR}"
             val sn = dataStore.readData(Constants.SN, Constants.DEFAULT_SN)
             val savePath = "$dir/$sn.json"
             val arguments = AppStateUtils.getArgumentList()
@@ -84,7 +80,7 @@ class SettingsArgumentsViewModel @Inject constructor(
     }
 
     // 导入参数
-    suspend fun importArguments(file: File?) {
+    suspend fun import(file: File?) {
         try {
             if (file == null) {
                 TipsUtils.showTips(Tips.error("参数文件不存在"))
@@ -101,25 +97,15 @@ class SettingsArgumentsViewModel @Inject constructor(
                 TipsUtils.showTips(Tips.error("参数文件通道数量错误"))
                 return
             }
-            val fail = mutableListOf<Int>()
             repeat(ProductUtils.getChannelCount()) { index ->
                 if (!SerialPortUtils.setArguments(index, arguments[index])
                 ) {
-                    fail.add(index + 1)
+                    TipsUtils.showTips(Tips.error("导入参数失败: 通道 ${index + 1}"))
+                    return
                 }
             }
-            if (fail.isNotEmpty()) {
-                TipsUtils.showTips(
-                    Tips(
-                        TipsType.ERROR,
-                        "导入参数失败: 通道 ${fail.joinToString()}"
-                    )
-                )
-                return
-            } else {
-                AppStateUtils.setArgumentsList(arguments)
-                TipsUtils.showTips(Tips.info("导入参数成功"))
-            }
+            AppStateUtils.setArgumentsList(arguments)
+            TipsUtils.showTips(Tips.info("导入参数成功"))
         } catch (e: Exception) {
             LogUtils.error("ImportArguments", e.stackTraceToString(), true)
             TipsUtils.showTips(Tips.error("导入参数失败"))
@@ -136,7 +122,7 @@ class SettingsArgumentsViewModel @Inject constructor(
 
         try {
             val fileList = mutableListOf<File>()
-            val dir = usbList.first() + "/${StorageUtils.ARGUMENTS_DIR}"
+            val dir = usbList.first() + "/${StorageUtils.ROOT_DIR}/${StorageUtils.ARGUMENTS_DIR}"
             val file = File(dir)
 
             if (file.exists() && file.isDirectory) {

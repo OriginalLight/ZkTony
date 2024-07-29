@@ -76,7 +76,7 @@ fun DateTimePicker(
                         OutlinedButton(modifier = Modifier.padding(end = 16.dp),
                             onClick = { onDismissRequest() }) {
                             Text(
-                                text = stringResource(id = R.string.cancel),
+                                text = stringResource(id = R.string.app_cancel),
                                 style = MaterialTheme.typography.bodyLarge
                             )
                         }
@@ -86,7 +86,7 @@ fun DateTimePicker(
                             step = 1
                         }) {
                             Text(
-                                text = stringResource(id = R.string.next),
+                                text = stringResource(id = R.string.app_next),
                                 style = MaterialTheme.typography.bodyLarge
                             )
                         }
@@ -117,7 +117,7 @@ fun DateTimePicker(
                         OutlinedButton(modifier = Modifier.padding(end = 16.dp),
                             onClick = { onDismissRequest() }) {
                             Text(
-                                text = stringResource(id = R.string.cancel),
+                                text = stringResource(id = R.string.app_cancel),
                                 style = MaterialTheme.typography.bodyLarge
                             )
                         }
@@ -131,7 +131,7 @@ fun DateTimePicker(
                             onDateChange(selectedMillis)
                         }) {
                             Text(
-                                text = stringResource(id = R.string.ok),
+                                text = stringResource(id = R.string.app_confirm),
                                 style = MaterialTheme.typography.bodyLarge
                             )
                         }

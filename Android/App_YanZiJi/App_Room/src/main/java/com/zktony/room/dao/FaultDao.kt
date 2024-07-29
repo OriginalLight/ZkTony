@@ -4,5 +4,4 @@ import androidx.room.Dao
 import com.zktony.room.entities.Fault
 
 @Dao
-abstract class FaultDao: BaseDao<Fault> {
-}
+abstract class FaultDao : BaseDao<Fault>

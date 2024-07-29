@@ -46,3 +46,13 @@ fun Date.dateFormat(format: String = "yyyy-MM-dd HH:mm:ss"): String {
     val sdf = SimpleDateFormat(format)
     return sdf.format(this)
 }
+
+/**
+ * 当天某小时初始时间,value表示某小时
+ */
+
+@SuppressLint("SimpleDateFormat")
+fun Long.dateFormat(format: String = "yyyy-MM-dd HH:mm:ss"): String {
+    val sdf = SimpleDateFormat(format)
+    return sdf.format(Date(this))
+}

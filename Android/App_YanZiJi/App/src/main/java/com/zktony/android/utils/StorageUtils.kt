@@ -5,10 +5,12 @@ import java.io.File
 
 
 object StorageUtils {
+    const val ROOT_DIR = "YanZiJi"
     const val LOG_DIR = "logs"
     const val ARGUMENTS_DIR = "arguments"
-    const val EXPERIMENTAL_DIR = "experimental"
-    const val RUNTIME_DIR = "runtime"
+    const val PROGRAM_DIR = "program"
+    const val EXPERIMENTAL_LOG_DIR = "experimental"
+    const val RUNTIME_LOG_DIR = "runtime"
 
     // 获取内部存储路径 /data/data/com.zktony.android/files
     fun getFileDir(): String {

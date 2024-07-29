@@ -37,8 +37,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
-import com.zktony.android.data.Sound
 import com.zktony.android.data.Role
+import com.zktony.android.data.Sound
 import com.zktony.android.ui.components.DateTimePicker
 import com.zktony.android.ui.components.PasswordModifyDialog
 import com.zktony.android.ui.components.RequirePermission
@@ -114,7 +114,7 @@ fun UserSettingsView(
     ) {
         Text(
             modifier = Modifier.padding(top = 16.dp),
-            text = stringResource(id = R.string.user_settings),
+            text = stringResource(id = R.string.app_user_settings),
             style = MaterialTheme.typography.headlineMedium
         )
 
@@ -163,7 +163,7 @@ fun UserSettingsView(
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.small)
                     .clickable { navigationActions.navigate(Route.SETTINGS_USER_MANAGEMENT) },
-                title = stringResource(id = R.string.user_management)
+                title = stringResource(id = R.string.app_user_management)
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
@@ -236,12 +236,12 @@ fun SystemSettingsView(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = stringResource(id = R.string.system_settings),
+            text = stringResource(id = R.string.app_system_settings),
             style = MaterialTheme.typography.headlineMedium
         )
 
         // 语言
-        SettingsItem(title = stringResource(id = R.string.language)) {
+        SettingsItem(title = stringResource(id = R.string.app_language)) {
             SegmentedButtonTabRow(
                 modifier = Modifier.width(300.dp),
                 tabItems = listOf("简体中文", "English"),
@@ -255,7 +255,7 @@ fun SystemSettingsView(
         }
 
         // 提示音
-        SettingsItem(title = stringResource(id = R.string.sound)) {
+        SettingsItem(title = stringResource(id = R.string.app_sound)) {
             SegmentedButtonTabRow(
                 modifier = Modifier.width(300.dp),
                 tabItems = Sound.getResIdList().map { stringResource(id = it) },
@@ -269,7 +269,7 @@ fun SystemSettingsView(
         }
 
         // 导航栏
-        SettingsItem(title = stringResource(id = R.string.navigation_bar)) {
+        SettingsItem(title = stringResource(id = R.string.app_navigation_bar)) {
             Switch(
                 checked = navigationBar,
                 onCheckedChange = {
@@ -285,7 +285,7 @@ fun SystemSettingsView(
         }
 
         // 状态栏
-        SettingsItem(title = stringResource(id = R.string.status_bar)) {
+        SettingsItem(title = stringResource(id = R.string.app_status_bar)) {
             Switch(
                 checked = statusBar,
                 onCheckedChange = {
@@ -301,7 +301,7 @@ fun SystemSettingsView(
         }
 
         // 主屏幕
-        SettingsItem(title = stringResource(id = R.string.home_package)) {
+        SettingsItem(title = stringResource(id = R.string.app_home_package)) {
             Switch(checked = homePackage, onCheckedChange = {
                 scope.launch {
                     homePackage = it
@@ -318,7 +318,7 @@ fun SystemSettingsView(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable { },
-            title = stringResource(id = R.string.accessory_life)
+            title = stringResource(id = R.string.app_accessory_life)
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
@@ -331,7 +331,7 @@ fun SystemSettingsView(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable { },
-            title = stringResource(id = R.string.maintenance_record)
+            title = stringResource(id = R.string.app_maintenance_record)
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
@@ -344,7 +344,7 @@ fun SystemSettingsView(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable { },
-            title = stringResource(id = R.string.error_log)
+            title = stringResource(id = R.string.app_error_log)
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
@@ -357,7 +357,7 @@ fun SystemSettingsView(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable { navigationActions.navigate(Route.SETTINGS_VERSION_INFO) },
-            title = stringResource(id = R.string.version_info)
+            title = stringResource(id = R.string.app_version_info)
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
@@ -370,7 +370,7 @@ fun SystemSettingsView(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable { showDateTimePicker = true },
-            title = stringResource(id = R.string.system_time)
+            title = stringResource(id = R.string.app_system_time)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -401,7 +401,7 @@ fun FactorySettingsView(modifier: Modifier = Modifier) {
     ) {
         Text(
             modifier = Modifier.padding(top = 16.dp),
-            text = stringResource(id = R.string.factory_settings),
+            text = stringResource(id = R.string.app_factory_settings),
             style = MaterialTheme.typography.headlineMedium
         )
 
@@ -410,7 +410,7 @@ fun FactorySettingsView(modifier: Modifier = Modifier) {
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable { navigationActions.navigate(Route.SETTINGS_ARGUMENTS) },
-            title = stringResource(id = R.string.arguments)
+            title = stringResource(id = R.string.app_arguments)
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
@@ -423,7 +423,7 @@ fun FactorySettingsView(modifier: Modifier = Modifier) {
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable { navigationActions.navigate(Route.SETTINGS_DEBUG) },
-            title = stringResource(id = R.string.debug)
+            title = stringResource(id = R.string.app_debug)
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
@@ -437,7 +437,7 @@ fun FactorySettingsView(modifier: Modifier = Modifier) {
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.small)
                     .clickable { navigationActions.navigate(Route.SETTINGS_FQC) },
-                title = stringResource(id = R.string.fqc)
+                title = stringResource(id = R.string.app_fqc)
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
@@ -450,7 +450,7 @@ fun FactorySettingsView(modifier: Modifier = Modifier) {
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.small)
                     .clickable { navigationActions.navigate(Route.SETTINGS_AGING) },
-                title = stringResource(id = R.string.aging)
+                title = stringResource(id = R.string.app_aging)
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
@@ -464,7 +464,7 @@ fun FactorySettingsView(modifier: Modifier = Modifier) {
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable { navigationActions.navigate(Route.SETTINGS_RUNTIME_LOG) },
-            title = stringResource(id = R.string.runtime_log)
+            title = stringResource(id = R.string.app_runtime_log)
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,

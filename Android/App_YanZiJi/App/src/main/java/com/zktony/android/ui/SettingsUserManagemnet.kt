@@ -78,7 +78,7 @@ fun SettingsUserManagementTopBar(
         ) {
             Icon(imageVector = Icons.AutoMirrored.Default.Reply, contentDescription = "Back")
             Text(
-                text = stringResource(id = R.string.user_management),
+                text = stringResource(id = R.string.app_user_management),
                 style = MaterialTheme.typography.titleLarge
             )
         }

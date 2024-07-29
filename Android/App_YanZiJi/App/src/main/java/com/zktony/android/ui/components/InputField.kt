@@ -89,7 +89,7 @@ fun ArgumentsSetField(
 
         Button(
             onClick = { onSetClick(text) }) {
-            Text(text = stringResource(id = R.string.set))
+            Text(text = stringResource(id = R.string.app_set))
         }
     }
 }
@@ -179,7 +179,7 @@ fun UserNameInputField(
             }
         },
         placeholder = {
-            Text(text = stringResource(id = R.string.username))
+            Text(text = stringResource(id = R.string.app_username))
         },
         leadingIcon = {
             Icon(
@@ -228,7 +228,7 @@ fun PasswordInputField(
             }
         },
         placeholder = {
-            Text(text = stringResource(id = R.string.password))
+            Text(text = stringResource(id = R.string.app_password))
         },
         leadingIcon = {
             Icon(

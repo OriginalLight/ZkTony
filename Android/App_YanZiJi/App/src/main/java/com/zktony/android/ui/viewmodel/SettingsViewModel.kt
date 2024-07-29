@@ -6,8 +6,8 @@ import com.zktony.android.R
 import com.zktony.android.ui.components.Tips
 import com.zktony.android.utils.AuthUtils
 import com.zktony.android.utils.HzmctUtils
-import com.zktony.android.utils.SoundUtils
 import com.zktony.android.utils.ResourceUtils
+import com.zktony.android.utils.SoundUtils
 import com.zktony.android.utils.TipsUtils
 import com.zktony.log.LogUtils
 import com.zktony.room.repository.UserRepository
@@ -27,7 +27,7 @@ class SettingsViewModel @Inject constructor(
     // 语言
     fun setLanguage(language: String) {
         val tipsMessage =
-            "${ResourceUtils.stringResource(R.string.language)} ${ResourceUtils.stringResource(R.string.set_success)}"
+            "${ResourceUtils.stringResource(R.string.app_language)} ${ResourceUtils.stringResource(R.string.app_set_success)}"
         TipsUtils.showTips(Tips.info(tipsMessage))
         LogUtils.info("$tipsMessage $language", true)
     }
@@ -36,7 +36,7 @@ class SettingsViewModel @Inject constructor(
     fun setSound(name: String) {
         SoundUtils.with(name)
         val tipsMessage =
-            "${ResourceUtils.stringResource(R.string.sound)} ${ResourceUtils.stringResource(R.string.set_success)}"
+            "${ResourceUtils.stringResource(R.string.app_sound)} ${ResourceUtils.stringResource(R.string.app_set_success)}"
         TipsUtils.showTips(Tips.info(tipsMessage))
         LogUtils.info("$tipsMessage $name", true)
     }
@@ -45,14 +45,14 @@ class SettingsViewModel @Inject constructor(
     fun setNavigationBar(status: Boolean): Boolean {
         val bool = HzmctUtils.setNavigationBar(status)
         if (bool) {
-            val tipsMessage = "${ResourceUtils.stringResource(R.string.navigation_bar)} ${
-                ResourceUtils.stringResource(R.string.set_success)
+            val tipsMessage = "${ResourceUtils.stringResource(R.string.app_navigation_bar)} ${
+                ResourceUtils.stringResource(R.string.app_set_success)
             }"
             TipsUtils.showTips(Tips.info(tipsMessage))
             LogUtils.info("$tipsMessage $status", true)
         } else {
-            val tipsMessage = "${ResourceUtils.stringResource(R.string.navigation_bar)} ${
-                ResourceUtils.stringResource(R.string.set_failed)
+            val tipsMessage = "${ResourceUtils.stringResource(R.string.app_navigation_bar)} ${
+                ResourceUtils.stringResource(R.string.app_set_failed)
             }"
             TipsUtils.showTips(Tips.error(tipsMessage))
             LogUtils.error("$tipsMessage $status", true)
@@ -64,14 +64,14 @@ class SettingsViewModel @Inject constructor(
     fun setStatusBar(status: Boolean): Boolean {
         val bool = HzmctUtils.setStatusBar(status)
         if (bool) {
-            val tipsMessage = "${ResourceUtils.stringResource(R.string.status_bar)} ${
-                ResourceUtils.stringResource(R.string.set_success)
+            val tipsMessage = "${ResourceUtils.stringResource(R.string.app_status_bar)} ${
+                ResourceUtils.stringResource(R.string.app_set_success)
             }"
             TipsUtils.showTips(Tips.info(tipsMessage))
             LogUtils.info("$tipsMessage $status", true)
         } else {
-            val tipsMessage = "${ResourceUtils.stringResource(R.string.status_bar)} ${
-                ResourceUtils.stringResource(R.string.set_failed)
+            val tipsMessage = "${ResourceUtils.stringResource(R.string.app_status_bar)} ${
+                ResourceUtils.stringResource(R.string.app_set_failed)
             }"
             TipsUtils.showTips(Tips.error(tipsMessage))
             LogUtils.error("$tipsMessage $status", true)
@@ -84,14 +84,14 @@ class SettingsViewModel @Inject constructor(
         val bool =
             HzmctUtils.setHomePackage(if (b) BuildConfig.APPLICATION_ID else "com.android.launcher3")
         if (bool) {
-            val tipsMessage = "${ResourceUtils.stringResource(R.string.home_package)} ${
-                ResourceUtils.stringResource(R.string.set_success)
+            val tipsMessage = "${ResourceUtils.stringResource(R.string.app_home_package)} ${
+                ResourceUtils.stringResource(R.string.app_set_success)
             }"
             TipsUtils.showTips(Tips.info(tipsMessage))
             LogUtils.info("$tipsMessage $b", true)
         } else {
-            val tipsMessage = "${ResourceUtils.stringResource(R.string.home_package)} ${
-                ResourceUtils.stringResource(R.string.set_failed)
+            val tipsMessage = "${ResourceUtils.stringResource(R.string.app_home_package)} ${
+                ResourceUtils.stringResource(R.string.app_set_failed)
             }"
             TipsUtils.showTips(Tips.error(tipsMessage))
             LogUtils.error("$tipsMessage $b", true)
@@ -103,14 +103,14 @@ class SettingsViewModel @Inject constructor(
     fun setSystemTime(time: Long): Boolean {
         val bool = HzmctUtils.setSystemTime(time)
         if (bool) {
-            val tipsMessage = "${ResourceUtils.stringResource(R.string.system_time)} ${
-                ResourceUtils.stringResource(R.string.set_success)
+            val tipsMessage = "${ResourceUtils.stringResource(R.string.app_system_time)} ${
+                ResourceUtils.stringResource(R.string.app_set_success)
             }"
             TipsUtils.showTips(Tips.info(tipsMessage))
             LogUtils.info("$tipsMessage $time", true)
         } else {
-            val tipsMessage = "${ResourceUtils.stringResource(R.string.system_time)} ${
-                ResourceUtils.stringResource(R.string.set_failed)
+            val tipsMessage = "${ResourceUtils.stringResource(R.string.app_system_time)} ${
+                ResourceUtils.stringResource(R.string.app_set_failed)
             }"
             TipsUtils.showTips(Tips.error(tipsMessage))
             LogUtils.error("$tipsMessage $time", true)

@@ -2,7 +2,9 @@ package com.zktony.android.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.zktony.android.ui.components.Tips
 import com.zktony.android.utils.AuthUtils
+import com.zktony.android.utils.TipsUtils
 import com.zktony.log.LogUtils
 import com.zktony.room.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,6 +31,7 @@ class LoginViewModel @Inject constructor(
             if (res.isSuccess) {
                 AuthUtils.login(res.getOrNull()!!)
                 LogUtils.info("登录成功：$userName", true)
+                TipsUtils.showTips(Tips.info("欢迎使用 $userName"))
                 return 0
             } else {
                 LogUtils.info("登录失败：$userName", true)

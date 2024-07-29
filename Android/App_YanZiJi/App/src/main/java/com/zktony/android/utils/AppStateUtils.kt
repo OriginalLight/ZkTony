@@ -19,9 +19,6 @@ object AppStateUtils {
 
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    // flags
-    var isArgumentsSync = false         // 是否同步参数
-
     // 轮询
     val isPolling = Mutex(false)
 

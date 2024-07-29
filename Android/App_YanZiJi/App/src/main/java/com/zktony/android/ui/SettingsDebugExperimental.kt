@@ -105,14 +105,14 @@ fun SettingsDebugExperimentalTopBar(
         ) {
             Icon(imageVector = Icons.AutoMirrored.Default.Reply, contentDescription = "Back")
             Text(
-                text = stringResource(id = R.string.experimental),
+                text = stringResource(id = R.string.app_experimental),
                 style = MaterialTheme.typography.titleLarge
             )
         }
 
         SegmentedButtonTabRow(
             modifier = Modifier.width(400.dp),
-            tabItems = List(ProductUtils.getChannelCount()) { stringResource(id = R.string.channel) + (it + 1) },
+            tabItems = List(ProductUtils.getChannelCount()) { stringResource(id = R.string.app_channel) + (it + 1) },
             selected = channel
         ) { index ->
             onChannelChange(index)

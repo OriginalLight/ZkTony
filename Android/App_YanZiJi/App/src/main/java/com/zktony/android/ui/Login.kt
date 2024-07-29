@@ -90,7 +90,7 @@ fun QrCode(modifier: Modifier = Modifier) {
                 contentDescription = "WX Code"
             )
             Text(
-                text = stringResource(id = R.string.wechat),
+                text = stringResource(id = R.string.app_wechat),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.surface
             )
@@ -103,7 +103,7 @@ fun QrCode(modifier: Modifier = Modifier) {
                 contentDescription = "SPH Code"
             )
             Text(
-                text = stringResource(id = R.string.video),
+                text = stringResource(id = R.string.app_video),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.surface
             )

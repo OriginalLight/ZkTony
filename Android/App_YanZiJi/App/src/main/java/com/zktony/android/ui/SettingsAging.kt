@@ -69,7 +69,7 @@ fun SettingsAgingTopBar(
         ) {
             Icon(imageVector = Icons.AutoMirrored.Default.Reply, contentDescription = "Back")
             Text(
-                text = stringResource(id = R.string.aging),
+                text = stringResource(id = R.string.app_aging),
                 style = MaterialTheme.typography.titleLarge
             )
         }

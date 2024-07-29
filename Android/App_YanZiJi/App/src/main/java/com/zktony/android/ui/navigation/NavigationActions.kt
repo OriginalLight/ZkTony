@@ -93,21 +93,21 @@ val TOP_LEVEL_DESTINATIONS = listOf(
     TopLevelDestination(
         route = Route.EXPERIMENTAL,
         icon = Experimental,
-        iconTextId = R.string.experimental
+        iconTextId = R.string.app_experimental
     ),
     TopLevelDestination(
         route = Route.PROGRAM,
         icon = Program,
-        iconTextId = R.string.program
+        iconTextId = R.string.app_program
     ),
     TopLevelDestination(
         route = Route.LOG,
         icon = Log,
-        iconTextId = R.string.log
+        iconTextId = R.string.app_log
     ),
     TopLevelDestination(
         route = Route.SETTINGS,
         icon = Settings,
-        iconTextId = R.string.settings
+        iconTextId = R.string.app_settings
     )
 )

@@ -11,10 +11,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Reply
+import androidx.compose.material.icons.filled.ImportExport
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zktony.android.R
-import com.zktony.android.ui.components.ButtonLoading
+import com.zktony.android.ui.components.IconLoading
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
@@ -84,6 +84,7 @@ fun SettingsRuntimeLogTopBar(
 ) {
     val scope = rememberCoroutineScope()
     var loading by remember { mutableStateOf(false) }
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -104,13 +105,12 @@ fun SettingsRuntimeLogTopBar(
         ) {
             Icon(imageVector = Icons.AutoMirrored.Default.Reply, contentDescription = "Back")
             Text(
-                text = stringResource(id = R.string.runtime_log),
+                text = stringResource(id = R.string.app_runtime_log),
                 style = MaterialTheme.typography.titleLarge
             )
         }
 
         Button(
-            modifier = Modifier.width(120.dp),
             enabled = !loading && selected.isNotEmpty(),
             onClick = {
                 scope.launch {
@@ -119,9 +119,13 @@ fun SettingsRuntimeLogTopBar(
                     loading = false
                 }
             }) {
-            ButtonLoading(loading = loading) {
-                Text(text = stringResource(id = R.string.one_click_export))
+            IconLoading(loading = loading) {
+                Icon(imageVector = Icons.Default.ImportExport, contentDescription = "ImportExport")
             }
+            Text(
+                text = stringResource(id = R.string.app_export),
+                style = MaterialTheme.typography.bodyLarge
+            )
         }
     }
 }

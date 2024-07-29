@@ -21,7 +21,7 @@ class SettingsArgumentsEquipmentViewModel @Inject constructor() : ViewModel() {
     fun setProductNumber(pn: String) {
         viewModelScope.launch {
             ProductUtils.with(pn)
-            val tipsMessage = "P/N ${ResourceUtils.stringResource(R.string.set_success)}"
+            val tipsMessage = "P/N ${ResourceUtils.stringResource(R.string.app_set_success)}"
             TipsUtils.showTips(Tips.info(tipsMessage))
             LogUtils.info("$tipsMessage $pn")
             repeat(ProductUtils.getChannelCount()) { index ->
@@ -33,7 +33,7 @@ class SettingsArgumentsEquipmentViewModel @Inject constructor() : ViewModel() {
     // 设置S/N参数
     fun setSerialNumber(sn: String) {
         viewModelScope.launch {
-            val tipsMessage = "S/N ${ResourceUtils.stringResource(R.string.set_success)}"
+            val tipsMessage = "S/N ${ResourceUtils.stringResource(R.string.app_set_success)}"
             TipsUtils.showTips(Tips.info(tipsMessage))
             LogUtils.info("$tipsMessage $sn")
             repeat(ProductUtils.getChannelCount()) { index ->

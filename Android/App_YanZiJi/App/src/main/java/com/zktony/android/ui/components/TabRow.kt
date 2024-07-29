@@ -46,7 +46,8 @@ fun SegmentedButtonTabRow(
                 Text(
                     modifier = Modifier.padding(vertical = 12.dp),
                     text = s,
-                    color = if (selected == index) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onPrimaryContainer
+                    color = if (selected == index) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onPrimaryContainer,
+                    style = MaterialTheme.typography.bodyLarge
                 )
             }
         }

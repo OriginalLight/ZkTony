@@ -79,7 +79,7 @@ fun SettingsArgumentsEquipmentTopBar(
         ) {
             Icon(imageVector = Icons.AutoMirrored.Default.Reply, contentDescription = "Back")
             Text(
-                text = stringResource(id = R.string.equipment_arguments),
+                text = stringResource(id = R.string.app_equipment_arguments),
                 style = MaterialTheme.typography.titleLarge
             )
         }
@@ -106,7 +106,7 @@ fun EquipmentArgumentsListView(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
 
-        SettingsItem(title = stringResource(id = R.string.product_number)) {
+        SettingsItem(title = stringResource(id = R.string.app_product_number)) {
             DropDownBox(
                 modifier = Modifier
                     .width(200.dp)
@@ -119,7 +119,7 @@ fun EquipmentArgumentsListView(
             }
         }
 
-        SettingsItem(title = stringResource(id = R.string.serial_number)) {
+        SettingsItem(title = stringResource(id = R.string.app_serial_number)) {
             ArgumentsSetField(
                 modifier = Modifier.width(350.dp),
                 value = sn,

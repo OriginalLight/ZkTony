@@ -10,10 +10,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.automirrored.filled.Reply
+import androidx.compose.material.icons.filled.ImportExport
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -31,8 +31,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zktony.android.R
-import com.zktony.android.ui.components.ButtonLoading
 import com.zktony.android.ui.components.FileChoiceDialog
+import com.zktony.android.ui.components.IconLoading
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
@@ -76,7 +76,8 @@ fun SettingsArgumentsTopBar(
         FileChoiceDialog(files = fileObjectList, onDismiss = { showFileChoice = false }) { file ->
             scope.launch {
                 loadingImport = true
-                viewModel.importArguments(file)
+                showFileChoice = false
+                viewModel.import(file)
                 loadingImport = false
             }
         }
@@ -101,7 +102,7 @@ fun SettingsArgumentsTopBar(
         ) {
             Icon(imageVector = Icons.AutoMirrored.Default.Reply, contentDescription = "Back")
             Text(
-                text = stringResource(id = R.string.arguments),
+                text = stringResource(id = R.string.app_arguments),
                 style = MaterialTheme.typography.titleLarge
             )
         }
@@ -111,7 +112,6 @@ fun SettingsArgumentsTopBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Button(
-                modifier = Modifier.width(150.dp),
                 enabled = !loadingImport,
                 onClick = {
                     scope.launch {
@@ -121,24 +121,37 @@ fun SettingsArgumentsTopBar(
                         }
                     }
                 }) {
-                ButtonLoading(loading = loadingImport) {
-                    Text(text = stringResource(id = R.string.one_click_import))
+                IconLoading(loading = loadingImport) {
+                    Icon(
+                        imageVector = Icons.Default.ImportExport,
+                        contentDescription = "ImportExport"
+                    )
                 }
+                Text(
+                    text = stringResource(id = R.string.app_import),
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
 
             Button(
-                modifier = Modifier.width(150.dp),
                 enabled = !loadingExport,
                 onClick = {
                     scope.launch {
                         loadingExport = true
-                        viewModel.exportArguments()
+                        viewModel.export()
                         loadingExport = false
                     }
                 }) {
-                ButtonLoading(loading = loadingExport) {
-                    Text(text = stringResource(id = R.string.one_click_export))
+                IconLoading(loading = loadingExport) {
+                    Icon(
+                        imageVector = Icons.Default.ImportExport,
+                        contentDescription = "ImportExport"
+                    )
                 }
+                Text(
+                    text = stringResource(id = R.string.app_export),
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         }
     }
@@ -163,7 +176,7 @@ fun ArgumentsListView(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable { navigationActions.navigate(Route.SETTINGS_ARGUMENTS_EQUIPMENT) },
-            title = stringResource(id = R.string.equipment_arguments)
+            title = stringResource(id = R.string.app_equipment_arguments)
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
@@ -176,7 +189,7 @@ fun ArgumentsListView(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable { navigationActions.navigate(Route.SETTINGS_ARGUMENTS_RUNTIME) },
-            title = stringResource(id = R.string.runtime_arguments)
+            title = stringResource(id = R.string.app_runtime_arguments)
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
@@ -189,7 +202,7 @@ fun ArgumentsListView(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable { navigationActions.navigate(Route.SETTINGS_ARGUMENTS_PUMP) },
-            title = stringResource(id = R.string.pump_arguments)
+            title = stringResource(id = R.string.app_pump_arguments)
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
@@ -202,7 +215,7 @@ fun ArgumentsListView(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable { navigationActions.navigate(Route.SETTINGS_ARGUMENTS_VOLTAGE) },
-            title = stringResource(id = R.string.voltage_arguments)
+            title = stringResource(id = R.string.app_voltage_arguments)
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
@@ -215,7 +228,7 @@ fun ArgumentsListView(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
                 .clickable { navigationActions.navigate(Route.SETTINGS_ARGUMENTS_SENSOR) },
-            title = stringResource(id = R.string.sensor_arguments)
+            title = stringResource(id = R.string.app_sensor_arguments)
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,

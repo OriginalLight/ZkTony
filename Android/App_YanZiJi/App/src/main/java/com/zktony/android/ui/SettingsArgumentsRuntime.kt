@@ -103,14 +103,14 @@ fun SettingsArgumentsRuntimeTopBar(
         ) {
             Icon(imageVector = Icons.AutoMirrored.Default.Reply, contentDescription = "Back")
             Text(
-                text = stringResource(id = R.string.runtime_arguments),
+                text = stringResource(id = R.string.app_runtime_arguments),
                 style = MaterialTheme.typography.titleLarge
             )
         }
 
         SegmentedButtonTabRow(
             modifier = Modifier.width(400.dp),
-            tabItems = List(ProductUtils.getChannelCount()) { stringResource(id = R.string.channel) + (it + 1) },
+            tabItems = List(ProductUtils.getChannelCount()) { stringResource(id = R.string.app_channel) + (it + 1) },
             selected = channel
         ) { index ->
             onChannelChange(index)
@@ -214,7 +214,7 @@ fun TransferRuntimeArgumentsView(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        Text(text = stringResource(id = R.string.transfer), fontSize = 20.sp)
+        Text(text = stringResource(id = R.string.app_transfer), fontSize = 20.sp)
 
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -327,7 +327,7 @@ fun TransferRuntimeArgumentsView(
             }) {
             ButtonLoading(loading = loading) {
                 Text(
-                    text = stringResource(id = R.string.set),
+                    text = stringResource(id = R.string.app_set),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -397,7 +397,7 @@ fun CleanRuntimeArgumentsView(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        Text(text = stringResource(id = R.string.clean), fontSize = 20.sp)
+        Text(text = stringResource(id = R.string.app_clean), fontSize = 20.sp)
 
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -510,7 +510,7 @@ fun CleanRuntimeArgumentsView(
             }) {
             ButtonLoading(loading = loading) {
                 Text(
-                    text = stringResource(id = R.string.set),
+                    text = stringResource(id = R.string.app_set),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }

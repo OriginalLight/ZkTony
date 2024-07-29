@@ -3,9 +3,9 @@ package com.zktony.android.data
 import com.zktony.android.R
 
 enum class Sound(val resId: Int) {
-    MUTE(R.string.mute),
-    RING(R.string.ring),
-    VOICE(R.string.voice);
+    MUTE(R.string.app_sound_mute),
+    RING(R.string.app_sound_ring),
+    VOICE(R.string.app_sound_voice);
 
     companion object {
         fun fromName(name: String): Sound {

@@ -68,7 +68,7 @@ fun SettingsFqcTopBar(
         ) {
             Icon(imageVector = Icons.AutoMirrored.Default.Reply, contentDescription = "Back")
             Text(
-                text = stringResource(id = R.string.fqc),
+                text = stringResource(id = R.string.app_fqc),
                 style = MaterialTheme.typography.titleLarge
             )
         }
