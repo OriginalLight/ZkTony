@@ -237,14 +237,12 @@ fun ProgramList(
     /**
      * 开始浓度
      */
-    val startRange = rememberDataSaverState(key = "startRange", default = 0.0)
-    var startRange_ex by remember { mutableStateOf(startRange.value.toString()) }
+    var startRange_ex by remember { mutableStateOf("0.0") }
 
     /**
      * 结束浓度
      */
-    var endRange = rememberDataSaverState(key = "endRange", default = 0.0)
-    var endRange_ex by remember { mutableStateOf(endRange.value.toString()) }
+    var endRange_ex by remember { mutableStateOf("0.0") }
 
 
     /**
@@ -258,19 +256,35 @@ fun ProgramList(
     /**
      * 促凝剂体积
      */
-    var coagulant = rememberDataSaverState(key = "coagulant", default = 0)
-    var coagulant_ex by remember { mutableStateOf(coagulant.value.toString()) }
+    var coagulant_ex by remember { mutableStateOf("0") }
 
     /**
      * 胶液体积
      */
-    var volume = rememberDataSaverState(key = "volume", default = 0f)
-    var volume_ex by remember { mutableStateOf(volume.value.format(3)) }
+    var volume_ex by remember { mutableStateOf("0") }
 
     /**
      * 创建人
      */
     var founder by remember { mutableStateOf("") }
+
+
+    var coagulantTemp = ""
+    var volumeTemp = ""
+
+    var coagulantDef = true
+    var volumeDef = true
+
+    if (thickness.value == "0.75") {
+        coagulantTemp = "140"
+        volumeTemp = "9.6"
+    } else if (thickness.value == "1.0") {
+        coagulantTemp = "96"
+        volumeTemp = "6.4"
+    } else if (thickness.value == "1.5") {
+        coagulantTemp = "72"
+        volumeTemp = "4.8"
+    }
 
     /**
      * home选中的制胶程序id
@@ -286,13 +300,13 @@ fun ProgramList(
      */
     var export by remember { mutableStateOf(true) }
 
-    if (importError.isNotEmpty()){
+    if (importError.isNotEmpty()) {
         Toast.makeText(
             context,
             importError,
             Toast.LENGTH_SHORT
         ).show()
-        importError=""
+        importError = ""
     }
 
     //	定义列宽
@@ -515,7 +529,7 @@ fun ProgramList(
                                     val entity = entities[selectedIndex]
                                     if (entity != null) {
                                         try {
-                                            export=false
+                                            export = false
                                             val release = Build.VERSION.RELEASE
                                             path += "/${entity.displayText}.txt"
                                             val text =
@@ -559,8 +573,8 @@ fun ProgramList(
                                                 "导出异常,请重试!",
                                                 Toast.LENGTH_SHORT
                                             ).show()
-                                        }finally {
-                                            export=true
+                                        } finally {
+                                            export = true
                                         }
 
                                     }
@@ -696,7 +710,7 @@ fun ProgramList(
                                     RadioButton(
                                         colors = RadioButtonDefaults.colors(
                                             Color(
-                                                android.graphics.Color.rgb(
+                                                rgb(
                                                     0,
                                                     105,
                                                     52
@@ -722,10 +736,18 @@ fun ProgramList(
 
                     item {
                         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                            OutlinedTextField(value = volume_ex,
+                            OutlinedTextField(value = if ((volume_ex.toFloatOrNull()
+                                    ?: 0f) > 0
+                            ) volume_ex else volumeTemp,
                                 label = { Text(fontSize = 20.sp, text = "胶液体积/mL") },
-                                textStyle = TextStyle(fontSize = 20.sp),
-                                onValueChange = { volume_ex = it },
+                                textStyle = if ((volume_ex.toFloatOrNull() ?: 0f) > 0) TextStyle(
+                                    fontSize = 20.sp
+                                )
+                                else TextStyle(fontSize = 20.sp, color = Color.Gray),
+                                onValueChange = {
+                                    volumeDef = false
+                                    volume_ex = it
+                                },
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = Color(rgb(0, 105, 52)),
                                     focusedLabelColor = Color(rgb(0, 105, 52)),
@@ -746,10 +768,18 @@ fun ProgramList(
 
                     item {
                         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                            OutlinedTextField(value = coagulant_ex,
+                            OutlinedTextField(value = if ((coagulant_ex.toIntOrNull()
+                                    ?: 0) > 0
+                            ) coagulant_ex else coagulantTemp,
                                 label = { Text(fontSize = 20.sp, text = "促凝剂体积/μL") },
-                                textStyle = TextStyle(fontSize = 20.sp),
-                                onValueChange = { coagulant_ex = it },
+                                textStyle = if ((coagulant_ex.toIntOrNull() ?: 0) > 0) TextStyle(
+                                    fontSize = 20.sp
+                                )
+                                else TextStyle(fontSize = 20.sp, color = Color.Gray),
+                                onValueChange = {
+                                    coagulantDef = false
+                                    coagulant_ex = it
+                                },
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = Color(rgb(0, 105, 52)),
                                     focusedLabelColor = Color(rgb(0, 105, 52)),
@@ -913,13 +943,21 @@ fun ProgramList(
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 } else {
-                                    if (Pattern.compile(speChat).matcher(displayText).find()) {
+                                    if (Pattern.compile(speChat).matcher(displayText)
+                                            .find() || displayText.isEmpty()
+                                    ) {
                                         Toast.makeText(
                                             context,
                                             "文件名不能包含特殊字符!",
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     } else {
+                                        if (volumeDef) {
+                                            volume_ex = volumeTemp
+                                        }
+                                        if (coagulantDef) {
+                                            coagulant_ex = coagulantTemp
+                                        }
                                         if (startRange_ex.toDouble() > endRange_ex.toDouble()) {
                                             Toast.makeText(
                                                 context,
