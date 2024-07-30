@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,10 +16,13 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ImportExport
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,9 +41,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.zktony.android.ui.components.DeleteDialog
 import com.zktony.android.ui.components.FileChoiceDialog
 import com.zktony.android.ui.components.IconLoading
 import com.zktony.android.ui.components.ListEmptyView
+import com.zktony.android.ui.components.ProgramQueryDialog
+import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.toList
@@ -78,10 +85,14 @@ fun ProgramTopBar(
     viewModel: ProgramViewModel
 ) {
     val scope = rememberCoroutineScope()
+    val navigationActions = LocalNavigationActions.current
     var showFileChoice by remember { mutableStateOf(false) }
+    var showDelete by remember { mutableStateOf(false) }
+    var showQuery by remember { mutableStateOf(false) }
     var fileObjectList by remember { mutableStateOf(listOf<File>()) }
     var loadingImport by remember { mutableStateOf(false) }
     var loadingExport by remember { mutableStateOf(false) }
+    var loadingDelete by remember { mutableStateOf(false) }
 
     if (showFileChoice) {
         FileChoiceDialog(files = fileObjectList, onDismiss = { showFileChoice = false }) { file ->
@@ -90,6 +101,25 @@ fun ProgramTopBar(
                 showFileChoice = false
                 viewModel.import(file)
                 loadingImport = false
+            }
+        }
+    }
+
+    if (showDelete) {
+        DeleteDialog(onDismiss = { showDelete = false }) {
+            scope.launch {
+                loadingDelete = true
+                viewModel.delete()
+                loadingDelete = false
+            }
+        }
+    }
+
+    if (showQuery) {
+        ProgramQueryDialog(onDismiss = { showQuery = false }) {
+            scope.launch {
+                showQuery = false
+                viewModel.search(it)
             }
         }
     }
@@ -104,7 +134,7 @@ fun ProgramTopBar(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Button(onClick = { /*TODO*/ }) {
+        Button(onClick = { showQuery = true }) {
             Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
             Text(text = "搜索", style = MaterialTheme.typography.bodyLarge)
         }
@@ -114,24 +144,33 @@ fun ProgramTopBar(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             // 添加
-            Button(onClick = { /*TODO*/ }) {
+            Button(onClick = { navigationActions.navigate(Route.PROGRAM_ADD_OR_UPDATE + "/-1") }) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
                 Text(text = "添加", style = MaterialTheme.typography.bodyLarge)
             }
             // 修改
             Button(
                 enabled = selected.size == 1,
-                onClick = { /*TODO*/ }
+                onClick = {
+                    scope.launch {
+                        selected.firstOrNull()?.let {
+                            navigationActions.navigate(Route.PROGRAM_ADD_OR_UPDATE + "/${it.id}")
+                        }
+                    }
+                }
             ) {
                 Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
-                Text(text = "修改", style = MaterialTheme.typography.bodyLarge)
+                Text(text = "编辑", style = MaterialTheme.typography.bodyLarge)
             }
             // 删除
             Button(
                 enabled = selected.isNotEmpty(),
-                onClick = { /*TODO*/ }
+                onClick = { showDelete = true },
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
             ) {
-                Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
+                IconLoading(loading = loadingDelete) {
+                    Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
+                }
                 Text(text = "删除", style = MaterialTheme.typography.bodyLarge)
             }
             // 导入
@@ -220,7 +259,9 @@ fun ProgramItem(
     selected: List<Program>,
     viewModel: ProgramViewModel
 ) {
-    Row(
+    var expend by remember { mutableStateOf(false) }
+
+    Column(
         modifier = modifier
             .background(
                 color = if (selected.contains(item)) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.surfaceVariant,
@@ -229,62 +270,109 @@ fun ProgramItem(
             .clip(MaterialTheme.shapes.medium)
             .clickable { viewModel.select(item) }
             .padding(horizontal = 8.dp, vertical = 4.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Checkbox(checked = selected.contains(item), onCheckedChange = { viewModel.select(item) })
-        Text(
-            modifier = Modifier.weight(1f),
-            text = (index + 1).toString(),
-            fontSize = 18.sp,
-            textAlign = TextAlign.Center
-        )
-        Text(
-            modifier = Modifier.weight(4f),
-            text = item.name,
-            fontSize = 18.sp,
-            textAlign = TextAlign.Center
-        )
-        Text(
-            modifier = Modifier.weight(3f),
-            text = if (item.experimentalType == 0) "转膜" else "染色",
-            fontSize = 18.sp,
-            textAlign = TextAlign.Center
-        )
-        Text(
-            modifier = Modifier.weight(3f),
-            text = when (item.workMode) {
-                0 -> "恒压"
-                1 -> "恒流"
-                2 -> "恒功率"
-                else -> "未知"
-            },
-            fontSize = 18.sp,
-            textAlign = TextAlign.Center
-        )
-        Text(
-            modifier = Modifier.weight(2f),
-            text = item.value + when (item.workMode) {
-                0 -> "V"
-                1 -> "A"
-                2 -> "W"
-                else -> "/"
-            },
-            fontSize = 18.sp,
-            textAlign = TextAlign.Center
-        )
-        Text(
-            modifier = Modifier.weight(2f),
-            text = item.time,
-            fontSize = 18.sp,
-            textAlign = TextAlign.Center
-        )
-        Text(
-            modifier = Modifier.weight(3f),
-            text = item.createTime.dateFormat("HH:mm\nyyyy-MM-dd"),
-            fontSize = 18.sp,
-            textAlign = TextAlign.Center
-        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Checkbox(
+                checked = selected.contains(item),
+                onCheckedChange = { viewModel.select(item) })
+
+            listOf(
+                Pair((index + 1).toString(), 1f),
+                Pair(item.name, 4f),
+                Pair(if (item.experimentalType == 0) "转膜" else "染色", 2f),
+                Pair(
+                    when (item.workMode) {
+                        0 -> "恒压"
+                        1 -> "恒流"
+                        2 -> "恒功率"
+                        else -> "未知"
+                    }, 2f
+                ),
+                Pair(
+                    item.value + when (item.workMode) {
+                        0 -> "V"
+                        1 -> "A"
+                        2 -> "W"
+                        else -> "/"
+                    }, 2f
+                ),
+                Pair(item.time, 2f),
+                Pair(item.createTime.dateFormat("HH:mm\nyyyy-MM-dd"), 3f),
+            ).forEach {
+                Text(
+                    modifier = Modifier.weight(it.second),
+                    text = it.first,
+                    fontSize = 18.sp,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                IconButton(onClick = { expend = !expend }) {
+                    Icon(
+                        imageVector = Icons.Default.MoreHoriz,
+                        contentDescription = "More",
+                        tint = if (expend) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
+        }
+
+        if (expend) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (item.experimentalType == 0) {
+                    Text(
+                        text = item.flowSpeed + "mL/min",
+                        fontSize = 18.sp
+                    )
+                }
+
+                Text(
+                    text = if (item.glueType == 0) "普通胶" else "梯度胶",
+                    fontSize = 18.sp
+                )
+
+                Text(
+                    text = item.getGlueConcentrationStr(),
+                    fontSize = 18.sp
+                )
+
+                Text(
+                    text = when (item.glueThickness) {
+                        0 -> "0.75mm"
+                        1 -> "1.0mm"
+                        2 -> "1.5mm"
+                        else -> "/"
+                    },
+                    fontSize = 18.sp
+                )
+
+                Text(
+                    text = item.proteinSize + "kDa",
+                    fontSize = 18.sp
+                )
+
+                Text(
+                    text = when (item.bufferType) {
+                        0 -> "厂家缓冲液"
+                        1 -> "其他缓冲液"
+                        else -> "/"
+                    },
+                    fontSize = 18.sp
+                )
+            }
+        }
     }
 }
 
@@ -309,47 +397,22 @@ fun ProgramListHeader(
             onCheckedChange(it)
         })
 
-        Text(
-            modifier = Modifier.weight(1f),
-            text = "序号",
-            fontSize = 18.sp,
-            textAlign = TextAlign.Center
-        )
-        Text(
-            modifier = Modifier.weight(4f),
-            text = "程序名称",
-            fontSize = 18.sp,
-            textAlign = TextAlign.Center
-        )
-        Text(
-            modifier = Modifier.weight(3f),
-            text = "实验类型",
-            fontSize = 18.sp,
-            textAlign = TextAlign.Center
-        )
-        Text(
-            modifier = Modifier.weight(3f),
-            text = "工作模式",
-            fontSize = 18.sp,
-            textAlign = TextAlign.Center
-        )
-        Text(
-            modifier = Modifier.weight(2f),
-            text = "数值",
-            fontSize = 18.sp,
-            textAlign = TextAlign.Center
-        )
-        Text(
-            modifier = Modifier.weight(2f),
-            text = "时间(min)",
-            fontSize = 18.sp,
-            textAlign = TextAlign.Center
-        )
-        Text(
-            modifier = Modifier.weight(3f),
-            text = "创建时间",
-            fontSize = 18.sp,
-            textAlign = TextAlign.Center
-        )
+        listOf(
+            Pair("序号", 1f),
+            Pair("程序名称", 4f),
+            Pair("实验类型", 2f),
+            Pair("工作模式", 2f),
+            Pair("数值", 2f),
+            Pair("时间(min)", 2f),
+            Pair("创建时间", 3f),
+            Pair("操作", 1f)
+        ).forEach {
+            Text(
+                modifier = Modifier.weight(it.second),
+                text = it.first,
+                fontSize = 18.sp,
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }

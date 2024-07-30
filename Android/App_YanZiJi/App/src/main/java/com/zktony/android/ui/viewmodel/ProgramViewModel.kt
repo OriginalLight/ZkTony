@@ -1,10 +1,13 @@
 package com.zktony.android.ui.viewmodel
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
+import com.zktony.android.data.ProgramQuery
+import com.zktony.android.data.defaults.defaultProgramQuery
 import com.zktony.android.ui.components.Tips
 import com.zktony.android.utils.JsonUtils
 import com.zktony.android.utils.StorageUtils
@@ -15,8 +18,10 @@ import com.zktony.room.entities.Program
 import com.zktony.room.repository.ProgramRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -32,14 +37,41 @@ class ProgramViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _selected = MutableStateFlow<List<Program>>(emptyList())
+    private val _query = MutableStateFlow(defaultProgramQuery())
 
     val selected = _selected.asStateFlow()
-    val entities = Pager(
-        config = PagingConfig(pageSize = 20, initialLoadSize = 40),
-    ) { programRepository.getByPage() }.flow.cachedIn(
-        viewModelScope
-    )
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @SuppressLint("CheckResult")
+    val entities = _query.flatMapLatest { query ->
+        Pager(PagingConfig(pageSize = 20, initialLoadSize = 40)) {
+            programRepository.getByPage(query.name, query.startTime, query.endTime)
+        }.flow.cachedIn(viewModelScope)
+    }
+
+    // 删除
+    suspend fun delete() {
+        try {
+            val programs = _selected.value
+            if (programs.isEmpty()) {
+                return
+            }
+            withContext(Dispatchers.IO) {
+                val res = programRepository.deleteAll(programs)
+                if (res.isSuccess) {
+                    _selected.value = emptyList()
+                    TipsUtils.showTips(Tips.info("删除成功"))
+                } else {
+                    TipsUtils.showTips(Tips.error("删除失败"))
+                }
+            }
+        } catch (e: Exception) {
+            LogUtils.error(e.stackTraceToString(), true)
+            TipsUtils.showTips(Tips.error("删除失败"))
+        }
+    }
+
+    // 单选
     fun select(program: Program) {
         val list = _selected.value.toMutableList()
         if (list.contains(program)) {
@@ -50,10 +82,43 @@ class ProgramViewModel @Inject constructor(
         _selected.value = list
     }
 
+    // 全选
     fun selectAll(list: List<Program>) {
         viewModelScope.launch {
             _selected.value = list
-            LogUtils.info("selectAll: ${list.size}")
+        }
+    }
+
+    // 获取参数文件
+    fun getProgramFiles(): List<File>? {
+        val usbList = StorageUtils.getUsbStorageDir()
+        if (usbList.isEmpty()) {
+            TipsUtils.showTips(Tips.error("未检测到U盘"))
+            return null
+        }
+
+        try {
+            val fileList = mutableListOf<File>()
+            val dir = usbList.first() + "/${StorageUtils.ROOT_DIR}/${StorageUtils.PROGRAM_DIR}"
+            val file = File(dir)
+
+            if (file.exists() && file.isDirectory) {
+                file.listFiles()?.forEach {
+                    if (it.isFile && it.name.endsWith(".json")) {
+                        fileList.add(it)
+                    }
+                }
+            }
+
+            if (fileList.isEmpty()) {
+                TipsUtils.showTips(Tips.error("未检测到程序文件"))
+                return null
+            }
+            return fileList
+        } catch (e: Exception) {
+            LogUtils.error(e.stackTraceToString(), true)
+            TipsUtils.showTips(Tips.error("未知错误"))
+            return null
         }
     }
 
@@ -95,6 +160,7 @@ class ProgramViewModel @Inject constructor(
         }
     }
 
+    // 导出参数
     suspend fun export() {
         try {
             val selected = _selected.value
@@ -131,36 +197,11 @@ class ProgramViewModel @Inject constructor(
         }
     }
 
-    // 获取参数文件
-    fun getProgramFiles(): List<File>? {
-        val usbList = StorageUtils.getUsbStorageDir()
-        if (usbList.isEmpty()) {
-            TipsUtils.showTips(Tips.error("未检测到U盘"))
-            return null
-        }
-
-        try {
-            val fileList = mutableListOf<File>()
-            val dir = usbList.first() + "/${StorageUtils.ROOT_DIR}/${StorageUtils.PROGRAM_DIR}"
-            val file = File(dir)
-
-            if (file.exists() && file.isDirectory) {
-                file.listFiles()?.forEach {
-                    if (it.isFile && it.name.endsWith(".json")) {
-                        fileList.add(it)
-                    }
-                }
-            }
-
-            if (fileList.isEmpty()) {
-                TipsUtils.showTips(Tips.error("未检测到程序文件"))
-                return null
-            }
-            return fileList
-        } catch (e: Exception) {
-            LogUtils.error(e.stackTraceToString(), true)
-            TipsUtils.showTips(Tips.error("未知错误"))
-            return null
-        }
+    // 搜索
+    fun search(query: ProgramQuery) {
+        _query.value = query
+        _selected.value = emptyList()
+        TipsUtils.showTips(Tips.info("搜索成功"))
     }
+
 }

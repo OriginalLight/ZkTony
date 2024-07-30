@@ -2,7 +2,7 @@
     <string name="app.name">YanZiJi</string>
     <string name="app.experimental">Experimental</string>
     <string name="app.factory.settings">Factory Settings</string>
-    <string name="app.log">History</string>
+    <string name="app.log">Log</string>
     <string name="app.home.package">Home Screen</string>
     <string name="app.language">Language</string>
     <string name="app.login">Login</string>

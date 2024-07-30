@@ -23,10 +23,33 @@ abstract class ProgramDao : BaseDao<Program> {
     @Query(
         """
         SELECT * FROM programs
+        WHERE id = :id
+        """
+    )
+    abstract fun getById(id: Long): Program?
+
+    @Query(
+        """
+        SELECT * FROM programs
         ORDER BY createTime DESC
         """
     )
     abstract fun getByPage(): PagingSource<Int, Program>
+
+    @Query(
+        """
+        SELECT * FROM programs
+        WHERE (CASE WHEN :name IS NULL THEN 1 ELSE name LIKE '%' || :name || '%' END)
+        AND (CASE WHEN :startTime IS NULL THEN 1 ELSE createTime >= :startTime END)
+        AND (CASE WHEN :endTime IS NULL THEN 1 ELSE createTime <= :endTime END)
+        ORDER BY createTime DESC
+        """
+    )
+    abstract fun getByPage(
+        name: String?,
+        startTime: Long?,
+        endTime: Long?
+    ): PagingSource<Int, Program>
 
     @Query(
         """

@@ -36,11 +36,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.zktony.android.ui.ExperimentalView
 import com.zktony.android.ui.LogView
 import com.zktony.android.ui.LoginView
+import com.zktony.android.ui.ProgramAddOrUpdateView
 import com.zktony.android.ui.ProgramView
 import com.zktony.android.ui.SettingsAgingView
 import com.zktony.android.ui.SettingsArgumentsEquipmentView
@@ -108,6 +111,10 @@ fun AppNavigation() {
             ) {
                 composable(Route.LOGIN) { LoginView() }
                 composable(Route.PROGRAM) { ProgramView() }
+                composable(
+                    Route.PROGRAM_ADD_OR_UPDATE + "/{id}",
+                    arguments = listOf(navArgument("id") { type = NavType.LongType })
+                ) { ProgramAddOrUpdateView() }
                 composable(Route.EXPERIMENTAL) { ExperimentalView() }
                 composable(Route.LOG) { LogView() }
                 composable(Route.SETTINGS) { SettingsView() }

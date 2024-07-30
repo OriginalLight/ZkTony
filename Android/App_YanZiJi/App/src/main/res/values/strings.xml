@@ -3,7 +3,7 @@
     <string name="app.name">YanZiJi</string>
     <string name="app.experimental">实验操作</string>
     <string name="app.factory.settings">工厂设置</string>
-    <string name="app.log">实验日志</string>
+    <string name="app.log">实验记录</string>
     <string name="app.home.package">主屏幕</string>
     <string name="app.language">系统语言</string>
     <string name="app.login">登录</string>

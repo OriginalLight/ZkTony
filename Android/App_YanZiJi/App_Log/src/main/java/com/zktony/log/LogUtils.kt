@@ -13,7 +13,7 @@ object LogUtils {
     }
 
     // 导出
-    fun getLogs() : List<File> {
+    fun getLogs(): List<File> {
         return service.getLogs()
     }
 

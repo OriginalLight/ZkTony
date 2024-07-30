@@ -15,6 +15,7 @@ object Route {
     const val LOGIN = "Login"
     const val EXPERIMENTAL = "Experimental"
     const val PROGRAM = "Program"
+    const val PROGRAM_ADD_OR_UPDATE = "ProgramAddOrUpdate"
     const val LOG = "Log"
     const val SETTINGS = "Settings"
     const val SETTINGS_ACCESSORY_LIFE = "SettingsAccessoryLife"

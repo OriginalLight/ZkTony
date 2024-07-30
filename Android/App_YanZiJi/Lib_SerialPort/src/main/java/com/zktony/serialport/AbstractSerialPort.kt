@@ -29,7 +29,7 @@ abstract class AbstractSerialPort {
     private val buffer = ByteArrayOutputStream()
     private val byteArrayQueue = LinkedBlockingQueue<ByteArray>()
 
-    val callbacks : MutableMap<String, (ByteArray) -> Unit> = ConcurrentHashMap()
+    val callbacks: MutableMap<String, (ByteArray) -> Unit> = ConcurrentHashMap()
 
     /**
      * Open the serial port

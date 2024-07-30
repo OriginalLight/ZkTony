@@ -30,6 +30,7 @@ data class ZktyProtocol(
             0
         )
     }
+
     // 重写equals
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -48,6 +49,7 @@ data class ZktyProtocol(
 
         return true
     }
+
     // 重写hashCode
     override fun hashCode(): Int {
         var result = header.hashCode()

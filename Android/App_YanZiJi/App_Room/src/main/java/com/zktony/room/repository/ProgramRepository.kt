@@ -8,23 +8,11 @@ class ProgramRepository @Inject constructor(
     private val programDao: ProgramDao
 ) {
 
-    suspend fun init() {
-        repeat(100) {
-            programDao.insert(
-                Program(
-                    name = "Program $it",
-                    value = "100",
-                    time = "100",
-                    description = "Description $it"
-                )
-            )
-        }
-    }
-
     /**
      * Get by page.
      */
-    fun getByPage() = programDao.getByPage()
+    fun getByPage(name: String? = null, startTime: Long? = null, endTime: Long? = null) =
+        programDao.getByPage(name, startTime, endTime)
 
     /**
      * Insert.
@@ -36,4 +24,19 @@ class ProgramRepository @Inject constructor(
         val id = programDao.insert(program)
         return if (id > 0) Result.success(program.copy(id = id)) else Result.failure(Exception("2"))
     }
+
+    /**
+     * Delete.
+     * @param programs List<Program>.
+     * @return effect with success, 1 if failed.
+     */
+    suspend fun deleteAll(programs: List<Program>): Result<Int> {
+        val effect = programDao.deleteAll(programs)
+        return if (effect > 0) Result.success(effect) else Result.failure(Exception("1"))
+    }
+
+    /**
+     * Get by id.
+     */
+    fun getById(id: Long) = programDao.getById(id)
 }

@@ -10,7 +10,8 @@ import java.util.concurrent.Executors
 
 class LogStorageService(ctx: Context) {
     private val logDir: File = File(ctx.cacheDir, "logs")
-    private val logFileName: String = "${SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())}.log"
+    private val logFileName: String =
+        "${SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())}.log"
     private val executor = Executors.newSingleThreadExecutor()
 
     init {
@@ -22,8 +23,9 @@ class LogStorageService(ctx: Context) {
 
     fun writeLog(msg: String) {
         executor.execute {
-            val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault()).format(Date())
-            val message = "$timestamp: $msg\n"
+            val time =
+                SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault()).format(Date())
+            val message = "$time: $msg\n"
             try {
                 val logFile = File(logDir, logFileName)
                 synchronized(logFile) {
@@ -46,7 +48,10 @@ class LogStorageService(ctx: Context) {
             // 删除7天前的日志
             val files = logDir.listFiles()
             files?.forEach {
-                val date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(it.nameWithoutExtension)
+                val date = SimpleDateFormat(
+                    "yyyy-MM-dd",
+                    Locale.getDefault()
+                ).parse(it.nameWithoutExtension)
                 if (date != null && System.currentTimeMillis() - date.time > 7 * 24 * 60 * 60 * 1000) {
                     it.delete()
                 }

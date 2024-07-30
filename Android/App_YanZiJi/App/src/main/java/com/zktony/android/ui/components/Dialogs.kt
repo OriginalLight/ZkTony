@@ -7,9 +7,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -17,12 +17,15 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material3.Button
+import androidx.compose.material3.DateRangePicker
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -46,6 +49,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.zktony.android.R
+import com.zktony.android.data.ProgramQuery
+import com.zktony.android.data.defaults.defaultProgramQuery
 import com.zktony.android.utils.extra.size
 import kotlinx.coroutines.launch
 import java.io.File
@@ -109,6 +114,64 @@ fun LogoutDialog(
 }
 
 @Composable
+fun DeleteDialog(
+    modifier: Modifier = Modifier,
+    onDismiss: () -> Unit,
+    onDelete: () -> Unit
+) {
+    Dialog(onDismissRequest = { onDismiss() }) {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.medium)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = "删除",
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                text = "确认删除所选项吗？",
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                OutlinedButton(
+                    modifier = Modifier.padding(end = 16.dp),
+                    onClick = { onDismiss() }
+                ) {
+                    Text(
+                        text = "取消",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+
+                Button(
+                    onClick = {
+                        onDismiss()
+                        onDelete()
+                    }
+                ) {
+                    Text(
+                        text = "确认",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun PasswordModifyDialog(
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
@@ -158,8 +221,7 @@ fun PasswordModifyDialog(
                                     errorOldPasswordMsg = ""
                                 }
                             },
-                            placeholder = { Text("旧密码") },
-                            shape = CircleShape,
+                            label = { Text("旧密码") },
                             singleLine = true,
                             textStyle = TextStyle(fontSize = 20.sp),
                             visualTransformation = if (showOldPassword) VisualTransformation.None else PasswordVisualTransformation(),
@@ -251,8 +313,7 @@ fun PasswordModifyDialog(
                             modifier = Modifier.fillMaxWidth(),
                             value = newPassword,
                             onValueChange = { newPassword = it },
-                            placeholder = { Text("新密码") },
-                            shape = CircleShape,
+                            label = { Text("新密码") },
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(
                                 imeAction = ImeAction.Next,
@@ -299,8 +360,7 @@ fun PasswordModifyDialog(
                                     errorOldPasswordMsg = ""
                                 }
                             },
-                            placeholder = { Text("确认密码") },
-                            shape = CircleShape,
+                            label = { Text("确认密码") },
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(
                                 imeAction = ImeAction.Done,
@@ -420,6 +480,7 @@ fun FileChoiceDialog(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .heightIn(max = 480.dp)
                     .padding(8.dp)
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -476,6 +537,103 @@ fun FileChoiceDialog(
                         "确认",
                         style = MaterialTheme.typography.bodyLarge
                     )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProgramQueryDialog(
+    modifier: Modifier = Modifier,
+    onDismiss: () -> Unit,
+    onQuery: (ProgramQuery) -> Unit
+) {
+    var name by remember { mutableStateOf<String?>(null) }
+    val dateRangePickerState = rememberDateRangePickerState()
+
+    Dialog(
+        onDismissRequest = { onDismiss() },
+        properties = DialogProperties(dismissOnClickOutside = false)
+    ) {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.medium)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+
+            Text(
+                text = "搜索",
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    value = name ?: "",
+                    onValueChange = { name = it },
+                    singleLine = true,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    label = { Text("程序名称") }
+                )
+                DateRangePicker(
+                    modifier = Modifier.heightIn(max = 450.dp),
+                    state = dateRangePickerState
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Button(
+                    onClick = {
+                        onQuery(defaultProgramQuery())
+                    }
+                ) {
+                    Text(
+                        text = "重置",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+
+                Row {
+                    OutlinedButton(
+                        modifier = Modifier.padding(end = 16.dp),
+                        onClick = { onDismiss() }
+                    ) {
+                        Text(
+                            text = "取消",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+
+                    Button(
+                        onClick = {
+                            onQuery(
+                                ProgramQuery(
+                                    name = name,
+                                    startTime = dateRangePickerState.selectedStartDateMillis,
+                                    endTime = dateRangePickerState.selectedEndDateMillis
+                                )
+                            )
+                        }
+                    ) {
+                        Text(
+                            text = "搜索",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
                 }
             }
         }

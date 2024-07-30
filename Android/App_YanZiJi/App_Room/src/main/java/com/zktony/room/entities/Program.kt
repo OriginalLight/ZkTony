@@ -22,7 +22,7 @@ data class Program(
     // 值
     val value: String,
     // 流速
-    val flowSpeed: String = "0",
+    val flowSpeed: String = "",
     // 时间
     val time: String,
     // 胶种类
@@ -39,4 +39,22 @@ data class Program(
     val description: String = "None",
     // 创建时间
     val createTime: Long = System.currentTimeMillis()
-)
+) {
+    fun getGlueConcentrationStr(): String {
+        if (glueType == 0) {
+            return "$glueConcentration%"
+        } else {
+            val list = glueConcentration.split(",")
+            return "${list.getOrNull(0) ?: "0"}% - ${list.getOrNull(1) ?: "0"}%"
+        }
+    }
+
+    fun canSave(): Boolean {
+        val bool = name.isNotEmpty() && value.isNotEmpty() && time.isNotEmpty()
+        if (experimentalType == 0) {
+            return bool && flowSpeed.isNotEmpty()
+        }
+
+        return bool
+    }
+}
