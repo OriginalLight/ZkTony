@@ -40,17 +40,17 @@ fun WasteVerticalProgressBar(
 
     val feiDescLayoutResult = rememberTextMeasurer().measure(
         AnnotatedString("废"),
-        TextStyle(color = Color(18, 95, 202), fontSize = 16.sp)
+        TextStyle(color = Color(18, 95, 202), fontSize = 20.sp)
     )
 
     val yeDescLayoutResult = rememberTextMeasurer().measure(
         AnnotatedString("液"),
-        TextStyle(color = Color(18, 95, 202), fontSize = 16.sp)
+        TextStyle(color = Color(18, 95, 202), fontSize = 20.sp)
     )
 
     val caoDescLayoutResult = rememberTextMeasurer().measure(
         AnnotatedString("槽"),
-        TextStyle(color = Color(18, 95, 202), fontSize = 16.sp)
+        TextStyle(color = Color(18, 95, 202), fontSize = 20.sp)
     )
 
 

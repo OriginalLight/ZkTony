@@ -32,7 +32,7 @@ fun getStoragePath(context: Context, isUsb: Boolean): String {
                 assert(file != null)
                 path = file.getAbsolutePath()
                 val release = Build.VERSION.RELEASE
-                if (release == "6.0.1" ||release == "10") {
+                if (release == "6.0.1") {
                     //Android6.0.1系统是迈冲
                     if (path != null) {
                         path = path.replace("storage", "/mnt/media_rw")

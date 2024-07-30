@@ -28,7 +28,7 @@ object SerialPortUtils {
         // 初始化tec串口
         serialPortOf {
             log = true
-            device = "/dev/ttyS3"
+            device = "/dev/ttyS2"
         }?.let { SerialStoreUtils.put("led", it) }
         // rtu串口全局回调
         SerialStoreUtils.get("zkty")?.registerCallback("globe") { bytes ->

@@ -157,6 +157,7 @@ class SettingViewModel @Inject constructor(
     }
 
 
+    
     fun dispatch(intent: SettingIntent) {
         when (intent) {
             is SettingIntent.CheckUpdate -> checkUpdate()
@@ -362,6 +363,7 @@ class SettingViewModel @Inject constructor(
 
     }
 
+    
     private fun updateApkU(context: Context, apkPath: String) {
         viewModelScope.launch {
             try {
@@ -386,6 +388,7 @@ class SettingViewModel @Inject constructor(
 
     }
 
+    
     fun getApkCode(context: Context, apkFilePath: String): Int {
         val info =
             context.packageManager.getPackageArchiveInfo(apkFilePath, PackageManager.GET_ACTIVITIES)

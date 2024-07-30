@@ -8,6 +8,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -155,7 +156,6 @@ fun experimentList(
      */
     var export by remember { mutableStateOf(true) }
 
-
     var selectedIndex by remember { mutableStateOf(0) }
 
 //    for (i in 1..11) {
@@ -274,8 +274,7 @@ fun experimentList(
                         .padding(start = 70.dp)
                         .width(100.dp)
                         .height(50.dp),
-                        enabled = export,
-                        colors = ButtonDefaults.buttonColors(
+                    enabled = export, colors = ButtonDefaults.buttonColors(
                         containerColor = Color(rgb(0, 105, 52))
                     ),
                     shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
@@ -287,14 +286,7 @@ fun experimentList(
                                     val entity = entities[selectedIndex]
                                     if (entity != null) {
                                         try {
-                                            export=false
-                                            val release = Build.VERSION.RELEASE
-                                            if (release == "6.0.1") {
-                                                //Android6.0.1系统是迈冲
-                                                if (path != null) {
-                                                    path = path.replace("storage", "/mnt/media_rw")
-                                                }
-                                            }
+                                            export = false
                                             path += "/exp${System.currentTimeMillis()}.txt"
 
                                             val file = File(path)
@@ -356,8 +348,8 @@ fun experimentList(
                                                 "导出异常,请重试!",
                                                 Toast.LENGTH_SHORT
                                             ).show()
-                                        }finally {
-                                            export=true
+                                        } finally {
+                                            export = true
                                         }
                                     }
                                 }
@@ -532,10 +524,12 @@ fun experimentList(
                 text = {
 
                     Button(
-                        modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(rgb(0, 105, 52))
+                        modifier = Modifier.width(100.dp),
+                        border = BorderStroke(1.dp, Color.Gray),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Transparent
                         ), onClick = { deleteDialog.value = false }) {
-                        Text(text = "取消")
+                        Text(fontSize = 18.sp, text = "取   消", color = Color.Black)
                     }
 
                 }, confirmButton = {}, dismissButton = {
@@ -563,7 +557,7 @@ fun experimentList(
                             }
 
                         }) {
-                        Text(text = "确认")
+                        Text(fontSize = 18.sp, text = "确   认")
                     }
 
                 })

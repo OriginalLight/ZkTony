@@ -17,6 +17,7 @@ import androidx.navigation.compose.composable
 import com.zktony.android.ui.*
 
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AppNavigation(
     navController: NavHostController,

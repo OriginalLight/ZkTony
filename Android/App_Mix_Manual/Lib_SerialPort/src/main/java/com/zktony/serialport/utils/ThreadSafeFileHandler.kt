@@ -21,17 +21,16 @@ fun writeThread(content: String) {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
     val currentDate = dateFormat.format(Date())
     val file = File("sdcard/Download/log_${currentDate.substringBefore(" ")}.txt")
-    try {
-        if (!file.exists()) {
-            if (file.createNewFile()) {
-                logInfo("创建日志", "创建${currentDate}日志成功")
-            }
+    if (!file.exists()) {
+        if (file.createNewFile()) {
+            logInfo("创建日志", "创建${currentDate}日志成功")
         }
+    }
+
+    try {
         FileWriter(file, true).use { writer ->
             writer.append("${currentDate}__$content\n")
         }
-    } catch (e: Exception) {
-        logInfo("创建日志", "创建${e}日志失败")
     } finally {
         lock.unlock()
     }

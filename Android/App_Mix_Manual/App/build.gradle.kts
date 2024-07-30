@@ -11,7 +11,6 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
-
 android {
 
     compileSdk = libs.versions.compileSdk.get().toInt()
@@ -20,8 +19,8 @@ android {
         applicationId = "com.zktony.android"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 6
-        versionName = "3.0.1"
+        versionCode = 7
+        versionName = "3.0.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -102,6 +101,7 @@ android {
 
 dependencies {
     implementation("org.jetbrains:annotations:15.0")
+//    implementation(libs.androidx.blankj)
     val composeBom = platform(libs.androidx.compose.bom)
     ksp(libs.androidx.room.compiler)
     ksp(libs.hilt.compiler)
