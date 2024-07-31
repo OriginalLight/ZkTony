@@ -50,7 +50,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.zktony.android.R
 import com.zktony.android.data.ProgramQuery
-import com.zktony.android.data.defaults.defaultProgramQuery
 import com.zktony.android.utils.extra.size
 import kotlinx.coroutines.launch
 import java.io.File
@@ -594,46 +593,33 @@ fun ProgramQueryDialog(
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.End
             ) {
-                Button(
-                    onClick = {
-                        onQuery(defaultProgramQuery())
-                    }
+                OutlinedButton(
+                    modifier = Modifier.padding(end = 16.dp),
+                    onClick = { onDismiss() }
                 ) {
                     Text(
-                        text = "重置",
+                        text = "取消",
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
 
-                Row {
-                    OutlinedButton(
-                        modifier = Modifier.padding(end = 16.dp),
-                        onClick = { onDismiss() }
-                    ) {
-                        Text(
-                            text = "取消",
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                    }
-
-                    Button(
-                        onClick = {
-                            onQuery(
-                                ProgramQuery(
-                                    name = name,
-                                    startTime = dateRangePickerState.selectedStartDateMillis,
-                                    endTime = dateRangePickerState.selectedEndDateMillis
-                                )
+                Button(
+                    onClick = {
+                        onQuery(
+                            ProgramQuery(
+                                name = name,
+                                startTime = dateRangePickerState.selectedStartDateMillis,
+                                endTime = dateRangePickerState.selectedEndDateMillis
                             )
-                        }
-                    ) {
-                        Text(
-                            text = "搜索",
-                            style = MaterialTheme.typography.bodyLarge
                         )
                     }
+                ) {
+                    Text(
+                        text = "搜索",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                 }
             }
         }

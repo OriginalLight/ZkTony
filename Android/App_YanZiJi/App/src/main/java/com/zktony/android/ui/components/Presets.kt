@@ -24,12 +24,7 @@ fun Presets(content: @Composable () -> Unit) {
     context.setLanguage(dataSaver.readData(Constants.LANGUAGE, Constants.DEFAULT_LANGUAGE))
 
     // 提示音
-    SoundUtils.with(
-        dataSaver.readData(
-            Constants.SOUND,
-            Constants.DEFAULT_SOUND
-        )
-    )
+    SoundUtils.with(dataSaver.readData(Constants.SOUND, Constants.DEFAULT_SOUND))
 
     // P/N参数
     ProductUtils.with(dataSaver.readData(Constants.PN, Constants.DEFAULT_PN))

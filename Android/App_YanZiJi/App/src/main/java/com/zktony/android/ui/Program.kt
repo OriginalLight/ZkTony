@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -55,7 +56,9 @@ import com.zktony.android.ui.viewmodel.ProgramViewModel
 import com.zktony.android.utils.extra.dateFormat
 import com.zktony.android.utils.extra.itemsEqual
 import com.zktony.room.entities.Program
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 @Composable
@@ -71,7 +74,7 @@ fun ProgramView(viewModel: ProgramViewModel = hiltViewModel()) {
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         // 顶部导航栏
-        ProgramTopBar(viewModel = viewModel, selected = selected)
+        ProgramTopBar(viewModel = viewModel, selected = selected, entities = entities)
         // 列表
         ProgramListView(entities = entities, selected = selected, viewModel = viewModel)
     }
@@ -81,7 +84,8 @@ fun ProgramView(viewModel: ProgramViewModel = hiltViewModel()) {
 @Composable
 fun ProgramTopBar(
     modifier: Modifier = Modifier,
-    selected: List<Program>,
+    selected: List<Long>,
+    entities: LazyPagingItems<Program>,
     viewModel: ProgramViewModel
 ) {
     val scope = rememberCoroutineScope()
@@ -99,7 +103,9 @@ fun ProgramTopBar(
             scope.launch {
                 loadingImport = true
                 showFileChoice = false
-                viewModel.import(file)
+                withContext(Dispatchers.IO) {
+                    viewModel.import(file)
+                }
                 loadingImport = false
             }
         }
@@ -109,7 +115,9 @@ fun ProgramTopBar(
         DeleteDialog(onDismiss = { showDelete = false }) {
             scope.launch {
                 loadingDelete = true
-                viewModel.delete()
+                withContext(Dispatchers.IO) {
+                    viewModel.delete()
+                }
                 loadingDelete = false
             }
         }
@@ -154,7 +162,7 @@ fun ProgramTopBar(
                 onClick = {
                     scope.launch {
                         selected.firstOrNull()?.let {
-                            navigationActions.navigate(Route.PROGRAM_ADD_OR_UPDATE + "/${it.id}")
+                            navigationActions.navigate(Route.PROGRAM_ADD_OR_UPDATE + "/${it}")
                         }
                     }
                 }
@@ -193,7 +201,7 @@ fun ProgramTopBar(
                 onClick = {
                     scope.launch {
                         loadingExport = true
-                        viewModel.export()
+                        viewModel.export(entities.toList().filter { p -> selected.contains(p.id) })
                         loadingExport = false
                     }
                 }
@@ -212,30 +220,28 @@ fun ProgramTopBar(
 fun ProgramListView(
     modifier: Modifier = Modifier,
     entities: LazyPagingItems<Program>,
-    selected: List<Program>,
+    selected: List<Long>,
     viewModel: ProgramViewModel
 ) {
     Column(
         modifier = modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .background(
                 color = MaterialTheme.colorScheme.surface,
                 shape = MaterialTheme.shapes.medium
             )
             .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         if (entities.itemCount > 0) {
             ProgramListHeader(selected = selected, entities = entities) {
                 if (it) {
-                    viewModel.selectAll(entities.toList())
+                    viewModel.selectAll(entities.toList().map { p -> p.id })
                 } else {
                     viewModel.selectAll(emptyList())
                 }
             }
-            LazyColumn(
-                modifier = Modifier.padding(top = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 itemsIndexed(entities) { index, item ->
                     ProgramItem(
                         index = index,
@@ -251,12 +257,13 @@ fun ProgramListView(
     }
 }
 
+// 列表项
 @Composable
 fun ProgramItem(
     modifier: Modifier = Modifier,
     index: Int,
     item: Program,
-    selected: List<Program>,
+    selected: List<Long>,
     viewModel: ProgramViewModel
 ) {
     var expend by remember { mutableStateOf(false) }
@@ -264,11 +271,11 @@ fun ProgramItem(
     Column(
         modifier = modifier
             .background(
-                color = if (selected.contains(item)) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.surfaceVariant,
+                color = if (selected.contains(item.id)) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.surfaceVariant,
                 shape = MaterialTheme.shapes.medium
             )
             .clip(MaterialTheme.shapes.medium)
-            .clickable { viewModel.select(item) }
+            .clickable { viewModel.select(item.id) }
             .padding(horizontal = 8.dp, vertical = 4.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -278,8 +285,8 @@ fun ProgramItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Checkbox(
-                checked = selected.contains(item),
-                onCheckedChange = { viewModel.select(item) })
+                checked = selected.contains(item.id),
+                onCheckedChange = { viewModel.select(item.id) })
 
             listOf(
                 Pair((index + 1).toString(), 1f),
@@ -376,10 +383,11 @@ fun ProgramItem(
     }
 }
 
+// 列表头
 @Composable
 fun ProgramListHeader(
     modifier: Modifier = Modifier,
-    selected: List<Program>,
+    selected: List<Long>,
     entities: LazyPagingItems<Program>,
     onCheckedChange: (Boolean) -> Unit
 ) {
@@ -393,7 +401,7 @@ fun ProgramListHeader(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Checkbox(checked = selected.itemsEqual(entities.toList()), onCheckedChange = {
+        Checkbox(checked = selected.itemsEqual(entities.toList().map { it.id }), onCheckedChange = {
             onCheckedChange(it)
         })
 

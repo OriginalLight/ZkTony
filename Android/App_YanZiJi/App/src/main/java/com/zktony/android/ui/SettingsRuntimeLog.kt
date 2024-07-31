@@ -103,10 +103,15 @@ fun SettingsRuntimeLogTopBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Icon(imageVector = Icons.AutoMirrored.Default.Reply, contentDescription = "Back")
+            Icon(
+                imageVector = Icons.AutoMirrored.Default.Reply,
+                contentDescription = "Back",
+                tint = MaterialTheme.colorScheme.onPrimary
+            )
             Text(
                 text = stringResource(id = R.string.app_runtime_log),
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
 

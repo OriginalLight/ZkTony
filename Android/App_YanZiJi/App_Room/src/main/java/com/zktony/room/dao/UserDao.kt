@@ -13,7 +13,7 @@ abstract class UserDao : BaseDao<User> {
         SELECT * FROM users WHERE name = :name
         """
     )
-    abstract suspend fun getByName(name: String): User?
+    abstract suspend fun getByName(name: String): List<User>
 
     @Query(
         """
@@ -30,4 +30,11 @@ abstract class UserDao : BaseDao<User> {
         """
     )
     abstract fun getByPage(roles: List<String>): PagingSource<Int, User>
+
+    @Query(
+        """
+        DELETE FROM users WHERE id IN (:ids)
+        """
+    )
+    abstract suspend fun deleteByIds(ids: List<Long>): Int
 }

@@ -28,18 +28,19 @@ class LoginViewModel @Inject constructor(
         try {
             val res = userRepository.login(userName, password)
             delay(500L)
-            if (res.isSuccess) {
-                AuthUtils.login(res.getOrNull()!!)
-                LogUtils.info("登录成功：$userName", true)
-                TipsUtils.showTips(Tips.info("欢迎使用 $userName"))
-                return 0
-            } else {
-                LogUtils.info("登录失败：$userName", true)
-                return res.exceptionOrNull()?.message?.toIntOrNull() ?: -1
-            }
+            AuthUtils.login(res)
+            LogUtils.info("登录成功：$userName", true)
+            TipsUtils.showTips(Tips.info("欢迎使用 $userName"))
+            return 0
         } catch (e: Exception) {
-            LogUtils.error("LoginViewModel", e.stackTraceToString(), true)
-            return -1
+            LogUtils.error(e.stackTraceToString(), true)
+            return when (e.message) {
+                "1" -> 1
+                "2" -> 2
+                "3" -> 3
+                "4" -> 4
+                else -> -1
+            }
         }
     }
 }

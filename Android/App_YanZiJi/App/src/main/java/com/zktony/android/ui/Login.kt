@@ -135,8 +135,8 @@ fun LoginForm(
     ) {
         val scope = rememberCoroutineScope()
         val navigationActions = LocalNavigationActions.current
-        var userName by remember { mutableStateOf("") }
-        var password by remember { mutableStateOf("") }
+        var userName by remember { mutableStateOf("zkty") }
+        var password by remember { mutableStateOf("zkty") }
         var loading by remember { mutableStateOf(false) }
         var errorText by remember { mutableStateOf<String?>(null) }
 

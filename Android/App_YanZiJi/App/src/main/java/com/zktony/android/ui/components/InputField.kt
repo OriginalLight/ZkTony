@@ -106,8 +106,6 @@ fun ArgumentsInputField(
     onValueChange: (String) -> Unit
 ) {
 
-    var text by remember { mutableStateOf(value) }
-
     Row(
         modifier = modifier
             .background(MaterialTheme.colorScheme.surface, CircleShape)
@@ -126,10 +124,9 @@ fun ArgumentsInputField(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 8.dp),
-            value = text,
+            value = value,
             onValueChange = {
                 if (it.length <= maxLength) {
-                    text = it
                     onValueChange(it)
                 }
             },
@@ -146,7 +143,7 @@ fun ArgumentsInputField(
             )
         }
 
-        if (showClear && text.isNotEmpty()) {
+        if (showClear && value.isNotEmpty()) {
             Box(
                 modifier = Modifier
                     .size(40.dp)

@@ -95,10 +95,15 @@ fun SettingsDebugPipelineTopBar(
                 .padding(horizontal = 8.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(imageVector = Icons.AutoMirrored.Default.Reply, contentDescription = "Back")
+            Icon(
+                imageVector = Icons.AutoMirrored.Default.Reply,
+                contentDescription = "Back",
+                tint = MaterialTheme.colorScheme.onPrimary
+            )
             Text(
                 text = stringResource(id = R.string.app_pipeline),
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
 

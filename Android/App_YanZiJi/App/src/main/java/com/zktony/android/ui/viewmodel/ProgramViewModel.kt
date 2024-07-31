@@ -36,7 +36,7 @@ class ProgramViewModel @Inject constructor(
     private val programRepository: ProgramRepository
 ) : ViewModel() {
 
-    private val _selected = MutableStateFlow<List<Program>>(emptyList())
+    private val _selected = MutableStateFlow<List<Long>>(emptyList())
     private val _query = MutableStateFlow(defaultProgramQuery())
 
     val selected = _selected.asStateFlow()
@@ -52,18 +52,18 @@ class ProgramViewModel @Inject constructor(
     // 删除
     suspend fun delete() {
         try {
-            val programs = _selected.value
-            if (programs.isEmpty()) {
+            val ids = _selected.value
+            if (ids.isEmpty()) {
                 return
             }
-            withContext(Dispatchers.IO) {
-                val res = programRepository.deleteAll(programs)
-                if (res.isSuccess) {
-                    _selected.value = emptyList()
-                    TipsUtils.showTips(Tips.info("删除成功"))
-                } else {
-                    TipsUtils.showTips(Tips.error("删除失败"))
-                }
+            val res = programRepository.deleteByIds(ids)
+            if (res) {
+                _selected.value = emptyList()
+                TipsUtils.showTips(Tips.info("删除成功"))
+                LogUtils.info("删除成功 $ids", true)
+            } else {
+                TipsUtils.showTips(Tips.error("删除失败"))
+                LogUtils.error("删除失败 $ids", true)
             }
         } catch (e: Exception) {
             LogUtils.error(e.stackTraceToString(), true)
@@ -72,20 +72,20 @@ class ProgramViewModel @Inject constructor(
     }
 
     // 单选
-    fun select(program: Program) {
+    fun select(id: Long) {
         val list = _selected.value.toMutableList()
-        if (list.contains(program)) {
-            list.remove(program)
+        if (list.contains(id)) {
+            list.remove(id)
         } else {
-            list.add(program)
+            list.add(id)
         }
         _selected.value = list
     }
 
     // 全选
-    fun selectAll(list: List<Program>) {
+    fun selectAll(ids: List<Long>) {
         viewModelScope.launch {
-            _selected.value = list
+            _selected.value = ids
         }
     }
 
@@ -138,33 +138,24 @@ class ProgramViewModel @Inject constructor(
                 return
             }
 
-            withContext(Dispatchers.IO) {
-                programs.forEach {
-                    val res = programRepository.insert(it.copy(id = 0L))
-                    if (res.isFailure) {
-                        val message = when (res.exceptionOrNull()?.message) {
-                            "1" -> "程序名重复"
-                            "2" -> "插入数据库失败"
-                            else -> "未知错误"
-                        }
-                        TipsUtils.showTips(Tips.error("导入程序失败 $message"))
-                        return@withContext
-                    }
-                }
-                TipsUtils.showTips(Tips.info("导入程序成功"))
+            programs.forEach {
+                programRepository.insert(it.copy(id = 0L, createTime = System.currentTimeMillis()))
             }
+            TipsUtils.showTips(Tips.info("导入程序成功"))
 
         } catch (e: Exception) {
+            when (e.message) {
+                "1" -> { TipsUtils.showTips(Tips.error("程序名重复")) }
+                else -> { TipsUtils.showTips(Tips.error("未知错误")) }
+            }
             LogUtils.error(e.stackTraceToString(), true)
-            TipsUtils.showTips(Tips.error("导入程序失败"))
         }
     }
 
     // 导出参数
-    suspend fun export() {
+    suspend fun export(pl: List<Program>) {
         try {
-            val selected = _selected.value
-            if (selected.isEmpty()) {
+            if (pl.isEmpty()) {
                 return
             }
 
@@ -179,7 +170,7 @@ class ProgramViewModel @Inject constructor(
                 File(dstDir).mkdirs()
             }
 
-            val json = JsonUtils.toJson(selected)
+            val json = JsonUtils.toJson(pl)
             val fileName = System.currentTimeMillis().dateFormat("yyyyMMddHHmmss") + ".json"
 
             withContext(Dispatchers.IO) {

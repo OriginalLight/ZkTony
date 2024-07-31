@@ -120,25 +120,49 @@ class SettingsViewModel @Inject constructor(
 
     // 密码验证
     suspend fun verifyPassword(oldPassword: String): Boolean {
-        val res = userRepository.verifyPassword(AuthUtils.getIdentity(), oldPassword)
-        delay(300L)
-        if (res.isSuccess) {
-            return res.getOrNull() ?: false
+        try {
+            val res = userRepository.verifyPassword(AuthUtils.getIdentity(), oldPassword)
+            delay(300L)
+            if (res) {
+                TipsUtils.showTips(Tips.info("密码验证成功"))
+                LogUtils.info("密码验证成功", true)
+                return true
+            } else {
+                TipsUtils.showTips(Tips.error("密码验证失败"))
+                LogUtils.error("密码验证失败", true)
+            }
+        } catch (e: Exception) {
+            when (e.message) {
+                "1" -> { TipsUtils.showTips(Tips.error("用户不存在")) }
+                else -> { TipsUtils.showTips(Tips.error("未知错误")) }
+            }
+            LogUtils.error(e.stackTraceToString(), true)
         }
+
         return false
     }
 
     // 修改密码
     suspend fun modifyPassword(newPassword: String): Boolean {
-        val res = userRepository.modifyPassword(AuthUtils.getIdentity(), newPassword)
-        delay(300L)
-        if (res.isSuccess) {
-            TipsUtils.showTips(Tips.info("密码修改成功"))
-            LogUtils.info("密码修改成功", true)
-            return res.getOrNull() != null
+        try {
+            val res = userRepository.modifyPassword(AuthUtils.getIdentity(), newPassword)
+            delay(300L)
+            if (res) {
+                TipsUtils.showTips(Tips.info("密码修改成功"))
+                LogUtils.info("密码修改成功", true)
+                return true
+            } else {
+                TipsUtils.showTips(Tips.error("密码修改失败"))
+                LogUtils.error("密码修改失败", true)
+            }
+        } catch (e: Exception) {
+            when (e.message) {
+                "1" -> { TipsUtils.showTips(Tips.error("用户不存在")) }
+                else -> { TipsUtils.showTips(Tips.error("未知错误")) }
+            }
+            LogUtils.error(e.stackTraceToString(), true)
         }
-        TipsUtils.showTips(Tips.error("密码修改失败"))
-        LogUtils.error("密码修改失败", true)
+
         return false
     }
 }

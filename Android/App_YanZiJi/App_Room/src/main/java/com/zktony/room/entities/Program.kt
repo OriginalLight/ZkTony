@@ -18,7 +18,7 @@ data class Program(
     // 实验类型
     val experimentalType: Int = 0,
     // 工作模式
-    val workMode: Int = 1,
+    val workMode: Int = 0,
     // 值
     val value: String,
     // 流速
@@ -41,12 +41,17 @@ data class Program(
     val createTime: Long = System.currentTimeMillis()
 ) {
     fun getGlueConcentrationStr(): String {
-        if (glueType == 0) {
-            return "$glueConcentration%"
+        val list = glueConcentration.split(",")
+        return if (glueType == 0) {
+            "${list.getOrNull(0) ?: "0"}%"
         } else {
-            val list = glueConcentration.split(",")
-            return "${list.getOrNull(0) ?: "0"}% - ${list.getOrNull(1) ?: "0"}%"
+            "${list.getOrNull(0) ?: "0"}% - ${list.getOrNull(1) ?: "0"}%"
         }
+    }
+
+    fun getGlueConcentrationList(): List<String> {
+        val list = glueConcentration.split(",")
+        return listOf(list.getOrNull(0) ?: "0", list.getOrNull(1) ?: "0")
     }
 
     fun canSave(): Boolean {

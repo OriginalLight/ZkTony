@@ -18,6 +18,10 @@ val zktyBrush = Brush.linearGradient(
     colors = listOf(zktyGreen, zktyBlue)
 )
 
+val zktyHorizontalBrush = Brush.horizontalGradient(
+    colors = listOf(zktyGreen, zktyBlue)
+)
+
 @Preview
 @Composable
 fun PreviewColorUtils() {
@@ -26,6 +30,19 @@ fun PreviewColorUtils() {
             modifier = Modifier
                 .size(200.dp)
                 .background(brush = zktyBrush)
+        ) {
+        }
+    }
+}
+
+@Preview
+@Composable
+fun PreviewHorizontalBrush() {
+    MaterialTheme {
+        Box(
+            modifier = Modifier
+                .size(200.dp)
+                .background(brush = zktyHorizontalBrush)
         ) {
         }
     }
