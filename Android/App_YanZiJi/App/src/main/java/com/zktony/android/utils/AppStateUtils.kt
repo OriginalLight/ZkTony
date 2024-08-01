@@ -2,6 +2,9 @@ package com.zktony.android.utils
 
 import com.zktony.android.data.Arguments
 import com.zktony.android.data.ChannelState
+import com.zktony.android.data.ExperimentalState
+import com.zktony.room.defaults.defaultProgram
+import com.zktony.room.entities.Program
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -27,10 +30,16 @@ object AppStateUtils {
         MutableStateFlow(List(ProductUtils.MAX_CHANNEL_COUNT) { Arguments() })
     private val _channelStateList =
         MutableStateFlow(List(ProductUtils.MAX_CHANNEL_COUNT) { ChannelState() })
+    private val _channelProgramList =
+        MutableStateFlow(List(ProductUtils.MAX_CHANNEL_COUNT) { defaultProgram() })
+    private val _experimentalStateList =
+        MutableStateFlow(List(ProductUtils.MAX_CHANNEL_COUNT) { ExperimentalState.NONE })
 
     // stateFlow
     val argumentsList = _argumentsList.asStateFlow()
     val channelStateList = _channelStateList.asStateFlow()
+    val channelProgramList = _channelProgramList.asStateFlow()
+    val experimentalStateList = _experimentalStateList.asStateFlow()
 
     init {
         // 通道状态轮询
@@ -65,5 +74,26 @@ object AppStateUtils {
 
     fun setChannelStateList(channelStateList: List<ChannelState>) {
         _channelStateList.value = channelStateList
+    }
+
+    fun setChannelProgramList(channelProgramList: List<Program>) {
+        _channelProgramList.value = channelProgramList
+    }
+
+    fun setExperimentalStateHook(channel: Int, state: ChannelState) {
+        // 未插入状态
+        if (state.opto1 == 0 && state.opto2 == 0) {
+            _experimentalStateList.value =
+                _experimentalStateList.value.mapIndexed { index, experimentalState ->
+                    if (index == channel) {
+                        ExperimentalState.NONE
+                    } else {
+                        experimentalState
+                    }
+                }
+            return
+        }
+
+
     }
 }

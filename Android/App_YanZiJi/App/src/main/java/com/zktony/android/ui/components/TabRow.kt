@@ -31,7 +31,7 @@ fun SegmentedButtonTabRow(
             .height(40.dp)
             .clip(CircleShape),
         selectedTabIndex = selected,
-        containerColor = MaterialTheme.colorScheme.primaryContainer,
+        containerColor = MaterialTheme.colorScheme.surface,
         indicator = { Box {} },
         divider = { }
     ) {
@@ -39,14 +39,14 @@ fun SegmentedButtonTabRow(
             Tab(
                 modifier = Modifier
                     .clip(CircleShape)
-                    .background(if (selected == index) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primaryContainer),
+                    .background(if (selected == index) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface),
                 selected = selected == index,
                 onClick = { onClick(index) }
             ) {
                 Text(
                     modifier = Modifier.padding(vertical = 12.dp),
                     text = s,
-                    color = if (selected == index) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onPrimaryContainer,
+                    color = if (selected == index) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.bodyLarge
                 )
             }

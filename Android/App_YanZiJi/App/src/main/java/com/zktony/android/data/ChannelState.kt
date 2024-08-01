@@ -4,6 +4,7 @@ import com.zktony.log.LogUtils
 import com.zktony.serialport.ext.readInt16LE
 import com.zktony.serialport.ext.readInt32LE
 import com.zktony.serialport.ext.readInt8
+import com.zktony.serialport.ext.toHexString
 import java.math.RoundingMode
 
 data class ChannelState(
@@ -39,7 +40,7 @@ data class ChannelState(
 
 fun toChannelState(byteArray: ByteArray): ChannelState? {
     try {
-        if (byteArray.size != 21) throw Exception("ChannelState 长度不正确")
+        if (byteArray.size != 21) throw Exception("ChannelState 长度不正确 ${byteArray.toHexString()}")
         val voltage = byteArray.readInt16LE(7).toBigDecimal().divide(100.toBigDecimal())
         val current = byteArray.readInt16LE(9).toBigDecimal().divide(100.toBigDecimal())
         return ChannelState(

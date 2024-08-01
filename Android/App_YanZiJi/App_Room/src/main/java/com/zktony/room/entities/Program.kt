@@ -62,4 +62,18 @@ data class Program(
 
         return bool
     }
+
+    fun canStart(): Boolean {
+        val bool = value.isNotEmpty() && time.isNotEmpty()
+        if (experimentalType == 0) {
+            return bool && flowSpeed.isNotEmpty()
+        }
+
+        return bool
+    }
+
+    fun getTimeSeconds(): Int {
+        val min = time.toDoubleOrNull() ?: 0.0
+        return (min * 60).toInt()
+    }
 }

@@ -133,8 +133,13 @@ class SettingsViewModel @Inject constructor(
             }
         } catch (e: Exception) {
             when (e.message) {
-                "1" -> { TipsUtils.showTips(Tips.error("用户不存在")) }
-                else -> { TipsUtils.showTips(Tips.error("未知错误")) }
+                "1" -> {
+                    TipsUtils.showTips(Tips.error("用户不存在"))
+                }
+
+                else -> {
+                    TipsUtils.showTips(Tips.error("未知错误"))
+                }
             }
             LogUtils.error(e.stackTraceToString(), true)
         }
@@ -157,8 +162,13 @@ class SettingsViewModel @Inject constructor(
             }
         } catch (e: Exception) {
             when (e.message) {
-                "1" -> { TipsUtils.showTips(Tips.error("用户不存在")) }
-                else -> { TipsUtils.showTips(Tips.error("未知错误")) }
+                "1" -> {
+                    TipsUtils.showTips(Tips.error("用户不存在"))
+                }
+
+                else -> {
+                    TipsUtils.showTips(Tips.error("未知错误"))
+                }
             }
             LogUtils.error(e.stackTraceToString(), true)
         }

@@ -79,9 +79,9 @@ data class ZktyProtocol(
                     target = byteArray[2],
                     func = byteArray[3],
                     len = byteArray.copyOfRange(4, 6),
-                    data = byteArray.copyOfRange(6, byteArray.size - 6),
-                    crc = byteArray.copyOfRange(byteArray.size - 6, byteArray.size - 4),
-                    end = byteArray.copyOfRange(byteArray.size - 4, byteArray.size)
+                    data = byteArray.copyOfRange(6, byteArray.size - 4),
+                    crc = byteArray.copyOfRange(byteArray.size - 4, byteArray.size - 2),
+                    end = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
                 )
             } catch (e: Exception) {
                 throw Exception("to Protocol error by ${byteArray.toHexString()}")

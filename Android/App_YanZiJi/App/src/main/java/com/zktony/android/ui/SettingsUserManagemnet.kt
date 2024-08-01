@@ -27,7 +27,6 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.R
 import com.zktony.android.ui.navigation.NavigationActions
-import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.zktyBrush
@@ -39,7 +38,7 @@ fun SettingsUserManagementView(viewModel: SettingsUserManagementViewModel = hilt
     val navigationActions = LocalNavigationActions.current
 
     BackHandler {
-        navigationActions.navigate(Route.SETTINGS)
+        navigationActions.navigateUp()
     }
 
     val entities = viewModel.entities.collectAsLazyPagingItems()

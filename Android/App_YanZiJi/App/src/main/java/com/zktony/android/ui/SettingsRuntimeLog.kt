@@ -38,7 +38,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zktony.android.R
 import com.zktony.android.ui.components.IconLoading
 import com.zktony.android.ui.navigation.NavigationActions
-import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.zktyBrush
 import com.zktony.android.ui.viewmodel.SettingsRuntimeLogViewModel
@@ -51,7 +50,7 @@ fun SettingsRuntimeLogView(viewModel: SettingsRuntimeLogViewModel = hiltViewMode
     val navigationActions = LocalNavigationActions.current
 
     BackHandler {
-        navigationActions.navigate(Route.SETTINGS)
+        navigationActions.navigateUp()
     }
 
     val fileList by viewModel.fileList.collectAsStateWithLifecycle()

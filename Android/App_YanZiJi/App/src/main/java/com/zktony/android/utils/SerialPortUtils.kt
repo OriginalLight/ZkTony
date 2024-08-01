@@ -448,6 +448,7 @@ object SerialPortUtils {
             val ba = query(target, "QueryChannelState", 0x40.toByte(), byteArrayOf(), 100)
             if (ba != null) {
                 toChannelState(ba)?.let { channelState ->
+                    AppStateUtils.setExperimentalStateHook(target, channelState)
                     AppStateUtils.setChannelStateList(AppStateUtils.channelStateList.value.mapIndexed { index, state ->
                         if (index == target) {
                             channelState

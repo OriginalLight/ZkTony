@@ -42,7 +42,6 @@ import com.zktony.android.ui.components.ArgumentsInputField
 import com.zktony.android.ui.components.ButtonLoading
 import com.zktony.android.ui.components.SegmentedButtonTabRow
 import com.zktony.android.ui.navigation.NavigationActions
-import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.zktyBrush
 import com.zktony.android.ui.viewmodel.SettingsDebugExperimentalViewModel
@@ -55,7 +54,7 @@ fun SettingsDebugExperimentalView(viewModel: SettingsDebugExperimentalViewModel 
     val navigationActions = LocalNavigationActions.current
 
     BackHandler {
-        navigationActions.navigate(Route.SETTINGS)
+        navigationActions.navigateUp()
     }
 
     var channel by remember { mutableIntStateOf(0) }

@@ -145,8 +145,13 @@ class ProgramViewModel @Inject constructor(
 
         } catch (e: Exception) {
             when (e.message) {
-                "1" -> { TipsUtils.showTips(Tips.error("程序名重复")) }
-                else -> { TipsUtils.showTips(Tips.error("未知错误")) }
+                "1" -> {
+                    TipsUtils.showTips(Tips.error("程序名重复"))
+                }
+
+                else -> {
+                    TipsUtils.showTips(Tips.error("未知错误"))
+                }
             }
             LogUtils.error(e.stackTraceToString(), true)
         }

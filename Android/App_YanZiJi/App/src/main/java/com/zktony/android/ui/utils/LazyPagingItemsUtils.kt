@@ -73,3 +73,6 @@ fun <T : Any> LazyGridScope.itemsIndexed(
 }
 
 fun <T : Any> LazyPagingItems<T>.toList() = this.itemSnapshotList.items
+
+fun <T : Any> LazyPagingItems<T>.filter(predicate: (T) -> Boolean) =
+    this.itemSnapshotList.items.filter(predicate)

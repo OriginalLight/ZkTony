@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zktony.android.R
 import com.zktony.android.ui.navigation.NavigationActions
-import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.zktyBrush
 import com.zktony.android.ui.viewmodel.SettingsFqcViewModel
@@ -33,7 +32,7 @@ fun SettingsFqcView(viewModel: SettingsFqcViewModel = hiltViewModel()) {
     val navigationActions = LocalNavigationActions.current
 
     BackHandler {
-        navigationActions.navigate(Route.SETTINGS)
+        navigationActions.navigateUp()
     }
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {

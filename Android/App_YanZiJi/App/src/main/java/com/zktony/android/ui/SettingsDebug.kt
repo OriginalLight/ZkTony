@@ -35,7 +35,7 @@ fun SettingsDebugView(viewModel: SettingsDebugViewModel = hiltViewModel()) {
     val navigationActions = LocalNavigationActions.current
 
     BackHandler {
-        navigationActions.navigate(Route.SETTINGS)
+        navigationActions.navigateUp()
     }
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {

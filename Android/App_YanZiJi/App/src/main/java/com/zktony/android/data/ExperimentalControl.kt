@@ -1,5 +1,6 @@
 package com.zktony.android.data
 
+import com.zktony.room.entities.Program
 import com.zktony.serialport.ext.writeInt16LE
 import com.zktony.serialport.ext.writeInt8
 
@@ -33,4 +34,21 @@ data class ExperimentalControl(
         byteArray.writeInt16LE(temperature.toBigDecimal().multiply(100.toBigDecimal()).toInt(), 12)
         return byteArray
     }
+
+    companion object {
+        fun fromProgram(program: Program): ExperimentalControl {
+            return ExperimentalControl(
+                type = program.experimentalType,
+                mode = program.workMode,
+                speed = program.flowSpeed,
+                time = program.time.toBigDecimal().multiply(60.toBigDecimal()).stripTrailingZeros()
+                    .toPlainString(),
+                voltage = program.value,
+                current = program.value,
+                power = program.value,
+                temperature = program.value
+            )
+        }
+    }
+
 }

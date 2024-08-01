@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -102,13 +103,15 @@ fun ArgumentsInputField(
     prefix: String? = null,
     suffix: String? = null,
     value: String,
+    shape: Shape = CircleShape,
+    textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
     keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
     onValueChange: (String) -> Unit
 ) {
 
     Row(
         modifier = modifier
-            .background(MaterialTheme.colorScheme.surface, CircleShape)
+            .background(MaterialTheme.colorScheme.surface, shape)
             .padding(4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -131,7 +134,7 @@ fun ArgumentsInputField(
                 }
             },
             singleLine = true,
-            textStyle = MaterialTheme.typography.bodyLarge,
+            textStyle = textStyle,
             keyboardOptions = keyboardOptions
         )
 
