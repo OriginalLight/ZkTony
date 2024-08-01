@@ -169,15 +169,17 @@ class HomeViewModel @Inject constructor(
 
     private val coagulantStart = MutableStateFlow(0L)
 
-
-    private var syringeJob: Job? = null
+    /**
+     * 正常流程状态显示：预排中（加三个点）---制胶中（加三个点）--准备冲洗（不加三个点）--冲洗中（加三个点）
+     * 手动停止流程状态显示：点击开始制胶后，显示预排中，在后续的任一阶段，点击停止，状态显示“已中止（不加三个点）”
+     */
+    private val _scheduleState = MutableStateFlow("")
 
     val selected = _selected.asStateFlow()
     val selectedER = _selectedER.asStateFlow()
     val page = _page.asStateFlow()
     val uiFlags = _uiFlags.asStateFlow()
     val job = _job.asStateFlow()
-    val job2 = _job2.asStateFlow()
     val complate = _complate.asStateFlow()
     val progress = _progress.asStateFlow()
     val calculate = _calculate.asStateFlow()
@@ -195,6 +197,7 @@ class HomeViewModel @Inject constructor(
     val heartbeatError = _heartbeatError.asStateFlow()
     val initHintDialog = _initHintDialog.asStateFlow()
     val erCount = _erCount.asStateFlow()
+    val scheduleState = _scheduleState.asStateFlow()
 
 
     /**
@@ -2327,7 +2330,7 @@ class HomeViewModel @Inject constructor(
                 }
             }
 
-
+            _scheduleState.value = ""
 
             _waitTimeRinseJob.value?.cancel()
             _waitTimeRinseJob.value = null
@@ -2817,7 +2820,7 @@ class HomeViewModel @Inject constructor(
             _job.value?.cancel()
             _job.value = launch {
                 try {
-
+                    _progress.value = 0f
                     launch {
                         var startTime = 0
                         val guleTimeToInt = ceil(guleTime) + 30
@@ -2829,8 +2832,6 @@ class HomeViewModel @Inject constructor(
                                     erDao.getById(_selectedER.value).firstOrNull()
                                 val countER = erDao.count()
                                 val modelsThickness = dataStore.readData("modelsThickness", "G1520")
-                                println("modelsThickness====$modelsThickness")
-                                println("countER====$countER")
                                 if (modelsThickness == "G1500") {
                                     if (countER < 100) {
                                         if (experimentRecord != null) {
@@ -2908,7 +2909,7 @@ class HomeViewModel @Inject constructor(
 
 
                     //===================废液槽运动开始=====================
-                    _uiFlags.value = UiFlags.objects(101)
+                    _scheduleState.value = "预排中"
                     logInfo(
                         "HomeViewModel_startJob",
                         "===废液槽运动开始==="
@@ -3033,7 +3034,7 @@ class HomeViewModel @Inject constructor(
                         "===制胶位置移动开始==="
                     )
                     //制胶位置
-                    _uiFlags.value = UiFlags.objects(102)
+                    _scheduleState.value = "制胶中"
                     start {
                         timeOut = 1000L * 60L
 //                        with(index = 0, pdv = glueBoardPosition)
@@ -3145,7 +3146,7 @@ class HomeViewModel @Inject constructor(
                         "HomeViewModel_startJob",
                         "x轴复位，防止x轴运动偏移位置，复位开始"
                     )
-                    _uiFlags.value = UiFlags.objects(103)
+                    _scheduleState.value = "准备冲洗"
                     start {
                         timeOut = 1000L * 30
                         with(
@@ -3174,7 +3175,6 @@ class HomeViewModel @Inject constructor(
                      */
                     val rinseP = pulse(index = 4, dvp = setting.rinseCleanVolume * 1000)
                     //制胶进度归0
-                    _progress.value = 0f
                     start {
                         exceptionPolicy = ExceptionPolicy.SKIP
                         timeOut = 1000L * 60L
@@ -3184,7 +3184,7 @@ class HomeViewModel @Inject constructor(
                             pdv = setting.wastePosition
                         )
                     }
-
+                    _scheduleState.value = "冲洗中"
                     //测算使用时间
                     startTime = Calendar.getInstance().timeInMillis
                     delay(100)
@@ -3284,6 +3284,7 @@ class HomeViewModel @Inject constructor(
                     ApplicationUtils.ctx.playAudio(R.raw.error_buzz)
                     ex.printStackTrace()
                 } finally {
+                    _scheduleState.value = ""
                     _job.value?.cancel()
                     _job.value = null
                 }
@@ -3296,12 +3297,10 @@ class HomeViewModel @Inject constructor(
      * 全部制胶运动完成
      */
     private fun moveCom(startNum: Int) {
-
-        /**
-         * 制胶运动全部完成
-         */
         viewModelScope.launch {
             _uiFlags.value = UiFlags.objects(12)
+            println("全部结束了啦啦啦啦啦啦啦啦啦")
+            _scheduleState.value = "准备冲洗"
             _job2.value?.cancel()
             _job2.value = null
             _hintJob.value?.cancel()
@@ -3317,8 +3316,6 @@ class HomeViewModel @Inject constructor(
             val selectRudio = dataStore.readData("selectRudio", 1)
             val countER = erDao.count()
             val modelsThickness = dataStore.readData("modelsThickness", "G1520")
-            println("modelsThickness====$modelsThickness")
-            println("countER====$countER")
             if (selectedER != null) {
                 if (startNum == 1) {
                     if (modelsThickness == "G1500") {
@@ -3340,6 +3337,8 @@ class HomeViewModel @Inject constructor(
                             erDao.update(selectedER)
                         }
                     }
+
+                    _scheduleState.value = "已完成"
 
                 } else {
                     if (modelsThickness == "G1500") {
@@ -3366,6 +3365,49 @@ class HomeViewModel @Inject constructor(
                     }
 
 
+                    val rinseSpeed = dataStore.readData("rinseSpeed", 600L)
+
+
+                    val wastePosition = setting.wastePosition
+
+                    /**
+                     * x轴转速
+                     */
+                    val xSpeed = dataStore.readData("xSpeed", 100L)
+
+                    start {
+                        timeOut = 1000L * 60L * 10
+                        with(
+
+                            index = 0,
+                            pdv = wastePosition,
+                            ads = Triple(xSpeed * 20, xSpeed * 20, xSpeed * 20),
+                        )
+                    }
+
+                    start {
+                        timeOut = 1000L * 60L
+                        with(
+                            index = 1,
+                            ads = Triple(rinseSpeed * 13, rinseSpeed * 1193, rinseSpeed * 1193),
+                            pdv = -coagulantStart.value
+                        )
+                    }
+
+                    _scheduleState.value = "冲洗中"
+
+                    start {
+                        timeOut = 1000L * 60L
+                        with(
+                            index = 4,
+                            ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
+                            pdv = setting.rinseCleanVolume * 1000
+                        )
+                    }
+
+
+                    _scheduleState.value = "已中止"
+
                     if (selectRudio == 1) {
 
                     } else if (selectRudio == 2) {
@@ -3375,42 +3417,15 @@ class HomeViewModel @Inject constructor(
 
             }
 
-
-            val rinseSpeed = dataStore.readData("rinseSpeed", 600L)
-
-            logInfo(
-                "moveCom",
-                "===停止运动的柱塞泵步数===${coagulantStart.value}"
-            )
-
-            start {
-                timeOut = 1000L * 60L
-                with(
-                    index = 1,
-                    ads = Triple(rinseSpeed * 13, rinseSpeed * 1193, rinseSpeed * 1193),
-                    pdv = -coagulantStart.value
-                )
-            }
-
-            start {
-                timeOut = 1000L * 60L
-                with(
-                    index = 4,
-                    ads = Triple(rinseSpeed * 30, rinseSpeed * 30, rinseSpeed * 30),
-                    pdv = setting.rinseCleanVolume * 1000
-                )
-            }
             lightGreed()
             _uiFlags.value = UiFlags.none()
-            delay(200)
-
-
         }
 
     }
 
     private fun stopJob() {
         viewModelScope.launch {
+
             _waitTimeRinseJob.value?.cancel()
             _waitTimeRinseJob.value = null
             _waitTimeRinseNum.value = 0
@@ -3427,15 +3442,11 @@ class HomeViewModel @Inject constructor(
 
 
 
-
             lightFlashYellow()
-
 
             val selectedER = erDao.getById(_selectedER.value).firstOrNull()
             val countER = erDao.count()
             val modelsThickness = dataStore.readData("modelsThickness", "G1520")
-            println("modelsThickness====$modelsThickness")
-            println("countER====$countER")
             if (modelsThickness == "G1500") {
                 if (countER < 100) {
                     if (selectedER != null) {
@@ -3474,7 +3485,7 @@ class HomeViewModel @Inject constructor(
             } else if (selectRudio == 2) {
                 ApplicationUtils.ctx.playAudio(R.raw.startstop_voice)
             }
-            _uiFlags.value = UiFlags.objects(1)
+
 
             delay(200L)
             stop(0, 1, 2, 3, 4)
@@ -3482,7 +3493,8 @@ class HomeViewModel @Inject constructor(
 
 
             try {
-                delay(500)
+                _scheduleState.value = "准备冲洗"
+                println("停止之后的===${_scheduleState.value}")
                 val selectRudio = dataStore.readData("selectRudio", 1)
                 if (selectRudio == 1) {
 
@@ -3511,7 +3523,7 @@ class HomeViewModel @Inject constructor(
                  */
                 val coagulantResetPulse = dataStore.readData("coagulantResetPulse", 1500).toLong()
 
-
+                _uiFlags.value = UiFlags.objects(1)
                 withTimeout(60 * 1000L) {
                     /**
                      * 0-x轴    3200/圈    0号光电-复位光电；1号光电-限位光电
@@ -3855,12 +3867,32 @@ class HomeViewModel @Inject constructor(
                     }
 
                 }
+
                 delay(200L)
                 val slEnetity = slDao.getById(1L).firstOrNull()
                 if (slEnetity != null) {
                     val rinseCleanVolume = slEnetity.rinseCleanVolume
                     _wasteprogress.value += (rinseCleanVolume / 150).toFloat()
 
+                    val wastePosition = slEnetity.wastePosition
+
+                    /**
+                     * x轴转速
+                     */
+                    val xSpeed = dataStore.readData("xSpeed", 100L)
+
+                    start {
+                        timeOut = 1000L * 60L * 10
+                        with(
+
+                            index = 0,
+                            pdv = wastePosition,
+                            ads = Triple(xSpeed * 20, xSpeed * 20, xSpeed * 20),
+                        )
+                    }
+
+
+                    _scheduleState.value = "冲洗中"
                     /**
                      * 冲洗转速
                      */
@@ -3885,6 +3917,8 @@ class HomeViewModel @Inject constructor(
                 delay(100)
                 ApplicationUtils.ctx.playAudio(R.raw.error_buzz)
                 _uiFlags.value = UiFlags.message("复位超时请重试")
+            } finally {
+                _scheduleState.value = "已中止"
             }
 
         }

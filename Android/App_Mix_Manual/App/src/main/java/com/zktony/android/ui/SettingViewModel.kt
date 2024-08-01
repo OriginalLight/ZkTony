@@ -23,6 +23,7 @@ import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.dao.SettingDao
 import com.zktony.android.data.dao.SportsLogDao
 import com.zktony.android.data.datastore.DataSaverDataStore
+import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.Motor
 import com.zktony.android.data.entities.NewCalibration
 import com.zktony.android.data.entities.Program
@@ -338,12 +339,193 @@ class SettingViewModel @Inject constructor(
                 ApplicationUtils.ctx.startActivity(intent)
             }
 
-            is SettingIntent.CopyFileToUSB -> copyFileToUSB(intent.context, intent.usbPath)
+            is SettingIntent.CopyFileToUSB -> copyFileToUSB(intent.usbPath)
+
+            is SettingIntent.FillCoagulant ->viewModelScope.launch {
+                val coagulantFill=  intent.coagulantVol
+                /**
+                 * 促凝剂总行程
+                 */
+                val coagulantpulse = dataStore.readData("coagulantpulse", 550000).toLong()
+
+                /**
+                 * 复位后预排步数
+                 */
+                val coagulantResetPulse =
+                    dataStore.readData("coagulantResetPulse", 1500).toLong()
+
+
+                /**
+                 * 促凝剂转速
+                 */
+                val coagulantSpeed = dataStore.readData("coagulantSpeed", 200L)
+
+
+
+                val p1jz = (AppStateUtils.hpc[1] ?: { x -> x * 100 }).invoke(1.0)
+                var p1 = ( coagulantFill * 1000  * p1jz).toLong()
+
+
+                val p1Count = p1.toDouble() / (coagulantpulse - 50000)
+
+                //向下取整
+                val count = floor(p1Count).toInt()
+
+                val qyu = p1 % (coagulantpulse - 50000)
+
+
+                for (i in 1..count) {
+                    if (i == 1) {
+                        start {
+                            timeOut = 1000L * 60L * 10
+                            with(
+                                index = 1,
+                                ads = Triple(
+                                    coagulantSpeed * 13,
+                                    coagulantSpeed * 1193,
+                                    coagulantSpeed * 1193
+                                ),
+                                pdv = coagulantpulse - 50000
+                            )
+                        }
+                        delay(1000L)
+                        start {
+                            timeOut = 1000L * 60L * 10
+                            with(
+                                index = 1,
+                                ads = Triple(
+                                    coagulantSpeed * 13,
+                                    coagulantSpeed * 1193,
+                                    coagulantSpeed * 1193
+                                ),
+                                pdv = -(coagulantpulse - 50000 + coagulantResetPulse)
+                            )
+                        }
+                        delay(1000L)
+                    } else {
+                        start {
+                            timeOut = 1000L * 60L * 10
+                            with(
+                                index = 1,
+                                ads = Triple(
+                                    coagulantSpeed * 13,
+                                    coagulantSpeed * 1193,
+                                    coagulantSpeed * 1193
+                                ),
+                                pdv = (coagulantpulse - 50000)
+                            )
+                        }
+                        delay(1000L)
+                        start {
+                            timeOut = 1000L * 60L * 10
+                            with(
+                                index = 1,
+                                ads = Triple(
+                                    coagulantSpeed * 13,
+                                    coagulantSpeed * 1193,
+                                    coagulantSpeed * 1193
+                                ),
+                                pdv = -(coagulantpulse - 50000)
+                            )
+                        }
+                        delay(1000L)
+                    }
+                }
+
+                if (count == 0) {
+                    //没有进上面的循环
+                    start {
+                        timeOut = 1000L * 60L * 10
+                        with(
+                            index = 1,
+                            ads = Triple(
+                                coagulantSpeed * 13,
+                                coagulantSpeed * 1193,
+                                coagulantSpeed * 1193
+                            ),
+                            pdv = qyu
+                        )
+                    }
+                    delay(1000L)
+                    start {
+                        timeOut = 1000L * 60L * 10
+                        with(
+                            index = 1,
+                            ads = Triple(
+                                coagulantSpeed * 13,
+                                coagulantSpeed * 1193,
+                                coagulantSpeed * 1193
+                            ),
+                            pdv = -(qyu + coagulantResetPulse)
+                        )
+                    }
+                    delay(1000L)
+
+                    start {
+                        timeOut = 1000L * 60L * 10
+                        with(
+                            index = 1,
+                            ads = Triple(
+                                coagulantSpeed * 13,
+                                coagulantSpeed * 1193,
+                                coagulantSpeed * 1193
+                            ),
+                            pdv = coagulantResetPulse
+                        )
+                    }
+                    delay(1000L)
+
+                } else {
+                    //进入上面的循环
+                    start {
+                        timeOut = 1000L * 60L * 10
+                        with(
+                            index = 1,
+                            ads = Triple(
+                                coagulantSpeed * 13,
+                                coagulantSpeed * 1193,
+                                coagulantSpeed * 1193
+                            ),
+                            pdv = qyu
+                        )
+                    }
+                    delay(1000L)
+                    start {
+                        timeOut = 1000L * 60L * 10
+                        with(
+                            index = 1,
+                            ads = Triple(
+                                coagulantSpeed * 13,
+                                coagulantSpeed * 1193,
+                                coagulantSpeed * 1193
+                            ),
+                            pdv = -qyu
+                        )
+                    }
+                    delay(1000L)
+
+                    start {
+                        timeOut = 1000L * 60L * 10
+                        with(
+                            index = 1,
+                            ads = Triple(
+                                coagulantSpeed * 13,
+                                coagulantSpeed * 1193,
+                                coagulantSpeed * 1193
+                            ),
+                            pdv = coagulantResetPulse
+                        )
+                    }
+                    delay(1000L)
+
+                }
+
+            }
 
         }
     }
 
-    private fun copyFileToUSB(context: Context, usbPath: String) {
+    private fun copyFileToUSB(usbPath: String) {
 
         val targetDir = File(usbPath)
 
@@ -3453,4 +3635,7 @@ sealed class SettingIntent {
     data object exit : SettingIntent()
 
     data class CopyFileToUSB(val context: Context, val usbPath: String) : SettingIntent()
+
+
+    data class FillCoagulant(val coagulantVol: Double) : SettingIntent()
 }

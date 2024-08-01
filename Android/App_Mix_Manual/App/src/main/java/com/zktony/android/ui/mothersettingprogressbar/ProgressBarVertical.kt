@@ -97,7 +97,7 @@ fun VerticalProgressBar(
             textLayoutResult = zhiDescLayoutResult,
             topLeft = Offset(
                 canvasWidth / 2 - textDescWidth / 2,
-                canvasHeight / 2 - 20
+                canvasHeight / 2 - 30
             ),
         )
         drawText(
@@ -111,7 +111,7 @@ fun VerticalProgressBar(
             textLayoutResult = jiaDescLayoutResult,
             topLeft = Offset(
                 canvasWidth / 2 - textDescWidth / 2,
-                canvasHeight / 2 + 20
+                canvasHeight / 2 + 30
             ),
         )
 

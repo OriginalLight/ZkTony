@@ -683,7 +683,7 @@ fun rehearsalMode(
                             focusedLabelColor = Color(rgb(0, 105, 52)),
                             cursorColor = Color(rgb(0, 105, 52))
                         ),
-                        label = { Text(text = "待机清洗体积1/mL", fontSize = 20.sp) },
+                        label = { Text(text = "待机冲洗体积1/mL", fontSize = 20.sp) },
                         onValueChange = {
                             if (Pattern.compile(speChat).matcher(it).find()) {
                                 Toast.makeText(
@@ -723,7 +723,7 @@ fun rehearsalMode(
                             focusedLabelColor = Color(rgb(0, 105, 52)),
                             cursorColor = Color(rgb(0, 105, 52))
                         ),
-                        label = { Text(text = "待机清洗体积2/mL", fontSize = 20.sp) },
+                        label = { Text(text = "待机冲洗体积2/mL", fontSize = 20.sp) },
                         onValueChange = {
                             if (Pattern.compile(speChat).matcher(it).find()) {
                                 Toast.makeText(

@@ -90,7 +90,7 @@ fun WasteVerticalProgressBar(
             textLayoutResult = feiDescLayoutResult,
             topLeft = Offset(
                 canvasWidth / 2 - textDescWidth / 2,
-                canvasHeight / 2 - 20
+                canvasHeight / 2 - 30
             ),
         )
 
@@ -106,7 +106,7 @@ fun WasteVerticalProgressBar(
             textLayoutResult = caoDescLayoutResult,
             topLeft = Offset(
                 canvasWidth / 2 - textDescWidth / 2,
-                canvasHeight / 2 + 20
+                canvasHeight / 2 + 30
             ),
         )
 

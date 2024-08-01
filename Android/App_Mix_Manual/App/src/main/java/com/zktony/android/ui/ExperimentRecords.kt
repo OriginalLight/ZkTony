@@ -29,6 +29,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -48,6 +49,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -158,12 +160,9 @@ fun experimentList(
 
     var selectedIndex by remember { mutableStateOf(0) }
 
-//    for (i in 1..11) {
-//        dispatch(ExperimentRecordsIntent.Insert(0.0, 0.0, "", 0, 0.0, 0, "", ""))
-//    }
 
-    //	定义列宽
-    val cellWidthList = arrayListOf(70, 100, 70, 130, 120, 120)
+    //	定义列宽val cellWidthList = arrayListOf(70, 130, 140, 70, 140)
+    val cellWidthList = arrayListOf(80, 100, 70, 135, 90, 140)
     //	使用lazyColumn来解决大数据量时渲染的性能问题
     Column(
         modifier = Modifier
@@ -180,13 +179,12 @@ fun experimentList(
                 .padding(top = 20.dp, start = 15.dp)
         ) {
             stickyHeader {
-                Row(Modifier.background(Color(android.graphics.Color.rgb(0, 105, 52)))) {
-                    TableTextHead(text = "序号", width = cellWidthList[0])
-                    TableTextHead(text = "日             期", width = cellWidthList[5])
-                    TableTextHead(text = "浓               度", width = cellWidthList[3])
-//                    TableTextHead(text = "厚度", width = cellWidthList[2])
-                    TableTextHead(text = "制胶数量", width = cellWidthList[1])
-                    TableTextHead(text = "状             态", width = cellWidthList[4])
+                Row(Modifier.background(Color(rgb(0, 105, 52)))) {
+                    TableTextHead(text = "序  号", width = cellWidthList[0])
+                    TableTextHead(text = "日  期", width = cellWidthList[5])
+                    TableTextHead(text = "浓  度", width = cellWidthList[3])
+                    TableTextHead(text = "数  量", width = cellWidthList[1])
+                    TableTextHead(text = "状  态", width = cellWidthList[4])
                 }
             }
 
@@ -194,10 +192,9 @@ fun experimentList(
                 val selected = item == entities[selectedIndex]
                 Row(
                     modifier = Modifier
-//                        .background(if (selected) Color.Gray else Color.White)
                         .background(
                             if (index % 2 == 0) Color(
-                                android.graphics.Color.rgb(
+                                rgb(
                                     239,
                                     239,
                                     239
@@ -208,10 +205,9 @@ fun experimentList(
                             selectedIndex = index
                         })
                 ) {
-                    //(index + 1).toString()
                     TableTextBody(text = (index + 1).toString(), width = cellWidthList[0], selected)
                     TableTextBody(
-                        text = "" + item.createTime.dateFormat("yyyy-MM-dd"),
+                        text = "" + item.createTime.dateFormat("yyyy/MM/dd"),
                         width = cellWidthList[5], selected
                     )
                     TableTextBody(
@@ -248,6 +244,20 @@ fun experimentList(
                     ),
                     shape = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp),
                     onClick = {
+//                        for (i in 1..100) {
+//                            dispatch(
+//                                ExperimentRecordsIntent.Insert(
+//                                    0.0,
+//                                    0.0,
+//                                    "",
+//                                    0,
+//                                    0.0,
+//                                    0,
+//                                    "",
+//                                    ""
+//                                )
+//                            )
+//                        }
                         showingDialog.value = true
                     }
                 ) {
@@ -395,11 +405,11 @@ fun experimentList(
                                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
 
                                     Text(
-                                        fontSize = 16.sp,
+                                        fontSize = 20.sp,
                                         text = "日期："
                                     )
                                     Text(
-                                        fontSize = 16.sp,
+                                        fontSize = 20.sp,
                                         text = entity.createTime.dateFormat("yyyy-MM-dd HH:mm:ss")
                                     )
 
@@ -412,19 +422,19 @@ fun experimentList(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
-                                        fontSize = 16.sp,
+                                        fontSize = 20.sp,
                                         text = "浓度范围："
                                     )
                                     Text(
-                                        fontSize = 16.sp,
+                                        fontSize = 20.sp,
                                         text = entity.startRange.toString() + "%"
                                     )
                                     Text(
-                                        fontSize = 16.sp,
+                                        fontSize = 20.sp,
                                         text = "~"
                                     )
                                     Text(
-                                        fontSize = 16.sp,
+                                        fontSize = 20.sp,
                                         text = entity.endRange.toString() + "%"
                                     )
 
@@ -434,11 +444,11 @@ fun experimentList(
                             item {
                                 Row {
                                     Text(
-                                        fontSize = 16.sp,
+                                        fontSize = 20.sp,
                                         text = "厚度："
                                     )
                                     Text(
-                                        fontSize = 16.sp,
+                                        fontSize = 20.sp,
                                         text = entity.thickness + "mm"
                                     )
 
@@ -449,11 +459,11 @@ fun experimentList(
                                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
 
                                     Text(
-                                        fontSize = 16.sp,
+                                        fontSize = 20.sp,
                                         text = "胶液体积："
                                     )
                                     Text(
-                                        fontSize = 16.sp,
+                                        fontSize = 20.sp,
                                         text = entity.volume.toString() + "mL"
                                     )
 
@@ -464,11 +474,11 @@ fun experimentList(
                                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
 
                                     Text(
-                                        fontSize = 16.sp,
+                                        fontSize = 20.sp,
                                         text = "促凝剂体积："
                                     )
                                     Text(
-                                        fontSize = 16.sp,
+                                        fontSize = 20.sp,
                                         text = entity.coagulant.toString() + "μL"
                                     )
 
@@ -479,11 +489,11 @@ fun experimentList(
                                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
 
                                     Text(
-                                        fontSize = 16.sp,
+                                        fontSize = 20.sp,
                                         text = "状态："
                                     )
                                     Text(
-                                        fontSize = 16.sp,
+                                        fontSize = 20.sp,
                                         text = entity.status
                                     )
 
@@ -492,7 +502,7 @@ fun experimentList(
                             item {
                                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                                     Text(
-                                        fontSize = 16.sp,
+                                        fontSize = 20.sp,
                                         text = entity.detail
                                     )
 
@@ -515,59 +525,71 @@ fun experimentList(
 
     //删除弹窗
     if (deleteDialog.value) {
-        if (entitiesList.isNotEmpty()) {
-            AlertDialog(
-                onDismissRequest = { deleteDialog.value = false },
-                title = {
-                    Text(text = "是否确认删除!")
-                },
-                text = {
+        Dialog(onDismissRequest = {}) {
+            ElevatedCard {
+                Column(
+                    modifier = Modifier
+                        .padding(30.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Column {
+                        Text(
+                            fontSize = 20.sp,
+                            text = "是否确认删除!"
+                        )
 
-                    Button(
-                        modifier = Modifier.width(100.dp),
-                        border = BorderStroke(1.dp, Color.Gray),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent
-                        ), onClick = { deleteDialog.value = false }) {
-                        Text(fontSize = 18.sp, text = "取   消", color = Color.Black)
                     }
 
-                }, confirmButton = {}, dismissButton = {
-
-                    Button(
-                        modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(rgb(0, 105, 52))
-                        ), onClick = {
-                            val entity = entities[selectedIndex]
-                            if (entity != null) {
-                                if (entity.status != EPStatus.RUNNING) {
-                                    dispatch(ExperimentRecordsIntent.Delete(entity.id))
-                                    if (selectedIndex > 0) {
-                                        selectedIndex -= 1
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Button(
+                            modifier = Modifier
+                                .width(100.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ),
+                            onClick = {
+                                val entity = entities[selectedIndex]
+                                if (entity != null) {
+                                    if (entity.status != EPStatus.RUNNING) {
+                                        dispatch(ExperimentRecordsIntent.Delete(entity.id))
+                                        if (selectedIndex > 0) {
+                                            selectedIndex -= 1
+                                        }
+                                        deleteDialog.value = false
+                                    } else {
+                                        Toast.makeText(
+                                            context,
+                                            "制胶程序还在运动中,无法删除!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
-                                    deleteDialog.value = false
-                                } else {
-                                    Toast.makeText(
-                                        context,
-                                        "制胶程序还在运动中,无法删除!",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+
                                 }
+                            }) {
+                            Text(fontSize = 18.sp, text = "确   认")
+                        }
 
-                            }
-
-                        }) {
-                        Text(fontSize = 18.sp, text = "确   认")
+                        Button(
+                            modifier = Modifier
+                                .padding(start = 40.dp)
+                                .width(100.dp),
+                            border = BorderStroke(1.dp, Color.Gray),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Transparent
+                            ),
+                            onClick = {
+                                deleteDialog.value = false
+                            }) {
+                            Text(fontSize = 18.sp, text = "取   消", color = Color.Black)
+                        }
                     }
-
-                })
-        } else {
-            deleteDialog.value = false
+                }
+            }
         }
-
-
     }
-
 
 }
 

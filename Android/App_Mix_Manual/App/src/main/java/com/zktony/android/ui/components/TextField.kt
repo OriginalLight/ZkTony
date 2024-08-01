@@ -1,5 +1,6 @@
 package com.zktony.android.ui.components
 
+import android.graphics.Paint
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -14,6 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
@@ -25,6 +28,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zktony.android.data.entities.internal.Point
@@ -282,7 +286,7 @@ fun TableTextHead(text: String?, width: Int) {
             .padding(15.dp),
         textAlign = TextAlign.Center,
         color = Color.White,
-        fontSize = 18.sp
+        fontSize = 20.sp
     )
 }
 
@@ -296,6 +300,51 @@ fun TableTextBody(text: String?, width: Int, selected: Boolean?) {
             .border(1.dp, Color.White)
             .padding(15.dp),
         textAlign = TextAlign.Center,
-        color = if (selected != null && selected) Color.Red else Color.Black
+        color = if (selected != null && selected) Color.Red else Color.Black,
+        fontSize = 20.sp
     )
+}
+
+@Composable
+fun TableTextdisplayText(text: String?, width: Int, selected: Boolean?) {
+    val displayText = getTruncatedText(text ?: "", width)
+
+    Text(
+        text = displayText ?: "",
+        Modifier
+            .width(width.dp)
+            .height(50.dp)
+            .border(1.dp, Color.White)
+            .padding(15.dp),
+        textAlign = TextAlign.Center,
+        color = if (selected != null && selected) Color.Red else Color.Black,
+        fontSize = 20.sp
+    )
+}
+
+
+@Composable
+fun getTruncatedText(text: String, width: Int): String {
+    val density = LocalDensity.current
+    val textSizePx = with(density) { 20.sp.toPx() } // Assuming fontSize is 20.sp
+
+    val textPaint = remember {
+        Paint().apply {
+            isAntiAlias = true
+            textSize = textSizePx
+        }
+    }
+
+    val maxTextWidthPx = with(density) { (width-20).dp.toPx() }
+
+    if (textPaint.measureText(text) <= maxTextWidthPx) {
+        return text
+    }
+
+    var truncatedText = text
+    while (textPaint.measureText("$truncatedText...") > maxTextWidthPx && truncatedText.isNotEmpty()) {
+        truncatedText = truncatedText.dropLast(1)
+    }
+
+    return if (truncatedText.isNotEmpty()) "$truncatedText..." else text
 }

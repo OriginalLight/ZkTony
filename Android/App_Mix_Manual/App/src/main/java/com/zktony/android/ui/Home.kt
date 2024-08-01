@@ -122,6 +122,7 @@ fun HomeRoute(viewModel: HomeViewModel) {
 
     val heartbeatError by viewModel.heartbeatError.collectAsStateWithLifecycle()
     val erCount by viewModel.erCount.collectAsStateWithLifecycle()
+    val scheduleState by viewModel.scheduleState.collectAsStateWithLifecycle()
 
     val navigation: () -> Unit = {
         scope.launch {
@@ -178,6 +179,7 @@ fun HomeRoute(viewModel: HomeViewModel) {
                 coagulantmother,
                 heartbeatError,
                 erCount,
+                scheduleState,
             )
         }
     }
@@ -211,6 +213,7 @@ fun operate(
     coagulantmother: Float,
     heartbeatErrorHome: Boolean,
     erCount: Int,
+    scheduleState: String,
 ) {
 
     val scope = rememberCoroutineScope()
@@ -252,10 +255,6 @@ fun operate(
 
     uiEvent(HomeIntent.erCount)
 
-    /**
-     * 纯水弹窗
-     */
-    val waterDialog = remember { mutableStateOf(false) }
 
     /**
      * 促凝剂弹窗
@@ -353,12 +352,6 @@ fun operate(
     val resetError = remember { mutableStateOf(false) }
 
     /**
-     * 制胶运动状态
-     */
-    var scheduleState by remember { mutableStateOf("") }
-
-
-    /**
      * 纯水进度
      */
     var waterSweepState by remember {
@@ -398,17 +391,24 @@ fun operate(
     var dots by remember { mutableStateOf("") }
 
 
-    LaunchedEffect(uiFlags is UiFlags.Objects && uiFlags.objects == 101 || uiFlags is UiFlags.Objects && uiFlags.objects == 102 || uiFlags is UiFlags.Objects && uiFlags.objects == 103) {
-        while (uiFlags is UiFlags.Objects && uiFlags.objects == 101 || uiFlags is UiFlags.Objects && uiFlags.objects == 102 || uiFlags is UiFlags.Objects && uiFlags.objects == 103) {
-            delay(500) // 每500毫秒更新一次
-            dots = when (dots) {
-                "." -> ".."
-                ".." -> "..."
-                "..." -> "."
-                else -> "."
+    LaunchedEffect(scheduleState) {
+        if (scheduleState.isNotEmpty() && (scheduleState == "预排中" || scheduleState == "制胶中" || scheduleState == "冲洗中")) {
+            while (true) {
+                delay(500) // 每500毫秒更新一次
+                dots = when (dots) {
+                    "." -> ".."
+                    ".." -> "..."
+                    "..." -> "."
+                    else -> "."
+                }
             }
         }
     }
+
+    if (scheduleState == "准备冲洗" || scheduleState == "已中止" || scheduleState == "已完成") {
+        dots = ""
+    }
+
 
     /**
      * 同步LazyRow滑动
@@ -430,36 +430,21 @@ fun operate(
         )
     }
 
-//    println("heartbeatErrorHome====$heartbeatErrorHome")
     if (uiFlags is UiFlags.Objects && uiFlags.objects == 4) {
-        scheduleState = ""
-        dots = ""
         continueGlueDialog.value = true
         if (wasteprogress > 0.9) {
             wasteDialog.value = true
         }
     } else if (uiFlags is UiFlags.Objects && uiFlags.objects == 6) {
-        scheduleState = ""
-        dots = ""
         expectedMakeNum.value = 0
         expectedMakeNum_ex = "0"
-        uiEvent(HomeIntent.MotherVolZero)
         continueGlueDialog.value = false
+        uiEvent(HomeIntent.MotherVolZero)
         uiEvent(HomeIntent.MoveCom(1))
     } else if (uiFlags is UiFlags.Objects && uiFlags.objects == 14) {
         //复位失败弹窗
         resetError.value = true
-    } else if (uiFlags is UiFlags.Objects && uiFlags.objects == 101) {//制胶预排液
-        scheduleState = "预排中"
-    } else if (uiFlags is UiFlags.Objects && uiFlags.objects == 102) {//制胶预排液
-        scheduleState = "制胶中"
-    } else if (uiFlags is UiFlags.Objects && uiFlags.objects == 103) {//制胶预排液
-        scheduleState = "冲洗中"
     }
-//    else if (uiFlags is UiFlags.Objects && uiFlags.objects == 15) {
-//        //上下位机失联弹窗
-//        heartbeatError.value = true
-//    }
 
     Column(
         modifier = Modifier
@@ -489,14 +474,7 @@ fun operate(
                 .fillMaxWidth()
         ) {
 
-            Row(
-                modifier = Modifier
-                    .clickable(onClick = {
-                        if (uiFlags is UiFlags.None) {
-                            waterDialog.value = true
-                        }
-                    })
-            ) {
+            Row {
                 //纯水进度条
                 WaterVerticalProgressBar(
                     if (uiFlags is UiFlags.Objects && uiFlags.objects == 4 || uiFlags is UiFlags.Objects && uiFlags.objects == 0) watermother / waterSweepState else 0f,
@@ -647,7 +625,7 @@ fun operate(
 
             }
 
-            Column(modifier = Modifier.padding(start = 120.dp)) {
+            Column(modifier = Modifier.padding(start = 120.dp, top = 20.dp)) {
                 Text(
                     text = "制胶数量",
                     fontSize = 22.sp,
@@ -1365,6 +1343,7 @@ fun operate(
                                 containerColor = Color(rgb(0, 105, 52))
                             ),
                             onClick = {
+                                dots = ""
                                 expectedMakeNum.value = 0
                                 expectedMakeNum_ex = "0"
                                 uiEvent(HomeIntent.MotherVolZero)
@@ -1547,9 +1526,6 @@ fun operate(
                                             startMake = "停止制胶"
                                             uiEvent(HomeIntent.Start(0))
 
-
-
-
                                             guleDialog.value = false
                                         } else {
                                             Toast.makeText(
@@ -1576,93 +1552,6 @@ fun operate(
                                 guleDialog.value = false
                             }) {
                             Text(fontSize = 18.sp, text = "取   消", color = Color.Black)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * 纯水弹窗
-     */
-    if (waterDialog.value) {
-        if (job == null) {
-            if (uiFlags is UiFlags.None) {
-                Dialog(onDismissRequest = {}) {
-                    ElevatedCard {
-                        Column(
-                            modifier = Modifier
-                                .padding(30.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                        ) {
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    fontSize = 20.sp,
-                                    text = "冲洗液量："
-                                )
-                                OutlinedTextField(
-                                    modifier = Modifier.width(100.dp),
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = Color(rgb(0, 105, 52)),
-                                        focusedLabelColor = Color(rgb(0, 105, 52)),
-                                        cursorColor = Color(rgb(0, 105, 52))
-                                    ),
-                                    value = watermother.toString(),
-                                    label = { },
-                                    textStyle = TextStyle(fontSize = 20.sp),
-                                    enabled = false,
-                                    onValueChange = {
-                                    },
-                                    keyboardOptions = KeyboardOptions(
-                                        keyboardType = KeyboardType.Number,
-                                        imeAction = ImeAction.Done,
-                                    ),
-                                    keyboardActions = KeyboardActions(
-                                        onDone = {
-                                            keyboard?.hide()
-                                        }
-                                    )
-                                )
-                                Text(
-                                    fontSize = 20.sp,
-                                    text = "mL"
-                                )
-                            }
-
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(16.dp)
-                            ) {
-                                Button(
-                                    modifier = Modifier
-                                        .width(100.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color(rgb(0, 105, 52))
-                                    ),
-                                    onClick = {
-                                        waterDialog.value = false
-                                    }) {
-                                    Text(fontSize = 18.sp, text = "确   认")
-                                }
-
-                                Button(
-                                    modifier = Modifier
-                                        .padding(start = 40.dp)
-                                        .width(100.dp),
-                                    border = BorderStroke(1.dp, Color.Gray),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color.Transparent
-                                    ),
-                                    onClick = {
-                                        waterDialog.value = false
-                                    }) {
-                                    Text(fontSize = 18.sp, text = "取   消", color = Color.Black)
-                                }
-                            }
                         }
                     }
                 }
@@ -1732,43 +1621,6 @@ fun operate(
                                     text = "%"
                                 )
 
-                            }
-
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    fontSize = 20.sp,
-                                    text = "促凝剂液量："
-                                )
-                                OutlinedTextField(
-                                    modifier = Modifier.width(100.dp),
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = Color(rgb(0, 105, 52)),
-                                        focusedLabelColor = Color(rgb(0, 105, 52)),
-                                        cursorColor = Color(rgb(0, 105, 52))
-                                    ),
-                                    value = coagulantmother.toString(),
-                                    enabled = false,
-                                    label = { },
-                                    textStyle = TextStyle(fontSize = 20.sp),
-                                    onValueChange = {
-                                    },
-                                    keyboardOptions = KeyboardOptions(
-                                        keyboardType = KeyboardType.Number,
-                                        imeAction = ImeAction.Done,
-                                    ),
-                                    keyboardActions = KeyboardActions(
-                                        onDone = {
-                                            keyboard?.hide()
-                                        }
-                                    )
-                                )
-                                Text(
-                                    fontSize = 20.sp,
-                                    text = "mL"
-                                )
                             }
 
                             Row(
@@ -1871,42 +1723,6 @@ fun operate(
                                 )
                             }
 
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    fontSize = 20.sp,
-                                    text = "低浓度液量："
-                                )
-                                OutlinedTextField(
-                                    modifier = Modifier.width(100.dp),
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = Color(rgb(0, 105, 52)),
-                                        focusedLabelColor = Color(rgb(0, 105, 52)),
-                                        cursorColor = Color(rgb(0, 105, 52))
-                                    ),
-                                    value = lowmother.toString(),
-                                    enabled = false,
-                                    label = { },
-                                    textStyle = TextStyle(fontSize = 20.sp),
-                                    onValueChange = {
-                                    },
-                                    keyboardOptions = KeyboardOptions(
-                                        keyboardType = KeyboardType.Number,
-                                        imeAction = ImeAction.Done,
-                                    ),
-                                    keyboardActions = KeyboardActions(
-                                        onDone = {
-                                            keyboard?.hide()
-                                        }
-                                    )
-                                )
-                                Text(
-                                    fontSize = 20.sp,
-                                    text = "mL"
-                                )
-                            }
 
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -2035,42 +1851,6 @@ fun operate(
                                 )
                             }
 
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    fontSize = 20.sp,
-                                    text = "高浓度液量："
-                                )
-                                OutlinedTextField(
-                                    modifier = Modifier.width(100.dp),
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = Color(rgb(0, 105, 52)),
-                                        focusedLabelColor = Color(rgb(0, 105, 52)),
-                                        cursorColor = Color(rgb(0, 105, 52))
-                                    ),
-                                    value = higemother.toString(),
-                                    enabled = false,
-                                    label = { },
-                                    textStyle = TextStyle(fontSize = 20.sp),
-                                    onValueChange = {
-                                    },
-                                    keyboardOptions = KeyboardOptions(
-                                        keyboardType = KeyboardType.Number,
-                                        imeAction = ImeAction.Done,
-                                    ),
-                                    keyboardActions = KeyboardActions(
-                                        onDone = {
-                                            keyboard?.hide()
-                                        }
-                                    )
-                                )
-                                Text(
-                                    fontSize = 20.sp,
-                                    text = "mL"
-                                )
-                            }
 
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -2249,7 +2029,7 @@ fun operate(
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color.Transparent
                             ), onClick = { programListDialog.value = false }) {
-                            Text(text = "取   消")
+                            Text(fontSize = 18.sp, text = "取   消", color = Color.Black)
                         }
 
                     }, dismissButton = {
@@ -2287,7 +2067,7 @@ fun operate(
                                     programListDialog.value = false
                                 }
                             }) {
-                            Text(text = "确   认")
+                            Text(fontSize = 18.sp, text = "确   认")
                         }
 
                     })

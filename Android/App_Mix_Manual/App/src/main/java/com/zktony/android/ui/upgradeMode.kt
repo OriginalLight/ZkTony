@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.storage.StorageManager
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -410,20 +411,21 @@ fun upgradeMode(
                                                 }
 
                                             }) {
-                                            Text(fontSize = 18.sp, text = "确认")
+                                            Text(fontSize = 18.sp, text = "确   认")
                                         }
 
                                         Button(
                                             modifier = Modifier
                                                 .padding(start = 250.dp)
                                                 .width(100.dp),
+                                            border = BorderStroke(1.dp, Color.Gray),
                                             colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color(rgb(0, 105, 52))
+                                                containerColor = Color.Transparent
                                             ),
                                             onClick = {
                                                 masterDialog.value = false
                                             }) {
-                                            Text(fontSize = 18.sp, text = "取消")
+                                            Text(fontSize = 18.sp, text = "取   消", color = Color.Black)
                                         }
                                     }
                                     Row(modifier = Modifier.padding(top = 10.dp, start = 180.dp)) {
@@ -514,20 +516,21 @@ fun upgradeMode(
                                         }
 
                                     }) {
-                                    Text(fontSize = 18.sp, text = "确认")
+                                    Text(fontSize = 18.sp, text = "确   认")
                                 }
 
                                 Button(
                                     modifier = Modifier
                                         .padding(start = 250.dp)
                                         .width(100.dp),
+                                    border = BorderStroke(1.dp, Color.Gray),
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color(rgb(0, 105, 52))
+                                        containerColor = Color.Transparent
                                     ),
                                     onClick = {
                                         stateDialog.value = false
                                     }) {
-                                    Text(fontSize = 18.sp, text = "取消")
+                                    Text(fontSize = 18.sp, text = "取   消", color = Color.Black)
                                 }
                             }
                         }
@@ -598,20 +601,21 @@ fun upgradeMode(
                                         }
 
                                     }) {
-                                    Text(fontSize = 18.sp, text = "确认")
+                                    Text(fontSize = 18.sp, text = "确   认")
                                 }
 
                                 Button(
                                     modifier = Modifier
                                         .padding(start = 250.dp)
                                         .width(100.dp),
+                                    border = BorderStroke(1.dp, Color.Gray),
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color(rgb(0, 105, 52))
+                                        containerColor = Color.Transparent
                                     ),
                                     onClick = {
                                         apkDialog.value = false
                                     }) {
-                                    Text(fontSize = 18.sp, text = "取消")
+                                    Text(fontSize = 18.sp, text = "取   消", color = Color.Black)
                                 }
                             }
                         }

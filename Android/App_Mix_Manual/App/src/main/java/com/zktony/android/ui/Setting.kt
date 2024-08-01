@@ -630,28 +630,35 @@ fun SettingLits(
                                     ),
                                     onClick = {
                                         scope.launch {
-                                            start {
-                                                timeOut = 1000L * 30
-                                                with(
-                                                    index = 2,
-                                                    pdv = higeFilling.value * 1000,
-                                                    ads = Triple(
-                                                        rinseSpeed.value * 13,
-                                                        rinseSpeed.value * 1193,
-                                                        rinseSpeed.value * 1193
-                                                    ),
+                                            if (higeFilling.value > 0) {
+                                                start {
+                                                    timeOut = 1000L * 30
+                                                    with(
+                                                        index = 2,
+                                                        pdv = higeFilling.value * 1000,
+                                                        ads = Triple(
+                                                            rinseSpeed.value * 13,
+                                                            rinseSpeed.value * 1193,
+                                                            rinseSpeed.value * 1193
+                                                        ),
 
+                                                        )
+                                                }
+
+                                                start {
+                                                    timeOut = 1000L * 30
+                                                    with(
+                                                        index = 4,
+                                                        ads = Triple(
+                                                            rinseSpeed.value * 30,
+                                                            rinseSpeed.value * 30,
+                                                            rinseSpeed.value * 30
+                                                        ),
+                                                        pdv = setting.rinseCleanVolume * 1000
                                                     )
+                                                }
                                             }
 
-                                            start {
-                                                timeOut = 1000L * 30
-                                                with(
-                                                    index = 4,
-                                                    ads = Triple(rinseSpeed.value * 30, rinseSpeed.value * 30, rinseSpeed.value * 30),
-                                                    pdv = setting.rinseCleanVolume * 1000
-                                                )
-                                            }
                                         }
                                     }) {
                                     Text(fontSize = 18.sp, text = "填   充")
@@ -724,27 +731,33 @@ fun SettingLits(
                                     ),
                                     onClick = {
                                         scope.launch {
-                                            start {
-                                                timeOut = 1000L * 30
-                                                with(
-                                                    index = 3,
-                                                    pdv = lowFilling.value * 1000,
-                                                    ads = Triple(
-                                                        rinseSpeed.value * 13,
-                                                        rinseSpeed.value * 1193,
-                                                        rinseSpeed.value * 1193
-                                                    ),
+                                            if (lowFilling.value > 0) {
+                                                start {
+                                                    timeOut = 1000L * 30
+                                                    with(
+                                                        index = 3,
+                                                        pdv = lowFilling.value * 1000,
+                                                        ads = Triple(
+                                                            rinseSpeed.value * 13,
+                                                            rinseSpeed.value * 1193,
+                                                            rinseSpeed.value * 1193
+                                                        ),
 
+                                                        )
+                                                }
+
+                                                start {
+                                                    timeOut = 1000L * 30
+                                                    with(
+                                                        index = 4,
+                                                        ads = Triple(
+                                                            rinseSpeed.value * 30,
+                                                            rinseSpeed.value * 30,
+                                                            rinseSpeed.value * 30
+                                                        ),
+                                                        pdv = setting.rinseCleanVolume * 1000
                                                     )
-                                            }
-
-                                            start {
-                                                timeOut = 1000L * 30
-                                                with(
-                                                    index = 4,
-                                                    ads = Triple(rinseSpeed.value * 30, rinseSpeed.value * 30, rinseSpeed.value * 30),
-                                                    pdv = setting.rinseCleanVolume * 1000
-                                                )
+                                                }
                                             }
                                         }
                                     }) {
@@ -820,29 +833,8 @@ fun SettingLits(
                                         containerColor = Color(rgb(0, 105, 52))
                                     ),
                                     onClick = {
-                                        scope.launch {
-                                            start {
-                                                timeOut = 1000L * 30
-                                                with(
-                                                    index = 1,
-                                                    pdv = coagulantFilling.value * 1000,
-                                                    ads = Triple(
-                                                        rinseSpeed.value * 13,
-                                                        rinseSpeed.value * 1193,
-                                                        rinseSpeed.value * 1193
-                                                    ),
-
-                                                    )
-                                            }
-
-                                            start {
-                                                timeOut = 1000L * 30
-                                                with(
-                                                    index = 4,
-                                                    ads = Triple(rinseSpeed.value * 30, rinseSpeed.value * 30, rinseSpeed.value * 30),
-                                                    pdv = setting.rinseCleanVolume * 1000
-                                                )
-                                            }
+                                        if (coagulantFilling.value > 0) {
+                                            uiEvent(SettingIntent.FillCoagulant(coagulantFilling.value))
                                         }
                                     }) {
                                     Text(fontSize = 18.sp, text = "填   充")
@@ -890,7 +882,7 @@ fun SettingLits(
                                 text = (index + 1).toString(), width = cellWidthList[0], selected
                             )
                             TableTextBody(
-                                text = "" + item.createTime.dateFormat("yyyy-MM-dd"),
+                                text = "" + item.createTime.dateFormat("yyyy/MM/dd"),
                                 width = cellWidthList[1],
                                 selected
                             )

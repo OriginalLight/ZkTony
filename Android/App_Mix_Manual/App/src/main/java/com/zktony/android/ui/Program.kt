@@ -82,6 +82,7 @@ import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.components.HomeAppBar
 import com.zktony.android.ui.components.TableTextBody
 import com.zktony.android.ui.components.TableTextHead
+import com.zktony.android.ui.components.TableTextdisplayText
 import com.zktony.android.ui.utils.AnimatedContent
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
@@ -171,8 +172,8 @@ fun ProgramList(
     dispatch: (ProgramIntent) -> Unit,
     entityNum: Int
 ) {
+
     val scope = rememberCoroutineScope()
-    val snackbarHostState = LocalSnackbarHostState.current
     val context = LocalContext.current
 
     val keyboard = LocalSoftwareKeyboardController.current
@@ -276,14 +277,14 @@ fun ProgramList(
     var volumeDef = true
 
     if (thickness.value == "0.75") {
-        coagulantTemp = "140"
-        volumeTemp = "9.6"
+        coagulantTemp = "72"
+        volumeTemp = "4.8"
     } else if (thickness.value == "1.0") {
         coagulantTemp = "96"
         volumeTemp = "6.4"
     } else if (thickness.value == "1.5") {
-        coagulantTemp = "72"
-        volumeTemp = "4.8"
+        coagulantTemp = "140"
+        volumeTemp = "9.6"
     }
 
     /**
@@ -309,8 +310,8 @@ fun ProgramList(
         importError = ""
     }
 
-    //	定义列宽
-    val cellWidthList = arrayListOf(70, 100, 120, 70, 90, 120)
+    //	定义列宽 90
+    val cellWidthList = arrayListOf(70, 130, 140, 70, 140)
     //	使用lazyColumn来解决大数据量时渲染的性能问题
     Column(
         modifier = Modifier
@@ -332,8 +333,7 @@ fun ProgramList(
                     TableTextHead(text = "名        称", width = cellWidthList[1])
                     TableTextHead(text = "浓             度", width = cellWidthList[2])
                     TableTextHead(text = "厚度", width = cellWidthList[3])
-                    TableTextHead(text = "创建人", width = cellWidthList[4])
-                    TableTextHead(text = "日期", width = cellWidthList[5])
+                    TableTextHead(text = "日             期", width = cellWidthList[4])
                 }
             }
 
@@ -348,16 +348,15 @@ fun ProgramList(
                         })
                 ) {
                     TableTextBody(text = (index + 1).toString(), width = cellWidthList[0], selected)
-                    TableTextBody(text = item.displayText, width = cellWidthList[1], selected)
+                    TableTextdisplayText(text = item.displayText, width = cellWidthList[1], selected)
                     TableTextBody(
                         text = "" + item.startRange + "%~" + item.endRange + "%",
                         width = cellWidthList[2], selected
                     )
                     TableTextBody(text = item.thickness, width = cellWidthList[3], selected)
-                    TableTextBody(text = item.founder, width = cellWidthList[4], selected)
                     TableTextBody(
-                        text = "" + item.createTime.dateFormat("yyyy-MM-dd"),
-                        width = cellWidthList[5], selected
+                        text = "" + item.createTime.dateFormat("yyyy/MM/dd"),
+                        width = cellWidthList[4], selected
                     )
                 }
             }
@@ -625,10 +624,10 @@ fun ProgramList(
                                 label = { Text(fontSize = 20.sp, text = "制胶名称") },
                                 textStyle = TextStyle(fontSize = 20.sp),
                                 onValueChange = {
-                                    if (it.length > 7) {
+                                    if (it.length > 32) {
                                         Toast.makeText(
                                             context,
-                                            "名称长度不能过长!",
+                                            "名称过长!",
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     } else {
@@ -826,6 +825,9 @@ fun ProgramList(
                         containerColor = Color.Transparent
                     ),
                     onClick = {
+//                        for (i in 1..100) {
+//                            dispatch(ProgramIntent.Insert("$i", 0.0, 0.0, "", 0, 0.0, ""))
+//                        }
                         thickness.value = "1.0"
                         showingDialog.value = false
                     }) {
@@ -871,7 +873,7 @@ fun ProgramList(
                                     if (Pattern.compile(speChat).matcher(displayText).find()) {
                                         Toast.makeText(
                                             context,
-                                            "文件名不能包含特殊字符!",
+                                            "名称只支持输入中英文、数字字符，及特殊字符“-”！",
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     } else {
@@ -943,15 +945,19 @@ fun ProgramList(
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 } else {
-                                    if (Pattern.compile(speChat).matcher(displayText)
-                                            .find() || displayText.isEmpty()
-                                    ) {
+                                    if (Pattern.compile(speChat).matcher(displayText).find()) {
                                         Toast.makeText(
                                             context,
-                                            "文件名不能包含特殊字符!",
+                                            "名称只支持输入中英文、数字字符，及特殊字符“-”！",
                                             Toast.LENGTH_SHORT
                                         ).show()
-                                    } else {
+                                    } else if(displayText.isEmpty()){
+                                        Toast.makeText(
+                                            context,
+                                            "文件名不能为空!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }else{
                                         if (volumeDef) {
                                             volume_ex = volumeTemp
                                         }
@@ -1028,56 +1034,74 @@ fun ProgramList(
 
     //删除弹窗
     if (deleteDialog.value) {
-        AlertDialog(
-            onDismissRequest = { deleteDialog.value = false },
-            title = {
-                Text(text = "是否确认删除!")
-            },
-            text = {
+        Dialog(onDismissRequest = {}) {
+            ElevatedCard {
+                Column(
+                    modifier = Modifier
+                        .padding(30.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Column {
+                        Text(
+                            fontSize = 20.sp,
+                            text = "是否确认删除!"
+                        )
 
-            }, confirmButton = {
+                    }
 
-                Button(
-                    modifier = Modifier.width(100.dp),
-                    border = BorderStroke(1.dp, Color.Gray),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Transparent
-                    ), onClick = { deleteDialog.value = false }) {
-                    Text(text = "取   消")
-                }
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Button(
+                            modifier = Modifier
+                                .width(100.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(rgb(0, 105, 52))
+                            ),
+                            onClick = {
+                                if (entitiesList.isNotEmpty()) {
+                                    val entity = entities[selectedIndex]
+                                    if (entity != null) {
+                                        if (programId.value == entity.id) {
+                                            Toast.makeText(
+                                                context,
+                                                "已在制胶操作选中,无法删除!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else {
+                                            if (selectedIndex > 0) {
+                                                selectedIndex -= 1
+                                            }
+                                            dispatch(ProgramIntent.Delete(entity.id))
+                                            deleteDialog.value = false
+                                        }
 
-            }, dismissButton = {
-                Button(
-                    modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(rgb(0, 105, 52))
-                    ), onClick = {
-                        if (entitiesList.size > 0) {
-                            val entity = entities[selectedIndex]
-                            if (entity != null) {
-                                if (programId.value == entity.id) {
-                                    Toast.makeText(
-                                        context,
-                                        "已在制胶操作选中,无法删除!",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                } else {
-                                    if (selectedIndex > 0) {
-                                        selectedIndex -= 1
                                     }
-                                    dispatch(ProgramIntent.Delete(entity.id))
-                                    deleteDialog.value = false
+
                                 }
-
-                            }
-
+                            }) {
+                            Text(fontSize = 18.sp, text = "确   认")
                         }
-                    }) {
-                    Text(text = "确   认")
+
+                        Button(
+                            modifier = Modifier
+                                .padding(start = 40.dp)
+                                .width(100.dp),
+                            border = BorderStroke(1.dp, Color.Gray),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Transparent
+                            ),
+                            onClick = {
+                                deleteDialog.value = false
+                            }) {
+                            Text(fontSize = 18.sp, text = "取   消", color = Color.Black)
+                        }
+                    }
                 }
-
-            })
+            }
+        }
     }
-
 
     if (permissionsDialog.value) {
         Dialog(onDismissRequest = {}) {
@@ -1114,7 +1138,7 @@ fun ProgramList(
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.Transparent
                     ), onClick = { importDialog.value = false }) {
-                    Text(text = "取   消")
+                    Text(fontSize = 18.sp, text = "取   消", color = Color.Black)
                 }
             }, dismissButton = {
 

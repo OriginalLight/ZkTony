@@ -22,13 +22,15 @@ object SerialPortUtils {
         // 初始化zkty串口
         serialPortOf {
             log = true
-            device = "/dev/ttyS0"
+            device = "/dev/ttyS0"//软方屏幕和硬核派
+//            device = "/dev/ttyS1"//迈冲G20
         }?.let { SerialStoreUtils.put("zkty", it) }
 
         // 初始化tec串口
         serialPortOf {
             log = true
-            device = "/dev/ttyS2"
+            device = "/dev/ttyS3"//软方屏幕
+//            device = "/dev/ttyS2"
         }?.let { SerialStoreUtils.put("led", it) }
         // rtu串口全局回调
         SerialStoreUtils.get("zkty")?.registerCallback("globe") { bytes ->
