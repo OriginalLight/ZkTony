@@ -31,6 +31,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -160,10 +162,15 @@ fun AppNavigationDrawer(
         modifier = modifier
             .fillMaxHeight()
             .width(120.dp)
-            .background(
-                shape = MaterialTheme.shapes.medium,
-                brush = zktyBrush
-            )
+            .drawWithCache {
+                onDrawBehind {
+                    drawRoundRect(
+                        brush = zktyBrush,
+                        size = size,
+                        cornerRadius = CornerRadius(16.dp.toPx()),
+                    )
+                }
+            }
             .padding(vertical = 16.dp),
     ) {
         Column(

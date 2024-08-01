@@ -669,6 +669,7 @@ fun ProgramSelectDialog(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done
                 ),
+                singleLine = true
             )
             LazyColumn(
                 modifier = modifier
