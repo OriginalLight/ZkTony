@@ -162,7 +162,7 @@ fun experimentList(
 
 
     //	定义列宽val cellWidthList = arrayListOf(70, 130, 140, 70, 140)
-    val cellWidthList = arrayListOf(80, 100, 70, 135, 90, 140)
+    val cellWidthList = arrayListOf(80, 100, 70, 145, 90, 145)
     //	使用lazyColumn来解决大数据量时渲染的性能问题
     Column(
         modifier = Modifier
@@ -176,7 +176,7 @@ fun experimentList(
             modifier = Modifier
                 .height(800.dp)
                 .fillMaxWidth()
-                .padding(top = 20.dp, start = 15.dp)
+                .padding(5.dp)
         ) {
             stickyHeader {
                 Row(Modifier.background(Color(rgb(0, 105, 52)))) {
@@ -207,7 +207,7 @@ fun experimentList(
                 ) {
                     TableTextBody(text = (index + 1).toString(), width = cellWidthList[0], selected)
                     TableTextBody(
-                        text = "" + item.createTime.dateFormat("yyyy/MM/dd"),
+                        text = item.createTime.dateFormat("yyyy/MM/dd"),
                         width = cellWidthList[5], selected
                     )
                     TableTextBody(

@@ -130,7 +130,7 @@ fun sportsLogMode(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(800.dp)
-                .padding(top = 20.dp, start = 25.dp)
+                .padding(20.dp)
         ) {
 
 
@@ -138,7 +138,7 @@ fun sportsLogMode(
                 Row(
                     Modifier.background(Color(rgb(0, 105, 52)))
                 ) {
-                    TableTextHead(text = "序号", width = cellWidthList[0])
+                    TableTextHead(text = "序  号", width = cellWidthList[0])
                     TableTextHead(text = "文件名称", width = cellWidthList[1])
                 }
             }

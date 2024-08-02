@@ -281,7 +281,7 @@ fun TableTextHead(text: String?, width: Int) {
         text = text ?: "",
         Modifier
             .width(width.dp)
-            .height(55 .dp)
+            .height(55.dp)
             .border(1.dp, Color.White)
             .padding(15.dp),
         textAlign = TextAlign.Center,
@@ -296,9 +296,9 @@ fun TableTextBody(text: String?, width: Int, selected: Boolean?) {
         text = text ?: "",
         Modifier
             .width(width.dp)
-            .height(50.dp)
+            .height(60.dp)
             .border(1.dp, Color.White)
-            .padding(15.dp),
+            .padding(top = 15.dp, start = 10.dp),
         textAlign = TextAlign.Center,
         color = if (selected != null && selected) Color.Red else Color.Black,
         fontSize = 20.sp
@@ -310,12 +310,12 @@ fun TableTextdisplayText(text: String?, width: Int, selected: Boolean?) {
     val displayText = getTruncatedText(text ?: "", width)
 
     Text(
-        text = displayText ?: "",
+        text = displayText,
         Modifier
             .width(width.dp)
-            .height(50.dp)
+            .height(60.dp)
             .border(1.dp, Color.White)
-            .padding(15.dp),
+            .padding(top = 15.dp, start = 10.dp),
         textAlign = TextAlign.Center,
         color = if (selected != null && selected) Color.Red else Color.Black,
         fontSize = 20.sp
@@ -335,7 +335,7 @@ fun getTruncatedText(text: String, width: Int): String {
         }
     }
 
-    val maxTextWidthPx = with(density) { (width-20).dp.toPx() }
+    val maxTextWidthPx = with(density) { (width - 20).dp.toPx() }
 
     if (textPaint.measureText(text) <= maxTextWidthPx) {
         return text

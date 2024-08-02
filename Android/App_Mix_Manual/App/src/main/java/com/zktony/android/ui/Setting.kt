@@ -366,7 +366,7 @@ fun SettingLits(
 
     var selectedIndex by remember { mutableStateOf(0) }
     //	定义列宽
-    val cellWidthList = arrayListOf(70, 115, 241)
+    val cellWidthList = arrayListOf(80, 140, 215)
 
     //下位机版本号
     var lowVersion by remember { mutableStateOf("Unknown") }
@@ -857,8 +857,8 @@ fun SettingLits(
                         Row(
                             Modifier.background(Color(rgb(0, 105, 52)))
                         ) {
-                            TableTextHead(text = "序号", width = cellWidthList[0])
-                            TableTextHead(text = "时        间", width = cellWidthList[1])
+                            TableTextHead(text = "序  号", width = cellWidthList[0])
+                            TableTextHead(text = "时  间", width = cellWidthList[1])
                             TableTextHead(text = "故障情况", width = cellWidthList[2])
                         }
                     }

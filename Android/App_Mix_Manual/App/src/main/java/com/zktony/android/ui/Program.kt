@@ -311,7 +311,7 @@ fun ProgramList(
     }
 
     //	定义列宽 90
-    val cellWidthList = arrayListOf(70, 130, 140, 70, 140)
+    val cellWidthList = arrayListOf(80, 130, 140, 80, 160)
     //	使用lazyColumn来解决大数据量时渲染的性能问题
     Column(
         modifier = Modifier
@@ -325,15 +325,15 @@ fun ProgramList(
             modifier = Modifier
                 .height(800.dp)
                 .fillMaxWidth()
-                .padding(top = 20.dp, start = 2.dp)
+                .padding(5.dp)
         ) {
             stickyHeader {
                 Row(Modifier.background(Color(rgb(0, 105, 52)))) {
-                    TableTextHead(text = "序号", width = cellWidthList[0])
-                    TableTextHead(text = "名        称", width = cellWidthList[1])
-                    TableTextHead(text = "浓             度", width = cellWidthList[2])
-                    TableTextHead(text = "厚度", width = cellWidthList[3])
-                    TableTextHead(text = "日             期", width = cellWidthList[4])
+                    TableTextHead(text = "序  号", width = cellWidthList[0])
+                    TableTextHead(text = "名  称", width = cellWidthList[1])
+                    TableTextHead(text = "浓  度", width = cellWidthList[2])
+                    TableTextHead(text = "厚  度", width = cellWidthList[3])
+                    TableTextHead(text = "日  期", width = cellWidthList[4])
                 }
             }
 
@@ -355,7 +355,7 @@ fun ProgramList(
                     )
                     TableTextBody(text = item.thickness, width = cellWidthList[3], selected)
                     TableTextBody(
-                        text = "" + item.createTime.dateFormat("yyyy/MM/dd"),
+                        text = item.createTime.dateFormat("yyyy/MM/dd"),
                         width = cellWidthList[4], selected
                     )
                 }

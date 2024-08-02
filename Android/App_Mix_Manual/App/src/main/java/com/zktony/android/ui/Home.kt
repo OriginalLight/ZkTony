@@ -431,6 +431,7 @@ fun operate(
     }
 
     if (uiFlags is UiFlags.Objects && uiFlags.objects == 4) {
+        dots = ""
         continueGlueDialog.value = true
         if (wasteprogress > 0.9) {
             wasteDialog.value = true
@@ -1435,8 +1436,6 @@ fun operate(
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 } else {
-//                                    experimentRecord.number = complate
-//                                    uiEvent(HomeIntent.Update(experimentRecord))
                                     continueGlueDialog.value = false
                                     uiEvent(HomeIntent.Start(complate))
                                 }
