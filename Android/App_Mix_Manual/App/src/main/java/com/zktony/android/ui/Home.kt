@@ -71,6 +71,7 @@ import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.components.HomeAppBar
 import com.zktony.android.ui.components.TableTextBody
 import com.zktony.android.ui.components.TableTextHead
+import com.zktony.android.ui.components.TableTextdisplayText
 import com.zktony.android.ui.mothersettingprogressbar.CoagulantProgressBarVertical
 import com.zktony.android.ui.mothersettingprogressbar.HighCoagulantProgressBarVertical
 import com.zktony.android.ui.mothersettingprogressbar.LowCoagulantProgressBarVertical
@@ -1921,7 +1922,7 @@ fun operate(
                     onDismissRequest = { },
                     text = {
                         //	定义列宽
-                        val cellWidthList = arrayListOf(70, 100, 130, 90, 100, 120)
+                        val cellWidthList = arrayListOf(80, 130, 130, 90, 100, 120)
                         //	使用lazyColumn来解决大数据量时渲染的性能问题
                         LazyColumn(
                             modifier = Modifier
@@ -1942,12 +1943,12 @@ fun operate(
                                     )
                                 ) {
                                     item {
-                                        TableTextHead(text = "序号", width = cellWidthList[0])
-                                        TableTextHead(text = "名称", width = cellWidthList[1])
-                                        TableTextHead(text = "浓度", width = cellWidthList[2])
-                                        TableTextHead(text = "厚度", width = cellWidthList[3])
+                                        TableTextHead(text = "序 号", width = cellWidthList[0])
+                                        TableTextHead(text = "名 称", width = cellWidthList[1])
+                                        TableTextHead(text = "浓 度", width = cellWidthList[2])
+                                        TableTextHead(text = "厚 度", width = cellWidthList[3])
+                                        TableTextHead(text = "胶 液", width = cellWidthList[3])
                                         TableTextHead(text = "促凝剂", width = cellWidthList[3])
-                                        TableTextHead(text = "胶液", width = cellWidthList[3])
                                         TableTextHead(text = "创建人", width = cellWidthList[3])
                                     }
                                 }
@@ -1979,7 +1980,7 @@ fun operate(
                                             width = cellWidthList[0],
                                             selectedEntity
                                         )
-                                        TableTextBody(
+                                        TableTextdisplayText(
                                             text = item.displayText,
                                             width = cellWidthList[1],
                                             selectedEntity

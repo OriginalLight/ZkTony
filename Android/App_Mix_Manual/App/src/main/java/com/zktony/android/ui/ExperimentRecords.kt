@@ -305,7 +305,7 @@ fun experimentList(
                                                     FileWriter(path, true).use { writer ->
                                                         writer.write(
                                                             "实验记录:" + ",日期：" + entity.createTime.dateFormat(
-                                                                "yyyy-MM-dd"
+                                                                "yyyy/MM/dd"
                                                             )
                                                                     + ",开始浓度:" + entity.startRange.toString()
                                                                     + ",结束浓度:" + entity.endRange.toString()
@@ -333,7 +333,7 @@ fun experimentList(
                                                 FileWriter(path, true).use { writer ->
                                                     writer.write(
                                                         "实验记录:" + ",日期：" + entity.createTime.dateFormat(
-                                                            "yyyy-MM-dd"
+                                                            "yyyy/MM/dd"
                                                         )
                                                                 + ",开始浓度:" + entity.startRange.toString()
                                                                 + ",结束浓度:" + entity.endRange.toString()
@@ -410,7 +410,7 @@ fun experimentList(
                                     )
                                     Text(
                                         fontSize = 20.sp,
-                                        text = entity.createTime.dateFormat("yyyy-MM-dd HH:mm:ss")
+                                        text = entity.createTime.dateFormat("yyyy/MM/dd HH:mm:ss")
                                     )
 
                                 }

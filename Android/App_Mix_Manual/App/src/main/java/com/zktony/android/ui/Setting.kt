@@ -1372,11 +1372,21 @@ fun SettingLits(
                             verticalAlignment = CenterVertically
                         ) {
                             Text(text = "高浓度泵", fontSize = 25.sp)
-                            Text(modifier = Modifier.padding(start = 10.dp), text = "已使用:")
                             Text(
-                                modifier = Modifier.padding(start = 10.dp), text = useHighTime
+                                modifier = Modifier.padding(start = 10.dp),
+                                fontSize = 20.sp,
+                                text = "已使用:"
                             )
-                            Text(modifier = Modifier.padding(start = 10.dp), text = "小时")
+                            Text(
+                                modifier = Modifier.padding(start = 10.dp),
+                                fontSize = 20.sp,
+                                text = useHighTime
+                            )
+                            Text(
+                                modifier = Modifier.padding(start = 10.dp),
+                                fontSize = 20.sp,
+                                text = "小时"
+                            )
                         }
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -1399,7 +1409,9 @@ fun SettingLits(
                                 }
 
                                 Text(
-                                    modifier = Modifier.padding(start = 10.dp), text = "预期寿命:"
+                                    modifier = Modifier.padding(start = 10.dp),
+                                    fontSize = 20.sp,
+                                    text = "预期寿命:"
                                 )
 
                                 OutlinedTextField(
@@ -1411,6 +1423,7 @@ fun SettingLits(
                                         cursorColor = Color(rgb(0, 105, 52))
                                     ),
                                     label = { },
+                                    textStyle = TextStyle(fontSize = 20.sp),
                                     onValueChange = {
                                         if (Pattern.compile(speChat).matcher(it).find()) {
                                             Toast.makeText(
@@ -1436,7 +1449,11 @@ fun SettingLits(
                                     })
                                 )
 
-                                Text(modifier = Modifier.padding(start = 10.dp), text = "小时")
+                                Text(
+                                    modifier = Modifier.padding(start = 10.dp),
+                                    fontSize = 20.sp,
+                                    text = "小时"
+                                )
                             } else {
                                 Button(modifier = Modifier
                                     .width(100.dp)
@@ -1454,13 +1471,20 @@ fun SettingLits(
                                 }
 
                                 Text(
-                                    modifier = Modifier.padding(start = 10.dp), text = "预期寿命:"
+                                    modifier = Modifier.padding(start = 10.dp),
+                                    fontSize = 20.sp,
+                                    text = "预期寿命:"
                                 )
                                 Text(
                                     modifier = Modifier.padding(start = 10.dp),
+                                    fontSize = 20.sp,
                                     text = setting.highTimeExpected.toString()
                                 )
-                                Text(modifier = Modifier.padding(start = 10.dp), text = "小时")
+                                Text(
+                                    modifier = Modifier.padding(start = 10.dp),
+                                    fontSize = 20.sp,
+                                    text = "小时"
+                                )
                             }
 
                         }
@@ -1472,11 +1496,21 @@ fun SettingLits(
                             verticalAlignment = CenterVertically
                         ) {
                             Text(text = "低浓度泵", fontSize = 25.sp)
-                            Text(modifier = Modifier.padding(start = 10.dp), text = "已使用:")
                             Text(
-                                modifier = Modifier.padding(start = 10.dp), text = useLowTime
+                                modifier = Modifier.padding(start = 10.dp),
+                                fontSize = 20.sp,
+                                text = "已使用:"
                             )
-                            Text(modifier = Modifier.padding(start = 10.dp), text = "小时")
+                            Text(
+                                modifier = Modifier.padding(start = 10.dp),
+                                fontSize = 20.sp,
+                                text = useLowTime
+                            )
+                            Text(
+                                modifier = Modifier.padding(start = 10.dp),
+                                fontSize = 20.sp,
+                                text = "小时"
+                            )
                         }
 
                         Row(
@@ -1501,7 +1535,9 @@ fun SettingLits(
                                 }
 
                                 Text(
-                                    modifier = Modifier.padding(start = 10.dp), text = "预期寿命:"
+                                    modifier = Modifier.padding(start = 10.dp),
+                                    fontSize = 20.sp,
+                                    text = "预期寿命:"
                                 )
 
                                 OutlinedTextField(
@@ -1513,6 +1549,7 @@ fun SettingLits(
                                         cursorColor = Color(rgb(0, 105, 52))
                                     ),
                                     label = { },
+                                    textStyle = TextStyle(fontSize = 20.sp),
                                     onValueChange = {
                                         if (Pattern.compile(speChat).matcher(it).find()) {
                                             Toast.makeText(
@@ -1539,7 +1576,11 @@ fun SettingLits(
                                     })
                                 )
 
-                                Text(modifier = Modifier.padding(start = 10.dp), text = "小时")
+                                Text(
+                                    modifier = Modifier.padding(start = 10.dp),
+                                    fontSize = 20.sp,
+                                    text = "小时"
+                                )
                             } else {
                                 Button(modifier = Modifier
                                     .width(100.dp)
@@ -1557,13 +1598,20 @@ fun SettingLits(
                                 }
 
                                 Text(
-                                    modifier = Modifier.padding(start = 10.dp), text = "预期寿命:"
+                                    modifier = Modifier.padding(start = 10.dp),
+                                    fontSize = 20.sp,
+                                    text = "预期寿命:"
                                 )
                                 Text(
                                     modifier = Modifier.padding(start = 10.dp),
+                                    fontSize = 20.sp,
                                     text = setting.lowTimeExpected.toString()
                                 )
-                                Text(modifier = Modifier.padding(start = 10.dp), text = "小时")
+                                Text(
+                                    modifier = Modifier.padding(start = 10.dp),
+                                    fontSize = 20.sp,
+                                    text = "小时"
+                                )
                             }
 
 
@@ -1576,12 +1624,22 @@ fun SettingLits(
                             verticalAlignment = CenterVertically
                         ) {
                             Text(text = "冲洗液泵", fontSize = 25.sp)
-                            Text(modifier = Modifier.padding(start = 10.dp), text = "已使用:")
+                            Text(
+                                modifier = Modifier.padding(start = 10.dp),
+                                fontSize = 20.sp,
+                                text = "已使用:"
+                            )
 
                             Text(
-                                modifier = Modifier.padding(start = 10.dp), text = useRinseTime
+                                modifier = Modifier.padding(start = 10.dp),
+                                fontSize = 20.sp,
+                                text = useRinseTime
                             )
-                            Text(modifier = Modifier.padding(start = 10.dp), text = "小时")
+                            Text(
+                                modifier = Modifier.padding(start = 10.dp),
+                                fontSize = 20.sp,
+                                text = "小时"
+                            )
                         }
 
                         Row(
@@ -1605,7 +1663,9 @@ fun SettingLits(
                                 }
 
                                 Text(
-                                    modifier = Modifier.padding(start = 10.dp), text = "预期寿命:"
+                                    modifier = Modifier.padding(start = 10.dp),
+                                    fontSize = 20.sp,
+                                    text = "预期寿命:"
                                 )
 
                                 OutlinedTextField(
@@ -1617,6 +1677,7 @@ fun SettingLits(
                                         cursorColor = Color(rgb(0, 105, 52))
                                     ),
                                     label = { },
+                                    textStyle = TextStyle(fontSize = 20.sp),
                                     onValueChange = {
                                         if (Pattern.compile(speChat).matcher(it).find()) {
                                             Toast.makeText(
@@ -1643,7 +1704,11 @@ fun SettingLits(
                                     })
                                 )
 
-                                Text(modifier = Modifier.padding(start = 10.dp), text = "小时")
+                                Text(
+                                    modifier = Modifier.padding(start = 10.dp),
+                                    fontSize = 20.sp,
+                                    text = "小时"
+                                )
                             } else {
                                 Button(modifier = Modifier
                                     .width(100.dp)
@@ -1661,13 +1726,19 @@ fun SettingLits(
                                 }
 
                                 Text(
-                                    modifier = Modifier.padding(start = 10.dp), text = "预期寿命:"
+                                    modifier = Modifier.padding(start = 10.dp),
+                                    fontSize = 20.sp,
+                                    text = "预期寿命:"
+                                )
+                                Text(
+                                    modifier = Modifier.padding(start = 10.dp), fontSize = 20.sp,
+                                    text = setting.rinseTimeExpected.toString()
                                 )
                                 Text(
                                     modifier = Modifier.padding(start = 10.dp),
-                                    text = setting.rinseTimeExpected.toString()
+                                    fontSize = 20.sp,
+                                    text = "小时"
                                 )
-                                Text(modifier = Modifier.padding(start = 10.dp), text = "小时")
                             }
 
                         }
@@ -1678,6 +1749,15 @@ fun SettingLits(
 
 
             }, confirmButton = {
+                Button(modifier = Modifier.width(100.dp),
+                    border = BorderStroke(1.dp, Color.Gray),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent
+                    ), onClick = { accessoriesDialog.value = false }) {
+                    Text(fontSize = 18.sp, text = "取   消", color = Color.Black)
+                }
+
+            }, dismissButton = {
                 if (factoryAdminPwd.value == currentpwd) {
                     Button(modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
                         containerColor = Color(rgb(0, 105, 52))
@@ -1705,13 +1785,6 @@ fun SettingLits(
                         Text(fontSize = 18.sp, text = "全部重置")
                     }
                 }
-
-            }, dismissButton = {
-                Button(modifier = Modifier.width(100.dp), colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(rgb(0, 105, 52))
-                ), onClick = { accessoriesDialog.value = false }) {
-                    Text(fontSize = 18.sp, text = "返   回")
-                }
             })
         }
 
@@ -1733,7 +1806,8 @@ fun SettingLits(
                                 focusedLabelColor = Color(rgb(0, 105, 52)),
                                 cursorColor = Color(rgb(0, 105, 52))
                             ),
-                            label = { Text(text = "胶板位置") },
+                            label = { Text(fontSize = 20.sp, text = "胶板位置") },
+                            textStyle = TextStyle(fontSize = 20.sp),
                             onValueChange = {
                                 if (Pattern.compile(speChat).matcher(it).find()) {
                                     Toast.makeText(
@@ -1795,7 +1869,8 @@ fun SettingLits(
                                 focusedLabelColor = Color(rgb(0, 105, 52)),
                                 cursorColor = Color(rgb(0, 105, 52))
                             ),
-                            label = { Text(text = "废液槽位置") },
+                            label = { Text(fontSize = 20.sp, text = "废液槽位置") },
+                            textStyle = TextStyle(fontSize = 20.sp),
                             onValueChange = {
                                 if (Pattern.compile(speChat).matcher(it).find()) {
                                     Toast.makeText(
@@ -1887,7 +1962,7 @@ fun SettingLits(
                     uiEvent(SettingIntent.UpdateSet(setting))
                     positionDialog.value = false
                 }) {
-                    Text(text = "保   存")
+                    Text(fontSize = 18.sp, text = "保   存")
                 }
             })
         }
@@ -1909,13 +1984,13 @@ fun SettingLits(
                         Text(
                             text = "应用软件版本号:",
                             fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
+
+                            )
                         Text(
                             text = BuildConfig.VERSION_NAME,
                             fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
+
+                            )
                     }
 
                     Row(
@@ -1926,31 +2001,15 @@ fun SettingLits(
                         Text(
                             text = "主控板固件版本号:",
                             fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
+
+                            )
                         Text(
                             text = "$lowVersion",
                             fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
+
+                            )
                     }
 
-                    Row(
-                        modifier = Modifier.padding(top = 20.dp),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalAlignment = CenterVertically
-                    ) {
-                        Text(
-                            text = "状态指示板固件版本号:",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
-                        Text(
-                            text = "",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
 
                     Row(
                         modifier = Modifier.padding(top = 20.dp),
@@ -1960,13 +2019,13 @@ fun SettingLits(
                         Text(
                             text = "SN码:",
                             fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
+
+                            )
                         Text(
                             text = snNumber.value,
                             fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
+
+                            )
                     }
 
                 }

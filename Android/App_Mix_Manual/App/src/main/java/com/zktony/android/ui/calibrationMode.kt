@@ -279,8 +279,8 @@ fun calibrationMode(
                             modifier = Modifier.padding(top = 10.dp, start = 24.7.dp),
                             text = "高浓度泵",
                             fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+
+                            )
                         Button(modifier = Modifier
                             .padding(top = 10.dp, start = 150.dp)
                             .width(100.dp)
@@ -317,7 +317,7 @@ fun calibrationMode(
                         modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
                         value = higeLiquidVolume1_ex,
                         textStyle = TextStyle.Default.copy(
-                            fontSize = 18.sp,
+                            fontSize = 20.sp,
                         ),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color(rgb(0, 105, 52)),
@@ -358,7 +358,7 @@ fun calibrationMode(
                         modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
                         value = higeLiquidVolume2_ex,
                         textStyle = TextStyle.Default.copy(
-                            fontSize = 18.sp,
+                            fontSize = 20.sp,
                         ),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color(rgb(0, 105, 52)),
@@ -398,7 +398,7 @@ fun calibrationMode(
                         modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
                         value = higeLiquidVolume3_ex,
                         textStyle = TextStyle.Default.copy(
-                            fontSize = 18.sp,
+                            fontSize = 20.sp,
                         ),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color(rgb(0, 105, 52)),
@@ -455,8 +455,8 @@ fun calibrationMode(
                             modifier = Modifier.padding(top = 10.dp, start = 24.7.dp),
                             text = "低浓度泵",
                             fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+
+                            )
                         Button(modifier = Modifier
                             .padding(top = 10.dp, start = 150.dp)
                             .width(100.dp)
@@ -493,7 +493,7 @@ fun calibrationMode(
                         modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
                         value = lowLiquidVolume1_ex,
                         textStyle = TextStyle.Default.copy(
-                            fontSize = 18.sp,
+                            fontSize = 20.sp,
                         ),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color(rgb(0, 105, 52)),
@@ -533,7 +533,7 @@ fun calibrationMode(
                         modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
                         value = lowLiquidVolume2_ex,
                         textStyle = TextStyle.Default.copy(
-                            fontSize = 18.sp,
+                            fontSize = 20.sp,
                         ),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color(rgb(0, 105, 52)),
@@ -573,7 +573,7 @@ fun calibrationMode(
                         modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
                         value = lowLiquidVolume3_ex,
                         textStyle = TextStyle.Default.copy(
-                            fontSize = 18.sp,
+                            fontSize = 20.sp,
                         ),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color(rgb(0, 105, 52)),
@@ -629,8 +629,8 @@ fun calibrationMode(
                             modifier = Modifier.padding(top = 10.dp, start = 24.7.dp),
                             text = "冲洗液泵",
                             fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+
+                            )
                         Button(modifier = Modifier
                             .padding(top = 10.dp, start = 150.dp)
                             .width(100.dp)
@@ -668,7 +668,7 @@ fun calibrationMode(
                         modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
                         value = rinseLiquidVolume1_ex,
                         textStyle = TextStyle.Default.copy(
-                            fontSize = 18.sp,
+                            fontSize = 20.sp,
                         ),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color(rgb(0, 105, 52)),
@@ -708,7 +708,7 @@ fun calibrationMode(
                         modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
                         value = rinseLiquidVolume2_ex,
                         textStyle = TextStyle.Default.copy(
-                            fontSize = 18.sp,
+                            fontSize = 20.sp,
                         ),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color(rgb(0, 105, 52)),
@@ -748,7 +748,7 @@ fun calibrationMode(
                         modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
                         value = rinseLiquidVolume3_ex,
                         textStyle = TextStyle.Default.copy(
-                            fontSize = 18.sp,
+                            fontSize = 20.sp,
                         ),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color(rgb(0, 105, 52)),
@@ -803,8 +803,8 @@ fun calibrationMode(
                             modifier = Modifier.padding(top = 10.dp, start = 24.7.dp),
                             text = "促凝剂泵",
                             fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+
+                            )
                         Button(modifier = Modifier
                             .padding(top = 10.dp, start = 150.dp)
                             .width(100.dp)
@@ -855,7 +855,7 @@ fun calibrationMode(
                         modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
                         value = coagulantLiquidVolume1_ex,
                         textStyle = TextStyle.Default.copy(
-                            fontSize = 18.sp,
+                            fontSize = 20.sp,
                         ),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color(rgb(0, 105, 52)),
@@ -895,7 +895,7 @@ fun calibrationMode(
                         modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
                         value = coagulantLiquidVolume2_ex,
                         textStyle = TextStyle.Default.copy(
-                            fontSize = 18.sp,
+                            fontSize = 20.sp,
                         ),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color(rgb(0, 105, 52)),
@@ -935,7 +935,7 @@ fun calibrationMode(
                         modifier = Modifier.padding(top = 10.dp, start = 47.7.dp),
                         value = coagulantLiquidVolume3_ex,
                         textStyle = TextStyle.Default.copy(
-                            fontSize = 18.sp,
+                            fontSize = 20.sp,
                         ),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color(rgb(0, 105, 52)),
@@ -1149,7 +1149,7 @@ fun calibrationMode(
                 border = BorderStroke(1.dp, Color.Gray),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Transparent
-                ),onClick = { calibrationResetDialog.value = false }) {
+                ), onClick = { calibrationResetDialog.value = false }) {
                 Text(fontSize = 18.sp, text = "取   消", color = Color.Black)
             }
         })

@@ -348,7 +348,11 @@ fun ProgramList(
                         })
                 ) {
                     TableTextBody(text = (index + 1).toString(), width = cellWidthList[0], selected)
-                    TableTextdisplayText(text = item.displayText, width = cellWidthList[1], selected)
+                    TableTextdisplayText(
+                        text = item.displayText,
+                        width = cellWidthList[1],
+                        selected
+                    )
                     TableTextBody(
                         text = "" + item.startRange + "%~" + item.endRange + "%",
                         width = cellWidthList[2], selected
@@ -533,7 +537,7 @@ fun ProgramList(
                                             path += "/${entity.displayText}.txt"
                                             val text =
                                                 "制胶程序:" + entity.displayText + ",开始浓度:" + entity.startRange.toString() + ",结束浓度:" + entity.endRange.toString() + ",常用厚度:" + entity.thickness + ",促凝剂体积:" + entity.coagulant.toString() + ",胶液体积:" + entity.volume.toString() + ",创建人:" + entity.founder + ",日期：" + entity.createTime.dateFormat(
-                                                    "yyyy-MM-dd"
+                                                    "yyyy/MM/dd"
                                                 )
 
                                             val file = File(path)
@@ -848,9 +852,6 @@ fun ProgramList(
                                 //打开
                                 val entity = entities[selectedIndex]
 
-                                var speChat =
-                                    "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~!@#￥%……&*（）——+|{}【】‘；：”“’。，、？\\s]"
-
                                 var nameRepeat = false
 
                                 entitiesList.forEach {
@@ -870,10 +871,10 @@ fun ProgramList(
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 } else {
-                                    if (Pattern.compile(speChat).matcher(displayText).find()) {
+                                    if (displayText.isEmpty()) {
                                         Toast.makeText(
                                             context,
-                                            "名称只支持输入中英文、数字字符，及特殊字符“-”！",
+                                            "程序名称不能为空!",
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     } else {
@@ -926,9 +927,6 @@ fun ProgramList(
 
 
                             } else {
-                                //新建
-                                var speChat =
-                                    "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~!@#￥%……&*（）——+|{}【】‘；：”“’。，、？\\s]"
 
                                 var nameRepeat = false
 
@@ -945,19 +943,13 @@ fun ProgramList(
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 } else {
-                                    if (Pattern.compile(speChat).matcher(displayText).find()) {
+                                    if (displayText.isEmpty()) {
                                         Toast.makeText(
                                             context,
-                                            "名称只支持输入中英文、数字字符，及特殊字符“-”！",
+                                            "程序名称不能为空!",
                                             Toast.LENGTH_SHORT
                                         ).show()
-                                    } else if(displayText.isEmpty()){
-                                        Toast.makeText(
-                                            context,
-                                            "文件名不能为空!",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }else{
+                                    } else {
                                         if (volumeDef) {
                                             volume_ex = volumeTemp
                                         }

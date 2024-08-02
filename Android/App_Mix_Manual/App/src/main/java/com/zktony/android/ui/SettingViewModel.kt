@@ -158,7 +158,6 @@ class SettingViewModel @Inject constructor(
     }
 
 
-    
     fun dispatch(intent: SettingIntent) {
         when (intent) {
             is SettingIntent.CheckUpdate -> checkUpdate()
@@ -341,8 +340,9 @@ class SettingViewModel @Inject constructor(
 
             is SettingIntent.CopyFileToUSB -> copyFileToUSB(intent.usbPath)
 
-            is SettingIntent.FillCoagulant ->viewModelScope.launch {
-                val coagulantFill=  intent.coagulantVol
+            is SettingIntent.FillCoagulant -> viewModelScope.launch {
+                val coagulantFill = intent.coagulantVol
+
                 /**
                  * 促凝剂总行程
                  */
@@ -361,9 +361,8 @@ class SettingViewModel @Inject constructor(
                 val coagulantSpeed = dataStore.readData("coagulantSpeed", 200L)
 
 
-
                 val p1jz = (AppStateUtils.hpc[1] ?: { x -> x * 100 }).invoke(1.0)
-                var p1 = ( coagulantFill * 1000  * p1jz).toLong()
+                var p1 = (coagulantFill * 1000 * p1jz).toLong()
 
 
                 val p1Count = p1.toDouble() / (coagulantpulse - 50000)
@@ -520,6 +519,25 @@ class SettingViewModel @Inject constructor(
 
                 }
 
+                val rinseSpeed = dataStore.readData("rinseSpeed", 200L)
+
+                val setting = slEntitiy.firstOrNull()
+                if (setting != null) {
+                    start {
+                        timeOut = 1000L * 30
+                        with(
+                            index = 4,
+                            ads = Triple(
+                                rinseSpeed * 30,
+                                rinseSpeed * 30,
+                                rinseSpeed * 30
+                            ),
+                            pdv = setting.rinseCleanVolume * 1000
+                        )
+                    }
+                }
+
+
             }
 
         }
@@ -545,7 +563,7 @@ class SettingViewModel @Inject constructor(
 
     }
 
-    
+
     private fun updateApkU(context: Context, apkPath: String) {
         viewModelScope.launch {
             try {
@@ -553,15 +571,15 @@ class SettingViewModel @Inject constructor(
                 val versionCode = getApkCode(context, apkPath)
                 var currentCode = BuildConfig.VERSION_CODE
                 if (versionCode > currentCode) {
-                    _updateMsg.value =""
+                    _updateMsg.value = ""
                     val apkFile = File(apkPath)
                     ApplicationUtils.installApp(apkFile)
                 } else {
-                    _updateMsg.value ="更新文件版本过低！"
+                    _updateMsg.value = "更新文件版本过低！"
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                _updateMsg.value ="更新数据错误！"
+                _updateMsg.value = "更新数据错误！"
                 return@launch
             } finally {
                 _uiFlags.value = UiFlags.none()
@@ -570,7 +588,7 @@ class SettingViewModel @Inject constructor(
 
     }
 
-    
+
     fun getApkCode(context: Context, apkFilePath: String): Int {
         val info =
             context.packageManager.getPackageArchiveInfo(apkFilePath, PackageManager.GET_ACTIVITIES)

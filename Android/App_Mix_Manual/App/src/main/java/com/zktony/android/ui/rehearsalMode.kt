@@ -245,7 +245,7 @@ fun rehearsalMode(
                         modifier = Modifier.padding(top = 10.dp, start = 24.7.dp),
                         text = "管路填充",
                         fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold
+                        
                     )
 
                     OutlinedTextField(
@@ -426,7 +426,7 @@ fun rehearsalMode(
                         modifier = Modifier.padding(top = 10.dp, start = 24.7.dp),
                         text = "预排液量",
                         fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold
+                        
                     )
 
                     OutlinedTextField(
@@ -488,7 +488,7 @@ fun rehearsalMode(
                         modifier = Modifier.padding(top = 10.dp, start = 24.7.dp),
                         text = "清洗液量",
                         fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold
+                        
                     )
 
 
@@ -669,7 +669,7 @@ fun rehearsalMode(
                         modifier = Modifier.padding(top = 10.dp, start = 24.7.dp),
                         text = "冲洗液量",
                         fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold
+                        
                     )
 
                     OutlinedTextField(
