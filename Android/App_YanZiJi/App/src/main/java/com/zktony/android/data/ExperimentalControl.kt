@@ -6,11 +6,11 @@ import com.zktony.serialport.ext.writeInt8
 
 data class ExperimentalControl(
     // 类型
-    val type: Int = 0,
+    val experimentalType: Int = 0,
     // 模式
-    val mode: Int = 0,
+    val experimentalMode: Int = 0,
     // 速度
-    val speed: String = "0",
+    val flowSpeed: String = "0",
     // 时间
     val time: String = "0",
     // 电压
@@ -24,9 +24,9 @@ data class ExperimentalControl(
 ) {
     fun toByteArray(): ByteArray {
         val byteArray = ByteArray(14)
-        byteArray.writeInt8(type + 1, 0)
-        byteArray.writeInt8(mode + 1, 1)
-        byteArray.writeInt16LE(speed.toBigDecimal().multiply(100.toBigDecimal()).toInt(), 2)
+        byteArray.writeInt8(experimentalType + 1, 0)
+        byteArray.writeInt8(experimentalMode + 1, 1)
+        byteArray.writeInt16LE(flowSpeed.toBigDecimal().multiply(100.toBigDecimal()).toInt(), 2)
         byteArray.writeInt16LE(voltage.toBigDecimal().multiply(100.toBigDecimal()).toInt(), 4)
         byteArray.writeInt16LE(current.toBigDecimal().multiply(100.toBigDecimal()).toInt(), 6)
         byteArray.writeInt16LE(power.toBigDecimal().multiply(100.toBigDecimal()).toInt(), 8)
@@ -38,9 +38,9 @@ data class ExperimentalControl(
     companion object {
         fun fromProgram(program: Program): ExperimentalControl {
             return ExperimentalControl(
-                type = program.experimentalType,
-                mode = program.workMode,
-                speed = program.flowSpeed,
+                experimentalType = program.experimentalType,
+                experimentalMode = program.experimentalMode,
+                flowSpeed = program.flowSpeed,
                 time = program.time.toBigDecimal().multiply(60.toBigDecimal()).stripTrailingZeros()
                     .toPlainString(),
                 voltage = program.value,

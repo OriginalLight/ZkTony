@@ -79,11 +79,11 @@ class SettingsDebugExperimentalViewModel @Inject constructor() : ViewModel() {
             if (!files.exists()) {
                 files.createNewFile()
             }
-            files.appendText("电压(V): ${control.voltage},电流(A): ${control.current},功率(W): ${control.power},温度(℃): ${control.temperature},时间(s): ${control.time},流量(mL/min): ${control.speed}\n")
+            files.appendText("电压(V): ${control.voltage},电流(A): ${control.current},功率(W): ${control.power},温度(℃): ${control.temperature},时间(s): ${control.time},流量(mL/min): ${control.flowSpeed}\n")
             while (true) {
                 val state = AppStateUtils.channelStateList.value[channel]
                 if (state.step == 7) {
-                    files.appendText("${state.voltage},${state.current},${state.power},${state.temperature},${state.timing}\n")
+                    files.appendText("${state.voltage},${state.current},${state.power},${state.temperature},${state.time}\n")
                 }
                 delay(1000L)
             }

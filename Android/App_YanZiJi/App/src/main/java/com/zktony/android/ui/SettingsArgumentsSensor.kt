@@ -39,9 +39,9 @@ import com.zktony.android.data.ChannelState
 import com.zktony.android.ui.components.ArgumentsInputField
 import com.zktony.android.ui.components.ButtonLoading
 import com.zktony.android.ui.components.SegmentedButtonTabRow
+import com.zktony.android.ui.components.TopBarRow
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.utils.LocalNavigationActions
-import com.zktony.android.ui.utils.zktyBrush
 import com.zktony.android.ui.viewmodel.SettingsArgumentsSensorViewModel
 import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.ProductUtils
@@ -87,16 +87,7 @@ fun SettingsArgumentsSensorTopBar(
     onChannelChange: (Int) -> Unit,
     navigationActions: NavigationActions
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(64.dp)
-            .background(brush = zktyBrush, shape = MaterialTheme.shapes.medium)
-            .clip(MaterialTheme.shapes.medium)
-            .padding(horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
+    TopBarRow(modifier = modifier) {
         Row(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.medium)
@@ -166,7 +157,7 @@ fun RealTimeSensorView(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.medium)
                 .padding(horizontal = 24.dp, vertical = 12.dp),
-            text = "进液气泡传感器：" + if (channelState.bubble1 == 0) "空气" else "液体",
+            text = "进液气泡传感器：" + if (channelState.bub1 == 0) "空气" else "液体",
             style = MaterialTheme.typography.bodyLarge
         )
 
@@ -174,7 +165,7 @@ fun RealTimeSensorView(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.medium)
                 .padding(horizontal = 24.dp, vertical = 12.dp),
-            text = "出液气泡传感器：" + if (channelState.bubble2 == 0) "空气" else "液体",
+            text = "出液气泡传感器：" + if (channelState.bub2 == 0) "空气" else "液体",
             style = MaterialTheme.typography.bodyLarge
         )
 
@@ -182,7 +173,7 @@ fun RealTimeSensorView(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.medium)
                 .padding(horizontal = 24.dp, vertical = 12.dp),
-            text = "染色盒光耦：" + if (channelState.opto1 == 0) "空闲" else "遮挡",
+            text = "转膜盒光耦：" + if (channelState.opt1 == 0) "空闲" else "遮挡",
             style = MaterialTheme.typography.bodyLarge
         )
 
@@ -190,7 +181,7 @@ fun RealTimeSensorView(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.medium)
                 .padding(horizontal = 24.dp, vertical = 12.dp),
-            text = "转膜盒光耦：" + if (channelState.opto2 == 0) "空闲" else "遮挡",
+            text = "染色盒光耦：" + if (channelState.opt2 == 0) "空闲" else "遮挡",
             style = MaterialTheme.typography.bodyLarge
         )
     }

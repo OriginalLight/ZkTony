@@ -41,8 +41,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zktony.android.ui.components.ArgumentsInputField
 import com.zktony.android.ui.components.IconLoading
 import com.zktony.android.ui.components.SegmentedButtonTabRow
+import com.zktony.android.ui.components.TopBarRow
 import com.zktony.android.ui.utils.LocalNavigationActions
-import com.zktony.android.ui.utils.zktyBrush
 import com.zktony.android.ui.viewmodel.ProgramAddOrUpdateViewModel
 import com.zktony.room.defaults.defaultProgram
 import com.zktony.room.entities.Program
@@ -84,16 +84,7 @@ fun ProgramAddOrUpdateTopBar(
     val navigationActions = LocalNavigationActions.current
     var loading by remember { mutableStateOf(false) }
 
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(64.dp)
-            .background(brush = zktyBrush, shape = MaterialTheme.shapes.medium)
-            .clip(MaterialTheme.shapes.medium)
-            .padding(horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
+    TopBarRow(modifier = modifier) {
         Row(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.medium)
@@ -187,16 +178,16 @@ fun ProgramAttributeList(
             ProgramAttributeItem(title = "工作模式", required = true) {
                 SegmentedButtonTabRow(
                     modifier = Modifier.width(300.dp),
-                    tabItems = listOf("恒压", "恒流", "恒功率"), selected = obj.workMode
+                    tabItems = listOf("恒压", "恒流", "恒功率"), selected = obj.experimentalMode
                 ) {
-                    onObjChange(obj.copy(workMode = it))
+                    onObjChange(obj.copy(experimentalMode = it))
                 }
             }
         }
 
         item {
             ProgramAttributeItem(
-                title = when (obj.workMode) {
+                title = when (obj.experimentalMode) {
                     0 -> "电压"
                     1 -> "电流"
                     2 -> "功率"
@@ -207,7 +198,7 @@ fun ProgramAttributeList(
                 ArgumentsInputField(
                     modifier = Modifier.size(450.dp, 48.dp),
                     value = obj.value,
-                    suffix = when (obj.workMode) {
+                    suffix = when (obj.experimentalMode) {
                         0 -> "V"
                         1 -> "A"
                         2 -> "W"

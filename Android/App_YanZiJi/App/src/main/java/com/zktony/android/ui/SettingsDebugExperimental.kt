@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -41,9 +40,9 @@ import com.zktony.android.data.PipelineControl
 import com.zktony.android.ui.components.ArgumentsInputField
 import com.zktony.android.ui.components.ButtonLoading
 import com.zktony.android.ui.components.SegmentedButtonTabRow
+import com.zktony.android.ui.components.TopBarRow
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.utils.LocalNavigationActions
-import com.zktony.android.ui.utils.zktyBrush
 import com.zktony.android.ui.viewmodel.SettingsDebugExperimentalViewModel
 import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.ProductUtils
@@ -85,16 +84,7 @@ fun SettingsDebugExperimentalTopBar(
     onChannelChange: (Int) -> Unit,
     navigationActions: NavigationActions
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(64.dp)
-            .background(brush = zktyBrush, shape = MaterialTheme.shapes.medium)
-            .clip(MaterialTheme.shapes.medium)
-            .padding(horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
+    TopBarRow(modifier = modifier) {
         Row(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.medium)
@@ -250,9 +240,9 @@ fun ExperimentalDebugListView(
                                     viewModel.startExperiment(
                                         channel,
                                         ExperimentalControl(
-                                            type = type,
-                                            mode = mode,
-                                            speed = if (type == 0) speed else "0",
+                                            experimentalType = type,
+                                            experimentalMode = mode,
+                                            flowSpeed = if (type == 0) speed else "0",
                                             time = time,
                                             voltage = if (mode == 0) value else "0",
                                             current = if (mode == 1) value else "0",
@@ -424,7 +414,7 @@ fun RealTimeExperimentalView(
                         MaterialTheme.shapes.medium
                     )
                     .padding(horizontal = 24.dp, vertical = 12.dp),
-                text = "时间：" + channelState.timing + " s",
+                text = "时间：" + channelState.time + " s",
                 style = MaterialTheme.typography.bodyLarge
             )
         }
@@ -441,7 +431,7 @@ fun RealTimeExperimentalView(
                         MaterialTheme.shapes.medium
                     )
                     .padding(horizontal = 24.dp, vertical = 12.dp),
-                text = "进液气泡传感器：" + if (channelState.bubble1 == 0) "空气" else "液体",
+                text = "进液气泡传感器：" + if (channelState.bub1 == 0) "空气" else "液体",
                 style = MaterialTheme.typography.bodyLarge
             )
 
@@ -452,7 +442,7 @@ fun RealTimeExperimentalView(
                         MaterialTheme.shapes.medium
                     )
                     .padding(horizontal = 24.dp, vertical = 12.dp),
-                text = "出液气泡传感器：" + if (channelState.bubble2 == 0) "空气" else "液体",
+                text = "出液气泡传感器：" + if (channelState.bub2 == 0) "空气" else "液体",
                 style = MaterialTheme.typography.bodyLarge
             )
 
@@ -463,7 +453,7 @@ fun RealTimeExperimentalView(
                         MaterialTheme.shapes.medium
                     )
                     .padding(horizontal = 24.dp, vertical = 12.dp),
-                text = "染色盒光耦：" + if (channelState.opto1 == 0) "空闲" else "遮挡",
+                text = "染色盒光耦：" + if (channelState.opt1 == 0) "空闲" else "遮挡",
                 style = MaterialTheme.typography.bodyLarge
             )
 
@@ -474,7 +464,7 @@ fun RealTimeExperimentalView(
                         MaterialTheme.shapes.medium
                     )
                     .padding(horizontal = 24.dp, vertical = 12.dp),
-                text = "转膜盒光耦：" + if (channelState.opto2 == 0) "空闲" else "遮挡",
+                text = "转膜盒光耦：" + if (channelState.opt2 == 0) "空闲" else "遮挡",
                 style = MaterialTheme.typography.bodyLarge
             )
         }

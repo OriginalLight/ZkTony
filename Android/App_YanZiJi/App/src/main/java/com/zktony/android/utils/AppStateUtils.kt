@@ -3,6 +3,7 @@ package com.zktony.android.utils
 import com.zktony.android.data.Arguments
 import com.zktony.android.data.ChannelState
 import com.zktony.android.data.ExperimentalState
+import com.zktony.log.LogUtils
 import com.zktony.room.defaults.defaultProgram
 import com.zktony.room.entities.Program
 import kotlinx.coroutines.CoroutineScope
@@ -82,18 +83,56 @@ object AppStateUtils {
 
     fun setExperimentalStateHook(channel: Int, state: ChannelState) {
         // 未插入状态
-        if (state.opto1 == 0 && state.opto2 == 0) {
-            _experimentalStateList.value =
-                _experimentalStateList.value.mapIndexed { index, experimentalState ->
-                    if (index == channel) {
-                        ExperimentalState.NONE
-                    } else {
-                        experimentalState
-                    }
-                }
+        if (state.opt1 == 0 && state.opt2 == 0) {
+            transformState(channel, ExperimentalState.NONE)
             return
         }
 
+        //
+        when(state.runState) {
+            0 -> { transformState(channel, ExperimentalState.READY) }
+            1 -> {
+                transformState(channel, when(state.step) {
+                    5 -> ExperimentalState.STARTING
+                    6 -> ExperimentalState.FILL
+                    7 -> ExperimentalState.TIMING
+                    8 -> ExperimentalState.DRAIN
+                    64 -> ExperimentalState.READY
+                    else -> ExperimentalState.NONE
+                })
+            }
+            2 -> { transformState(channel, ExperimentalState.PAUSE) }
+            3 -> { transformState(channel, ExperimentalState.READY) }
+            else -> {}
+        }
+    }
 
+    fun transformState(channel: Int, newState: ExperimentalState) {
+        try {
+            val oldState = _experimentalStateList.value[channel]
+            if (oldState == newState) {
+                return
+            }
+            _experimentalStateList.value = _experimentalStateList.value.mapIndexed { index, experimentalState ->
+                if (index == channel) {
+                    newState
+                } else {
+                    experimentalState
+                }
+            }
+            // do something when state changed from oldState to newState
+            when(oldState) {
+                ExperimentalState.NONE -> {}
+                ExperimentalState.READY -> {}
+                ExperimentalState.PAUSE -> {}
+                ExperimentalState.STARTING -> {}
+                ExperimentalState.TIMING -> {}
+                ExperimentalState.FILL -> {}
+                ExperimentalState.DRAIN -> {}
+                ExperimentalState.ERROR -> {}
+            }
+        } catch (e: Exception) {
+            LogUtils.error(e.stackTraceToString(), true)
+        }
     }
 }

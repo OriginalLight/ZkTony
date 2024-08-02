@@ -16,8 +16,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,7 +32,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -45,10 +46,13 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.data.ChannelState
 import com.zktony.android.data.ExperimentalControl
 import com.zktony.android.data.ExperimentalState
+import com.zktony.android.data.disableEdit
+import com.zktony.android.data.isRunning
 import com.zktony.android.ui.components.ArgumentsInputField
 import com.zktony.android.ui.components.ButtonLoading
 import com.zktony.android.ui.components.ExperimentalState
 import com.zktony.android.ui.components.ProgramSelectDialog
+import com.zktony.android.ui.components.StopExperimentalDialog
 import com.zktony.android.ui.components.Tips
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.zktyHorizontalBrush
@@ -107,7 +111,7 @@ fun ExperimentalChannelView(
                     drawRoundRect(
                         brush = zktyHorizontalBrush,
                         size = size.copy(height = 96.dp.toPx()),
-                        cornerRadius = CornerRadius(16.dp.toPx()),
+                        cornerRadius = CornerRadius(16.dp.toPx())
                     )
                 }
             }
@@ -128,19 +132,21 @@ fun ExperimentalChannelView(
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 ExperimentalProgramState(
                     index = index,
+                    enable = !experimentalState.disableEdit(),
                     entities = entities,
                     program = program,
                     onProgramChange = { channel, program ->
                         viewModel.updateProgram(channel, program)
                     }
                 )
-                ExperimentalRealtimeState(channelState = channelState, viewModel = viewModel)
+                ExperimentalRealtimeState(channelState = channelState)
             }
 
             ExperimentalActions(
                 index = index,
                 program = program,
                 channelState = channelState,
+                experimentalState = experimentalState,
                 viewModel = viewModel
             )
         }
@@ -151,6 +157,7 @@ fun ExperimentalChannelView(
 fun ExperimentalProgramState(
     modifier: Modifier = Modifier,
     index: Int,
+    enable: Boolean,
     entities: LazyPagingItems<Program>,
     program: Program,
     onProgramChange: (Int, Program) -> Unit
@@ -182,7 +189,11 @@ fun ExperimentalProgramState(
                     .clickable {
                         scope.launch {
                             if (entities.itemCount > 0) {
-                                showProgramSelectDialog = true
+                                if (enable) {
+                                    showProgramSelectDialog = true
+                                } else {
+                                    TipsUtils.showTips(Tips.warning("请先停止实验"))
+                                }
                             } else {
                                 TipsUtils.showTips(Tips.warning("没有可用程序"))
                             }
@@ -209,11 +220,11 @@ fun ExperimentalProgramState(
             }
         }
         ExperimentalAttributeItem(
-            title = when (program.workMode) {
+            title = when (program.experimentalMode) {
                 0 -> "电压"
                 1 -> "电流"
                 else -> "功率"
-            }, subTitle = when (program.workMode) {
+            }, subTitle = when (program.experimentalMode) {
                 0 -> "V"
                 1 -> "A"
                 else -> "W"
@@ -226,6 +237,7 @@ fun ExperimentalProgramState(
                 value = program.value,
                 shape = MaterialTheme.shapes.medium,
                 showClear = false,
+                enable = enable,
                 textStyle = TextStyle(
                     fontSize = 18.sp,
                     textAlign = TextAlign.Center
@@ -243,6 +255,7 @@ fun ExperimentalProgramState(
                     value = program.flowSpeed,
                     shape = MaterialTheme.shapes.medium,
                     showClear = false,
+                    enable = enable,
                     textStyle = TextStyle(
                         fontSize = 18.sp,
                         textAlign = TextAlign.Center
@@ -260,6 +273,7 @@ fun ExperimentalProgramState(
                 value = program.time,
                 shape = MaterialTheme.shapes.medium,
                 showClear = false,
+                enable = enable,
                 textStyle = TextStyle(
                     fontSize = 18.sp,
                     textAlign = TextAlign.Center
@@ -274,8 +288,7 @@ fun ExperimentalProgramState(
 @Composable
 fun ExperimentalRealtimeState(
     modifier: Modifier = Modifier,
-    channelState: ChannelState,
-    viewModel: ExperimentalViewModel
+    channelState: ChannelState
 ) {
     Column(
         modifier = modifier
@@ -284,7 +297,7 @@ fun ExperimentalRealtimeState(
                 shape = MaterialTheme.shapes.medium
             )
             .padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -337,7 +350,7 @@ fun ExperimentalRealtimeState(
                 fontSize = 18.sp
             )
             Text(
-                text = "${channelState.timing} ℃",
+                text = "${channelState.time} ℃",
                 fontSize = 18.sp
             )
         }
@@ -350,36 +363,116 @@ fun ExperimentalActions(
     index: Int,
     program: Program,
     channelState: ChannelState,
+    experimentalState: ExperimentalState,
     viewModel: ExperimentalViewModel
 ) {
     val scope = rememberCoroutineScope()
-    var loading by remember { mutableStateOf(false) }
+    var loadingStart by remember { mutableStateOf(false) }
+    var loadingPause by remember { mutableStateOf(false) }
+    var loadingStop by remember { mutableStateOf(false) }
+    var loadingResume by remember { mutableStateOf(false) }
+    var showStopExperimentalDialog by remember { mutableStateOf(false) }
+
+    if (showStopExperimentalDialog) {
+        StopExperimentalDialog(onDismiss = { showStopExperimentalDialog = false }) {
+            scope.launch {
+                loadingStop = true
+                viewModel.stopExperiment(index, program.experimentalType)
+                loadingStop = false
+            }
+        }
+    }
 
     Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(24.dp),
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = (program.getTimeSeconds() - channelState.timing).timeFormat(),
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Monospace
-        )
+        if (experimentalState == ExperimentalState.TIMING) {
+            Text(
+                modifier = Modifier.padding(bottom = 16.dp),
+                text = (program.getTimeSeconds() - channelState.time).timeFormat(),
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Monospace
+            )
+        }
 
-        Button(
-            enabled = !loading && program.canStart(),
-            modifier = Modifier.fillMaxWidth(),
-            onClick = {
-                scope.launch {
-                    loading = true
-                    viewModel.startExperiment(index, ExperimentalControl.fromProgram(program))
-                    loading = false
+        if (experimentalState.isRunning()) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (experimentalState == ExperimentalState.PAUSE) {
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        enabled = !loadingResume,
+                        onClick = {
+                            scope.launch {
+                                loadingResume = true
+                                viewModel.startExperiment(
+                                    index,
+                                    ExperimentalControl.fromProgram(program)
+                                )
+                                loadingResume = false
+                            }
+                        }) {
+                        ButtonLoading(loading = loadingResume) {
+                            Text(text = "继续", fontSize = 18.sp)
+                        }
+                    }
+                } else {
+                    OutlinedButton(
+                        modifier = Modifier.weight(1f),
+                        enabled = !loadingPause,
+                        onClick = {
+                            scope.launch {
+                                loadingPause = true
+                                viewModel.pauseExperiment(index)
+                                loadingPause = false
+                            }
+                        }) {
+                        ButtonLoading(loading = loadingPause) {
+                            Text(text = "暂停", fontSize = 18.sp)
+                        }
+                    }
+                }
+
+                Button(
+                    modifier = Modifier.weight(1f),
+                    enabled = !loadingStop,
+                    onClick = {
+                        showStopExperimentalDialog = true
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                ) {
+                    ButtonLoading(loading = loadingStop) {
+                        Text(text = "停止", fontSize = 18.sp)
+                    }
                 }
             }
-        ) {
-            ButtonLoading(loading = loading) {
-                Text(text = "开 始", fontSize = 18.sp)
+        }
+
+        if (experimentalState == ExperimentalState.DRAIN) {
+            Text(
+                modifier = Modifier.padding(bottom = 16.dp),
+                text = "请等待排液完成",
+                fontSize = 18.sp
+            )
+        }
+
+        if (experimentalState == ExperimentalState.READY) {
+            Button(
+                enabled = !loadingStart && program.canStart(channelState.opt1, channelState.opt2),
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {
+                    scope.launch {
+                        loadingStart = true
+                        viewModel.startExperiment(index, ExperimentalControl.fromProgram(program))
+                        loadingStart = false
+                    }
+                }
+            ) {
+                ButtonLoading(loading = loadingStart) {
+                    Text(text = "开 始", fontSize = 18.sp)
+                }
             }
         }
     }

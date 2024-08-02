@@ -103,6 +103,7 @@ fun ArgumentsInputField(
     prefix: String? = null,
     suffix: String? = null,
     value: String,
+    enable: Boolean = true,
     shape: Shape = CircleShape,
     textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
     keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -133,6 +134,7 @@ fun ArgumentsInputField(
                     onValueChange(it)
                 }
             },
+            enabled = enable,
             singleLine = true,
             textStyle = textStyle,
             keyboardOptions = keyboardOptions

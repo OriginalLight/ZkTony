@@ -21,6 +21,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.zktony.android.ui.utils.zktyGreen
+import com.zktony.android.ui.utils.zktyYellow
 import com.zktony.android.utils.SnackbarUtils
 import com.zktony.android.utils.TipsUtils
 
@@ -73,7 +75,7 @@ fun TipsIcon(tips: Tips?) {
             Icon(
                 imageVector = Icons.Default.Warning,
                 contentDescription = "Warning",
-                tint = Color.Yellow
+                tint = zktyYellow
             )
         }
 
@@ -102,7 +104,7 @@ fun TipsMessage(tips: Tips?) {
 @Composable
 fun TipsPreview() {
     Surface {
-        TipsUtils.showTips(Tips(TipsType.INFO, "这个是一个提示信息"))
+        TipsUtils.showTips(Tips.info("这个是一个提示信息"))
         Tips()
     }
 }

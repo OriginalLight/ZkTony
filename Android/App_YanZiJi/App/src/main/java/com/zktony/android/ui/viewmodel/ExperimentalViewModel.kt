@@ -6,6 +6,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.zktony.android.data.ExperimentalControl
+import com.zktony.android.data.ExperimentalState
 import com.zktony.android.ui.components.Tips
 import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.SerialPortUtils
@@ -48,6 +49,29 @@ class ExperimentalViewModel @Inject constructor(
             return false
         } else {
             TipsUtils.showTips(Tips.info("实验开始成功 通道：${channel + 1}"))
+            AppStateUtils.transformState(channel, ExperimentalState.STARTING)
+            return true
+        }
+    }
+
+    suspend fun pauseExperiment(channel: Int): Boolean {
+        if (!SerialPortUtils.setExperimentalState(channel, 2)) {
+            TipsUtils.showTips(Tips.error("实验暂停失败 通道：${channel + 1}"))
+            return false
+        } else {
+            TipsUtils.showTips(Tips.info("实验暂停成功 通道：${channel + 1}"))
+            AppStateUtils.transformState(channel, ExperimentalState.PAUSE)
+            return true
+        }
+    }
+
+    suspend fun stopExperiment(channel: Int, experimentalType: Int): Boolean {
+        if (!SerialPortUtils.setExperimentalState(channel, 3)) {
+            TipsUtils.showTips(Tips.error("实验停止失败 通道：${channel + 1}"))
+            return false
+        } else {
+            TipsUtils.showTips(Tips.info("实验停止成功 通道：${channel + 1}"))
+            AppStateUtils.transformState(channel, if (experimentalType == 0) ExperimentalState.DRAIN else ExperimentalState.READY)
             return true
         }
     }

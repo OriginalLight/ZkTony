@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 
 val zktyGreen = Color(0xFF1D9858)
 val zktyBlue = Color(0xFF1C68A9)
+val zktyYellow = Color(0xFFFF9800)
 
 val zktyBrush = Brush.linearGradient(
     colors = listOf(zktyGreen, zktyBlue)

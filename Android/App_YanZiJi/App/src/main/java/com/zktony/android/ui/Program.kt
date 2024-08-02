@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -48,11 +46,11 @@ import com.zktony.android.ui.components.FileChoiceDialog
 import com.zktony.android.ui.components.IconLoading
 import com.zktony.android.ui.components.ListEmptyView
 import com.zktony.android.ui.components.ProgramQueryDialog
+import com.zktony.android.ui.components.TopBarRow
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.toList
-import com.zktony.android.ui.utils.zktyBrush
 import com.zktony.android.ui.viewmodel.ProgramViewModel
 import com.zktony.android.utils.extra.dateFormat
 import com.zktony.android.utils.extra.itemsEqual
@@ -133,16 +131,7 @@ fun ProgramTopBar(
         }
     }
 
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(64.dp)
-            .background(brush = zktyBrush, shape = MaterialTheme.shapes.medium)
-            .clip(MaterialTheme.shapes.medium)
-            .padding(horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
+    TopBarRow(modifier = modifier) {
         Button(onClick = { showQuery = true }) {
             Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
             Text(text = "搜索", style = MaterialTheme.typography.bodyLarge)
@@ -294,7 +283,7 @@ fun ProgramItem(
                 Pair(item.name, 4f),
                 Pair(if (item.experimentalType == 0) "转膜" else "染色", 2f),
                 Pair(
-                    when (item.workMode) {
+                    when (item.experimentalMode) {
                         0 -> "恒压"
                         1 -> "恒流"
                         2 -> "恒功率"
@@ -302,7 +291,7 @@ fun ProgramItem(
                     }, 2f
                 ),
                 Pair(
-                    item.value + when (item.workMode) {
+                    item.value + when (item.experimentalMode) {
                         0 -> "V"
                         1 -> "A"
                         2 -> "W"

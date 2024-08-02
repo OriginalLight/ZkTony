@@ -719,3 +719,61 @@ fun ProgramSelectDialog(
 
     }
 }
+
+@Composable
+fun StopExperimentalDialog(
+    modifier: Modifier = Modifier,
+    onDismiss: () -> Unit,
+    onStop: () -> Unit
+) {
+    Dialog(onDismissRequest = { onDismiss() }) {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.medium)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = "停止实验",
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                text = "确认停止当前通道的实验吗？",
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                OutlinedButton(
+                    modifier = Modifier.padding(end = 16.dp),
+                    onClick = { onDismiss() }
+                ) {
+                    Text(
+                        text = "取消",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+
+                Button(
+                    onClick = {
+                        onDismiss()
+                        onStop()
+                    }
+                ) {
+                    Text(
+                        text = "确认",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+        }
+    }
+}

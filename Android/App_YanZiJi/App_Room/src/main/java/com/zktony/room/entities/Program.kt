@@ -17,8 +17,8 @@ data class Program(
     val name: String = "",
     // 实验类型
     val experimentalType: Int = 0,
-    // 工作模式
-    val workMode: Int = 0,
+    // 模式
+    val experimentalMode: Int = 0,
     // 值
     val value: String,
     // 流速
@@ -63,10 +63,13 @@ data class Program(
         return bool
     }
 
-    fun canStart(): Boolean {
+    fun canStart(opt1: Int, opt2: Int): Boolean {
         val bool = value.isNotEmpty() && time.isNotEmpty()
         if (experimentalType == 0) {
-            return bool && flowSpeed.isNotEmpty()
+            return bool && flowSpeed.isNotEmpty() && opt1 == 1
+        }
+        if (experimentalType == 2) {
+            return bool && opt2 == 1
         }
 
         return bool
