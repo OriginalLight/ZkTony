@@ -8,13 +8,13 @@ import com.zktony.android.data.ArgumentsSpeed
 import com.zktony.android.data.ArgumentsTemperature
 import com.zktony.android.data.ArgumentsTransfer
 import com.zktony.android.data.ArgumentsVoltage
+import com.zktony.android.data.ChannelState
 import com.zktony.android.data.ExperimentalControl
 import com.zktony.android.data.PipelineControl
 import com.zktony.android.data.PumpControl
 import com.zktony.android.data.UpgradeState
 import com.zktony.android.data.VoltageControl
 import com.zktony.android.data.toArguments
-import com.zktony.android.data.toChannelState
 import com.zktony.log.LogUtils
 import com.zktony.serialport.ext.ascii2ByteArray
 import com.zktony.serialport.ext.readInt8
@@ -447,7 +447,7 @@ object SerialPortUtils {
         try {
             val ba = query(target, "QueryChannelState", 0x40.toByte(), byteArrayOf(), 100)
             if (ba != null) {
-                toChannelState(ba)?.let { channelState ->
+                ChannelState.fromByteArray(ba)?.let { channelState ->
                     AppStateUtils.setExperimentalStateHook(target, channelState)
                     AppStateUtils.setChannelStateList(AppStateUtils.channelStateList.value.mapIndexed { index, state ->
                         if (index == target) {

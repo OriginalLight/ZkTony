@@ -3,9 +3,13 @@ package com.zktony.room.di
 import android.content.Context
 import androidx.room.Room
 import com.zktony.room.AppDatabase
-import com.zktony.room.dao.FaultDao
+import com.zktony.room.dao.ErrorLogDao
+import com.zktony.room.dao.LogDao
+import com.zktony.room.dao.LogSnapshotDao
 import com.zktony.room.dao.UserDao
-import com.zktony.room.repository.FaultRepository
+import com.zktony.room.repository.ErrorLogRepository
+import com.zktony.room.repository.LogRepository
+import com.zktony.room.repository.LogSnapshotRepository
 import com.zktony.room.repository.UserRepository
 import dagger.Module
 import dagger.Provides
@@ -28,20 +32,29 @@ object RoomModule {
     }
 
     @Provides
-    fun historyDao(database: AppDatabase) = database.HistoryDao()
-
-    @Provides
     fun programDao(database: AppDatabase) = database.ProgramDao()
 
     @Provides
-    fun faultDao(database: AppDatabase) = database.FaultDao()
+    fun errorLogDao(database: AppDatabase) = database.errorLogDao()
+
+    @Provides
+    fun logDao(database: AppDatabase) = database.logDao()
+
+    @Provides
+    fun logSnapshotDao(database: AppDatabase) = database.logSnapshotDao()
 
     @Provides
     fun userDao(database: AppDatabase) = database.UserDao()
 
     // Repository
     @Provides
-    fun faultRepository(faultDao: FaultDao) = FaultRepository(faultDao)
+    fun errorLogRepository(errorLogDao: ErrorLogDao) = ErrorLogRepository(errorLogDao)
+
+    @Provides
+    fun logRepository(logDao: LogDao) = LogRepository(logDao)
+
+    @Provides
+    fun logSnapshotRepository(logSnapshotDao: LogSnapshotDao) = LogSnapshotRepository(logSnapshotDao)
 
     @Provides
     fun userRepository(userDao: UserDao) = UserRepository(userDao)

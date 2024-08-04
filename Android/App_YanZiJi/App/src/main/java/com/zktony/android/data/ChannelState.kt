@@ -35,34 +35,36 @@ data class ChannelState(
     // 气泡传感器1状态
     val bub1: Int = 0,
     // 气泡传感器2状态
-    val bub2: Int = 0,
-)
-
-fun toChannelState(byteArray: ByteArray): ChannelState? {
-    try {
-        if (byteArray.size != 21) throw Exception("ChannelState 长度不正确 ${byteArray.toHexString()}")
-        val voltage = byteArray.readInt16LE(7).toBigDecimal().divide(100.toBigDecimal())
-        val current = byteArray.readInt16LE(9).toBigDecimal().divide(100.toBigDecimal())
-        return ChannelState(
-            runState = byteArray.readInt8(0),
-            experimentType = byteArray.readInt8(1),
-            experimentalMode = byteArray.readInt8(2),
-            errorInfo = byteArray.readInt32LE(3),
-            voltage = voltage.stripTrailingZeros().toPlainString(),
-            current = current.stripTrailingZeros().toPlainString(),
-            power = voltage.multiply(current).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros()
-                .toPlainString(),
-            temperature = byteArray.readInt16LE(11).toBigDecimal().divide(100.toBigDecimal())
-                .stripTrailingZeros().toPlainString(),
-            time = byteArray.readInt16LE(13),
-            step = byteArray.readInt16LE(15),
-            opt1 = byteArray.readInt8(17),
-            opt2 = byteArray.readInt8(18),
-            bub1 = byteArray.readInt8(19),
-            bub2 = byteArray.readInt8(20)
-        )
-    } catch (e: Exception) {
-        LogUtils.error("ChannelState 解析失败 ${e.printStackTrace()}", true)
-        return null
+    val bub2: Int = 0
+) {
+    companion object {
+        fun fromByteArray(byteArray: ByteArray): ChannelState? {
+            try {
+                if (byteArray.size != 21) throw Exception("ChannelState 长度不正确 ${byteArray.toHexString()}")
+                val voltage = byteArray.readInt16LE(7).toBigDecimal().divide(100.toBigDecimal())
+                val current = byteArray.readInt16LE(9).toBigDecimal().divide(100.toBigDecimal())
+                return ChannelState(
+                    runState = byteArray.readInt8(0),
+                    experimentType = byteArray.readInt8(1),
+                    experimentalMode = byteArray.readInt8(2),
+                    errorInfo = byteArray.readInt32LE(3),
+                    voltage = voltage.stripTrailingZeros().toPlainString(),
+                    current = current.stripTrailingZeros().toPlainString(),
+                    power = voltage.multiply(current).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros()
+                        .toPlainString(),
+                    temperature = byteArray.readInt16LE(11).toBigDecimal().divide(100.toBigDecimal())
+                        .stripTrailingZeros().toPlainString(),
+                    time = byteArray.readInt16LE(13),
+                    step = byteArray.readInt16LE(15),
+                    opt1 = byteArray.readInt8(17),
+                    opt2 = byteArray.readInt8(18),
+                    bub1 = byteArray.readInt8(19),
+                    bub2 = byteArray.readInt8(20)
+                )
+            } catch (e: Exception) {
+                LogUtils.error("ChannelState 解析失败 ${e.printStackTrace()}", true)
+                return null
+            }
+        }
     }
 }

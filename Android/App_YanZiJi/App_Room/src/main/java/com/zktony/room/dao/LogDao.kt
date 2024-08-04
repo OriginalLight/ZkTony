@@ -3,7 +3,7 @@ package com.zktony.room.dao
 import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Query
-import com.zktony.room.entities.History
+import com.zktony.room.entities.Log
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -11,26 +11,26 @@ import kotlinx.coroutines.flow.Flow
  * @date 2023/8/30 10:56
  */
 @Dao
-abstract class HistoryDao : BaseDao<History> {
+abstract class LogDao : BaseDao<Log> {
     @Query(
         """
-        SELECT * FROM history
+        SELECT * FROM logs
         ORDER BY createTime DESC
         """
     )
-    abstract fun getAll(): Flow<List<History>>
+    abstract fun getAll(): Flow<List<Log>>
 
     @Query(
         """
-        SELECT * FROM history
+        SELECT * FROM logs
         ORDER BY createTime DESC
         """
     )
-    abstract fun getByPage(): PagingSource<Int, History>
+    abstract fun getByPage(): PagingSource<Int, Log>
 
     @Query(
         """
-        DELETE FROM history
+        DELETE FROM logs
         WHERE id = :id
         """
     )

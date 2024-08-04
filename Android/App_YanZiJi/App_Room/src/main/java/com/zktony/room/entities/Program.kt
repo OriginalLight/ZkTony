@@ -36,7 +36,7 @@ data class Program(
     // 缓冲液类型
     val bufferType: Int = 0,
     // 描述
-    val description: String = "None",
+    val description: String = "",
     // 创建时间
     val createTime: Long = System.currentTimeMillis()
 ) {

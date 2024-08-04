@@ -41,8 +41,7 @@ data class ExperimentalControl(
                 experimentalType = program.experimentalType,
                 experimentalMode = program.experimentalMode,
                 flowSpeed = program.flowSpeed,
-                time = program.time.toBigDecimal().multiply(60.toBigDecimal()).stripTrailingZeros()
-                    .toPlainString(),
+                time = program.time.toBigDecimal().multiply(60.toBigDecimal()).toPlainString(),
                 voltage = program.value,
                 current = program.value,
                 power = program.value,

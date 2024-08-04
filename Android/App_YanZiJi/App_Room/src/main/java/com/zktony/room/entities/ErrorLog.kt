@@ -3,12 +3,11 @@ package com.zktony.room.entities
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity("faults")
-data class Fault(
+@Entity("error_logs")
+data class ErrorLog(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,
-    val code: String,
-    val description: String,
-    val severity: Int,
+    val code: Int = 0,
+    val description: String = "",
     val timestamp: Long = System.currentTimeMillis()
 )

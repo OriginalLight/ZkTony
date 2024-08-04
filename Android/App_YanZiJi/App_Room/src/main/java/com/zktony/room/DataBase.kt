@@ -3,12 +3,14 @@ package com.zktony.room
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.zktony.room.dao.FaultDao
-import com.zktony.room.dao.HistoryDao
+import com.zktony.room.dao.ErrorLogDao
+import com.zktony.room.dao.LogDao
+import com.zktony.room.dao.LogSnapshotDao
 import com.zktony.room.dao.ProgramDao
 import com.zktony.room.dao.UserDao
-import com.zktony.room.entities.Fault
-import com.zktony.room.entities.History
+import com.zktony.room.entities.ErrorLog
+import com.zktony.room.entities.Log
+import com.zktony.room.entities.LogSnapshot
 import com.zktony.room.entities.Program
 import com.zktony.room.entities.User
 
@@ -17,14 +19,15 @@ import com.zktony.room.entities.User
  */
 @Database(
     entities =
-    [History::class, Program::class, Fault::class, User::class],
+    [Program::class, ErrorLog::class, Log::class, LogSnapshot::class, User::class],
     version = 1,
     exportSchema = false
 )
 @TypeConverters(DateConverters::class)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun HistoryDao(): HistoryDao
     abstract fun ProgramDao(): ProgramDao
-    abstract fun FaultDao(): FaultDao
+    abstract fun errorLogDao(): ErrorLogDao
+    abstract fun logDao(): LogDao
+    abstract fun logSnapshotDao(): LogSnapshotDao
     abstract fun UserDao(): UserDao
 }

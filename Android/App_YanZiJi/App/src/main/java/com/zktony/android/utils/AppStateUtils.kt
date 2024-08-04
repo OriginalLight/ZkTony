@@ -5,6 +5,8 @@ import com.zktony.android.data.ChannelState
 import com.zktony.android.data.ExperimentalState
 import com.zktony.log.LogUtils
 import com.zktony.room.defaults.defaultProgram
+import com.zktony.room.entities.Log
+import com.zktony.room.entities.LogSnapshot
 import com.zktony.room.entities.Program
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -14,6 +16,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import java.util.Queue
+import java.util.concurrent.LinkedTransferQueue
 
 /**
  * @author 刘贺贺
@@ -29,6 +33,8 @@ object AppStateUtils {
     // mutableStateFlow
     private val _argumentsList =
         MutableStateFlow(List(ProductUtils.MAX_CHANNEL_COUNT) { Arguments() })
+    private val _channelLogList =
+        MutableStateFlow(List<Log?>(ProductUtils.MAX_CHANNEL_COUNT) { null })
     private val _channelStateList =
         MutableStateFlow(List(ProductUtils.MAX_CHANNEL_COUNT) { ChannelState() })
     private val _channelProgramList =
@@ -36,11 +42,16 @@ object AppStateUtils {
     private val _experimentalStateList =
         MutableStateFlow(List(ProductUtils.MAX_CHANNEL_COUNT) { ExperimentalState.NONE })
 
+
     // stateFlow
     val argumentsList = _argumentsList.asStateFlow()
+    val channelLogList = _channelLogList.asStateFlow()
     val channelStateList = _channelStateList.asStateFlow()
     val channelProgramList = _channelProgramList.asStateFlow()
     val experimentalStateList = _experimentalStateList.asStateFlow()
+
+    // Queue
+    val channelLogSnapshotQueue = LinkedTransferQueue<LogSnapshot>()
 
     init {
         // 通道状态轮询
