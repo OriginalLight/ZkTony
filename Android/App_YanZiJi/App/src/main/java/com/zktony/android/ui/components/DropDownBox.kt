@@ -2,16 +2,14 @@ package com.zktony.android.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -38,19 +36,18 @@ fun DropDownBox(
 ) {
 
     var option by remember { mutableStateOf(options[selected]) }
-    var expended by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(false) }
 
     Box(
         modifier = modifier
-            .background(MaterialTheme.colorScheme.surface, CircleShape)
-            .clip(CircleShape)
-            .clickable { expended = !expended },
+            .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.medium)
+            .clip(MaterialTheme.shapes.medium)
+            .clickable { expanded = true },
         contentAlignment = Alignment.Center
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 modifier = Modifier.weight(1f),
@@ -58,14 +55,14 @@ fun DropDownBox(
             )
 
             Icon(
-                imageVector = if (expended) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
                 contentDescription = "Expand"
             )
         }
 
         DropdownMenu(
-            expanded = expended,
-            onDismissRequest = { expended = false }
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
         ) {
             options.forEachIndexed { index, text ->
                 DropdownMenuItem(
@@ -73,7 +70,7 @@ fun DropDownBox(
                     onClick = {
                         option = text
                         onSelectedChange(index)
-                        expended = false
+                        expanded = false
                     }
                 )
             }

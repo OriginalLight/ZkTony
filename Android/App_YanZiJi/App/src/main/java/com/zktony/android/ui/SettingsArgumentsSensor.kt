@@ -37,9 +37,9 @@ import com.zktony.android.data.Arguments
 import com.zktony.android.data.ArgumentsBubble
 import com.zktony.android.data.ChannelState
 import com.zktony.android.ui.components.ArgumentsInputField
+import com.zktony.android.ui.components.BaseTopBar
 import com.zktony.android.ui.components.ButtonLoading
 import com.zktony.android.ui.components.SegmentedButtonTabRow
-import com.zktony.android.ui.components.TopBarRow
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.viewmodel.SettingsArgumentsSensorViewModel
@@ -87,7 +87,7 @@ fun SettingsArgumentsSensorTopBar(
     onChannelChange: (Int) -> Unit,
     navigationActions: NavigationActions
 ) {
-    TopBarRow(modifier = modifier) {
+    BaseTopBar(modifier = modifier) {
         Row(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.medium)
@@ -223,7 +223,7 @@ fun BubbleSensorThresholdView(
             ArgumentsInputField(
                 modifier = Modifier
                     .width(550.dp)
-                    .height(56.dp)
+                    .height(48.dp)
                     .fillMaxWidth(),
                 prefix = "出液",
                 value = outBobble,
@@ -233,7 +233,7 @@ fun BubbleSensorThresholdView(
             ArgumentsInputField(
                 modifier = Modifier
                     .width(550.dp)
-                    .height(56.dp)
+                    .height(48.dp)
                     .fillMaxWidth(),
                 prefix = "进液",
                 value = inBobble,

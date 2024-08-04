@@ -58,4 +58,8 @@
     <string name="app.password.modify">密码修改</string>
     <string name="app.version.info">版本信息</string>
     <string name="app.confirm">确认</string>
+    <string name="app.role.user">普通用户</string>
+    <string name="app.role.admin">管理员</string>
+    <string name="app.role.factory">工厂用户</string>
+    <string name="app.role.customer.service">用户服务</string>
 </resources>

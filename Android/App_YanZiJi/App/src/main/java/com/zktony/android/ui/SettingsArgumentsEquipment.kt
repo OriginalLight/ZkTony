@@ -10,23 +10,30 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Reply
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zktony.android.R
 import com.zktony.android.data.Product
-import com.zktony.android.ui.components.ArgumentsSetField
+import com.zktony.android.ui.components.ArgumentsInputField
+import com.zktony.android.ui.components.BaseTopBar
 import com.zktony.android.ui.components.DropDownBox
-import com.zktony.android.ui.components.TopBarRow
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.viewmodel.SettingsArgumentsEquipmentViewModel
@@ -59,7 +66,7 @@ fun SettingsArgumentsEquipmentTopBar(
     navigationActions: NavigationActions
 ) {
 
-    TopBarRow(modifier = modifier) {
+    BaseTopBar(modifier = modifier) {
         Row(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.medium)
@@ -104,8 +111,8 @@ fun EquipmentArgumentsListView(
         SettingsItem(title = stringResource(id = R.string.app_product_number)) {
             DropDownBox(
                 modifier = Modifier
-                    .width(200.dp)
-                    .height(48.dp),
+                    .width(160.dp)
+                    .height(40.dp),
                 selected = Product.indexFromName(pn),
                 options = Product.getTextList(),
             ) {
@@ -115,12 +122,29 @@ fun EquipmentArgumentsListView(
         }
 
         SettingsItem(title = stringResource(id = R.string.app_serial_number)) {
-            ArgumentsSetField(
-                modifier = Modifier.width(350.dp),
-                value = sn,
+            var snText by remember(sn) { mutableStateOf(sn) }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                sn = it
-                viewModel.setSerialNumber(sn)
+                ArgumentsInputField(
+                    modifier = Modifier
+                        .width(300.dp)
+                        .height(48.dp),
+                    value = snText,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
+                ) {
+                    snText = it
+                }
+
+                Button(
+                    onClick = {
+                        sn = snText
+                        viewModel.setSerialNumber(snText)
+                    }
+                ) {
+                    Text(text = stringResource(id = R.string.app_set))
+                }
             }
         }
     }

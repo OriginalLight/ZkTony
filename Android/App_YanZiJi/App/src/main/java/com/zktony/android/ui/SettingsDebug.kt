@@ -22,7 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zktony.android.R
-import com.zktony.android.ui.components.TopBarRow
+import com.zktony.android.ui.components.BaseTopBar
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
@@ -51,7 +51,7 @@ fun SettingsDebugTopBar(
     modifier: Modifier = Modifier,
     navigationActions: NavigationActions
 ) {
-    TopBarRow(modifier = modifier) {
+    BaseTopBar(modifier = modifier) {
         Row(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.medium)

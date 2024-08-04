@@ -39,11 +39,12 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zktony.android.ui.components.ArgumentsInputField
+import com.zktony.android.ui.components.BaseTopBar
 import com.zktony.android.ui.components.IconLoading
 import com.zktony.android.ui.components.SegmentedButtonTabRow
-import com.zktony.android.ui.components.TopBarRow
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.viewmodel.ProgramAddOrUpdateViewModel
+import com.zktony.android.utils.ProductUtils
 import com.zktony.room.defaults.defaultProgram
 import com.zktony.room.entities.Program
 import kotlinx.coroutines.Dispatchers
@@ -59,7 +60,11 @@ fun ProgramAddOrUpdateView(viewModel: ProgramAddOrUpdateViewModel = hiltViewMode
     }
 
     val navObj by viewModel.navObj.collectAsStateWithLifecycle()
-    var obj by remember(navObj) { mutableStateOf(navObj ?: defaultProgram()) }
+    var obj by remember(navObj) {
+        mutableStateOf(
+            navObj ?: defaultProgram(ProductUtils.getProgramType().firstOrNull() ?: 0)
+        )
+    }
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         // 顶部导航栏
@@ -68,7 +73,6 @@ fun ProgramAddOrUpdateView(viewModel: ProgramAddOrUpdateViewModel = hiltViewMode
         ProgramAttributeList(obj = obj) {
             obj = it
         }
-
     }
 }
 
@@ -84,7 +88,7 @@ fun ProgramAddOrUpdateTopBar(
     val navigationActions = LocalNavigationActions.current
     var loading by remember { mutableStateOf(false) }
 
-    TopBarRow(modifier = modifier) {
+    BaseTopBar(modifier = modifier) {
         Row(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.medium)
@@ -163,13 +167,15 @@ fun ProgramAttributeList(
             }
         }
 
-        item {
-            ProgramAttributeItem(title = "实验类型", required = true) {
-                SegmentedButtonTabRow(
-                    modifier = Modifier.width(200.dp),
-                    tabItems = listOf("转膜", "染色"), selected = obj.experimentalType
-                ) {
-                    onObjChange(obj.copy(experimentalType = it))
+        if (ProductUtils.getProgramType().size > 1) {
+            item {
+                ProgramAttributeItem(title = "实验类型", required = true) {
+                    SegmentedButtonTabRow(
+                        modifier = Modifier.width(200.dp),
+                        tabItems = listOf("转膜", "染色"), selected = obj.experimentalType
+                    ) {
+                        onObjChange(obj.copy(experimentalType = it))
+                    }
                 }
             }
         }
@@ -248,6 +254,17 @@ fun ProgramAttributeList(
         }
 
         item {
+            ProgramAttributeItem(title = "胶厚度") {
+                SegmentedButtonTabRow(
+                    modifier = Modifier.width(300.dp),
+                    tabItems = listOf("0.75mm", "1.0mm", "1.5mm"), selected = obj.glueThickness
+                ) {
+                    onObjChange(obj.copy(glueThickness = it))
+                }
+            }
+        }
+
+        item {
             ProgramAttributeItem(title = "胶浓度") {
                 if (obj.glueType == 0) {
                     ArgumentsInputField(
@@ -283,17 +300,6 @@ fun ProgramAttributeList(
                             onObjChange(obj.copy(glueConcentration = "$min,$max"))
                         }
                     }
-                }
-            }
-        }
-
-        item {
-            ProgramAttributeItem(title = "胶厚度") {
-                SegmentedButtonTabRow(
-                    modifier = Modifier.width(300.dp),
-                    tabItems = listOf("0.75mm", "1.0mm", "1.5mm"), selected = obj.glueThickness
-                ) {
-                    onObjChange(obj.copy(glueThickness = it))
                 }
             }
         }

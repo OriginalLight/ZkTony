@@ -33,11 +33,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zktony.android.R
 import com.zktony.android.data.Role
+import com.zktony.android.ui.components.BaseTopBar
 import com.zktony.android.ui.components.FileChoiceDialog
-import com.zktony.android.ui.components.RequirePermission
-import com.zktony.android.ui.components.TopBarRow
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.utils.LocalNavigationActions
+import com.zktony.android.ui.utils.RequirePermission
 import com.zktony.android.ui.viewmodel.SettingsVersionInfoViewModel
 import com.zktony.android.utils.extra.installApp
 import kotlinx.coroutines.launch
@@ -67,7 +67,7 @@ fun SettingsVersionInfoTopBar(
     modifier: Modifier = Modifier,
     navigationActions: NavigationActions,
 ) {
-    TopBarRow(modifier = modifier) {
+    BaseTopBar(modifier = modifier) {
         Row(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.medium)

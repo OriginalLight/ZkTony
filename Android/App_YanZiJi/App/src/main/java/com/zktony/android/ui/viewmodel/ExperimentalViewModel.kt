@@ -71,7 +71,10 @@ class ExperimentalViewModel @Inject constructor(
             return false
         } else {
             TipsUtils.showTips(Tips.info("实验停止成功 通道：${channel + 1}"))
-            AppStateUtils.transformState(channel, if (experimentalType == 0) ExperimentalState.DRAIN else ExperimentalState.READY)
+            AppStateUtils.transformState(
+                channel,
+                if (experimentalType == 0) ExperimentalState.DRAIN else ExperimentalState.READY
+            )
             return true
         }
     }

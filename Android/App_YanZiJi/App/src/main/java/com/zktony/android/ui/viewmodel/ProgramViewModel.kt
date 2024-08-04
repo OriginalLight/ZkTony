@@ -10,6 +10,7 @@ import com.zktony.android.data.ProgramQuery
 import com.zktony.android.data.defaults.defaultProgramQuery
 import com.zktony.android.ui.components.Tips
 import com.zktony.android.utils.JsonUtils
+import com.zktony.android.utils.ProductUtils
 import com.zktony.android.utils.StorageUtils
 import com.zktony.android.utils.TipsUtils
 import com.zktony.android.utils.extra.dateFormat
@@ -139,8 +140,16 @@ class ProgramViewModel @Inject constructor(
             }
 
             programs.forEach {
-                programRepository.insert(it.copy(id = 0L, createTime = System.currentTimeMillis()))
+                if (ProductUtils.getProgramType().contains(it.experimentalType)) {
+                    programRepository.insert(
+                        it.copy(
+                            id = 0L,
+                            createTime = System.currentTimeMillis()
+                        )
+                    )
+                }
             }
+
             TipsUtils.showTips(Tips.info("导入程序成功"))
 
         } catch (e: Exception) {

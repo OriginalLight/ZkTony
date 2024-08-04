@@ -41,12 +41,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.zktony.android.ui.components.BaseTopBar
 import com.zktony.android.ui.components.DeleteDialog
 import com.zktony.android.ui.components.FileChoiceDialog
 import com.zktony.android.ui.components.IconLoading
 import com.zktony.android.ui.components.ListEmptyView
 import com.zktony.android.ui.components.ProgramQueryDialog
-import com.zktony.android.ui.components.TopBarRow
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.itemsIndexed
@@ -131,7 +131,7 @@ fun ProgramTopBar(
         }
     }
 
-    TopBarRow(modifier = modifier) {
+    BaseTopBar(modifier = modifier) {
         Button(onClick = { showQuery = true }) {
             Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
             Text(text = "搜索", style = MaterialTheme.typography.bodyLarge)
@@ -236,9 +236,10 @@ fun ProgramListView(
                     ProgramItem(
                         index = index,
                         item = item,
-                        selected = selected,
-                        viewModel = viewModel
-                    )
+                        selected = selected
+                    ) {
+                        viewModel.select(it)
+                    }
                 }
             }
         } else {
@@ -254,9 +255,9 @@ fun ProgramItem(
     index: Int,
     item: Program,
     selected: List<Long>,
-    viewModel: ProgramViewModel
+    onSelect: (Long) -> Unit
 ) {
-    var expend by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -265,7 +266,7 @@ fun ProgramItem(
                 shape = MaterialTheme.shapes.medium
             )
             .clip(MaterialTheme.shapes.medium)
-            .clickable { viewModel.select(item.id) }
+            .clickable { onSelect(item.id) }
             .padding(horizontal = 8.dp, vertical = 4.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -276,7 +277,7 @@ fun ProgramItem(
         ) {
             Checkbox(
                 checked = selected.contains(item.id),
-                onCheckedChange = { viewModel.select(item.id) })
+                onCheckedChange = { onSelect(item.id) })
 
             listOf(
                 Pair((index + 1).toString(), 1f),
@@ -315,17 +316,17 @@ fun ProgramItem(
                 modifier = Modifier.weight(1f),
                 contentAlignment = Alignment.Center
             ) {
-                IconButton(onClick = { expend = !expend }) {
+                IconButton(onClick = { expanded = !expanded }) {
                     Icon(
                         imageVector = Icons.Default.MoreHoriz,
                         contentDescription = "More",
-                        tint = if (expend) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                        tint = if (expanded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
         }
 
-        if (expend) {
+        if (expanded) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -393,9 +394,11 @@ fun ProgramListHeader(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Checkbox(checked = selected.itemsEqual(entities.toList().map { it.id }), onCheckedChange = {
-            onCheckedChange(it)
-        })
+        Checkbox(
+            checked = selected.itemsEqual(entities.toList().map { it.id }),
+            onCheckedChange = {
+                onCheckedChange(it)
+            })
 
         listOf(
             Pair("序号", 1f),

@@ -1,4 +1,4 @@
-package com.zktony.android.ui.components
+package com.zktony.android.ui.utils
 
 import androidx.compose.runtime.Composable
 import com.zktony.android.data.Role

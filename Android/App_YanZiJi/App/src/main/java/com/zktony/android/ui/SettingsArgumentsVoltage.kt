@@ -43,9 +43,9 @@ import com.zktony.android.data.ArgumentsVoltage
 import com.zktony.android.data.ChannelState
 import com.zktony.android.data.VoltageControl
 import com.zktony.android.ui.components.ArgumentsInputField
+import com.zktony.android.ui.components.BaseTopBar
 import com.zktony.android.ui.components.ButtonLoading
 import com.zktony.android.ui.components.SegmentedButtonTabRow
-import com.zktony.android.ui.components.TopBarRow
 import com.zktony.android.ui.components.VerticalRadioButtonGroup
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.utils.LocalNavigationActions
@@ -92,7 +92,7 @@ fun SettingsArgumentsVoltageTopBar(
     onChannelChange: (Int) -> Unit,
     navigationActions: NavigationActions
 ) {
-    TopBarRow(modifier = modifier) {
+    BaseTopBar(modifier = modifier) {
         Row(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.medium)
@@ -259,7 +259,7 @@ fun VoltageControlView(
         ArgumentsInputField(
             modifier = Modifier
                 .width(350.dp)
-                .height(56.dp),
+                .height(48.dp),
             value = value,
             prefix = when (mode) {
                 0 -> "电压"

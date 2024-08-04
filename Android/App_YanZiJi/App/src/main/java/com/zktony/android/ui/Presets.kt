@@ -1,4 +1,4 @@
-package com.zktony.android.ui.components
+package com.zktony.android.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext

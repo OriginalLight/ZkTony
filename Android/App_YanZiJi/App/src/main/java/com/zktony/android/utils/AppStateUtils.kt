@@ -45,18 +45,18 @@ object AppStateUtils {
     init {
         // 通道状态轮询
         scope.launch {
+            var start: Long
             while (true) {
                 if (_channelStateList.subscriptionCount.value > 0) {
                     // 获取通道状态
-                    val start = System.currentTimeMillis()
+                    start = System.currentTimeMillis()
                     repeat(ProductUtils.getChannelCount()) {
                         if (!isPolling.isLocked) {
                             SerialPortUtils.queryChannelState(it)
                         }
                     }
-                    val end = System.currentTimeMillis()
                     // 间隔时间
-                    delay(1000L - (end - start))
+                    delay(1000L - (System.currentTimeMillis() - start))
                 } else {
                     delay(1000L)
                 }
@@ -88,21 +88,33 @@ object AppStateUtils {
             return
         }
 
-        //
-        when(state.runState) {
-            0 -> { transformState(channel, ExperimentalState.READY) }
-            1 -> {
-                transformState(channel, when(state.step) {
-                    5 -> ExperimentalState.STARTING
-                    6 -> ExperimentalState.FILL
-                    7 -> ExperimentalState.TIMING
-                    8 -> ExperimentalState.DRAIN
-                    64 -> ExperimentalState.READY
-                    else -> ExperimentalState.NONE
-                })
+        // 通道状态
+        when (state.runState) {
+            0 -> {
+                transformState(channel, ExperimentalState.READY)
             }
-            2 -> { transformState(channel, ExperimentalState.PAUSE) }
-            3 -> { transformState(channel, ExperimentalState.READY) }
+
+            1 -> {
+                transformState(
+                    channel, when (state.step) {
+                        5 -> ExperimentalState.STARTING
+                        6 -> ExperimentalState.FILL
+                        7 -> ExperimentalState.TIMING
+                        8 -> ExperimentalState.DRAIN
+                        64 -> ExperimentalState.READY
+                        else -> ExperimentalState.NONE
+                    }
+                )
+            }
+
+            2 -> {
+                transformState(channel, ExperimentalState.PAUSE)
+            }
+
+            3 -> {
+                transformState(channel, ExperimentalState.READY)
+            }
+
             else -> {}
         }
     }
@@ -113,15 +125,16 @@ object AppStateUtils {
             if (oldState == newState) {
                 return
             }
-            _experimentalStateList.value = _experimentalStateList.value.mapIndexed { index, experimentalState ->
-                if (index == channel) {
-                    newState
-                } else {
-                    experimentalState
+            _experimentalStateList.value =
+                _experimentalStateList.value.mapIndexed { index, experimentalState ->
+                    if (index == channel) {
+                        newState
+                    } else {
+                        experimentalState
+                    }
                 }
-            }
             // do something when state changed from oldState to newState
-            when(oldState) {
+            when (oldState) {
                 ExperimentalState.NONE -> {}
                 ExperimentalState.READY -> {}
                 ExperimentalState.PAUSE -> {}

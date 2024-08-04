@@ -21,4 +21,16 @@ object ProductUtils {
     fun getChannelCount(): Int {
         return product.count
     }
+
+    // 根据产品型号获取允许的程序类型
+    fun getProgramType(): List<Int> {
+        return when (product) {
+            Product.M_BLOT_T4000 -> listOf(0, 1)
+            Product.M_BLOT_T4100 -> listOf(0)
+            Product.M_BLOT_T4200 -> listOf(1)
+            Product.M_BLOT_T2000 -> listOf(0, 1)
+            Product.M_BLOT_T2100 -> listOf(0)
+            Product.M_BLOT_T2200 -> listOf(1)
+        }
+    }
 }

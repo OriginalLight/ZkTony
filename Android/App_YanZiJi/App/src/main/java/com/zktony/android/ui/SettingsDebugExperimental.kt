@@ -38,9 +38,9 @@ import com.zktony.android.data.ChannelState
 import com.zktony.android.data.ExperimentalControl
 import com.zktony.android.data.PipelineControl
 import com.zktony.android.ui.components.ArgumentsInputField
+import com.zktony.android.ui.components.BaseTopBar
 import com.zktony.android.ui.components.ButtonLoading
 import com.zktony.android.ui.components.SegmentedButtonTabRow
-import com.zktony.android.ui.components.TopBarRow
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.viewmodel.SettingsDebugExperimentalViewModel
@@ -84,7 +84,7 @@ fun SettingsDebugExperimentalTopBar(
     onChannelChange: (Int) -> Unit,
     navigationActions: NavigationActions
 ) {
-    TopBarRow(modifier = modifier) {
+    BaseTopBar(modifier = modifier) {
         Row(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.medium)

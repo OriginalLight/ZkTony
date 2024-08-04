@@ -1,17 +1,19 @@
 package com.zktony.android.data
 
-enum class Role(val permission: Int) {
+import com.zktony.android.R
+
+enum class Role(val permission: Int, val resId: Int) {
     // 工厂
-    FACTORY(0),
+    FACTORY(0, R.string.app_role_factory),
 
     // 用服
-    CUSTOMER_SERVICE(1),
+    CUSTOMER_SERVICE(1, R.string.app_role_customer_service),
 
     // 管理员
-    ADMIN(2),
+    ADMIN(2, R.string.app_role_admin),
 
     // 用户
-    USER(3);
+    USER(3, R.string.app_role_user);
 
     companion object {
         fun fromName(name: String): Role {
@@ -24,12 +26,21 @@ enum class Role(val permission: Int) {
             }
         }
 
-        fun getLowerRole(role: Role): List<String> {
+        fun getLowerRoleName(role: Role): List<String> {
             return when (role) {
                 FACTORY -> listOf("CUSTOMER_SERVICE", "ADMIN", "USER")
                 CUSTOMER_SERVICE -> listOf("ADMIN", "USER")
                 ADMIN -> listOf("USER")
                 USER -> listOf("NONE")
+            }
+        }
+
+        fun getLowerRole(role: Role): List<Role> {
+            return when (role) {
+                FACTORY -> listOf(CUSTOMER_SERVICE, ADMIN, USER)
+                CUSTOMER_SERVICE -> listOf(ADMIN, USER)
+                ADMIN -> listOf(USER)
+                USER -> listOf(USER)
             }
         }
     }

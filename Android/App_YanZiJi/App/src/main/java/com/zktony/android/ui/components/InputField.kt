@@ -13,9 +13,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.PermContactCalendar
 import androidx.compose.material.icons.filled.RemoveRedEye
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -38,62 +38,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zktony.android.R
-
-@Composable
-fun ArgumentsSetField(
-    modifier: Modifier = Modifier,
-    maxLength: Int = 64,
-    showClear: Boolean = true,
-    value: String,
-    onSetClick: (String) -> Unit
-) {
-    var text by remember { mutableStateOf(value) }
-
-    Row(
-        modifier = modifier
-            .background(MaterialTheme.colorScheme.surface, CircleShape)
-            .padding(4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        if (showClear && text.isNotEmpty()) {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .clickable { text = "" },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Clear,
-                    contentDescription = "Clear"
-                )
-            }
-        }
-
-        BasicTextField(
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 8.dp),
-            value = text,
-            onValueChange = {
-                if (it.length <= maxLength) {
-                    text = it
-                }
-            },
-            singleLine = true,
-            textStyle = MaterialTheme.typography.bodyLarge
-        )
-
-        Button(
-            onClick = { onSetClick(text) }) {
-            Text(text = stringResource(id = R.string.app_set))
-        }
-    }
-}
 
 @Composable
 fun ArgumentsInputField(
@@ -104,12 +53,11 @@ fun ArgumentsInputField(
     suffix: String? = null,
     value: String,
     enable: Boolean = true,
-    shape: Shape = CircleShape,
+    shape: Shape = MaterialTheme.shapes.medium,
     textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
     keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
     onValueChange: (String) -> Unit
 ) {
-
     Row(
         modifier = modifier
             .background(MaterialTheme.colorScheme.surface, shape)
@@ -166,10 +114,43 @@ fun ArgumentsInputField(
 }
 
 @Composable
+fun ExperimentalAttributeInputField(
+    modifier: Modifier = Modifier,
+    maxLength: Int = 64,
+    value: String,
+    enable: Boolean = true,
+    onValueChange: (String) -> Unit
+) {
+    Box(
+        modifier = modifier
+            .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.medium)
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        BasicTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = value,
+            onValueChange = {
+                if (it.length <= maxLength) {
+                    onValueChange(it)
+                }
+            },
+            enabled = enable,
+            singleLine = true,
+            textStyle = TextStyle(
+                fontSize = 18.sp,
+                textAlign = TextAlign.Center
+            ),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        )
+    }
+}
+
+@Composable
 fun UserNameInputField(
     modifier: Modifier = Modifier,
     value: String,
-    maxLength: Int = 32,
+    maxLength: Int = 64,
     onValueChange: (String) -> Unit
 ) {
     TextField(
@@ -189,8 +170,11 @@ fun UserNameInputField(
                 contentDescription = "Person"
             )
         },
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-        shape = CircleShape,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Ascii,
+            imeAction = ImeAction.Next
+        ),
+        shape = MaterialTheme.shapes.medium,
         singleLine = true,
         colors = TextFieldDefaults.colors(
             unfocusedIndicatorColor = Color.Transparent,
@@ -216,7 +200,7 @@ fun UserNameInputField(
 fun PasswordInputField(
     modifier: Modifier = Modifier,
     value: String,
-    maxLength: Int = 32,
+    maxLength: Int = 64,
     onValueChange: (String) -> Unit
 ) {
     var showPassword by remember { mutableStateOf(false) }
@@ -234,7 +218,7 @@ fun PasswordInputField(
         },
         leadingIcon = {
             Icon(
-                imageVector = Icons.Default.Lock,
+                imageVector = if (showPassword) Icons.Default.LockOpen else Icons.Default.Lock,
                 contentDescription = "Password"
             )
         },
@@ -242,7 +226,7 @@ fun PasswordInputField(
             imeAction = ImeAction.Done,
             keyboardType = KeyboardType.Password
         ),
-        shape = CircleShape,
+        shape = MaterialTheme.shapes.medium,
         singleLine = true,
         visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
         colors = TextFieldDefaults.colors(
@@ -272,13 +256,6 @@ fun PasswordInputField(
             }
         }
     )
-}
-
-
-@Preview
-@Composable
-fun ArgumentsSetFieldPreview() {
-    ArgumentsSetField(value = "Hello", onSetClick = {})
 }
 
 @Preview

@@ -37,9 +37,9 @@ import com.zktony.android.data.Arguments
 import com.zktony.android.data.ArgumentsClean
 import com.zktony.android.data.ArgumentsTransfer
 import com.zktony.android.ui.components.ArgumentsInputField
+import com.zktony.android.ui.components.BaseTopBar
 import com.zktony.android.ui.components.ButtonLoading
 import com.zktony.android.ui.components.SegmentedButtonTabRow
-import com.zktony.android.ui.components.TopBarRow
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.viewmodel.SettingsArgumentsRuntimeViewModel
@@ -83,7 +83,7 @@ fun SettingsArgumentsRuntimeTopBar(
     onChannelChange: (Int) -> Unit,
     navigationActions: NavigationActions
 ) {
-    TopBarRow(modifier = modifier) {
+    BaseTopBar(modifier = modifier) {
         Row(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.medium)

@@ -17,11 +17,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.zktony.android.ui.utils.zktyGreen
 import com.zktony.android.ui.utils.zktyYellow
 import com.zktony.android.utils.SnackbarUtils
 import com.zktony.android.utils.TipsUtils
@@ -45,8 +43,8 @@ data class Tips(
 
 @Composable
 fun Tips(modifier: Modifier = Modifier) {
+    // Observe the latest tips
     val tips by TipsUtils.tips.collectAsStateWithLifecycle()
-
     Row(
         modifier = modifier
             .clip(MaterialTheme.shapes.small)
@@ -56,7 +54,9 @@ fun Tips(modifier: Modifier = Modifier) {
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         TipsIcon(tips)
-        TipsMessage(tips)
+        tips?.message?.let {
+            Text(text = it, style = MaterialTheme.typography.bodyLarge)
+        }
     }
 }
 
@@ -93,18 +93,12 @@ fun TipsIcon(tips: Tips?) {
     }
 }
 
-@Composable
-fun TipsMessage(tips: Tips?) {
-    tips?.message?.let {
-        Text(text = it, style = MaterialTheme.typography.bodyLarge)
-    }
-}
 
 @Preview
 @Composable
 fun TipsPreview() {
     Surface {
-        TipsUtils.showTips(Tips.info("这个是一个提示信息"))
+        TipsUtils.showTips(Tips.warning("这个是一个提示信息"))
         Tips()
     }
 }

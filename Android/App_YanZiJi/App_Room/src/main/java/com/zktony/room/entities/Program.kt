@@ -40,6 +40,10 @@ data class Program(
     // 创建时间
     val createTime: Long = System.currentTimeMillis()
 ) {
+    // 时间转换
+    fun timeSeconds() = ((time.toDoubleOrNull() ?: 0.0) * 60).toInt()
+
+    // 获取胶浓度字符串
     fun getGlueConcentrationStr(): String {
         val list = glueConcentration.split(",")
         return if (glueType == 0) {
@@ -49,34 +53,29 @@ data class Program(
         }
     }
 
+    // 获取胶浓度列表
     fun getGlueConcentrationList(): List<String> {
         val list = glueConcentration.split(",")
         return listOf(list.getOrNull(0) ?: "0", list.getOrNull(1) ?: "0")
     }
 
+    // 是否可以保存
     fun canSave(): Boolean {
-        val bool = name.isNotEmpty() && value.isNotEmpty() && time.isNotEmpty()
-        if (experimentalType == 0) {
-            return bool && flowSpeed.isNotEmpty()
+        val bool = (value.toDoubleOrNull() ?: 0.0) > 0  && (time.toDoubleOrNull() ?: 0.0) > 0
+        return if (experimentalType == 0) {
+            bool && (flowSpeed.toDoubleOrNull() ?: 0.0) > 0.0
+        } else {
+            bool
         }
-
-        return bool
     }
 
+    // 是否可以开始
     fun canStart(opt1: Int, opt2: Int): Boolean {
-        val bool = value.isNotEmpty() && time.isNotEmpty()
-        if (experimentalType == 0) {
-            return bool && flowSpeed.isNotEmpty() && opt1 == 1
+        val bool = (value.toDoubleOrNull() ?: 0.0) > 0  && (time.toDoubleOrNull() ?: 0.0) > 0
+        return if (experimentalType == 0) {
+            bool && (flowSpeed.toDoubleOrNull() ?: 0.0) > 0 && opt1 == 1
+        } else  {
+            bool && opt2 == 1
         }
-        if (experimentalType == 2) {
-            return bool && opt2 == 1
-        }
-
-        return bool
-    }
-
-    fun getTimeSeconds(): Int {
-        val min = time.toDoubleOrNull() ?: 0.0
-        return (min * 60).toInt()
     }
 }

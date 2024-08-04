@@ -11,10 +11,12 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -48,8 +50,8 @@ import com.zktony.android.data.ExperimentalControl
 import com.zktony.android.data.ExperimentalState
 import com.zktony.android.data.disableEdit
 import com.zktony.android.data.isRunning
-import com.zktony.android.ui.components.ArgumentsInputField
 import com.zktony.android.ui.components.ButtonLoading
+import com.zktony.android.ui.components.ExperimentalAttributeInputField
 import com.zktony.android.ui.components.ExperimentalState
 import com.zktony.android.ui.components.ProgramSelectDialog
 import com.zktony.android.ui.components.StopExperimentalDialog
@@ -124,7 +126,7 @@ fun ExperimentalChannelView(
                 .fillMaxSize()
                 .background(
                     color = MaterialTheme.colorScheme.surface,
-                    shape = MaterialTheme.shapes.medium
+                    shape = RoundedCornerShape(0.dp, 16.dp, 16.dp, 16.dp)
                 )
                 .padding(8.dp),
             verticalArrangement = Arrangement.SpaceBetween
@@ -177,7 +179,7 @@ fun ExperimentalProgramState(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         ExperimentalAttributeItem(title = "程序", subTitle = "切换程序") {
-            Row(
+            Box(
                 modifier = Modifier
                     .weight(1f)
                     .height(40.dp)
@@ -199,12 +201,13 @@ fun ExperimentalProgramState(
                             }
                         }
                     }
-                    .padding(horizontal = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    .padding(horizontal = 8.dp),
+                contentAlignment = Alignment.Center
             ) {
                 Text(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = 16.dp),
                     text = program.name,
                     style = TextStyle(
                         fontSize = 18.sp,
@@ -213,9 +216,11 @@ fun ExperimentalProgramState(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
+
                 Icon(
-                    imageVector = Icons.Default.KeyboardArrowDown,
-                    contentDescription = "ArrowDown"
+                    modifier = Modifier.align(Alignment.CenterEnd),
+                    imageVector = Icons.Default.ArrowDropDown,
+                    contentDescription = "ArrowDropDown"
                 )
             }
         }
@@ -230,54 +235,36 @@ fun ExperimentalProgramState(
                 else -> "W"
             }
         ) {
-            ArgumentsInputField(
+            ExperimentalAttributeInputField(
                 modifier = Modifier
                     .weight(1f)
                     .height(40.dp),
                 value = program.value,
-                shape = MaterialTheme.shapes.medium,
-                showClear = false,
-                enable = enable,
-                textStyle = TextStyle(
-                    fontSize = 18.sp,
-                    textAlign = TextAlign.Center
-                )
+                enable = enable
             ) {
                 onProgramChange(index, program.copy(value = it))
             }
         }
         if (program.experimentalType == 0) {
             ExperimentalAttributeItem(title = "流量", subTitle = "mL/min") {
-                ArgumentsInputField(
+                ExperimentalAttributeInputField(
                     modifier = Modifier
                         .weight(1f)
                         .height(40.dp),
                     value = program.flowSpeed,
-                    shape = MaterialTheme.shapes.medium,
-                    showClear = false,
-                    enable = enable,
-                    textStyle = TextStyle(
-                        fontSize = 18.sp,
-                        textAlign = TextAlign.Center
-                    )
+                    enable = enable
                 ) {
                     onProgramChange(index, program.copy(flowSpeed = it))
                 }
             }
         }
         ExperimentalAttributeItem(title = "时间", subTitle = "min") {
-            ArgumentsInputField(
+            ExperimentalAttributeInputField(
                 modifier = Modifier
                     .weight(1f)
                     .height(40.dp),
                 value = program.time,
-                shape = MaterialTheme.shapes.medium,
-                showClear = false,
-                enable = enable,
-                textStyle = TextStyle(
-                    fontSize = 18.sp,
-                    textAlign = TextAlign.Center
-                )
+                enable = enable
             ) {
                 onProgramChange(index, program.copy(time = it))
             }
@@ -291,67 +278,27 @@ fun ExperimentalRealtimeState(
     channelState: ChannelState
 ) {
     Column(
-        modifier = modifier
-            .background(
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = MaterialTheme.shapes.medium
-            )
-            .padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "电流：",
-                fontSize = 18.sp
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            ExperimentalRealtimeItem(
+                modifier = Modifier.weight(1f),
+                title = "电流：", value = "${channelState.current}A"
             )
-            Text(
-                text = "${channelState.current} A",
-                fontSize = 18.sp
+            ExperimentalRealtimeItem(
+                modifier = Modifier.weight(1f),
+                title = "电压：", value = "${channelState.voltage}V"
             )
         }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "电压：",
-                fontSize = 18.sp
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            ExperimentalRealtimeItem(
+                modifier = Modifier.weight(1f),
+                title = "功率：", value = "${channelState.power}W"
             )
-            Text(
-                text = "${channelState.voltage} V",
-                fontSize = 18.sp
-            )
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "功率：",
-                fontSize = 18.sp
-            )
-            Text(
-                text = "${channelState.power} W",
-                fontSize = 18.sp
-            )
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "温度：",
-                fontSize = 18.sp
-            )
-            Text(
-                text = "${channelState.time} ℃",
-                fontSize = 18.sp
+            ExperimentalRealtimeItem(
+                modifier = Modifier.weight(1f),
+                title = "温度：", value = "${channelState.time}℃"
             )
         }
     }
@@ -390,9 +337,9 @@ fun ExperimentalActions(
     ) {
         if (experimentalState == ExperimentalState.TIMING) {
             Text(
-                modifier = Modifier.padding(bottom = 16.dp),
-                text = (program.getTimeSeconds() - channelState.time).timeFormat(),
-                fontSize = 32.sp,
+                modifier = Modifier.padding(bottom = 24.dp),
+                text = (program.timeSeconds() - channelState.time).timeFormat(),
+                fontSize = 36.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily.Monospace
             )
@@ -454,7 +401,7 @@ fun ExperimentalActions(
             Text(
                 modifier = Modifier.padding(bottom = 16.dp),
                 text = "请等待排液完成",
-                fontSize = 18.sp
+                fontSize = 22.sp
             )
         }
 
@@ -514,7 +461,10 @@ fun ExperimentalAttributeItem(
         modifier = modifier
             .fillMaxWidth()
             .height(56.dp)
-            .background(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.medium)
+            .background(
+                MaterialTheme.colorScheme.surfaceVariant,
+                RoundedCornerShape(0.dp, 16.dp, 0.dp, 16.dp)
+            )
             .padding(horizontal = 8.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -524,5 +474,35 @@ fun ExperimentalAttributeItem(
             Text(text = subTitle, style = MaterialTheme.typography.bodySmall)
         }
         content()
+    }
+}
+
+@Composable
+fun ExperimentalRealtimeItem(
+    modifier: Modifier = Modifier,
+    title: String,
+    value: String
+) {
+    Box(
+        modifier = modifier
+            .height(64.dp)
+            .background(
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                shape = RoundedCornerShape(0.dp, 16.dp, 0.dp, 16.dp)
+            )
+            .padding(4.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            modifier = Modifier.align(Alignment.TopStart),
+            text = title,
+            style = MaterialTheme.typography.bodySmall
+        )
+
+        Text(
+            modifier = Modifier.offset(y = 4.dp),
+            text = value,
+            fontSize = 22.sp
+        )
     }
 }

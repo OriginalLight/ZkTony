@@ -96,8 +96,8 @@ class UserRepository @Inject constructor(
      * @param roles List<String>.
      * @return PagingSource<Int, User>.
      */
-    fun getByPage(roles: List<String>): PagingSource<Int, User> {
-        return userDao.getByPage(roles)
+    fun getByPage(roles: List<String>, name: String?): PagingSource<Int, User> {
+        return userDao.getByPage(roles, name)
     }
 
     /**

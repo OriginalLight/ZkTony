@@ -41,10 +41,10 @@ import com.zktony.android.data.Role
 import com.zktony.android.data.Sound
 import com.zktony.android.ui.components.DateTimePicker
 import com.zktony.android.ui.components.PasswordModifyDialog
-import com.zktony.android.ui.components.RequirePermission
 import com.zktony.android.ui.components.SegmentedButtonTabRow
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
+import com.zktony.android.ui.utils.RequirePermission
 import com.zktony.android.ui.viewmodel.SettingsViewModel
 import com.zktony.android.utils.AuthUtils
 import com.zktony.android.utils.Constants

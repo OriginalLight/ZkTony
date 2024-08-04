@@ -5,3 +5,7 @@ data class ProgramQuery(
     val startTime: Long? = null,
     val endTime: Long? = null
 )
+
+data class UserQuery(
+    val name: String? = null
+)

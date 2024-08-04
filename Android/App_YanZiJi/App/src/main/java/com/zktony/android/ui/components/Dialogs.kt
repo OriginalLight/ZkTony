@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
@@ -17,6 +18,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.LockOpen
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
@@ -27,6 +30,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
@@ -55,10 +59,14 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.paging.compose.LazyPagingItems
 import com.zktony.android.R
 import com.zktony.android.data.ProgramQuery
+import com.zktony.android.data.Role
+import com.zktony.android.data.UserQuery
 import com.zktony.android.ui.utils.filter
 import com.zktony.android.ui.utils.itemsIndexed
+import com.zktony.android.utils.AuthUtils
 import com.zktony.android.utils.extra.size
 import com.zktony.room.entities.Program
+import com.zktony.room.entities.User
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -234,7 +242,7 @@ fun PasswordModifyDialog(
                             visualTransformation = if (showOldPassword) VisualTransformation.None else PasswordVisualTransformation(),
                             leadingIcon = {
                                 Icon(
-                                    imageVector = Icons.Default.Lock,
+                                    imageVector = if (showOldPassword) Icons.Default.LockOpen else Icons.Default.Lock,
                                     contentDescription = "Password"
                                 )
                             },
@@ -330,7 +338,7 @@ fun PasswordModifyDialog(
                             textStyle = TextStyle(fontSize = 20.sp),
                             leadingIcon = {
                                 Icon(
-                                    imageVector = Icons.Default.Lock,
+                                    imageVector = if (showNewPassword) Icons.Default.LockOpen else Icons.Default.Lock,
                                     contentDescription = "Password"
                                 )
                             },
@@ -377,7 +385,7 @@ fun PasswordModifyDialog(
                             textStyle = TextStyle(fontSize = 20.sp),
                             leadingIcon = {
                                 Icon(
-                                    imageVector = Icons.Default.Lock,
+                                    imageVector = if (showConfirmPassword) Icons.Default.LockOpen else Icons.Default.Lock,
                                     contentDescription = "Password"
                                 )
                             },
@@ -766,6 +774,357 @@ fun StopExperimentalDialog(
                     onClick = {
                         onDismiss()
                         onStop()
+                    }
+                ) {
+                    Text(
+                        text = "确认",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun UserQueryDialog(
+    modifier: Modifier = Modifier,
+    onDismiss: () -> Unit,
+    onQuery: (UserQuery) -> Unit
+) {
+    var name by remember { mutableStateOf<String?>(null) }
+
+    Dialog(
+        onDismissRequest = { onDismiss() },
+        properties = DialogProperties(dismissOnClickOutside = false)
+    ) {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.medium)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+
+            Text(
+                text = "搜索",
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            OutlinedTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                value = name ?: "",
+                onValueChange = { name = it },
+                singleLine = true,
+                textStyle = MaterialTheme.typography.bodyLarge,
+                label = { Text("用户名") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Person"
+                    )
+                }
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                OutlinedButton(
+                    modifier = Modifier.padding(end = 16.dp),
+                    onClick = { onDismiss() }
+                ) {
+                    Text(
+                        text = "取消",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+
+                Button(
+                    onClick = { onQuery(UserQuery(name = name)) }
+                ) {
+                    Text(
+                        text = "搜索",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun UserAddDialog(
+    modifier: Modifier = Modifier,
+    onDismiss: () -> Unit,
+    onAdd: suspend (User) -> Int
+) {
+    val scope = rememberCoroutineScope()
+    var name by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var showPassword by remember { mutableStateOf(false) }
+    var role by remember { mutableStateOf("USER") }
+    var errorMsg by remember { mutableStateOf("") }
+    var enable by remember { mutableStateOf(true) }
+    var loading by remember { mutableStateOf(false) }
+
+    Dialog(
+        onDismissRequest = { onDismiss() },
+        properties = DialogProperties(dismissOnClickOutside = false)
+    ) {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.medium)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = "添加用户",
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            Column(
+                modifier = Modifier.padding(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = name,
+                    onValueChange = {
+                        name = it
+                        errorMsg = ""
+                    },
+                    label = { Text("用户名") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next,
+                        keyboardType = KeyboardType.Ascii
+                    ),
+                    textStyle = TextStyle(fontSize = 20.sp),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Person"
+                        )
+                    },
+                    trailingIcon = {
+                        if (name.isNotEmpty()) {
+                            IconButton(onClick = { name = "" }) {
+                                Icon(
+                                    imageVector = Icons.Default.Clear,
+                                    contentDescription = "Clear"
+                                )
+                            }
+                        }
+                    }
+                )
+
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = password,
+                    onValueChange = {
+                        password = it
+                        errorMsg = ""
+                    },
+                    label = { Text("确认密码") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Done,
+                        keyboardType = KeyboardType.Password
+                    ),
+                    visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                    textStyle = TextStyle(fontSize = 20.sp),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Lock,
+                            contentDescription = "Password"
+                        )
+                    },
+                    trailingIcon = {
+                        if (password.isNotEmpty()) {
+                            Row {
+                                IconButton(onClick = {
+                                    showPassword = !showPassword
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.RemoveRedEye,
+                                        contentDescription = "Show Password",
+                                        tint = if (showPassword) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
+
+                                IconButton(onClick = { password = "" }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Clear,
+                                        contentDescription = "Clear"
+                                    )
+                                }
+                            }
+                        }
+                    }
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            shape = MaterialTheme.shapes.medium
+                        )
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val roles = Role.getLowerRole(AuthUtils.getRole())
+
+                    Text(
+                        text = "用户角色",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+
+
+                    DropDownBox(
+                        modifier = Modifier
+                            .width(120.dp)
+                            .height(40.dp),
+                        selected = roles.indexOf(Role.fromName(role)),
+                        options = roles.map { stringResource(id = it.resId) },
+                    ) {
+                        val ro = roles.getOrNull(it) ?: Role.USER
+                        role = ro.name
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            shape = MaterialTheme.shapes.medium
+                        )
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "是否启用",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+
+                    Switch(
+                        checked = enable,
+                        onCheckedChange = { enable = it }
+                    )
+                }
+
+                if (errorMsg.isNotEmpty()) {
+                    Text(
+                        text = errorMsg,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                OutlinedButton(
+                    modifier = Modifier.padding(end = 16.dp),
+                    enabled = !loading,
+                    onClick = { onDismiss() }) {
+                    Text(
+                        "取消",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+
+                Button(
+                    enabled = name.isNotEmpty() && password.isNotEmpty() && !loading,
+                    onClick = {
+                        scope.launch {
+                            loading = true
+                            val res = onAdd(
+                                User(
+                                    name = name,
+                                    password = password,
+                                    role = role,
+                                    enable = enable
+                                )
+                            )
+                            loading = false
+                            when (res) {
+                                0 -> onDismiss()
+                                1 -> errorMsg = "用户已存在"
+                                else -> onDismiss()
+                            }
+                        }
+                    }) {
+                    ButtonLoading(loading = loading) {
+                        Text(
+                            "确认",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PasswordClearDialog(
+    modifier: Modifier = Modifier,
+    onDismiss: () -> Unit,
+    onClear: () -> Unit
+) {
+    Dialog(onDismissRequest = { onDismiss() }) {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.medium)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = "清除密码",
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                text = "确认重置所选用户的密码为默认密码吗？",
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                OutlinedButton(
+                    modifier = Modifier.padding(end = 16.dp),
+                    onClick = { onDismiss() }
+                ) {
+                    Text(
+                        text = "取消",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+
+                Button(
+                    onClick = {
+                        onDismiss()
+                        onClear()
                     }
                 ) {
                     Text(

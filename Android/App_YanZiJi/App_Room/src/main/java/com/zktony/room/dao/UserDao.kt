@@ -26,10 +26,11 @@ abstract class UserDao : BaseDao<User> {
         """
         SELECT * FROM users
         WHERE role IN (:roles)
+        AND (CASE WHEN :name IS NULL THEN 1 ELSE name LIKE '%' || :name || '%' END)
         ORDER BY createTime DESC
         """
     )
-    abstract fun getByPage(roles: List<String>): PagingSource<Int, User>
+    abstract fun getByPage(roles: List<String>, name: String?): PagingSource<Int, User>
 
     @Query(
         """

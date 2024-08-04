@@ -40,10 +40,10 @@ import com.zktony.android.data.Arguments
 import com.zktony.android.data.ArgumentsSpeed
 import com.zktony.android.data.PumpControl
 import com.zktony.android.ui.components.ArgumentsInputField
+import com.zktony.android.ui.components.BaseTopBar
 import com.zktony.android.ui.components.ButtonLoading
 import com.zktony.android.ui.components.RadioButtonGroup
 import com.zktony.android.ui.components.SegmentedButtonTabRow
-import com.zktony.android.ui.components.TopBarRow
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.viewmodel.SettingsArgumentsPumpViewModel
@@ -87,7 +87,7 @@ fun SettingsArgumentsPumpTopBar(
     onChannelChange: (Int) -> Unit,
     navigationActions: NavigationActions
 ) {
-    TopBarRow(modifier = modifier) {
+    BaseTopBar(modifier = modifier) {
         Row(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.medium)
@@ -224,7 +224,7 @@ fun PumpControlView(
             ArgumentsInputField(
                 modifier = Modifier
                     .width(350.dp)
-                    .height(56.dp)
+                    .height(48.dp)
                     .fillMaxWidth(),
                 prefix = "转速",
                 suffix = if (speedUnit == 0) "rpm" else "mL/min",
@@ -235,7 +235,7 @@ fun PumpControlView(
             ArgumentsInputField(
                 modifier = Modifier
                     .width(350.dp)
-                    .height(56.dp)
+                    .height(48.dp)
                     .fillMaxWidth(),
                 prefix = "时间",
                 suffix = "s",
@@ -387,17 +387,19 @@ fun OutPumpCalibrationView(
     ) {
         Text(text = "出液泵校准", fontSize = 20.sp)
 
-        for (list in listOf(listOf(1, 3, 5, 7, 9), listOf(2, 4, 6, 8, 10))) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                for (i in list) {
-                    ArgumentsInputField(
-                        modifier = Modifier.size(350.dp, 48.dp),
-                        prefix = "${i * 50}",
-                        suffix = "mL",
-                        value = speedComp[i - 1]
-                    ) {
-                        speedComp = speedComp.toMutableList().also { list ->
-                            list[i - 1] = it
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            for (list in listOf(listOf(1, 3, 5, 7, 9), listOf(2, 4, 6, 8, 10))) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    for (i in list) {
+                        ArgumentsInputField(
+                            modifier = Modifier.size(350.dp, 48.dp),
+                            prefix = "${i * 50}",
+                            suffix = "mL",
+                            value = speedComp[i - 1]
+                        ) {
+                            speedComp = speedComp.toMutableList().also { list ->
+                                list[i - 1] = it
+                            }
                         }
                     }
                 }

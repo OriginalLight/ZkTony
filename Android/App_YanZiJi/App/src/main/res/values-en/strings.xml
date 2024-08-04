@@ -57,4 +57,8 @@
     <string name="app.password.modify">Password Modify</string>
     <string name="app.version.info">Version Info</string>
     <string name="app.confirm">OK</string>
+    <string name="app.role.user">User</string>
+    <string name="app.role.admin">Admin</string>
+    <string name="app.role.factory">Factory</string>
+    <string name="app.role.customer.service">Customer Service</string>
 </resources>

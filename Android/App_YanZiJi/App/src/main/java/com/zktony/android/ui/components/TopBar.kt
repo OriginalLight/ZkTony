@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.zktony.android.ui.utils.zktyBrush
 
 @Composable
-fun TopBarRow(
+fun BaseTopBar(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
