@@ -123,6 +123,7 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.okhttp3)
+    implementation(libs.vico.compose)
 
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)

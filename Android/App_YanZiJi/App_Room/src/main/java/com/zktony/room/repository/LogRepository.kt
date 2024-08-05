@@ -4,8 +4,6 @@ import androidx.paging.PagingSource
 import com.zktony.room.dao.LogDao
 import com.zktony.room.dao.LogSnapshotDao
 import com.zktony.room.entities.Log
-import com.zktony.room.entities.LogSnapshot
-import com.zktony.room.entities.Program
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

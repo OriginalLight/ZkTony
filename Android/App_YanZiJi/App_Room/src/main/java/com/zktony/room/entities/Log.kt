@@ -20,11 +20,11 @@ data class Log(
     // 模式
     val experimentalMode: Int = 0,
     // 值
-    val value: String,
+    val value: String = "",
     // 流速
     val flowSpeed: String = "",
     // 时间
-    val time: String,
+    val time: String = "",
     // 胶种类
     val glueType: Int = 0,
     // 胶浓度
