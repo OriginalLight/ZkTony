@@ -58,9 +58,9 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.paging.compose.LazyPagingItems
 import com.zktony.android.R
-import com.zktony.android.data.ProgramQuery
+import com.zktony.android.data.NameTimeRangeQuery
 import com.zktony.android.data.Role
-import com.zktony.android.data.UserQuery
+import com.zktony.android.data.NameQuery
 import com.zktony.android.ui.utils.filter
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.utils.AuthUtils
@@ -560,10 +560,10 @@ fun FileChoiceDialog(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProgramQueryDialog(
+fun NameTimeRangeDialog(
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
-    onQuery: (ProgramQuery) -> Unit
+    onQuery: (NameTimeRangeQuery) -> Unit
 ) {
     var name by remember { mutableStateOf<String?>(null) }
     val dateRangePickerState = rememberDateRangePickerState()
@@ -624,13 +624,82 @@ fun ProgramQueryDialog(
                 Button(
                     onClick = {
                         onQuery(
-                            ProgramQuery(
+                            NameTimeRangeQuery(
                                 name = name,
                                 startTime = dateRangePickerState.selectedStartDateMillis,
                                 endTime = dateRangePickerState.selectedEndDateMillis
                             )
                         )
                     }
+                ) {
+                    Text(
+                        text = "搜索",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun NameQueryDialog(
+    modifier: Modifier = Modifier,
+    onDismiss: () -> Unit,
+    onQuery: (NameQuery) -> Unit
+) {
+    var name by remember { mutableStateOf<String?>(null) }
+
+    Dialog(
+        onDismissRequest = { onDismiss() },
+        properties = DialogProperties(dismissOnClickOutside = false)
+    ) {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.medium)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+
+            Text(
+                text = "搜索",
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            OutlinedTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                value = name ?: "",
+                onValueChange = { name = it },
+                singleLine = true,
+                textStyle = MaterialTheme.typography.bodyLarge,
+                label = { Text("用户名") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Person"
+                    )
+                }
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                OutlinedButton(
+                    modifier = Modifier.padding(end = 16.dp),
+                    onClick = { onDismiss() }
+                ) {
+                    Text(
+                        text = "取消",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+
+                Button(
+                    onClick = { onQuery(NameQuery(name = name)) }
                 ) {
                     Text(
                         text = "搜索",
@@ -778,75 +847,6 @@ fun StopExperimentalDialog(
                 ) {
                     Text(
                         text = "确认",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun UserQueryDialog(
-    modifier: Modifier = Modifier,
-    onDismiss: () -> Unit,
-    onQuery: (UserQuery) -> Unit
-) {
-    var name by remember { mutableStateOf<String?>(null) }
-
-    Dialog(
-        onDismissRequest = { onDismiss() },
-        properties = DialogProperties(dismissOnClickOutside = false)
-    ) {
-        Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.medium)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-
-            Text(
-                text = "搜索",
-                style = MaterialTheme.typography.titleLarge
-            )
-
-            OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                value = name ?: "",
-                onValueChange = { name = it },
-                singleLine = true,
-                textStyle = MaterialTheme.typography.bodyLarge,
-                label = { Text("用户名") },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Person"
-                    )
-                }
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                OutlinedButton(
-                    modifier = Modifier.padding(end = 16.dp),
-                    onClick = { onDismiss() }
-                ) {
-                    Text(
-                        text = "取消",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
-
-                Button(
-                    onClick = { onQuery(UserQuery(name = name)) }
-                ) {
-                    Text(
-                        text = "搜索",
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }

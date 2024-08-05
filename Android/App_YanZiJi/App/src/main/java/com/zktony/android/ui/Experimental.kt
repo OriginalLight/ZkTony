@@ -56,6 +56,7 @@ import com.zktony.android.ui.components.ExperimentalState
 import com.zktony.android.ui.components.ProgramSelectDialog
 import com.zktony.android.ui.components.StopExperimentalDialog
 import com.zktony.android.ui.components.Tips
+import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.zktyHorizontalBrush
 import com.zktony.android.ui.viewmodel.ExperimentalViewModel
@@ -63,6 +64,7 @@ import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.ProductUtils
 import com.zktony.android.utils.TipsUtils
 import com.zktony.android.utils.extra.timeFormat
+import com.zktony.room.entities.Log
 import com.zktony.room.entities.Program
 import kotlinx.coroutines.launch
 
@@ -76,6 +78,7 @@ fun ExperimentalView(viewModel: ExperimentalViewModel = hiltViewModel()) {
     }
 
     val entities = viewModel.entities.collectAsLazyPagingItems()
+    val channelLogList by AppStateUtils.channelLogList.collectAsStateWithLifecycle()
     val channelStateList by AppStateUtils.channelStateList.collectAsStateWithLifecycle()
     val channelProgramList by AppStateUtils.channelProgramList.collectAsStateWithLifecycle()
     val experimentalStateList by AppStateUtils.experimentalStateList.collectAsStateWithLifecycle()
@@ -86,8 +89,9 @@ fun ExperimentalView(viewModel: ExperimentalViewModel = hiltViewModel()) {
                 modifier = Modifier.weight(1f),
                 index = index,
                 entities = entities,
+                channelLog = channelLogList[index],
                 channelState = channelStateList[index],
-                program = channelProgramList[index],
+                channelProgram = channelProgramList[index],
                 experimentalState = experimentalStateList[index],
                 viewModel = viewModel
             )
@@ -100,8 +104,9 @@ fun ExperimentalChannelView(
     modifier: Modifier = Modifier,
     index: Int = 0,
     entities: LazyPagingItems<Program>,
+    channelLog: Log?,
     channelState: ChannelState,
-    program: Program,
+    channelProgram: Program,
     experimentalState: ExperimentalState,
     viewModel: ExperimentalViewModel
 ) {
@@ -136,7 +141,7 @@ fun ExperimentalChannelView(
                     index = index,
                     enable = !experimentalState.disableEdit(),
                     entities = entities,
-                    program = program,
+                    program = channelProgram,
                     onProgramChange = { channel, program ->
                         viewModel.updateProgram(channel, program)
                     }
@@ -146,7 +151,8 @@ fun ExperimentalChannelView(
 
             ExperimentalActions(
                 index = index,
-                program = program,
+                log = channelLog,
+                program = channelProgram,
                 channelState = channelState,
                 experimentalState = experimentalState,
                 viewModel = viewModel
@@ -308,12 +314,14 @@ fun ExperimentalRealtimeState(
 fun ExperimentalActions(
     modifier: Modifier = Modifier,
     index: Int,
+    log: Log?,
     program: Program,
     channelState: ChannelState,
     experimentalState: ExperimentalState,
     viewModel: ExperimentalViewModel
 ) {
     val scope = rememberCoroutineScope()
+    val navigationActions = LocalNavigationActions.current
     var loadingStart by remember { mutableStateOf(false) }
     var loadingPause by remember { mutableStateOf(false) }
     var loadingStop by remember { mutableStateOf(false) }
@@ -400,12 +408,26 @@ fun ExperimentalActions(
         if (experimentalState == ExperimentalState.DRAIN) {
             Text(
                 modifier = Modifier.padding(bottom = 16.dp),
-                text = "请等待排液完成",
-                fontSize = 22.sp
+                text = "正在排液，等等待！",
+                fontSize = 18.sp
             )
         }
 
         if (experimentalState == ExperimentalState.READY) {
+
+            log?.let {
+                OutlinedButton(
+                    modifier = Modifier.padding(bottom = 16.dp),
+                    onClick = {
+                        scope.launch {
+                            navigationActions.navigate(Route.LOG_DETAIL + "/${it.id}")
+                        }
+                    }
+                ) {
+                    Text(text = "查看实验记录", fontSize = 18.sp)
+                }
+            }
+
             Button(
                 enabled = !loadingStart && program.canStart(channelState.opt1, channelState.opt2),
                 modifier = Modifier.fillMaxWidth(),

@@ -14,6 +14,7 @@ import com.zktony.android.utils.TipsUtils
 import com.zktony.log.LogUtils
 import com.zktony.room.entities.LogSnapshot
 import com.zktony.room.entities.Program
+import com.zktony.room.repository.LogRepository
 import com.zktony.room.repository.LogSnapshotRepository
 import com.zktony.room.repository.ProgramRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,6 +27,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ExperimentalViewModel @Inject constructor(
     private val programRepository: ProgramRepository,
+    private val logRepository: LogRepository,
     private val logSnapshotRepository: LogSnapshotRepository
 ) : ViewModel() {
 
@@ -38,13 +40,11 @@ class ExperimentalViewModel @Inject constructor(
     }.flow.cachedIn(viewModelScope)
 
     fun updateProgram(channel: Int, program: Program) {
-        AppStateUtils.setChannelProgramList(AppStateUtils.channelProgramList.value.mapIndexed { index, state ->
-            if (index == channel) {
-                program
-            } else {
-                state
-            }
-        })
+        try {
+            AppStateUtils.setChannelProgram(channel, program)
+        } catch (e: Exception) {
+            LogUtils.error(e.stackTraceToString(), true)
+        }
     }
 
     suspend fun startExperiment(channel: Int, experimental: ExperimentalControl): Boolean {
@@ -61,6 +61,7 @@ class ExperimentalViewModel @Inject constructor(
         } else {
             TipsUtils.showTips(Tips.info("实验开始成功 通道：${channel + 1}"))
             AppStateUtils.transformState(channel, ExperimentalState.STARTING)
+            createLog(channel)
             return true
         }
     }
@@ -90,6 +91,21 @@ class ExperimentalViewModel @Inject constructor(
         }
     }
 
+    private fun createLog(channel: Int) {
+        viewModelScope.launch {
+            try {
+                val program = AppStateUtils.getChannelProgram(channel)
+                val log = program.toLog(channel)
+                withContext(Dispatchers.IO) {
+                    val id = logRepository.insert(log)
+                    AppStateUtils.setChannelLog(channel, log.copy(id = id))
+                }
+            } catch (e: Exception) {
+                LogUtils.error(e.stackTraceToString(), true)
+            }
+        }
+    }
+
     private fun setLogSnapshotCollectJob() {
         viewModelScope.launch {
             val queue = AppStateUtils.channelLogSnapshotQueue
@@ -116,5 +132,4 @@ class ExperimentalViewModel @Inject constructor(
             }
         }
     }
-
 }

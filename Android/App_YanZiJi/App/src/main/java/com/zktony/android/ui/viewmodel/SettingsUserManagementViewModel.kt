@@ -6,8 +6,8 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.zktony.android.data.Role
-import com.zktony.android.data.UserQuery
-import com.zktony.android.data.defaults.defaultUserQuery
+import com.zktony.android.data.NameQuery
+import com.zktony.android.data.defaults.defaultNameQuery
 import com.zktony.android.ui.components.Tips
 import com.zktony.android.utils.AuthUtils
 import com.zktony.android.utils.TipsUtils
@@ -28,7 +28,7 @@ class SettingsUserManagementViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _selected = MutableStateFlow<List<Long>>(emptyList())
-    private val _query = MutableStateFlow(defaultUserQuery())
+    private val _query = MutableStateFlow(defaultNameQuery())
 
     val selected = _selected.asStateFlow()
 
@@ -131,7 +131,7 @@ class SettingsUserManagementViewModel @Inject constructor(
     }
 
     // 搜索
-    fun search(query: UserQuery) {
+    fun search(query: NameQuery) {
         _query.value = query
         _selected.value = emptyList()
         TipsUtils.showTips(Tips.info("搜索成功"))

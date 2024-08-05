@@ -449,13 +449,7 @@ object SerialPortUtils {
             if (ba != null) {
                 ChannelState.fromByteArray(ba)?.let { channelState ->
                     AppStateUtils.setExperimentalStateHook(target, channelState)
-                    AppStateUtils.setChannelStateList(AppStateUtils.channelStateList.value.mapIndexed { index, state ->
-                        if (index == target) {
-                            channelState
-                        } else {
-                            state
-                        }
-                    })
+                    AppStateUtils.setChannelState(target, channelState)
                 } ?: return false
                 return true
             } else {
@@ -474,13 +468,7 @@ object SerialPortUtils {
                 queryAndPausePolling(target, "QueryArguments", 0x41.toByte(), byteArrayOf(), 1000)
             if (ba != null) {
                 toArguments(ba)?.let { arguments ->
-                    AppStateUtils.setArgumentsList(AppStateUtils.argumentsList.value.mapIndexed { index, arg ->
-                        if (index == target) {
-                            arguments
-                        } else {
-                            arg
-                        }
-                    })
+                    AppStateUtils.setArguments(target, arguments)
                 } ?: return false
                 return true
             } else {

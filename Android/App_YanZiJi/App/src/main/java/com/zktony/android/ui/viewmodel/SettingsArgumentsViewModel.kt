@@ -98,13 +98,12 @@ class SettingsArgumentsViewModel @Inject constructor(
                 return
             }
             repeat(ProductUtils.getChannelCount()) { index ->
-                if (!SerialPortUtils.setArguments(index, arguments[index])
-                ) {
+                if (!SerialPortUtils.setArguments(index, arguments[index])) {
+                    AppStateUtils.setArguments(channel = index, arg = arguments[index])
                     TipsUtils.showTips(Tips.error("导入参数失败: 通道 ${index + 1}"))
                     return
                 }
             }
-            AppStateUtils.setArgumentsList(arguments)
             TipsUtils.showTips(Tips.info("导入参数成功"))
         } catch (e: Exception) {
             LogUtils.error("ImportArguments", e.stackTraceToString(), true)

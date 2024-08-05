@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
-import com.zktony.android.data.ProgramQuery
-import com.zktony.android.data.defaults.defaultProgramQuery
+import com.zktony.android.data.NameTimeRangeQuery
+import com.zktony.android.data.defaults.defaultNameTimeRangeQuery
 import com.zktony.android.ui.components.Tips
 import com.zktony.android.utils.JsonUtils
 import com.zktony.android.utils.ProductUtils
@@ -38,7 +38,7 @@ class ProgramViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _selected = MutableStateFlow<List<Long>>(emptyList())
-    private val _query = MutableStateFlow(defaultProgramQuery())
+    private val _query = MutableStateFlow(defaultNameTimeRangeQuery())
 
     val selected = _selected.asStateFlow()
 
@@ -203,7 +203,7 @@ class ProgramViewModel @Inject constructor(
     }
 
     // 搜索
-    fun search(query: ProgramQuery) {
+    fun search(query: NameTimeRangeQuery) {
         _query.value = query
         _selected.value = emptyList()
         TipsUtils.showTips(Tips.info("搜索成功"))

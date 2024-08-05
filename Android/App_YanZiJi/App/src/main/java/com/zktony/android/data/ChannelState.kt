@@ -1,6 +1,7 @@
 package com.zktony.android.data
 
 import com.zktony.log.LogUtils
+import com.zktony.room.entities.LogSnapshot
 import com.zktony.serialport.ext.readInt16LE
 import com.zktony.serialport.ext.readInt32LE
 import com.zktony.serialport.ext.readInt8
@@ -37,23 +38,46 @@ data class ChannelState(
     // 气泡传感器2状态
     val bub2: Int = 0
 ) {
+    fun toLogSnapshot(subId: Long): LogSnapshot {
+        return LogSnapshot(
+            subId = subId,
+            runState = runState,
+            experimentType = experimentType,
+            experimentalMode = experimentalMode,
+            errorInfo = errorInfo,
+            current = current,
+            voltage = voltage,
+            power = power,
+            temperature = temperature,
+            time = time,
+            step = step,
+            opt1 = opt1,
+            opt2 = opt2,
+            bub1 = bub1,
+            bub2 = bub2
+        )
+    }
+
     companion object {
         fun fromByteArray(byteArray: ByteArray): ChannelState? {
             try {
                 if (byteArray.size != 21) throw Exception("ChannelState 长度不正确 ${byteArray.toHexString()}")
                 val voltage = byteArray.readInt16LE(7).toBigDecimal().divide(100.toBigDecimal())
+                    .setScale(2, RoundingMode.HALF_UP)
                 val current = byteArray.readInt16LE(9).toBigDecimal().divide(100.toBigDecimal())
+                    .setScale(2, RoundingMode.HALF_UP)
                 return ChannelState(
                     runState = byteArray.readInt8(0),
                     experimentType = byteArray.readInt8(1),
                     experimentalMode = byteArray.readInt8(2),
                     errorInfo = byteArray.readInt32LE(3),
-                    voltage = voltage.stripTrailingZeros().toPlainString(),
-                    current = current.stripTrailingZeros().toPlainString(),
-                    power = voltage.multiply(current).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros()
+                    voltage = voltage.toPlainString(),
+                    current = current.toPlainString(),
+                    power = voltage.multiply(current).setScale(2, RoundingMode.HALF_UP)
                         .toPlainString(),
-                    temperature = byteArray.readInt16LE(11).toBigDecimal().divide(100.toBigDecimal())
-                        .stripTrailingZeros().toPlainString(),
+                    temperature = byteArray.readInt16LE(11).toBigDecimal()
+                        .divide(100.toBigDecimal()).setScale(2, RoundingMode.HALF_UP)
+                        .toPlainString(),
                     time = byteArray.readInt16LE(13),
                     step = byteArray.readInt16LE(15),
                     opt1 = byteArray.readInt8(17),

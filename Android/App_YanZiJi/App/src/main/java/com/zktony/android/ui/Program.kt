@@ -46,7 +46,8 @@ import com.zktony.android.ui.components.DeleteDialog
 import com.zktony.android.ui.components.FileChoiceDialog
 import com.zktony.android.ui.components.IconLoading
 import com.zktony.android.ui.components.ListEmptyView
-import com.zktony.android.ui.components.ProgramQueryDialog
+import com.zktony.android.ui.components.NameTimeRangeDialog
+import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.itemsIndexed
@@ -73,9 +74,18 @@ fun ProgramView(viewModel: ProgramViewModel = hiltViewModel()) {
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         // 顶部导航栏
-        ProgramTopBar(viewModel = viewModel, selected = selected, entities = entities)
+        ProgramTopBar(
+            selected = selected,
+            entities = entities,
+            viewModel = viewModel,
+            navigationActions = navigationActions
+        )
         // 列表
-        ProgramListView(entities = entities, selected = selected, viewModel = viewModel)
+        ProgramListView(
+            entities = entities,
+            selected = selected,
+            viewModel = viewModel
+        )
     }
 }
 
@@ -85,10 +95,10 @@ fun ProgramTopBar(
     modifier: Modifier = Modifier,
     selected: List<Long>,
     entities: LazyPagingItems<Program>,
-    viewModel: ProgramViewModel
+    viewModel: ProgramViewModel,
+    navigationActions: NavigationActions
 ) {
     val scope = rememberCoroutineScope()
-    val navigationActions = LocalNavigationActions.current
     var showFileChoice by remember { mutableStateOf(false) }
     var showDelete by remember { mutableStateOf(false) }
     var showQuery by remember { mutableStateOf(false) }
@@ -123,7 +133,7 @@ fun ProgramTopBar(
     }
 
     if (showQuery) {
-        ProgramQueryDialog(onDismiss = { showQuery = false }) {
+        NameTimeRangeDialog(onDismiss = { showQuery = false }) {
             scope.launch {
                 showQuery = false
                 viewModel.search(it)

@@ -12,4 +12,10 @@ abstract class LogSnapshotDao : BaseDao<LogSnapshot> {
         WHERE subId < 2000
     """)
     abstract fun test() :List<LogSnapshot>
+
+    @Query("""
+        DELETE FROM log_snapshots
+        WHERE subId = :subId
+    """)
+    abstract fun deleteBySubId(subId: Long) :Int
 }

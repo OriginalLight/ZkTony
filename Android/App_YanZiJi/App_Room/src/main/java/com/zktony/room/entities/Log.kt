@@ -11,6 +11,8 @@ import androidx.room.PrimaryKey
 data class Log(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,
+    // 通道
+    val channel: Int = 0,
     // 名称
     val name: String = "",
     // 实验类型

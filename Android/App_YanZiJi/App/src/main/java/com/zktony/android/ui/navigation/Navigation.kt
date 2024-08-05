@@ -43,6 +43,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.zktony.android.ui.ExperimentalView
+import com.zktony.android.ui.LogDetailView
 import com.zktony.android.ui.LogView
 import com.zktony.android.ui.LoginView
 import com.zktony.android.ui.ProgramAddOrUpdateView
@@ -119,6 +120,10 @@ fun AppNavigation() {
                 ) { ProgramAddOrUpdateView() }
                 composable(Route.EXPERIMENTAL) { ExperimentalView() }
                 composable(Route.LOG) { LogView() }
+                composable(
+                    Route.LOG_DETAIL + "/{id}",
+                    arguments = listOf(navArgument("id") { type = NavType.LongType })
+                ) { LogDetailView() }
                 composable(Route.SETTINGS) { SettingsView() }
                 composable(Route.SETTINGS_VERSION_INFO) { SettingsVersionInfoView() }
                 composable(Route.SETTINGS_USER_MANAGEMENT) { SettingsUserManagementView() }

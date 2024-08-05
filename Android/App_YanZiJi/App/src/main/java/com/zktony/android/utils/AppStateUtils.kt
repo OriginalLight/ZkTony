@@ -76,20 +76,52 @@ object AppStateUtils {
     }
 
     // mutableStateFlow set function
-    fun setArgumentsList(argumentsList: List<Arguments>) {
-        _argumentsList.value = argumentsList
+    fun setArguments(channel: Int, arg: Arguments) {
+        _argumentsList.value = _argumentsList.value.mapIndexed { index, arguments ->
+            if (index == channel) {
+                arg
+            } else {
+                arguments
+            }
+        }
     }
 
     fun getArgumentList(): List<Arguments> {
         return _argumentsList.value
     }
 
-    fun setChannelStateList(channelStateList: List<ChannelState>) {
-        _channelStateList.value = channelStateList
+    fun setChannelLog(channel: Int, log: Log?) {
+        _channelLogList.value = _channelLogList.value.mapIndexed { index, logState ->
+            if (index == channel) {
+                log
+            } else {
+                logState
+            }
+        }
     }
 
-    fun setChannelProgramList(channelProgramList: List<Program>) {
-        _channelProgramList.value = channelProgramList
+    fun setChannelState(channel: Int, state: ChannelState) {
+        _channelStateList.value = _channelStateList.value.mapIndexed { index, channelState ->
+            if (index == channel) {
+                state
+            } else {
+                channelState
+            }
+        }
+    }
+
+    fun setChannelProgram(channel: Int, program: Program) {
+        _channelProgramList.value = _channelProgramList.value.mapIndexed { index, programState ->
+            if (index == channel) {
+                program
+            } else {
+                programState
+            }
+        }
+    }
+
+    fun getChannelProgram(channel: Int): Program {
+        return _channelProgramList.value[channel]
     }
 
     fun setExperimentalStateHook(channel: Int, state: ChannelState) {
@@ -106,16 +138,33 @@ object AppStateUtils {
             }
 
             1 -> {
-                transformState(
-                    channel, when (state.step) {
-                        5 -> ExperimentalState.STARTING
-                        6 -> ExperimentalState.FILL
-                        7 -> ExperimentalState.TIMING
-                        8 -> ExperimentalState.DRAIN
-                        64 -> ExperimentalState.READY
-                        else -> ExperimentalState.NONE
+                when (state.step) {
+                    5 -> {
+                        // 开始
+                        transformState(channel, ExperimentalState.STARTING)
                     }
-                )
+                    6 -> {
+                        // 充液
+                        transformState(channel, ExperimentalState.FILL)
+                    }
+                    7 -> {
+                        // 计时
+                        transformState(channel, ExperimentalState.TIMING)
+                        collectLogSnapshot(channel, state)
+                    }
+                    8 -> {
+                        // 排液
+                        transformState(channel, ExperimentalState.DRAIN)
+                    }
+                    64 -> {
+                        // 结束
+                        transformState(channel, ExperimentalState.READY)
+                    }
+                    else -> {
+                        transformState(channel, ExperimentalState.NONE)
+                        LogUtils.warn("通道${channel + 1} 未知状态${state.step}")
+                    }
+                }
             }
 
             2 -> {
@@ -154,6 +203,18 @@ object AppStateUtils {
                 ExperimentalState.FILL -> {}
                 ExperimentalState.DRAIN -> {}
                 ExperimentalState.ERROR -> {}
+            }
+        } catch (e: Exception) {
+            LogUtils.error(e.stackTraceToString(), true)
+        }
+    }
+
+    private fun collectLogSnapshot(channel: Int, state: ChannelState) {
+        try {
+            val channelLog = _channelLogList.value[channel]
+            channelLog?.let {
+                val snapshot = state.toLogSnapshot(it.id)
+                channelLogSnapshotQueue.add(snapshot)
             }
         } catch (e: Exception) {
             LogUtils.error(e.stackTraceToString(), true)

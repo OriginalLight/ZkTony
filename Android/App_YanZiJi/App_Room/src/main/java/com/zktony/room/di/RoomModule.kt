@@ -48,14 +48,18 @@ object RoomModule {
 
     // Repository
     @Provides
+    @Singleton
     fun errorLogRepository(errorLogDao: ErrorLogDao) = ErrorLogRepository(errorLogDao)
 
     @Provides
-    fun logRepository(logDao: LogDao) = LogRepository(logDao)
+    @Singleton
+    fun logRepository(logDao: LogDao, logSnapshotDao: LogSnapshotDao) = LogRepository(logDao, logSnapshotDao)
 
     @Provides
+    @Singleton
     fun logSnapshotRepository(logSnapshotDao: LogSnapshotDao) = LogSnapshotRepository(logSnapshotDao)
 
     @Provides
+    @Singleton
     fun userRepository(userDao: UserDao) = UserRepository(userDao)
 }

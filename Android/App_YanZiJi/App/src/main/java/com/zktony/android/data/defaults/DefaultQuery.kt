@@ -1,14 +1,14 @@
 package com.zktony.android.data.defaults
 
-import com.zktony.android.data.ProgramQuery
-import com.zktony.android.data.UserQuery
+import com.zktony.android.data.NameTimeRangeQuery
+import com.zktony.android.data.NameQuery
 
-fun defaultProgramQuery() = ProgramQuery(
+fun defaultNameTimeRangeQuery() = NameTimeRangeQuery(
     name = null,
     startTime = null,
     endTime = null
 )
 
-fun defaultUserQuery() = UserQuery(
+fun defaultNameQuery() = NameQuery(
     name = null
 )

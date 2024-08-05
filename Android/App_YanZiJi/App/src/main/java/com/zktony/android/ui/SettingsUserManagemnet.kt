@@ -52,7 +52,7 @@ import com.zktony.android.ui.components.IconLoading
 import com.zktony.android.ui.components.ListEmptyView
 import com.zktony.android.ui.components.PasswordClearDialog
 import com.zktony.android.ui.components.UserAddDialog
-import com.zktony.android.ui.components.UserQueryDialog
+import com.zktony.android.ui.components.NameQueryDialog
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.itemsIndexed
@@ -113,7 +113,7 @@ fun SettingsUserManagementTopBar(
     var loadingClear by remember { mutableStateOf(false) }
 
     if (showQuery) {
-        UserQueryDialog(onDismiss = { showQuery = false }) {
+        NameQueryDialog(onDismiss = { showQuery = false }) {
             showQuery = false
             viewModel.search(it)
         }

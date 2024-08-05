@@ -78,4 +78,22 @@ data class Program(
             bool && opt2 == 1
         }
     }
+
+    fun toLog(channel: Int): Log {
+        return Log(
+            channel = channel,
+            name = name,
+            experimentalType = experimentalType,
+            experimentalMode = experimentalMode,
+            value = value,
+            flowSpeed = flowSpeed,
+            time = time,
+            glueType = glueType,
+            glueConcentration = glueConcentration,
+            glueThickness = glueThickness,
+            proteinSize = proteinSize,
+            bufferType = bufferType,
+            description = description
+        )
+    }
 }

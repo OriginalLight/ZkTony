@@ -4,11 +4,11 @@ import androidx.compose.ui.graphics.Color
 import com.zktony.android.ui.utils.zktyYellow
 
 enum class ExperimentalState(val color: Color, val text: String) {
-    NONE(Color.Gray, "未插入"),
+    NONE(Color.Gray, "模块未插入"),
     READY(Color.Green, "已就绪"),
     PAUSE(zktyYellow, "暂停中"),
     STARTING(Color.Green, "开始中"),
-    TIMING(zktyYellow, "计时中"),
+    TIMING(zktyYellow, "实验中"),
     FILL(zktyYellow, "填充中"),
     DRAIN(zktyYellow, "排液中"),
     ERROR(Color.Red, "错误");

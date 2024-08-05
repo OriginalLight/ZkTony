@@ -12,12 +12,20 @@ object LogUtils {
         service = LogStorageService(app)
     }
 
-    // 导出
+    /**
+     * 获取日志文件列表
+     * @return List<File>
+     */
     fun getLogs(): List<File> {
         return service.getLogs()
     }
 
-    // Error日志级别
+    /**
+     * Error日志级别
+     * @param msg String
+     * @param storage Boolean
+     * @return Unit
+     */
     fun error(msg: String, storage: Boolean = false) {
         Log.e(TAG, msg)
         if (storage) {
@@ -25,7 +33,12 @@ object LogUtils {
         }
     }
 
-    // Info日志级别
+    /**
+     * Info日志级别
+     * @param msg String
+     * @param storage Boolean
+     * @return Unit
+     */
     fun info(msg: String, storage: Boolean = false) {
         Log.i(TAG, msg)
         if (storage) {
@@ -33,7 +46,12 @@ object LogUtils {
         }
     }
 
-    // Debug日志级别
+    /**
+     * Debug日志级别
+     * @param msg String
+     * @param storage Boolean
+     * @return Unit
+     */
     fun debug(msg: String, storage: Boolean = false) {
         Log.d(TAG, msg)
         if (storage) {
@@ -41,7 +59,12 @@ object LogUtils {
         }
     }
 
-    // Warn日志级别
+    /**
+     * Warn日志级别
+     * @param msg String
+     * @param storage Boolean
+     * @return Unit
+     */
     fun warn(msg: String, storage: Boolean = false) {
         Log.w(TAG, msg)
         if (storage) {
@@ -49,7 +72,12 @@ object LogUtils {
         }
     }
 
-    // Verbose日志级别
+    /**
+     * Verbose日志级别
+     * @param msg String
+     * @param storage Boolean
+     * @return Unit
+     */
     fun verbose(msg: String, storage: Boolean = false) {
         Log.v(TAG, msg)
         if (storage) {
@@ -57,7 +85,12 @@ object LogUtils {
         }
     }
 
-    // WTF日志级别
+    /**
+     * WTF日志级别
+     * @param msg String
+     * @param storage Boolean
+     * @return Unit
+     */
     fun wtf(msg: String, storage: Boolean = false) {
         Log.wtf(TAG, msg)
         if (storage) {
@@ -65,7 +98,13 @@ object LogUtils {
         }
     }
 
-    // Error日志级别
+    /**
+     * Error日志级别
+     * @param tag String
+     * @param msg String
+     * @param storage Boolean
+     * @return Unit
+     */
     fun error(tag: String, msg: String, storage: Boolean = false) {
         Log.e(tag, msg)
         if (storage) {
@@ -73,7 +112,13 @@ object LogUtils {
         }
     }
 
-    // Info日志级别
+    /**
+     * Info日志级别
+     * @param tag String
+     * @param msg String
+     * @param storage Boolean
+     * @return Unit
+     */
     fun info(tag: String, msg: String, storage: Boolean = false) {
         Log.i(tag, msg)
         if (storage) {
@@ -81,7 +126,12 @@ object LogUtils {
         }
     }
 
-    // Debug日志级别
+    /**
+     * Debug日志级别
+     * @param tag String
+     * @param msg String
+     * @param storage Boolean
+     */
     fun debug(tag: String, msg: String, storage: Boolean = false) {
         Log.d(tag, msg)
         if (storage) {
@@ -89,7 +139,13 @@ object LogUtils {
         }
     }
 
-    // Warn日志级别
+    /**
+     * Warn日志级别
+     * @param tag String
+     * @param msg String
+     * @param storage Boolean
+     * @return Unit
+     */
     fun warn(tag: String, msg: String, storage: Boolean = false) {
         Log.w(tag, msg)
         if (storage) {
@@ -97,7 +153,13 @@ object LogUtils {
         }
     }
 
-    // Verbose日志级别
+    /**
+     * Verbose日志级别
+     * @param tag String
+     * @param msg String
+     * @param storage Boolean
+     * @return Unit
+     */
     fun verbose(tag: String, msg: String, storage: Boolean = false) {
         Log.v(tag, msg)
         if (storage) {
@@ -105,7 +167,13 @@ object LogUtils {
         }
     }
 
-    // WTF日志级别
+    /**
+     * WTF日志级别
+     * @param tag String
+     * @param msg String
+     * @param storage Boolean
+     * @return Unit
+     */
     fun wtf(tag: String, msg: String, storage: Boolean = false) {
         Log.wtf(tag, msg)
         if (storage) {
