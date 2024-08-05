@@ -3484,6 +3484,7 @@ class HomeViewModel @Inject constructor(
 
             } else if (selectRudio == 2) {
                 ApplicationUtils.ctx.playAudio(R.raw.startstop_voice)
+                delay(500)
             }
 
 
@@ -4339,6 +4340,7 @@ class HomeViewModel @Inject constructor(
                  */
                 val slEnetity = slDao.getById(1L).firstOrNull()
                 if (slEnetity != null) {
+                    ApplicationUtils.ctx.playAudio(R.raw.start_pipeline_voice)
                     lightYellow()
                     val higeFilling = slEnetity.higeFilling
                     logInfo(
