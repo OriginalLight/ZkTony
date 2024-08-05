@@ -9,7 +9,7 @@
         </a-list-item-meta>
         <template #actions>
           <div v-if="userStore.name !== 'public'">
-            <a-button shape="round" style="width: 120px" @click="handleModifyPassword">
+            <a-button shape="round" style="width: 120px" @click="visible = true">
               <template #icon>
                 <icon-edit />
               </template>
