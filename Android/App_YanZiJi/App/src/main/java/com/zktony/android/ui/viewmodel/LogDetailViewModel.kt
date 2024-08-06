@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.android.ui.components.Tips
 import com.zktony.android.utils.TipsUtils
 import com.zktony.log.LogUtils
+import com.zktony.room.entities.Log
+import com.zktony.room.entities.LogSnapshot
 import com.zktony.room.entities.Program
 import com.zktony.room.repository.LogRepository
 import com.zktony.room.repository.LogSnapshotRepository
@@ -25,10 +27,18 @@ class LogDetailViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val id: Long = checkNotNull(savedStateHandle["id"])
+    private val _navObj = MutableStateFlow<Log?>(null)
+    private val _entities = MutableStateFlow<List<LogSnapshot>>(emptyList())
+
+    val navObj = _navObj.asStateFlow()
+    val entities = _entities.asStateFlow()
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            LogUtils.info("LogDetailViewModel id: $id")
+            _navObj.value = logRepository.getById(id)
+            logSnapshotRepository.getBySubId(id).collect {
+                _entities.value = it
+            }
         }
     }
 }

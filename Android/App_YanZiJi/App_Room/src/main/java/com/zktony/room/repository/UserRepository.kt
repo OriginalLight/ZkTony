@@ -2,7 +2,7 @@ package com.zktony.room.repository
 
 import androidx.paging.PagingSource
 import com.zktony.room.dao.UserDao
-import com.zktony.room.defaults.defaultUsers
+import com.zktony.room.defaultUsers
 import com.zktony.room.entities.User
 import java.security.MessageDigest
 import javax.inject.Inject

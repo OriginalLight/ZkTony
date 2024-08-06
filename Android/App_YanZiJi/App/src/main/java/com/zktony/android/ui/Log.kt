@@ -163,7 +163,7 @@ fun LogTopBar(
 
             // 导出
             Button(
-                enabled = selected.isNotEmpty(),
+                enabled = selected.isNotEmpty() && !loadingExport,
                 onClick = {}
             ) {
                 IconLoading(loading = loadingExport) {
@@ -258,6 +258,14 @@ fun LogItem(
                 }, 2f
             ),
             Pair(item.createTime.dateFormat("HH:mm\nyyyy-MM-dd"), 3f),
+            Pair(
+                when (item.status) {
+                    0 -> "完成"
+                    1 -> "中止"
+                    2 -> "出错"
+                    else -> "未知"
+                }, 2f
+            )
         ).forEach {
             Text(
                 modifier = Modifier.weight(it.second),
@@ -301,7 +309,8 @@ fun LogListHeader(
             Pair("程序名称", 4f),
             Pair("实验类型", 2f),
             Pair("工作模式", 2f),
-            Pair("开始时间", 3f)
+            Pair("开始时间", 3f),
+            Pair("状态", 2f)
         ).forEach {
             Text(
                 modifier = Modifier.weight(it.second),

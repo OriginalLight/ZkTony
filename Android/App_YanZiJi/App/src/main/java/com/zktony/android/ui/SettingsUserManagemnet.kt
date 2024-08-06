@@ -345,11 +345,13 @@ fun UserItem(
             contentAlignment = Alignment.Center,
         ) {
             val roles = Role.getLowerRole(AuthUtils.getRole())
+            val roleIndex = roles.indexOfFirst { p -> p.name == item.role }
+
             DropDownBox(
                 modifier = Modifier
                     .width(120.dp)
                     .height(40.dp),
-                selected = roles.indexOf(Role.fromName(item.role)),
+                selected = roleIndex,
                 options = roles.map { stringResource(id = it.resId) },
             ) {
                 val role = roles.getOrNull(it) ?: Role.USER

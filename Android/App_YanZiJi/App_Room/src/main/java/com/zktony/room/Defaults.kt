@@ -1,5 +1,7 @@
-package com.zktony.room.defaults
+package com.zktony.room
 
+import com.zktony.room.entities.Log
+import com.zktony.room.entities.Program
 import com.zktony.room.entities.User
 
 fun defaultUsers() = listOf(
@@ -24,3 +26,9 @@ fun defaultUsers() = listOf(
         role = "CUSTOMER_SERVICE"
     )
 )
+
+fun defaultProgram() = Program(name = "None", value = "", time = "")
+
+fun defaultProgram(type: Int) =  Program(name = "None", value = "", time = "", experimentalType = type)
+
+fun defaultLog() = Log(name = "None")

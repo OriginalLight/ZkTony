@@ -3,8 +3,9 @@ package com.zktony.android.utils
 import com.zktony.android.data.Arguments
 import com.zktony.android.data.ChannelState
 import com.zktony.android.data.ExperimentalState
+import com.zktony.android.data.equateTo
 import com.zktony.log.LogUtils
-import com.zktony.room.defaults.defaultProgram
+import com.zktony.room.defaultProgram
 import com.zktony.room.entities.Log
 import com.zktony.room.entities.LogSnapshot
 import com.zktony.room.entities.Program
@@ -16,7 +17,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
-import java.util.Queue
 import java.util.concurrent.LinkedTransferQueue
 
 /**
@@ -51,6 +51,7 @@ object AppStateUtils {
     val experimentalStateList = _experimentalStateList.asStateFlow()
 
     // Queue
+    val channelLogQueue = LinkedTransferQueue<Log>()
     val channelLogSnapshotQueue = LinkedTransferQueue<LogSnapshot>()
 
     init {
@@ -100,6 +101,10 @@ object AppStateUtils {
         }
     }
 
+    fun getChannelLog(channel: Int): Log? {
+        return _channelLogList.value[channel]
+    }
+
     fun setChannelState(channel: Int, state: ChannelState) {
         _channelStateList.value = _channelStateList.value.mapIndexed { index, channelState ->
             if (index == channel) {
@@ -143,23 +148,28 @@ object AppStateUtils {
                         // 开始
                         transformState(channel, ExperimentalState.STARTING)
                     }
+
                     6 -> {
                         // 充液
                         transformState(channel, ExperimentalState.FILL)
                     }
+
                     7 -> {
                         // 计时
                         transformState(channel, ExperimentalState.TIMING)
                         collectLogSnapshot(channel, state)
                     }
+
                     8 -> {
                         // 排液
                         transformState(channel, ExperimentalState.DRAIN)
                     }
+
                     64 -> {
                         // 结束
                         transformState(channel, ExperimentalState.READY)
                     }
+
                     else -> {
                         transformState(channel, ExperimentalState.NONE)
                         LogUtils.warn("通道${channel + 1} 未知状态${state.step}")
@@ -194,15 +204,25 @@ object AppStateUtils {
                     }
                 }
             // do something when state changed from oldState to newState
-            when (oldState) {
-                ExperimentalState.NONE -> {}
-                ExperimentalState.READY -> {}
-                ExperimentalState.PAUSE -> {}
-                ExperimentalState.STARTING -> {}
-                ExperimentalState.TIMING -> {}
-                ExperimentalState.FILL -> {}
-                ExperimentalState.DRAIN -> {}
-                ExperimentalState.ERROR -> {}
+            if (!oldState.equateTo(newState)) {
+
+                if (newState == ExperimentalState.READY) {
+                    // 更新结束时间
+                    _channelLogList.value[channel]?.let {
+                        val newLog = it.copy(endTime = System.currentTimeMillis())
+                        channelLogQueue.add(newLog)
+                        setChannelLog(channel, newLog)
+                    }
+                }
+
+                if (newState == ExperimentalState.ERROR) {
+                    // 更新结束时间
+                    _channelLogList.value[channel]?.let {
+                        val newLog = it.copy(endTime = System.currentTimeMillis(), status = 2)
+                        channelLogQueue.add(newLog)
+                        setChannelLog(channel, newLog)
+                    }
+                }
             }
         } catch (e: Exception) {
             LogUtils.error(e.stackTraceToString(), true)

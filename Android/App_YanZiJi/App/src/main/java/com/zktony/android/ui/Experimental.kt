@@ -11,10 +11,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
@@ -34,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -131,7 +131,7 @@ fun ExperimentalChannelView(
                 .fillMaxSize()
                 .background(
                     color = MaterialTheme.colorScheme.surface,
-                    shape = RoundedCornerShape(0.dp, 16.dp, 16.dp, 16.dp)
+                    shape = MaterialTheme.shapes.medium
                 )
                 .padding(8.dp),
             verticalArrangement = Arrangement.SpaceBetween
@@ -290,21 +290,21 @@ fun ExperimentalRealtimeState(
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             ExperimentalRealtimeItem(
                 modifier = Modifier.weight(1f),
-                title = "电流：", value = "${channelState.current}A"
+                title = "电流", value = "${channelState.current}A"
             )
             ExperimentalRealtimeItem(
                 modifier = Modifier.weight(1f),
-                title = "电压：", value = "${channelState.voltage}V"
+                title = "电压", value = "${channelState.voltage}V"
             )
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             ExperimentalRealtimeItem(
                 modifier = Modifier.weight(1f),
-                title = "功率：", value = "${channelState.power}W"
+                title = "功率", value = "${channelState.power}W"
             )
             ExperimentalRealtimeItem(
                 modifier = Modifier.weight(1f),
-                title = "温度：", value = "${channelState.time}℃"
+                title = "温度", value = "${channelState.time}℃"
             )
         }
     }
@@ -408,7 +408,7 @@ fun ExperimentalActions(
         if (experimentalState == ExperimentalState.DRAIN) {
             Text(
                 modifier = Modifier.padding(bottom = 16.dp),
-                text = "正在排液，等等待！",
+                text = "正在排液，请等待！",
                 fontSize = 18.sp
             )
         }
@@ -453,22 +453,20 @@ fun ExperimentalChannelHeader(
     index: Int = 0,
     experimentalState: ExperimentalState,
 ) {
-    Box {
-        Row(
-            modifier = modifier
-                .height(48.dp)
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            ExperimentalState(state = experimentalState)
-            Text(
-                text = (index + 1).toString(),
-                fontSize = 24.sp,
-                color = MaterialTheme.colorScheme.onPrimary
-            )
-        }
+    Row(
+        modifier = modifier
+            .height(48.dp)
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        ExperimentalState(state = experimentalState)
+        Text(
+            text = (index + 1).toString(),
+            fontSize = 24.sp,
+            color = MaterialTheme.colorScheme.onPrimary
+        )
     }
 }
 
@@ -484,8 +482,8 @@ fun ExperimentalAttributeItem(
             .fillMaxWidth()
             .height(56.dp)
             .background(
-                MaterialTheme.colorScheme.surfaceVariant,
-                RoundedCornerShape(0.dp, 16.dp, 0.dp, 16.dp)
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                shape = MaterialTheme.shapes.medium
             )
             .padding(horizontal = 8.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -510,7 +508,7 @@ fun ExperimentalRealtimeItem(
             .height(64.dp)
             .background(
                 color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = RoundedCornerShape(0.dp, 16.dp, 0.dp, 16.dp)
+                shape = MaterialTheme.shapes.medium
             )
             .padding(4.dp),
         contentAlignment = Alignment.Center
@@ -522,7 +520,6 @@ fun ExperimentalRealtimeItem(
         )
 
         Text(
-            modifier = Modifier.offset(y = 4.dp),
             text = value,
             fontSize = 22.sp
         )

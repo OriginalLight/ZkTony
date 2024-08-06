@@ -98,6 +98,7 @@ fun EquipmentArgumentsListView(
     var pn by rememberDataSaverState(key = Constants.PN, initialValue = Constants.DEFAULT_PN)
     // S/N参数
     var sn by rememberDataSaverState(key = Constants.SN, initialValue = Constants.DEFAULT_SN)
+    var snText by remember { mutableStateOf(sn) }
 
     Column(
         modifier = modifier
@@ -122,7 +123,6 @@ fun EquipmentArgumentsListView(
         }
 
         SettingsItem(title = stringResource(id = R.string.app_serial_number)) {
-            var snText by remember(sn) { mutableStateOf(sn) }
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically

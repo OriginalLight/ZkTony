@@ -20,6 +20,11 @@ class LogRepository @Inject constructor(
         clearExpiredLog()
     }
 
+    /**
+     * Insert.
+     * @param log Log.
+     * @return Long.
+     */
     suspend fun insert(log: Log): Long {
         return logDao.insert(log)
     }
@@ -39,7 +44,40 @@ class LogRepository @Inject constructor(
         return logDao.getByPage(name, startTime, endTime)
     }
 
-    // 清理过期日志
+    /**
+     * Get by id.
+     * @param id Long.
+     * @return Log?.
+     */
+    fun getById(id: Long): Log? {
+        return logDao.getById(id)
+    }
+
+    /**
+     * Update.
+     * @param log Log.
+     * @return Int.
+     */
+    suspend fun update(log: Log): Int {
+        return logDao.update(log)
+    }
+
+    /**
+     * Delete by ids.
+     * @param ids List<Long>.
+     * @return Boolean.
+     */
+    suspend fun deleteByIds(ids: List<Long>): Boolean {
+        ids.forEach {
+            logSnapshotDao.deleteBySubId(it)
+        }
+        val effect = logDao.deleteByIds(ids)
+        return effect > 0
+    }
+
+    /**
+     * Clear expired log.
+     */
     private fun clearExpiredLog() {
         scope.launch {
             val expired = System.currentTimeMillis() - 30 * 24 * 60 * 60 * 1000L
@@ -50,13 +88,5 @@ class LogRepository @Inject constructor(
             logDao.deleteAll(logs)
             android.util.Log.d("LogRepository", "clearExpiredLog: ${logs.size}")
         }
-    }
-
-    suspend fun deleteByIds(ids: List<Long>): Boolean {
-        ids.forEach {
-            logSnapshotDao.deleteBySubId(it)
-        }
-        val effect = logDao.deleteByIds(ids)
-        return effect > 0
     }
 }

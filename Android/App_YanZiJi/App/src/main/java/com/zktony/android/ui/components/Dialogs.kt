@@ -58,9 +58,9 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.paging.compose.LazyPagingItems
 import com.zktony.android.R
+import com.zktony.android.data.NameQuery
 import com.zktony.android.data.NameTimeRangeQuery
 import com.zktony.android.data.Role
-import com.zktony.android.data.NameQuery
 import com.zktony.android.ui.utils.filter
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.utils.AuthUtils
@@ -200,7 +200,7 @@ fun PasswordModifyDialog(
     var showOldPassword by remember { mutableStateOf(false) }
     var showNewPassword by remember { mutableStateOf(false) }
     var showConfirmPassword by remember { mutableStateOf(false) }
-    var errorOldPasswordMsg by remember { mutableStateOf("") }
+    var errMsg by remember { mutableStateOf<String?>(null) }
     var step by remember { mutableIntStateOf(0) }
     var loading by remember { mutableStateOf(false) }
 
@@ -232,13 +232,12 @@ fun PasswordModifyDialog(
                             value = oldPassword,
                             onValueChange = {
                                 oldPassword = it
-                                if (errorOldPasswordMsg.isNotEmpty()) {
-                                    errorOldPasswordMsg = ""
-                                }
+                                errMsg = null
                             },
                             label = { Text("旧密码") },
                             singleLine = true,
-                            textStyle = TextStyle(fontSize = 20.sp),
+                            textStyle = MaterialTheme.typography.bodyLarge,
+                            shape = MaterialTheme.shapes.medium,
                             visualTransformation = if (showOldPassword) VisualTransformation.None else PasswordVisualTransformation(),
                             leadingIcon = {
                                 Icon(
@@ -268,12 +267,12 @@ fun PasswordModifyDialog(
                                     }
                                 }
                             },
-                            isError = errorOldPasswordMsg.isNotEmpty()
+                            isError = errMsg != null
                         )
 
-                        if (errorOldPasswordMsg.isNotEmpty()) {
+                        errMsg?.let {
                             Text(
-                                text = errorOldPasswordMsg,
+                                text = it,
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.error
                             )
@@ -304,7 +303,7 @@ fun PasswordModifyDialog(
                                     if (res) {
                                         step = 1
                                     } else {
-                                        errorOldPasswordMsg = "密码错误"
+                                        errMsg = "密码错误"
                                     }
                                 }
                             }) {
@@ -327,7 +326,10 @@ fun PasswordModifyDialog(
                         OutlinedTextField(
                             modifier = Modifier.fillMaxWidth(),
                             value = newPassword,
-                            onValueChange = { newPassword = it },
+                            onValueChange = {
+                                newPassword = it
+                                errMsg = null
+                            },
                             label = { Text("新密码") },
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(
@@ -335,7 +337,8 @@ fun PasswordModifyDialog(
                                 keyboardType = KeyboardType.Password
                             ),
                             visualTransformation = if (showNewPassword) VisualTransformation.None else PasswordVisualTransformation(),
-                            textStyle = TextStyle(fontSize = 20.sp),
+                            textStyle = MaterialTheme.typography.bodyLarge,
+                            shape = MaterialTheme.shapes.medium,
                             leadingIcon = {
                                 Icon(
                                     imageVector = if (showNewPassword) Icons.Default.LockOpen else Icons.Default.Lock,
@@ -371,9 +374,7 @@ fun PasswordModifyDialog(
                             value = confirmPassword,
                             onValueChange = {
                                 confirmPassword = it
-                                if (errorOldPasswordMsg.isNotEmpty()) {
-                                    errorOldPasswordMsg = ""
-                                }
+                                errMsg = null
                             },
                             label = { Text("确认密码") },
                             singleLine = true,
@@ -382,7 +383,8 @@ fun PasswordModifyDialog(
                                 keyboardType = KeyboardType.Password
                             ),
                             visualTransformation = if (showConfirmPassword) VisualTransformation.None else PasswordVisualTransformation(),
-                            textStyle = TextStyle(fontSize = 20.sp),
+                            textStyle = MaterialTheme.typography.bodyLarge,
+                            shape = MaterialTheme.shapes.medium,
                             leadingIcon = {
                                 Icon(
                                     imageVector = if (showConfirmPassword) Icons.Default.LockOpen else Icons.Default.Lock,
@@ -411,12 +413,12 @@ fun PasswordModifyDialog(
                                     }
                                 }
                             },
-                            isError = errorOldPasswordMsg.isNotEmpty()
+                            isError = errMsg != null
                         )
 
-                        if (errorOldPasswordMsg.isNotEmpty()) {
+                        errMsg?.let {
                             Text(
-                                text = errorOldPasswordMsg,
+                                text = it,
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.error
                             )
@@ -443,7 +445,7 @@ fun PasswordModifyDialog(
                                 scope.launch {
                                     loading = true
                                     if (newPassword != confirmPassword) {
-                                        errorOldPasswordMsg = "两次密码不一致"
+                                        errMsg = "两次密码不一致"
                                         loading = false
                                         return@launch
                                     }
@@ -452,7 +454,7 @@ fun PasswordModifyDialog(
                                     if (res) {
                                         onDismiss()
                                     } else {
-                                        errorOldPasswordMsg = "修改失败"
+                                        errMsg = "修改失败"
                                     }
                                 }
                             }) {
@@ -599,6 +601,7 @@ fun NameTimeRangeDialog(
                     onValueChange = { name = it },
                     singleLine = true,
                     textStyle = MaterialTheme.typography.bodyLarge,
+                    shape = MaterialTheme.shapes.medium,
                     label = { Text("程序名称") }
                 )
                 DateRangePicker(
@@ -675,6 +678,7 @@ fun NameQueryDialog(
                 onValueChange = { name = it },
                 singleLine = true,
                 textStyle = MaterialTheme.typography.bodyLarge,
+                shape = MaterialTheme.shapes.medium,
                 label = { Text("用户名") },
                 leadingIcon = {
                     Icon(
@@ -742,6 +746,8 @@ fun ProgramSelectDialog(
                         contentDescription = "Search"
                     )
                 },
+                textStyle = MaterialTheme.typography.bodyLarge,
+                shape = MaterialTheme.shapes.medium,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done
@@ -904,7 +910,8 @@ fun UserAddDialog(
                         imeAction = ImeAction.Next,
                         keyboardType = KeyboardType.Ascii
                     ),
-                    textStyle = TextStyle(fontSize = 20.sp),
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    shape = MaterialTheme.shapes.medium,
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Person,
@@ -930,14 +937,15 @@ fun UserAddDialog(
                         password = it
                         errorMsg = ""
                     },
-                    label = { Text("确认密码") },
+                    label = { Text("密码") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Done,
                         keyboardType = KeyboardType.Password
                     ),
                     visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
-                    textStyle = TextStyle(fontSize = 20.sp),
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    shape = MaterialTheme.shapes.medium,
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Lock,
@@ -986,7 +994,6 @@ fun UserAddDialog(
                         text = "用户角色",
                         style = MaterialTheme.typography.bodyLarge
                     )
-
 
                     DropDownBox(
                         modifier = Modifier

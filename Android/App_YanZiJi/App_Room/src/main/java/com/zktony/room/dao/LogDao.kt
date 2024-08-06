@@ -23,6 +23,14 @@ abstract class LogDao : BaseDao<Log> {
     @Query(
         """
         SELECT * FROM logs
+        WHERE id = :id
+        """
+    )
+    abstract fun getById(id: Long): Log?
+
+    @Query(
+        """
+        SELECT * FROM logs
         WHERE (CASE WHEN :name IS NULL THEN 1 ELSE name LIKE '%' || :name || '%' END)
         AND (CASE WHEN :startTime IS NULL THEN 1 ELSE createTime >= :startTime END)
         AND (CASE WHEN :endTime IS NULL THEN 1 ELSE createTime <= :endTime END)

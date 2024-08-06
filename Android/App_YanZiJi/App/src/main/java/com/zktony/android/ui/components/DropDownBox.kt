@@ -34,8 +34,6 @@ fun DropDownBox(
     options: List<String>,
     onSelectedChange: (Int) -> Unit
 ) {
-
-    var option by remember { mutableStateOf(options[selected]) }
     var expanded by remember { mutableStateOf(false) }
 
     Box(
@@ -51,7 +49,8 @@ fun DropDownBox(
         ) {
             Text(
                 modifier = Modifier.weight(1f),
-                text = option, style = MaterialTheme.typography.bodyLarge
+                text = options.getOrNull(selected) ?: "Unknown",
+                style = MaterialTheme.typography.bodyLarge
             )
 
             Icon(
@@ -68,7 +67,6 @@ fun DropDownBox(
                 DropdownMenuItem(
                     text = { Text(text, style = MaterialTheme.typography.bodyLarge) },
                     onClick = {
-                        option = text
                         onSelectedChange(index)
                         expanded = false
                     }

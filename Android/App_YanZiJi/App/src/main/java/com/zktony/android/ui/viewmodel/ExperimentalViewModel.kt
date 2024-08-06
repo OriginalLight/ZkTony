@@ -32,6 +32,7 @@ class ExperimentalViewModel @Inject constructor(
 ) : ViewModel() {
 
     init {
+        setLogUpdateJob()
         setLogSnapshotCollectJob()
     }
 
@@ -87,6 +88,11 @@ class ExperimentalViewModel @Inject constructor(
                 channel,
                 if (experimentalType == 0) ExperimentalState.DRAIN else ExperimentalState.READY
             )
+            AppStateUtils.getChannelLog(channel)?.let {
+                val newLog = it.copy(status = 1)
+                AppStateUtils.setChannelLog(channel, newLog)
+                AppStateUtils.channelLogQueue.add(newLog)
+            }
             return true
         }
     }
@@ -102,6 +108,27 @@ class ExperimentalViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 LogUtils.error(e.stackTraceToString(), true)
+            }
+        }
+    }
+
+    private fun setLogUpdateJob() {
+        viewModelScope.launch {
+            val queue = AppStateUtils.channelLogQueue
+            while (true) {
+                try {
+                    while (queue.size > 0) {
+                        queue.poll()?.let {
+                            withContext(Dispatchers.IO) {
+                                logRepository.update(it)
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    LogUtils.error(e.stackTraceToString(), true)
+                } finally {
+                    delay(3000L)
+                }
             }
         }
     }

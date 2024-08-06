@@ -45,7 +45,7 @@ import com.zktony.android.ui.components.SegmentedButtonTabRow
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.viewmodel.ProgramAddOrUpdateViewModel
 import com.zktony.android.utils.ProductUtils
-import com.zktony.room.defaults.defaultProgram
+import com.zktony.room.defaultProgram
 import com.zktony.room.entities.Program
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -326,7 +326,6 @@ fun ProgramAttributeList(
                 }
             }
         }
-
     }
 }
 

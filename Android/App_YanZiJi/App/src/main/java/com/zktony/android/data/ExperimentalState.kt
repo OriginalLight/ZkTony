@@ -26,3 +26,7 @@ fun ExperimentalState.disableEdit(): Boolean {
             this == ExperimentalState.TIMING ||
             this == ExperimentalState.FILL
 }
+
+fun ExperimentalState.equateTo(other: ExperimentalState): Boolean {
+    return this.name == other.name
+}

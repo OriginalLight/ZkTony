@@ -12,7 +12,7 @@ export default {
   'home.camera.options.auto.model': '自\u2002动\u2002模\u2002式',
   'home.camera.options.manual.model': '手\u2002动\u2002模\u2002式',
   'home.camera.options.pixel': '画质',
-  'home.camera.options.3000': '标准',
+  'home.camera.options.3000': '标\u2002准',
   'home.camera.options.1500': '高灵敏',
   'home.camera.options.1000': '超高灵敏',
   'home.camera.options.3000.pixel': '标准灵敏度',
