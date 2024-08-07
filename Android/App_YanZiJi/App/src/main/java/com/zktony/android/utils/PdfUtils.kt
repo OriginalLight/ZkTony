@@ -236,10 +236,11 @@ object PdfUtils {
             )
         }
 
-        // draw the x-axis unit
+        // draw the x-axis unit text "s" centered behind the x-axis
+        val xUnitWidth = paint.measureText("s")
         page.canvas.drawText(
             "s",
-            margin + xAxisWith + 20,
+            margin + xAxisWith - xUnitWidth / 2,
             margin + yAxisWith + 20,
             paint.apply {
                 color = 0xFF000000.toInt()
@@ -247,11 +248,12 @@ object PdfUtils {
             }
         )
 
-        // draw the y-axis unit
+        // draw the y-axis unit text "A" centered behind the y-axis
+        val yUnitWidth = paint.measureText("A")
         page.canvas.drawText(
             "A",
             margin - 20,
-            margin - 20,
+            margin - yUnitWidth / 2,
             paint.apply {
                 color = 0xFF000000.toInt()
                 style = Paint.Style.FILL
