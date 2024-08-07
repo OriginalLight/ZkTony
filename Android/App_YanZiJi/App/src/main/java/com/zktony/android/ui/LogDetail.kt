@@ -62,6 +62,7 @@ import com.zktony.android.ui.components.ListEmptyView
 import com.zktony.android.ui.components.rememberMarker
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.utils.LocalNavigationActions
+import com.zktony.android.ui.utils.getAttributes
 import com.zktony.android.ui.utils.zktyChartLinearColors
 import com.zktony.android.ui.utils.zktyHorizontalBrush
 import com.zktony.android.ui.viewmodel.LogDetailViewModel

@@ -25,3 +25,11 @@ enum class Sound(val resId: Int) {
         }
     }
 }
+
+enum class SoundType(val ring: Int, val voice: Int) {
+    START(R.raw.test, R.raw.test),
+    STOP(R.raw.test, R.raw.test),
+    SWITCH(R.raw.test, R.raw.test),
+    ERROR(R.raw.test, R.raw.test),
+    EXPORT(R.raw.test, R.raw.test)
+}

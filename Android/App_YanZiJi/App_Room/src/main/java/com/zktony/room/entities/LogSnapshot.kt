@@ -17,7 +17,7 @@ data class LogSnapshot(
     // 运行模式
     val experimentalMode: Int = 0,
     // 故障信息
-    val errorInfo: Int = 0,
+    val errorInfo: Long = 0L,
     // 当前电流
     val current: String = "0",
     // 当前电压

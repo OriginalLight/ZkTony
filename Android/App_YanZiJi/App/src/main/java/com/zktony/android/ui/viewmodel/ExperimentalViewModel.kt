@@ -12,8 +12,10 @@ import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.SerialPortUtils
 import com.zktony.android.utils.TipsUtils
 import com.zktony.log.LogUtils
+import com.zktony.room.entities.ErrorLog
 import com.zktony.room.entities.LogSnapshot
 import com.zktony.room.entities.Program
+import com.zktony.room.repository.ErrorLogRepository
 import com.zktony.room.repository.LogRepository
 import com.zktony.room.repository.LogSnapshotRepository
 import com.zktony.room.repository.ProgramRepository
@@ -28,12 +30,14 @@ import javax.inject.Inject
 class ExperimentalViewModel @Inject constructor(
     private val programRepository: ProgramRepository,
     private val logRepository: LogRepository,
-    private val logSnapshotRepository: LogSnapshotRepository
+    private val logSnapshotRepository: LogSnapshotRepository,
+    private val errorLogRepository: ErrorLogRepository
 ) : ViewModel() {
 
     init {
         setLogUpdateJob()
         setLogSnapshotCollectJob()
+        setErrorLogCollectJob()
     }
 
     val entities = Pager(PagingConfig(pageSize = 20, initialLoadSize = 40)) {
@@ -61,7 +65,7 @@ class ExperimentalViewModel @Inject constructor(
             return false
         } else {
             TipsUtils.showTips(Tips.info("实验开始成功 通道：${channel + 1}"))
-            AppStateUtils.transformState(channel, ExperimentalState.STARTING)
+            AppStateUtils.transformExperimentalState(channel, ExperimentalState.STARTING)
             createLog(channel)
             return true
         }
@@ -73,7 +77,7 @@ class ExperimentalViewModel @Inject constructor(
             return false
         } else {
             TipsUtils.showTips(Tips.info("实验暂停成功 通道：${channel + 1}"))
-            AppStateUtils.transformState(channel, ExperimentalState.PAUSE)
+            AppStateUtils.transformExperimentalState(channel, ExperimentalState.PAUSE)
             return true
         }
     }
@@ -84,7 +88,7 @@ class ExperimentalViewModel @Inject constructor(
             return false
         } else {
             TipsUtils.showTips(Tips.info("实验停止成功 通道：${channel + 1}"))
-            AppStateUtils.transformState(
+            AppStateUtils.transformExperimentalState(
                 channel,
                 if (experimentalType == 0) ExperimentalState.DRAIN else ExperimentalState.READY
             )
@@ -150,6 +154,33 @@ class ExperimentalViewModel @Inject constructor(
                             logSnapshotRepository.insertAll(snapshots)
                         }
                         snapshots.clear()
+                    }
+                } catch (e: Exception) {
+                    LogUtils.error(e.stackTraceToString(), true)
+                } finally {
+                    delay(3000L)
+                }
+            }
+        }
+    }
+
+    private fun setErrorLogCollectJob() {
+        viewModelScope.launch {
+            val queue = AppStateUtils.channelErrorLogQueue
+            val errorLogs = mutableListOf<ErrorLog>()
+            while (true) {
+                try {
+                    while (queue.size > 0) {
+                        queue.poll()?.let {
+                            errorLogs.add(it)
+                        }
+                    }
+
+                    if (errorLogs.size > 0) {
+                        withContext(Dispatchers.IO) {
+                            errorLogRepository.insertAll(errorLogs)
+                        }
+                        errorLogs.clear()
                     }
                 } catch (e: Exception) {
                     LogUtils.error(e.stackTraceToString(), true)

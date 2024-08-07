@@ -3,8 +3,8 @@ package com.zktony.android.data
 import com.zktony.log.LogUtils
 import com.zktony.room.entities.LogSnapshot
 import com.zktony.serialport.ext.readInt16LE
-import com.zktony.serialport.ext.readInt32LE
 import com.zktony.serialport.ext.readInt8
+import com.zktony.serialport.ext.readUInt32LE
 import com.zktony.serialport.ext.toHexString
 import java.math.RoundingMode
 
@@ -16,7 +16,7 @@ data class ChannelState(
     // 运行模式
     val experimentalMode: Int = 0,
     // 故障信息
-    val errorInfo: Int = 0,
+    val errorInfo: Long = 0L,
     // 当前电流
     val current: String = "0",
     // 当前电压
@@ -70,7 +70,7 @@ data class ChannelState(
                     runState = byteArray.readInt8(0),
                     experimentType = byteArray.readInt8(1),
                     experimentalMode = byteArray.readInt8(2),
-                    errorInfo = byteArray.readInt32LE(3),
+                    errorInfo = byteArray.readUInt32LE(3),
                     voltage = voltage.toPlainString(),
                     current = current.toPlainString(),
                     power = voltage.multiply(current).setScale(2, RoundingMode.HALF_UP)

@@ -61,7 +61,7 @@ data class Program(
 
     // 是否可以保存
     fun canSave(): Boolean {
-        val bool = (value.toDoubleOrNull() ?: 0.0) > 0  && (time.toDoubleOrNull() ?: 0.0) > 0
+        val bool = (value.toDoubleOrNull() ?: 0.0) > 0 && (time.toDoubleOrNull() ?: 0.0) > 0
         return if (experimentalType == 0) {
             bool && (flowSpeed.toDoubleOrNull() ?: 0.0) > 0.0
         } else {
@@ -71,10 +71,10 @@ data class Program(
 
     // 是否可以开始
     fun canStart(opt1: Int, opt2: Int): Boolean {
-        val bool = (value.toDoubleOrNull() ?: 0.0) > 0  && (time.toDoubleOrNull() ?: 0.0) > 0
+        val bool = (value.toDoubleOrNull() ?: 0.0) > 0 && (time.toDoubleOrNull() ?: 0.0) > 0
         return if (experimentalType == 0) {
             bool && (flowSpeed.toDoubleOrNull() ?: 0.0) > 0 && opt1 == 1
-        } else  {
+        } else {
             bool && opt2 == 1
         }
     }

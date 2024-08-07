@@ -50,10 +50,12 @@ import com.zktony.android.ui.components.NameTimeRangeDialog
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
+import com.zktony.android.ui.utils.getItemAttributes
+import com.zktony.android.ui.utils.getItemExpandAttributes
 import com.zktony.android.ui.utils.itemsIndexed
+import com.zktony.android.ui.utils.programHeaderItems
 import com.zktony.android.ui.utils.toList
 import com.zktony.android.ui.viewmodel.ProgramViewModel
-import com.zktony.android.utils.extra.dateFormat
 import com.zktony.android.utils.extra.itemsEqual
 import com.zktony.room.entities.Program
 import kotlinx.coroutines.Dispatchers
@@ -272,7 +274,8 @@ fun ProgramItem(
     Column(
         modifier = modifier
             .background(
-                color = if (selected.contains(item.id)) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.surfaceVariant,
+                color = if (selected.contains(item.id)) MaterialTheme.colorScheme.inversePrimary
+                else MaterialTheme.colorScheme.surfaceVariant,
                 shape = MaterialTheme.shapes.medium
             )
             .clip(MaterialTheme.shapes.medium)
@@ -289,37 +292,17 @@ fun ProgramItem(
                 checked = selected.contains(item.id),
                 onCheckedChange = { onSelect(item.id) })
 
-            listOf(
-                Pair((index + 1).toString(), 1f),
-                Pair(item.name, 4f),
-                Pair(if (item.experimentalType == 0) "转膜" else "染色", 2f),
-                Pair(
-                    when (item.experimentalMode) {
-                        0 -> "恒压"
-                        1 -> "恒流"
-                        2 -> "恒功率"
-                        else -> "未知"
-                    }, 2f
-                ),
-                Pair(
-                    item.value + when (item.experimentalMode) {
-                        0 -> "V"
-                        1 -> "A"
-                        2 -> "W"
-                        else -> "/"
-                    }, 2f
-                ),
-                Pair(item.time, 2f),
-                Pair(item.createTime.dateFormat("HH:mm\nyyyy-MM-dd"), 3f),
-            ).forEach {
-                Text(
-                    modifier = Modifier.weight(it.second),
-                    text = it.first,
-                    fontSize = 18.sp,
-                    textAlign = TextAlign.Center,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
+            item.getItemAttributes(index = index).forEach {
+                it?.let {
+                    Text(
+                        modifier = Modifier.weight(it.second),
+                        text = it.first,
+                        fontSize = 18.sp,
+                        textAlign = TextAlign.Center,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
 
             Box(
@@ -341,46 +324,14 @@ fun ProgramItem(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (item.experimentalType == 0) {
-                    Text(
-                        text = item.flowSpeed + "mL/min",
-                        fontSize = 18.sp
-                    )
+                item.getItemExpandAttributes().forEach {
+                    it?.let {
+                        Text(
+                            text = it,
+                            fontSize = 18.sp
+                        )
+                    }
                 }
-
-                Text(
-                    text = if (item.glueType == 0) "普通胶" else "梯度胶",
-                    fontSize = 18.sp
-                )
-
-                Text(
-                    text = item.getGlueConcentrationStr(),
-                    fontSize = 18.sp
-                )
-
-                Text(
-                    text = when (item.glueThickness) {
-                        0 -> "0.75mm"
-                        1 -> "1.0mm"
-                        2 -> "1.5mm"
-                        else -> "/"
-                    },
-                    fontSize = 18.sp
-                )
-
-                Text(
-                    text = item.proteinSize + "kDa",
-                    fontSize = 18.sp
-                )
-
-                Text(
-                    text = when (item.bufferType) {
-                        0 -> "厂家缓冲液"
-                        1 -> "其他缓冲液"
-                        else -> "/"
-                    },
-                    fontSize = 18.sp
-                )
             }
         }
     }
@@ -410,22 +361,15 @@ fun ProgramListHeader(
                 onCheckedChange(it)
             })
 
-        listOf(
-            Pair("序号", 1f),
-            Pair("程序名称", 4f),
-            Pair("实验类型", 2f),
-            Pair("工作模式", 2f),
-            Pair("数值", 2f),
-            Pair("时间(min)", 2f),
-            Pair("创建时间", 3f),
-            Pair("操作", 1f)
-        ).forEach {
-            Text(
-                modifier = Modifier.weight(it.second),
-                text = it.first,
-                fontSize = 18.sp,
-                textAlign = TextAlign.Center
-            )
+        programHeaderItems().forEach {
+            it?.let {
+                Text(
+                    modifier = Modifier.weight(it.second),
+                    text = it.first,
+                    fontSize = 18.sp,
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 }

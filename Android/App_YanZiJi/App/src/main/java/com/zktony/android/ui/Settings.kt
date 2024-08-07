@@ -343,7 +343,7 @@ fun SystemSettingsView(
         SettingsItem(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
-                .clickable { },
+                .clickable { navigationActions.navigate(Route.SETTINGS_ERROR_LOG) },
             title = stringResource(id = R.string.app_error_log)
         ) {
             Icon(

@@ -45,10 +45,11 @@ import com.zktony.android.ui.components.NameTimeRangeDialog
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.LocalNavigationActions
+import com.zktony.android.ui.utils.getItemAttributes
 import com.zktony.android.ui.utils.itemsIndexed
+import com.zktony.android.ui.utils.logHeaderItems
 import com.zktony.android.ui.utils.toList
 import com.zktony.android.ui.viewmodel.LogViewModel
-import com.zktony.android.utils.extra.dateFormat
 import com.zktony.android.utils.extra.itemsEqual
 import com.zktony.room.entities.Log
 import kotlinx.coroutines.Dispatchers
@@ -231,7 +232,8 @@ fun LogItem(
     Row(
         modifier = modifier
             .background(
-                color = if (selected.contains(item.id)) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.surfaceVariant,
+                color = if (selected.contains(item.id)) MaterialTheme.colorScheme.inversePrimary
+                else MaterialTheme.colorScheme.surfaceVariant,
                 shape = MaterialTheme.shapes.medium
             )
             .clip(MaterialTheme.shapes.medium)
@@ -244,37 +246,17 @@ fun LogItem(
             checked = selected.contains(item.id),
             onCheckedChange = { onSelect(item.id) })
 
-        listOf(
-            Pair((index + 1).toString(), 1f),
-            Pair((item.channel + 1).toString(), 1f),
-            Pair(item.name, 4f),
-            Pair(if (item.experimentalType == 0) "转膜" else "染色", 2f),
-            Pair(
-                when (item.experimentalMode) {
-                    0 -> "恒压"
-                    1 -> "恒流"
-                    2 -> "恒功率"
-                    else -> "未知"
-                }, 2f
-            ),
-            Pair(item.createTime.dateFormat("HH:mm\nyyyy-MM-dd"), 3f),
-            Pair(
-                when (item.status) {
-                    0 -> "完成"
-                    1 -> "中止"
-                    2 -> "出错"
-                    else -> "未知"
-                }, 2f
-            )
-        ).forEach {
-            Text(
-                modifier = Modifier.weight(it.second),
-                text = it.first,
-                fontSize = 18.sp,
-                textAlign = TextAlign.Center,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
+        item.getItemAttributes(index).forEach { it ->
+            it?.let {
+                Text(
+                    modifier = Modifier.weight(it.second),
+                    text = it.first,
+                    fontSize = 18.sp,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
     }
 }
@@ -301,23 +283,18 @@ fun LogListHeader(
             checked = selected.itemsEqual(entities.toList().map { it.id }),
             onCheckedChange = {
                 onCheckedChange(it)
-            })
+            }
+        )
 
-        listOf(
-            Pair("序号", 1f),
-            Pair("通道", 1f),
-            Pair("程序名称", 4f),
-            Pair("实验类型", 2f),
-            Pair("工作模式", 2f),
-            Pair("开始时间", 3f),
-            Pair("状态", 2f)
-        ).forEach {
-            Text(
-                modifier = Modifier.weight(it.second),
-                text = it.first,
-                fontSize = 18.sp,
-                textAlign = TextAlign.Center
-            )
+        logHeaderItems().forEach {
+            it?.let {
+                Text(
+                    modifier = Modifier.weight(it.second),
+                    text = it.first,
+                    fontSize = 18.sp,
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 }

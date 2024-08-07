@@ -7,7 +7,6 @@ import com.zktony.android.ui.components.Tips
 import com.zktony.android.utils.AuthUtils
 import com.zktony.android.utils.HzmctUtils
 import com.zktony.android.utils.ResourceUtils
-import com.zktony.android.utils.SnackbarUtils
 import com.zktony.android.utils.SoundUtils
 import com.zktony.android.utils.TipsUtils
 import com.zktony.log.LogUtils

@@ -757,7 +757,8 @@ fun ProgramSelectDialog(
             LazyColumn(
                 modifier = modifier
                     .heightIn(max = 420.dp)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .padding(8.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 val content = @Composable { index: Int, item: Program ->

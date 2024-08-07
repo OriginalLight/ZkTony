@@ -59,6 +59,7 @@ import com.zktony.android.ui.SettingsDebugExperimentalView
 import com.zktony.android.ui.SettingsDebugPipelineView
 import com.zktony.android.ui.SettingsDebugSolenoidValveView
 import com.zktony.android.ui.SettingsDebugView
+import com.zktony.android.ui.SettingsErrorLogView
 import com.zktony.android.ui.SettingsFqcView
 import com.zktony.android.ui.SettingsRuntimeLogView
 import com.zktony.android.ui.SettingsUserManagementView
@@ -125,6 +126,7 @@ fun AppNavigation() {
                     arguments = listOf(navArgument("id") { type = NavType.LongType })
                 ) { LogDetailView() }
                 composable(Route.SETTINGS) { SettingsView() }
+                composable(Route.SETTINGS_ERROR_LOG) { SettingsErrorLogView() }
                 composable(Route.SETTINGS_VERSION_INFO) { SettingsVersionInfoView() }
                 composable(Route.SETTINGS_USER_MANAGEMENT) { SettingsUserManagementView() }
                 composable(Route.SETTINGS_ARGUMENTS) { SettingsArgumentsView() }

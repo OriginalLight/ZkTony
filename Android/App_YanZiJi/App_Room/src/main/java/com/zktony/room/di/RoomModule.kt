@@ -53,11 +53,13 @@ object RoomModule {
 
     @Provides
     @Singleton
-    fun logRepository(logDao: LogDao, logSnapshotDao: LogSnapshotDao) = LogRepository(logDao, logSnapshotDao)
+    fun logRepository(logDao: LogDao, logSnapshotDao: LogSnapshotDao) =
+        LogRepository(logDao, logSnapshotDao)
 
     @Provides
     @Singleton
-    fun logSnapshotRepository(logSnapshotDao: LogSnapshotDao) = LogSnapshotRepository(logSnapshotDao)
+    fun logSnapshotRepository(logSnapshotDao: LogSnapshotDao) =
+        LogSnapshotRepository(logSnapshotDao)
 
     @Provides
     @Singleton

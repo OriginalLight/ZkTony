@@ -50,13 +50,14 @@ import com.zktony.android.ui.components.DeleteDialog
 import com.zktony.android.ui.components.DropDownBox
 import com.zktony.android.ui.components.IconLoading
 import com.zktony.android.ui.components.ListEmptyView
+import com.zktony.android.ui.components.NameQueryDialog
 import com.zktony.android.ui.components.PasswordClearDialog
 import com.zktony.android.ui.components.UserAddDialog
-import com.zktony.android.ui.components.NameQueryDialog
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.toList
+import com.zktony.android.ui.utils.userHeaderItems
 import com.zktony.android.ui.viewmodel.SettingsUserManagementViewModel
 import com.zktony.android.utils.AuthUtils
 import com.zktony.android.utils.extra.dateFormat
@@ -261,45 +262,6 @@ fun SettingsUserListView(
     }
 }
 
-// 列表头
-@Composable
-fun UserListHeader(
-    modifier: Modifier = Modifier,
-    selected: List<Long>,
-    entities: LazyPagingItems<User>,
-    onCheckedChange: (Boolean) -> Unit
-) {
-    Row(
-        modifier = modifier
-            .background(
-                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
-                shape = MaterialTheme.shapes.medium
-            )
-            .padding(horizontal = 8.dp, vertical = 4.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Checkbox(checked = selected.itemsEqual(entities.toList().map { it.id }), onCheckedChange = {
-            onCheckedChange(it)
-        })
-
-        listOf(
-            Pair("序号", 1f),
-            Pair("用户名", 4f),
-            Pair("用户角色", 3f),
-            Pair("是否启用", 3f),
-            Pair("上次登录时间", 3f)
-        ).forEach {
-            Text(
-                modifier = Modifier.weight(it.second),
-                text = it.first,
-                fontSize = 18.sp,
-                textAlign = TextAlign.Center
-            )
-        }
-    }
-}
-
 // 列表项
 @Composable
 fun UserItem(
@@ -313,7 +275,8 @@ fun UserItem(
     Row(
         modifier = modifier
             .background(
-                color = if (selected.contains(item.id)) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.surfaceVariant,
+                color = if (selected.contains(item.id)) MaterialTheme.colorScheme.inversePrimary
+                else MaterialTheme.colorScheme.surfaceVariant,
                 shape = MaterialTheme.shapes.medium
             )
             .clip(MaterialTheme.shapes.medium)
@@ -376,5 +339,40 @@ fun UserItem(
             maxLines = 2,
             overflow = TextOverflow.Ellipsis
         )
+    }
+}
+
+// 列表头
+@Composable
+fun UserListHeader(
+    modifier: Modifier = Modifier,
+    selected: List<Long>,
+    entities: LazyPagingItems<User>,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = modifier
+            .background(
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+                shape = MaterialTheme.shapes.medium
+            )
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Checkbox(checked = selected.itemsEqual(entities.toList().map { it.id }), onCheckedChange = {
+            onCheckedChange(it)
+        })
+
+        userHeaderItems().forEach {
+            it?.let {
+                Text(
+                    modifier = Modifier.weight(it.second),
+                    text = it.first,
+                    fontSize = 18.sp,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
     }
 }

@@ -7,7 +7,8 @@ import androidx.room.PrimaryKey
 data class ErrorLog(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,
-    val code: Int = 0,
+    val code: Long = 0L,
+    val channel: Int = 0,
     val description: String = "",
-    val timestamp: Long = System.currentTimeMillis()
+    val createTime: Long = System.currentTimeMillis()
 )

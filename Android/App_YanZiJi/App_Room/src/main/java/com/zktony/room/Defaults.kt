@@ -29,6 +29,6 @@ fun defaultUsers() = listOf(
 
 fun defaultProgram() = Program(name = "None", value = "", time = "")
 
-fun defaultProgram(type: Int) =  Program(name = "None", value = "", time = "", experimentalType = type)
+fun defaultProgram(type: Int) = Program(name = "None", value = "", time = "", experimentalType = type)
 
 fun defaultLog() = Log(name = "None")

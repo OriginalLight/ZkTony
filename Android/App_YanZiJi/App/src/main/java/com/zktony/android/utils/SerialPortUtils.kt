@@ -449,6 +449,7 @@ object SerialPortUtils {
             if (ba != null) {
                 ChannelState.fromByteArray(ba)?.let { channelState ->
                     AppStateUtils.setExperimentalStateHook(target, channelState)
+                    AppStateUtils.setLedStateHook()
                     AppStateUtils.setChannelState(target, channelState)
                 } ?: return false
                 return true
@@ -671,6 +672,26 @@ object SerialPortUtils {
             } finally {
                 serialPort.unregisterCallback(key)
             }
+        }
+    }
+
+    // 设置LED状态
+    fun setLedState(state: Int, on: Boolean = true): Boolean {
+        val bytesList = mutableListOf<ByteArray>()
+        val serialPort = SerialStoreUtils.get("B") ?: return false
+        try {
+            val bytes = zktyProtocolOf {
+                this.func = 0x10
+                this.target = 0x02
+                this.data = byteArrayOf(state.toByte(), if (on) 0x01 else 0x00)
+            }
+            serialPort.sendByteArray(bytes)
+            bytesList.add(bytes)
+            return true
+        } catch (e: Exception) {
+            bytesList.forEach { LogUtils.error("SetLedState", it.toHexString(), true) }
+            LogUtils.error("SetLedState", e.stackTraceToString(), true)
+            return false
         }
     }
 }

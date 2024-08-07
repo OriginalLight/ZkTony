@@ -7,15 +7,19 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class LogSnapshotDao : BaseDao<LogSnapshot> {
-    @Query("""
+    @Query(
+        """
         DELETE FROM log_snapshots
         WHERE subId = :subId
-    """)
-    abstract fun deleteBySubId(subId: Long) :Int
+    """
+    )
+    abstract fun deleteBySubId(subId: Long): Int
 
-    @Query("""
+    @Query(
+        """
         SELECT * FROM log_snapshots
         WHERE subId = :subId
-    """)
+    """
+    )
     abstract fun getBySubId(subId: Long): Flow<List<LogSnapshot>>
 }
