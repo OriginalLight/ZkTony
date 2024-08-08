@@ -21,4 +21,10 @@ object LedUtils {
             }
         }
     }
+
+    fun transformWithoutState(newState: LedState) {
+        scope.launch {
+            SerialPortUtils.setLedState(newState.id)
+        }
+    }
 }

@@ -101,6 +101,7 @@ dependencies {
     val composeBom = platform(libs.androidx.compose.bom)
 
     ksp(libs.hilt.compiler)
+    ksp(libs.hilt.ext.compiler)
 
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
     implementation(project(mapOf("path" to ":App_DataStore")))
@@ -116,10 +117,13 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.work)
     implementation(libs.androidx.lifecycle.runtime)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewModelCompose)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.work.runtime)
+    implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.hilt.android)
     implementation(libs.itextpdf)
     implementation(libs.kotlinx.serialization.json)

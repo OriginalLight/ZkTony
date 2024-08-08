@@ -24,8 +24,6 @@ import com.zktony.log.LogUtils
 import com.zktony.room.entities.Log
 import com.zktony.room.entities.LogSnapshot
 import java.io.File
-import java.io.FileNotFoundException
-import java.io.IOException
 import java.math.RoundingMode
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -300,7 +298,7 @@ object PdfUtils {
         canvas.drawText(
             "X - 时间(s)",
             margin + xAxisWith - 32,
-             24f,
+            24f,
             paint.apply {
                 color = 0xFF000000.toInt()
                 style = Paint.Style.FILL

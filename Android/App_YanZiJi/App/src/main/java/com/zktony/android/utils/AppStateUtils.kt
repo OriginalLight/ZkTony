@@ -292,10 +292,7 @@ object AppStateUtils {
                                 Tips.warning("通道${channel + 1} ${it.message}")
                             }
                         )
-                        LogUtils.error(
-                            "ErrorLog",
-                            "通道${channel + 1} ${it.message} ${it.code} ${it.severity}"
-                        )
+                        LogUtils.error("通道${channel + 1} ${it.message} ${it.code} ${it.severity}")
                     }
                 }
             }

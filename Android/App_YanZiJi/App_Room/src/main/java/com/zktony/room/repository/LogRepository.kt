@@ -4,22 +4,12 @@ import androidx.paging.PagingSource
 import com.zktony.room.dao.LogDao
 import com.zktony.room.dao.LogSnapshotDao
 import com.zktony.room.entities.Log
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class LogRepository @Inject constructor(
     private val logDao: LogDao,
     private val logSnapshotDao: LogSnapshotDao
 ) {
-    private val scope = CoroutineScope(Dispatchers.IO)
-
-    init {
-        // 清理过期日志
-        clearExpiredLog()
-    }
-
     /**
      * Insert.
      * @param log Log.
@@ -78,15 +68,13 @@ class LogRepository @Inject constructor(
     /**
      * Clear expired log.
      */
-    private fun clearExpiredLog() {
-        scope.launch {
-            val expired = System.currentTimeMillis() - 30 * 24 * 60 * 60 * 1000L
-            val logs = logDao.getBeforeTime(expired)
-            logs.forEach {
-                logSnapshotDao.deleteBySubId(it.id)
-            }
-            logDao.deleteAll(logs)
-            android.util.Log.d("LogRepository", "clearExpiredLog: ${logs.size}")
+    suspend fun clearExpiredLog() {
+        val expired = System.currentTimeMillis() - 30 * 24 * 60 * 60 * 1000L
+        val logs = logDao.getBeforeTime(expired)
+        logs.forEach {
+            logSnapshotDao.deleteBySubId(it.id)
         }
+        logDao.deleteAll(logs)
+        android.util.Log.d("LogRepository", "clearExpiredLog: ${logs.size}")
     }
 }
