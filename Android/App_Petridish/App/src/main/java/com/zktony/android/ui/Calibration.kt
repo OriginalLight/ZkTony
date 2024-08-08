@@ -1603,7 +1603,7 @@ fun CalibrationList(
                                 tx {
                                     move(MoveType.MOVE_PULSE) {
                                         index = 4
-                                        pulse = (3255L * xpkwjl1.value.toDouble()).toLong();
+                                        pulse = (1300 * xpkwjl1.value.toDouble()).toLong()
                                     }
                                 }
                             } catch (e: Exception) {

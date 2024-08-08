@@ -96,7 +96,7 @@ class Protocol : BaseProtocol {
             }
 
             // 分包处理
-            byteArray.splitByteArray(expectHead, expectEnd).forEach { pkg ->
+            byteArray.let{ pkg ->
                 // 验证包头和包尾
                 val head = pkg.copyOfRange(0, 1)
                 if (!head.contentEquals(expectHead)) {
