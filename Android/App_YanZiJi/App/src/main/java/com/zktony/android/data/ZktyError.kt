@@ -17,7 +17,8 @@ enum class ZktyError(val code: Long, val message: String, val severity: Int) {
     ERROR_14(0x00002000, "短路/过载报警", 1),
     ERROR_15(0x00004000, "电压突变", 1),
     ERROR_16(0x00008000, "电流突变", 1),
-    ERROR_17(0x00010000, "DAC芯片异常", 1);
+    ERROR_17(0x00010000, "DAC芯片异常", 1),
+    ERROR_18(0x00020000, "下位机通讯异常", 1);
 
     companion object {
         fun fromCode(code: Long): List<ZktyError> {
