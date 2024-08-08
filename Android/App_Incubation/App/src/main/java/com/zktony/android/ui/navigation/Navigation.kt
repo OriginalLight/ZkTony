@@ -31,12 +31,11 @@ fun AppNavigation(
     ) { scaffoldPadding ->
         NavHost(
             navController = navController,
-            startDestination = Route.SPLASH,
+            startDestination = Route.HOME,
             modifier = Modifier
                 .padding(scaffoldPadding)
                 .consumeWindowInsets(scaffoldPadding)
         ) {
-            composable(Route.SPLASH) { Splash() }
             composable(Route.HOME) { HomeRoute(viewModel = homeViewModel) }
             composable(Route.PROGRAM) { ProgramRoute(viewModel = hiltViewModel()) }
             composable(Route.CALIBRATION) { CalibrationRoute(viewModel = hiltViewModel()) }

@@ -57,6 +57,7 @@ import com.zktony.android.ui.components.HomeAppBar
 import com.zktony.android.ui.components.HomeDialog
 import com.zktony.android.ui.components.IncubationStageItem
 import com.zktony.android.ui.components.ModuleItem
+import com.zktony.android.ui.components.TipsDialog
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.AnimatedContent
 import com.zktony.android.ui.utils.LocalNavigationActions
@@ -86,6 +87,7 @@ fun HomeRoute(viewModel: HomeViewModel) {
     val insulation by viewModel.insulation.collectAsStateWithLifecycle()
     val shaker by viewModel.shaker.collectAsStateWithLifecycle()
     val cleanJob by viewModel.cleanJob.collectAsStateWithLifecycle()
+    var showTips by remember { mutableStateOf(false) }
 
     val entities = viewModel.entities.collectAsLazyPagingItems()
     val navigation: () -> Unit = {
@@ -106,6 +108,16 @@ fun HomeRoute(viewModel: HomeViewModel) {
         }
     }
 
+    if (showTips) {
+        val state = stateList.find { it.index == selected } ?: IncubationState()
+        val vs = (entities.toList().find { it.id == state.id } ?: Program()).getPreviewVolume()
+        TipsDialog(
+            title = "程序确认",
+            message = "本轮实验预计使用\n封闭液：${vs[0]}mL\n一抗：${vs[1]}mL\n二抗：${vs[2]}mL\n洗涤液：${vs[3]}mL\n请检查试剂瓶中试剂余量",
+            onConfirm = { showTips = false }
+        )
+    }
+
     Column {
         HomeAppBar(page) { navigation() }
         ModuleList(selected, stateList, insulation, viewModel::dispatch)
@@ -122,7 +134,7 @@ fun HomeRoute(viewModel: HomeViewModel) {
                     viewModel::dispatch
                 )
 
-                PageType.PROGRAM_LIST -> ProgramList(entities, selected, viewModel::dispatch)
+                PageType.PROGRAM_LIST -> ProgramList(entities, selected, viewModel::dispatch) { showTips = true }
                 else -> {}
             }
         }
@@ -195,10 +207,9 @@ fun HomeContent(
     }
 
     if (confirm > 0) {
-        val vs = (entities.find { it.id == state.id } ?: Program()).getCleanVolume()
         ConfirmDialog(
             title = "程序确认",
-            message = if (confirm == 1) "${'A' + selected}模块本轮实验预计使用\n封闭液${vs[0]}mL\n一抗${vs[1]}mL\n二抗${vs[2]}mL\n洗涤液${vs[3]}mL\n请检查试剂瓶中试剂余量" else "确认中止 ${'A' + selected} 模块程序？",
+            message = if (confirm == 1) "确认开始执行 ${'A' + selected} 模块程序？" else "确认中止 ${'A' + selected} 模块程序？",
             onConfirm = {
                 scope.launch {
                     if (confirm == 1) {
@@ -213,7 +224,7 @@ fun HomeContent(
     }
 
     LaunchedEffect(true) {
-        delay(500L)
+        delay(1500L)
         dialog = AppStateUtils.dialog
     }
 
@@ -380,7 +391,8 @@ fun HomeContent(
 fun ProgramList(
     entities: LazyPagingItems<Program>,
     selected: Int,
-    dispatch: (HomeIntent) -> Unit
+    dispatch: (HomeIntent) -> Unit,
+    showTips: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
 
@@ -397,6 +409,7 @@ fun ProgramList(
                     .clip(MaterialTheme.shapes.small)
                     .clickable {
                         scope.launch {
+                            showTips()
                             dispatch(HomeIntent.Stages(selected, item))
                             dispatch(HomeIntent.NavTo(PageType.HOME))
                         }

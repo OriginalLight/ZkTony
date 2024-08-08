@@ -265,7 +265,7 @@ fun CleanDialog(
                         }
                     ) {
                         Text(
-                            text = if (job == 1) "中止" else "返回",
+                            text = if (job == 1) "中止" else "取消",
                             color = if (job == 1) MaterialTheme.colorScheme.error else Color.Black
                         )
                     }
@@ -371,8 +371,51 @@ fun HomeDialog(onConfirm: () -> Unit){
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "实验结束后需及时清洗管路，避免管路残液变质!!!",
+                    text = stringResource(id = R.string.notice),
                     style = MaterialTheme.typography.titleLarge
+                )
+
+                Text(
+                    text = stringResource(id = R.string.notice_content),
+                    fontSize = 18.sp
+                )
+
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    onClick = { onConfirm() }
+                ) {
+                    Text(text = stringResource(id = R.string.confirm))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun TipsDialog(
+    title: String,
+    message: String,
+    onConfirm: () -> Unit
+){
+    Dialog(onDismissRequest = onConfirm) {
+        ElevatedCard {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleLarge
+                )
+
+                Text(
+                    text = message,
+                    fontSize = 18.sp
                 )
 
                 Button(

@@ -2,7 +2,7 @@
 <resources>
     <string name="already_latest">已是最新版</string>
     <string name="app_name">ZkTony</string>
-    <string name="cancel">返回</string>
+    <string name="cancel">取消</string>
     <string name="finish">完成</string>
     <string name="help">帮助</string>
     <string name="motor_config">电机参数</string>
@@ -23,7 +23,7 @@
     <string name="deceleration">减速度</string>
     <string name="delete">删除</string>
     <string name="setting">设置</string>
-    <string name="notice_content">1. 运动机构运行时请不要打开抽屉\n2. 执行程序前请确认有充足的洗涤液\n3. 程序结束后请及时清理容器，避免滋生微生物等问题\n4. 实验结束后即时断电，延长Tec寿命\n5. 请阅读说明书后使用，避免误操作</string>
+    <string name="notice_content">1. 运动机构运行时请不要打开抽屉\n2. 执行程序前请确认有充足的洗涤液\n3. 程序结束后请及时清理容器，避免滋生微生物等问题\n4. 实验结束后即时断电，延长Tec寿命\n5. 实验结束后需及时清洗管路，避免管路残液变质\n6. 请阅读说明书后使用，避免误操作</string>
     <string name="notice">注意事项</string>
     <string name="confirm">确认</string>
     <string name="blocking">封闭液</string>

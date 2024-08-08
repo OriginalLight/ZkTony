@@ -195,6 +195,10 @@ fun SettingContent(
                 scope.launch {
                     showDialog = false
                     val speed = it.toIntOrNull() ?: 0
+                    if (speed < 0 || speed > 1000) {
+                        snackbarHostState.showSnackbar(message = "速度范围为 0-1000")
+                        return@launch
+                    }
                     dispatch(SettingIntent.Update(shaker.copy(speed = speed.toLong())))
                     writeRegister(shaker.index, 154, speed)
                     delay(500L)

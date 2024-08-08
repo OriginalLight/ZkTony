@@ -578,16 +578,6 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             writeWithTemperature(index + 1, stage.temperature)
         }
-        // 停止摇床
-        _shaker.value = 4
-        writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
-        delay(300L)
-        writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
-        dataStore.readData(Constants.ZT_0005, 0.0).takeIf { it > 0.0 }?.let {
-            delay(3500L)
-            writeRegister(startAddr = 222, slaveAddr = 0, value = (it * 6400).toLong())
-        }
-        _shaker.value = 1
         // 切阀加液
         delay(100L)
         writeWithValve(inAddr, inChannel)
@@ -682,6 +672,7 @@ class HomeViewModel @Inject constructor(
                 writeWithPulse(group + 1, -(rx * 6400 * 3).toLong())
             }
         }
+        // 打开摇床
         writeRegister(slaveAddr = 0, startAddr = 200, value = 1)
         _shaker.value = 0
     }
