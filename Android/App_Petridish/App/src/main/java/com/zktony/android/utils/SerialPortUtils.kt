@@ -12,6 +12,7 @@ object SerialPortUtils {
     fun with() {
         // 初始化zkty串口
         SerialStoreUtils.put("zkty", serialPortOf {
+            log = true
             device = "/dev/ttyS0"
         })
 
@@ -40,6 +41,9 @@ object SerialPortUtils {
                                 val index = protocol.data.readInt8(offset = i * 2)
                                 val status = protocol.data.readInt8(offset = i * 2 + 1)
                                 hpg[index] = status == 1
+                                println("回复的光电信息===index:$index")
+                                println("回复的光电信息===status:$status")
+                                println("回复的光电信息===hpg[index]:${hpg[index]}")
                             }
                         }
 
