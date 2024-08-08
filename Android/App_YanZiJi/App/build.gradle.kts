@@ -121,6 +121,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewModelCompose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.hilt.android)
+    implementation(libs.itextpdf)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.okhttp3)
     implementation(libs.vico.compose)

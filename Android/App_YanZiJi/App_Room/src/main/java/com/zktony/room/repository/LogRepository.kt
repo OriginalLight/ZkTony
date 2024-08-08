@@ -13,7 +13,7 @@ class LogRepository @Inject constructor(
     private val logDao: LogDao,
     private val logSnapshotDao: LogSnapshotDao
 ) {
-    val scope = CoroutineScope(Dispatchers.IO)
+    private val scope = CoroutineScope(Dispatchers.IO)
 
     init {
         // 清理过期日志

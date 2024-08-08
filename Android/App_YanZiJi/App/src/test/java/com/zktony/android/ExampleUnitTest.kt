@@ -53,16 +53,16 @@ class ExampleUnitTest {
     fun errorTest() {
         val errors = ZktyError.fromCode(0x00000001)
         assertEquals(errors.size, 1)
-        assertEquals(errors[0], ZktyError.ZKTY_ERROR_1)
+        assertEquals(errors[0], ZktyError.ERROR_1)
 
         val errors2 = ZktyError.fromCode(3)
         assertEquals(errors2.size, 2)
-        assertEquals(errors2[0], ZktyError.ZKTY_ERROR_1)
+        assertEquals(errors2[0], ZktyError.ERROR_1)
         assertEquals(errors2[1], ZktyError.ZKTY_ERROR_2)
 
         val errors3 = ZktyError.fromCode(11)
         assertEquals(errors3.size, 3)
-        assertEquals(errors3[0], ZktyError.ZKTY_ERROR_1)
+        assertEquals(errors3[0], ZktyError.ERROR_1)
         assertEquals(errors3[1], ZktyError.ZKTY_ERROR_2)
         assertEquals(errors3[2], ZktyError.ZKTY_ERROR_4)
     }

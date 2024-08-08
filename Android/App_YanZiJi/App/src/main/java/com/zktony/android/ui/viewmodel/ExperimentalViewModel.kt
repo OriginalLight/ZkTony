@@ -9,7 +9,9 @@ import com.zktony.android.data.ExperimentalControl
 import com.zktony.android.data.ExperimentalState
 import com.zktony.android.ui.components.Tips
 import com.zktony.android.utils.AppStateUtils
+import com.zktony.android.utils.PdfUtils
 import com.zktony.android.utils.SerialPortUtils
+import com.zktony.android.utils.StorageUtils
 import com.zktony.android.utils.TipsUtils
 import com.zktony.log.LogUtils
 import com.zktony.room.entities.ErrorLog
@@ -24,6 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel

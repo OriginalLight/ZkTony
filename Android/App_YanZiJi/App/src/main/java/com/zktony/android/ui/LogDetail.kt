@@ -24,6 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -71,6 +72,7 @@ import com.zktony.room.defaultLog
 import com.zktony.room.entities.Log
 import com.zktony.room.entities.LogSnapshot
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 
@@ -87,7 +89,7 @@ fun LogDetailView(viewModel: LogDetailViewModel = hiltViewModel()) {
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         // 顶部导航栏
-        LogDetailTopBar(navigationActions = navigationActions)
+        LogDetailTopBar(navigationActions = navigationActions, viewModel = viewModel)
         // 内容
         LogDetailContent(
             log = navObj ?: defaultLog(),
@@ -100,8 +102,10 @@ fun LogDetailView(viewModel: LogDetailViewModel = hiltViewModel()) {
 @Composable
 fun LogDetailTopBar(
     modifier: Modifier = Modifier,
-    navigationActions: NavigationActions
+    navigationActions: NavigationActions,
+    viewModel: LogDetailViewModel
 ) {
+    val scope = rememberCoroutineScope()
     var loadingExport by remember { mutableStateOf(false) }
 
     BaseTopBar(modifier = modifier) {
@@ -127,7 +131,13 @@ fun LogDetailTopBar(
         // 导出
         Button(
             enabled = !loadingExport,
-            onClick = {}
+            onClick = {
+                scope.launch {
+                    loadingExport = true
+                    viewModel.export()
+                    loadingExport = false
+                }
+            }
         ) {
             IconLoading(loading = loadingExport) {
                 Icon(imageVector = Icons.Default.ImportExport, contentDescription = "Export")
@@ -210,13 +220,14 @@ fun LogDetailContent(
                                     modifier = Modifier.weight(1f),
                                     text = it.first,
                                     fontSize = 18.sp,
-                                    textAlign = TextAlign.End
+                                    textAlign = TextAlign.Center
                                 )
                                 Text(
                                     modifier = Modifier.weight(1f),
                                     text = it.second,
                                     fontSize = 18.sp,
                                     maxLines = 1,
+                                    textAlign = TextAlign.Center,
                                     overflow = TextOverflow.Ellipsis
                                 )
                             }

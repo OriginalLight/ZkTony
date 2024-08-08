@@ -179,7 +179,7 @@ fun LoginForm(
         ) {
             ButtonLoading(loading = loading) {
                 Text(
-                    text = "登 录",
+                    text = "登录",
                     fontSize = 18.sp
                 )
             }

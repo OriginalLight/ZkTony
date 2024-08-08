@@ -359,7 +359,8 @@ fun ProgramListHeader(
             checked = selected.itemsEqual(entities.toList().map { it.id }),
             onCheckedChange = {
                 onCheckedChange(it)
-            })
+            }
+        )
 
         programHeaderItems().forEach {
             it?.let {

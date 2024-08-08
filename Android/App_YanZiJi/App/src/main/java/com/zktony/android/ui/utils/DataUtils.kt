@@ -1,7 +1,9 @@
 package com.zktony.android.ui.utils
 
 import androidx.compose.runtime.Composable
+import com.zktony.android.data.ZktyError
 import com.zktony.android.utils.extra.dateFormat
+import com.zktony.room.entities.ErrorLog
 import com.zktony.room.entities.Log
 import com.zktony.room.entities.Program
 
@@ -161,5 +163,36 @@ fun userHeaderItems(): List<Pair<String, Float>?> {
         Pair("用户角色", 3f),
         Pair("是否启用", 3f),
         Pair("上次登录时间", 3f)
+    )
+}
+
+// ErrorLog
+@Composable
+fun errorLogHeaderItems(): List<Pair<String, Float>?> {
+    return listOf(
+        Pair("序号", 1f),
+        Pair("通道", 1f),
+        Pair("错误码", 2f),
+        Pair("错误信息", 4f),
+        Pair("严重程度", 2f),
+        Pair("发生时间", 3f),
+    )
+}
+
+fun ErrorLog.getItemAttributes(index: Int): List<Pair<String, Float>?> {
+    val error = ZktyError.fromCodeSignal(code)
+    return listOf(
+        Pair((index + 1).toString(), 1f),
+        Pair((channel + 1).toString(), 1f),
+        Pair(error?.name ?: "UNKNOWN_ERROR", 2f),
+        Pair(error?.message ?: "未知" , 4f),
+        Pair(
+            when (error?.severity) {
+                0 -> "警告"
+                1 -> "错误"
+                else -> "未知"
+            }, 2f
+        ),
+        Pair(createTime.dateFormat("HH:mm\nyyyy-MM-dd"), 3f),
     )
 }
