@@ -682,6 +682,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                          * true=没有
                          */
                         val jiance1 = getGpio(5)
+                        println("获取是否有培养皿:$jiance1")
 //                        val jiance1 = false
                         if (!jiance1) {
                             /**
@@ -748,6 +749,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                          * true=摆放错误
                          */
                         val jiance2 = getGpio(6)
+                        println("获取检测培养皿是否摆放正确:$jiance2")
 //                        val jiance2 = true
                         if (!jiance2) {
                             startState = 3;

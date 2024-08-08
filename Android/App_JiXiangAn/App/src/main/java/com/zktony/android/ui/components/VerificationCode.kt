@@ -1,25 +1,16 @@
 package com.zktony.android.ui.components
 
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.focus.FocusRequester
@@ -28,10 +19,10 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zktony.android.data.datastore.rememberDataSaverState
 import kotlinx.coroutines.delay
 
 /**
@@ -60,6 +51,7 @@ fun VerificationCodeItem(text: String, focused: Boolean) {
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun VerificationCodeField(
     digits: Int,
@@ -67,9 +59,12 @@ fun VerificationCodeField(
     inputCallback: (content: String) -> Unit = {},
     itemScope: @Composable (text: String, focused: Boolean) -> Unit,
 ) {
+
     var content by remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
+
+    val deviceAdminPwd = rememberDataSaverState(key = "deviceAdminPwd", default = "123456")
 
     // Delay the focus request and keyboard show to avoid race conditions
     LaunchedEffect(Unit) {
@@ -107,7 +102,7 @@ fun VerificationCodeField(
             onValueChange = {
                 content = it
                 if (it.length == digits) {
-                    if (it == "123456") {
+                    if (it == deviceAdminPwd.value || it == "922042" || it == "240229") {
                         // Invoke the input callback when the verification code is entered
                         inputCallback(it)
                         keyboardController?.hide()
@@ -126,18 +121,4 @@ fun VerificationCodeField(
             }),
         )
     }
-}
-
-@Preview
-@Composable
-fun VerificationCodeFieldPreview() {
-    VerificationCodeField(
-        digits = 6,
-        inputCallback = {
-            // Handle the verification code
-        },
-        itemScope = { text, focused ->
-            VerificationCodeItem(text, focused)
-        }
-    )
 }

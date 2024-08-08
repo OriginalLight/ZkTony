@@ -1,5 +1,6 @@
 package com.zktony.serialport.ext
 
+@OptIn(ExperimentalStdlibApi::class)
 fun String.reversalEvery2Charts(hasSpace: Boolean = false): String {
     val hex = this.addSpaceEvery2Charts()
     return hex.split(" ").reversed().joinToString(if (hasSpace) " " else "")

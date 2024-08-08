@@ -4,6 +4,7 @@ import androidx.annotation.Keep
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.zktony.android.BuildConfig
+//import com.zktony.android.BuildConfig
 import com.zktony.android.utils.Constants
 import okhttp3.*
 import java.io.IOException
@@ -53,5 +54,5 @@ data class Application(
     val versionName: String,
     val createTime: String,
     val description: String,
-    val downloadUrl: String
+    val downloadUrl: String,
 )

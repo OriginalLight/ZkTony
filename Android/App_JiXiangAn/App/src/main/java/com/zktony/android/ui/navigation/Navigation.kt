@@ -1,5 +1,8 @@
 package com.zktony.android.ui.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -11,26 +14,19 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.zktony.android.ui.CalibrationRoute
-import com.zktony.android.ui.DebugRoute
-import com.zktony.android.ui.HistoryRoute
-import com.zktony.android.ui.HomeRoute
-import com.zktony.android.ui.HomeViewModel
-import com.zktony.android.ui.ProgramRoute
-import com.zktony.android.ui.SettingRoute
-import com.zktony.android.ui.Splash
+import com.zktony.android.ui.*
 
+
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AppNavigation(
     navController: NavHostController,
     homeViewModel: HomeViewModel,
     snackbarHostState: SnackbarHostState
 ) {
-
     Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) { scaffoldPadding ->
-
         NavHost(
             navController = navController,
             startDestination = Route.SPLASH,
@@ -38,13 +34,18 @@ fun AppNavigation(
                 .padding(scaffoldPadding)
                 .consumeWindowInsets(scaffoldPadding)
         ) {
-            composable(Route.SPLASH) { Splash() }
+            //制胶程序
             composable(Route.HOME) { HomeRoute(viewModel = homeViewModel) }
+            //制胶操作
             composable(Route.PROGRAM) { ProgramRoute(viewModel = hiltViewModel()) }
-            composable(Route.CALIBRATION) { CalibrationRoute(viewModel = hiltViewModel()) }
-            composable(Route.HISTORY) { HistoryRoute(viewModel = hiltViewModel()) }
-            composable(Route.DEBUG) { DebugRoute(viewModel = hiltViewModel()) }
-            composable(Route.SETTING) { SettingRoute(viewModel = hiltViewModel()) }
+//            //校准设置
+//            composable(Route.CALIBRATION) { CalibrationRoute(viewModel = hiltViewModel()) }
+            //实验记录
+            composable(Route.EXPERIMENTRECORDS) {ExperimentRecords(viewModel = hiltViewModel())}
+            //系统设置
+            composable(Route.SETTING) { SettingRoute(viewModel = hiltViewModel(),homeViewModel) }
+            //首页
+            composable(Route.SPLASH) { Splash(viewModel = homeViewModel) }
         }
     }
 }

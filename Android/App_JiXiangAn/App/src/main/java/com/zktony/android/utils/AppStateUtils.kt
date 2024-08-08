@@ -1,5 +1,6 @@
 package com.zktony.android.utils
 
+import com.zktony.android.data.entities.Motor
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -8,17 +9,38 @@ import java.util.concurrent.ConcurrentHashMap
  */
 object AppStateUtils {
     /**
-     * 阀门通道
+     * 轴状态
      */
-    val hpv: MutableMap<Int, Int> = ConcurrentHashMap()
+    val hpa: MutableMap<Int, Boolean> = ConcurrentHashMap()
 
     /**
-     * 运行速度
+     * GPIO 状态
      */
-    val hps: MutableMap<Int, Int> = ConcurrentHashMap()
+    val hpg: MutableMap<Int, Boolean> = ConcurrentHashMap()
 
     /**
-     * 校准函数
+     * 电机信息
+     */
+    val hpm: MutableMap<Int, Motor> = ConcurrentHashMap()
+
+    /**
+     * 绝对位置
+     */
+    val hpp: MutableMap<Int, Long> = ConcurrentHashMap()
+
+    /**
+     * 校准曲线
      */
     val hpc: MutableMap<Int, (Double) -> Double> = ConcurrentHashMap()
+
+    /**
+     * 灯光回复
+     */
+    val hpd: MutableMap<Int, Boolean> = ConcurrentHashMap()
+
+    /**
+     * 上下位机是否断开-心跳
+     */
+    val hpe: MutableMap<Int, Boolean> = ConcurrentHashMap()
+
 }

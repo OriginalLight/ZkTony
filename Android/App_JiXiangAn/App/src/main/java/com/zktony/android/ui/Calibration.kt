@@ -20,15 +20,17 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Numbers
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -45,7 +47,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.zktony.android.ui.components.CalibrationAppBar
+import com.zktony.android.data.entities.Calibration
+//import com.zktony.android.ui.components.CalibrationAppBar
 import com.zktony.android.ui.components.CalibrationItem
 import com.zktony.android.ui.components.PointItem
 import com.zktony.android.ui.utils.AnimatedContent
@@ -55,7 +58,6 @@ import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.ui.utils.itemsIndexed
 import com.zktony.android.ui.utils.toList
-import com.zktony.room.entities.Calibration
 import kotlinx.coroutines.launch
 
 /**
@@ -69,6 +71,7 @@ fun CalibrationRoute(viewModel: CalibrationViewModel) {
 
     val scope = rememberCoroutineScope()
     val navigationActions = LocalNavigationActions.current
+    val snackbarHostState = LocalSnackbarHostState.current
 
     val page by viewModel.page.collectAsStateWithLifecycle()
     val selected by viewModel.selected.collectAsStateWithLifecycle()
@@ -86,29 +89,35 @@ fun CalibrationRoute(viewModel: CalibrationViewModel) {
 
     BackHandler { navigation() }
 
-    Column {
-        CalibrationAppBar(entities.toList(), selected, page, viewModel::dispatch) { navigation() }
-        AnimatedContent(targetState = page) {
-            when (page) {
-                PageType.CALIBRATION_LIST -> CalibrationList(entities, viewModel::dispatch)
-                PageType.CALIBRATION_DETAIL -> CalibrationDetail(
-                    entities.toList(),
-                    selected,
-                    uiFlags,
-                    viewModel::dispatch
-                )
-
-                else -> {}
-            }
+    LaunchedEffect(key1 = uiFlags) {
+        if (uiFlags is UiFlags.Message) {
+            snackbarHostState.showSnackbar((uiFlags as UiFlags.Message).message)
+            viewModel.dispatch(CalibrationIntent.Flags(UiFlags.none()))
         }
     }
-}
 
+//    Column {
+//        CalibrationAppBar(entities.toList(), selected, page, viewModel::dispatch) { navigation() }
+//        AnimatedContent(targetState = page) {
+//            when (page) {
+//                PageType.CALIBRATION_LIST -> CalibrationList(entities, viewModel::dispatch)
+//                PageType.CALIBRATION_DETAIL -> CalibrationDetail(
+//                    entities.toList(),
+//                    selected,
+//                    uiFlags,
+//                    viewModel::dispatch
+//                )
+//
+//                else -> {}
+//            }
+//        }
+//    }
+}
 
 @Composable
 fun CalibrationList(
     entities: LazyPagingItems<Calibration>,
-    dispatch: (CalibrationIntent) -> Unit
+    uiEvent: (CalibrationIntent) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackbarHostState.current
@@ -126,13 +135,13 @@ fun CalibrationList(
                 item = item,
                 onClick = {
                     scope.launch {
-                        dispatch(CalibrationIntent.Selected(item.id))
-                        dispatch(CalibrationIntent.NavTo(PageType.CALIBRATION_DETAIL))
+                        uiEvent(CalibrationIntent.Selected(item.id))
+                        uiEvent(CalibrationIntent.NavTo(PageType.CALIBRATION_DETAIL))
                     }
                 },
                 onDelete = {
                     scope.launch {
-                        dispatch(CalibrationIntent.Delete(item.id))
+                        uiEvent(CalibrationIntent.Delete(item.id))
                         snackbarHostState.showSnackbar("删除成功")
                     }
                 }
@@ -141,6 +150,7 @@ fun CalibrationList(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun CalibrationDetail(
     entities: List<Calibration>,
@@ -219,7 +229,7 @@ fun CalibrationDetail(
                                 )
                                 innerTextField()
                             }
-                            HorizontalDivider()
+                            Divider()
                         }
                     }
                 )
@@ -255,12 +265,11 @@ fun CalibrationDetail(
                 key = calibration.points.size,
                 index = index,
                 item = item,
+                uiFlags = uiFlags,
                 onClick = { flag ->
                     scope.launch {
                         if (flag == 0) {
-                            if (uiFlags is UiFlags.None) {
-                                dispatch(CalibrationIntent.Transfer(calibration.index, item.y))
-                            }
+                            dispatch(CalibrationIntent.Transfer(calibration.index, item.y))
                         } else {
                             val points = calibration.points.toMutableList()
                             points.remove(item)

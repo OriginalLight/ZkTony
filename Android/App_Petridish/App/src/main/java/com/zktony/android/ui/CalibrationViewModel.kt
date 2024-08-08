@@ -145,15 +145,17 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
                             }
                         }
                     }
+
+
+
                     if (ids.size > 1) {
                         //移动上盘到原点距离
                         tx {
                             move(MoveType.MOVE_PULSE) {
                                 index = 3
                                 pulse = (3200L * spydjl).toLong();
-                                
-                            }
 
+                            }
                             //移动下盘到原点距离
                             move(MoveType.MOVE_PULSE) {
                                 index = 4
@@ -177,6 +179,55 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
                                 
                             }
                         }
+//                        if(getGpio(3)){
+//                            tx {
+//                                timeout = 1000L * 10
+//                                move(MoveType.MOVE_PULSE) {
+//                                    index = 3
+//                                    pulse = 800L
+//
+//                                }
+//                            }
+//
+//                            tx {
+//                                timeout = 1000L * 10
+//                                move(MoveType.MOVE_PULSE) {
+//                                    index = 3
+//                                    pulse = 3200L * -3
+//
+//                                }
+//                            }
+//                        }else{
+//                            tx {
+//                                timeout = 1000L * 60
+//                                move(MoveType.MOVE_PULSE) {
+//                                    index = 3
+//                                    pulse = 3200L * -30
+//
+//                                }
+//
+//                            }
+//
+//                            tx {
+//                                timeout = 1000L * 10
+//                                move(MoveType.MOVE_PULSE) {
+//                                    index = 3
+//                                    pulse = 800L
+//
+//                                }
+//                            }
+//
+//                            tx {
+//                                timeout = 1000L * 10
+//                                move(MoveType.MOVE_PULSE) {
+//                                    index = 3
+//                                    pulse = 3200L * -3
+//
+//                                }
+//                            }
+//                        }
+
+
 
                     }
 

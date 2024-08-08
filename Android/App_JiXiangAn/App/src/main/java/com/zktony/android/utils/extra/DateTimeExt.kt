@@ -12,7 +12,6 @@ import java.util.*
 /**
  * 将秒数转化为分秒格式
  */
-@SuppressLint("DefaultLocale")
 fun Int.timeFormat(): String {
     val mm = this % 3600 / 60
     val ss = this % 3600 % 60
@@ -22,7 +21,6 @@ fun Int.timeFormat(): String {
 /**
  * 将秒数转化为分秒格式
  */
-@SuppressLint("DefaultLocale")
 fun Long.timeFormat(): String {
     val temp = this.toInt()
     val hh = temp / 3600

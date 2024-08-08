@@ -1,21 +1,26 @@
+import com.android.build.gradle.internal.api.ApkVariantOutputImpl
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Date
+
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
 }
 
 android {
+
     compileSdk = libs.versions.compileSdk.get().toInt()
     namespace = "com.zktony.android"
     defaultConfig {
         applicationId = "com.zktony.android"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "0.0.1"
-
+        versionCode = 7
+        versionName = "3.0.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -23,17 +28,18 @@ android {
         debug {
             isDebuggable = true
             signingConfig = signingConfigs.getByName("debug")
-            applicationIdSuffix = ".jxa.debug"
+            applicationIdSuffix = ".manual.debug"
         }
 
         release {
             isMinifyEnabled = true
             signingConfig = signingConfigs.getByName("debug")
-            applicationIdSuffix = ".jxa.release"
+            applicationIdSuffix = ".manual.release"
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
         }
+
     }
 
     signingConfigs {
@@ -57,17 +63,13 @@ android {
         buildConfig = true
     }
 
-    composeCompiler {
-        enableStrongSkippingMode = true
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
     }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
     packaging {
@@ -81,12 +83,13 @@ android {
         jniLibs.keepDebugSymbols += listOf(
             "*/x86/*.so", "*/x86_64/*.so", "*/armeabi-v7a/*.so", "*/arm64-v8a/*.so"
         )
+
     }
 
     applicationVariants.all {
         outputs.all {
-            (this as? com.android.build.gradle.internal.api.ApkVariantOutputImpl)?.outputFileName =
-                "App-JiXiangAn-${versionName}-${name}.apk"
+            (this as? ApkVariantOutputImpl)?.outputFileName =
+                "zktony-manual-${versionName}-${name}.apk"
         }
     }
 
@@ -97,27 +100,30 @@ android {
 }
 
 dependencies {
+    implementation("org.jetbrains:annotations:15.0")
     val composeBom = platform(libs.androidx.compose.bom)
-
+    ksp(libs.androidx.room.compiler)
     ksp(libs.hilt.compiler)
 
-    implementation(project(mapOf("path" to ":App_DataStore")))
-    implementation(project(mapOf("path" to ":App_Log")))
-    implementation(project(mapOf("path" to ":App_Room")))
     implementation(project(mapOf("path" to ":Lib_SerialPort")))
-
-    implementation(libs.accompanist.permissions)
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.21")
+    implementation("com.blankj:utilcode:1.30.7")
+    implementation("com.google.accompanist:accompanist-permissions:0.24.7-alpha")
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material.iconsExtended)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.paging)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.lifecycle.runtime)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewModelCompose)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.paging)
+    implementation(libs.androidx.room.runtime)
     implementation(libs.gson)
     implementation(libs.hilt.android)
     implementation(libs.okhttp3)

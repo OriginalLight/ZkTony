@@ -322,6 +322,7 @@ fun MenuContent(
 
                 enabled = uiState.loading == 0,
                 onClick = {
+//                    event(HomeEvent.spStart(valveOne.value))
                     if (isResetBool.value) {
                         if (spStartNum < 8) {
                             if (valveOne.value == 7) {
@@ -355,7 +356,6 @@ fun MenuContent(
                 modifier = Modifier
                     .width(140.dp)
                     .padding(start = 20.dp, top = 10.dp),
-
                 enabled = uiState.loading == 2,
                 onClick = {
                     event(HomeEvent.xpStart)

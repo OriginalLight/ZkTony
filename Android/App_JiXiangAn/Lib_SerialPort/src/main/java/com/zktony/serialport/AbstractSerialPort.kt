@@ -1,9 +1,9 @@
 package com.zktony.serialport
 
-import android.util.Log
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.core.SerialPort
 import com.zktony.serialport.ext.toHexString
+import com.zktony.serialport.utils.logInfo
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
@@ -29,7 +29,7 @@ abstract class AbstractSerialPort {
     private val buffer = ByteArrayOutputStream()
     private val byteArrayQueue = LinkedBlockingQueue<ByteArray>()
 
-    val callbacks : MutableMap<String, (ByteArray) -> Unit> = ConcurrentHashMap()
+    val callbacks: MutableMap<String, (ByteArray) -> Unit> = ConcurrentHashMap()
 
     /**
      * Open the serial port
@@ -99,8 +99,10 @@ abstract class AbstractSerialPort {
             if (buffer.size() > 0) {
                 try {
                     if (config.log) {
-                        Log.i(config.device, "RX: ${buffer.toByteArray().toHexString()}")
-                        Log.i(config.device, "Callbacks: ${callbacks.keys}")
+                        logInfo(
+                            config.device,
+                            "RX: ${buffer.toByteArray().toHexString()}"
+                        )
                     }
                     callbacks.values.forEach { it.invoke((buffer.toByteArray())) }
                 } catch (ex: Exception) {
@@ -156,7 +158,7 @@ abstract class AbstractSerialPort {
                     val message = byteArrayQueue.poll(config.delay, TimeUnit.MILLISECONDS)
                     if (message != null) {
                         if (config.log) {
-                            Log.i(config.device, "TX: ${message.toHexString()}")
+                            logInfo(config.device, "TX: ${message.toHexString()}")
                         }
                         send(message)
                     }

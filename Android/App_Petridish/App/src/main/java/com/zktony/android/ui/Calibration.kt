@@ -340,7 +340,7 @@ fun CalibrationList(
                         isResetBool_ex = true
                         event(
                             CalibrationEvent.Reset(
-                                listOf(1, 0, 2, 4, 5),
+                                listOf(1, 0, 2, 4, 3),
                                 spydjl.value.toDouble(),
                                 xpydjl.value.toDouble(),
                                 fwgd.value.toDouble(),

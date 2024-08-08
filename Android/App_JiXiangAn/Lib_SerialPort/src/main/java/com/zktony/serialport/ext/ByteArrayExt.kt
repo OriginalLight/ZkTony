@@ -6,6 +6,7 @@ import java.util.Locale
 
 // https://www.jianshu.com/p/8ee33de703e2
 
+@OptIn(ExperimentalStdlibApi::class)
 fun ByteArray.toHexString(hasSpace: Boolean = true) =
     this.joinToString(if (hasSpace) " " else "") { String.format("%02X", it) }
 
@@ -428,28 +429,7 @@ fun ByteArray.splitByteArray(head: ByteArray, end: ByteArray): List<ByteArray> {
                 byteArray = byteArray.copyOfRange(bytes.size, byteArray.size)
             }
         } else {
-            break
-        }
-    }
-    return list
-}
-
-fun ByteArray.splitByteArray(): List<ByteArray> {
-    if (this.size < 11) return listOf()
-    var byteArray = this.copyOfRange(0, this.size)
-    val list = mutableListOf<ByteArray>()
-    while (byteArray.isNotEmpty()) {
-        val length = byteArray.readInt16LE(3)
-        val pacLength = length + 11
-        if (byteArray.size >= pacLength) {
-            val bytes = byteArray.copyOfRange(0, pacLength)
-            list.add(bytes)
-            if (bytes.size == byteArray.size) {
-                break
-            } else {
-                byteArray = byteArray.copyOfRange(pacLength, byteArray.size)
-            }
-        } else {
+            list.add(byteArray)
             break
         }
     }

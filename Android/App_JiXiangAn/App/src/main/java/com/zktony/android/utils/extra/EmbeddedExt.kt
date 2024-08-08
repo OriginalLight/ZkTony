@@ -1,28 +1,22 @@
 package com.zktony.android.utils.extra
 
-import android.util.Log
 import com.zktony.serialport.command.Protocol
-import com.zktony.serialport.ext.readInt16LE
 import com.zktony.serialport.ext.readInt8
 import com.zktony.serialport.ext.toAsciiString
 import com.zktony.serialport.ext.writeInt16LE
 import com.zktony.serialport.ext.writeInt32LE
 import com.zktony.serialport.lifecycle.SerialStoreUtils
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import com.zktony.serialport.utils.logInfo
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import java.io.File
 
-suspend fun embeddedUpgrade(hexFile: File) = channelFlow {
-    val key = "embeddedUpgrade"
+suspend fun embeddedUpgrade(hexFile: File,keyName:String,serialName:String) = channelFlow {
+    val key = keyName
     val byteLength = 1024
-    val serialPort = SerialStoreUtils.get("rtu") ?: return@channelFlow
+    val serialPort = SerialStoreUtils.get(serialName) ?: return@channelFlow
     try {
         var flag = -1
         var rx: Boolean
@@ -32,7 +26,7 @@ suspend fun embeddedUpgrade(hexFile: File) = channelFlow {
                 launch {
                     when(it.func) {
                         0xA0.toByte() -> {
-                            Log.d("EmbeddedExt", "升级准备就绪")
+                            logInfo("EmbeddedExt", "升级准备就绪")
                             flag = if (it.data.readInt8() == 1) {
                                 -1
                             } else {
@@ -40,7 +34,7 @@ suspend fun embeddedUpgrade(hexFile: File) = channelFlow {
                             }
                         }
                         0xA1.toByte() -> {
-                            Log.d("EmbeddedExt", "升级数据信息就绪")
+                            logInfo("EmbeddedExt", "升级数据信息就绪")
                             flag = if (it.data.readInt8() == 1) {
                                 -1
                             } else {
@@ -48,7 +42,7 @@ suspend fun embeddedUpgrade(hexFile: File) = channelFlow {
                             }
                         }
                         0xA2.toByte() -> {
-                            Log.d("EmbeddedExt", "地址擦除就绪")
+                            logInfo("EmbeddedExt", "地址擦除就绪")
                             flag = if (it.data.readInt8() == 1) {
                                 -1
                             } else {
@@ -65,15 +59,15 @@ suspend fun embeddedUpgrade(hexFile: File) = channelFlow {
                             if (it.data.readInt8() == 1) {
                                 flag = -1
                                 send(UpgradeState.Err(Exception("升级失败")))
-                                Log.e("EmbeddedExt", "升级失败")
+                                logInfo("EmbeddedExt", "升级失败")
                             } else {
                                 send(UpgradeState.Success)
                                 flag = 3
-                                Log.d("EmbeddedExt", "升级成功")
+                                logInfo("EmbeddedExt", "升级成功")
                             }
                         }
                         else -> {
-                            Log.d("EmbeddedExt", "未知命令")
+                            logInfo("EmbeddedExt", "未知命令")
                         }
                     }
                 }
@@ -146,7 +140,7 @@ suspend fun embeddedUpgrade(hexFile: File) = channelFlow {
             }
         }
     } catch (e: Exception) {
-        Log.e("EmbeddedExt", e.message ?: "Unknown Error")
+        logInfo("EmbeddedExt", e.message ?: "Unknown Error")
         send(UpgradeState.Err(e))
     } finally {
         serialPort.unregisterCallback(key)
@@ -156,7 +150,7 @@ suspend fun embeddedUpgrade(hexFile: File) = channelFlow {
 suspend fun embeddedVersion(): String {
     var version = "Unknown"
     val key = "embeddedVersion"
-    val serialPort = SerialStoreUtils.get("rtu") ?: return version
+    val serialPort = SerialStoreUtils.get("zkty") ?: return version
     try {
         // 注册回调
         serialPort.registerCallback(key) { bytes ->
@@ -177,7 +171,7 @@ suspend fun embeddedVersion(): String {
             }
         }
     } catch (e: Exception) {
-        Log.e("EmbeddedExt", e.message ?: "Unknown")
+        logInfo("EmbeddedExt", e.message ?: "Unknown")
     } finally {
         // 取消注册
         serialPort.unregisterCallback(key)
