@@ -257,266 +257,266 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
     /**
      * 上培养皿运动
      */
-//    private fun spStart(runIndex: Int) {
-//        viewModelScope.launch {
-//
-//            /**
-//             * 举升1复位高度
-//             */
-//            val fwgd = dataSaver.readData("fwgd", 0f);
-//
-//
-//            /**
-//             * 举升1上盘高度
-//             */
-//            val spgd = dataSaver.readData("spgd", 0f);
-//
-//
-//            /**
-//             * 举升2复位高度
-//             */
-//            val fwgd2 = dataSaver.readData("fwgd2", 0f);
-//
-//
-//            /**
-//             * 举升2上盘高度
-//             */
-//            val spgd2 = dataSaver.readData("spgd2", 0f);
-//
-//
-//            /**
-//             * 1.获取移动步数
-//             */
-//
-//            spStratBool = true
-//            var spydjl = dataSaver.readData("spydjl", 0f)
-//            var spydbs = (spydjl * 3200).toLong()
-//            if (runIndex == 0) {
-//                spydbs += 8 * 3198
-//            } else {
-//                spydbs += runIndex * 3198
-//            }
-//
-//            println("runIndex===" + runIndex + "spydbs===" + spydbs)
-//
-//            /**
-//             * 1.举升1到上盘高度
-//             *
-//             * 2.上盘移动400步
-//             *
-//             * 3.1举升1到复位高度
-//             * 3.2举升2到上盘高度
-//             *
-//             * 4.上盘移动剩余的1266
-//             *
-//             * 5.举升2到复位高度
-//             *
-//             */
-//            tx {
-//                move(MoveType.MOVE_PULSE) {
-//                    index = 1
-//                    pulse = (spgd * 3200L).toLong()
-//                }
-//            }
-//
-//            tx {
-//                move(MoveType.MOVE_PULSE) {
-//                    index = 3
-//                    pulse = spydbs - 2700
-//                }
-//            }
-//
-//            tx {
-//                move(MoveType.MOVE_PULSE) {
-//                    index = 1
-//                    pulse = (fwgd * 3200L).toLong()
-//                }
-//                move(MoveType.MOVE_PULSE) {
-//                    index = 0
-//                    pulse = (spgd2 * 3200L).toLong()
-//                }
-//
-//            }
-//
-//            tx {
-//                move(MoveType.MOVE_PULSE) {
-//                    index = 3
-//                    pulse = spydbs
-//                }
-//            }
-//
-//            tx {
-//                move(MoveType.MOVE_PULSE) {
-//                    index = 0
-//                    pulse = (fwgd2 * 3200L).toLong()
-//                }
-//
-//            }
-//
-//
-//        }
-//
-//    }
+    private fun spStart(runIndex: Int) {
+        viewModelScope.launch {
+
+            /**
+             * 举升1复位高度
+             */
+            val fwgd = dataSaver.readData("fwgd", 0f);
+
+
+            /**
+             * 举升1上盘高度
+             */
+            val spgd = dataSaver.readData("spgd", 0f);
+
+
+            /**
+             * 举升2复位高度
+             */
+            val fwgd2 = dataSaver.readData("fwgd2", 0f);
+
+
+            /**
+             * 举升2上盘高度
+             */
+            val spgd2 = dataSaver.readData("spgd2", 0f);
+
+
+            /**
+             * 1.获取移动步数
+             */
+
+            spStratBool = true
+            var spydjl = dataSaver.readData("spydjl", 0f)
+            var spydbs = (spydjl * 3200).toLong()
+            if (runIndex == 0) {
+                spydbs += 8 * 3198
+            } else {
+                spydbs += runIndex * 3198
+            }
+
+            println("runIndex===" + runIndex + "spydbs===" + spydbs)
+
+            /**
+             * 1.举升1到上盘高度
+             *
+             * 2.上盘移动400步
+             *
+             * 3.1举升1到复位高度
+             * 3.2举升2到上盘高度
+             *
+             * 4.上盘移动剩余的1266
+             *
+             * 5.举升2到复位高度
+             *
+             */
+            tx {
+                move(MoveType.MOVE_PULSE) {
+                    index = 1
+                    pulse = (spgd * 3200L).toLong()
+                }
+            }
+
+            tx {
+                move(MoveType.MOVE_PULSE) {
+                    index = 3
+                    pulse = spydbs - 2700
+                }
+            }
+
+            tx {
+                move(MoveType.MOVE_PULSE) {
+                    index = 1
+                    pulse = (fwgd * 3200L).toLong()
+                }
+                move(MoveType.MOVE_PULSE) {
+                    index = 0
+                    pulse = (spgd2 * 3200L).toLong()
+                }
+
+            }
+
+            tx {
+                move(MoveType.MOVE_PULSE) {
+                    index = 3
+                    pulse = spydbs
+                }
+            }
+
+            tx {
+                move(MoveType.MOVE_PULSE) {
+                    index = 0
+                    pulse = (fwgd2 * 3200L).toLong()
+                }
+
+            }
+
+
+        }
+
+    }
 
     /**
      * 下培养皿运动
      */
-//    private fun xpStart() {
+    private fun xpStart() {
+        viewModelScope.launch {
+
+            if (xpStartNum < 8) {
+
+                /**
+                 * 举升1复位高度
+                 */
+                val fwgd = dataSaver.readData("fwgd", 0f);
+
+
+                /**
+                 * 举升1上盘高度
+                 */
+                val spgd = dataSaver.readData("spgd", 0f);
+
+
+                /**
+                 * 举升2复位高度
+                 */
+                val fwgd2 = dataSaver.readData("fwgd2", 0f);
+
+
+                /**
+                 * 举升2上盘高度
+                 */
+                val spgd2 = dataSaver.readData("spgd2", 0f);
+
+
+                /**
+                 * 1.获取移动步数
+                 */
+                var spydjl = dataSaver.readData("spydjl", 0f)
+                var spydbs = (spydjl * 3200).toLong()
+                spydbs += (spStartNum + xpStartNum) * 3198
+
+                /**
+                 * 1.举升1到上盘高度
+                 *
+                 * 2.上盘移动400步
+                 *
+                 * 3.1举升1到复位高度
+                 * 3.2举升2到上盘高度
+                 *
+                 * 4.上盘移动剩余的1266
+                 *
+                 * 5.举升2到复位高度
+                 *
+                 */
+                tx {
+                    move(MoveType.MOVE_PULSE) {
+                        index = 1
+                        pulse = (spgd * 3200L).toLong()
+                    }
+                }
+
+                tx {
+                    move(MoveType.MOVE_PULSE) {
+                        index = 3
+                        pulse = spydbs - 2700
+                    }
+                }
+
+                tx {
+                    move(MoveType.MOVE_PULSE) {
+                        index = 1
+                        pulse = (fwgd * 3200L).toLong()
+                    }
+                    move(MoveType.MOVE_PULSE) {
+                        index = 0
+                        pulse = (spgd2 * 3200L).toLong()
+                    }
+
+                }
+
+                tx {
+                    move(MoveType.MOVE_PULSE) {
+                        index = 3
+                        pulse = spydbs
+                    }
+                }
+
+                tx {
+                    move(MoveType.MOVE_PULSE) {
+                        index = 0
+                        pulse = (fwgd2 * 3200L).toLong()
+                    }
+
+                }
+
+                if (_spCount.value == 7) {
+                    _spCount.value = 0
+                } else {
+                    _spCount.value += 1
+                }
+                xpStartNum += 1
+            }
+
+
+        }
+
+
+    }
+
+
+//    private fun spStart(runIndex: Int) {
 //        viewModelScope.launch {
+//            tx {
+//                queryGpio(5)
+//                delay = 1000L
+//            }
 //
-//            if (xpStartNum < 8) {
+//            /**
+//             * 获取是否有培养皿
+//             * false=没有
+//             * true=有
+//             */
+//            val jiance1 = getGpio(5)
+//            println("获取是否有培养皿:$jiance1")
 //
-//                /**
-//                 * 举升1复位高度
-//                 */
-//                val fwgd = dataSaver.readData("fwgd", 0f);
+//            val ids = listOf(1, 0, 2, 4, 3)
+//            tx {
+//                queryGpio(ids)
+//                delay = 1000L
+//            }
+//            ids.forEach {
+//                println("获取it的光电:${getGpio(it)}")
 //
-//
-//                /**
-//                 * 举升1上盘高度
-//                 */
-//                val spgd = dataSaver.readData("spgd", 0f);
-//
-//
-//                /**
-//                 * 举升2复位高度
-//                 */
-//                val fwgd2 = dataSaver.readData("fwgd2", 0f);
-//
-//
-//                /**
-//                 * 举升2上盘高度
-//                 */
-//                val spgd2 = dataSaver.readData("spgd2", 0f);
-//
-//
-//                /**
-//                 * 1.获取移动步数
-//                 */
-//                var spydjl = dataSaver.readData("spydjl", 0f)
-//                var spydbs = (spydjl * 3200).toLong()
-//                spydbs += (spStartNum + xpStartNum) * 3198
-//
-//                /**
-//                 * 1.举升1到上盘高度
-//                 *
-//                 * 2.上盘移动400步
-//                 *
-//                 * 3.1举升1到复位高度
-//                 * 3.2举升2到上盘高度
-//                 *
-//                 * 4.上盘移动剩余的1266
-//                 *
-//                 * 5.举升2到复位高度
-//                 *
-//                 */
-//                tx {
-//                    move(MoveType.MOVE_PULSE) {
-//                        index = 1
-//                        pulse = (spgd * 3200L).toLong()
-//                    }
-//                }
-//
-//                tx {
-//                    move(MoveType.MOVE_PULSE) {
-//                        index = 3
-//                        pulse = spydbs - 2700
-//                    }
-//                }
-//
-//                tx {
-//                    move(MoveType.MOVE_PULSE) {
-//                        index = 1
-//                        pulse = (fwgd * 3200L).toLong()
-//                    }
-//                    move(MoveType.MOVE_PULSE) {
-//                        index = 0
-//                        pulse = (spgd2 * 3200L).toLong()
-//                    }
-//
-//                }
-//
-//                tx {
-//                    move(MoveType.MOVE_PULSE) {
-//                        index = 3
-//                        pulse = spydbs
-//                    }
-//                }
-//
-//                tx {
-//                    move(MoveType.MOVE_PULSE) {
-//                        index = 0
-//                        pulse = (fwgd2 * 3200L).toLong()
-//                    }
-//
-//                }
-//
-//                if (_spCount.value == 7) {
-//                    _spCount.value = 0
-//                } else {
-//                    _spCount.value += 1
-//                }
-//                xpStartNum += 1
 //            }
 //
 //
 //        }
 //
+//    }
+//
+//    private fun xpStart() {
+//        viewModelScope.launch {
+//            tx {
+//                /**
+//                 * 检测培养皿是否摆放正确
+//                 */
+//                queryGpio(6)
+//                delay = 1000L
+//            }
+//
+//
+//            /**
+//             * 获取检测培养皿是否摆放正确
+//             * false=摆放错误
+//             * true=摆放正确
+//             */
+//            val jiance2 = getGpio(6)
+//            println("获取检测培养皿是否摆放正确:$jiance2")
+//        }
 //
 //    }
-
-
-    private fun spStart(runIndex: Int) {
-        viewModelScope.launch {
-            tx {
-                queryGpio(5)
-                delay = 1000L
-            }
-
-            /**
-             * 获取是否有培养皿
-             * false=没有
-             * true=有
-             */
-            val jiance1 = getGpio(5)
-            println("获取是否有培养皿:$jiance1")
-
-            val ids = listOf(1, 0, 2, 4, 3)
-            tx {
-                queryGpio(ids)
-                delay = 1000L
-            }
-            ids.forEach {
-                println("获取it的光电:${getGpio(it)}")
-
-            }
-
-
-        }
-
-    }
-
-    private fun xpStart() {
-        viewModelScope.launch {
-            tx {
-                /**
-                 * 检测培养皿是否摆放正确
-                 */
-                queryGpio(6)
-                delay = 1000L
-            }
-
-
-            /**
-             * 获取检测培养皿是否摆放正确
-             * false=摆放错误
-             * true=摆放正确
-             */
-            val jiance2 = getGpio(6)
-            println("获取检测培养皿是否摆放正确:$jiance2")
-        }
-
-    }
 
 
     private fun PumpingOrRecrement(int: Int) {
