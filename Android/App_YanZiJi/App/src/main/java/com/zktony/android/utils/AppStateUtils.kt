@@ -4,6 +4,7 @@ import com.zktony.android.data.Arguments
 import com.zktony.android.data.ChannelState
 import com.zktony.android.data.ExperimentalState
 import com.zktony.android.data.LedState
+import com.zktony.android.data.SoundType
 import com.zktony.android.data.ZktyError
 import com.zktony.android.data.equateTo
 import com.zktony.android.ui.components.Tips
@@ -33,6 +34,7 @@ object AppStateUtils {
 
     // 心跳
     private val heartbeatList = MutableList(ProductUtils.MAX_CHANNEL_COUNT) { 0L }
+
     // 轮询
     private val pollingLock = Mutex(false)
 
@@ -83,6 +85,11 @@ object AppStateUtils {
     // 获取轮询锁
     fun getPollingLock(): Mutex {
         return pollingLock
+    }
+
+    // 获取心跳
+    fun getHeartbeat(channel: Int): Long {
+        return heartbeatList[channel]
     }
 
     // state set and get
@@ -143,13 +150,14 @@ object AppStateUtils {
     }
 
     fun setExperimentalState(channel: Int, state: ExperimentalState) {
-        _experimentalStateList.value = _experimentalStateList.value.mapIndexed { index, experimentalState ->
-            if (index == channel) {
-                state
-            } else {
-                experimentalState
+        _experimentalStateList.value =
+            _experimentalStateList.value.mapIndexed { index, experimentalState ->
+                if (index == channel) {
+                    state
+                } else {
+                    experimentalState
+                }
             }
-        }
     }
 
     fun getExperimentalState(channel: Int): ExperimentalState {
@@ -157,7 +165,7 @@ object AppStateUtils {
     }
 
     // 根据通道状态获取实验状态
-    fun setExperimentalStateHook(channel: Int, state: ChannelState) {
+    fun setChannelStateQueryHook(channel: Int, state: ChannelState) {
         // 错误
         if (state.errorInfo > 0L) {
             collectErrorLog(channel, state)
@@ -256,7 +264,8 @@ object AppStateUtils {
                         // update log
                         setChannelLog(channel, newLog)
                     }
-                    // 声音 TODO
+                    // 声音
+                    SoundUtils.play(SoundType.ERROR)
                 }
             }
         } catch (e: Exception) {
@@ -341,10 +350,10 @@ object AppStateUtils {
             heartbeatList[channel] = if (heart) {
                 0L
             } else {
-                heartbeatList[channel] + 1
+                heartbeatList[channel] + 1L
             }
 
-            if (heartbeatList[channel] > 10 + channel) {
+            if (heartbeatList[channel] == 10L + channel) {
                 transformExperimentalState(channel, ExperimentalState.ERROR)
                 val error = ZktyError.ERROR_18
                 channelErrorLogQueue.add(ErrorLog(code = error.code, channel = channel))

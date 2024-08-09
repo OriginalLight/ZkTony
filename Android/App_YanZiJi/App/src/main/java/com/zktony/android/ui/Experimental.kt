@@ -303,7 +303,7 @@ fun ExperimentalRealtimeState(
             )
             ExperimentalRealtimeItem(
                 modifier = Modifier.weight(1f),
-                title = "温度", value = "${channelState.time}℃"
+                title = "温度", value = "${channelState.temperature}℃"
             )
         }
     }
@@ -342,7 +342,7 @@ fun ExperimentalActions(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (channelState.errorInfo > 0L) {
+        if (channelState.errorInfo > 0L || experimentalState == ExperimentalState.ERROR) {
             OutlinedButton(
                 colors = ButtonDefaults.outlinedButtonColors(
                     contentColor = if (experimentalState == ExperimentalState.ERROR) MaterialTheme.colorScheme.error else zktyYellow
@@ -356,17 +356,16 @@ fun ExperimentalActions(
             }
         }
 
-        if (experimentalState == ExperimentalState.TIMING) {
-            Text(
-                modifier = Modifier.padding(bottom = 16.dp),
-                text = (program.timeSeconds() - channelState.time).timeFormat(),
-                fontSize = 36.sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.Monospace
-            )
-        }
-
         if (experimentalState.isRunning()) {
+            if (experimentalState == ExperimentalState.TIMING) {
+                Text(
+                    text = (program.timeSeconds() - channelState.time).timeFormat(),
+                    fontSize = 36.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.Monospace
+                )
+            }
+
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (experimentalState == ExperimentalState.PAUSE) {
                     Button(
@@ -428,11 +427,11 @@ fun ExperimentalActions(
 
         if (experimentalState == ExperimentalState.READY) {
 
-            log?.let {
+            if (log != null) {
                 OutlinedButton(
                     onClick = {
                         scope.launch {
-                            navigationActions.navigate(Route.LOG_DETAIL + "/${it.id}")
+                            navigationActions.navigate(Route.LOG_DETAIL + "/${log.id}")
                         }
                     }
                 ) {
@@ -440,19 +439,42 @@ fun ExperimentalActions(
                 }
             }
 
-            Button(
-                enabled = !loadingStart && program.canStart(channelState.opt1, channelState.opt2),
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {
-                    scope.launch {
-                        loadingStart = true
-                        viewModel.startExperiment(index, ExperimentalControl.fromProgram(program))
-                        loadingStart = false
+            if (program.experimentalType == 0 && channelState.opt2 == 0) {
+                Text(
+                    modifier = Modifier.padding(bottom = 16.dp),
+                    text = "请插入转膜盒",
+                    fontSize = 18.sp
+                )
+            } else if (program.experimentalType == 1 && channelState.opt1 == 0) {
+                Text(
+                    modifier = Modifier.padding(bottom = 16.dp),
+                    text = "请插入染色盒",
+                    fontSize = 18.sp
+                )
+            } else {
+                Button(
+                    enabled = !loadingStart && program.canStart(
+                        channelState.opt1,
+                        channelState.opt2
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        scope.launch {
+                            loadingStart = true
+                            viewModel.startExperiment(
+                                index,
+                                ExperimentalControl.fromProgram(program)
+                            )
+                            loadingStart = false
+                        }
                     }
-                }
-            ) {
-                ButtonLoading(loading = loadingStart) {
-                    Text(text = "开 始", fontSize = 18.sp)
+                ) {
+                    ButtonLoading(loading = loadingStart) {
+                        Text(
+                            text = "开始",
+                            fontSize = 18.sp
+                        )
+                    }
                 }
             }
         }

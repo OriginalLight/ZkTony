@@ -27,7 +27,7 @@ class SettingsRuntimeLogViewModel @Inject constructor() : ViewModel() {
 
     init {
         viewModelScope.launch {
-            _fileList.value = LogUtils.getLogs().sorted()
+            _fileList.value = LogUtils.getLogs().sorted().asReversed()
         }
     }
 
@@ -58,11 +58,13 @@ class SettingsRuntimeLogViewModel @Inject constructor() : ViewModel() {
                 File(dstDir).mkdirs()
             }
 
+            var count = 0
             selected.forEach { log ->
                 withContext(Dispatchers.IO) {
                     File(log.absolutePath).copyTo(File(dstDir + "/" + log.name), true)
                 }
                 delay(100L)
+                TipsUtils.showTips(Tips.info("导出 ${++count}/${selected.size}"))
             }
 
             TipsUtils.showTips(Tips.info("导出成功"))

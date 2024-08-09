@@ -1,6 +1,5 @@
 package com.zktony.android.ui
 
-import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -158,7 +157,6 @@ fun SettingsRuntimeLogListView(
 }
 
 // 运行日志列表项
-@SuppressLint("DefaultLocale")
 @Composable
 fun RuntimeLogItem(
     modifier: Modifier = Modifier,

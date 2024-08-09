@@ -185,7 +185,7 @@ fun ErrorLog.getItemAttributes(index: Int): List<Pair<String, Float>?> {
         Pair((index + 1).toString(), 1f),
         Pair((channel + 1).toString(), 1f),
         Pair(error?.name ?: "UNKNOWN_ERROR", 2f),
-        Pair(error?.message ?: "未知" , 4f),
+        Pair(error?.message ?: "未知", 4f),
         Pair(
             when (error?.severity) {
                 0 -> "警告"

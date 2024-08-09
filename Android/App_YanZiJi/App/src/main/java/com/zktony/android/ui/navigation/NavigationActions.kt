@@ -36,6 +36,8 @@ object Route {
     const val SETTINGS_DEBUG_EXPERIMENTAL = "SettingsDebugExperimental"
     const val SETTINGS_FQC = "SettingsFqc"
     const val SETTINGS_AGING = "SettingsAging"
+    const val SETTINGS_AGING_MODULE = "SettingsAgingModule"
+    const val SETTINGS_AGING_COMPLETE = "SettingsAgingComplete"
     const val SETTINGS_RUNTIME_LOG = "SettingsRuntimeLog"
 }
 

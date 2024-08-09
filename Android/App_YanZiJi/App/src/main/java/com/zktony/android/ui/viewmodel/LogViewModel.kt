@@ -9,15 +9,23 @@ import androidx.paging.cachedIn
 import com.zktony.android.data.NameTimeRangeQuery
 import com.zktony.android.data.defaults.defaultNameTimeRangeQuery
 import com.zktony.android.ui.components.Tips
+import com.zktony.android.utils.PdfUtils
+import com.zktony.android.utils.StorageUtils
 import com.zktony.android.utils.TipsUtils
+import com.zktony.android.utils.extra.dateFormat
 import com.zktony.log.LogUtils
 import com.zktony.room.repository.LogRepository
+import com.zktony.room.repository.LogSnapshotRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -26,7 +34,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class LogViewModel @Inject constructor(
-    private val logRepository: LogRepository
+    private val logRepository: LogRepository,
+    private val logSnapshotRepository: LogSnapshotRepository
 ) : ViewModel() {
     private val _selected = MutableStateFlow<List<Long>>(emptyList())
     private val _query = MutableStateFlow(defaultNameTimeRangeQuery())
@@ -86,6 +95,42 @@ class LogViewModel @Inject constructor(
         _query.value = query
         _selected.value = emptyList()
         TipsUtils.showTips(Tips.info("搜索成功"))
+    }
+
+    // 导出
+    suspend fun export() {
+        try {
+            val ids = _selected.value
+            if (ids.isEmpty()) {
+                return
+            }
+
+            val usbList = StorageUtils.getUsbStorageDir()
+            if (usbList.isEmpty()) {
+                TipsUtils.showTips(Tips.error("未检测到U盘"))
+                return
+            }
+
+            var count = 0
+            ids.forEach { id ->
+                withContext(Dispatchers.IO) {
+                    val log = logRepository.getById(id) ?: return@withContext
+                    val snapshots = logSnapshotRepository.getBySubId(id).first()
+                    val dstFile =
+                        usbList.first() + "/${log.createTime.dateFormat("yyyyMMddHHmmss")}.pdf"
+                    val file = File(dstFile)
+                    if (!file.exists()) {
+                        file.createNewFile()
+                    }
+                    PdfUtils.generatePdf(file, log, snapshots)
+                    TipsUtils.showTips(Tips.info("导出 ${++count}/${ids.size}"))
+                }
+            }
+            TipsUtils.showTips(Tips.info("导出成功"))
+        } catch (e: Exception) {
+            LogUtils.error(e.stackTraceToString(), true)
+            TipsUtils.showTips(Tips.error("导出失败"))
+        }
     }
 }
 

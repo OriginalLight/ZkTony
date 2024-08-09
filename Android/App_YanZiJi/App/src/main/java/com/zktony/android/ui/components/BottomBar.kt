@@ -8,13 +8,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.zktony.android.utils.Constants
-import com.zktony.datastore.rememberDataSaverState
 
 @Composable
 fun BottomBar(modifier: Modifier = Modifier) {
@@ -29,21 +26,8 @@ fun BottomBar(modifier: Modifier = Modifier) {
             )
             .padding(horizontal = 8.dp)
     ) {
-        // S/N
-        val sn by rememberDataSaverState(
-            key = Constants.SN,
-            initialValue = Constants.DEFAULT_SN,
-            senseExternalDataChange = true
-        )
-
         // Content
         Tips(modifier = Modifier.align(Alignment.CenterStart))
-
-        Text(
-            modifier = Modifier.align(Alignment.Center),
-            text = "S/N: $sn",
-            style = MaterialTheme.typography.bodyLarge
-        )
 
         Row(
             modifier = Modifier

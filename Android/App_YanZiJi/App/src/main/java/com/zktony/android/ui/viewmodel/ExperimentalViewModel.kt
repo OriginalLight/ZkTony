@@ -9,9 +9,7 @@ import com.zktony.android.data.ExperimentalControl
 import com.zktony.android.data.ExperimentalState
 import com.zktony.android.ui.components.Tips
 import com.zktony.android.utils.AppStateUtils
-import com.zktony.android.utils.PdfUtils
 import com.zktony.android.utils.SerialPortUtils
-import com.zktony.android.utils.StorageUtils
 import com.zktony.android.utils.TipsUtils
 import com.zktony.log.LogUtils
 import com.zktony.room.entities.ErrorLog
@@ -26,7 +24,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -56,6 +53,7 @@ class ExperimentalViewModel @Inject constructor(
     }
 
     suspend fun startExperiment(channel: Int, experimental: ExperimentalControl): Boolean {
+        LogUtils.info("startExperiment: $channel, $experimental", true)
         if (!SerialPortUtils.setExperimentalArguments(channel, experimental)) {
             TipsUtils.showTips(Tips.error("实验参数设置失败 通道：${channel + 1}"))
             return false
@@ -75,6 +73,7 @@ class ExperimentalViewModel @Inject constructor(
     }
 
     suspend fun pauseExperiment(channel: Int): Boolean {
+        LogUtils.info("pauseExperiment: $channel", true)
         if (!SerialPortUtils.setExperimentalState(channel, 2)) {
             TipsUtils.showTips(Tips.error("实验暂停失败 通道：${channel + 1}"))
             return false
@@ -86,6 +85,7 @@ class ExperimentalViewModel @Inject constructor(
     }
 
     suspend fun stopExperiment(channel: Int, experimentalType: Int): Boolean {
+        LogUtils.info("stopExperiment: $channel", true)
         if (!SerialPortUtils.setExperimentalState(channel, 3)) {
             TipsUtils.showTips(Tips.error("实验停止失败 通道：${channel + 1}"))
             return false
@@ -107,6 +107,7 @@ class ExperimentalViewModel @Inject constructor(
     private fun createLog(channel: Int) {
         viewModelScope.launch {
             try {
+                LogUtils.info("createLog: $channel", true)
                 val program = AppStateUtils.getChannelProgram(channel)
                 val log = program.toLog(channel)
                 withContext(Dispatchers.IO) {
@@ -121,6 +122,7 @@ class ExperimentalViewModel @Inject constructor(
 
     private fun setLogUpdateJob() {
         viewModelScope.launch {
+            LogUtils.info("setLogUpdateJob", true)
             val queue = AppStateUtils.channelLogQueue
             while (true) {
                 try {
@@ -142,16 +144,12 @@ class ExperimentalViewModel @Inject constructor(
 
     private fun setLogSnapshotCollectJob() {
         viewModelScope.launch {
+            LogUtils.info("setLogSnapshotCollectJob", true)
             val queue = AppStateUtils.channelLogSnapshotQueue
             val snapshots = mutableListOf<LogSnapshot>()
             while (true) {
                 try {
-                    while (queue.size > 0) {
-                        queue.poll()?.let {
-                            snapshots.add(it)
-                        }
-                    }
-
+                    queue.drainTo(snapshots)
                     if (snapshots.size > 0) {
                         withContext(Dispatchers.IO) {
                             logSnapshotRepository.insertAll(snapshots)
@@ -169,16 +167,12 @@ class ExperimentalViewModel @Inject constructor(
 
     private fun setErrorLogCollectJob() {
         viewModelScope.launch {
+            LogUtils.info("setErrorLogCollectJob", true)
             val queue = AppStateUtils.channelErrorLogQueue
             val errorLogs = mutableListOf<ErrorLog>()
             while (true) {
                 try {
-                    while (queue.size > 0) {
-                        queue.poll()?.let {
-                            errorLogs.add(it)
-                        }
-                    }
-
+                    queue.drainTo(errorLogs)
                     if (errorLogs.size > 0) {
                         withContext(Dispatchers.IO) {
                             errorLogRepository.insertAll(errorLogs)

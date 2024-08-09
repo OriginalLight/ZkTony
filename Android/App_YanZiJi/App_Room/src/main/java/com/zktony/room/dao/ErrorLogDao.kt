@@ -21,9 +21,11 @@ abstract class ErrorLogDao : BaseDao<ErrorLog> {
 
     @Query(
         """
-        SELECT * FROM error_logs
-        WHERE createTime < :expired
+        DELETE FROM error_logs
+        WHERE id NOT IN (
+            SELECT id FROM error_logs ORDER BY createTime DESC LIMIT :keep
+        )
         """
     )
-    abstract fun getBeforeTime(expired: Long): List<ErrorLog>
+    abstract suspend fun deleteOutOf(keep: Int) : Int
 }

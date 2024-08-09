@@ -119,12 +119,14 @@ class SettingsDebugExperimentalViewModel @Inject constructor() : ViewModel() {
                 return
             }
 
+            var count = 0
             srcFiles.forEach { file ->
                 withContext(Dispatchers.IO) {
                     file.copyTo(File(dstDir + "/" + file.name), true)
                     file.delete()
                 }
                 delay(100L)
+                TipsUtils.showTips(Tips.info("导出 ${++count}/${srcFiles.size}"))
             }
 
             TipsUtils.showTips(Tips.info("导出成功"))

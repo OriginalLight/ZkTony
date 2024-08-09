@@ -48,6 +48,8 @@ import com.zktony.android.ui.LogView
 import com.zktony.android.ui.LoginView
 import com.zktony.android.ui.ProgramAddOrUpdateView
 import com.zktony.android.ui.ProgramView
+import com.zktony.android.ui.SettingsAgingCompleteView
+import com.zktony.android.ui.SettingsAgingModuleView
 import com.zktony.android.ui.SettingsAgingView
 import com.zktony.android.ui.SettingsArgumentsEquipmentView
 import com.zktony.android.ui.SettingsArgumentsPumpView
@@ -141,6 +143,8 @@ fun AppNavigation() {
                 composable(Route.SETTINGS_DEBUG_EXPERIMENTAL) { SettingsDebugExperimentalView() }
                 composable(Route.SETTINGS_FQC) { SettingsFqcView() }
                 composable(Route.SETTINGS_AGING) { SettingsAgingView() }
+                composable(Route.SETTINGS_AGING_COMPLETE) { SettingsAgingCompleteView() }
+                composable(Route.SETTINGS_AGING_MODULE) { SettingsAgingModuleView() }
                 composable(Route.SETTINGS_RUNTIME_LOG) { SettingsRuntimeLogView() }
             }
         }

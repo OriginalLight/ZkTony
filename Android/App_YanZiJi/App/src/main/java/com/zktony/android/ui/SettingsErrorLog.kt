@@ -125,6 +125,7 @@ fun ErrorLogItem(
                 shape = MaterialTheme.shapes.medium
             )
             .clip(MaterialTheme.shapes.medium)
+            .clickable { }
             .padding(horizontal = 8.dp, vertical = 4.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically

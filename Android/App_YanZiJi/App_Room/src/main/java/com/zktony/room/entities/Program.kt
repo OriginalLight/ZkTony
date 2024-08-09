@@ -73,9 +73,9 @@ data class Program(
     fun canStart(opt1: Int, opt2: Int): Boolean {
         val bool = (value.toDoubleOrNull() ?: 0.0) > 0 && (time.toDoubleOrNull() ?: 0.0) > 0
         return if (experimentalType == 0) {
-            bool && (flowSpeed.toDoubleOrNull() ?: 0.0) > 0 && opt1 == 1
+            bool && (flowSpeed.toDoubleOrNull() ?: 0.0) > 0 && opt2 == 1
         } else {
-            bool && opt2 == 1
+            bool && opt1 == 1
         }
     }
 

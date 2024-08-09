@@ -14,10 +14,10 @@ import kotlinx.coroutines.launch
 
 @HiltWorker
 class LogCleanWork @AssistedInject constructor(
-    private val repo : LogRepository,
-    @Assisted appContext : Context,
-    @Assisted params : WorkerParameters
-) : Worker(appContext,params) {
+    private val repo: LogRepository,
+    @Assisted appContext: Context,
+    @Assisted params: WorkerParameters
+) : Worker(appContext, params) {
     override fun doWork(): Result {
         return try {
             CoroutineScope(Dispatchers.IO).launch {

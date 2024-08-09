@@ -30,9 +30,8 @@ class ErrorLogRepository @Inject constructor(
      * Clear expired log.
      */
     suspend fun clearExpiredLog() {
-        val expired = System.currentTimeMillis() - 30 * 24 * 60 * 60 * 1000L
-        val logs = errorLogDao.getBeforeTime(expired)
-        errorLogDao.deleteAll(logs)
-        android.util.Log.d("ErrorLogRepository", "clearExpiredLog: ${logs.size}")
+        // 只保留最新的10000条错误日志
+        val effect = errorLogDao.deleteOutOf(10000)
+        android.util.Log.d("ErrorLogRepository", "clearExpiredLog: $effect")
     }
 }

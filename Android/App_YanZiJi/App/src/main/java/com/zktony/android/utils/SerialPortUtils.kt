@@ -41,9 +41,9 @@ object SerialPortUtils {
             device = "/dev/ttyS2"
         }?.let {
             SerialStoreUtils.put("A", it)
-            LogUtils.info("下位机串口初始化完成: ID = A, Device = ttyS2", true)
+            LogUtils.info("A serialport init succeeded with ttyS2", true)
         } ?: {
-            LogUtils.error("下位机串口初始化化失败: ID = A, Device = ttyS2", true)
+            LogUtils.error("A serialport init failed with ttyS2", true)
         }
 
         // 初始化tec串口
@@ -51,9 +51,9 @@ object SerialPortUtils {
             device = "/dev/ttyS0"
         }?.let {
             SerialStoreUtils.put("B", it)
-            LogUtils.info("灯板串口初始化完成: ID = B, Device = ttyS0", true)
+            LogUtils.info("B serialport init succeeded with ttyS0", true)
         } ?: {
-            LogUtils.error("灯板串口初始化失败: ID = B, Device = ttyS0", true)
+            LogUtils.error("B  serialport init failed with ttyS0", true)
         }
     }
 
@@ -112,7 +112,8 @@ object SerialPortUtils {
         func: Byte,
         byteArray: ByteArray,
         timeOut: Long,
-        device: String = "A"
+        device: String = "A",
+        storage: Boolean = true
     ): ByteArray? {
         val serialPort = SerialStoreUtils.get(device) ?: return null
         val bytesList = mutableListOf<ByteArray>()
@@ -144,8 +145,8 @@ object SerialPortUtils {
             }
             if (ba == null) throw Exception("Query Return Failed")
         } catch (e: Exception) {
-            bytesList.forEach { LogUtils.error(key, it.toHexString(), true) }
-            LogUtils.error(key, e.stackTraceToString(), true)
+            bytesList.forEach { LogUtils.error(key, it.toHexString(), storage) }
+            LogUtils.error(key, e.stackTraceToString(), storage)
         } finally {
             serialPort.unregisterCallback(key)
         }
@@ -443,10 +444,17 @@ object SerialPortUtils {
     // 查询 ChannelState
     suspend fun queryChannelState(target: Int): Boolean {
         try {
-            val ba = query(target, "QueryChannelState", 0x40.toByte(), byteArrayOf(), 100)
+            val ba = query(
+                target = target,
+                key ="QueryChannelState",
+                func = 0x40.toByte(),
+                byteArray = byteArrayOf(),
+                timeOut = 100,
+                storage = AppStateUtils.getHeartbeat(channel = target) <= 10L + target
+            )
             if (ba != null) {
                 ChannelState.fromByteArray(ba)?.let { channelState ->
-                    AppStateUtils.setExperimentalStateHook(target, channelState)
+                    AppStateUtils.setChannelStateQueryHook(target, channelState)
                     AppStateUtils.setChannelState(target, channelState)
                 } ?: return false
                 return true
@@ -498,7 +506,7 @@ object SerialPortUtils {
     }
 
     // 升级
-    suspend fun upgrade(hexFile: File, device: String, target: Int) = channelFlow {
+    suspend fun upgrade(hexFile: File, device: String = "A", target: Int) = channelFlow {
         AppStateUtils.getPollingLock().withLock {
             delay(100L)
             val key = "upgrade"

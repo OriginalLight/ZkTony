@@ -173,7 +173,7 @@ fun RealTimeSensorView(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.medium)
                 .padding(horizontal = 24.dp, vertical = 12.dp),
-            text = "转膜盒光耦：" + if (channelState.opt1 == 0) "空闲" else "遮挡",
+            text = "转膜盒光耦：" + if (channelState.opt2 == 0) "空闲" else "遮挡",
             style = MaterialTheme.typography.bodyLarge
         )
 
@@ -181,7 +181,7 @@ fun RealTimeSensorView(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.medium)
                 .padding(horizontal = 24.dp, vertical = 12.dp),
-            text = "染色盒光耦：" + if (channelState.opt2 == 0) "空闲" else "遮挡",
+            text = "染色盒光耦：" + if (channelState.opt1 == 0) "空闲" else "遮挡",
             style = MaterialTheme.typography.bodyLarge
         )
     }

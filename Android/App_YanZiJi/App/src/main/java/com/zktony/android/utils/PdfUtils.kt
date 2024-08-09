@@ -57,7 +57,9 @@ object PdfUtils {
             // 创建一个表格
             document.add(generateTable(log))
             // 添加一个分页符
-            document.add(AreaBreak(AreaBreakType.NEXT_PAGE))
+            if (snapshots.isNotEmpty()) {
+                document.add(AreaBreak(AreaBreakType.NEXT_PAGE))
+            }
 
             // 时间-电流图
             generateChart(snapshots, 0)?.let {
@@ -183,9 +185,9 @@ object PdfUtils {
         var finalSnapshots: List<LogSnapshot> = snapshots
 
         if (snapshots.size > 20) {
-            // 从snapshots中根据时间取出30个数据
-            val scale = snapshots.size / 20
-            finalSnapshots = snapshots.filter { it.time % scale == 0 }.take(20)
+            // 从snapshots中根据index取出20个数据,均匀取
+            val step = snapshots.size / 20
+            finalSnapshots = snapshots.filterIndexed { index, _ -> index % step == 0 }
         }
 
         val points = Array(finalSnapshots.size) { arrayOf(0f, 0f) }
@@ -302,6 +304,7 @@ object PdfUtils {
             paint.apply {
                 color = 0xFF000000.toInt()
                 style = Paint.Style.FILL
+                textSize = 12f
             }
         )
 
@@ -319,6 +322,7 @@ object PdfUtils {
             paint.apply {
                 color = 0xFF000000.toInt()
                 style = Paint.Style.FILL
+                textSize = 12f
             }
         )
 

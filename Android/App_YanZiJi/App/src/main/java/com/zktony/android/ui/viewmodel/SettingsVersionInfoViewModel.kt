@@ -23,17 +23,17 @@ class SettingsVersionInfoViewModel @Inject constructor() : ViewModel() {
     val versionList = _versionList.asStateFlow()
 
     init {
-        queryVersion()
+        viewModelScope.launch {
+            queryVersion()
+        }
     }
 
-    fun queryVersion() {
-        viewModelScope.launch {
-            _versionList.value = listOf(BuildConfig.VERSION_NAME)
-            _versionList.value += SerialPortUtils.queryVersion(0, "B")
-            repeat(4) {
-                _versionList.value += SerialPortUtils.queryVersion(it)
-            }
+    suspend fun queryVersion() {
+        _versionList.value = listOf(BuildConfig.VERSION_NAME)
+        repeat(4) {
+            _versionList.value += SerialPortUtils.queryVersion(it)
         }
+        _versionList.value += SerialPortUtils.queryVersion(0, "B")
     }
 
     fun getApks(): List<File>? {
@@ -97,8 +97,8 @@ class SettingsVersionInfoViewModel @Inject constructor() : ViewModel() {
     }
 
     @SuppressLint("DefaultLocale")
-    suspend fun upgrade(file: File, device: String = "A", channel: Int = 0) {
-        SerialPortUtils.upgrade(File(file.absolutePath), device, channel).collect {
+    suspend fun upgrade(file: File, channel: Int = 0) {
+        SerialPortUtils.upgrade(File(file.absolutePath), target = channel).collect {
             when (it) {
                 is UpgradeState.Message -> {
                     TipsUtils.showTips(Tips.info(it.message))

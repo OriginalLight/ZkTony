@@ -165,7 +165,13 @@ fun LogTopBar(
             // 导出
             Button(
                 enabled = selected.isNotEmpty() && !loadingExport,
-                onClick = {}
+                onClick = {
+                    scope.launch {
+                        loadingExport = true
+                        viewModel.export()
+                        loadingExport = false
+                    }
+                }
             ) {
                 IconLoading(loading = loadingExport) {
                     Icon(imageVector = Icons.Default.ImportExport, contentDescription = "Export")
